@@ -56,7 +56,7 @@
         <h1>로봇 정도측정 계획(안)</h1>
         <div class="small" style="margin-top:4px; color:var(--muted)">B라인 갠트리 · 위치 정도 측정 및 검증</div>
       </div>
-      <span id="doc-version-badge" class="badge">v0.7</span>
+      <span id="doc-version-badge" class="badge">v0.11</span>
     </div>
     <div class="toc">
       <h3>목차</h3>
@@ -97,17 +97,19 @@
     <div><b>작업 일시</b> 2025년 10월 1일 ~ 10월 2일</div>
     <div><b>작업 장소</b> 자동용접 갠트리 B라인</div>
     <div><b>대상 설비</b> 갠트리 3대(G1, G2, G3) × 로봇 2대(R1, R2) = 총 6대</div>
-    <div><b>문서 버전</b> <span id="meta-version-text">v0.7</span> · <a href="#revision">변경 이력 보기</a></div>
+    <div><b>문서 버전</b> <span id="meta-version-text">v0.11</span> · <a href="#revision">변경 이력 보기</a></div>
   </div>
 
   <h2 id="sec-0-terms">0. 용어 정리</h2>
   <ul class="small">
     <li><b>GCS</b>: B라인 갠트리 3호기로 정의한 전역 좌표계(Global Coordinate System)</li>
     <li><b>O_R</b>: R축 회전센터(점)</li>
+    <li><b>GCU</b>: 건 센터 유닛 기준점(측정 기준점). 문서 내에서는 <b>P_gcu</b>로 좌표를 표기</li>
     <li><b>P_ball</b>: 비전 캘리브레이션 구 중심점</li>
     <li><b>TCP</b>: 로봇 툴센터포인트</li>
     <li><b>N</b>: R축 회전 각도 샘플 수(권장 ≥ 8, 균등 분포)</li>
-    <li><b>d_ref</b>: 기준거리, <code>d_ref = ||O_R − P_ball||</code></li>
+    <li><b>P_gcu</b>: GCU의 3D 좌표(측정/계산 결과)</li>
+    <li><b>d_ref</b>: 기준거리, <code>d_ref = ||P_gcu − P_ball||</code></li>
   </ul>
 
   <h2 id="sec-1-purpose">1. 목적</h2>
@@ -211,17 +213,17 @@
         <li>검증: 기준점 재측정 재현성 확인(허용오차 이내)</li>
       </ul>
     </li>
-    <li><b>1차 목표: O_R–비전 캘리브레이션 구 간 거리 계산</b>
+    <li><b>1차 목표: GCU–비전 캘리브레이션 구 간 거리 계산</b>
       <ul>
-        <li>비전 캘리브레이션 구 중심 <code>P_ball</code> 측정(TCS) 후 GCS로 변환</li>
-        <li><code>O_R</code> 또한 GCS로 변환하여 기준거리 <code>d_ref = ||O_R − P_ball||</code> 계산 및 기록</li>
+        <li>비전 캘리브레이션 구 중심 <code>P_ball</code>과 GCU 기준점 <code>P_gcu</code>를 측정(TCS) 후 GCS로 변환</li>
+        <li>기준거리 <code>d_ref = ||P_gcu − P_ball||</code> 계산 및 기록</li>
       </ul>
     </li>
-    <li><b>1차 목표 검증: TCP로 거리 일치 확인 및 편차 평가</b>
+    <li><b>1차 목표 검증: 기준거리 기반 TCP 이동 및 편차 평가</b>
       <ul>
         <li>로봇 TCP에 레이저 트래커(SMR) 장착</li>
-        <li><code>||TCP − P_ball|| = d_ref</code>가 되도록 목표점 T를 산정·이동</li>
-        <li>팬던트 표시 TCP값과 실측(<code>TCP_meas</code>)을 이용해 <code>Δd = | ||TCP_meas − P_ball|| − d_ref |</code> 및 축별/3D 편차 평가</li>
+        <li><code>||TCP − P_ball|| = d_ref</code>가 되도록 목표점 T를 산정·이동(기준거리만큼 TCP를 이동)</li>
+        <li>팬던트 표시 TCP값과 트래커 실측(<code>TCP_meas</code>)을 비교하여 <code>Δd = | ||TCP_meas − P_ball|| − d_ref |</code> 및 축별/3D 편차 평가</li>
       </ul>
     </li>
     <li><b>2차 목표: 팬던트 O_R 값 평가(1/2/3호기)</b>
@@ -236,10 +238,11 @@
         <li>갠트리 내 로봇 간 거리 <code>D_{ij}</code> 산출 후 설계치와 비교</li>
       </ul>
     </li>
-    <li><b>4차 목표: 공통 용접자세 근처 TCP 일치</b>
+    <li><b>4차 목표: 공통 자세 TCP 일치(팬던트 vs 트래커, R1↔R2)</b>
       <ul>
-        <li>각 호기별 공통지점 <code>P_common</code>에서 동일 용접자세로 위치</li>
-        <li>각각의 TCP를 측정하여 공통점임에도 불구하고 존재하는 <code>Δpos</code>, <code>Δori</code> 편차를 평가</li>
+        <li>각 호기별 공통지점 <code>P_common</code>에서 R1과 R2를 동일 자세로 위치</li>
+        <li>각 로봇의 <b>팬던트 TCP</b>와 <b>트래커 TCP_meas</b>를 모두 기록</li>
+        <li>R1↔R2 간 <code>Δpos</code>, <code>Δori</code>를 트래커 기준으로 산출하고, 팬던트 값과의 차이도 참고</li>
       </ul>
     </li>
   </ol>
@@ -279,10 +282,10 @@
   <h2 id="sec-9-records">9. 데이터 기록표</h2>
   <p class="small">※ 1차~4차 목표에 맞춘 기록 양식으로 일원화했습니다.</p>
 
-  <h3>9.1 1차 목표 — TCP 거리 일치 검증</h3>
-  <table aria-label="1차 목표 기록표">
+  <h3>9.1 1차 목표 — GCU–캘리브레이션 기준거리 기반 TCP 검증</h3>
+  <table aria-label="1차 목표 기록표 (GCU–캘리브레이션)">
     <thead>
-      <tr><th>설비-로봇</th><th>d_ref = ||O_R − P_ball|| (mm)</th><th>Trial</th><th>||TCP_meas − P_ball|| (mm)</th><th>Δd (mm)</th><th>ΔX</th><th>ΔY</th><th>ΔZ</th><th>판정</th><th>비고</th></tr>
+      <tr><th>설비-로봇</th><th>d_ref = ||P_gcu − P_ball|| (mm)</th><th>Trial</th><th>||TCP_meas − P_ball|| (mm)</th><th>Δd (mm)</th><th>ΔX</th><th>ΔY</th><th>ΔZ</th><th>판정</th><th>비고</th></tr>
     </thead>
     <tbody>
       <tr><td>G1-R1</td><td></td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
@@ -299,13 +302,13 @@
     </tfoot>
   </table>
 
-  <h3>9.2 2차 목표 — 팬던트 O_R 비교</h3>
-  <table aria-label="2차 목표 기록표">
+  <h3>9.2 2차 목표 — 팬던트 O_R vs 계측기 O_R 비교</h3>
+  <table aria-label="2차 목표 기록표 (팬던트 vs 계측기)">
     <thead>
-      <tr><th>설비-로봇</th><th>O_R,pdt (X,Y,Z)</th><th>O_R (X,Y,Z)</th><th>ΔX</th><th>ΔY</th><th>ΔZ</th><th>3D 오차</th><th>판정</th><th>비고</th></tr>
+      <tr><th>설비-로봇</th><th>O_R,pdt (X,Y,Z)</th><th>O_R,meas (X,Y,Z)</th><th>ΔX</th><th>ΔY</th><th>ΔZ</th><th>3D 오차</th><th>판정</th><th>비고</th></tr>
     </thead>
     <tbody>
-      <tr><td>G1-R1</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
+      <tr><td>G1-R1</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td></td><td></td><td>합/부</td><td>계측기: 레이저 트래커</td></tr>
       <tr><td>G2-R1</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
       <tr><td>G3-R1</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
       <tr><td>G1-R2</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
@@ -314,38 +317,45 @@
     </tbody>
   </table>
 
-  <h3>9.3 3차 목표 — 베이스 포인트/상호거리</h3>
-  <table aria-label="3차 목표 베이스 포인트">
-    <thead><tr><th>설비-로봇</th><th>B_i (X,Y,Z)</th><th>비고</th></tr></thead>
+  <h3>9.3 3차 목표 — 베이스 포인트/상호거리(R1–R2)</h3>
+  <table aria-label="3차 목표 베이스 포인트(R1/R2)">
+    <thead><tr><th>설비</th><th>B_R1 (X,Y,Z)</th><th>B_R2 (X,Y,Z)</th><th>비고</th></tr></thead>
     <tbody>
-      <tr><td>G1-R1</td><td>( , , )</td><td></td></tr>
-      <tr><td>G2-R1</td><td>( , , )</td><td></td></tr>
-      <tr><td>G3-R1</td><td>( , , )</td><td></td></tr>
-      <tr><td>G1-R2</td><td>( , , )</td><td></td></tr>
-      <tr><td>G2-R2</td><td>( , , )</td><td></td></tr>
-      <tr><td>G3-R2</td><td>( , , )</td><td></td></tr>
+      <tr><td>G1</td><td>( , , )</td><td>( , , )</td><td>측정: 계측기 기준</td></tr>
+      <tr><td>G2</td><td>( , , )</td><td>( , , )</td><td></td></tr>
+      <tr><td>G3</td><td>( , , )</td><td>( , , )</td><td></td></tr>
     </tbody>
   </table>
 
-  <table aria-label="3차 목표 상호거리">
-    <thead><tr><th>로봇쌍</th><th>D_ij 측정 (mm)</th><th>설계치 (mm)</th><th>편차 (mm)</th><th>판정</th><th>비고</th></tr></thead>
+  <table aria-label="3차 목표 상호거리(동일 갠트리 R1↔R2)">
+    <thead><tr><th>설비</th><th>D(R1,R2) 측정 (mm)</th><th>설계치 (mm)</th><th>편차 (mm)</th><th>판정</th><th>비고</th></tr></thead>
     <tbody>
-      <tr><td>G1-R1 ↔ G1-R2</td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
-      <tr><td>G2-R1 ↔ G2-R2</td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
-      <tr><td>G3-R1 ↔ G3-R2</td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
+      <tr><td>G1</td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
+      <tr><td>G2</td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
+      <tr><td>G3</td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
     </tbody>
   </table>
 
-  <h3>9.4 4차 목표 — 공통 자세 TCP 일치</h3>
-  <table aria-label="4차 목표 기록표">
-    <thead><tr><th>설비-로봇</th><th>P_common</th><th>TCP_meas (X,Y,Z)</th><th>Δpos (mm)</th><th>Δori (deg)</th><th>판정</th><th>비고</th></tr></thead>
+  <h3>9.4 4차 목표 — 공통 자세 TCP 일치(팬던트·트래커 비교, R1↔R2)</h3>
+  <table aria-label="4차 목표 기록표 (공통점, R1/R2, 팬던트/트래커)">
+    <thead>
+      <tr>
+        <th>설비</th>
+        <th>P_common</th>
+        <th>R1 TCP_pdt</th>
+        <th>R1 TCP_meas</th>
+        <th>R2 TCP_pdt</th>
+        <th>R2 TCP_meas</th>
+        <th>Δpos(R1−R2) meas (mm)</th>
+        <th>Δori(R1−R2) meas (deg)</th>
+        <th>판정</th>
+        <th>비고</th>
+      </tr>
+    </thead>
     <tbody>
-      <tr><td>G1-R1</td><td>ID/설명</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
-      <tr><td>G1-R2</td><td>ID/설명</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
-      <tr><td>G2-R1</td><td>ID/설명</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
-      <tr><td>G2-R2</td><td>ID/설명</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
-      <tr><td>G3-R1</td><td>ID/설명</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
-      <tr><td>G3-R2</td><td>ID/설명</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
+      <tr><td>G1</td><td>ID/설명</td><td>( , , )</td><td>( , , )</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
+      <tr><td>G2</td><td>ID/설명</td><td>( , , )</td><td>( , , )</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
+      <tr><td>G3</td><td>ID/설명</td><td>( , , )</td><td>( , , )</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
     </tbody>
   </table>
 
@@ -366,16 +376,7 @@
     <p class="small">판정 기준은 7장 “합격 기준(허용오차)” 표를 적용합니다.</p>
   </div>
 
-  <div class="box">
-    <h3>10.2 주요 인사이트 · 후속조치</h3>
-    <ul>
-      <li>편차 패턴 요약: 축/구역/자세별 특징</li>
-      <li>원인 추정: 구조/보정/환경/절차</li>
-      <li>즉시 조치: 프로그램 보정, 체결 재조임 등</li>
-      <li>중장기 과제: 모델 개선, 지그 개선 등</li>
-      <li>리스크와 대응계획: 일정·품질 영향 및 대응</li>
-    </ul>
-  </div>
+  
 
   <h2 id="sec-11-signoff">11. 서명·이력 관리</h2>
   <div class="grid-2">
@@ -395,6 +396,10 @@
       <table>
         <thead><tr><th>Rev</th><th>일자</th><th>변경 요약</th><th>작성자</th></tr></thead>
         <tbody id="revision-body">
+          <tr><td>v0.11</td><td>2025-09-29</td><td>10.2 주요 인사이트 · 후속조치 섹션 삭제(결과 요약 단순화)</td><td>시스템</td></tr>
+          <tr><td>v0.10</td><td>2025-09-29</td><td>9.4 공통 자세 TCP 일치: R1·R2를 동일 공통점에 위치시키고 팬던트/트래커 값 동시 기록, inter-robot Δpos/Δori 산출로 표 구조 개편. 8.2 문구 정교화.</td><td>시스템</td></tr>
+          <tr><td>v0.9</td><td>2025-09-29</td><td>9.2 팬던트 vs 계측기 O_R 비교로 명확화, 9.3 R1–R2 상호거리 표 구조 개편(B_R1/B_R2, D(R1,R2))</td><td>시스템</td></tr>
+          <tr><td>v0.8</td><td>2025-09-29</td><td>1차 목표를 GCU–캘리브레이션 거리 기반으로 재정의, 8.2/9.1/용어(d_ref, P_gcu) 수정</td><td>시스템</td></tr>
           <tr><td>v0.7</td><td>2025-09-29</td><td>컨셉 이미지 표시 크기 제한(720px) 및 스타일 정리, 버전/목차 갱신</td><td>시스템</td></tr>
           <tr><td>v0.5</td><td>2025-09-29</td><td>절차 순서 교체(O_R 선산출 → GCS 생성), 12.2 좌표계 생성 방법(기동/3점/리섹션) 추가, 작업 이력 헤더 명확화</td><td>시스템</td></tr>
           <tr><td>v0.4</td><td>2025-09-29</td><td>부록 12.1 컨셉 이미지 레퍼런스 추가(외부 링크 포함)</td><td>시스템</td></tr>
