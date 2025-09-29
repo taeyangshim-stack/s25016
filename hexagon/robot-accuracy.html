@@ -5,39 +5,84 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>로봇 정도측정 계획(안) — B라인 갠트리</title>
 <style>
-  :root { --fg:#111; --muted:#555; --line:#ddd; --accent:#0a7; }
-  html, body { margin:0; padding:0; color:var(--fg); font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif; }
-  .wrap { max-width:1120px; margin:32px auto; padding:0 20px 64px; }
-  h1 { font-size:24px; margin:0 0 16px; }
-  h2 { font-size:20px; margin:28px 0 10px; }
+  :root {
+    --fg:#0e1621; --fg-soft:#1d2a3a; --muted:#657189; --line:#e2e7ef; --surface:#f7f9fc;
+    --accent:#0a7; --accent-ink:#085; --warn:#b35; --ok:#0a6; --code-bg:#f3f6fa;
+  }
+  html, body { margin:0; padding:0; color:var(--fg); font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif; background:#fff; }
+  .wrap { max-width:1120px; margin:32px auto; padding:0 20px 72px; }
+  .doc-header { padding:18px 16px; border:1px solid var(--line); border-radius:14px; background:linear-gradient(180deg, #f7fafc, #f6fffb); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  h1 { font-size:26px; margin:0; letter-spacing:-0.2px; }
+  h2 { font-size:20px; margin:28px 0 12px; }
   h3 { font-size:16px; margin:22px 0 10px; color:var(--muted); }
-  p, li { line-height:1.6; }
-  .meta { padding:12px 14px; border:1px solid var(--line); border-radius:10px; background:#fafafa; margin:8px 0 24px; }
-  .meta b { display:inline-block; min-width:90px; }
+  p, li { line-height:1.65; }
+  a { color:#0a68a7; text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; background:#e8fbf4; color:var(--accent-ink); border:1px solid #c8f1e5; }
+  .meta { padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:var(--surface); margin:14px 0 24px; }
+  .meta b { display:inline-block; min-width:100px; color:var(--fg-soft); }
   .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:18px; }
-  table { width:100%; border-collapse:collapse; margin:10px 0 24px; font-size:14px; }
-  th, td { border:1px solid var(--line); padding:8px 10px; text-align:center; vertical-align:middle; }
-  thead th { background:#f3f7f6; font-weight:700; }
+  .toc { border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:#fff; margin:10px 0 24px; }
+  .toc h3 { margin:0 0 8px; color:var(--fg-soft); }
+  .toc a { color:var(--fg-soft); }
+  table { width:100%; border-collapse:separate; border-spacing:0; margin:10px 0 24px; font-size:14px; background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  th, td { border-bottom:1px solid var(--line); padding:10px 12px; text-align:center; vertical-align:middle; }
+  thead th { background:#f2f7fb; font-weight:700; position:sticky; top:0; z-index:1; }
+  tbody tr:nth-child(odd) { background:#fbfdff; }
+  tbody tr:hover { background:#f2fbf7; }
   tfoot td { background:#fafafa; font-size:13px; color:var(--muted); text-align:left; }
+  code, pre, kbd { background:var(--code-bg); border:1px solid #e2e7ef; border-radius:6px; padding:0 4px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
   .small { font-size:13px; color:var(--muted); }
-  .box { border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:16px 0; }
+  .box { border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:16px 0; background:#fff; }
   .tag { display:inline-block; padding:2px 8px; border-radius:999px; background:#eefaf6; color:#0a7; font-size:12px; margin-right:6px; border:1px solid #d6f4ea; }
   .note { border-left:4px solid var(--accent); padding:10px 14px; background:#f6fffb; margin:16px 0; }
-  @media print { .wrap { margin:0; padding:0; } .no-print { display:none !important; } }
+  @media (min-width: 1200px) {
+    .wrap { display:grid; grid-template-columns: 260px 1fr; gap:24px; }
+    .sidebar { position:sticky; top:16px; height:max-content; }
+    .main { min-width:0; }
+  }
+  @media print { body { background:#fff; } .wrap { display:block; margin:0; padding:0; } .no-print { display:none !important; } thead th { position:static; } .toc, .sidebar { display:none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <h1>로봇 정도측정 계획(안)</h1>
+  <div class="sidebar no-print">
+    <div class="doc-header">
+      <div>
+        <h1>로봇 정도측정 계획(안)</h1>
+        <div class="small" style="margin-top:4px; color:var(--muted)">B라인 갠트리 · 위치 정도 측정 및 검증</div>
+      </div>
+      <span class="badge">v0.6</span>
+    </div>
+    <div class="toc">
+      <h3>목차</h3>
+      <div class="small">
+        <div><a href="#sec-0-terms">0. 용어 정리</a></div>
+        <div><a href="#sec-1-purpose">1. 목적</a></div>
+        <div><a href="#sec-2-scope">2. 측정 대상 및 범위</a></div>
+        <div><a href="#sec-3-basics">3. 기준 및 방법</a></div>
+        <div><a href="#sec-4-equipment">4. 측정 장비·교정 정보</a></div>
+        <div><a href="#sec-5-environment">5. 환경 조건 기록</a></div>
+        <div><a href="#sec-6-frames">6. 좌표계 정의·참조점</a></div>
+        <div><a href="#sec-7-criteria">7. 합격 기준</a></div>
+        <div><a href="#sec-8-method">8. 측정 방법</a></div>
+        <div><a href="#sec-9-records">9. 데이터 기록표</a></div>
+        <div><a href="#sec-10-summary">10. 결과 정리</a></div>
+        <div><a href="#sec-11-signoff">11. 서명·이력</a></div>
+        <div><a href="#sec-12-appendix">12. 부록</a></div>
+        <div style="margin-top:8px"><a href="#revision">리비전/작업 이력</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="main">
   <div class="meta">
     <div><b>작업 일시</b> 2025년 10월 1일 ~ 10월 2일</div>
     <div><b>작업 장소</b> 자동용접 갠트리 B라인</div>
     <div><b>대상 설비</b> 갠트리 3대(G1, G2, G3) × 로봇 2대(R1, R2) = 총 6대</div>
-    <div><b>문서 버전</b> v0.5 · <a href="#revision">변경 이력 보기</a></div>
+    <div><b>문서 버전</b> v0.6 · <a href="#revision">변경 이력 보기</a></div>
   </div>
 
-  <h2>0. 용어 정리</h2>
+  <h2 id="sec-0-terms">0. 용어 정리</h2>
   <ul class="small">
     <li><b>GCS</b>: B라인 갠트리 3호기로 정의한 전역 좌표계(Global Coordinate System)</li>
     <li><b>O_R</b>: R축 회전센터(점)</li>
@@ -47,17 +92,17 @@
     <li><b>d_ref</b>: 기준거리, <code>d_ref = ||O_R − P_ball||</code></li>
   </ul>
 
-  <h2>1. 목적</h2>
+  <h2 id="sec-1-purpose">1. 목적</h2>
   <p>3대 갠트리에 탑재된 로봇(R1 그룹 3대, R2 그룹 3대)에 대해 동일 목표 좌표 조건 하에서 위치 정도를 측정하여,
      로봇 및 시스템의 <b>신뢰성</b>을 검토한다.</p>
 
-  <h2>2. 측정 대상 및 범위</h2>
+  <h2 id="sec-2-scope">2. 측정 대상 및 범위</h2>
   <ul>
     <li>대상: G1/G2/G3 각 갠트리의 R1, R2 로봇(총 6대)</li>
     <li>범위: 1차~4차 목표에 따른 <b>거리·좌표·자세</b> 검증 및 편차 평가</li>
   </ul>
 
-  <h2>3. 기준 및 방법</h2>
+  <h2 id="sec-3-basics">3. 기준 및 방법</h2>
   <div class="box">
     <span class="tag">기준면</span> R축 프레임 기준단을 기준면으로 사용<br />
     <span class="tag">좌표계</span> 기준면을 기준으로 <b>로봇 베이스 좌표계</b> 생성<br />
@@ -68,7 +113,7 @@
 
   
 
-  <h2>4. 측정 장비·교정 정보</h2>
+  <h2 id="sec-4-equipment">4. 측정 장비·교정 정보</h2>
   <table aria-label="측정 장비 교정 정보">
     <thead>
       <tr><th>장비</th><th>모델</th><th>S/N</th><th>교정일</th><th>불확도</th><th>교정기관</th><th>비고</th></tr>
@@ -80,7 +125,7 @@
     </tbody>
   </table>
 
-  <h2>5. 환경 조건 기록</h2>
+  <h2 id="sec-5-environment">5. 환경 조건 기록</h2>
   <table aria-label="환경 조건 기록">
     <thead>
       <tr><th>항목</th><th>허용 범위</th><th>실측 값</th><th>판정</th><th>비고</th></tr>
@@ -96,12 +141,12 @@
     영향이 큰 경우 “보정 혹은 재측정” 기준을 현장 합의로 명시하십시오. (예: 온도 허용 초과 시 보정 후 재측정)
   </div>
 
-  <h2>6. 좌표계 정의·참조점</h2>
+  <h2 id="sec-6-frames">6. 좌표계 정의·참조점</h2>
   <div class="box" style="min-height:120px">
     <p class="small">기준면 도식(이미지/스케치), 원점 정의, RHR 방향, 측정 지그 위치 기준 등 상세 내용을 기입하십시오.</p>
   </div>
 
-  <h2>7. 합격 기준(허용오차)</h2>
+  <h2 id="sec-7-criteria">7. 합격 기준(허용오차)</h2>
   <table aria-label="합격 기준">
     <thead>
       <tr><th>항목</th><th>기준값</th><th>비고</th></tr>
@@ -113,7 +158,7 @@
     </tbody>
   </table>
 
-  <h2>8. 측정 방법(재정리)</h2>
+  <h2 id="sec-8-method">8. 측정 방법(재정리)</h2>
   <h3>8.1 사전 준비 체크리스트</h3>
   <table aria-label="사전 준비 체크리스트">
     <thead>
@@ -213,7 +258,7 @@
     <b>분석 팁</b>: 편차는 좌표축별(ΔX, ΔY, ΔZ)과 3D 거리 편차(√(ΔX²+ΔY²+ΔZ²))를 함께 산출하면 그룹 내 분포 파악이 수월합니다.
   </div>
 
-  <h2>9. 데이터 기록표</h2>
+  <h2 id="sec-9-records">9. 데이터 기록표</h2>
   <p class="small">※ 1차~4차 목표에 맞춘 기록 양식으로 일원화했습니다.</p>
 
   <h3>9.1 1차 목표 — TCP 거리 일치 검증</h3>
@@ -286,7 +331,7 @@
     </tbody>
   </table>
 
-  <h2>10. 결과 정리(요약본)</h2>
+  <h2 id="sec-10-summary">10. 결과 정리(요약본)</h2>
   <div class="box">
     <h3>10.1 전체 요약</h3>
     <table aria-label="전체 요약">
@@ -314,7 +359,7 @@
     </ul>
   </div>
 
-  <h2>11. 서명·이력 관리</h2>
+  <h2 id="sec-11-signoff">11. 서명·이력 관리</h2>
   <div class="grid-2">
     <div class="box">
       <h3>서명</h3>
@@ -342,7 +387,7 @@
     </div>
   </div>
 
-  <h2>12. 부록 — 기입 가이드</h2>
+  <h2 id="sec-12-appendix">12. 부록 — 기입 가이드</h2>
   <ul class="small">
     <li>목표 좌표 입력 형식: <code>(X, Y, Z)</code> [mm]</li>
     <li>편차 계산 예: 축별 편차는 <code>ΔX = X<sub>측정</sub> - X<sub>목표</sub></code> 등,
@@ -392,5 +437,6 @@
   </div>
 
 </div>
+  </div>
 </body>
 </html>
