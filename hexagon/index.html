@@ -140,7 +140,7 @@
         $kDone.textContent = tasks.filter(t=>t.status==='완료').length;
       }
 
-      fetch('./data/tasks.json')
+      fetch('/data/tasks.json')
         .then(r => r.json())
         .then(json => { tasks = json; render(); })
         .catch(() => { $rows.innerHTML = '<tr><td colspan="4">데이터를 불러오지 못했습니다.</td></tr>'; });
