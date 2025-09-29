@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "hexagon/index.html", "use": "@vercel/static" },
+    { "src": "hexagon/docs/(.*)", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/hexagon/index.html" },
+    { "src": "/punchlist", "dest": "/hexagon/docs/punchlist.html" },
+    { "src": "/schedule", "dest": "/hexagon/docs/schedule.html" },
+    { "src": "/(.*)", "dest": "/hexagon/$1" }
+  ]
+}
+
