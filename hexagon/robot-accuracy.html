@@ -40,6 +40,8 @@
   figure.box.figure { text-align:center; }
   .figure img { max-width:720px; width:100%; height:auto; border:1px solid var(--line); border-radius:10px; background:#fff; }
   .figure figcaption { margin-top:6px; }
+  /* placeholder figures */
+  .ph-box { border:2px dashed var(--line); border-radius:12px; height:220px; display:flex; align-items:center; justify-content:center; background:#fff; color:var(--muted); padding:12px; text-align:center; }
   @media (min-width: 1200px) {
     .wrap { display:grid; grid-template-columns: 260px 1fr; gap:24px; }
     .sidebar { position:sticky; top:16px; height:max-content; }
@@ -56,7 +58,7 @@
         <h1>로봇 정도측정 계획(안)</h1>
         <div class="small" style="margin-top:4px; color:var(--muted)">B라인 갠트리 · 위치 정도 측정 및 검증</div>
       </div>
-      <span id="doc-version-badge" class="badge">v0.11</span>
+      <span id="doc-version-badge" class="badge">v0.14</span>
     </div>
     <div class="toc">
       <h3>목차</h3>
@@ -77,27 +79,13 @@
         <div style="margin-top:8px"><a href="#revision">리비전/작업 이력</a></div>
       </div>
     </div>
-    <div class="box no-print" style="margin-top:12px">
-      <h3 style="margin:0 0 8px; color:var(--fg-soft)">이력 자동 업데이트</h3>
-      <div class="small" style="display:grid; grid-template-columns: 1fr; gap:8px">
-        <label>버전 <input id="rev-version" type="text" value="" style="width:100%" /></label>
-        <label>일자 <input id="rev-date" type="date" value="" style="width:100%" /></label>
-        <label>작성자 <input id="rev-author" type="text" value="" placeholder="작성자" style="width:100%" /></label>
-        <label>변경 요약 <textarea id="rev-summary" rows="3" placeholder="변경 내용을 간단히 입력" style="width:100%"></textarea></label>
-        <div>
-          <button id="rev-apply" style="padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:#e8fbf4; cursor:pointer">이력 추가 및 버전 반영</button>
-          <button id="rev-export" style="padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:#f2f7fb; cursor:pointer">HTML 저장</button>
-        </div>
-        <div class="small" id="rev-msg" style="color:var(--muted)"></div>
-      </div>
-    </div>
   </div>
   <div class="main">
   <div class="meta">
     <div><b>작업 일시</b> 2025년 10월 1일 ~ 10월 2일</div>
     <div><b>작업 장소</b> 자동용접 갠트리 B라인</div>
     <div><b>대상 설비</b> 갠트리 3대(G1, G2, G3) × 로봇 2대(R1, R2) = 총 6대</div>
-    <div><b>문서 버전</b> <span id="meta-version-text">v0.11</span> · <a href="#revision">변경 이력 보기</a></div>
+    <div><b>문서 버전</b> <span id="meta-version-text">v0.14</span> · <a href="#revision">변경 이력 보기</a></div>
   </div>
 
   <h2 id="sec-0-terms">0. 용어 정리</h2>
@@ -144,6 +132,10 @@
       <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     </tbody>
   </table>
+  <figure class="box figure">
+    <div class="ph-box">[그림 자리표시자] 레이저 트래커와 SMR, R축 프레임 측면 브라켓 장착 사진(전경)</div>
+    <figcaption class="small">그림 E1. 장비 구성 개요(트래커/SMR/브라켓)</figcaption>
+  </figure>
 
   <h2 id="sec-5-environment">5. 환경 조건 기록</h2>
   <table aria-label="환경 조건 기록">
@@ -165,6 +157,10 @@
   <div class="box" style="min-height:120px">
     <p class="small">기준면 도식(이미지/스케치), 원점 정의, RHR 방향, 측정 지그 위치 기준 등 상세 내용을 기입하십시오.</p>
   </div>
+  <figure class="box figure">
+    <div class="ph-box">[그림 자리표시자] GCS 정의 도식: 갠트리 평면, 원점, x/y 축 방향(+ 직교화), z축 오른손 좌표계</div>
+    <figcaption class="small">그림 F1. GCS 정의 및 좌표축 방향</figcaption>
+  </figure>
 
   <h2 id="sec-7-criteria">7. 합격 기준(허용오차)</h2>
   <table aria-label="합격 기준">
@@ -256,6 +252,24 @@
     <br />
     • <b>리섹션</b>: 알려진 기준점 ≥4개를 측정해 트래커의 자세·위치를 최적화로 추정하는 방법(잡음에 강하고 신뢰도 향상).
   </div>
+  <div class="grid-2">
+    <figure class="box figure">
+      <div class="ph-box">[그림 자리표시자] O_R 산출 원리: 각도별 표적점 P_i, 평면 적합 및 원 적합, 중심 O_R 표시</div>
+      <figcaption class="small">그림 M1. O_R 원적합 개념도</figcaption>
+    </figure>
+    <figure class="box figure">
+      <div class="ph-box">[그림 자리표시자] GCS 생성: 갠트리 X/Y 직선 기동으로 축 방향 추정 및 직교화 흐름</div>
+      <figcaption class="small">그림 M2. X/Y 기동 기반 GCS 생성</figcaption>
+    </figure>
+    <figure class="box figure">
+      <div class="ph-box">[그림 자리표시자] d_ref 정의: GCU(P_gcu)와 캘리브레이션 구(P_ball) 간 거리</div>
+      <figcaption class="small">그림 M3. d_ref = ||P_gcu − P_ball||</figcaption>
+    </figure>
+    <figure class="box figure">
+      <div class="ph-box">[그림 자리표시자] TCP 검증: d_ref를 목표로 TCP 이동, 트래커 측정값과 팬던트 값 비교</div>
+      <figcaption class="small">그림 M4. 기준거리 기반 TCP 검증</figcaption>
+    </figure>
+  </div>
 
   <h3>8.3 중간점검·이슈 로그</h3>
   <table aria-label="이슈 로그">
@@ -316,6 +330,10 @@
       <tr><td>G3-R2</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
     </tbody>
   </table>
+  <figure class="box figure">
+    <div class="ph-box">[그림 자리표시자] 팬던트 O_R,pdt와 계측기 O_R,meas 비교 도식(두 점/벡터 차이)</div>
+    <figcaption class="small">그림 D2. O_R 비교 개념도</figcaption>
+  </figure>
 
   <h3>9.3 3차 목표 — 베이스 포인트/상호거리(R1–R2)</h3>
   <table aria-label="3차 목표 베이스 포인트(R1/R2)">
@@ -335,6 +353,10 @@
       <tr><td>G3</td><td></td><td></td><td></td><td>합/부</td><td></td></tr>
     </tbody>
   </table>
+  <figure class="box figure">
+    <div class="ph-box">[그림 자리표시자] 동일 갠트리 내 R1/R2 베이스 포인트와 상호거리 D(R1,R2) 도식</div>
+    <figcaption class="small">그림 D3. 베이스 포인트 및 상호거리</figcaption>
+  </figure>
 
   <h3>9.4 4차 목표 — 공통 자세 TCP 일치(팬던트·트래커 비교, R1↔R2)</h3>
   <table aria-label="4차 목표 기록표 (공통점, R1/R2, 팬던트/트래커)">
@@ -358,6 +380,10 @@
       <tr><td>G3</td><td>ID/설명</td><td>( , , )</td><td>( , , )</td><td>( , , )</td><td>( , , )</td><td></td><td></td><td>합/부</td><td></td></tr>
     </tbody>
   </table>
+  <figure class="box figure">
+    <div class="ph-box">[그림 자리표시자] 공통점 P_common에서 R1과 R2의 자세/위치 비교(팬던트 vs 트래커)</div>
+    <figcaption class="small">그림 D4. 공통 자세 TCP 비교</figcaption>
+  </figure>
 
   <h2 id="sec-10-summary">10. 결과 정리(요약본)</h2>
   <div class="box">
@@ -375,6 +401,10 @@
     </table>
     <p class="small">판정 기준은 7장 “합격 기준(허용오차)” 표를 적용합니다.</p>
   </div>
+  <figure class="box figure">
+    <div class="ph-box">[그림 자리표시자] 결과 요약 시각화 예시(축별 편차 바차트/3D 거리 편차 박스플롯 등)</div>
+    <figcaption class="small">그림 S1. 결과 요약 그래프(예시)</figcaption>
+  </figure>
 
   
 
@@ -396,6 +426,9 @@
       <table>
         <thead><tr><th>Rev</th><th>일자</th><th>변경 요약</th><th>작성자</th></tr></thead>
         <tbody id="revision-body">
+          <tr><td>v0.14</td><td>2025-09-29</td><td>설명용 그림 자리표시자 추가(4·6·8·9·10장), 섹션별 캡션 및 위치 제안</td><td>시스템</td></tr>
+          <tr><td>v0.13</td><td>2025-09-29</td><td>문서 내 편집 기능(이력 자동 업데이트 패널/스크립트) 제거</td><td>시스템</td></tr>
+          <tr><td>v0.12</td><td>2025-09-29</td><td>이력 입력 가드 추가(저장 확인 체크박스, 기본 비활성화). 적용 시 자동 저장 안내 목적.</td><td>시스템</td></tr>
           <tr><td>v0.11</td><td>2025-09-29</td><td>10.2 주요 인사이트 · 후속조치 섹션 삭제(결과 요약 단순화)</td><td>시스템</td></tr>
           <tr><td>v0.10</td><td>2025-09-29</td><td>9.4 공통 자세 TCP 일치: R1·R2를 동일 공통점에 위치시키고 팬던트/트래커 값 동시 기록, inter-robot Δpos/Δori 산출로 표 구조 개편. 8.2 문구 정교화.</td><td>시스템</td></tr>
           <tr><td>v0.9</td><td>2025-09-29</td><td>9.2 팬던트 vs 계측기 O_R 비교로 명확화, 9.3 R1–R2 상호거리 표 구조 개편(B_R1/B_R2, D(R1,R2))</td><td>시스템</td></tr>
@@ -462,76 +495,6 @@
 
 </div>
   </div>
-<script>
-  (function(){
-    const badge = document.getElementById('doc-version-badge');
-    const meta = document.getElementById('meta-version-text');
-    const body = document.getElementById('revision-body');
-    const iv = (sel) => document.getElementById(sel);
-
-    // Initialize form defaults
-    const curVer = (badge?.textContent || 'v0.0').trim();
-    function nextVersion(v){
-      const m = /^v(\d+)(?:\.(\d+))?$/.exec(v);
-      if(!m){ return 'v0.1'; }
-      const M = parseInt(m[1],10);
-      const mnr = m[2] != null ? parseInt(m[2],10) : 0;
-      return `v${M}.${mnr+1}`;
-    }
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth()+1).padStart(2,'0');
-    const dd = String(today.getDate()).padStart(2,'0');
-    if(iv('rev-version')) iv('rev-version').value = nextVersion(curVer);
-    if(iv('rev-date')) iv('rev-date').value = `${yyyy}-${mm}-${dd}`;
-    if(iv('rev-author')) iv('rev-author').value = localStorage.getItem('rev-author') || '';
-
-    function setMsg(t, ok=true){
-      const el = iv('rev-msg');
-      if(!el) return;
-      el.textContent = t;
-      el.style.color = ok ? 'var(--ok)' : 'var(--warn)';
-      setTimeout(()=>{ el.textContent=''; }, 4000);
-    }
-
-    const applyBtn = iv('rev-apply');
-    if(applyBtn) applyBtn.addEventListener('click', function(){
-      const v = (iv('rev-version')?.value || '').trim();
-      const d = (iv('rev-date')?.value || '').trim();
-      const a = (iv('rev-author')?.value || '').trim() || '시스템';
-      const s = (iv('rev-summary')?.value || '').trim();
-      if(!v){ return setMsg('버전을 입력하세요.', false); }
-      if(!d){ return setMsg('일자를 입력하세요.', false); }
-      if(!s){ return setMsg('변경 요약을 입력하세요.', false); }
-      // Update versions
-      if(badge) badge.textContent = v;
-      if(meta) meta.textContent = v;
-      // Append row to top of revision table
-      if(body){
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${v}</td><td>${d}</td><td>${s}</td><td>${a}</td>`;
-        body.insertBefore(tr, body.firstChild);
-      }
-      localStorage.setItem('rev-author', a);
-      setMsg('이력 추가 완료');
-      // Suggest next version
-      if(iv('rev-version')) iv('rev-version').value = nextVersion(v);
-      if(iv('rev-summary')) iv('rev-summary').value = '';
-    });
-
-    const exportBtn = iv('rev-export');
-    if(exportBtn) exportBtn.addEventListener('click', function(){
-      const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-      const blob = new Blob([html], {type:'text/html;charset=utf-8'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'robot-accuracy.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(a.href);
-    });
-  })();
 </script>
 </body>
 </html>
