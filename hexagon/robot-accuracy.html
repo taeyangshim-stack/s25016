@@ -130,29 +130,27 @@
 
   <h3>8.2 단계별 수행(재정리)</h3>
   <ol>
-    <li><b>B라인 갠트리 3호기로 좌표계 생성</b>
-      <ul>
-        <li>트래커 3점 또는 리섹션 방식으로 전역 좌표계(GCS)를 3호기 기준으로 정의</li>
-        <li>검증: 기준점 재측정 재현성 확인(허용오차 이내)</li>
-      </ul>
-    </li>
-    <li><b>O_R 측정(3호기 또는 1호기 사용)</b>
-      <ul>
-        <li>정의한 GCS를 기준으로 3호기 또는 1호기를 사용하여 R축 회전센터(<code>O_R</code>) 측정</li>
-      </ul>
-    </li>
-    <li><b>R축 프레임 측면 브라켓 + N각도 트래커 측정으로 O_R 산출</b>
+    <li><b>O_R 산출(브라켓 + N각도 트래커 측정)</b>
       <ul>
         <li>R축 프레임 측면 브라켓에 SMR/표적을 고정</li>
-        <li>R축을 −90°~+90° 범위에서 <b>N</b>개의 각도로 회전하며 표적 좌표 <code>P_i(GCS)</code> 취득</li>
-        <li>평면 적합 → 평면상 원 적합으로 중심 <code>C_c</code>와 반경 <code>r</code> 추정, <code>O_R = C_c</code></li>
+        <li>R축을 −90°~+90° 범위에서 <b>N</b>개의 각도로 회전하며 표적 좌표 <code>P_i</code>를 트래커 좌표계(TCS)로 취득</li>
+        <li>평면 적합 → 평면상 원 적합으로 중심 <code>C_c</code>와 반경 <code>r</code> 추정, <code>O_R = C_c</code> (현재는 TCS 좌표)</li>
         <li>품질기록: 적합 RMS, 최대편차, 샘플 수(N)</li>
+      </ul>
+    </li>
+    <li><b>GCS 생성(갠트리 X/Y 기동 기반)</b>
+      <ul>
+        <li>갠트리 특정 위치에서 X축으로 직선 기동하여 점열을 취득 → 방향벡터 <code>\hat{x}</code> 계산</li>
+        <li>동일 기준에서 Y축으로 직선 기동하여 점열을 취득 → 방향벡터 <code>\hat{y}</code> 계산</li>
+        <li>직교화: <code>\hat{y}' = \hat{y} - (\hat{y}\cdot\hat{x})\hat{x}</code>, 정규화 후 <code>\hat{z} = \hat{x} \times \hat{y}'</code></li>
+        <li>원점: 필요에 따라 <code>O_R</code> 또는 별도 기준점 선택. TCS→GCS 변환(<code>[R|t]</code>)을 구성</li>
+        <li>검증: 기준점 재측정 재현성 확인(허용오차 이내)</li>
       </ul>
     </li>
     <li><b>1차 목표: O_R–비전 캘리브레이션 구 간 거리 계산</b>
       <ul>
-        <li>비전 캘리브레이션 구 중심 <code>P_ball</code> 측정</li>
-        <li>기준거리 <code>d_ref = ||O_R − P_ball||</code> 계산 및 기록</li>
+        <li>비전 캘리브레이션 구 중심 <code>P_ball</code> 측정(TCS) 후 GCS로 변환</li>
+        <li><code>O_R</code> 또한 GCS로 변환하여 기준거리 <code>d_ref = ||O_R − P_ball||</code> 계산 및 기록</li>
       </ul>
     </li>
     <li><b>1차 목표 검증: TCP로 거리 일치 확인 및 편차 평가</b>
@@ -181,6 +179,16 @@
       </ul>
     </li>
   </ol>
+
+  <div class="note small">
+    <b>참고 — 좌표계 설정 방식</b>
+    <br />
+    • <b>기동 기반</b>: 실기 축(X/Y) 직선 기동으로 축 방향을 정의하여 GCS를 구성(현장 실무에 적합).
+    <br />
+    • <b>트래커 3점</b>: GCS에서 좌표가 알려진 3개 비공선 기준점을 트래커로 측정하여 TCS→GCS 변환을 산출(최소 3점, 더 많으면 과잉결정으로 평균화 가능).
+    <br />
+    • <b>리섹션</b>: 알려진 기준점 ≥4개를 측정해 트래커의 자세·위치를 최적화로 추정하는 방법(잡음에 강하고 신뢰도 향상).
+  </div>
 
   <h3>8.3 중간점검·이슈 로그</h3>
   <table aria-label="이슈 로그">
@@ -319,10 +327,11 @@
       </table>
     </div>
     <div class="box">
-      <h3>리비전 이력</h3>
+      <h3>리비전/작업 이력</h3>
       <table>
         <thead><tr><th>Rev</th><th>일자</th><th>변경 요약</th><th>작성자</th></tr></thead>
         <tbody>
+          <tr><td>v0.5</td><td>2025-09-29</td><td>절차 순서 교체(O_R 선산출 → GCS 생성), 12.2 좌표계 생성 방법(기동/3점/리섹션) 추가, 작업 이력 헤더 명확화</td><td>시스템</td></tr>
           <tr><td>v0.4</td><td>2025-09-29</td><td>부록 12.1 컨셉 이미지 레퍼런스 추가(외부 링크 포함)</td><td>시스템</td></tr>
           <tr><td>v0.3</td><td>2025-09-29</td><td>8장 측정 방법 재정리, 9장 기록표 목표별 개편, 범위/측정점 정리, 10장 결과 요약 신설, 서두 용어 정리 추가</td><td>시스템</td></tr>
           <tr><td>v0.2</td><td></td><td></td><td></td></tr>
@@ -357,6 +366,27 @@
     <ul class="small">
       <li>원본 링크 1: <a href="https://res.cloudinary.com/dmmjpofcc/image/upload/v1759148581/w6skhx8etgkop0umc0mj.jpg" target="_blank" rel="noopener">열기</a></li>
       <li>원본 링크 2: <a href="https://res.cloudinary.com/dmmjpofcc/image/upload/v1759148581/r34bpa6ly1563mgcgrhc.jpg" target="_blank" rel="noopener">열기</a></li>
+    </ul>
+  </div>
+
+  <h3>12.2 좌표계 생성 방법(상세)</h3>
+  <div class="box small">
+    <p><b>기동 기반 GCS</b></p>
+    <ul>
+      <li>X축 기동: 동일 기준점에서 X+ 방향으로 이동하며 점열 {X_k} 측정 → 방향벡터 <code>\hat{x} = normalize(X_{end}-X_{start})</code></li>
+      <li>Y축 기동: 동일 방식으로 점열 {Y_k} 측정 → <code>\hat{y}</code> 산출 후 <code>\hat{y}' = \hat{y} - (\hat{y}\cdot\hat{x})\hat{x}</code>, 정규화</li>
+      <li>Z축: <code>\hat{z} = \hat{x} \times \hat{y}'</code></li>
+      <li>원점: <code>O_R</code> 또는 별도 기준점 선택. 회전행렬 R=[\hat{x} \ \hat{y}' \ \hat{z}]와 평행이동 t로 TCS→GCS 구성</li>
+    </ul>
+    <p><b>트래커 3점</b> (알려진 GCS 기준점 A,B,C 사용)</p>
+    <ul>
+      <li>TCS에서 a,b,c 측정 → 두 좌표계에서 대응 벡터 집합 생성</li>
+      <li>정합(예: Kabsch/Procrustes)으로 R,t 추정 → TCS→GCS 변환</li>
+    </ul>
+    <p><b>리섹션</b> (기준점 ≥4)</p>
+    <ul>
+      <li>여러 기준점의 관측을 사용해 트래커 위치·자세를 최소제곱으로 추정(과잉결정)</li>
+      <li>장점: 잡음·은폐에 강함, 신뢰도 향상. 단점: 기준점 준비 필요</li>
     </ul>
   </div>
 
