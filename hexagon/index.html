@@ -73,8 +73,8 @@
           </select>
         </label>
         <span class="links">
-          <a class="btn" href="./punchlist.html" target="_blank">펀치리스트 보기</a>
-          <a class="btn" href="./schedule.html" target="_blank">달력 일정 보기</a>
+          <a class="btn" href="/punchlist" target="_blank">펀치리스트 보기</a>
+          <a class="btn" href="/schedule" target="_blank">달력 일정 보기</a>
         </span>
       </div>
 
@@ -140,7 +140,7 @@
         $kDone.textContent = tasks.filter(t=>t.status==='완료').length;
       }
 
-      fetch('./data/tasks.json')
+      fetch('./docs/data/tasks.json')
         .then(r => r.json())
         .then(json => { tasks = json; render(); })
         .catch(() => { $rows.innerHTML = '<tr><td colspan="4">데이터를 불러오지 못했습니다.</td></tr>'; });
@@ -150,4 +150,3 @@
     </script>
   </body>
   </html>
-
