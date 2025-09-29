@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>현장 대시보드 — 삼성중공업 소조립 용접라인</title>
+    <style>
+      :root{
+        --bg:#0f1115; --panel:#171a23; --border:#23283a; --text:#e6e8ee; --muted:#a8b0bf;
+        --a:#4fc3f7; --b:#ffd166; --sp:#c792ea; --done:#2ecc71; --test:#3498db; --prog:#f1c40f; --hold:#9b59b6;
+      }
+      *{box-sizing:border-box}
+      body{margin:0; background:var(--bg); color:var(--text); font:14px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, Arial, sans-serif}
+      header{padding:24px 20px; background:linear-gradient(180deg,#151826,#121520)}
+      h1{margin:0 0 6px; font-size:20px}
+      .subtitle{color:var(--muted); font-size:13px}
+      main{max-width:1100px; margin:0 auto; padding:16px}
+      .cards{display:grid; grid-template-columns: repeat(4,1fr); gap:12px; margin:12px 0 20px}
+      .card{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px}
+      .card h3{margin:0; font-size:13px; color:var(--muted)}
+      .card .num{font-size:26px; font-weight:800; margin-top:6px}
+      .num.prog{color:#fde07a} .num.test{color:#a7d6fb} .num.done{color:#b7f4cc} .num.hold{color:#ead0f3}
+      .toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:4px 0 12px}
+      select, button{background:#111521; color:var(--text); border:1px solid var(--border); border-radius:8px; padding:8px 10px; font-size:13px}
+      button.link{cursor:pointer}
+      .table{background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden}
+      table{width:100%; border-collapse:collapse}
+      th, td{border-bottom:1px solid var(--border); padding:10px 12px; text-align:left}
+      th{color:var(--muted); background:#1a1e29; font-weight:600}
+      tr:last-child td{border-bottom:0}
+      .badge{padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid var(--border); background:#212638}
+      .s-prog{background:rgba(241,196,15,.15); border-color:rgba(241,196,15,.35); color:#fde7a3}
+      .s-test{background:rgba(52,152,219,.15); border-color:rgba(52,152,219,.35); color:#c5e7fb}
+      .s-done{background:rgba(46,204,113,.15); border-color:rgba(46,204,113,.35); color:#b7f4cc}
+      .s-hold{background:rgba(155,89,182,.15); border-color:rgba(155,89,182,.35); color:#ead0f3}
+      .ldot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px}
+      .la{background:var(--a)} .lb{background:var(--b)} .lsp{background:var(--sp)}
+      .links{display:flex; gap:8px; margin:12px 0}
+      a.btn{display:inline-block; padding:8px 12px; border:1px solid var(--border); border-radius:8px; color:var(--text); text-decoration:none; background:#111521}
+      footer{max-width:1100px; margin:24px auto; padding:0 16px 40px; color:var(--muted); font-size:12px}
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>현장 대시보드</h1>
+      <div class="subtitle">삼성중공업 소조립 용접라인 · 진행/테스트/완료 현황</div>
+    </header>
+    <main>
+      <div class="cards">
+        <div class="card"><h3>전체 작업</h3><div class="num" id="k-total">—</div></div>
+        <div class="card"><h3>진행</h3><div class="num prog" id="k-prog">—</div></div>
+        <div class="card"><h3>테스트</h3><div class="num test" id="k-test">—</div></div>
+        <div class="card"><h3>완료</h3><div class="num done" id="k-done">—</div></div>
+      </div>
+
+      <div class="toolbar">
+        <label>라인
+          <select id="f-line">
+            <option value="">전체</option>
+            <option value="A">A LINE</option>
+            <option value="B">B LINE</option>
+            <option value="SP">SP / 공통</option>
+          </select>
+        </label>
+        <label>상태
+          <select id="f-status">
+            <option value="">전체</option>
+            <option>진행</option>
+            <option>테스트</option>
+            <option>협의/보류</option>
+            <option>예정</option>
+            <option>완료</option>
+          </select>
+        </label>
+        <span class="links">
+          <a class="btn" href="./punchlist.html" target="_blank">펀치리스트 보기</a>
+          <a class="btn" href="./schedule.html" target="_blank">달력 일정 보기</a>
+        </span>
+      </div>
+
+      <div class="table">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:120px">라인</th>
+              <th>작업</th>
+              <th style="width:140px">상태</th>
+              <th style="width:140px">일자</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </main>
+    <footer>
+      데이터 파일: <code>docs/data/tasks.json</code> · 상태 표기는 약어 없이 사용 (예: 완료(완료), 진행(진행)).
+    </footer>
+
+    <script>
+      const statusClass = s => (
+        s === '완료' ? 's-done' : s === '테스트' ? 's-test' : s === '진행' ? 's-prog' : 's-hold'
+      );
+      const lineDot = l => (l === 'A' ? 'la' : l === 'B' ? 'lb' : 'lsp');
+      const fmtDate = d => d ? d : '';
+      const stateOrder = { '진행':1, '테스트':2, '협의/보류':3, '예정':4, '완료':5 };
+
+      const $rows = document.getElementById('rows');
+      const $kTotal = document.getElementById('k-total');
+      const $kProg = document.getElementById('k-prog');
+      const $kTest = document.getElementById('k-test');
+      const $kDone = document.getElementById('k-done');
+      const $fLine = document.getElementById('f-line');
+      const $fStatus = document.getElementById('f-status');
+
+      let tasks = [];
+
+      function render(){
+        let filtered = tasks.filter(t => ($fLine.value ? t.line === $fLine.value : true) && ($fStatus.value ? t.status === $fStatus.value : true));
+        filtered.sort((a,b) => {
+          const so = (stateOrder[a.status]||9) - (stateOrder[b.status]||9);
+          if (so !== 0) return so;
+          // 날짜 오름차순 (없음은 뒤로)
+          const da = a.date || '9999-12-31';
+          const db = b.date || '9999-12-31';
+          return da.localeCompare(db);
+        });
+        $rows.innerHTML = filtered.map(t => `
+          <tr>
+            <td><span class="ldot ${lineDot(t.line)}"></span>${t.line || ''}</td>
+            <td>${t.title}</td>
+            <td><span class="badge ${statusClass(t.status)}">${t.status}</span></td>
+            <td>${fmtDate(t.date||'')}</td>
+          </tr>
+        `).join('');
+
+        // KPIs (전체 데이터 기준)
+        $kTotal.textContent = tasks.length;
+        $kProg.textContent = tasks.filter(t=>t.status==='진행').length;
+        $kTest.textContent = tasks.filter(t=>t.status==='테스트').length;
+        $kDone.textContent = tasks.filter(t=>t.status==='완료').length;
+      }
+
+      fetch('./data/tasks.json')
+        .then(r => r.json())
+        .then(json => { tasks = json; render(); })
+        .catch(() => { $rows.innerHTML = '<tr><td colspan="4">데이터를 불러오지 못했습니다.</td></tr>'; });
+
+      $fLine.addEventListener('change', render);
+      $fStatus.addEventListener('change', render);
+    </script>
+  </body>
+  </html>
+

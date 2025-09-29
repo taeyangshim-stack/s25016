@@ -1,0 +1,23 @@
+[
+  {"id": "A-1", "line": "A", "title": "시작점 터치 실패 시 동작 수정", "status": "진행"},
+  {"id": "A-2", "line": "A", "title": "쇼크 센서 활성 시 우회 기능 구현", "status": "진행"},
+  {"id": "A-3", "line": "A", "title": "LDS 원점관리 개선(로봇→PLC)", "status": "진행"},
+  {"id": "A-4", "line": "A", "title": "실시간 용접 제어 구현", "status": "테스트"},
+
+  {"id": "B-1", "line": "B", "title": "실시간 용접 제어 구현", "status": "진행"},
+  {"id": "B-2", "line": "B", "title": "UI 그림 변경 및 설명 보완", "status": "진행"},
+  {"id": "B-3", "line": "B", "title": "드라이런 대응", "status": "진행"},
+  {"id": "B-4", "line": "B", "title": "실 부재 용접 대응", "status": "진행"},
+
+  {"id": "SP-1", "line": "SP", "title": "갠트리 이동 전 충돌 점검", "status": "완료", "date": "2025-09-21"},
+  {"id": "A-5", "line": "A", "title": "아크 에러 동작 확인", "status": "완료", "date": "2025-09-23"},
+  {"id": "A-6", "line": "A", "title": "동시 용접 테스트(244)", "status": "완료", "date": "2025-09-23"},
+  {"id": "SP-2", "line": "SP", "title": "쇼크센서 신규 교체 (B1-2, A3)", "status": "완료", "date": "2025-09-23"},
+  {"id": "A-7", "line": "A", "title": "아크센싱(심 트레킹) 적용", "status": "완료", "date": "2025-09-26"},
+  {"id": "B-5", "line": "B", "title": "UI 갠트리 이동방향/범위 표시", "status": "완료", "date": "2025-09-26"},
+  {"id": "B-6", "line": "B", "title": "로봇속도 배율 % 표시", "status": "완료", "date": "2025-09-26"},
+  {"id": "A-8", "line": "A", "title": "부재 높이별 용접 동작 최적화", "status": "완료", "date": "2025-09-27"},
+
+  {"id": "A-9", "line": "A", "title": "일정 협의 필요", "status": "협의/보류"}
+]
+
