@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>삼성중공업 소조립 용접라인 — 펀치리스트 요약</title>
+    <style>
+      :root {
+        --bg: #0f1115; --panel:#161922; --text:#e6e8ee; --muted:#a8b0bf;
+        --ok:#2ecc71; --warn:#f1c40f; --err:#e74c3c; --info:#3498db; --hold:#9b59b6;
+        --chip:#212638; --border:#23283a;
+      }
+      *{box-sizing:border-box}
+      body{margin:0; font:14px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, Arial, sans-serif; background:var(--bg); color:var(--text)}
+      header{padding:24px 20px; background:linear-gradient(180deg, #151826, #121520);} 
+      h1{margin:0 0 4px; font-size:20px}
+      .subtitle{color:var(--muted); font-size:13px}
+      main{max-width:980px; margin:0 auto; padding:20px}
+      section{background:var(--panel); border:1px solid var(--border); border-radius:10px; margin:12px 0; overflow:hidden}
+      section > header{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#171a24; border-bottom:1px solid var(--border)}
+      section h2{margin:0; font-size:16px}
+      .legend{display:flex; gap:8px; flex-wrap:wrap}
+      .badge{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; background:var(--chip); color:var(--text); border:1px solid var(--border)}
+      .status-done{background:rgba(46,204,113,.15); border-color:rgba(46,204,113,.35); color:#b7f4cc}
+      .status-test{background:rgba(52,152,219,.15); border-color:rgba(52,152,219,.35); color:#c5e7fb}
+      .status-progress{background:rgba(241,196,15,.15); border-color:rgba(241,196,15,.35); color:#fde7a3}
+      .status-hold{background:rgba(155,89,182,.15); border-color:rgba(155,89,182,.35); color:#ead0f3}
+      .status-plan{background:rgba(168,176,191,.12); border-color:rgba(168,176,191,.35); color:#d6dbe6}
+      ul.items{list-style:none; margin:0; padding:0}
+      li.item{display:grid; grid-template-columns: auto 1fr auto; gap:8px 12px; padding:12px 14px; border-top:1px dashed var(--border)}
+      li.item:first-child{border-top:0}
+      .id{color:var(--muted); min-width:42px}
+      .title{font-weight:600}
+      .meta{grid-column:2 / -1; color:var(--muted); font-size:12px}
+      .kicker{color:var(--muted)}
+      .chips{display:flex; gap:6px; flex-wrap:wrap}
+      footer{max-width:980px; margin:24px auto; padding:0 20px 40px; color:var(--muted); font-size:12px}
+      code{background:#111421; padding:.1rem .35rem; border-radius:6px; border:1px solid var(--border)}
+      @media (max-width:680px){ li.item{grid-template-columns: 1fr auto; } .id{display:none} .meta{grid-column:1 / -1} }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>펀치리스트 요약</h1>
+      <div class="subtitle">삼성중공업 소조립 용접라인 · 기준일 2025-09-20</div>
+    </header>
+    <main>
+      <section>
+        <header>
+          <h2>상태 코드 범례</h2>
+        </header>
+        <ul class="items">
+          <li class="item"><span class="id"></span><span class="title">완료</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">괄호 표기도 약어 없이 사용: 완료(완료)</div></li>
+          <li class="item"><span class="id"></span><span class="title">테스트</span><span class="chips"><span class="badge status-test">테스트</span></span><div class="meta">괄호 표기 예: 테스트(테스트)</div></li>
+          <li class="item"><span class="id"></span><span class="title">진행</span><span class="chips"><span class="badge status-progress">진행</span></span><div class="meta">괄호 표기 예: 진행(진행)</div></li>
+          <li class="item"><span class="id"></span><span class="title">협의/보류</span><span class="chips"><span class="badge status-hold">협의/보류</span></span><div class="meta">괄호 표기 예: 협의(협의), 보류(보류)</div></li>
+          <li class="item"><span class="id"></span><span class="title">예정/대기 · 우선순위 낮음</span><span class="chips"><span class="badge status-plan">예정/대기</span></span><div class="meta">우선순위 표기는 약어 없이: 낮음/보통/높음</div></li>
+        </ul>
+      </section>
+
+      <section>
+        <header>
+          <h2>A LINE — 진행중·테스트</h2>
+        </header>
+        <ul class="items">
+          <li class="item"><span class="id">[1]</span><span class="title">시작점 터치 실패 시 동작 수정</span><span class="chips"><span class="badge status-progress">진행</span></span><div class="meta">요청: 이동혁 · 담당: 김격림</div></li>
+          <li class="item"><span class="id">[5]</span><span class="title">쇼크 센서 활성 시 정지 및 우회(수동)</span><span class="chips"><span class="badge status-progress">진행</span></span><div class="meta">요청: 이동혁 · 담당: 김격림</div></li>
+          <li class="item"><span class="id">[6]</span><span class="title">LDS 원점관리 개선(로봇 → PLC)</span><span class="chips"><span class="badge status-progress">진행</span></span><div class="meta">요청: 이동혁 · 담당: 김격림</div></li>
+          <li class="item"><span class="id">[7]</span><span class="title">실시간 용접 제어 구현</span><span class="chips"><span class="badge status-test">테스트</span></span><div class="meta">요청: 이동혁 · 담당: 최광년</div></li>
+        </ul>
+      </section>
+
+      <section>
+        <header>
+          <h2>A LINE — 완료</h2>
+        </header>
+        <ul class="items">
+          <li class="item"><span class="id">[2]</span><span class="title">와이어 교체 모드 구현</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">요청: 한진범 · 담당: 최광년</div></li>
+          <li class="item"><span class="id">[3]</span><span class="title">아크센싱(심 트레킹) 적용</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">완료일: 09/26 · 요청: 한진범 · 담당: 김격림</div></li>
+          <li class="item"><span class="id">[4]</span><span class="title">브레이크 포인트 동작 구현</span><span class="chips"><span class="badge status-progress">부분 진행</span></span><div class="meta">요청: 이동혁 · 담당: 김격림</div></li>
+          <li class="item"><span class="id">[8]</span><span class="title">아크 에러 동작 확인(반복 테스트)</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">완료일: 09/23 · 요청: 이동혁 · 담당: 최광년</div></li>
+          <li class="item"><span class="id">[9]</span><span class="title">400mm 미만 짧은 부재 터치 모션 개선</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">요청: 이동혁 · 담당: 최광년</div></li>
+          <li class="item"><span class="id">[10]</span><span class="title">부재 높이별 용접 동작 최적화</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">완료일: 09/27 · 요청: 이동혁 · 담당: 최광년</div></li>
+          <li class="item"><span class="id">[11]</span><span class="title">동시 용접 테스트(244)</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">완료일: 09/23 · 요청: 이동혁 · 담당: 최광년</div></li>
+        </ul>
+      </section>
+
+      <section>
+        <header>
+          <h2>B LINE — 보류/협의</h2>
+        </header>
+        <ul class="items">
+          <li class="item"><span class="id">—</span><span class="title">로봇 1대 용접</span><span class="chips"><span class="badge status-hold">보류/협의</span></span><div class="meta">진행여부 협의 필요</div></li>
+        </ul>
+      </section>
+
+      <section>
+        <header>
+          <h2>SP · 격림 · 디파인 — 진행중·테스트·협의</h2>
+        </header>
+        <ul class="items">
+          <li class="item"><span class="id">[2]</span><span class="title">용접 중 명령 중단 및 사용자 에러 처리 기능</span><span class="chips"><span class="badge status-test">테스트</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">[3]</span><span class="title">실시간 용접 조건 제어 테스트(전압, 와이어 속도)</span><span class="chips"><span class="badge status-test">테스트</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">[5]</span><span class="title">수직용접 구현</span><span class="chips"><span class="badge status-progress">진행/협의</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">[10]</span><span class="title">RIMS PC 사용: 실제 사용 전류 표시</span><span class="chips"><span class="badge status-progress">진행</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">[11-1]</span><span class="title">수동용접: 용접위치 저장 제한 해소(RC → UI)</span><span class="chips"><span class="badge status-test">테스트</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">[11-2]</span><span class="title">수동용접: 브레이크 포인트 기능 추가/보완</span><span class="chips"><span class="badge status-progress">보완</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">[11-3]</span><span class="title">매크로별 용접 위치 개수 필터링(VIA/브포)</span><span class="chips"><span class="badge status-test">테스트</span></span><div class="meta">요청: 이동혁</div></li>
+        </ul>
+      </section>
+
+      <section>
+        <header>
+          <h2>SP · 격림 · 디파인 — 완료</h2>
+        </header>
+        <ul class="items">
+          <li class="item"><span class="id">[1]</span><span class="title">에러 핸들링, 와이어 교체 Z홈 모션 추가</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">[4]</span><span class="title">와이어 교체 위치 지정 기능</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">[6]</span><span class="title">PLC 갠트리 간섭위치 확인</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">[7]</span><span class="title">갠트리 이동 전 충돌 점검</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">완료: 9/21, 9/23</div></li>
+          <li class="item"><span class="id">[8]</span><span class="title">갠트리 동작범위 초과 명령 차단</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta"></div></li>
+          <li class="item"><span class="id">[9]</span><span class="title">와이어 커팅 커맨드 정리(로봇 구분)</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta"></div></li>
+        </ul>
+      </section>
+
+      <section>
+        <header>
+          <h2>SP 기타/설비 — 진행·테스트·예정(완료는 하단)</h2>
+        </header>
+        <ul class="items">
+          <!-- Active/Test first -->
+          <li class="item"><span class="id">—</span><span class="title">각 갠트리 TCP 오차 확인</span><span class="chips"><span class="badge status-test">테스트</span></span><div class="meta">요청: 이무림</div></li>
+          <!-- Planned next -->
+          <li class="item"><span class="id">—</span><span class="title">와이어 잔량 체크 센서</span><span class="chips"><span class="badge status-plan">우선순위 낮음</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">—</span><span class="title">OP ROOM 스위치 박스 교체 및 추가 결선</span><span class="chips"><span class="badge status-plan">예정 · 야간</span></span><div class="meta"></div></li>
+          <li class="item"><span class="id">—</span><span class="title">용접기–로봇 컨트롤러 랜선 정리</span><span class="chips"><span class="badge status-plan">예정 · 야간</span></span><div class="meta"></div></li>
+          <li class="item"><span class="id">—</span><span class="title">1~4호기 PLC BOX 전장품 스티커 재부착</span><span class="chips"><span class="badge status-plan">예정 · 야간</span></span><div class="meta"></div></li>
+          <li class="item"><span class="id">—</span><span class="title">Y축 케이블 베어 케이블 재정리</span><span class="chips"><span class="badge status-plan">예정</span></span><div class="meta"></div></li>
+          <li class="item"><span class="id">—</span><span class="title">압력 게이지/유량 센서 전원 미입력</span><span class="chips"><span class="badge status-plan">예정</span></span><div class="meta"></div></li>
+          <li class="item"><span class="id">—</span><span class="title">LDS + 십자 레이저 결선</span><span class="chips"><span class="badge status-plan">예정</span></span><div class="meta">브라켓 발주</div></li>
+          <li class="item"><span class="id">—</span><span class="title">센서 명판 작업</span><span class="chips"><span class="badge status-plan">예정</span></span><div class="meta"></div></li>
+          <li class="item"><span class="id">—</span><span class="title">케이블 경로 스티커 재부착</span><span class="chips"><span class="badge status-plan">예정</span></span><div class="meta"></div></li>
+          <li class="item"><span class="id">—</span><span class="title">로봇 커넥터 ㄱ자 변경</span><span class="chips"><span class="badge status-plan">예정</span></span><div class="meta">요청: 이동혁</div></li>
+          <li class="item"><span class="id">—</span><span class="title">와이어 커터 2개 증량</span><span class="chips"><span class="badge status-plan">예정</span></span><div class="meta">담당: 이무림/심태양</div></li>
+          <!-- Completed at the bottom -->
+          <li class="item"><span class="id">—</span><span class="title">갠트리 R축 최대/최소 속도 확인</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">요청: 정예희</div></li>
+          <li class="item"><span class="id">—</span><span class="title">불스아이 결선</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">ABB 확인</div></li>
+          <li class="item"><span class="id">—</span><span class="title">안전도어 결선</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta"></div></li>
+          <li class="item"><span class="id">—</span><span class="title">와이어 커터 흔들림 보강</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">담당: 이무림/심태양</div></li>
+          <li class="item"><span class="id">—</span><span class="title">쇼크센서 신규 교체 (B LINE 1호기 2번로봇 / A LINE 3호기)</span><span class="chips"><span class="badge status-done">완료</span></span><div class="meta">완료일: 09/23 · 담당: 심태양</div></li>
+        </ul>
+      </section>
+
+      <section>
+        <header>
+          <h2>보류 요청자</h2>
+        </header>
+        <ul class="items">
+          <li class="item"><span class="id">—</span><span class="title">안창우 프로(이동혁 프로)</span><span class="chips"><span class="badge status-hold">보류/관리</span></span><div class="meta">보류 항목 총괄</div></li>
+        </ul>
+      </section>
+
+    </main>
+    <footer>
+      이 문서는 제공된 펀치리스트를 요약·정리한 정적 HTML입니다. 상태/담당/날짜는 현장 기준으로 수시 업데이트하세요.
+    </footer>
+  </body>
+  </html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>갠트리 로봇 상하축 이슈 프로젝트 대시보드</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .critical-issues {
+            grid-column: 1 / -1;
+            border-left-color: #e74c3c;
+        }
+
+        .critical-issues h3 {
+            color: #e74c3c;
+        }
+
+        .issue-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .issue-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .issue-priority {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .priority-critical {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .priority-high {
+            background: #f39c12;
+            color: white;
+        }
+
+        .stars {
+            color: #f39c12;
+            font-size: 1.2em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.5s ease;
+        }
+
+        .folder-structure {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .folder-structure li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .folder-icon {
+            font-size: 1.2em;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #3498db;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3498db;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-urgent {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .status-progress {
+            background: #f39c12;
+            color: white;
+        }
+
+        .status-complete {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .issue-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 갠트리 로봇 상하축 이슈 해결 프로젝트</h1>
+            <p>3명 협업 · 시운전 단계 발견 · 즉시 대응 필요</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- 주요 문제점 -->
+            <div class="card critical-issues">
+                <h3><span class="emoji">🚨</span> 주요 문제점 및 위험도</h3>
+                <div class="issue-grid">
+                    <div class="issue-item">
+                        <div class="issue-priority priority-critical">매우 높음</div>
+                        <h4>갠트리 로봇-소재 간섭</h4>
+                        <p>용접 사전모션 시 1.5m 소재와 충돌 위험</p>
+                        <div class="stars">★★★★★ (5/5)</div>
+                        <small>📍 매 용접 작업마다 발생 가능</small>
+                    </div>
+                    <div class="issue-item">
+                        <div class="issue-priority priority-high">높음</div>
+                        <h4>설계-실제 운용 불일치</h4>
+                        <p>이론적 설계와 실제 작업 궤적 상충</p>
+                        <div class="stars">★★★★☆ (4/5)</div>
+                        <small>📍 전체 프로세스 재검토 필요</small>
+                    </div>
+                    <div class="issue-item">
+                        <div class="issue-priority priority-high">높음</div>
+                        <h4>기설치 설비 개조 복잡성</h4>
+                        <p>시운전 단계 발견으로 대규모 개조 필요</p>
+                        <div class="stars">★★★★☆ (4/5)</div>
+                        <small>📍 일정 지연 및 추가 비용 발생</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 프로젝트 구조 -->
+            <div class="card">
+                <h3><span class="emoji">📁</span> 프로젝트 폴더 구조</h3>
+                <ul class="folder-structure">
+                    <li><span class="folder-icon">📋</span> 01_문제점분석 - 현재 상황 분석 및 원인 규명</li>
+                    <li><span class="folder-icon">🛠️</span> 02_대책수립 - 해결방안 검토 및 평가</li>
+                    <li><span class="folder-icon">📅</span> 03_일정관리 - 마일스톤 및 진행상황 추적</li>
+                    <li><span class="folder-icon">🔄</span> 04_작업진행 - 개별 작업현황 및 일일보고</li>
+                    <li><span class="folder-icon">📚</span> 05_문서자료 - 기술문서 및 회의록</li>
+                    <li><span class="folder-icon">🤝</span> 99_공유폴더 - 팀 공통 작업공간</li>
+                </ul>
+            </div>
+
+            <!-- 팀 구성 -->
+            <div class="card">
+                <h3><span class="emoji">👥</span> 팀 구성 및 역할</h3>
+                <div class="team-member">
+                    <div class="member-avatar">1</div>
+                    <div>
+                        <strong>작업자1</strong><br>
+                        <small>문제점 분석 + 기술 검토</small>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">2</div>
+                    <div>
+                        <strong>작업자2</strong><br>
+                        <small>대책 수립 + 일정 관리</small>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-avatar">3</div>
+                    <div>
+                        <strong>작업자3</strong><br>
+                        <small>실행 계획 + 문서 정리</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 진행 상황 -->
+            <div class="card">
+                <h3><span class="emoji">📊</span> 프로젝트 진행 현황</h3>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 타임라인 -->
+            <div class="card">
+                <h3><span class="emoji">⏱️</span> 작업 타임라인</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <strong>2024.09.17</strong>
+                        <span class="status-badge status-urgent">긴급</span>
+                        <p>갠트리 로봇 간섭 문제 발견</p>
+                        <small>시운전 중 안전 위험 요소 확인</small>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>진행 중</strong>
+                        <span class="status-badge status-progress">분석</span>
+                        <p>문제점 상세 분석 및 원인 규명</p>
+                        <small>정밀 측정 및 3D 모델링 검토</small>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>예정</strong>
+                        <span class="status-badge status-progress">대책</span>
+                        <p>기술적 해결방안 수립</p>
+                        <small>갠트리 높이 조정 vs 로봇 교체 검토</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 협업 규칙 -->
+            <div class="card">
+                <h3><span class="emoji">📋</span> 협업 규칙 및 체크리스트</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4>📝 파일 관리</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>✅ YYMMDD_작성자_제목.확장자</li>
+                            <li>✅ 수정 시 원본 백업</li>
+                            <li>✅ 99_공유폴더에서 검토 후 이동</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>📞 커뮤니케이션</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>✅ 일일 진행상황 업데이트</li>
+                            <li>✅ 긴급사항 즉시 공유</li>
+                            <li>✅ 표준 템플릿 활용</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #ffe6e6; border-radius: 8px;">
+                    <h4 style="color: #e74c3c;">🚨 즉시 보고 상황</h4>
+                    <p style="margin: 5px 0;">• 기존 계획으로 해결 불가능한 기술적 문제</p>
+                    <p style="margin: 5px 0;">• 2일 이상 일정 지연 예상</p>
+                    <p style="margin: 5px 0;">• 추가 리소스 필요</p>
+                    <p style="margin: 5px 0;">• 안전상 위험 요소 발견</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 프로젝트 진행 현황 차트
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        const progressChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['문제점 분석', '대책 수립', '일정 관리', '작업 진행', '문서 정리', '미완료'],
+                datasets: [{
+                    data: [85, 20, 30, 75, 40, 25],
+                    backgroundColor: [
+                        '#e74c3c',
+                        '#f39c12',
+                        '#3498db',
+                        '#2ecc71',
+                        '#9b59b6',
+                        '#ecf0f1'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: '단계별 진행률 (%)',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 애니메이션 효과
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
