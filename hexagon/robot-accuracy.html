@@ -36,6 +36,10 @@
   .box { border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:16px 0; background:#fff; }
   .tag { display:inline-block; padding:2px 8px; border-radius:999px; background:#eefaf6; color:#0a7; font-size:12px; margin-right:6px; border:1px solid #d6f4ea; }
   .note { border-left:4px solid var(--accent); padding:10px 14px; background:#f6fffb; margin:16px 0; }
+  /* media / figures */
+  figure.box.figure { text-align:center; }
+  .figure img { max-width:720px; width:100%; height:auto; border:1px solid var(--line); border-radius:10px; background:#fff; }
+  .figure figcaption { margin-top:6px; }
   @media (min-width: 1200px) {
     .wrap { display:grid; grid-template-columns: 260px 1fr; gap:24px; }
     .sidebar { position:sticky; top:16px; height:max-content; }
@@ -52,7 +56,7 @@
         <h1>로봇 정도측정 계획(안)</h1>
         <div class="small" style="margin-top:4px; color:var(--muted)">B라인 갠트리 · 위치 정도 측정 및 검증</div>
       </div>
-      <span class="badge">v0.6</span>
+      <span id="doc-version-badge" class="badge">v0.7</span>
     </div>
     <div class="toc">
       <h3>목차</h3>
@@ -73,13 +77,27 @@
         <div style="margin-top:8px"><a href="#revision">리비전/작업 이력</a></div>
       </div>
     </div>
+    <div class="box no-print" style="margin-top:12px">
+      <h3 style="margin:0 0 8px; color:var(--fg-soft)">이력 자동 업데이트</h3>
+      <div class="small" style="display:grid; grid-template-columns: 1fr; gap:8px">
+        <label>버전 <input id="rev-version" type="text" value="" style="width:100%" /></label>
+        <label>일자 <input id="rev-date" type="date" value="" style="width:100%" /></label>
+        <label>작성자 <input id="rev-author" type="text" value="" placeholder="작성자" style="width:100%" /></label>
+        <label>변경 요약 <textarea id="rev-summary" rows="3" placeholder="변경 내용을 간단히 입력" style="width:100%"></textarea></label>
+        <div>
+          <button id="rev-apply" style="padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:#e8fbf4; cursor:pointer">이력 추가 및 버전 반영</button>
+          <button id="rev-export" style="padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:#f2f7fb; cursor:pointer">HTML 저장</button>
+        </div>
+        <div class="small" id="rev-msg" style="color:var(--muted)"></div>
+      </div>
+    </div>
   </div>
   <div class="main">
   <div class="meta">
     <div><b>작업 일시</b> 2025년 10월 1일 ~ 10월 2일</div>
     <div><b>작업 장소</b> 자동용접 갠트리 B라인</div>
     <div><b>대상 설비</b> 갠트리 3대(G1, G2, G3) × 로봇 2대(R1, R2) = 총 6대</div>
-    <div><b>문서 버전</b> v0.6 · <a href="#revision">변경 이력 보기</a></div>
+    <div><b>문서 버전</b> <span id="meta-version-text">v0.7</span> · <a href="#revision">변경 이력 보기</a></div>
   </div>
 
   <h2 id="sec-0-terms">0. 용어 정리</h2>
@@ -376,7 +394,8 @@
       <h3 id="revision">리비전/작업 이력</h3>
       <table>
         <thead><tr><th>Rev</th><th>일자</th><th>변경 요약</th><th>작성자</th></tr></thead>
-        <tbody>
+        <tbody id="revision-body">
+          <tr><td>v0.7</td><td>2025-09-29</td><td>컨셉 이미지 표시 크기 제한(720px) 및 스타일 정리, 버전/목차 갱신</td><td>시스템</td></tr>
           <tr><td>v0.5</td><td>2025-09-29</td><td>절차 순서 교체(O_R 선산출 → GCS 생성), 12.2 좌표계 생성 방법(기동/3점/리섹션) 추가, 작업 이력 헤더 명확화</td><td>시스템</td></tr>
           <tr><td>v0.4</td><td>2025-09-29</td><td>부록 12.1 컨셉 이미지 레퍼런스 추가(외부 링크 포함)</td><td>시스템</td></tr>
           <tr><td>v0.3</td><td>2025-09-29</td><td>8장 측정 방법 재정리, 9장 기록표 목표별 개편, 범위/측정점 정리, 10장 결과 요약 신설, 서두 용어 정리 추가</td><td>시스템</td></tr>
@@ -399,13 +418,13 @@
   <div class="box">
     <p class="small">참고용 컨셉 이미지입니다. 외부 호스팅 링크이므로 오프라인 환경에서는 표시되지 않을 수 있습니다. 필요 시 이미지를 로컬로 저장하여 경로를 상대경로로 교체하세요.</p>
 
-    <figure class="box" style="text-align:center">
-      <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1759148581/w6skhx8etgkop0umc0mj.jpg" alt="컨셉 이미지 1" style="max-width:100%; height:auto" loading="lazy" referrerpolicy="no-referrer" />
+    <figure class="box figure">
+      <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1759148581/w6skhx8etgkop0umc0mj.jpg" alt="컨셉 이미지 1" loading="lazy" referrerpolicy="no-referrer" />
       <figcaption class="small">그림 1. 컨셉 이미지 1 — 측정 구성/표현 아이디어</figcaption>
     </figure>
 
-    <figure class="box" style="text-align:center">
-      <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1759148581/r34bpa6ly1563mgcgrhc.jpg" alt="컨셉 이미지 2" style="max-width:100%; height:auto" loading="lazy" referrerpolicy="no-referrer" />
+    <figure class="box figure">
+      <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1759148581/r34bpa6ly1563mgcgrhc.jpg" alt="컨셉 이미지 2" loading="lazy" referrerpolicy="no-referrer" />
       <figcaption class="small">그림 2. 컨셉 이미지 2 — 결과 정리/레이아웃 아이디어</figcaption>
     </figure>
 
@@ -438,5 +457,76 @@
 
 </div>
   </div>
+<script>
+  (function(){
+    const badge = document.getElementById('doc-version-badge');
+    const meta = document.getElementById('meta-version-text');
+    const body = document.getElementById('revision-body');
+    const iv = (sel) => document.getElementById(sel);
+
+    // Initialize form defaults
+    const curVer = (badge?.textContent || 'v0.0').trim();
+    function nextVersion(v){
+      const m = /^v(\d+)(?:\.(\d+))?$/.exec(v);
+      if(!m){ return 'v0.1'; }
+      const M = parseInt(m[1],10);
+      const mnr = m[2] != null ? parseInt(m[2],10) : 0;
+      return `v${M}.${mnr+1}`;
+    }
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth()+1).padStart(2,'0');
+    const dd = String(today.getDate()).padStart(2,'0');
+    if(iv('rev-version')) iv('rev-version').value = nextVersion(curVer);
+    if(iv('rev-date')) iv('rev-date').value = `${yyyy}-${mm}-${dd}`;
+    if(iv('rev-author')) iv('rev-author').value = localStorage.getItem('rev-author') || '';
+
+    function setMsg(t, ok=true){
+      const el = iv('rev-msg');
+      if(!el) return;
+      el.textContent = t;
+      el.style.color = ok ? 'var(--ok)' : 'var(--warn)';
+      setTimeout(()=>{ el.textContent=''; }, 4000);
+    }
+
+    const applyBtn = iv('rev-apply');
+    if(applyBtn) applyBtn.addEventListener('click', function(){
+      const v = (iv('rev-version')?.value || '').trim();
+      const d = (iv('rev-date')?.value || '').trim();
+      const a = (iv('rev-author')?.value || '').trim() || '시스템';
+      const s = (iv('rev-summary')?.value || '').trim();
+      if(!v){ return setMsg('버전을 입력하세요.', false); }
+      if(!d){ return setMsg('일자를 입력하세요.', false); }
+      if(!s){ return setMsg('변경 요약을 입력하세요.', false); }
+      // Update versions
+      if(badge) badge.textContent = v;
+      if(meta) meta.textContent = v;
+      // Append row to top of revision table
+      if(body){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${v}</td><td>${d}</td><td>${s}</td><td>${a}</td>`;
+        body.insertBefore(tr, body.firstChild);
+      }
+      localStorage.setItem('rev-author', a);
+      setMsg('이력 추가 완료');
+      // Suggest next version
+      if(iv('rev-version')) iv('rev-version').value = nextVersion(v);
+      if(iv('rev-summary')) iv('rev-summary').value = '';
+    });
+
+    const exportBtn = iv('rev-export');
+    if(exportBtn) exportBtn.addEventListener('click', function(){
+      const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'robot-accuracy.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    });
+  })();
+</script>
 </body>
 </html>
