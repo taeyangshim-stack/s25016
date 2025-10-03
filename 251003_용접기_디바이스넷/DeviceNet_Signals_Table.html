@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lincoln Electric Power Wave DeviceNet 시그널 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #0066cc;
+            margin-top: 30px;
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #006600;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        th {
+            background-color: #0066cc;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f0f0f0;
+        }
+        .signal-type {
+            background-color: #006600;
+        }
+        .arc-object {
+            background-color: #cc6600;
+        }
+        .phase-gen {
+            background-color: #660066;
+        }
+        .system-interface {
+            background-color: #006666;
+        }
+        .info {
+            background-color: #ffffcc;
+            padding: 10px;
+            border-left: 4px solid #ffcc00;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lincoln Electric Power Wave DeviceNet Interface<br/>Signal Specification</h1>
+
+    <div class="info">
+        <strong>문서 정보:</strong> Y50031-21 DeviceNet Interface Specification (2010/04/20)<br/>
+        <strong>대상 장비:</strong> Power Wave 용접기 시리즈
+    </div>
+
+    <h2>1. Standard I/O Assembly Signals (표준 I/O 어셈블리)</h2>
+
+    <h3>1.1 Produced Assembly - Input to Power Wave (8 bytes)</h3>
+    <table>
+        <tr>
+            <th>Byte</th>
+            <th>Bit</th>
+            <th>Signal Name</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>0</td>
+            <td>Trigger</td>
+            <td>Digital</td>
+            <td>Welding trigger command (level sensitive)</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>1</td>
+            <td>Gas Purge</td>
+            <td>Digital</td>
+            <td>Gas purge command</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>2</td>
+            <td>Touch Sense Cmd</td>
+            <td>Digital</td>
+            <td>Touch sense command (level sensitive)</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>3</td>
+            <td>Cold Inch Fwd</td>
+            <td>Digital</td>
+            <td>Cold inch forward command</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>4</td>
+            <td>Cold Inch Rev</td>
+            <td>Digital</td>
+            <td>Cold inch reverse command</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>5</td>
+            <td>Weld Output Disable</td>
+            <td>Digital</td>
+            <td>Disable welding output</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>6</td>
+            <td>Fault Reset (Arc Obj)</td>
+            <td>Digital</td>
+            <td>Reset Arc Object faults (Arc Object only)</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>0</td>
+            <td>Schedule Select (Bit 0)</td>
+            <td>Digital</td>
+            <td>Schedule selection bit 0</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>1</td>
+            <td>Schedule Select (Bit 1)</td>
+            <td>Digital</td>
+            <td>Schedule selection bit 1</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>Schedule Select (Bit 2)</td>
+            <td>Digital</td>
+            <td>Schedule selection bit 2</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>3</td>
+            <td>Process Select Ready</td>
+            <td>Digital</td>
+            <td>Process selection ready signal</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>4</td>
+            <td>Attribute Request</td>
+            <td>Digital</td>
+            <td>DeviceNet attribute request bit</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>5</td>
+            <td>Prod Mon Fault Reset</td>
+            <td>Digital</td>
+            <td>Production monitoring fault reset</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>6</td>
+            <td>PM SN Request</td>
+            <td>Digital</td>
+            <td>Production monitoring serial number request</td>
+        </tr>
+        <tr>
+            <td>2-3</td>
+            <td>-</td>
+            <td>Analog Reference 1</td>
+            <td>Analog (16-bit)</td>
+            <td>Welding Workpoint (WFS/Current)</td>
+        </tr>
+        <tr>
+            <td>4-5</td>
+            <td>-</td>
+            <td>Analog Reference 2</td>
+            <td>Analog (16-bit)</td>
+            <td>Welding Trim (Voltage)</td>
+        </tr>
+        <tr>
+            <td>6-7</td>
+            <td>-</td>
+            <td>Analog Reference 3</td>
+            <td>Analog (16-bit)</td>
+            <td>Wave Control 1</td>
+        </tr>
+    </table>
+
+    <h3>1.2 Consumed Assembly - Output from Power Wave (8 bytes)</h3>
+    <table>
+        <tr>
+            <th>Byte</th>
+            <th>Bit</th>
+            <th>Signal Name</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>0</td>
+            <td>Arc Detect</td>
+            <td>Digital</td>
+            <td>Arc detection status</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>1</td>
+            <td>Touch Sensed</td>
+            <td>Digital</td>
+            <td>Touch sense detected</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>2</td>
+            <td>Gas Fault</td>
+            <td>Digital</td>
+            <td>Gas controller fault</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>3</td>
+            <td>Wire Fault</td>
+            <td>Digital</td>
+            <td>Wire drive fault</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>4</td>
+            <td>Water Fault</td>
+            <td>Digital</td>
+            <td>Water fault (Shutdown 1)</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>5</td>
+            <td>Inverter Fault</td>
+            <td>Digital</td>
+            <td>Power source fault</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>6</td>
+            <td>Wire Stick</td>
+            <td>Digital</td>
+            <td>Wire stick condition detected</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>7</td>
+            <td>DN Fault (Sys Fault)</td>
+            <td>Digital</td>
+            <td>DeviceNet/System fault</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>0</td>
+            <td>Process Select Ack</td>
+            <td>Digital</td>
+            <td>Process selection acknowledge</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>1</td>
+            <td>Limit Error</td>
+            <td>Digital</td>
+            <td>Analog reference out of limits</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>Weld Complete</td>
+            <td>Digital</td>
+            <td>Weld cycle completed</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>3</td>
+            <td>PM Fault</td>
+            <td>Digital</td>
+            <td>Production monitoring fault/alarm</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>4</td>
+            <td>Gas Purge On</td>
+            <td>Digital</td>
+            <td>Gas purge active status</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>5</td>
+            <td>Active Feed Head</td>
+            <td>Digital</td>
+            <td>Active wire feed head (0=Head1, 1=Head2)</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>6</td>
+            <td>Toggle Bit (Arc Obj Only)</td>
+            <td>Digital</td>
+            <td>Toggle bit for Arc Object (alternates each packet)</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>7</td>
+            <td>Attribute Response</td>
+            <td>Digital</td>
+            <td>DeviceNet attribute response bit</td>
+        </tr>
+        <tr>
+            <td>2-3</td>
+            <td>-</td>
+            <td>Analog Feedback 1</td>
+            <td>Analog (16-bit)</td>
+            <td>Actual Voltage</td>
+        </tr>
+        <tr>
+            <td>4-5</td>
+            <td>-</td>
+            <td>Analog Feedback 2</td>
+            <td>Analog (16-bit)</td>
+            <td>Actual Current</td>
+        </tr>
+        <tr>
+            <td>6-7</td>
+            <td>-</td>
+            <td>Analog Feedback 3</td>
+            <td>Analog (16-bit)</td>
+            <td>Actual WFS (Wire Feed Speed)</td>
+        </tr>
+    </table>
+
+    <h2>2. Welding Object Attributes (Class 100, Instance 1)</h2>
+    <table>
+        <tr>
+            <th>Attr ID</th>
+            <th>Name</th>
+            <th>Access</th>
+            <th>Param Instance</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>TRIGGER</td>
+            <td>R/W</td>
+            <td>1</td>
+            <td>Welding trigger</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>GAS_CMD</td>
+            <td>R/W</td>
+            <td>3</td>
+            <td>Gas command</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>TOUCHSENSE_CMD</td>
+            <td>R/W</td>
+            <td>4</td>
+            <td>Touch sense command</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>CINCHFWD_CMD</td>
+            <td>R/W</td>
+            <td>5</td>
+            <td>Cold inch forward</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>CINCHREV_CMD</td>
+            <td>R/W</td>
+            <td>6</td>
+            <td>Cold inch reverse</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>TOUCHSENSED</td>
+            <td>RO</td>
+            <td>21</td>
+            <td>Touch sensed status</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>ARC_DETECT</td>
+            <td>RO</td>
+            <td>22</td>
+            <td>Arc detection status</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>ACTUALI</td>
+            <td>RO</td>
+            <td>23</td>
+            <td>Actual current (A)</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>ACTUALV</td>
+            <td>RO</td>
+            <td>24</td>
+            <td>Actual voltage (V)</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>ACTUALWFS</td>
+            <td>RO</td>
+            <td>25</td>
+            <td>Actual wire feed speed (ipm)</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>WCFSTATUS</td>
+            <td>RO</td>
+            <td>26</td>
+            <td>Weld controller fault status</td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td>WDFSTATUS</td>
+            <td>RO</td>
+            <td>27</td>
+            <td>Wire drive fault status</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td>GASFAULT</td>
+            <td>RO</td>
+            <td>28</td>
+            <td>Gas fault status</td>
+        </tr>
+        <tr>
+            <td>14</td>
+            <td>WDFAULT</td>
+            <td>RO</td>
+            <td>29</td>
+            <td>Wire drive fault</td>
+        </tr>
+        <tr>
+            <td>15</td>
+            <td>PSFAULT</td>
+            <td>RO</td>
+            <td>30</td>
+            <td>Power source fault</td>
+        </tr>
+        <tr>
+            <td>16</td>
+            <td>H2OFAULT</td>
+            <td>RO</td>
+            <td>31</td>
+            <td>Water fault</td>
+        </tr>
+        <tr>
+            <td>17</td>
+            <td>WIRESTICK</td>
+            <td>RO</td>
+            <td>32</td>
+            <td>Wire stick detected</td>
+        </tr>
+        <tr>
+            <td>18</td>
+            <td>BADVALUE</td>
+            <td>RO</td>
+            <td>33</td>
+            <td>DeviceNet bad IO value</td>
+        </tr>
+        <tr>
+            <td>19</td>
+            <td>DNFAULT</td>
+            <td>RO</td>
+            <td>34</td>
+            <td>DeviceNet fault</td>
+        </tr>
+        <tr>
+            <td>20</td>
+            <td>DNREADY</td>
+            <td>RO</td>
+            <td>35</td>
+            <td>DeviceNet ready status</td>
+        </tr>
+        <tr>
+            <td>21</td>
+            <td>AI0_FOUT</td>
+            <td>R/W</td>
+            <td>36</td>
+            <td>Analog In 0 Fan Out</td>
+        </tr>
+        <tr>
+            <td>22</td>
+            <td>AI1_FOUT</td>
+            <td>R/W</td>
+            <td>37</td>
+            <td>Analog In 1 Fan Out</td>
+        </tr>
+        <tr>
+            <td>23</td>
+            <td>AI2_FOUT</td>
+            <td>R/W</td>
+            <td>38</td>
+            <td>Analog In 2 Fan Out</td>
+        </tr>
+        <tr>
+            <td>28</td>
+            <td>METER_FREQ</td>
+            <td>R/W</td>
+            <td>43</td>
+            <td>Meter update frequency (ms)</td>
+        </tr>
+        <tr>
+            <td>29</td>
+            <td>METER_FILTER</td>
+            <td>R/W</td>
+            <td>44</td>
+            <td>Meter averaging filter time (ms)</td>
+        </tr>
+        <tr>
+            <td>31</td>
+            <td>COLDINCH_WFS</td>
+            <td>R/W</td>
+            <td>10</td>
+            <td>Cold inch wire feed speed (ipm)</td>
+        </tr>
+        <tr>
+            <td>32</td>
+            <td>DN Fault Error Code</td>
+            <td>RO</td>
+            <td>45</td>
+            <td>DeviceNet fault error code</td>
+        </tr>
+        <tr>
+            <td>38</td>
+            <td>Wire Stick Disable</td>
+            <td>R/W</td>
+            <td>57</td>
+            <td>Disable automatic wire stick detection</td>
+        </tr>
+        <tr>
+            <td>40</td>
+            <td>Weld Complete</td>
+            <td>RO</td>
+            <td>60</td>
+            <td>Weld cycle complete status</td>
+        </tr>
+        <tr>
+            <td>52</td>
+            <td>Gas Purge On</td>
+            <td>RO</td>
+            <td>74</td>
+            <td>Gas purge active status</td>
+        </tr>
+        <tr>
+            <td>53</td>
+            <td>Active Head</td>
+            <td>RO</td>
+            <td>75</td>
+            <td>Active wire feed head</td>
+        </tr>
+    </table>
+
+    <h2>3. Weld Schedule Object Attributes (Class 101, Instances 1-8)</h2>
+    <table>
+        <tr>
+            <th>Attr ID</th>
+            <th>Name</th>
+            <th>State</th>
+            <th>Param Instance</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>WELDMODE</td>
+            <td>-</td>
+            <td>2</td>
+            <td>Weld mode/procedure selection</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>TRIGGER_MODE</td>
+            <td>-</td>
+            <td>7</td>
+            <td>Trigger mode</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>RUNINWFS</td>
+            <td>3</td>
+            <td>8</td>
+            <td>Strike wire feed speed (ipm)</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>RESTRIKEWFS</td>
+            <td>12</td>
+            <td>9</td>
+            <td>Restrike wire feed speed (ipm)</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>WELDTIMER</td>
+            <td>-</td>
+            <td>11</td>
+            <td>Weld timer (s)</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>STATE_ENABLE</td>
+            <td>-</td>
+            <td>12</td>
+            <td>State enable bit mask</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>STATE_TIMER_ENABLE</td>
+            <td>-</td>
+            <td>13</td>
+            <td>State timer enable bit mask</td>
+        </tr>
+        <tr>
+            <td>9-22</td>
+            <td>WORKPOINT (States 0-13)</td>
+            <td>0-13</td>
+            <td>14</td>
+            <td>Workpoint for each state (ipm)</td>
+        </tr>
+        <tr>
+            <td>23-36</td>
+            <td>TRIM (States 0-13)</td>
+            <td>0-13</td>
+            <td>15</td>
+            <td>Trim for each state (V)</td>
+        </tr>
+        <tr>
+            <td>37-50</td>
+            <td>WAVE1 (States 0-13)</td>
+            <td>0-13</td>
+            <td>16</td>
+            <td>Wave control 1 for each state</td>
+        </tr>
+        <tr>
+            <td>51-64</td>
+            <td>WAVE2 (States 0-13)</td>
+            <td>0-13</td>
+            <td>17</td>
+            <td>Wave control 2 for each state</td>
+        </tr>
+        <tr>
+            <td>65-78</td>
+            <td>WAVE3 (States 0-13)</td>
+            <td>0-13</td>
+            <td>18</td>
+            <td>Wave control 3 for each state</td>
+        </tr>
+        <tr>
+            <td>79-92</td>
+            <td>WAVE4 (States 0-13)</td>
+            <td>0-13</td>
+            <td>19</td>
+            <td>Wave control 4 for each state</td>
+        </tr>
+        <tr>
+            <td>93-106</td>
+            <td>STATE_TIMER (States 0-13)</td>
+            <td>0-13</td>
+            <td>20</td>
+            <td>State timer for each state (ms)</td>
+        </tr>
+        <tr>
+            <td>107</td>
+            <td>Analog In Param Ref 1</td>
+            <td>-</td>
+            <td>51</td>
+            <td>Parameter instance for analog input 1</td>
+        </tr>
+        <tr>
+            <td>108</td>
+            <td>Analog In Param Ref 2</td>
+            <td>-</td>
+            <td>52</td>
+            <td>Parameter instance for analog input 2</td>
+        </tr>
+        <tr>
+            <td>109</td>
+            <td>Analog In Param Ref 3</td>
+            <td>-</td>
+            <td>53</td>
+            <td>Parameter instance for analog input 3</td>
+        </tr>
+        <tr>
+            <td>110</td>
+            <td>Analog Out Param Ref 1</td>
+            <td>-</td>
+            <td>54</td>
+            <td>Parameter instance for analog output 1</td>
+        </tr>
+        <tr>
+            <td>111</td>
+            <td>Analog Out Param Ref 2</td>
+            <td>-</td>
+            <td>55</td>
+            <td>Parameter instance for analog output 2</td>
+        </tr>
+        <tr>
+            <td>112</td>
+            <td>Analog Out Param Ref 3</td>
+            <td>-</td>
+            <td>56</td>
+            <td>Parameter instance for analog output 3</td>
+        </tr>
+        <tr>
+            <td>113</td>
+            <td>Post Purge Time</td>
+            <td>-</td>
+            <td>58</td>
+            <td>Post-flow gas purge time (s)</td>
+        </tr>
+        <tr>
+            <td>114</td>
+            <td>Pre Purge Time</td>
+            <td>-</td>
+            <td>59</td>
+            <td>Pre-flow gas purge time (s)</td>
+        </tr>
+        <tr>
+            <td>115</td>
+            <td>Wire Retract Dist</td>
+            <td>-</td>
+            <td>61</td>
+            <td>Wire retract distance (in)</td>
+        </tr>
+        <tr>
+            <td>116</td>
+            <td>Crater Fill Time</td>
+            <td>-</td>
+            <td>62</td>
+            <td>Crater fill time (s)</td>
+        </tr>
+        <tr>
+            <td>117</td>
+            <td>Cycle Counter Target</td>
+            <td>-</td>
+            <td>63</td>
+            <td>Production monitoring cycle counter target</td>
+        </tr>
+        <tr>
+            <td>118</td>
+            <td>Burn Back Timer</td>
+            <td>-</td>
+            <td>64</td>
+            <td>Burnback timer (ms)</td>
+        </tr>
+        <tr>
+            <td>119</td>
+            <td>Dual Head Mode</td>
+            <td>-</td>
+            <td>65</td>
+            <td>Dual wire feed head mode</td>
+        </tr>
+        <tr>
+            <td>120</td>
+            <td>Hot Start Boost</td>
+            <td>-</td>
+            <td>68</td>
+            <td>Hot start boost amount</td>
+        </tr>
+        <tr>
+            <td>121</td>
+            <td>Hot Start Time</td>
+            <td>-</td>
+            <td>69</td>
+            <td>Hot start time (ms)</td>
+        </tr>
+        <tr>
+            <td>122</td>
+            <td>Weld Output Inhibit</td>
+            <td>-</td>
+            <td>70</td>
+            <td>Weld output disable command</td>
+        </tr>
+        <tr>
+            <td>123</td>
+            <td>Process Select Ack</td>
+            <td>-</td>
+            <td>71</td>
+            <td>Process select acknowledge</td>
+        </tr>
+        <tr>
+            <td>124</td>
+            <td>Process Select Ready</td>
+            <td>-</td>
+            <td>72</td>
+            <td>Process select ready status</td>
+        </tr>
+        <tr>
+            <td>125</td>
+            <td>Process Running</td>
+            <td>-</td>
+            <td>73</td>
+            <td>Process running status</td>
+        </tr>
+        <tr>
+            <td>126</td>
+            <td>Schedule Num</td>
+            <td>-</td>
+            <td>76</td>
+            <td>Active schedule number (1-8)</td>
+        </tr>
+        <tr>
+            <td>127</td>
+            <td>Prod Mon Fault Code</td>
+            <td>-</td>
+            <td>77</td>
+            <td>Production monitoring fault code</td>
+        </tr>
+        <tr>
+            <td>128</td>
+            <td>PM SN Request</td>
+            <td>-</td>
+            <td>78</td>
+            <td>Production monitoring serial number request</td>
+        </tr>
+        <tr>
+            <td>129</td>
+            <td>PM Fault Reset</td>
+            <td>-</td>
+            <td>79</td>
+            <td>Production monitoring fault reset command</td>
+        </tr>
+    </table>
+
+    <h2>4. Arc Object for ACDC Systems (Class 100 Extended)</h2>
+    <div class="info">
+        <strong>참고:</strong> Arc Object는 ACDC 용접 시스템에서만 사용되는 확장 클래스입니다.
+    </div>
+
+    <h3>4.1 Arc Object Additional Attributes</h3>
+    <table>
+        <tr class="arc-object">
+            <th>Attr ID</th>
+            <th>Name</th>
+            <th>Access</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>100</td>
+            <td>Arc Number</td>
+            <td>RO</td>
+            <td>Arc instance number (1-4)</td>
+        </tr>
+        <tr>
+            <td>101</td>
+            <td>Arc Polarity</td>
+            <td>R/W</td>
+            <td>Arc polarity setting (EN/EP/AC)</td>
+        </tr>
+        <tr>
+            <td>102</td>
+            <td>Arc Enable</td>
+            <td>R/W</td>
+            <td>Enable/disable this arc</td>
+        </tr>
+        <tr>
+            <td>103</td>
+            <td>Fault Code</td>
+            <td>RO</td>
+            <td>Arc-specific fault code</td>
+        </tr>
+        <tr>
+            <td>104</td>
+            <td>Fault Reset</td>
+            <td>R/W</td>
+            <td>Reset arc faults</td>
+        </tr>
+    </table>
+
+    <h3>4.2 Arc Object I/O Assembly (Extended Format)</h3>
+    <table>
+        <tr class="arc-object">
+            <th>Byte</th>
+            <th>Bit</th>
+            <th>Signal Name</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>6</td>
+            <td>Arc Fault Reset</td>
+            <td>Reset arc-specific faults (Arc Object only)</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>6</td>
+            <td>Toggle Bit</td>
+            <td>Toggle bit for Arc Object (alternates each packet)</td>
+        </tr>
+    </table>
+
+    <h2>5. Phase Generator Objects (Class 102/103)</h2>
+    <div class="info">
+        <strong>참고:</strong> Phase Generator는 다중 아크 용접 시스템을 위한 고급 제어 기능입니다.
+    </div>
+
+    <table>
+        <tr class="phase-gen">
+            <th>Attr ID</th>
+            <th>Name</th>
+            <th>Class</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Phase Enable</td>
+            <td>102</td>
+            <td>Enable phase generator</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Phase Offset</td>
+            <td>102</td>
+            <td>Phase offset angle (degrees)</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Phase Frequency</td>
+            <td>102</td>
+            <td>Phase switching frequency (Hz)</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Arc Assignment 1</td>
+            <td>102</td>
+            <td>Arc 1 phase assignment</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Arc Assignment 2</td>
+            <td>102</td>
+            <td>Arc 2 phase assignment</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>Arc Assignment 3</td>
+            <td>102</td>
+            <td>Arc 3 phase assignment</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>Arc Assignment 4</td>
+            <td>102</td>
+            <td>Arc 4 phase assignment</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Polarity A Enable</td>
+            <td>103</td>
+            <td>Enable polarity A phase</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Polarity B Enable</td>
+            <td>103</td>
+            <td>Enable polarity B phase</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Balance Control</td>
+            <td>103</td>
+            <td>AC balance control (-100 to +100)</td>
+        </tr>
+    </table>
+
+    <h2>6. System Interface Object (Class 104)</h2>
+    <div class="info">
+        <strong>참고:</strong> System Interface는 용접 이송 속도 제어를 위한 인터페이스입니다.
+    </div>
+
+    <table>
+        <tr class="system-interface">
+            <th>Attr ID</th>
+            <th>Name</th>
+            <th>Access</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Travel Speed</td>
+            <td>R/W</td>
+            <td>Welding travel speed (ipm)</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Travel Speed Enable</td>
+            <td>R/W</td>
+            <td>Enable travel speed control</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Travel Speed Feedback</td>
+            <td>RO</td>
+            <td>Actual travel speed feedback (ipm)</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Jog Forward</td>
+            <td>R/W</td>
+            <td>Jog forward command</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Jog Reverse</td>
+            <td>R/W</td>
+            <td>Jog reverse command</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>Jog Speed</td>
+            <td>R/W</td>
+            <td>Jog speed setting (ipm)</td>
+        </tr>
+    </table>
+
+    <h2>7. Tractor Class Object (Class 105)</h2>
+    <div class="info">
+        <strong>참고:</strong> Tractor Class는 용접 캐리지 제어를 위한 전용 클래스입니다.
+    </div>
+
+    <table>
+        <tr class="system-interface">
+            <th>Attr ID</th>
+            <th>Name</th>
+            <th>Access</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Tractor Enable</td>
+            <td>R/W</td>
+            <td>Enable tractor control</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Tractor Speed</td>
+            <td>R/W</td>
+            <td>Tractor speed setting (ipm)</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Tractor Direction</td>
+            <td>R/W</td>
+            <td>Tractor direction (0=Forward, 1=Reverse)</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Tractor Run</td>
+            <td>R/W</td>
+            <td>Tractor run command</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Tractor Fault</td>
+            <td>RO</td>
+            <td>Tractor fault status</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>Tractor Fault Code</td>
+            <td>RO</td>
+            <td>Tractor fault error code</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>Tractor Position</td>
+            <td>RO</td>
+            <td>Tractor position feedback (inches)</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>Tractor Home</td>
+            <td>R/W</td>
+            <td>Tractor home position command</td>
+        </tr>
+    </table>
+
+    <h2>8. Sequencer State Definitions</h2>
+    <div class="info">
+        <strong>참고:</strong> Sequencer는 용접 프로세스의 14개 상태를 제어합니다. 각 상태는 고유한 Workpoint, Trim, Wave 제어 값을 가집니다.
+    </div>
+
+    <table>
+        <tr>
+            <th>State Number</th>
+            <th>State Name</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>Idle</td>
+            <td>대기 상태</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Setup</td>
+            <td>설정 상태</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Preflow</td>
+            <td>가스 프리플로우 (용접 전 가스 공급)</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Strike</td>
+            <td>아크 착화 (초기 아크 발생)</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Start</td>
+            <td>용접 시작 단계</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Upslope</td>
+            <td>상승 구간 (전류 증가)</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>Weld1</td>
+            <td>주 용접 구간 1</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>Weld2</td>
+            <td>주 용접 구간 2</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>Downslope</td>
+            <td>하강 구간 (전류 감소)</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>Crater</td>
+            <td>크레이터 충진 (용접 종료부 처리)</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>Burnback</td>
+            <td>번백 (와이어 연소)</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>Postflow</td>
+            <td>포스트플로우 (용접 후 가스 공급)</td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td>Restrike</td>
+            <td>재착화 (아크 재점화)</td>
+        </tr>
+        <tr>
+            <td>13</td>
+            <td>Fault</td>
+            <td>고장 상태</td>
+        </tr>
+    </table>
+
+    <h2>9. Common Error Codes</h2>
+    <table>
+        <tr>
+            <th>Error Code</th>
+            <th>Category</th>
+            <th>Description (Korean)</th>
+        </tr>
+        <tr>
+            <td>0x01</td>
+            <td>Gas Fault</td>
+            <td>가스 제어기 고장</td>
+        </tr>
+        <tr>
+            <td>0x02</td>
+            <td>Wire Fault</td>
+            <td>와이어 송급 고장</td>
+        </tr>
+        <tr>
+            <td>0x04</td>
+            <td>Water Fault</td>
+            <td>냉각수 고장 (Shutdown 1)</td>
+        </tr>
+        <tr>
+            <td>0x08</td>
+            <td>Inverter Fault</td>
+            <td>인버터 전원부 고장</td>
+        </tr>
+        <tr>
+            <td>0x10</td>
+            <td>Wire Stick</td>
+            <td>와이어 스틱 감지</td>
+        </tr>
+        <tr>
+            <td>0x20</td>
+            <td>DeviceNet Fault</td>
+            <td>DeviceNet 통신 고장</td>
+        </tr>
+        <tr>
+            <td>0x40</td>
+            <td>Limit Error</td>
+            <td>아날로그 입력 범위 초과</td>
+        </tr>
+        <tr>
+            <td>0x80</td>
+            <td>Production Monitor</td>
+            <td>생산 모니터링 알람/고장</td>
+        </tr>
+    </table>
+
+    <h2>10. DeviceNet Connection Summary</h2>
+    <table>
+        <tr>
+            <th>Connection Type</th>
+            <th>Description</th>
+            <th>Data Size</th>
+            <th>Update Rate</th>
+        </tr>
+        <tr>
+            <td>Polled I/O</td>
+            <td>실시간 제어 연결 (Produced + Consumed Assembly)</td>
+            <td>8 bytes each</td>
+            <td>2-100 ms (configurable)</td>
+        </tr>
+        <tr>
+            <td>Explicit Messaging</td>
+            <td>파라미터 설정 및 조회 (Class 100, 101, 102, 103, 104, 105)</td>
+            <td>Variable</td>
+            <td>On-demand</td>
+        </tr>
+    </table>
+
+    <div class="info" style="margin-top: 30px; background-color: #e6f2ff;">
+        <strong>문서 작성 정보:</strong><br/>
+        - 원본 문서: Y50031-21 DeviceNet Interface Specification<br/>
+        - 발행: Lincoln Electric Machine R&D<br/>
+        - 날짜: 2010년 4월 20일<br/>
+        - 추출 날짜: 2025년 10월 3일<br/>
+        - 총 76페이지 기술 사양서에서 모든 DeviceNet 시그널 정보 정리
+    </div>
+
+</body>
+</html>
