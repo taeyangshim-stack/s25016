@@ -58,7 +58,7 @@
         <h1>로봇 정도측정 계획(안)</h1>
         <div class="small" style="margin-top:4px; color:var(--muted)">B라인 갠트리 · 위치 정도 측정 및 검증</div>
       </div>
-      <span id="doc-version-badge" class="badge">v0.14</span>
+      <span id="doc-version-badge" class="badge">v0.15</span>
     </div>
     <div class="toc">
       <h3>목차</h3>
@@ -85,7 +85,7 @@
     <div><b>작업 일시</b> 2025년 10월 1일 ~ 10월 2일</div>
     <div><b>작업 장소</b> 자동용접 갠트리 B라인</div>
     <div><b>대상 설비</b> 갠트리 3대(G1, G2, G3) × 로봇 2대(R1, R2) = 총 6대</div>
-    <div><b>문서 버전</b> <span id="meta-version-text">v0.14</span> · <a href="#revision">변경 이력 보기</a></div>
+    <div><b>문서 버전</b> <span id="meta-version-text">v0.15</span> · <a href="#revision">변경 이력 보기</a></div>
   </div>
 
   <h2 id="sec-0-terms">0. 용어 정리</h2>
@@ -112,11 +112,20 @@
 
   <h2 id="sec-3-basics">3. 기준 및 방법</h2>
   <div class="box">
-    <span class="tag">기준면</span> R축 프레임 기준단을 기준면으로 사용<br />
-    <span class="tag">좌표계</span> 기준면을 기준으로 <b>로봇 베이스 좌표계</b> 생성<br />
-    <span class="tag">지그</span> 90° 단 브라켓 사용<br />
-    <span class="tag">측정점</span> 목표점 T(1차), 공통점 P_common(4차) 중심으로 필요 지점만 측정<br />
-    <span class="tag">반복</span> 동일 조건으로 최소 3회 반복 측정(평균 및 표준편차 산출 권장)
+    <span class="tag">기준면</span> <b>O_R(회전센터)</b>을 기준으로 설계치에 따라 <b>baseFrame 좌표축</b>을 확보합니다. (기준면은 O_R 기준으로 설정)<br />
+    <span class="tag">좌표계</span> O_R 기준으로 <b>로봇 베이스 좌표계(baseFrame)</b>를 생성(설계치 준거)<br />
+    <span class="tag">지그</span> 90° 단 브라켓 미사용, <b>어댑터 및 측정기 전용 브라켓</b> 사용<br />
+    <span class="tag">측정점</span> 목표점 <b>T</b>는 팬던트로 제어하는 이동 목표 포인트이며, 측정점은 <b>R축 선회</b>로 얻는 선회 포인트, <b>캘리브레이션 구(P_ball)</b>, <b>TCP 장착 SMR</b> 측정 포인트로 구성<br />
+    <span class="tag">반복</span> 동일 조건 최소 <b>3회</b> 반복(평균 및 표준편차 산출)
+  </div>
+
+  <div class="box small">
+    <b>3회 반복 통계(예시)</b>
+    <ul>
+      <li>축별 평균: <code>\bar{x} = (x_1 + x_2 + x_3)/3</code>, <code>\bar{y} = (y_1 + y_2 + y_3)/3</code>, <code>\bar{z} = (z_1 + z_2 + z_3)/3</code></li>
+      <li>축별 표준편차(표본): <code>s_x = sqrt( ((x_1-\bar{x})^2 + (x_2-\bar{x})^2 + (x_3-\bar{x})^2) / (3-1) )</code> (y,z 동일)</li>
+      <li>3D 거리 편차: <code>d_i = || p_i - p_{target} ||</code>, 평균 <code>\bar{d} = (d_1+d_2+d_3)/3</code>, 표준편차 <code>s_d = sqrt( ((d_1-\bar{d})^2 + (d_2-\bar{d})^2 + (d_3-\bar{d})^2) / (3-1) )</code></li>
+    </ul>
   </div>
 
   
@@ -426,6 +435,7 @@
       <table>
         <thead><tr><th>Rev</th><th>일자</th><th>변경 요약</th><th>작성자</th></tr></thead>
         <tbody id="revision-body">
+          <tr><td>v0.15</td><td>2025-09-29</td><td>3장 기준/방법 정정: 기준면=O_R, baseFrame 생성 기준 명확화, 전용 브라켓 사용, 측정점 정의 상세화, 3회 반복 통계 수식 추가</td><td>시스템</td></tr>
           <tr><td>v0.14</td><td>2025-09-29</td><td>설명용 그림 자리표시자 추가(4·6·8·9·10장), 섹션별 캡션 및 위치 제안</td><td>시스템</td></tr>
           <tr><td>v0.13</td><td>2025-09-29</td><td>문서 내 편집 기능(이력 자동 업데이트 패널/스크립트) 제거</td><td>시스템</td></tr>
           <tr><td>v0.12</td><td>2025-09-29</td><td>이력 입력 가드 추가(저장 확인 체크박스, 기본 비활성화). 적용 시 자동 저장 안내 목적.</td><td>시스템</td></tr>
