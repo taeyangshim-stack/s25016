@@ -66,6 +66,55 @@
             border-left: 4px solid #ffcc00;
             margin: 20px 0;
         }
+        .troubleshooting {
+            background-color: #990000;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .error-box {
+            background-color: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .success-box {
+            background-color: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+        .checklist li {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #0066cc;
+        }
+        .checklist li:before {
+            content: "☐ ";
+            font-size: 1.3em;
+            margin-right: 10px;
+        }
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #0066cc;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -1257,13 +1306,287 @@
         </tr>
     </table>
 
+    <h2 style="color: #990000; border-bottom-color: #990000;">11. ABB ArcWare 연동 문제 해결 가이드</h2>
+
+    <div class="error-box">
+        <h3 style="color: #dc3545; margin-top: 0;">⚠️ 문제 상황</h3>
+        <p style="font-size: 1.1em; font-weight: bold;">
+            DeviceNet I/O 매핑은 완료했으나 ABB ArcWare에서 용접기가 반응하지 않는 경우
+        </p>
+        <p>
+            Lincoln Electric 용접기와 ABB 로봇 간 DeviceNet 통신이 물리적으로 연결되었으나,
+            ArcWare 용접 프로세스가 실제 용접기를 제어하지 못하는 상황입니다.
+        </p>
+    </div>
+
+    <h3>🔍 1단계: DeviceNet 통신 상태 확인</h3>
+
+    <div class="warning-box">
+        <h4>ABB Controller에서 확인</h4>
+        <ul class="checklist">
+            <li><strong>RobotStudio → I/O System → DeviceNet Master</strong> - 녹색 상태 확인</li>
+            <li><strong>I/O 리스트에서 Lincoln 용접기 노드</strong> - 온라인 상태 확인</li>
+            <li><strong>Produced/Consumed Assembly 연결</strong> - 8 bytes 송수신 정상 확인</li>
+            <li><strong>DeviceNet Network Status LED</strong> - 녹색 점멸 확인 (통신 중)</li>
+        </ul>
+    </div>
+
+    <table>
+        <tr class="troubleshooting">
+            <th>확인 항목</th>
+            <th>정상 상태</th>
+            <th>비정상 시 조치</th>
+        </tr>
+        <tr>
+            <td>DeviceNet Master 상태</td>
+            <td>Green (Online)</td>
+            <td>네트워크 케이블, 종단저항(120Ω) 확인</td>
+        </tr>
+        <tr>
+            <td>Lincoln 용접기 Node ID</td>
+            <td>설정값과 일치 (통상 63)</td>
+            <td>용접기 DeviceNet 설정 메뉴에서 Node ID 재확인</td>
+        </tr>
+        <tr>
+            <td>Baud Rate</td>
+            <td>125 kbps 또는 250 kbps (일치 필요)</td>
+            <td>Master와 Slave 모두 동일한 속도로 설정</td>
+        </tr>
+        <tr>
+            <td>I/O Mapping</td>
+            <td>Byte 0-7 입출력 매핑 완료</td>
+            <td>EIO.cfg 파일 확인 및 재로딩</td>
+        </tr>
+    </table>
+
+    <h3>🔧 2단계: ABB ArcWare 설정 확인</h3>
+
+    <div class="warning-box">
+        <h4>RAPID 프로그램에서 확인해야 할 사항</h4>
+        <p><span class="step-number">1</span><strong>ArcWare 초기화 코드</strong></p>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+MODULE MainModule
+    ! DeviceNet I/O 신호 선언
+    VAR signaldo doWeldTrigger;      ! Trigger (Byte 0, Bit 0)
+    VAR signaldo doGasPurge;         ! Gas Purge (Byte 0, Bit 1)
+    VAR signaldi diArcDetect;        ! Arc Detect (Byte 0, Bit 0)
+    VAR signalao aoWorkpoint;        ! Workpoint (Byte 2-3)
+    VAR signalao aoTrim;             ! Trim (Byte 4-5)
+    VAR signalai aiActualVolt;       ! Actual Voltage (Byte 2-3)
+    VAR signalai aiActualCurr;       ! Actual Current (Byte 4-5)
+
+    ! ArcWare 설정 데이터
+    PERS welddata wdLincoln := [초기값 설정];
+    PERS seamdata sdTest := [초기값 설정];
+
+    PROC main()
+        ! ArcWare 초기화 (필수!)
+        ArcInit;
+        ArcEnable;
+
+        ! 용접 프로세스
+        ArcL p10, v100, seam1, weld1, z10, tool1;
+    ENDPROC
+ENDMODULE</pre>
+
+        <p><span class="step-number">2</span><strong>welddata 파라미터 설정</strong></p>
+        <ul class="checklist">
+            <li><strong>weld_type</strong> = 1 (MIG/MAG 용접)</li>
+            <li><strong>equipment_no</strong> = 1 (용접기 번호, ArcWare 설정과 일치)</li>
+            <li><strong>schedule_no</strong> = 1~8 (Lincoln Schedule 번호)</li>
+            <li><strong>weld_mode</strong> = 용접 모드 (WELDMODE 파라미터)</li>
+        </ul>
+
+        <p><span class="step-number">3</span><strong>I/O 신호 매핑 확인</strong></p>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+! Configuration → I/O → Signal 메뉴에서 확인
+doWeldTrigger    DO  DeviceNet/Node63/Byte0/Bit0
+doGasPurge       DO  DeviceNet/Node63/Byte0/Bit1
+diArcDetect      DI  DeviceNet/Node63/Byte0/Bit0  (Consumed)
+aoWorkpoint      AO  DeviceNet/Node63/Byte2-3
+aoTrim           AO  DeviceNet/Node63/Byte4-5</pre>
+    </div>
+
+    <h3>⚙️ 3단계: ArcWare Equipment Configuration</h3>
+
+    <table>
+        <tr class="troubleshooting">
+            <th>파라미터</th>
+            <th>설정 위치</th>
+            <th>권장값</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>Equipment Number</td>
+            <td>Configuration → Arc</td>
+            <td>1</td>
+            <td>RAPID welddata의 equipment_no와 일치</td>
+        </tr>
+        <tr>
+            <td>Equipment Type</td>
+            <td>Configuration → Arc</td>
+            <td>External (DeviceNet)</td>
+            <td>외부 용접기 (Lincoln) 사용</td>
+        </tr>
+        <tr>
+            <td>Trigger Signal</td>
+            <td>Arc Equipment → I/O</td>
+            <td>doWeldTrigger</td>
+            <td>용접 트리거 출력 신호 매핑</td>
+        </tr>
+        <tr>
+            <td>Arc OK Signal</td>
+            <td>Arc Equipment → I/O</td>
+            <td>diArcDetect</td>
+            <td>아크 감지 입력 신호 매핑</td>
+        </tr>
+        <tr>
+            <td>Workpoint Signal</td>
+            <td>Arc Equipment → I/O</td>
+            <td>aoWorkpoint</td>
+            <td>WFS/전류 설정값 출력</td>
+        </tr>
+        <tr>
+            <td>Trim Signal</td>
+            <td>Arc Equipment → I/O</td>
+            <td>aoTrim</td>
+            <td>전압 설정값 출력</td>
+        </tr>
+    </table>
+
+    <h3>🧪 4단계: 수동 테스트 (Troubleshooting)</h3>
+
+    <div class="success-box">
+        <h4>Step-by-Step 수동 I/O 테스트</h4>
+
+        <p><strong>테스트 1: 디지털 출력 확인</strong></p>
+        <ol>
+            <li>RobotStudio → I/O 탭 → doWeldTrigger 신호 선택</li>
+            <li>수동으로 신호를 1 (High)로 설정</li>
+            <li>Lincoln 용접기에서 트리거 LED가 켜지는지 확인</li>
+            <li>용접기 디스플레이에서 "DN Trigger" 상태 확인</li>
+        </ol>
+
+        <p><strong>테스트 2: 아날로그 출력 확인</strong></p>
+        <ol>
+            <li>aoWorkpoint 신호를 수동으로 500 (50% = 약 200 ipm) 설정</li>
+            <li>aoTrim 신호를 수동으로 500 (50% = 약 20V) 설정</li>
+            <li>용접기 디스플레이에서 WFS 및 전압 설정값 변화 확인</li>
+        </ol>
+
+        <p><strong>테스트 3: 디지털 입력 확인</strong></p>
+        <ol>
+            <li>용접기에서 수동으로 트리거 버튼 누름 (또는 테스트 모드)</li>
+            <li>RobotStudio → I/O 탭 → diArcDetect 신호 값 확인</li>
+            <li>아크 발생 시 신호가 1 (High)로 변경되는지 확인</li>
+        </ol>
+    </div>
+
+    <h3>🚨 5단계: 일반적인 문제 및 해결책</h3>
+
+    <table>
+        <tr class="troubleshooting">
+            <th>증상</th>
+            <th>원인</th>
+            <th>해결 방법</th>
+        </tr>
+        <tr>
+            <td>ArcL 명령 실행 시 "Arc Start Timeout" 오류</td>
+            <td>Arc OK 신호 미수신</td>
+            <td>
+                • diArcDetect 신호 매핑 확인<br>
+                • Lincoln 용접기 Arc Detect 출력 활성화 확인<br>
+                • DeviceNet Consumed Assembly Byte0 Bit0 연결 확인
+            </td>
+        </tr>
+        <tr>
+            <td>트리거 신호는 나가지만 용접기 미동작</td>
+            <td>용접기 준비 미완료</td>
+            <td>
+                • 용접기 전면 패널에서 "Ready" 상태 확인<br>
+                • Gas Fault, Wire Fault 등 고장 상태 해제<br>
+                • Schedule 선택 (Byte1 Bit0-2) 확인<br>
+                • Weld Output Disable (Byte0 Bit5) = 0 확인
+            </td>
+        </tr>
+        <tr>
+            <td>아날로그 값 설정이 반영 안됨</td>
+            <td>스케일링 불일치</td>
+            <td>
+                • ArcWare 아날로그 스케일 설정 확인<br>
+                • Lincoln 16-bit 범위: 0~1000 = 0~100%<br>
+                • ABB AO 신호 범위: -10000~10000 → 0~1000 변환 필요
+            </td>
+        </tr>
+        <tr>
+            <td>간헐적 통신 끊김</td>
+            <td>DeviceNet 노이즈</td>
+            <td>
+                • 실드 케이블 접지 확인<br>
+                • 용접 전원선과 DeviceNet 케이블 분리 (최소 30cm)<br>
+                • 페라이트 코어 추가
+            </td>
+        </tr>
+        <tr>
+            <td>용접은 되지만 파라미터 조정 안됨</td>
+            <td>Explicit Message 미설정</td>
+            <td>
+                • DeviceNet Explicit Messaging 활성화<br>
+                • Class 101 (Weld Schedule) 쓰기 권한 확인<br>
+                • RAPID에서 SetDO/SetAO 명령으로 파라미터 전송
+            </td>
+        </tr>
+    </table>
+
+    <h3>📋 6단계: 최종 체크리스트</h3>
+
+    <div class="warning-box">
+        <h4>ABB + Lincoln DeviceNet 연동 검증 체크리스트</h4>
+        <ul class="checklist">
+            <li>DeviceNet Master 및 Lincoln Node 온라인 상태 (녹색)</li>
+            <li>Produced Assembly (8 bytes) → Lincoln 용접기 연결</li>
+            <li>Consumed Assembly (8 bytes) → ABB 로봇 연결</li>
+            <li>I/O 신호 매핑 (DO, DI, AO, AI) 완료 및 테스트</li>
+            <li>ArcWare Equipment Number 설정 (RAPID와 일치)</li>
+            <li>welddata 및 seamdata 파라미터 설정</li>
+            <li>ArcInit, ArcEnable 초기화 코드 실행</li>
+            <li>수동 I/O 테스트로 각 신호 동작 확인</li>
+            <li>Lincoln 용접기 Ready 상태 및 고장 해제</li>
+            <li>Schedule 번호 선택 (1~8) 확인</li>
+            <li>아크 감지 신호(Arc OK) 정상 수신 확인</li>
+            <li>실제 용접 테스트 (ArcL 명령) 성공</li>
+        </ul>
+    </div>
+
+    <h3>📞 7단계: 추가 지원</h3>
+
+    <div class="info" style="background-color: #e6f2ff;">
+        <h4>문제가 계속되는 경우</h4>
+        <p>
+            <strong>Lincoln Electric 기술 지원:</strong><br>
+            • DeviceNet 설정, 파라미터 확인<br>
+            • Y50031-21 사양서 6~10장 참조<br><br>
+
+            <strong>ABB 기술 지원:</strong><br>
+            • ArcWare Configuration Manual 참조<br>
+            • Application Manual - Arc Welding 참조<br>
+            • DeviceNet I/O 설정 가이드 참조<br><br>
+
+            <strong>DeviceNet 통신 분석:</strong><br>
+            • Wireshark + DeviceNet 플러그인으로 패킷 캡처<br>
+            • DeviceNet Analyzer로 네트워크 진단<br>
+            • Oscilloscope로 CAN High/Low 신호 확인
+        </p>
+    </div>
+
     <div class="info" style="margin-top: 30px; background-color: #e6f2ff;">
         <strong>문서 작성 정보:</strong><br/>
         - 원본 문서: Y50031-21 DeviceNet Interface Specification<br/>
         - 발행: Lincoln Electric Machine R&D<br/>
         - 날짜: 2010년 4월 20일<br/>
         - 추출 날짜: 2025년 10월 3일<br/>
-        - 총 76페이지 기술 사양서에서 모든 DeviceNet 시그널 정보 정리
+        - 총 76페이지 기술 사양서에서 모든 DeviceNet 시그널 정보 정리<br/>
+        - ABB ArcWare 연동 문제 해결 가이드 추가: 2025년 10월 3일
     </div>
 
 </body>
