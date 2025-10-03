@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S25015 프로젝트 통합 대시보드</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #4a90e2;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 20px 30px;
+            cursor: pointer;
+            background: #ecf0f1;
+            border: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .nav-tab:hover {
+            background: #d5dbdb;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #4a90e2;
+            border-bottom: 3px solid #4a90e2;
+            margin-bottom: -3px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid #4a90e2;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-devicenet {
+            border-left-color: #27ae60;
+        }
+
+        .card-robot {
+            border-left-color: #e74c3c;
+        }
+
+        .card-hexagon {
+            border-left-color: #9b59b6;
+        }
+
+        .project-link {
+            display: block;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .project-link:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .project-link-devicenet {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .project-link-devicenet:hover {
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .project-link-robot {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .project-link-robot:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .folder-structure {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .folder-structure li {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .folder-structure li:hover {
+            background: #f8f9fa;
+        }
+
+        .folder-icon {
+            font-size: 1.3em;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #4a90e2;
+            margin: 20px 0;
+        }
+
+        .info-box h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #4a90e2;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .file-link {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #ecf0f1;
+            color: #2c3e50;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .file-link:hover {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #f39c12;
+            margin: 20px 0;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #4a90e2 0%, #27ae60 100%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 8px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 20px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #4a90e2;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #4a90e2;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-new {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .badge-update {
+            background: #f39c12;
+            color: white;
+        }
+
+        .badge-complete {
+            background: #27ae60;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tab {
+                min-width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 S25015 프로젝트 통합 대시보드</h1>
+            <p>로봇 시스템 개발 · DeviceNet 통신 · 정밀 측정 솔루션</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">🏠 전체 개요</button>
+            <button class="nav-tab" onclick="showTab('devicenet')">🔌 DeviceNet</button>
+            <button class="nav-tab" onclick="showTab('robot')">🤖 로봇 상하축</button>
+            <button class="nav-tab" onclick="showTab('hexagon')">📐 Hexagon</button>
+            <button class="nav-tab" onclick="showTab('documents')">📚 문서 자료</button>
+        </div>
+
+        <!-- 전체 개요 탭 -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">진행 중 프로젝트</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">158</div>
+                    <div class="stat-label">DeviceNet 신호</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">14</div>
+                    <div class="stat-label">용접 시퀀스 상태</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">프로젝트 폴더</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card card-devicenet">
+                    <h3><span class="emoji">🔌</span> 용접기 DeviceNet 인터페이스</h3>
+                    <div class="info-box">
+                        <h4>Lincoln Electric Power Wave</h4>
+                        <p>
+                            <strong>문서:</strong> Y50031-21 DeviceNet Interface Specification<br>
+                            <strong>날짜:</strong> 2010년 4월 20일<br>
+                            <strong>분량:</strong> 76페이지 기술 사양서
+                        </p>
+                    </div>
+                    <a href="251003_용접기_디바이스넷/DeviceNet_Signals_Table.html" class="project-link project-link-devicenet" target="_blank">
+                        📋 DeviceNet 신호 테이블 보기
+                    </a>
+                    <a href="251003_용접기_디바이스넷/Y50031_DeviceNetInterfaceSpecification-21.pdf" class="project-link project-link-devicenet" target="_blank">
+                        📄 원본 PDF 문서 보기
+                    </a>
+                </div>
+
+                <div class="card card-robot">
+                    <h3><span class="emoji">🤖</span> 갠트리 로봇 상하축 이슈</h3>
+                    <div class="info-box">
+                        <h4>시운전 단계 긴급 대응</h4>
+                        <p>
+                            <strong>발견:</strong> 2024년 9월 17일<br>
+                            <strong>위험도:</strong> 매우 높음 (★★★★★)<br>
+                            <strong>팀 구성:</strong> 3명 협업 체제
+                        </p>
+                    </div>
+                    <a href="상하축이슈_대시보드.html" class="project-link project-link-robot" target="_blank">
+                        🎯 상하축 이슈 대시보드
+                    </a>
+                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link project-link-robot" target="_blank">
+                        🧪 테스트 결과 보기
+                    </a>
+                </div>
+
+                <div class="card card-hexagon">
+                    <h3><span class="emoji">📐</span> Hexagon 정밀 측정</h3>
+                    <div class="info-box">
+                        <h4>로봇 정밀도 검증 프로젝트</h4>
+                        <p>
+                            <strong>목적:</strong> 로봇 정확도 측정 및 분석<br>
+                            <strong>일정:</strong> 프로젝트 관리 시스템 운영<br>
+                            <strong>문서:</strong> 펀치리스트 및 일정표
+                        </p>
+                    </div>
+                    <a href="hexagon/index.html" class="project-link" target="_blank">
+                        🏠 Hexagon 메인 페이지
+                    </a>
+                    <a href="hexagon/robot-accuracy.html" class="project-link" target="_blank">
+                        📊 로봇 정확도 분석
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3><span class="emoji">📁</span> 프로젝트 폴더 구조</h3>
+                    <ul class="folder-structure">
+                        <li><span class="folder-icon">🔌</span> 251003_용접기_디바이스넷</li>
+                        <li><span class="folder-icon">🤖</span> 250917_상하축이슈</li>
+                        <li><span class="folder-icon">📐</span> hexagon</li>
+                        <li><span class="folder-icon">📋</span> AGENTS.md</li>
+                        <li><span class="folder-icon">📘</span> CLAUDE.md</li>
+                        <li><span class="folder-icon">⚙️</span> vercel.json</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">📅 최근 프로젝트 타임라인</h3>
+                <div class="timeline-item">
+                    <strong>2024.10.03</strong>
+                    <span class="badge badge-new">NEW</span>
+                    <p>DeviceNet 신호 테이블 HTML 문서 작성 완료</p>
+                    <small>Lincoln Electric Power Wave 사양서 76페이지 전체 분석</small>
+                </div>
+                <div class="timeline-item">
+                    <strong>2024.10.03</strong>
+                    <span class="badge badge-update">UPDATE</span>
+                    <p>ROBOT-UI 테스트 1차 결과 보고</p>
+                    <small>실행/부팅, 속도/배율, 안전/근접, 에러처리, UI/알람 5개 카테고리</small>
+                </div>
+                <div class="timeline-item">
+                    <strong>2024.09.29</strong>
+                    <span class="badge badge-complete">COMPLETE</span>
+                    <p>Hexagon 프로젝트 문서화 완료</p>
+                    <small>로봇 정확도 측정 시스템 구축</small>
+                </div>
+                <div class="timeline-item">
+                    <strong>2024.09.17</strong>
+                    <span class="badge badge-new">URGENT</span>
+                    <p>갠트리 로봇 상하축 간섭 문제 발견</p>
+                    <small>시운전 중 안전 위험 요소 확인 및 긴급 대응 시작</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- DeviceNet 탭 -->
+        <div id="devicenet" class="tab-content">
+            <div class="highlight-box">
+                <h2 style="color: #27ae60; margin-bottom: 15px;">🔌 Lincoln Electric Power Wave DeviceNet Interface</h2>
+                <p style="line-height: 1.8;">
+                    용접기 DeviceNet 통신 인터페이스의 모든 신호를 체계적으로 정리한 문서입니다.
+                    실시간 I/O Assembly부터 파라미터 객체까지 158개 이상의 신호를 10개 섹션으로 분류하여 제공합니다.
+                </p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>📋 신호 테이블 섹션</h3>
+                    <ul class="folder-structure">
+                        <li><span class="folder-icon">1️⃣</span> Standard I/O Assembly (16 bytes)</li>
+                        <li><span class="folder-icon">2️⃣</span> Welding Object (Class 100, 53 attributes)</li>
+                        <li><span class="folder-icon">3️⃣</span> Weld Schedule Object (Class 101, 129 attributes)</li>
+                        <li><span class="folder-icon">4️⃣</span> Arc Object for ACDC Systems</li>
+                        <li><span class="folder-icon">5️⃣</span> Phase Generator (Class 102/103)</li>
+                        <li><span class="folder-icon">6️⃣</span> System Interface (Class 104)</li>
+                        <li><span class="folder-icon">7️⃣</span> Tractor Class (Class 105)</li>
+                        <li><span class="folder-icon">8️⃣</span> Sequencer State Definitions (14 states)</li>
+                        <li><span class="folder-icon">9️⃣</span> Common Error Codes</li>
+                        <li><span class="folder-icon">🔟</span> DeviceNet Connection Summary</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🎯 주요 기능</h3>
+                    <div class="info-box">
+                        <h4>실시간 I/O 제어</h4>
+                        <p>
+                            <strong>Produced Assembly:</strong> PLC → 용접기 (8 bytes)<br>
+                            - 트리거, 가스, 터치센스 등 디지털 입력<br>
+                            - Workpoint, Trim, Wave 아날로그 제어<br><br>
+                            <strong>Consumed Assembly:</strong> 용접기 → PLC (8 bytes)<br>
+                            - 아크 감지, 고장 상태 등 디지털 출력<br>
+                            - 실제 전압, 전류, WFS 피드백
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 용접 시퀀스 상태</h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                        <p style="margin: 8px 0;"><strong>0:</strong> Idle (대기)</p>
+                        <p style="margin: 8px 0;"><strong>1:</strong> Setup (설정)</p>
+                        <p style="margin: 8px 0;"><strong>2:</strong> Preflow (가스 프리플로우)</p>
+                        <p style="margin: 8px 0;"><strong>3:</strong> Strike (아크 착화)</p>
+                        <p style="margin: 8px 0;"><strong>4:</strong> Start (용접 시작)</p>
+                        <p style="margin: 8px 0;"><strong>5:</strong> Upslope (상승 구간)</p>
+                        <p style="margin: 8px 0;"><strong>6-7:</strong> Weld1-2 (주 용접)</p>
+                        <p style="margin: 8px 0;"><strong>8:</strong> Downslope (하강 구간)</p>
+                        <p style="margin: 8px 0;"><strong>9:</strong> Crater (크레이터 충진)</p>
+                        <p style="margin: 8px 0;"><strong>10:</strong> Burnback (번백)</p>
+                        <p style="margin: 8px 0;"><strong>11:</strong> Postflow (포스트플로우)</p>
+                        <p style="margin: 8px 0;"><strong>12:</strong> Restrike (재착화)</p>
+                        <p style="margin: 8px 0;"><strong>13:</strong> Fault (고장)</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔗 문서 링크</h3>
+                    <a href="251003_용접기_디바이스넷/DeviceNet_Signals_Table.html" class="project-link project-link-devicenet" target="_blank">
+                        📋 전체 신호 테이블 HTML 보기
+                    </a>
+                    <a href="251003_용접기_디바이스넷/Y50031_DeviceNetInterfaceSpecification-21.pdf" class="project-link project-link-devicenet" target="_blank">
+                        📄 원본 PDF 사양서 (76 pages)
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로봇 상하축 탭 -->
+        <div id="robot" class="tab-content">
+            <div class="highlight-box" style="background: linear-gradient(135deg, #ffe6e6 0%, #ffcccc 100%); border-left-color: #e74c3c;">
+                <h2 style="color: #e74c3c; margin-bottom: 15px;">🤖 갠트리 로봇 상하축 이슈 해결 프로젝트</h2>
+                <p style="line-height: 1.8;">
+                    시운전 단계에서 발견된 갠트리 로봇과 1.5m 소재 간 간섭 문제를 해결하기 위한 긴급 대응 프로젝트입니다.
+                    3명의 팀원이 협업하여 문제 분석부터 대책 수립, 실행까지 체계적으로 진행하고 있습니다.
+                </p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>🚨 주요 이슈 (위험도: ★★★★★)</h3>
+                    <div style="background: #ffe6e6; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                        <h4 style="color: #e74c3c;">갠트리 로봇-소재 간섭</h4>
+                        <p>용접 사전모션 시 1.5m 소재와 충돌 위험</p>
+                        <small>📍 매 용접 작업마다 발생 가능</small>
+                    </div>
+                    <div style="background: #fff3e6; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                        <h4 style="color: #f39c12;">설계-실제 운용 불일치</h4>
+                        <p>이론적 설계와 실제 작업 궤적 상충</p>
+                        <small>📍 전체 프로세스 재검토 필요</small>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📁 프로젝트 폴더 구조</h3>
+                    <ul class="folder-structure">
+                        <li><span class="folder-icon">📋</span> 01_문제점분석</li>
+                        <li><span class="folder-icon">🛠️</span> 02_대책수립</li>
+                        <li><span class="folder-icon">📅</span> 03_일정관리</li>
+                        <li><span class="folder-icon">🔄</span> 04_작업진행</li>
+                        <li><span class="folder-icon">📚</span> 05_문서자료</li>
+                        <li><span class="folder-icon">🤝</span> 99_공유폴더</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🧪 테스트 진행 상황</h3>
+                    <div class="info-box">
+                        <h4>ROBOT+UI 테스트 1차 결과</h4>
+                        <p>
+                            <strong>날짜:</strong> 2024년 10월 3일<br>
+                            <strong>카테고리:</strong> 5개 테스트 영역<br>
+                            - 실행 및 부팅<br>
+                            - 속도 및 배율<br>
+                            - 안전 및 근접<br>
+                            - 에러 처리<br>
+                            - UI 및 알람
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔗 관련 문서</h3>
+                    <a href="상하축이슈_대시보드.html" class="project-link project-link-robot" target="_blank">
+                        🎯 상하축 이슈 전용 대시보드
+                    </a>
+                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link project-link-robot" target="_blank">
+                        🧪 테스트 1차 결과 보고서
+                    </a>
+                    <div style="margin-top: 15px;">
+                        <a href="250917_상하축이슈/01_문제점분석/251003_에이전트_ROBOT-UI_테스트이슈_분석.md" class="file-link">📄 테스트이슈 분석.md</a>
+                        <a href="250917_상하축이슈/01_문제점분석/240917_갠트리로봇_간섭문제.md" class="file-link">📄 간섭문제.md</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hexagon 탭 -->
+        <div id="hexagon" class="tab-content">
+            <div class="highlight-box" style="background: linear-gradient(135deg, #f3e6ff 0%, #e6ccff 100%); border-left-color: #9b59b6;">
+                <h2 style="color: #9b59b6; margin-bottom: 15px;">📐 Hexagon 로봇 정밀도 측정 프로젝트</h2>
+                <p style="line-height: 1.8;">
+                    로봇 시스템의 정확도를 검증하고 측정하기 위한 Hexagon 정밀 측정 프로젝트입니다.
+                    프로젝트 일정 관리, 펀치리스트, 로봇 정확도 분석 등을 체계적으로 관리합니다.
+                </p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>📊 주요 페이지</h3>
+                    <a href="hexagon/index.html" class="project-link" target="_blank">
+                        🏠 Hexagon 메인 페이지
+                    </a>
+                    <a href="hexagon/robot-accuracy.html" class="project-link" target="_blank">
+                        📊 로봇 정확도 분석
+                    </a>
+                    <a href="hexagon/schedule.html" class="project-link" target="_blank">
+                        📅 프로젝트 일정표
+                    </a>
+                    <a href="hexagon/punchlist.html" class="project-link" target="_blank">
+                        ✅ 펀치리스트
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>📁 폴더 구조</h3>
+                    <ul class="folder-structure">
+                        <li><span class="folder-icon">🏠</span> index.html</li>
+                        <li><span class="folder-icon">📊</span> robot-accuracy.html</li>
+                        <li><span class="folder-icon">📅</span> schedule.html</li>
+                        <li><span class="folder-icon">✅</span> punchlist.html</li>
+                        <li><span class="folder-icon">📁</span> docs/</li>
+                        <li><span class="folder-icon">📋</span> AGENTS.md</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 문서 자료 탭 -->
+        <div id="documents" class="tab-content">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">📚 프로젝트 문서 자료</h2>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>📋 프로젝트 가이드</h3>
+                    <a href="CLAUDE.md" class="file-link">📘 CLAUDE.md</a>
+                    <a href="AGENTS.md" class="file-link">📋 AGENTS.md</a>
+                    <a href="vercel.json" class="file-link">⚙️ vercel.json</a>
+                </div>
+
+                <div class="card">
+                    <h3>🔌 DeviceNet 문서</h3>
+                    <a href="251003_용접기_디바이스넷/DeviceNet_Signals_Table.html" class="file-link">📋 신호 테이블 (HTML)</a>
+                    <a href="251003_용접기_디바이스넷/Y50031_DeviceNetInterfaceSpecification-21.pdf" class="file-link">📄 원본 사양서 (PDF)</a>
+                </div>
+
+                <div class="card">
+                    <h3>🤖 로봇 테스트 문서</h3>
+                    <a href="ROBOT+UI 테스트 진행 1차결과" class="file-link">🧪 테스트 1차결과</a>
+                    <a href="ROBOT+UI 테스트 진행.txt" class="file-link">📝 테스트 진행.txt</a>
+                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="file-link">📊 테스트 결과 HTML</a>
+                </div>
+
+                <div class="card">
+                    <h3>📐 Hexagon 문서</h3>
+                    <a href="hexagon/AGENTS.md" class="file-link">📋 Hexagon AGENTS.md</a>
+                    <a href="hexagon/docs/schedule.html" class="file-link">📅 일정표</a>
+                    <a href="hexagon/docs/punchlist.html" class="file-link">✅ 펀치리스트</a>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 30px;">
+                <h4>📌 문서 관리 가이드</h4>
+                <p>
+                    • 파일명 규칙: YYMMDD_작성자_제목.확장자<br>
+                    • 수정 시 원본 백업 필수<br>
+                    • 99_공유폴더에서 검토 후 해당 폴더로 이동<br>
+                    • 일일 진행상황 업데이트<br>
+                    • 긴급사항 즉시 공유
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // 모든 탭 숨기기
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+
+            // 모든 탭 버튼 비활성화
+            const tabButtons = document.querySelectorAll('.nav-tab');
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+
+            // 선택된 탭 표시
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 페이지 로드 시 애니메이션
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        });
+    </script>
+</body>
+</html>

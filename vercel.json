@@ -1,11 +1,12 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/", "destination": "/hexagon/index.html" },
-    { "source": "/punchlist", "destination": "/hexagon/punchlist.html" },
-    { "source": "/schedule", "destination": "/hexagon/schedule.html" },
-    { "source": "/robot-accuracy", "destination": "/hexagon/robot-accuracy.html" },
-    { "source": "/data/(.*)", "destination": "/hexagon/data/$1" },
-    { "source": "/(.*)", "destination": "/hexagon/$1" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/hexagon", "destination": "/hexagon/index.html" },
+    { "source": "/hexagon/punchlist", "destination": "/hexagon/punchlist.html" },
+    { "source": "/hexagon/schedule", "destination": "/hexagon/schedule.html" },
+    { "source": "/hexagon/robot-accuracy", "destination": "/hexagon/robot-accuracy.html" },
+    { "source": "/devicenet", "destination": "/251003_용접기_디바이스넷/DeviceNet_Signals_Table.html" },
+    { "source": "/robot-dashboard", "destination": "/상하축이슈_대시보드.html" }
   ]
 }
