@@ -1152,88 +1152,463 @@
         </tr>
     </table>
 
-    <h2>8. Sequencer State Definitions</h2>
+    <h2>8. 용접 시퀀스 (Welding Sequence)</h2>
+
     <div class="info">
-        <strong>참고:</strong> Sequencer는 용접 프로세스의 14개 상태를 제어합니다. 각 상태는 고유한 Workpoint, Trim, Wave 제어 값을 가집니다.
+        <strong>참고:</strong> Lincoln Electric Power Wave는 14개 상태로 구성된 자동 용접 시퀀스를 제공합니다.
+        각 상태는 개별 Workpoint, Trim, Wave 제어 파라미터와 타이머를 가지며, DeviceNet을 통해 제어됩니다.
     </div>
 
+    <h3>8.1 시퀀스 상태 정의 (Sequencer States)</h3>
     <table>
         <tr>
-            <th>State Number</th>
-            <th>State Name</th>
-            <th>Description</th>
+            <th>State #</th>
+            <th>상태명</th>
+            <th>한글명</th>
+            <th>설명</th>
+            <th>주요 파라미터</th>
         </tr>
         <tr>
             <td>0</td>
             <td>Idle</td>
-            <td>대기 상태</td>
+            <td>대기</td>
+            <td>용접기 대기 상태, 트리거 대기 중</td>
+            <td>-</td>
         </tr>
         <tr>
             <td>1</td>
             <td>Setup</td>
-            <td>설정 상태</td>
+            <td>설정</td>
+            <td>용접 준비 단계, 파라미터 로딩</td>
+            <td>Schedule 선택</td>
         </tr>
         <tr>
             <td>2</td>
             <td>Preflow</td>
-            <td>가스 프리플로우 (용접 전 가스 공급)</td>
+            <td>가스 프리플로우</td>
+            <td>용접 전 보호가스 공급 (산화 방지)</td>
+            <td>Pre Purge Time (초)</td>
         </tr>
         <tr>
             <td>3</td>
             <td>Strike</td>
-            <td>아크 착화 (초기 아크 발생)</td>
+            <td>아크 착화</td>
+            <td>초기 아크 발생, Run-in WFS 적용</td>
+            <td>Run-in WFS (ipm), State Timer</td>
         </tr>
         <tr>
             <td>4</td>
             <td>Start</td>
-            <td>용접 시작 단계</td>
+            <td>용접 시작</td>
+            <td>아크 안정화 구간</td>
+            <td>Workpoint[4], Trim[4], Wave[4], Timer[4]</td>
         </tr>
         <tr>
             <td>5</td>
             <td>Upslope</td>
-            <td>상승 구간 (전류 증가)</td>
+            <td>전류 상승</td>
+            <td>시작 조건에서 주 용접 조건으로 점진적 증가</td>
+            <td>Workpoint[5], Trim[5], Wave[5], Timer[5]</td>
         </tr>
         <tr>
             <td>6</td>
             <td>Weld1</td>
-            <td>주 용접 구간 1</td>
+            <td>주 용접 1</td>
+            <td>1차 주 용접 구간 (정상 용접)</td>
+            <td>Workpoint[6], Trim[6], Wave[6], Timer[6] 또는 Weld Timer</td>
         </tr>
         <tr>
             <td>7</td>
             <td>Weld2</td>
-            <td>주 용접 구간 2</td>
+            <td>주 용접 2</td>
+            <td>2차 주 용접 구간 (옵션, 다단 용접)</td>
+            <td>Workpoint[7], Trim[7], Wave[7], Timer[7]</td>
         </tr>
         <tr>
             <td>8</td>
             <td>Downslope</td>
-            <td>하강 구간 (전류 감소)</td>
+            <td>전류 하강</td>
+            <td>주 용접 조건에서 종료 조건으로 점진적 감소</td>
+            <td>Workpoint[8], Trim[8], Wave[8], Timer[8]</td>
         </tr>
         <tr>
             <td>9</td>
             <td>Crater</td>
-            <td>크레이터 충진 (용접 종료부 처리)</td>
+            <td>크레이터 충진</td>
+            <td>용접 종료부 크레이터 채우기 (결함 방지)</td>
+            <td>Workpoint[9], Trim[9], Crater Fill Time</td>
         </tr>
         <tr>
             <td>10</td>
             <td>Burnback</td>
-            <td>번백 (와이어 연소)</td>
+            <td>번백</td>
+            <td>와이어 후퇴 방지를 위한 짧은 아크 유지</td>
+            <td>Burn Back Timer (ms)</td>
         </tr>
         <tr>
             <td>11</td>
             <td>Postflow</td>
-            <td>포스트플로우 (용접 후 가스 공급)</td>
+            <td>가스 포스트플로우</td>
+            <td>용접 후 보호가스 공급 (용융금속 보호)</td>
+            <td>Post Purge Time (초)</td>
         </tr>
         <tr>
             <td>12</td>
             <td>Restrike</td>
-            <td>재착화 (아크 재점화)</td>
+            <td>재착화</td>
+            <td>용접 중단 후 재시작 시 사용</td>
+            <td>Restrike WFS (ipm)</td>
         </tr>
         <tr>
             <td>13</td>
             <td>Fault</td>
-            <td>고장 상태</td>
+            <td>고장</td>
+            <td>고장 발생 시 진입, 모든 출력 중단</td>
+            <td>Fault Code</td>
         </tr>
     </table>
+
+    <h3>8.2 용접 시퀀스 플로우차트</h3>
+    <div class="warning-box">
+        <h4>📊 전형적인 MIG/MAG 용접 시퀀스 흐름</h4>
+        <pre style="background: #f8f9fa; padding: 20px; border-left: 4px solid #0066cc; font-family: monospace; line-height: 2;">
+┌─────────────┐
+│  0. Idle    │ ◄──────────────────────────────┐
+└──────┬──────┘                                 │
+       │ Trigger ON                             │
+       ▼                                        │
+┌─────────────┐                                 │
+│  1. Setup   │                                 │
+└──────┬──────┘                                 │
+       │                                        │
+       ▼                                        │
+┌─────────────┐                                 │
+│ 2. Preflow  │ ← Pre Purge Time (예: 0.5초)   │
+└──────┬──────┘                                 │
+       │                                        │
+       ▼                                        │
+┌─────────────┐                                 │
+│  3. Strike  │ ← Run-in WFS (초기 착화)        │
+└──────┬──────┘                                 │
+       │ Arc Detected                           │
+       ▼                                        │
+┌─────────────┐                                 │
+│  4. Start   │ ← Start Timer (예: 0.1초)       │
+└──────┬──────┘                                 │
+       │                                        │
+       ▼                                        │
+┌─────────────┐                                 │
+│ 5. Upslope  │ ← Upslope Timer (예: 0.2초)     │
+└──────┬──────┘                                 │
+       │                                        │
+       ▼                                        │
+┌─────────────┐                                 │
+│  6. Weld1   │ ← Weld Timer 또는 Timer[6]      │
+└──────┬──────┘                                 │
+       │ (옵션)                                 │
+       ▼                                        │
+┌─────────────┐                                 │
+│  7. Weld2   │ ← Timer[7] (State Enable 설정 시)│
+└──────┬──────┘                                 │
+       │ Trigger OFF                            │
+       ▼                                        │
+┌─────────────┐                                 │
+│ 8. Downslope│ ← Downslope Timer (예: 0.2초)   │
+└──────┬──────┘                                 │
+       │                                        │
+       ▼                                        │
+┌─────────────┐                                 │
+│  9. Crater  │ ← Crater Fill Time (예: 0.3초)  │
+└──────┬──────┘                                 │
+       │                                        │
+       ▼                                        │
+┌─────────────┐                                 │
+│ 10. Burnback│ ← Burn Back Timer (예: 50ms)    │
+└──────┬──────┘                                 │
+       │                                        │
+       ▼                                        │
+┌─────────────┐                                 │
+│ 11. Postflow│ ← Post Purge Time (예: 1.0초)   │
+└──────┬──────┘                                 │
+       │ Complete                               │
+       └────────────────────────────────────────┘
+
+       [재착화 경로]
+       Trigger OFF → ON (Weld 중) → 12. Restrike → 4. Start
+        </pre>
+    </div>
+
+    <h3>8.3 시퀀스 제어 파라미터 (Class 101 Attributes)</h3>
+    <table>
+        <tr>
+            <th>파라미터명</th>
+            <th>Attr ID</th>
+            <th>설명</th>
+            <th>설정 범위</th>
+        </tr>
+        <tr>
+            <td>STATE_ENABLE</td>
+            <td>7</td>
+            <td>각 상태 활성화 비트마스크 (14-bit)</td>
+            <td>Bit0=Idle, Bit1=Setup, ... Bit13=Fault</td>
+        </tr>
+        <tr>
+            <td>STATE_TIMER_ENABLE</td>
+            <td>8</td>
+            <td>각 상태 타이머 활성화 비트마스크</td>
+            <td>Bit0~13 (1=Enable, 0=Disable)</td>
+        </tr>
+        <tr>
+            <td>WORKPOINT[0~13]</td>
+            <td>9~22</td>
+            <td>각 상태별 WFS/전류 설정값</td>
+            <td>0~1000 (용접 모드에 따라 ipm 또는 A)</td>
+        </tr>
+        <tr>
+            <td>TRIM[0~13]</td>
+            <td>23~36</td>
+            <td>각 상태별 전압 Trim 값</td>
+            <td>-1000~+1000 (보통 V 단위)</td>
+        </tr>
+        <tr>
+            <td>WAVE1[0~13]</td>
+            <td>37~50</td>
+            <td>각 상태별 Wave Control 1</td>
+            <td>용접 모드별 상이 (펄스 주파수 등)</td>
+        </tr>
+        <tr>
+            <td>WAVE2[0~13]</td>
+            <td>51~64</td>
+            <td>각 상태별 Wave Control 2</td>
+            <td>용접 모드별 상이</td>
+        </tr>
+        <tr>
+            <td>WAVE3[0~13]</td>
+            <td>65~78</td>
+            <td>각 상태별 Wave Control 3</td>
+            <td>용접 모드별 상이</td>
+        </tr>
+        <tr>
+            <td>WAVE4[0~13]</td>
+            <td>79~92</td>
+            <td>각 상태별 Wave Control 4</td>
+            <td>용접 모드별 상이</td>
+        </tr>
+        <tr>
+            <td>STATE_TIMER[0~13]</td>
+            <td>93~106</td>
+            <td>각 상태별 지속 시간</td>
+            <td>0~65535 ms (STATE_TIMER_ENABLE 활성화 시)</td>
+        </tr>
+        <tr>
+            <td>WELD_TIMER</td>
+            <td>6</td>
+            <td>전체 용접 시간 (Weld1 상태)</td>
+            <td>0~999.9 초</td>
+        </tr>
+    </table>
+
+    <h3>8.4 시퀀스 예제: 일반적인 MIG 용접 설정</h3>
+    <div class="success-box">
+        <h4>예제 1: 기본 단순 용접 (Preflow → Strike → Weld → Burnback → Postflow)</h4>
+        <table style="background: white; margin-top: 15px;">
+            <tr>
+                <th>State</th>
+                <th>Enable</th>
+                <th>Timer (s)</th>
+                <th>Workpoint</th>
+                <th>Trim</th>
+                <th>설명</th>
+            </tr>
+            <tr>
+                <td>2. Preflow</td>
+                <td>✓</td>
+                <td>0.5</td>
+                <td>-</td>
+                <td>-</td>
+                <td>가스 프리플로우</td>
+            </tr>
+            <tr>
+                <td>3. Strike</td>
+                <td>✓</td>
+                <td>0.1</td>
+                <td>300 ipm</td>
+                <td>0</td>
+                <td>아크 착화</td>
+            </tr>
+            <tr>
+                <td>6. Weld1</td>
+                <td>✓</td>
+                <td>Trigger</td>
+                <td>250 ipm</td>
+                <td>+2 V</td>
+                <td>주 용접 (트리거 유지 시간)</td>
+            </tr>
+            <tr>
+                <td>10. Burnback</td>
+                <td>✓</td>
+                <td>0.05</td>
+                <td>-</td>
+                <td>-</td>
+                <td>번백</td>
+            </tr>
+            <tr>
+                <td>11. Postflow</td>
+                <td>✓</td>
+                <td>1.0</td>
+                <td>-</td>
+                <td>-</td>
+                <td>가스 포스트플로우</td>
+            </tr>
+        </table>
+
+        <h4 style="margin-top: 20px;">예제 2: 고급 다단 용접 (Upslope/Downslope 포함)</h4>
+        <table style="background: white; margin-top: 15px;">
+            <tr>
+                <th>State</th>
+                <th>Enable</th>
+                <th>Timer (s)</th>
+                <th>Workpoint</th>
+                <th>Trim</th>
+                <th>설명</th>
+            </tr>
+            <tr>
+                <td>2. Preflow</td>
+                <td>✓</td>
+                <td>0.5</td>
+                <td>-</td>
+                <td>-</td>
+                <td>가스 준비</td>
+            </tr>
+            <tr>
+                <td>3. Strike</td>
+                <td>✓</td>
+                <td>0.1</td>
+                <td>350 ipm</td>
+                <td>0</td>
+                <td>고속 착화</td>
+            </tr>
+            <tr>
+                <td>4. Start</td>
+                <td>✓</td>
+                <td>0.2</td>
+                <td>200 ipm</td>
+                <td>-1 V</td>
+                <td>저입열 시작</td>
+            </tr>
+            <tr>
+                <td>5. Upslope</td>
+                <td>✓</td>
+                <td>0.3</td>
+                <td>250 ipm</td>
+                <td>+1 V</td>
+                <td>점진적 증가</td>
+            </tr>
+            <tr>
+                <td>6. Weld1</td>
+                <td>✓</td>
+                <td>Trigger</td>
+                <td>300 ipm</td>
+                <td>+2 V</td>
+                <td>고입열 주 용접</td>
+            </tr>
+            <tr>
+                <td>8. Downslope</td>
+                <td>✓</td>
+                <td>0.3</td>
+                <td>250 ipm</td>
+                <td>+1 V</td>
+                <td>점진적 감소</td>
+            </tr>
+            <tr>
+                <td>9. Crater</td>
+                <td>✓</td>
+                <td>0.3</td>
+                <td>200 ipm</td>
+                <td>0 V</td>
+                <td>크레이터 충진</td>
+            </tr>
+            <tr>
+                <td>10. Burnback</td>
+                <td>✓</td>
+                <td>0.05</td>
+                <td>-</td>
+                <td>-</td>
+                <td>번백</td>
+            </tr>
+            <tr>
+                <td>11. Postflow</td>
+                <td>✓</td>
+                <td>1.5</td>
+                <td>-</td>
+                <td>-</td>
+                <td>포스트플로우</td>
+            </tr>
+        </table>
+    </div>
+
+    <h3>8.5 DeviceNet을 통한 시퀀스 제어</h3>
+    <div class="warning-box">
+        <h4>실시간 I/O를 통한 제어</h4>
+        <p><strong>Produced Assembly (PLC → 용접기):</strong></p>
+        <ul>
+            <li><strong>Byte 0, Bit 0 (Trigger):</strong> 용접 시퀀스 시작/종료
+                <ul>
+                    <li>0 → 1: Idle → Setup → Preflow → Strike → ...</li>
+                    <li>1 → 0 (Weld 중): → Downslope → Crater → Burnback → Postflow</li>
+                </ul>
+            </li>
+            <li><strong>Byte 1, Bit 0~2 (Schedule Select):</strong> 사전 저장된 시퀀스 1~8 선택</li>
+            <li><strong>Byte 2-3 (Workpoint):</strong> 실시간 WFS/전류 재정의 (옵션)</li>
+            <li><strong>Byte 4-5 (Trim):</strong> 실시간 전압 재정의 (옵션)</li>
+        </ul>
+
+        <p><strong>Consumed Assembly (용접기 → PLC):</strong></p>
+        <ul>
+            <li><strong>Byte 0, Bit 0 (Arc Detect):</strong> Strike 성공 후 1로 변경</li>
+            <li><strong>Byte 1, Bit 2 (Weld Complete):</strong> Postflow 완료 후 1로 변경</li>
+        </ul>
+
+        <h4 style="margin-top: 20px;">Explicit Messaging을 통한 스케줄 프로그래밍</h4>
+        <p>Class 101 (Weld Schedule Object) Instance 1~8에 시퀀스 파라미터 저장:</p>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// 예: Schedule 1 프로그래밍 (DeviceNet Explicit Message)
+Class: 101, Instance: 1
+
+// 상태 활성화 (Preflow, Strike, Weld1, Burnback, Postflow만 사용)
+Attr 7 (STATE_ENABLE) = 0b0000100001001100 = 0x090C
+
+// 타이머 활성화
+Attr 8 (STATE_TIMER_ENABLE) = 0b0000100001001100 = 0x090C
+
+// Preflow (State 2)
+Attr 114 (Pre Purge Time) = 0.5 sec
+
+// Strike (State 3)
+Attr 3 (Run-in WFS) = 300 ipm
+
+// Weld1 (State 6)
+Attr 9 + 6 = Attr 15 (WORKPOINT[6]) = 250 ipm
+Attr 23 + 6 = Attr 29 (TRIM[6]) = +2 V
+
+// Burnback (State 10)
+Attr 118 (Burn Back Timer) = 50 ms
+
+// Postflow (State 11)
+Attr 113 (Post Purge Time) = 1.0 sec</pre>
+    </div>
+
+    <h3>8.6 시퀀스 관련 주의사항</h3>
+    <div class="error-box">
+        <h4>⚠️ 일반적인 문제 및 해결</h4>
+        <ul>
+            <li><strong>아크 착화 실패:</strong> Strike WFS가 너무 낮거나 Strike Timer가 너무 짧음 → 300~400 ipm, 0.1~0.2초 권장</li>
+            <li><strong>크레이터 발생:</strong> Crater 상태 비활성화 또는 시간 부족 → Crater Fill Time 0.2~0.5초 설정</li>
+            <li><strong>와이어 스틱:</strong> Burnback Timer 부족 → 50~100ms 설정, 또는 Wire Retract 사용</li>
+            <li><strong>기공 발생:</strong> Preflow/Postflow 시간 부족 → 각각 0.5초 이상 권장</li>
+            <li><strong>급격한 입열 변화:</strong> Upslope/Downslope 미사용 → 0.2~0.5초 경사 시간 추가</li>
+        </ul>
+    </div>
 
     <h2>9. Common Error Codes</h2>
     <table>
