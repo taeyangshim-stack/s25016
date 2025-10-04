@@ -402,11 +402,18 @@
                             <strong>팀 구성:</strong> 3명 협업 체제
                         </p>
                     </div>
+                    <div class="highlight-box" style="background: #e3f2fd; border-left-color: #2196f3; margin: 15px 0;">
+                        <h4 style="color: #1976d2;">🧪 UI 테스트 현황</h4>
+                        <p style="font-size: 0.95em;">
+                            <strong>✅ 통합 결과:</strong> 10/3-10/4 완료 (31개 항목)<br>
+                            <strong>🚨 긴급:</strong> 충돌검사 미작동, UI 종료 버튼 필요
+                        </p>
+                    </div>
                     <a href="상하축이슈_대시보드.html" class="project-link project-link-robot" target="_blank">
                         🎯 상하축 이슈 대시보드
                     </a>
-                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link project-link-robot" target="_blank">
-                        🧪 테스트 결과 보기
+                    <a href="250917_상하축이슈/04_작업진행/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
+                        🧪 ROBOT↔UI 테스트 통합 결과 (10/3-10/4)
                     </a>
                 </div>
 
@@ -444,16 +451,20 @@
             <div class="timeline">
                 <h3 style="margin-bottom: 20px; color: #2c3e50;">📅 최근 프로젝트 타임라인</h3>
                 <div class="timeline-item">
+                    <strong>2024.10.04</strong>
+                    <span class="badge badge-complete">COMPLETE</span>
+                    <p>ROBOT↔UI 테스트 통합 결과 완료 (10/3-10/4)</p>
+                    <small>
+                        총 31개 항목 테스트 (✅완료 11 | 🔵부분완료 6 | ⚠️개선 9 | 🔴결함 1 | ⏸️보류 4)<br>
+                        <strong>🚨 긴급이슈:</strong> 충돌검사 미작동, UI 종료 버튼 필요<br>
+                        <strong>⚠️ 라인별:</strong> 드라이런 속도 배율 A라인 완료, B라인 로봇컨트롤러 대기
+                    </small>
+                </div>
+                <div class="timeline-item">
                     <strong>2024.10.03</strong>
                     <span class="badge badge-new">NEW</span>
                     <p>DeviceNet 신호 테이블 HTML 문서 작성 완료</p>
                     <small>Lincoln Electric Power Wave 사양서 76페이지 전체 분석</small>
-                </div>
-                <div class="timeline-item">
-                    <strong>2024.10.03</strong>
-                    <span class="badge badge-update">UPDATE</span>
-                    <p>ROBOT-UI 테스트 1차 결과 보고</p>
-                    <small>실행/부팅, 속도/배율, 안전/근접, 에러처리, UI/알람 5개 카테고리</small>
                 </div>
                 <div class="timeline-item">
                     <strong>2024.09.29</strong>
@@ -581,28 +592,51 @@
                 </div>
 
                 <div class="card">
-                    <h3>🧪 테스트 진행 상황</h3>
-                    <div class="info-box">
-                        <h4>ROBOT+UI 테스트 1차 결과</h4>
+                    <h3>🧪 ROBOT↔UI 테스트 현황</h3>
+                    <div class="info-box" style="background: #e0f2fe; border-left-color: #0284c7;">
+                        <h4 style="color: #0c4a6e;">📊 통합 테스트 결과 (10/3-10/4)</h4>
                         <p>
-                            <strong>날짜:</strong> 2024년 10월 3일<br>
-                            <strong>카테고리:</strong> 5개 테스트 영역<br>
-                            - 실행 및 부팅<br>
-                            - 속도 및 배율<br>
-                            - 안전 및 근접<br>
-                            - 에러 처리<br>
-                            - UI 및 알람
+                            <strong>총 테스트 항목:</strong> 31개 (10/3: 18개 + 10/4: 13개)<br>
+                            <strong>✅ 완료:</strong> 11개 | <strong>🔵 부분완료:</strong> 6개 (드라이런 A라인만 완료) | <strong>⚠️ 개선필요:</strong> 9개 | <strong>🔴 결함:</strong> 1개 | <strong>⏸️ 보류:</strong> 4개
                         </p>
                     </div>
+                    <div class="info-box" style="background: #fee2e2; border-left-color: #dc2626; margin-top: 15px;">
+                        <h4 style="color: #991b1b;">🚨 긴급 이슈</h4>
+                        <p>
+                            <strong>충돌 검사 미작동:</strong> 안전 근접거리 무시하고 진입 가능<br>
+                            <strong>UI 종료:</strong> 정상 종료 버튼 필요 (로봇 연동)
+                        </p>
+                    </div>
+                    <a href="250917_상하축이슈/04_작업진행/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
+                        📋 통합 테스트 결과 보기 (10/3-10/4)
+                    </a>
+                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link" target="_blank" style="background: #f3f4f6; color: #6b7280; margin-top: 10px;">
+                        📄 1차 결과 (10/3) - 백업
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>📊 10/4 테스트 항목 (12개)</h3>
+                    <ul class="folder-structure">
+                        <li><span class="folder-icon">📏</span> 갠트리 이동 범위 초과 에러 처리</li>
+                        <li><span class="folder-icon">🛡️</span> X축 안전 근접거리 DB 관리</li>
+                        <li><span class="folder-icon">⚠️</span> 갠트리 이동 전 충돌 검사</li>
+                        <li><span class="folder-icon">🎮</span> 수동 이동 UI 방향/제한 범위 표시</li>
+                        <li><span class="folder-icon">⚡</span> 속도 및 드라이런 배율 설정</li>
+                        <li><span class="folder-icon">🔧</span> 와이어 교체 모드</li>
+                        <li><span class="folder-icon">✂️</span> 개별 로봇 와이어 커팅</li>
+                        <li><span class="folder-icon">⚙️</span> 실시간 용접 조건 변경 (A LINE)</li>
+                        <li><span class="folder-icon">📊</span> 아크에러시 인근부재 최대높이 전달</li>
+                        <li><span class="folder-icon">💾</span> 용접 데이터 임시저장/되돌리기</li>
+                        <li><span class="folder-icon">📋</span> 매크로 설정값 일괄 변경</li>
+                        <li><span class="folder-icon">🚀</span> OP PC 부팅시 운영SW 자동 실행</li>
+                    </ul>
                 </div>
 
                 <div class="card">
                     <h3>🔗 관련 문서</h3>
                     <a href="상하축이슈_대시보드.html" class="project-link project-link-robot" target="_blank">
                         🎯 상하축 이슈 전용 대시보드
-                    </a>
-                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link project-link-robot" target="_blank">
-                        🧪 테스트 1차 결과 보고서
                     </a>
                     <div style="margin-top: 15px;">
                         <a href="250917_상하축이슈/01_문제점분석/251003_에이전트_ROBOT-UI_테스트이슈_분석.md" class="file-link">📄 테스트이슈 분석.md</a>
@@ -659,30 +693,61 @@
 
             <div class="dashboard-grid">
                 <div class="card">
-                    <h3>📋 프로젝트 가이드</h3>
-                    <a href="CLAUDE.md" class="file-link">📘 CLAUDE.md</a>
-                    <a href="AGENTS.md" class="file-link">📋 AGENTS.md</a>
-                    <a href="vercel.json" class="file-link">⚙️ vercel.json</a>
+                    <h3>📋 배포 정보</h3>
+                    <div class="info-box">
+                        <h4>Vercel 배포 설정</h4>
+                        <p>
+                            <strong>URL:</strong> https://your-project.vercel.app<br>
+                            <strong>자동 배포:</strong> master 브랜치 푸시 시<br>
+                            <strong>설정 파일:</strong> vercel.json
+                        </p>
+                    </div>
+                    <a href="VERCEL_DEPLOYMENT_GUIDE.md" class="file-link" target="_blank">📘 배포 가이드 보기</a>
                 </div>
 
                 <div class="card">
                     <h3>🔌 DeviceNet 문서</h3>
-                    <a href="251003_용접기_디바이스넷/DeviceNet_Signals_Table.html" class="file-link">📋 신호 테이블 (HTML)</a>
-                    <a href="251003_용접기_디바이스넷/Y50031_DeviceNetInterfaceSpecification-21.pdf" class="file-link">📄 원본 사양서 (PDF)</a>
+                    <a href="251003_용접기_디바이스넷/DeviceNet_Signals_Table.html" class="project-link project-link-devicenet" target="_blank">
+                        📋 DeviceNet 신호 테이블
+                    </a>
+                    <div style="margin-top: 15px; padding: 15px; background: #e8f5e9; border-radius: 8px;">
+                        <p style="margin: 0; color: #2e7d32; font-size: 0.95em;">
+                            <strong>📄 원본 사양서:</strong> Y50031-21 (76 pages)<br>
+                            Lincoln Electric Power Wave DeviceNet Interface
+                        </p>
+                    </div>
                 </div>
 
                 <div class="card">
                     <h3>🤖 로봇 테스트 문서</h3>
-                    <a href="ROBOT+UI 테스트 진행 1차결과" class="file-link">🧪 테스트 1차결과</a>
-                    <a href="ROBOT+UI 테스트 진행.txt" class="file-link">📝 테스트 진행.txt</a>
-                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="file-link">📊 테스트 결과 HTML</a>
+                    <a href="250917_상하축이슈/04_작업진행/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
+                        📋 ROBOT↔UI 테스트 통합 결과 (10/3-10/4)
+                    </a>
+                    <div style="margin-top: 15px; padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 3px solid #dc2626;">
+                        <p style="margin: 0; color: #991b1b; font-size: 0.95em;">
+                            <strong>🚨 긴급 이슈:</strong> 충돌검사 미작동<br>
+                            <strong>📅 다음 테스트:</strong> 2024.10.09 (에러핸들링 집중)
+                        </p>
+                    </div>
+                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link" target="_blank" style="background: #f3f4f6; color: #6b7280; margin-top: 10px;">
+                        📄 1차 결과 백업 (10/3)
+                    </a>
                 </div>
 
                 <div class="card">
                     <h3>📐 Hexagon 문서</h3>
-                    <a href="hexagon/AGENTS.md" class="file-link">📋 Hexagon AGENTS.md</a>
-                    <a href="hexagon/docs/schedule.html" class="file-link">📅 일정표</a>
-                    <a href="hexagon/docs/punchlist.html" class="file-link">✅ 펀치리스트</a>
+                    <a href="hexagon/index.html" class="project-link" target="_blank">
+                        🏠 Hexagon 메인 대시보드
+                    </a>
+                    <a href="hexagon/robot-accuracy.html" class="project-link" target="_blank">
+                        📊 로봇 정확도 분석
+                    </a>
+                    <a href="hexagon/schedule.html" class="project-link" target="_blank">
+                        📅 프로젝트 일정표
+                    </a>
+                    <a href="hexagon/punchlist.html" class="project-link" target="_blank">
+                        ✅ 펀치리스트
+                    </a>
                 </div>
             </div>
 
