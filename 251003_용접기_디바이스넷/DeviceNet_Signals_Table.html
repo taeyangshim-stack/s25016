@@ -2059,6 +2059,440 @@ Schedule 3: 후판 (WFS 350 ipm)
         </ol>
     </div>
 
+    <h3>8.7.8 ABB ArcWare를 사용한 WFS 제어 방법</h3>
+
+    <div class="info" style="background-color: #e8f5e9;">
+        <h4>🤖 ABB ArcWare 개요</h4>
+        <p>
+            ABB ArcWare는 ABB 로봇에서 아크 용접을 수행하기 위한 전용 소프트웨어 패키지입니다.
+            Lincoln Electric Power Wave와 같은 외부 용접기를 DeviceNet 또는 ArcLink 인터페이스로
+            연결하여 WFS를 포함한 모든 용접 파라미터를 제어할 수 있습니다.
+        </p>
+    </div>
+
+    <h4>8.7.8.1 ABB ArcWare WFS 제어 구조</h4>
+    <table>
+        <tr>
+            <th>제어 계층</th>
+            <th>데이터 타입</th>
+            <th>WFS 설정 위치</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td><strong>1. 용접 데이터<br>(Welddata)</strong></td>
+            <td>welddata</td>
+            <td>welddata.v_weld_speed<br>(Wire Feed Speed)</td>
+            <td>
+                • 주 용접 구간의 WFS 설정<br>
+                • Weld1/Weld2 상태에서 사용<br>
+                • 용접기로 전송되는 기본 WFS 값
+            </td>
+        </tr>
+        <tr>
+            <td><strong>2. 심 데이터<br>(Seamdata)</strong></td>
+            <td>seamdata</td>
+            <td>seamdata.v_start_speed<br>seamdata.v_end_speed</td>
+            <td>
+                • 용접 시작/종료부의 WFS<br>
+                • Strike, Start, Crater 등 각 상태별 WFS<br>
+                • welddata를 재정의하는 역할
+            </td>
+        </tr>
+        <tr>
+            <td><strong>3. 위빙 데이터<br>(Weavedata)</strong></td>
+            <td>weavedata</td>
+            <td>위빙 패턴 설정</td>
+            <td>
+                • 위빙 용접 시 사용<br>
+                • 진폭, 주파수, 패턴 정의<br>
+                • WFS는 welddata 기반
+            </td>
+        </tr>
+        <tr>
+            <td><strong>4. I/O 신호<br>(DeviceNet)</strong></td>
+            <td>Analog Output</td>
+            <td>aoWorkpoint<br>aoTrim</td>
+            <td>
+                • DeviceNet을 통한 실시간 WFS 제어<br>
+                • Lincoln Produced Assembly Byte 2-3<br>
+                • welddata 값을 용접기로 전송
+            </td>
+        </tr>
+    </table>
+
+    <h4>8.7.8.2 RAPID 프로그래밍: welddata를 사용한 WFS 설정</h4>
+    <div class="warning-box">
+        <h4>📝 welddata 데이터 구조</h4>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+! welddata 데이터 타입 구조
+PERS welddata weld_name := [
+    v_weld_voltage,      ! 용접 전압 (V) 또는 Trim
+    v_weld_speed,        ! Wire Feed Speed (ipm 또는 m/min) ⭐
+    arcdata,             ! 아크 제어 데이터
+    weavedata            ! 위빙 데이터
+];
+
+! 실제 예제: Lincoln Electric 용접기용 welddata
+PERS welddata wd_steel_3mm := [
+    24.5,                ! 전압: 24.5V
+    250,                 ! WFS: 250 ipm ⭐
+    [1, 0, 24.5, 10.5, 0, 266, 0, 0, 0],  ! arcdata
+    [0, 0, 0, 0, 0, 0, 0, 0, 0]           ! weavedata (위빙 없음)
+];
+
+! 예제: 박판용 저입열 welddata
+PERS welddata wd_thin_plate := [
+    22.0,                ! 전압: 22V
+    150,                 ! WFS: 150 ipm (저입열) ⭐
+    [1, 0, 22.0, 8.0, 0, 200, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
+
+! 예제: 후판용 고입열 welddata
+PERS welddata wd_thick_plate := [
+    26.0,                ! 전압: 26V
+    350,                 ! WFS: 350 ipm (고입열) ⭐
+    [1, 0, 26.0, 12.0, 0, 350, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
+
+! 용접 명령에서 welddata 사용
+PROC weld_procedure()
+    ArcL p10, v100, seam1, wd_steel_3mm \Weld, z10, tool1;
+ENDPROC</pre>
+    </div>
+
+    <h4>8.7.8.3 RAPID 프로그래밍: seamdata를 사용한 WFS 제어</h4>
+    <div class="warning-box">
+        <h4>📝 seamdata 데이터 구조 (시작/종료부 WFS)</h4>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+! seamdata 데이터 타입 구조
+PERS seamdata seam_name := [
+    v_start_speed,       ! 용접 시작부 WFS (ipm) ⭐
+    v_end_speed,         ! 용접 종료부 WFS (ipm) ⭐
+    arcdata_start,       ! 시작부 아크 데이터
+    t_start,             ! 시작 시간 (s)
+    ...
+];
+
+! 실제 예제: Strike/Crater 제어를 위한 seamdata
+PERS seamdata sd_with_crater := [
+    300,                 ! Strike WFS: 300 ipm (Run-in WFS) ⭐
+    150,                 ! Crater WFS: 150 ipm (크레이터 충진) ⭐
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],  ! arcdata_start
+    0.1,                 ! Strike 시간: 0.1초
+    0,                   ! 시작 전류 비율
+    0,                   ! 시작 전압 비율
+    0,                   ! 시작 길이
+    0,                   ! 시작 각도
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],  ! arcdata_end
+    0.3,                 ! Crater 시간: 0.3초 ⭐
+    0,                   ! 종료 전류 비율
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],  ! arcdata_fill
+    0.2,                 ! Fill 시간
+    0,                   ! Fill 전류 비율
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],  ! arcdata_retract
+    0.5                  ! Retract 시간
+];
+
+! 용접 명령에서 seamdata와 welddata 함께 사용
+PROC weld_with_seam_control()
+    ! 시작부 300 ipm Strike, 주 용접 250 ipm, 종료부 150 ipm Crater
+    ArcL p20, v100, sd_with_crater, wd_steel_3mm \Weld, z10, tool1;
+ENDPROC</pre>
+    </div>
+
+    <h4>8.7.8.4 동적 WFS 제어 (용접 중 실시간 변경)</h4>
+    <div class="success-box">
+        <h4>방법 1: ArcRefresh를 사용한 동적 WFS 변경</h4>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+MODULE DynamicWFS_Module
+    ! 기본 welddata 선언
+    PERS welddata wd_dynamic := [24.5, 250, [...], [...]];
+    PERS seamdata sd_normal := [...];
+
+    VAR intnum interrupt_timer;
+    VAR bool wfs_increased := FALSE;
+
+    PROC main()
+        ! 타이머 인터럽트 연결 (2초 후 WFS 증가)
+        CONNECT interrupt_timer WITH increase_wfs_interrupt;
+        ITimer 2.0, interrupt_timer;
+
+        ! 용접 시작 (초기 WFS: 250 ipm)
+        ArcL p100, v100, sd_normal, wd_dynamic \Weld, z10, tool1;
+
+        ! 타이머 해제
+        IDelete interrupt_timer;
+    ENDPROC
+
+    TRAP increase_wfs_interrupt
+        IF NOT wfs_increased THEN
+            ! 용접 중 WFS 250 → 300 ipm으로 증가
+            wd_dynamic.v_weld_speed := 300;
+
+            ! ArcRefresh로 변경사항 즉시 적용 ⭐
+            ArcRefresh wd_dynamic, sd_normal;
+
+            wfs_increased := TRUE;
+        ENDIF
+    ENDTRAP
+ENDMODULE</pre>
+
+        <h4 style="margin-top: 20px;">방법 2: 위치 기반 동적 WFS 제어</h4>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+MODULE PositionBasedWFS_Module
+    PERS welddata wd_variable := [24.5, 200, [...], [...]];
+    PERS seamdata sd_normal := [...];
+
+    PROC weld_with_variable_wfs()
+        ! 구간 1: 저입열 용접 (WFS 200 ipm)
+        wd_variable.v_weld_speed := 200;
+        ArcL p10, v100, sd_normal, wd_variable \Weld, z10, tool1;
+
+        ! 구간 2: 중입열로 전환 (WFS 250 ipm)
+        wd_variable.v_weld_speed := 250;
+        ArcRefresh wd_variable, sd_normal;  ! 실시간 적용 ⭐
+        ArcL p20, v100, sd_normal, wd_variable \Weld, z10, tool1;
+
+        ! 구간 3: 고입열로 전환 (WFS 300 ipm)
+        wd_variable.v_weld_speed := 300;
+        ArcRefresh wd_variable, sd_normal;  ! 실시간 적용 ⭐
+        ArcL p30, v100, sd_normal, wd_variable \Weld, z10, tool1;
+
+        ! 용접 종료 (Crater는 seamdata의 v_end_speed 사용)
+    ENDPROC
+ENDMODULE</pre>
+
+        <h4 style="margin-top: 20px;">방법 3: 센서 피드백 기반 적응형 WFS 제어</h4>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+MODULE AdaptiveWFS_Module
+    PERS welddata wd_adaptive := [24.5, 250, [...], [...]];
+    PERS seamdata sd_normal := [...];
+
+    VAR num actual_current;     ! 실제 용접 전류 피드백
+    VAR num target_current := 200;  ! 목표 전류 (A)
+    VAR num wfs_adjustment;
+
+    PROC adaptive_weld()
+        ArcL p10, v100, sd_normal, wd_adaptive \Weld, z10, tool1 \Conc;
+
+        ! 용접 중 주기적으로 전류 모니터링 및 WFS 조정
+        WHILE TRUE DO
+            ! DeviceNet에서 실제 전류 읽기 (Consumed Assembly Byte 4-5)
+            actual_current := aiActualCurr;
+
+            ! 전류가 목표보다 낮으면 WFS 증가
+            IF actual_current < (target_current - 10) THEN
+                wfs_adjustment := wd_adaptive.v_weld_speed * 1.05;  ! 5% 증가
+                wd_adaptive.v_weld_speed := wfs_adjustment;
+                ArcRefresh wd_adaptive, sd_normal;
+            ! 전류가 목표보다 높으면 WFS 감소
+            ELSEIF actual_current > (target_current + 10) THEN
+                wfs_adjustment := wd_adaptive.v_weld_speed * 0.95;  ! 5% 감소
+                wd_adaptive.v_weld_speed := wfs_adjustment;
+                ArcRefresh wd_adaptive, sd_normal;
+            ENDIF
+
+            WaitTime 0.1;  ! 100ms 주기
+        ENDWHILE
+    ENDPROC
+ENDMODULE</pre>
+    </div>
+
+    <h4>8.7.8.5 ABB-Lincoln DeviceNet 연동 시 WFS 매핑</h4>
+    <div class="warning-box">
+        <h4>ArcWare → DeviceNet → Lincoln 신호 흐름</h4>
+        <pre style="background: #f8f9fa; padding: 15px; border-left: 4px solid #0066cc; margin: 15px 0; font-family: monospace;">
+┌──────────────────────┐
+│  RAPID 프로그램       │
+│  welddata.v_weld_speed│  ← WFS: 250 ipm
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  ABB ArcWare         │
+│  WFS 스케일링 변환    │  ← ipm → 0~1000 범위로 변환
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  DeviceNet I/O       │
+│  aoWorkpoint 신호     │  ← Analog Output (16-bit)
+│  Byte 2-3            │
+└──────────┬───────────┘
+           │ DeviceNet Network
+           ▼
+┌──────────────────────┐
+│  Lincoln Power Wave  │
+│  Produced Assembly   │  ← Byte 2-3: Analog Reference 1
+│  WFS 제어            │     실제 WFS = (값/1000) × Max WFS
+└──────────────────────┘</pre>
+
+        <h4>Configuration → Arc Equipment 설정</h4>
+        <table style="background: white; margin-top: 15px;">
+            <tr>
+                <th>설정 항목</th>
+                <th>설정 위치</th>
+                <th>설정 값</th>
+                <th>설명</th>
+            </tr>
+            <tr>
+                <td>Equipment Number</td>
+                <td>Configuration → Arc</td>
+                <td>1</td>
+                <td>RAPID welddata의 equipment_no와 일치</td>
+            </tr>
+            <tr>
+                <td>Equipment Type</td>
+                <td>Configuration → Arc</td>
+                <td>Lincoln (DeviceNet)</td>
+                <td>용접기 제조사 및 통신 방식</td>
+            </tr>
+            <tr>
+                <td>Workpoint Signal</td>
+                <td>Arc Equipment → I/O Signals</td>
+                <td>aoWorkpoint</td>
+                <td>WFS 제어 아날로그 출력 신호</td>
+            </tr>
+            <tr>
+                <td>Workpoint Min/Max</td>
+                <td>Arc Equipment → Scaling</td>
+                <td>Min: 0 ipm<br>Max: 500 ipm</td>
+                <td>WFS 범위 설정 (용접기 사양에 맞춤)</td>
+            </tr>
+            <tr>
+                <td>Trim Signal</td>
+                <td>Arc Equipment → I/O Signals</td>
+                <td>aoTrim</td>
+                <td>전압 Trim 아날로그 출력 신호</td>
+            </tr>
+            <tr>
+                <td>Arc OK Signal</td>
+                <td>Arc Equipment → I/O Signals</td>
+                <td>diArcDetect</td>
+                <td>아크 감지 디지털 입력 신호</td>
+            </tr>
+        </table>
+    </div>
+
+    <h4>8.7.8.6 ABB RobotStudio 실시간 튜닝 (Manual Tuning)</h4>
+    <div class="success-box">
+        <h4>🎛️ 용접 중 실시간 WFS 조정 방법</h4>
+        <ol style="line-height: 2;">
+            <li><strong>FlexPendant 메뉴 열기</strong>
+                <ul>
+                    <li>Production Window → Arc → Tuning</li>
+                    <li>또는 직접 "Tuning" 버튼 클릭</li>
+                </ul>
+            </li>
+            <li><strong>용접 시작</strong>
+                <ul>
+                    <li>ArcL 명령 실행 (Trigger ON)</li>
+                    <li>아크가 발생하면 Tuning 창 활성화</li>
+                </ul>
+            </li>
+            <li><strong>실시간 WFS 조정</strong>
+                <ul>
+                    <li><strong>Wire Speed (WFS)</strong> 슬라이더 조작</li>
+                    <li>변경 즉시 용접기에 반영 (DeviceNet 경유)</li>
+                    <li>비드 형상, 스패터 관찰하며 최적값 탐색</li>
+                </ul>
+            </li>
+            <li><strong>조정값 저장</strong>
+                <ul>
+                    <li>"Apply to Program" 버튼 → welddata에 저장</li>
+                    <li>또는 수동으로 welddata.v_weld_speed 값 기록</li>
+                </ul>
+            </li>
+        </ol>
+
+        <p style="margin-top: 15px;"><strong>⚠️ 주의사항:</strong></p>
+        <ul>
+            <li>실시간 조정은 ±20% 범위 내에서 권장</li>
+            <li>급격한 WFS 변경 시 아크 불안정 또는 Wire Stick 발생 가능</li>
+            <li>최종 확정값은 반드시 welddata/seamdata에 저장하여 재현성 확보</li>
+        </ul>
+    </div>
+
+    <h4>8.7.8.7 ABB ArcWare WFS 제어 예제 요약</h4>
+    <table>
+        <tr>
+            <th>제어 방법</th>
+            <th>사용 시점</th>
+            <th>장점</th>
+            <th>단점</th>
+        </tr>
+        <tr>
+            <td><strong>welddata 설정</strong></td>
+            <td>기본 WFS 정의</td>
+            <td>
+                • 간단하고 직관적<br>
+                • 재현성 높음<br>
+                • 여러 welddata 사전 정의 가능
+            </td>
+            <td>
+                • 정적 제어만 가능<br>
+                • 용접 중 변경 불가
+            </td>
+        </tr>
+        <tr>
+            <td><strong>seamdata 설정</strong></td>
+            <td>시작/종료부 WFS 제어</td>
+            <td>
+                • Strike, Crater 등 세밀한 제어<br>
+                • 비드 품질 향상<br>
+                • welddata와 독립 설정
+            </td>
+            <td>
+                • 설정 파라미터 많음<br>
+                • 초기 학습 필요
+            </td>
+        </tr>
+        <tr>
+            <td><strong>ArcRefresh 동적 제어</strong></td>
+            <td>용접 중 WFS 변경</td>
+            <td>
+                • 실시간 적응 가능<br>
+                • 복잡한 조건 대응<br>
+                • 센서 피드백 연동 가능
+            </td>
+            <td>
+                • 프로그래밍 복잡<br>
+                • 디버깅 어려움<br>
+                • 타이밍 민감
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Manual Tuning</strong></td>
+            <td>시험 용접, 최적화</td>
+            <td>
+                • 즉시 효과 확인<br>
+                • 초보자 친화적<br>
+                • 빠른 최적값 탐색
+            </td>
+            <td>
+                • 생산 용접 부적합<br>
+                • 수동 작업 필요<br>
+                • 재현성 보장 위해 저장 필수
+            </td>
+        </tr>
+        <tr>
+            <td><strong>DeviceNet 직접 제어</strong></td>
+            <td>PLC 연동 시스템</td>
+            <td>
+                • ArcWare 우회 가능<br>
+                • PLC 로직 통합<br>
+                • 외부 시스템 연동
+            </td>
+            <td>
+                • ArcWare 기능 손실<br>
+                • 복잡한 시스템 구성<br>
+                • 유지보수 어려움
+            </td>
+        </tr>
+    </table>
+
     <h2>9. Common Error Codes</h2>
     <table>
         <tr>
