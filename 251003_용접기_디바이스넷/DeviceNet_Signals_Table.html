@@ -2493,6 +2493,491 @@ ENDMODULE</pre>
         </tr>
     </table>
 
+    <h2>8.8 Lincoln 용접기 외부 신호(DeviceNet) WFS 제어 파라미터 설정</h2>
+
+    <div class="error-box" style="background-color: #fff3e0; border-left-color: #ff9800;">
+        <h4 style="color: #e65100;">⚙️ 필수 설정: Lincoln Power Wave DeviceNet 파라미터</h4>
+        <p>
+            ABB 로봇(또는 PLC)에서 DeviceNet을 통해 Lincoln 용접기의 WFS를 제어하려면,
+            <strong>용접기 자체의 DeviceNet 파라미터를 올바르게 설정</strong>해야 합니다.
+            이 설정이 없으면 I/O 매핑이 완료되어도 용접기가 외부 신호에 반응하지 않습니다.
+        </p>
+    </div>
+
+    <h3>8.8.1 Lincoln Power Wave Manager 소프트웨어 설정</h3>
+
+    <div class="warning-box">
+        <h4>💻 Power Wave Manager 접속 방법</h4>
+        <ol style="line-height: 2;">
+            <li><strong>PC와 용접기 연결</strong>
+                <ul>
+                    <li>Ethernet 케이블로 PC와 Power Wave 연결</li>
+                    <li>또는 Wi-Fi 모듈 사용 (모델에 따라)</li>
+                    <li>용접기 IP 주소 확인 (기본값: 192.168.1.xxx)</li>
+                </ul>
+            </li>
+            <li><strong>Power Wave Manager 실행</strong>
+                <ul>
+                    <li>Lincoln Electric 웹사이트에서 다운로드</li>
+                    <li>또는 설치 CD 사용</li>
+                    <li>프로그램 실행 → "Connect to Power Wave" 선택</li>
+                </ul>
+            </li>
+            <li><strong>용접기 선택 및 로그인</strong>
+                <ul>
+                    <li>네트워크에서 용접기 검색</li>
+                    <li>암호 입력 (공장 기본값 또는 사용자 설정)</li>
+                    <li>"Configuration" 탭으로 이동</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <h3>8.8.2 DeviceNet 기본 설정 (Network Settings)</h3>
+
+    <table>
+        <tr style="background-color: #ff9800;">
+            <th style="color: white;">설정 항목</th>
+            <th style="color: white;">설정 위치</th>
+            <th style="color: white;">권장값</th>
+            <th style="color: white;">설명</th>
+        </tr>
+        <tr>
+            <td><strong>MAC ID (Node ID)</strong></td>
+            <td>Network Settings → DeviceNet → Configuration</td>
+            <td>63 (기본값)</td>
+            <td>
+                • DeviceNet 노드 주소 (0~63)<br>
+                • ABB Controller의 EIO.cfg와 일치 필수<br>
+                • 일부 모델은 DIP 스위치로 설정<br>
+                • 변경 후 용접기 재부팅 필요
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Baud Rate</strong></td>
+            <td>Network Settings → DeviceNet → Configuration</td>
+            <td>125K 또는 250K</td>
+            <td>
+                • DeviceNet 통신 속도<br>
+                • ABB DeviceNet Master와 일치 필수<br>
+                • 125K bps (일반적), 250K bps (고속)<br>
+                • 일부 모델은 DIP 스위치로 설정
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Connection Type</strong></td>
+            <td>Network Settings → DeviceNet → Configuration</td>
+            <td>Polled I/O + Explicit Messaging</td>
+            <td>
+                • Polled I/O: 실시간 제어 (8 bytes I/O)<br>
+                • Explicit Messaging: 파라미터 읽기/쓰기<br>
+                • 양쪽 모두 활성화 권장
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Update Rate (RPI)</strong></td>
+            <td>ABB Controller에서 설정</td>
+            <td>10~50 ms</td>
+            <td>
+                • Polled I/O 갱신 주기<br>
+                • 빠를수록 반응성 좋지만 네트워크 부하 증가<br>
+                • 용접 제어: 20~50 ms 권장
+            </td>
+        </tr>
+    </table>
+
+    <h3>8.8.3 Analog Input Fan Out 설정 (핵심 파라미터) ⭐</h3>
+
+    <div class="success-box">
+        <h4>📌 AI Fan Out이란?</h4>
+        <p>
+            <strong>Analog Input Fan Out</strong>은 DeviceNet Produced Assembly의 3개 아날로그 입력
+            (Byte 2-3, 4-5, 6-7)이 <strong>어떤 용접 파라미터를 제어할지</strong> 지정하는 설정입니다.
+        </p>
+        <p>
+            예: AI0 (Byte 2-3) = Workpoint (WFS), AI1 (Byte 4-5) = Trim (전압), AI2 (Byte 6-7) = Wave1
+        </p>
+    </div>
+
+    <table>
+        <tr style="background-color: #27ae60;">
+            <th style="color: white;">Analog Input</th>
+            <th style="color: white;">설정 위치</th>
+            <th style="color: white;">권장 Fan Out 대상</th>
+            <th style="color: white;">설명</th>
+        </tr>
+        <tr>
+            <td><strong>AI0 (Byte 2-3)</strong><br>Analog Reference 1</td>
+            <td>Configuration → DeviceNet → AI0 Fan Out</td>
+            <td><strong>Workpoint (WFS)</strong></td>
+            <td>
+                • 가장 중요한 제어 파라미터<br>
+                • CV 모드: WFS (ipm 또는 m/min)<br>
+                • CC 모드: 전류 (Ampere)<br>
+                • Pulse 모드: 평균 전류<br>
+                • <strong>반드시 Workpoint로 설정 필수!</strong>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>AI1 (Byte 4-5)</strong><br>Analog Reference 2</td>
+            <td>Configuration → DeviceNet → AI1 Fan Out</td>
+            <td><strong>Trim (전압 조정)</strong></td>
+            <td>
+                • 용접 전압 미세 조정<br>
+                • CV 모드: 설정 전압 Offset<br>
+                • CC 모드: 전압 Trim<br>
+                • 범위: 보통 ±5V 정도
+            </td>
+        </tr>
+        <tr>
+            <td><strong>AI2 (Byte 6-7)</strong><br>Analog Reference 3</td>
+            <td>Configuration → DeviceNet → AI2 Fan Out</td>
+            <td><strong>Wave Control 1</strong><br>(또는 사용 안함)</td>
+            <td>
+                • 고급 파형 제어 (Pulse, STT 등)<br>
+                • 펄스 주파수, 듀티 사이클 등<br>
+                • 기본 용접에서는 사용 안함 가능
+            </td>
+        </tr>
+    </table>
+
+    <h4>8.8.3.1 AI Fan Out 설정 예제</h4>
+    <div class="warning-box">
+        <h4>설정 경로: Power Wave Manager → Configuration → DeviceNet</h4>
+        <pre style="background: #f8f9fa; padding: 15px; border-left: 4px solid #27ae60; margin: 15px 0;">
+┌─────────────────────────────────────────────────┐
+│ DeviceNet Configuration                         │
+├─────────────────────────────────────────────────┤
+│ AI0 Fan Out:  [Workpoint (WFS)        ▼]  ⭐   │
+│ AI1 Fan Out:  [Trim                   ▼]       │
+│ AI2 Fan Out:  [Wave Control 1         ▼]       │
+│                                                 │
+│ ☑ Enable AI0 (Workpoint)                       │
+│ ☑ Enable AI1 (Trim)                            │
+│ ☐ Enable AI2 (Wave Control) - 선택사항         │
+└─────────────────────────────────────────────────┘
+
+<strong>주의:</strong> AI0을 Workpoint로 설정하지 않으면 ABB에서 WFS 제어 불가!</pre>
+    </div>
+
+    <h3>8.8.4 Workpoint/Trim 파라미터 포맷 설정</h3>
+
+    <table>
+        <tr style="background-color: #3498db;">
+            <th style="color: white;">설정 항목</th>
+            <th style="color: white;">옵션</th>
+            <th style="color: white;">설명</th>
+            <th style="color: white;">권장값</th>
+        </tr>
+        <tr>
+            <td rowspan="2"><strong>Workpoint Parameter Format</strong></td>
+            <td><strong>Engineering Units</strong> ⭐</td>
+            <td>
+                • 스케일된 실제 단위 사용<br>
+                • WFS: 0~500 ipm (실제 속도)<br>
+                • 전류: 0~400 A (실제 전류)<br>
+                • <strong>ABB ArcWare 사용 시 권장</strong>
+            </td>
+            <td rowspan="2"><strong>Engineering Units</strong><br>(대부분의 경우)</td>
+        </tr>
+        <tr>
+            <td>Unscaled Values</td>
+            <td>
+                • 원시 값 사용 (0~32767)<br>
+                • 최소~최대 WFS를 0~32767로 매핑<br>
+                • 저수준 PLC 제어 시 사용
+            </td>
+        </tr>
+        <tr>
+            <td rowspan="2"><strong>Trim/Wave Control Format</strong></td>
+            <td><strong>Engineering Units</strong> ⭐</td>
+            <td>
+                • 스케일된 실제 단위 사용<br>
+                • Trim: -5.0 ~ +5.0 V (실제 전압)<br>
+                • Wave: 용접 모드별 실제 단위<br>
+                • <strong>ABB ArcWare 사용 시 권장</strong>
+            </td>
+            <td rowspan="2"><strong>Engineering Units</strong></td>
+        </tr>
+        <tr>
+            <td>Unscaled Values</td>
+            <td>
+                • 원시 값 사용 (-32768~32767)<br>
+                • 0 = Nominal (기준값)<br>
+                • 저수준 PLC 제어 시 사용
+            </td>
+        </tr>
+    </table>
+
+    <h4>8.8.4.1 스케일링 설정 예제</h4>
+    <div class="warning-box">
+        <pre style="background: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; margin: 15px 0;">
+<strong>Engineering Units 모드 (권장):</strong>
+
+ABB에서 전송: welddata.v_weld_speed = 250 (ipm)
+     ↓
+DeviceNet Byte 2-3: 값 = 250 (그대로 전송)
+     ↓
+Lincoln 수신: WFS = 250 ipm (직접 해석)
+
+✅ 장점: 직관적, ArcWare와 자동 호환
+
+
+<strong>Unscaled Values 모드:</strong>
+
+Lincoln WFS 범위: 50~500 ipm (최소~최대)
+ABB에서 전송: 250 ipm 설정 원함
+     ↓
+스케일 계산: (250-50) / (500-50) × 32767 = 14563
+     ↓
+DeviceNet Byte 2-3: 값 = 14563 전송
+     ↓
+Lincoln 수신: (14563/32767) × (500-50) + 50 = 250 ipm
+
+⚠️ 단점: 복잡한 계산, 수동 스케일링 필요</pre>
+    </div>
+
+    <h3>8.8.5 Analog Input Hysteresis (노이즈 필터링)</h3>
+
+    <table>
+        <tr>
+            <th>파라미터</th>
+            <th>설명</th>
+            <th>권장값</th>
+        </tr>
+        <tr>
+            <td><strong>AI0 Hysteresis</strong><br>(Workpoint)</td>
+            <td>
+                DeviceNet AI0 값이 이 크기 이상 변경될 때만 용접기 반응<br>
+                너무 작으면: 노이즈로 인한 WFS 떨림 발생<br>
+                너무 크면: 미세 조정 불가
+            </td>
+            <td>
+                <strong>2~5</strong> (Engineering Units)<br>
+                예: WFS 2~5 ipm 변화 시 반영<br><br>
+                <strong>100~500</strong> (Unscaled Values)
+            </td>
+        </tr>
+        <tr>
+            <td><strong>AI1 Hysteresis</strong><br>(Trim)</td>
+            <td>
+                DeviceNet AI1 값 변경 임계값<br>
+                Trim은 미세 조정용이므로 낮게 설정
+            </td>
+            <td>
+                <strong>0.1~0.5 V</strong> (Engineering Units)<br><br>
+                <strong>50~200</strong> (Unscaled Values)
+            </td>
+        </tr>
+        <tr>
+            <td><strong>AI2 Hysteresis</strong><br>(Wave Control)</td>
+            <td>
+                DeviceNet AI2 값 변경 임계값<br>
+                Wave Control 사용 시 설정
+            </td>
+            <td>
+                용접 모드에 따라 상이<br>
+                <strong>1~10</strong> (일반적)
+            </td>
+        </tr>
+    </table>
+
+    <h3>8.8.6 용접 모드별 Workpoint 설정</h3>
+
+    <table>
+        <tr style="background-color: #9b59b6;">
+            <th style="color: white;">용접 모드</th>
+            <th style="color: white;">Workpoint 의미</th>
+            <th style="color: white;">단위</th>
+            <th style="color: white;">Lincoln 설정</th>
+        </tr>
+        <tr>
+            <td><strong>CV (Constant Voltage)</strong></td>
+            <td>Wire Feed Speed</td>
+            <td>ipm 또는 m/min</td>
+            <td>
+                Configuration → Weld Mode → CV<br>
+                Workpoint Type: <strong>WFS</strong>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>CC (Constant Current)</strong></td>
+            <td>Welding Current</td>
+            <td>Ampere (A)</td>
+            <td>
+                Configuration → Weld Mode → CC<br>
+                Workpoint Type: <strong>Current</strong>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Pulse (펄스)</strong></td>
+            <td>Average Current<br>또는 Average WFS</td>
+            <td>A 또는 ipm</td>
+            <td>
+                Configuration → Weld Mode → Pulse<br>
+                Workpoint Type: <strong>Avg Current</strong> 또는 <strong>WFS</strong>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>STT (Surface Tension Transfer)</strong></td>
+            <td>WFS</td>
+            <td>ipm</td>
+            <td>
+                Configuration → Weld Mode → STT<br>
+                Workpoint Type: <strong>WFS</strong>
+            </td>
+        </tr>
+    </table>
+
+    <h3>8.8.7 필수 설정 체크리스트</h3>
+
+    <div class="success-box">
+        <h4>✅ Lincoln Power Wave DeviceNet WFS 제어 설정 완료 체크리스트</h4>
+        <ul class="checklist">
+            <li><strong>MAC ID 설정</strong> - ABB EIO.cfg의 Node ID와 일치 (통상 63)</li>
+            <li><strong>Baud Rate 설정</strong> - ABB DeviceNet Master와 일치 (125K 또는 250K)</li>
+            <li><strong>AI0 Fan Out = Workpoint (WFS)</strong> ⭐ 가장 중요!</li>
+            <li><strong>AI1 Fan Out = Trim</strong> (전압 제어)</li>
+            <li><strong>AI2 Fan Out = Wave Control 1</strong> (선택사항)</li>
+            <li><strong>Workpoint Format = Engineering Units</strong> (ABB 사용 시)</li>
+            <li><strong>Trim Format = Engineering Units</strong></li>
+            <li><strong>AI0 Hysteresis = 2~5</strong> (노이즈 필터링)</li>
+            <li><strong>AI1 Hysteresis = 0.1~0.5 V</strong></li>
+            <li><strong>Weld Mode 선택</strong> (CV/CC/Pulse/STT)</li>
+            <li><strong>Schedule 1~8 프로그래밍</strong> (Explicit Messaging 사용 시)</li>
+            <li><strong>용접기 재부팅</strong> (MAC ID, Baud Rate 변경 후 필수)</li>
+        </ul>
+    </div>
+
+    <h3>8.8.8 설정 후 테스트 절차</h3>
+
+    <div class="warning-box">
+        <h4>🧪 단계별 동작 확인</h4>
+        <ol style="line-height: 2;">
+            <li><strong>DeviceNet 통신 확인</strong>
+                <ul>
+                    <li>Lincoln 용접기 전면: DeviceNet LED 녹색 점멸 확인</li>
+                    <li>ABB RobotStudio: I/O System → DeviceNet → Node 63 온라인 확인</li>
+                </ul>
+            </li>
+            <li><strong>수동 I/O 테스트 (ABB에서)</strong>
+                <ul>
+                    <li>RobotStudio → I/O 탭 → aoWorkpoint 선택</li>
+                    <li>값을 수동으로 250 설정 (250 ipm)</li>
+                    <li>Lincoln 용접기 디스플레이에서 WFS = 250 ipm 표시 확인 ⭐</li>
+                </ul>
+            </li>
+            <li><strong>Trim 테스트</strong>
+                <ul>
+                    <li>aoTrim 값을 500 설정 (+2V Trim)</li>
+                    <li>용접기에서 전압 변화 확인</li>
+                </ul>
+            </li>
+            <li><strong>실제 용접 테스트</strong>
+                <ul>
+                    <li>RAPID 프로그램 실행 (ArcL 명령)</li>
+                    <li>아크 발생 및 WFS 제어 확인</li>
+                    <li>비드 형상 관찰 → WFS 미세 조정</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <h3>8.8.9 문제 해결: WFS가 제어되지 않는 경우</h3>
+
+    <table>
+        <tr style="background-color: #e74c3c;">
+            <th style="color: white;">증상</th>
+            <th style="color: white;">원인</th>
+            <th style="color: white;">해결 방법</th>
+        </tr>
+        <tr>
+            <td>ABB에서 aoWorkpoint 변경해도<br>Lincoln WFS 무반응</td>
+            <td><strong>AI0 Fan Out 미설정</strong><br>또는 잘못된 파라미터 연결</td>
+            <td>
+                1. Power Wave Manager 접속<br>
+                2. Configuration → DeviceNet → AI0 Fan Out<br>
+                3. <strong>"Workpoint (WFS)"</strong> 선택 ⭐<br>
+                4. 용접기 재부팅
+            </td>
+        </tr>
+        <tr>
+            <td>WFS 값이 이상하게 표시됨<br>(예: 32000 ipm)</td>
+            <td>Workpoint Format 불일치<br>(Unscaled ↔ Engineering Units)</td>
+            <td>
+                1. Lincoln: Engineering Units로 변경<br>
+                2. ABB: Configuration → Arc Equipment → Scaling 확인<br>
+                3. 양쪽 단위 일치시키기
+            </td>
+        </tr>
+        <tr>
+            <td>WFS가 계속 떨리거나<br>미세하게 변동됨</td>
+            <td>Hysteresis 값 너무 낮음<br>(노이즈 영향)</td>
+            <td>
+                AI0 Hysteresis를 5~10으로 증가<br>
+                (DeviceNet 케이블 차폐 확인)
+            </td>
+        </tr>
+        <tr>
+            <td>WFS 미세 조정 불가<br>(변경해도 안 바뀜)</td>
+            <td>Hysteresis 값 너무 높음</td>
+            <td>
+                AI0 Hysteresis를 1~2로 감소
+            </td>
+        </tr>
+        <tr>
+            <td>DeviceNet 연결은 되는데<br>I/O 값 전송 안됨</td>
+            <td>Polled I/O 연결 미설정</td>
+            <td>
+                1. ABB EIO.cfg에서 Produced/Consumed Assembly 확인<br>
+                2. Connection Type: Polled I/O 활성화<br>
+                3. Warm Start 실행
+            </td>
+        </tr>
+        <tr>
+            <td>MAC ID 변경했는데<br>반영 안됨</td>
+            <td>용접기 재부팅 안함</td>
+            <td>
+                용접기 전원 완전 차단 후 재부팅<br>
+                (일부 모델은 설정 저장 후 자동 재시작)
+            </td>
+        </tr>
+    </table>
+
+    <h3>8.8.10 고급 설정: Schedule별 WFS 사전 프로그래밍</h3>
+
+    <div class="info" style="background-color: #e3f2fd;">
+        <h4>💡 Schedule 기반 WFS 제어</h4>
+        <p>
+            Lincoln Power Wave는 8개의 Schedule (1~8)을 지원합니다.
+            각 Schedule에 WFS를 포함한 전체 용접 시퀀스를 사전 프로그래밍하고,
+            DeviceNet Byte 1 Bit 0~2로 Schedule 번호만 선택하여 빠르게 전환할 수 있습니다.
+        </p>
+
+        <h4 style="margin-top: 15px;">Schedule 프로그래밍 방법:</h4>
+        <ol style="line-height: 1.8;">
+            <li><strong>Power Wave Manager → Schedules 탭</strong></li>
+            <li><strong>Schedule 1~8 선택</strong></li>
+            <li><strong>각 Schedule에 설정:</strong>
+                <ul>
+                    <li>Weld Mode (CV/CC/Pulse/STT)</li>
+                    <li>Run-in WFS (Strike): 300~400 ipm</li>
+                    <li>Workpoint WFS (Weld1): 200~400 ipm</li>
+                    <li>Crater WFS: 100~200 ipm</li>
+                    <li>Trim, Wave Control 값</li>
+                    <li>State Timer, State Enable 비트</li>
+                </ul>
+            </li>
+            <li><strong>ABB RAPID에서:</strong>
+                <pre style="background: #2d2d2d; color: #f8f8f2; padding: 10px; border-radius: 5px;">
+! Schedule 3 선택 (Byte 1, Bit 0~2 = 2진수 010 = 십진수 2)
+SetDO doScheduleBit0, 0;
+SetDO doScheduleBit1, 1;
+SetDO doScheduleBit2, 0;</pre>
+            </li>
+        </ol>
+    </div>
+
     <h2>9. Common Error Codes</h2>
     <table>
         <tr>
