@@ -348,6 +348,7 @@
             <button class="nav-tab active" onclick="showTab('overview')">🏠 전체 개요</button>
             <button class="nav-tab" onclick="showTab('devicenet')">🔌 DeviceNet</button>
             <button class="nav-tab" onclick="showTab('robot')">🤖 로봇 상하축</button>
+            <button class="nav-tab" onclick="showTab('robot-ui-test')">🧪 ROBOT↔UI 테스트</button>
             <button class="nav-tab" onclick="showTab('hexagon')">📐 Hexagon</button>
             <button class="nav-tab" onclick="showTab('documents')">📚 문서 자료</button>
         </div>
@@ -592,45 +593,18 @@
                 </div>
 
                 <div class="card">
-                    <h3>🧪 ROBOT↔UI 테스트 현황</h3>
+                    <h3>🧪 ROBOT↔UI 테스트</h3>
                     <div class="info-box" style="background: #e0f2fe; border-left-color: #0284c7;">
-                        <h4 style="color: #0c4a6e;">📊 통합 테스트 결과 (10/3-10/4)</h4>
+                        <h4 style="color: #0c4a6e;">📊 최근 테스트 현황</h4>
                         <p>
-                            <strong>총 테스트 항목:</strong> 31개 (10/3: 18개 + 10/4: 13개)<br>
-                            <strong>✅ 완료:</strong> 11개 | <strong>🔵 부분완료:</strong> 6개 (드라이런 A라인만 완료) | <strong>⚠️ 개선필요:</strong> 9개 | <strong>🔴 결함:</strong> 1개 | <strong>⏸️ 보류:</strong> 4개
-                        </p>
-                    </div>
-                    <div class="info-box" style="background: #fee2e2; border-left-color: #dc2626; margin-top: 15px;">
-                        <h4 style="color: #991b1b;">🚨 긴급 이슈</h4>
-                        <p>
-                            <strong>충돌 검사 미작동:</strong> 안전 근접거리 무시하고 진입 가능<br>
-                            <strong>UI 종료:</strong> 정상 종료 버튼 필요 (로봇 연동)
+                            <strong>테스트 기간:</strong> 2024.10.03-10.04<br>
+                            <strong>총 항목:</strong> 31개<br>
+                            <strong>다음 일정:</strong> 2024.10.11 (UI 개선 및 에러 핸들링)
                         </p>
                     </div>
                     <a href="250917_상하축이슈/04_작업진행/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
-                        📋 통합 테스트 결과 보기 (10/3-10/4)
+                        📋 상세 테스트 결과 보기
                     </a>
-                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link" target="_blank" style="background: #f3f4f6; color: #6b7280; margin-top: 10px;">
-                        📄 1차 결과 (10/3) - 백업
-                    </a>
-                </div>
-
-                <div class="card">
-                    <h3>📊 10/4 테스트 항목 (12개)</h3>
-                    <ul class="folder-structure">
-                        <li><span class="folder-icon">📏</span> 갠트리 이동 범위 초과 에러 처리</li>
-                        <li><span class="folder-icon">🛡️</span> X축 안전 근접거리 DB 관리</li>
-                        <li><span class="folder-icon">⚠️</span> 갠트리 이동 전 충돌 검사</li>
-                        <li><span class="folder-icon">🎮</span> 수동 이동 UI 방향/제한 범위 표시</li>
-                        <li><span class="folder-icon">⚡</span> 속도 및 드라이런 배율 설정</li>
-                        <li><span class="folder-icon">🔧</span> 와이어 교체 모드</li>
-                        <li><span class="folder-icon">✂️</span> 개별 로봇 와이어 커팅</li>
-                        <li><span class="folder-icon">⚙️</span> 실시간 용접 조건 변경 (A LINE)</li>
-                        <li><span class="folder-icon">📊</span> 아크에러시 인근부재 최대높이 전달</li>
-                        <li><span class="folder-icon">💾</span> 용접 데이터 임시저장/되돌리기</li>
-                        <li><span class="folder-icon">📋</span> 매크로 설정값 일괄 변경</li>
-                        <li><span class="folder-icon">🚀</span> OP PC 부팅시 운영SW 자동 실행</li>
-                    </ul>
                 </div>
 
                 <div class="card">
@@ -641,6 +615,151 @@
                     <div style="margin-top: 15px;">
                         <a href="250917_상하축이슈/01_문제점분석/251003_에이전트_ROBOT-UI_테스트이슈_분석.md" class="file-link">📄 테스트이슈 분석.md</a>
                         <a href="250917_상하축이슈/01_문제점분석/240917_갠트리로봇_간섭문제.md" class="file-link">📄 간섭문제.md</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROBOT↔UI 테스트 탭 -->
+        <div id="robot-ui-test" class="tab-content">
+            <div class="highlight-box" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-left-color: #0284c7;">
+                <h2 style="color: #0c4a6e; margin-bottom: 15px;">🧪 ROBOT↔UI 통합 테스트</h2>
+                <p style="line-height: 1.8;">
+                    로봇 시스템과 사용자 인터페이스(UI) 간의 연동 기능을 검증하는 통합 테스트입니다.
+                    34bay 자동용접 A라인/B라인에서 실시되며, 속도 제어, 충돌 검사, 데이터 관리 등 핵심 기능을 테스트합니다.
+                </p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #0284c7;">31</div>
+                    <div class="stat-label">총 테스트 항목</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #10b981;">
+                    <div class="stat-number" style="color: #10b981;">13</div>
+                    <div class="stat-label">완료</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #f59e0b;">
+                    <div class="stat-number" style="color: #f59e0b;">11</div>
+                    <div class="stat-label">개선 필요</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #ef4444;">
+                    <div class="stat-number" style="color: #ef4444;">7</div>
+                    <div class="stat-label">보류</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>📊 테스트 개요</h3>
+                    <div class="info-box">
+                        <h4>테스트 정보</h4>
+                        <p>
+                            <strong>기간:</strong> 2024.10.03 ~ 10.04<br>
+                            <strong>담당:</strong> SP 심태양<br>
+                            <strong>위치:</strong> 34bay 자동용접 A라인/B라인<br>
+                            <strong>다음 일정:</strong> 2024.10.11 (에러 핸들링)
+                        </p>
+                    </div>
+                    <a href="250917_상하축이슈/04_작업진행/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);" target="_blank">
+                        📋 통합 테스트 결과 상세 보기
+                    </a>
+                    <a href="250917_상하축이슈/04_작업진행/251004_고객발송_테스트결과.html" class="project-link" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);" target="_blank">
+                        📤 고객 발송용 보고서
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>✅ 완료 항목 (13개)</h3>
+                    <ul class="folder-structure">
+                        <li><span class="folder-icon">⚡</span> 전체 설비 속도 비율 설정</li>
+                        <li><span class="folder-icon">🛡️</span> X축 안전 근접거리 DB 관리</li>
+                        <li><span class="folder-icon">⚠️</span> 갠트리 이동 전 충돌 검사</li>
+                        <li><span class="folder-icon">🎮</span> 수동 이동 UI 방향/제한 범위 표시</li>
+                        <li><span class="folder-icon">🔧</span> 와이어 교체 모드</li>
+                        <li><span class="folder-icon">✂️</span> 개별 로봇 와이어 커팅</li>
+                        <li><span class="folder-icon">💾</span> 갠트리 limit 데이터 DB 최신화</li>
+                        <li><span class="folder-icon">📏</span> 이동 범위 초과 에러 처리</li>
+                        <li><span class="folder-icon">📋</span> 방향/용어 표준화</li>
+                        <li><span class="folder-icon">⚙️</span> 데이터 값 입력 후 설정</li>
+                        <li><span class="folder-icon">🚀</span> 드라이런 속도 배율 (A라인)</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>⚠️ 개선 필요 (11개)</h3>
+                    <div style="background: #fffbeb; padding: 15px; border-radius: 8px; border-left: 3px solid #f59e0b; margin: 10px 0;">
+                        <h4 style="color: #92400e; margin-bottom: 10px;">🔧 UI 기능 개선 (10/11까지)</h4>
+                        <ul style="margin-left: 20px; font-size: 0.95em; line-height: 1.8;">
+                            <li>용접 데이터 임시저장 및 되돌리기</li>
+                            <li>매크로 설정값 일괄 변경</li>
+                            <li>OP PC 부팅 시 운영SW 자동 실행</li>
+                            <li>수동조작 모드 가시성 개선</li>
+                            <li>갠트리 접근 UI 알람 처리</li>
+                        </ul>
+                    </div>
+                    <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; border-left: 3px solid #0284c7; margin: 10px 0;">
+                        <h4 style="color: #075985; margin-bottom: 10px;">🤖 로봇 컨트롤러 연동 (10/11)</h4>
+                        <ul style="margin-left: 20px; font-size: 0.95em; line-height: 1.8;">
+                            <li>드라이런 속도 배율 (B라인)</li>
+                            <li>와이어/갠트리/로봇 이동속도</li>
+                            <li>실시간 용접 조건 변경</li>
+                            <li>r축 충돌 방지 (y 연동 리미트)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>⏸️ 보류 사항 (7개)</h3>
+                    <div class="info-box" style="background: #fee2e2; border-left-color: #dc2626;">
+                        <h4 style="color: #991b1b;">🚨 일정 변경: 10/9 → 10/11</h4>
+                        <p style="margin-bottom: 10px;">
+                            <strong>사유:</strong> 디바이스넷 긴급 적용으로 일정 조정
+                        </p>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li>아크에러시 인근부재 최대높이 전달</li>
+                            <li>용접 진입/터치 에러 재시도</li>
+                            <li>시뮬레이션 vs 실제 상이</li>
+                            <li>SDK 예외 매핑·알람 설계 (일정 검토 중)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📅 향후 일정</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <strong>2024.10.11 (금)</strong>
+                            <span class="badge badge-update">SCHEDULED</span>
+                            <p>UI 개선 사항 완료 및 에러 핸들링 집중 진행</p>
+                            <small>
+                                • 용접 데이터, 매크로 설정 기능 보완<br>
+                                • 부팅 자동실행, 알람 처리 개선<br>
+                                • 로봇 컨트롤러 연동 작업
+                            </small>
+                        </div>
+                        <div class="timeline-item">
+                            <strong>SDK 관련</strong>
+                            <span class="badge" style="background: #9ca3af; color: white;">TBD</span>
+                            <p>일정 검토 중</p>
+                            <small>디바이스넷 작업 완료 후 일정 재수립 예정</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📄 관련 문서</h3>
+                    <a href="250917_상하축이슈/04_작업진행/251004_테스트결과_메신저보고.txt" class="file-link">
+                        💬 메신저 보고용 텍스트
+                    </a>
+                    <a href="250917_상하축이슈/04_작업진행/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="file-link">
+                        📄 1차 결과 백업 (10/3)
+                    </a>
+                    <div style="margin-top: 15px; padding: 15px; background: #f3f4f6; border-radius: 8px;">
+                        <p style="margin: 0; color: #6b7280; font-size: 0.9em;">
+                            <strong>📁 저장 위치:</strong> 250917_상하축이슈/04_작업진행/<br>
+                            <strong>📊 백업 파일:</strong> 자동 생성 (타임스탬프 포함)
+                        </p>
                     </div>
                 </div>
             </div>
