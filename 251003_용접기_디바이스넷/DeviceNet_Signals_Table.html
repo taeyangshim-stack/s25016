@@ -1610,6 +1610,455 @@ Attr 113 (Post Purge Time) = 1.0 sec</pre>
         </ul>
     </div>
 
+    <h2>8.7 WFS (Wire Feed Speed) 상세 설명</h2>
+
+    <div class="info" style="background-color: #e6f2ff;">
+        <h4>🔧 WFS란?</h4>
+        <p>
+            <strong>Wire Feed Speed (와이어 송급 속도)</strong>는 MIG/MAG 용접에서 용접 토치로 공급되는
+            용접 와이어(전극)의 속도를 의미합니다. 용접 전류와 직접적인 관계가 있으며,
+            용접 품질과 용입 깊이를 결정하는 가장 중요한 파라미터입니다.
+        </p>
+    </div>
+
+    <h3>8.7.1 WFS의 기본 개념</h3>
+    <table>
+        <tr>
+            <th>항목</th>
+            <th>내용</th>
+            <th>비고</th>
+        </tr>
+        <tr>
+            <td>단위</td>
+            <td>ipm (inch per minute) 또는 m/min (meter per minute)</td>
+            <td>Lincoln: ipm 사용 (1 ipm ≈ 0.0254 m/min)</td>
+        </tr>
+        <tr>
+            <td>일반적인 범위</td>
+            <td>50~500 ipm (약 1.3~12.7 m/min)</td>
+            <td>재질, 두께, 용접 모드에 따라 다름</td>
+        </tr>
+        <tr>
+            <td>제어 방식</td>
+            <td>와이어 송급 모터의 회전 속도 제어</td>
+            <td>DC 서보모터 또는 스테핑 모터</td>
+        </tr>
+        <tr>
+            <td>측정 방법</td>
+            <td>엔코더를 통한 실시간 피드백</td>
+            <td>실제 송급 속도 모니터링</td>
+        </tr>
+    </table>
+
+    <h3>8.7.2 WFS와 용접 전류의 관계</h3>
+    <div class="warning-box">
+        <h4>📊 WFS-전류 상관관계</h4>
+        <p>MIG/MAG 용접에서 <strong>WFS가 증가하면 용접 전류도 자동으로 증가</strong>합니다. 이는 다음 물리적 원리에 기반합니다:</p>
+
+        <pre style="background: #f8f9fa; padding: 15px; border-left: 4px solid #0066cc; margin: 15px 0;">
+<strong>자기조절 아크 (Self-Regulating Arc) 원리:</strong>
+
+1. WFS ↑ → 단위시간당 용융되는 와이어 양 ↑
+2. 와이어 용융에 필요한 에너지 ↑
+3. 용접기가 자동으로 전류 ↑ (아크 유지)
+4. 결과: WFS와 전류는 선형 비례 관계
+
+<strong>경험적 공식 (연강, ∅1.2mm 와이어):</strong>
+전류(A) ≈ WFS(ipm) × 0.8~1.0
+
+예시:
+• WFS = 200 ipm → 전류 ≈ 160~200A
+• WFS = 300 ipm → 전류 ≈ 240~300A
+• WFS = 400 ipm → 전류 ≈ 320~400A</pre>
+
+        <table style="background: white; margin-top: 15px;">
+            <tr>
+                <th>WFS (ipm)</th>
+                <th>예상 전류 (A)</th>
+                <th>용접 두께</th>
+                <th>용도</th>
+            </tr>
+            <tr>
+                <td>50~100</td>
+                <td>40~80A</td>
+                <td>박판 (&lt;1mm)</td>
+                <td>얇은 판재, 미세 용접</td>
+            </tr>
+            <tr>
+                <td>100~200</td>
+                <td>80~160A</td>
+                <td>1~3mm</td>
+                <td>일반 박판 용접</td>
+            </tr>
+            <tr>
+                <td>200~300</td>
+                <td>160~240A</td>
+                <td>3~6mm</td>
+                <td>중형 구조물 용접</td>
+            </tr>
+            <tr>
+                <td>300~400</td>
+                <td>240~320A</td>
+                <td>6~12mm</td>
+                <td>후판 용접</td>
+            </tr>
+            <tr>
+                <td>400~500</td>
+                <td>320~400A</td>
+                <td>12mm 이상</td>
+                <td>중후판, 다층 용접</td>
+            </tr>
+        </table>
+    </div>
+
+    <h3>8.7.3 Lincoln Power Wave에서의 WFS 설정</h3>
+    <table>
+        <tr>
+            <th>용접 모드</th>
+            <th>WFS 역할</th>
+            <th>Workpoint 의미</th>
+            <th>설명</th>
+        </tr>
+        <tr>
+            <td>CV (Constant Voltage)</td>
+            <td><strong>주 제어 파라미터</strong></td>
+            <td>WFS (ipm)</td>
+            <td>
+                • WFS로 용접 전류 간접 제어<br>
+                • Workpoint = 원하는 WFS 설정값<br>
+                • 용접기는 설정 전압(Trim) 유지
+            </td>
+        </tr>
+        <tr>
+            <td>CC (Constant Current)</td>
+            <td>보조 파라미터</td>
+            <td>전류 (A)</td>
+            <td>
+                • Workpoint = 직접 전류 설정<br>
+                • WFS는 아크 길이 유지를 위해 자동 조정<br>
+                • STT, Pulse 모드 등에 사용
+            </td>
+        </tr>
+        <tr>
+            <td>Pulse (펄스)</td>
+            <td>평균 전류 결정</td>
+            <td>평균 전류 (A) 또는 WFS (ipm)</td>
+            <td>
+                • WFS로 평균 용접 전류 설정<br>
+                • 펄스 주파수/듀티는 Wave Control로 제어<br>
+                • 스패터 저감, 박판 용접 유리
+            </td>
+        </tr>
+    </table>
+
+    <h3>8.7.4 시퀀스별 WFS 설정의 의미</h3>
+    <div class="success-box">
+        <h4>각 시퀀스 상태에서의 WFS 역할</h4>
+
+        <table style="background: white; margin-top: 15px;">
+            <tr>
+                <th>시퀀스 상태</th>
+                <th>WFS 파라미터</th>
+                <th>일반적인 값</th>
+                <th>목적 및 설명</th>
+            </tr>
+            <tr>
+                <td>3. Strike (착화)</td>
+                <td><strong>Run-in WFS</strong><br>(Attr 3)</td>
+                <td>300~400 ipm<br>(주 용접보다 높음)</td>
+                <td>
+                    <strong>⚡ 고속 착화 (Hot Start)</strong><br>
+                    • 높은 WFS → 높은 전류 → 빠른 아크 발생<br>
+                    • 모재와 와이어 간 확실한 용융<br>
+                    • 착화 실패 방지 (Cold Start 문제 해결)<br>
+                    • 지속 시간: 0.05~0.2초 (짧게)
+                </td>
+            </tr>
+            <tr>
+                <td>4. Start (시작)</td>
+                <td><strong>WORKPOINT[4]</strong><br>(Attr 13)</td>
+                <td>150~250 ipm<br>(주 용접보다 낮음)</td>
+                <td>
+                    <strong>🔥 저입열 안정화</strong><br>
+                    • 급격한 아크 발생 후 안정화<br>
+                    • 모재 과열 방지 (변형 최소화)<br>
+                    • 용융 풀 형성 시간 확보<br>
+                    • 지속 시간: 0.1~0.3초
+                </td>
+            </tr>
+            <tr>
+                <td>5. Upslope (상승)</td>
+                <td><strong>WORKPOINT[5]</strong><br>(Attr 14)</td>
+                <td>200~300 ipm<br>(점진적 증가)</td>
+                <td>
+                    <strong>📈 전류 램프업</strong><br>
+                    • Start → Weld1으로 점진적 증가<br>
+                    • 급격한 입열 변화 방지<br>
+                    • 균일한 비드 형성<br>
+                    • 지속 시간: 0.2~0.5초
+                </td>
+            </tr>
+            <tr>
+                <td>6. Weld1 (주 용접)</td>
+                <td><strong>WORKPOINT[6]</strong><br>(Attr 15)</td>
+                <td>200~400 ipm<br>(재질/두께에 따라)</td>
+                <td>
+                    <strong>⚙️ 정상 용접 조건</strong><br>
+                    • 설계된 용접 전류 달성<br>
+                    • 필요한 용입 깊이 확보<br>
+                    • 적절한 용착 속도<br>
+                    • 지속 시간: Trigger ON 유지 시간
+                </td>
+            </tr>
+            <tr>
+                <td>8. Downslope (하강)</td>
+                <td><strong>WORKPOINT[8]</strong><br>(Attr 17)</td>
+                <td>150~250 ipm<br>(점진적 감소)</td>
+                <td>
+                    <strong>📉 전류 램프다운</strong><br>
+                    • Weld1 → Crater로 점진적 감소<br>
+                    • 급냉 방지 (균열 예방)<br>
+                    • 비드 끝단 형상 개선<br>
+                    • 지속 시간: 0.2~0.5초
+                </td>
+            </tr>
+            <tr>
+                <td>9. Crater (충진)</td>
+                <td><strong>WORKPOINT[9]</strong><br>(Attr 18)</td>
+                <td>100~200 ipm<br>(주 용접보다 낮음)</td>
+                <td>
+                    <strong>🛡️ 크레이터 채우기</strong><br>
+                    • 저입열로 용접 끝부분 충진<br>
+                    • 크레이터 결함 방지<br>
+                    • 기공, 균열 발생 억제<br>
+                    • 지속 시간: 0.2~0.5초
+                </td>
+            </tr>
+            <tr>
+                <td>12. Restrike (재착화)</td>
+                <td><strong>Restrike WFS</strong><br>(Attr 4)</td>
+                <td>350~450 ipm<br>(Run-in WFS와 유사)</td>
+                <td>
+                    <strong>🔄 재시작 착화</strong><br>
+                    • 용접 중단 후 재개 시 사용<br>
+                    • 산화막 형성된 부위 재용융<br>
+                    • 높은 에너지로 확실한 재착화<br>
+                    • 지속 시간: 0.05~0.15초
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <h3>8.7.5 WFS 설정 시 주의사항</h3>
+    <div class="error-box">
+        <h4>⚠️ WFS 관련 일반적인 문제</h4>
+
+        <table style="background: white; margin-top: 15px;">
+            <tr>
+                <th>문제 증상</th>
+                <th>원인</th>
+                <th>해결 방법</th>
+            </tr>
+            <tr>
+                <td><strong>아크 착화 실패</strong><br>(Strike 상태)</td>
+                <td>Run-in WFS 너무 낮음<br>(전류 부족)</td>
+                <td>
+                    • Run-in WFS 증가 (300~400 ipm)<br>
+                    • Strike Timer 0.1~0.2초 확보<br>
+                    • Touch Sense 기능 활성화
+                </td>
+            </tr>
+            <tr>
+                <td><strong>스패터 과다 발생</strong></td>
+                <td>WFS 너무 높음<br>(과전류)</td>
+                <td>
+                    • Workpoint WFS 10~20% 감소<br>
+                    • Trim (전압) 0.5~1V 증가<br>
+                    • Pulse 모드 전환 검토
+                </td>
+            </tr>
+            <tr>
+                <td><strong>용입 부족</strong></td>
+                <td>WFS 너무 낮음<br>(전류 부족)</td>
+                <td>
+                    • Workpoint WFS 10~20% 증가<br>
+                    • 용접 속도(Travel Speed) 감소<br>
+                    • 다층 용접 고려
+                </td>
+            </tr>
+            <tr>
+                <td><strong>와이어 스틱<br>(Wire Stick)</strong></td>
+                <td>Burnback 부족<br>(와이어 잔류)</td>
+                <td>
+                    • Burnback Timer 50~100ms 설정<br>
+                    • Wire Retract 기능 활성화<br>
+                    • Crater WFS 낮추기
+                </td>
+            </tr>
+            <tr>
+                <td><strong>비드 불균일</strong></td>
+                <td>Upslope/Downslope 미사용<br>(급격한 전류 변화)</td>
+                <td>
+                    • Upslope 활성화 (0.3초, WFS 점진 증가)<br>
+                    • Downslope 활성화 (0.3초, WFS 점진 감소)<br>
+                    • 각 상태별 WFS 차이 20~30% 유지
+                </td>
+            </tr>
+            <tr>
+                <td><strong>크레이터 발생</strong></td>
+                <td>Crater 상태 비활성화<br>또는 WFS 너무 높음</td>
+                <td>
+                    • Crater 상태 활성화<br>
+                    • Crater WFS = Weld1 WFS의 50~70%<br>
+                    • Crater Fill Time 0.3~0.5초
+                </td>
+            </tr>
+            <tr>
+                <td><strong>용융 풀 과열<br>(Burn-through)</strong></td>
+                <td>박판에 WFS 너무 높음</td>
+                <td>
+                    • WFS 감소 (100~150 ipm)<br>
+                    • Pulse 모드 전환<br>
+                    • 용접 속도(Travel Speed) 증가
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <h3>8.7.6 DeviceNet을 통한 WFS 제어</h3>
+    <div class="warning-box">
+        <h4>실시간 WFS 제어 방법</h4>
+
+        <p><strong>방법 1: I/O Assembly를 통한 실시간 제어 (Produced Assembly)</strong></p>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// DeviceNet Produced Assembly (PLC → 용접기)
+Byte 2-3: Analog Reference 1 (Workpoint)
+
+// 16-bit 값, 범위: 0~1000 (0~100%)
+// 실제 WFS = (설정값 / 1000) × (최대 WFS)
+
+예: 최대 WFS = 500 ipm인 경우
+• 값 = 500 → WFS = (500/1000) × 500 = 250 ipm
+• 값 = 800 → WFS = (800/1000) × 500 = 400 ipm
+
+ABB RAPID 예제:
+SetAO aoWorkpoint, 500;  ! WFS = 250 ipm
+SetAO aoTrim, 600;       ! Trim = +2V</pre>
+
+        <p><strong>방법 2: Explicit Message를 통한 스케줄 프로그래밍</strong></p>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// DeviceNet Explicit Message
+Class: 101 (Weld Schedule Object)
+Instance: 1~8 (스케줄 번호)
+
+// Run-in WFS (Strike)
+Attr 3 = 300 ipm
+
+// Weld1 WFS
+Attr 15 (WORKPOINT[6]) = 250 ipm
+
+// Crater WFS
+Attr 18 (WORKPOINT[9]) = 150 ipm
+
+// Restrike WFS
+Attr 4 = 350 ipm</pre>
+
+        <p><strong>방법 3: Schedule Select를 통한 사전 설정 사용</strong></p>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;">
+// DeviceNet Produced Assembly
+Byte 1, Bit 0~2: Schedule Select (0~7 = Schedule 1~8)
+
+// 예: Schedule 3 선택
+Byte 1 = 0b00000010 = 0x02  (Bit0=0, Bit1=1, Bit2=0 → 값=2 → Schedule 3)
+
+// 각 Schedule에 미리 WFS 프로파일 저장:
+Schedule 1: 박판 (WFS 150 ipm)
+Schedule 2: 중판 (WFS 250 ipm)
+Schedule 3: 후판 (WFS 350 ipm)
+...</pre>
+    </div>
+
+    <h3>8.7.7 WFS 최적화 가이드라인</h3>
+    <div class="success-box">
+        <h4>✅ 용접 조건별 권장 WFS</h4>
+
+        <table style="background: white; margin-top: 15px;">
+            <tr>
+                <th>모재 재질</th>
+                <th>두께 (mm)</th>
+                <th>와이어 지름</th>
+                <th>권장 WFS (ipm)</th>
+                <th>비고</th>
+            </tr>
+            <tr>
+                <td rowspan="3">연강 (SS400)</td>
+                <td>1~3</td>
+                <td>∅0.9mm</td>
+                <td>100~200</td>
+                <td>CO₂ 또는 Ar+20%CO₂</td>
+            </tr>
+            <tr>
+                <td>3~6</td>
+                <td>∅1.2mm</td>
+                <td>200~300</td>
+                <td>Ar+20%CO₂ 권장</td>
+            </tr>
+            <tr>
+                <td>6~12</td>
+                <td>∅1.2mm</td>
+                <td>300~400</td>
+                <td>다층 용접, 예열 필요</td>
+            </tr>
+            <tr>
+                <td rowspan="3">스테인리스 (SUS304)</td>
+                <td>1~3</td>
+                <td>∅0.9mm</td>
+                <td>80~180</td>
+                <td>Ar+2%CO₂, Pulse 권장</td>
+            </tr>
+            <tr>
+                <td>3~6</td>
+                <td>∅1.2mm</td>
+                <td>180~280</td>
+                <td>Ar+2%CO₂</td>
+            </tr>
+            <tr>
+                <td>6~12</td>
+                <td>∅1.2mm</td>
+                <td>280~380</td>
+                <td>층간 온도 관리 필수</td>
+            </tr>
+            <tr>
+                <td rowspan="2">알루미늄 (A5052)</td>
+                <td>2~4</td>
+                <td>∅1.2mm</td>
+                <td>250~350</td>
+                <td>순수 Ar, AC Pulse 권장</td>
+            </tr>
+            <tr>
+                <td>4~8</td>
+                <td>∅1.6mm</td>
+                <td>300~450</td>
+                <td>예열 150°C, AC TIG 대안</td>
+            </tr>
+        </table>
+
+        <h4 style="margin-top: 20px;">📝 WFS 설정 절차</h4>
+        <ol style="line-height: 2;">
+            <li><strong>모재 두께 확인</strong> → 위 표에서 기준 WFS 선택</li>
+            <li><strong>시험 용접 실시</strong> → 비드 형상, 용입, 스패터 관찰</li>
+            <li><strong>미세 조정:</strong>
+                <ul>
+                    <li>용입 부족 → WFS +10~20 ipm</li>
+                    <li>스패터 과다 → WFS -10~20 ipm 또는 Trim(전압) +0.5V</li>
+                    <li>비드 불균일 → Upslope/Downslope 추가</li>
+                </ul>
+            </li>
+            <li><strong>스케줄 저장</strong> → DeviceNet Explicit Message로 Class 101에 저장</li>
+            <li><strong>생산 용접</strong> → Schedule Select로 호출 사용</li>
+        </ol>
+    </div>
+
     <h2>9. Common Error Codes</h2>
     <table>
         <tr>
