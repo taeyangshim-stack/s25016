@@ -1,0 +1,25 @@
+{
+  "name": "s25016-project",
+  "version": "1.0.0",
+  "description": "S25016 프로젝트 통합 대시보드 - DeviceNet, 로봇 상하축, Hexagon, Cloudinary 업로더",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": [
+    "s25016",
+    "dashboard",
+    "cloudinary",
+    "devicenet",
+    "robot"
+  ],
+  "author": "SP 심태양",
+  "license": "MIT",
+  "dependencies": {
+    "cloudinary": "^1.41.0",
+    "formidable": "^3.5.1"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}

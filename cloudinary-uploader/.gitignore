@@ -1,0 +1,24 @@
+# 환경 변수
+.env
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 업로드 결과
+upload-results.json
+*-results.json
+upload-urls.txt
+upload-urls.md
+*-urls.txt
+*-urls.md
+
+# 테스트 파일
+test-files/
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db

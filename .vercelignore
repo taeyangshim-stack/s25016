@@ -1,0 +1,20 @@
+# Cloudinary uploader 로컬 개발 파일
+cloudinary-uploader/node_modules
+cloudinary-uploader/server.js
+cloudinary-uploader/test-upload.js
+cloudinary-uploader/.env
+cloudinary-uploader/upload-*.json
+cloudinary-uploader/upload-*.txt
+cloudinary-uploader/upload-*.md
+cloudinary-uploader/test-files
+
+# Git
+.git
+.gitignore
+
+# 문서 (너무 큰 파일 제외)
+251003_용접기_디바이스넷/*.pdf
+
+# Editor
+.vscode
+.idea
