@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "S25016 프로젝트 통합 대시보드 - DeviceNet, 로봇 상하축, Hexagon, Cloudinary 업로더",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'Static site - no build needed'"
+    "dev": "vercel dev"
   },
   "keywords": [
     "s25016",
