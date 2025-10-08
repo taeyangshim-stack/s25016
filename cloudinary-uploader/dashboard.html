@@ -5,52 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cloudinary 업로드 대시보드</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
+        
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-
+        
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 40px;
             text-align: center;
         }
-
+        
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
+        
         .upload-section {
             padding: 30px;
             background: #f8f9fa;
             border-bottom: 2px solid #e0e0e0;
         }
-
+        
         .upload-area {
             border: 3px dashed #667eea;
             border-radius: 10px;
@@ -60,79 +51,37 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-
-        .upload-area:hover {
-            border-color: #764ba2;
-            background: #f8f9ff;
-        }
-
-        .upload-area.dragover {
-            border-color: #27ae60;
-            background: #e8f8f5;
-        }
-
-        .upload-icon {
-            font-size: 4em;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-
-        .upload-text {
-            font-size: 1.3em;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .upload-hint {
-            color: #7f8c8d;
-            font-size: 0.95em;
-        }
-
-        #fileInput {
-            display: none;
-        }
-
+        
+        .upload-area:hover { border-color: #764ba2; background: #f8f9ff; }
+        .upload-area.dragover { border-color: #27ae60; background: #e8f8f5; }
+        
+        #fileInput { display: none; }
+        
         .controls {
             padding: 30px;
             background: white;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: 1fr 1fr auto auto;
             gap: 20px;
+            align-items: end;
         }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        
         .control-group label {
             font-weight: bold;
             color: #2c3e50;
             font-size: 0.95em;
+            display: block;
+            margin-bottom: 8px;
         }
-
-        .control-group input,
-        .control-group select {
+        
+        .control-group input {
             padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 1em;
-            transition: border-color 0.3s ease;
+            width: 100%;
         }
-
-        .control-group input:focus,
-        .control-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-        }
-
+        
         .btn {
             padding: 12px 30px;
             border: none;
@@ -141,33 +90,21 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            flex: 1;
         }
-
+        
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-
+        
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
-
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #7f8c8d;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
+        
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
         .stats {
             padding: 30px;
             background: #f8f9fa;
@@ -175,7 +112,7 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
         }
-
+        
         .stat-card {
             background: white;
             padding: 25px;
@@ -184,29 +121,122 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border-left: 5px solid #667eea;
         }
-
+        
         .stat-number {
             font-size: 2.5em;
             font-weight: bold;
             color: #667eea;
             margin-bottom: 10px;
         }
-
-        .stat-label {
-            color: #7f8c8d;
+        
+        .preview-grid {
+            padding: 30px;
+            background: white;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .preview-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .preview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: 200px;
+            background: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            overflow: hidden;
+        }
+        
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-info { padding: 15px; }
+        
+        .preview-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            word-break: break-all;
             font-size: 0.95em;
         }
-
+        
+        .preview-size {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .preview-url {
+            background: #ecf0f1;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            color: #667eea;
+            word-break: break-all;
+            margin-bottom: 10px;
+            max-height: 60px;
+            overflow: auto;
+        }
+        
+        .preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        .btn-small:hover { background: #764ba2; }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-uploading { background: #cfe2ff; color: #084298; }
+        .status-success { background: #d1e7dd; color: #0f5132; }
+        .status-error { background: #f8d7da; color: #842029; }
+        
         .progress-section {
             padding: 30px;
             background: white;
+            border-top: 2px solid #e0e0e0;
             display: none;
         }
-
-        .progress-section.active {
-            display: block;
-        }
-
+        
+        .progress-section.active { display: block; }
+        
         .progress-bar {
             width: 100%;
             height: 30px;
@@ -215,7 +245,7 @@
             overflow: hidden;
             margin-bottom: 20px;
         }
-
+        
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
@@ -226,145 +256,30 @@
             color: white;
             font-weight: bold;
         }
-
-        .file-list {
-            padding: 30px;
-            background: white;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .file-item:hover {
-            background: #ecf0f1;
-            transform: translateX(5px);
-        }
-
-        .file-icon {
-            font-size: 2em;
-        }
-
-        .file-info {
-            flex: 1;
-        }
-
-        .file-name {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .file-url {
-            color: #667eea;
-            font-size: 0.9em;
-            word-break: break-all;
-        }
-
-        .file-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-icon {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            background: #667eea;
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #27ae60;
             color: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
-        }
-
-        .btn-icon:hover {
-            background: #764ba2;
-            transform: scale(1.05);
-        }
-
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            font-weight: bold;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-uploading {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .results-section {
-            padding: 30px;
-            background: white;
-            border-top: 2px solid #e0e0e0;
-        }
-
-        .result-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .log-area {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 20px;
+            padding: 15px 25px;
             border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
-
-        .log-item {
-            margin-bottom: 8px;
-            padding: 5px 0;
-            border-bottom: 1px solid #34495e;
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
         }
-
-        .log-success {
-            color: #2ecc71;
-        }
-
-        .log-error {
-            color: #e74c3c;
-        }
-
-        .log-info {
-            color: #3498db;
-        }
-
+        
         @media (max-width: 768px) {
-            .controls {
-                grid-template-columns: 1fr;
-            }
-
-            .stats {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
+            .controls { grid-template-columns: 1fr; }
+            .preview-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -375,39 +290,32 @@
             <p>S25016 프로젝트 파일 관리 시스템</p>
         </div>
 
-        <!-- 업로드 영역 -->
         <div class="upload-section">
             <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">📁</div>
-                <div class="upload-text">파일을 드래그하거나 클릭하여 선택</div>
-                <div class="upload-hint">여러 파일 동시 업로드 가능</div>
+                <div style="font-size: 4em; margin-bottom: 20px;">📁</div>
+                <div style="font-size: 1.3em; color: #2c3e50; margin-bottom: 10px;">
+                    파일을 드래그하거나 클릭하여 선택
+                </div>
+                <div style="color: #7f8c8d; font-size: 0.95em;">
+                    여러 파일 동시 업로드 가능 (이미지, PDF, 문서 등)
+                </div>
             </div>
-            <input type="file" id="fileInput" multiple>
+            <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.txt">
         </div>
 
-        <!-- 컨트롤 -->
         <div class="controls">
             <div class="control-group">
                 <label for="folderInput">📂 Cloudinary 폴더</label>
                 <input type="text" id="folderInput" placeholder="s25016" value="s25016">
             </div>
-
             <div class="control-group">
-                <label for="extFilter">🔍 확장자 필터 (선택)</label>
-                <input type="text" id="extFilter" placeholder=".jpg,.png,.pdf">
+                <label>📊 선택된 파일</label>
+                <input type="text" id="fileCountDisplay" value="0개" readonly>
             </div>
-
-            <div class="control-group button-group">
-                <button class="btn btn-primary" id="uploadBtn" disabled>
-                    🚀 업로드 시작
-                </button>
-                <button class="btn btn-secondary" id="clearBtn">
-                    🗑️ 초기화
-                </button>
-            </div>
+            <button class="btn btn-primary" id="uploadBtn" disabled>🚀 업로드 시작</button>
+            <button class="btn btn-secondary" id="clearBtn">🗑️ 초기화</button>
         </div>
 
-        <!-- 통계 -->
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-number" id="totalFiles">0</div>
@@ -422,298 +330,23 @@
                 <div class="stat-label">업로드 실패</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="totalSize">0 KB</div>
+                <div class="stat-number" id="totalSize">0 MB</div>
                 <div class="stat-label">총 파일 크기</div>
             </div>
         </div>
 
-        <!-- 진행 상태 -->
         <div class="progress-section" id="progressSection">
             <h3 style="margin-bottom: 15px;">업로드 진행 중...</h3>
             <div class="progress-bar">
-                <div class="progress-fill" id="progressFill">0%</div>
+                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
             </div>
         </div>
 
-        <!-- 파일 목록 -->
-        <div class="file-list" id="fileList">
-            <h3 style="margin-bottom: 20px; color: #2c3e50;">📋 선택된 파일</h3>
-            <div id="filesContainer">
-                <p style="text-align: center; color: #7f8c8d; padding: 40px;">파일을 선택해주세요</p>
-            </div>
-        </div>
-
-        <!-- 결과 -->
-        <div class="results-section" id="resultsSection" style="display: none;">
-            <h3 style="margin-bottom: 20px; color: #2c3e50;">✨ 업로드 결과</h3>
-
-            <div class="result-actions">
-                <button class="btn btn-primary" id="copyUrlsBtn">
-                    📋 URL 복사
-                </button>
-                <button class="btn btn-primary" id="downloadJsonBtn">
-                    💾 JSON 다운로드
-                </button>
-                <button class="btn btn-primary" id="downloadUrlsBtn">
-                    📄 URL 목록 다운로드
-                </button>
-            </div>
-
-            <div class="log-area" id="logArea"></div>
-        </div>
+        <div class="preview-grid" id="previewGrid"></div>
     </div>
 
-    <script>
-        // 상태 관리
-        let selectedFiles = [];
-        let uploadResults = [];
+    <div class="toast" id="toast"></div>
 
-        // DOM 요소
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const folderInput = document.getElementById('folderInput');
-        const extFilter = document.getElementById('extFilter');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const filesContainer = document.getElementById('filesContainer');
-        const progressSection = document.getElementById('progressSection');
-        const progressFill = document.getElementById('progressFill');
-        const resultsSection = document.getElementById('resultsSection');
-        const logArea = document.getElementById('logArea');
-
-        // 통계 요소
-        const totalFilesEl = document.getElementById('totalFiles');
-        const uploadedFilesEl = document.getElementById('uploadedFiles');
-        const failedFilesEl = document.getElementById('failedFiles');
-        const totalSizeEl = document.getElementById('totalSize');
-
-        // 클릭으로 파일 선택
-        uploadArea.addEventListener('click', () => fileInput.click());
-
-        // 파일 선택
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
-
-        // 드래그 앤 드롭
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            handleFiles(e.dataTransfer.files);
-        });
-
-        // 파일 처리
-        function handleFiles(files) {
-            selectedFiles = Array.from(files);
-            updateStats();
-            renderFileList();
-            uploadBtn.disabled = selectedFiles.length === 0;
-        }
-
-        // 통계 업데이트
-        function updateStats() {
-            totalFilesEl.textContent = selectedFiles.length;
-
-            const totalBytes = selectedFiles.reduce((sum, file) => sum + file.size, 0);
-            const totalKB = (totalBytes / 1024).toFixed(2);
-            totalSizeEl.textContent = `${totalKB} KB`;
-        }
-
-        // 파일 목록 렌더링
-        function renderFileList() {
-            if (selectedFiles.length === 0) {
-                filesContainer.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 40px;">파일을 선택해주세요</p>';
-                return;
-            }
-
-            filesContainer.innerHTML = selectedFiles.map((file, index) => `
-                <div class="file-item">
-                    <div class="file-icon">${getFileIcon(file.name)}</div>
-                    <div class="file-info">
-                        <div class="file-name">${file.name}</div>
-                        <div class="file-url">${(file.size / 1024).toFixed(2)} KB</div>
-                    </div>
-                    <span class="status-badge status-success">대기 중</span>
-                </div>
-            `).join('');
-        }
-
-        // 파일 아이콘
-        function getFileIcon(filename) {
-            const ext = filename.split('.').pop().toLowerCase();
-            const icons = {
-                'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️',
-                'pdf': '📄', 'doc': '📝', 'docx': '📝',
-                'html': '🌐', 'css': '🎨', 'js': '⚙️',
-                'zip': '📦', 'rar': '📦'
-            };
-            return icons[ext] || '📄';
-        }
-
-        // 업로드 버튼
-        uploadBtn.addEventListener('click', async () => {
-            if (selectedFiles.length === 0) return;
-
-            uploadBtn.disabled = true;
-            clearBtn.disabled = true;
-            progressSection.classList.add('active');
-            resultsSection.style.display = 'block';
-            logArea.innerHTML = '';
-            uploadResults = [];
-
-            addLog('업로드 시작...', 'info');
-            addLog(`총 ${selectedFiles.length}개 파일 업로드 예정`, 'info');
-
-            let uploaded = 0;
-            let failed = 0;
-
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const file = selectedFiles[i];
-                const progress = ((i + 1) / selectedFiles.length * 100).toFixed(0);
-
-                progressFill.style.width = `${progress}%`;
-                progressFill.textContent = `${progress}%`;
-
-                addLog(`[${i + 1}/${selectedFiles.length}] 업로드 중: ${file.name}`, 'info');
-
-                try {
-                    const result = await uploadToCloudinary(file);
-                    uploaded++;
-                    uploadResults.push({
-                        success: true,
-                        file: file.name,
-                        url: result.secure_url,
-                        public_id: result.public_id
-                    });
-                    addLog(`✅ 성공: ${file.name}`, 'success');
-                    addLog(`   URL: ${result.secure_url}`, 'success');
-                } catch (error) {
-                    failed++;
-                    uploadResults.push({
-                        success: false,
-                        file: file.name,
-                        error: error.message
-                    });
-                    addLog(`❌ 실패: ${file.name} - ${error.message}`, 'error');
-                }
-
-                uploadedFilesEl.textContent = uploaded;
-                failedFilesEl.textContent = failed;
-            }
-
-            addLog(`\n📊 업로드 완료!`, 'info');
-            addLog(`   ✅ 성공: ${uploaded}개`, 'success');
-            addLog(`   ❌ 실패: ${failed}개`, failed > 0 ? 'error' : 'info');
-
-            uploadBtn.disabled = false;
-            clearBtn.disabled = false;
-        });
-
-        // Cloudinary 업로드 (실제 서버 연동)
-        async function uploadToCloudinary(file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('folder', folderInput.value);
-
-            const response = await fetch('http://localhost:3000/upload', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || '업로드 실패');
-            }
-
-            const result = await response.json();
-
-            if (!result.success) {
-                throw new Error(result.error || '업로드 실패');
-            }
-
-            return {
-                secure_url: result.url,
-                public_id: result.public_id
-            };
-        }
-
-        // 로그 추가
-        function addLog(message, type = 'info') {
-            const logItem = document.createElement('div');
-            logItem.className = `log-item log-${type}`;
-            logItem.textContent = message;
-            logArea.appendChild(logItem);
-            logArea.scrollTop = logArea.scrollHeight;
-        }
-
-        // 초기화
-        clearBtn.addEventListener('click', () => {
-            selectedFiles = [];
-            uploadResults = [];
-            fileInput.value = '';
-            updateStats();
-            renderFileList();
-            uploadBtn.disabled = true;
-            progressSection.classList.remove('active');
-            resultsSection.style.display = 'none';
-            uploadedFilesEl.textContent = '0';
-            failedFilesEl.textContent = '0';
-        });
-
-        // URL 복사
-        document.getElementById('copyUrlsBtn').addEventListener('click', () => {
-            const urls = uploadResults
-                .filter(r => r.success)
-                .map(r => r.url)
-                .join('\n');
-
-            navigator.clipboard.writeText(urls).then(() => {
-                alert('📋 URL이 클립보드에 복사되었습니다!');
-            });
-        });
-
-        // JSON 다운로드
-        document.getElementById('downloadJsonBtn').addEventListener('click', () => {
-            const data = {
-                timestamp: new Date().toISOString(),
-                total: uploadResults.length,
-                success: uploadResults.filter(r => r.success).length,
-                failed: uploadResults.filter(r => !r.success).length,
-                results: uploadResults
-            };
-
-            downloadFile('upload-results.json', JSON.stringify(data, null, 2));
-        });
-
-        // URL 목록 다운로드
-        document.getElementById('downloadUrlsBtn').addEventListener('click', () => {
-            const urls = uploadResults
-                .filter(r => r.success)
-                .map(r => r.url)
-                .join('\n');
-
-            downloadFile('upload-urls.txt', urls);
-        });
-
-        // 파일 다운로드 헬퍼
-        function downloadFile(filename, content) {
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-    </script>
+    <script src="dashboard-vercel.js"></script>
 </body>
 </html>
