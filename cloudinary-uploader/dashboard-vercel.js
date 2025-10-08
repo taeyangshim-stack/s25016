@@ -245,13 +245,19 @@ uploadBtn.addEventListener('click', async () => {
     clearBtn.disabled = false;
 });
 
-// Cloudinary 업로드 (Vercel serverless function)
+// Cloudinary 업로드 (로컬 또는 Vercel)
 async function uploadToCloudinary(file) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('folder', folderInput.value);
 
-    const response = await fetch('/api/upload', {
+    // 로컬 개발: http://localhost:3000/upload
+    // Vercel 배포: /api/upload
+    const uploadUrl = window.location.hostname === 'localhost'
+        ? 'http://localhost:3000/upload'
+        : '/api/upload';
+
+    const response = await fetch(uploadUrl, {
         method: 'POST',
         body: formData
     });
