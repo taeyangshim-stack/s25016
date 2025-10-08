@@ -19,6 +19,7 @@
     { "source": "/devicenet", "destination": "/251003_용접기_디바이스넷/DeviceNet_Signals_Table.html" },
     { "source": "/devicenet/checklist", "destination": "/251003_용접기_디바이스넷/ABB_Lincoln_DeviceNet_체크리스트.html" },
     { "source": "/devicenet/status", "destination": "/251003_용접기_디바이스넷/통신문제_해결진행현황_대시보드.html" },
+    { "source": "/devicenet/1009", "destination": "/251003_용접기_디바이스넷/251009_작업진행_세부내용.html" },
     { "source": "/robot-dashboard", "destination": "/상하축이슈_대시보드.html" },
     { "source": "/cloudinary", "destination": "/cloudinary-uploader/dashboard.html" }
   ]
