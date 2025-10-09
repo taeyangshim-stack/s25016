@@ -766,12 +766,8 @@
             const index = parseInt(document.getElementById('editIndex').value);
             const record = allRecords[index];
 
-            console.log('✏️ 수정 요청 시작');
-            console.log('Index:', index);
-            console.log('원본 Record:', record);
-
             const updatedData = {
-                timestamp: record.timestamp,  // 기존 타임스탬프 유지 (식별용)
+                timestamp: record.timestamp,
                 date: document.getElementById('editDate').value,
                 name: document.getElementById('editName').value,
                 location: document.getElementById('editLocation').value,
@@ -781,34 +777,29 @@
                 notes: document.getElementById('editNotes').value || '-',
             };
 
-            console.log('수정할 데이터:', updatedData);
-            console.log('전송할 URL:', `${SCRIPT_URL}?action=update`);
-            console.log('전송 데이터:', JSON.stringify(updatedData));
-
             try {
-                // Google Sheets에 업데이트 요청
-                console.log('📡 Fetch 요청 전송 중...');
-                const response = await fetch(`${SCRIPT_URL}?action=update`, {
+                closeEditModal();
+
+                // 로컬 데이터 먼저 업데이트 (즉시 반영)
+                allRecords[index] = updatedData;
+                applyFilter();
+
+                // 백그라운드에서 Google Sheets 업데이트
+                fetch(`${SCRIPT_URL}?action=update`, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(updatedData)
+                }).then(() => {
+                    console.log('✅ Google Sheets 업데이트 완료');
+                }).catch(error => {
+                    console.error('⚠️ Google Sheets 업데이트 실패:', error);
+                    // 실패 시 데이터 다시 로드
+                    loadRecords();
                 });
 
-                console.log('✅ Fetch 요청 완료');
-                console.log('Response type:', response.type);
-                console.log('Response status:', response.status);
-
-                closeEditModal();
-
-                // Google Sheets에서 최신 데이터 다시 로드
-                console.log('📥 데이터 재로드 중...');
-                await loadRecords();
-                applyFilter();
-
-                console.log('✅ 수정 프로세스 완료');
                 alert('✅ 기록이 수정되었습니다.');
 
             } catch (error) {
@@ -824,40 +815,31 @@
             }
 
             const record = allRecords[index];
-
-            console.log('🗑️ 삭제 요청 시작');
-            console.log('Index:', index);
-            console.log('Record:', record);
-            console.log('Timestamp:', record.timestamp);
-            console.log('전송할 URL:', `${SCRIPT_URL}?action=delete`);
-
             const deleteData = {
                 timestamp: record.timestamp
             };
-            console.log('전송 데이터:', JSON.stringify(deleteData));
 
             try {
-                // Google Sheets에 삭제 요청
-                console.log('📡 Fetch 요청 전송 중...');
-                const response = await fetch(`${SCRIPT_URL}?action=delete`, {
+                // 로컬 데이터 먼저 삭제 (즉시 반영)
+                allRecords.splice(index, 1);
+                applyFilter();
+
+                // 백그라운드에서 Google Sheets 삭제
+                fetch(`${SCRIPT_URL}?action=delete`, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(deleteData)
+                }).then(() => {
+                    console.log('✅ Google Sheets 삭제 완료');
+                }).catch(error => {
+                    console.error('⚠️ Google Sheets 삭제 실패:', error);
+                    // 실패 시 데이터 다시 로드
+                    loadRecords();
                 });
 
-                console.log('✅ Fetch 요청 완료');
-                console.log('Response type:', response.type);
-                console.log('Response status:', response.status);
-
-                // Google Sheets에서 최신 데이터 다시 로드
-                console.log('📥 데이터 재로드 중...');
-                await loadRecords();
-                applyFilter();
-
-                console.log('✅ 삭제 프로세스 완료');
                 alert('✅ 기록이 삭제되었습니다.');
 
             } catch (error) {
