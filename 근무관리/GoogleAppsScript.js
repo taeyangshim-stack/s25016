@@ -376,7 +376,21 @@ function getAllRecords() {
     const records = data.slice(1).map(row => {
       const record = {};
       headers.forEach((header, index) => {
-        record[header] = row[index];
+        let value = row[index];
+
+        // 타임스탬프는 ISO 문자열로 변환
+        if (header === '타임스탬프' && value instanceof Date) {
+          value = value.toISOString();
+        }
+        // 날짜는 YYYY-MM-DD 형식으로 변환
+        else if (header === '날짜' && value instanceof Date) {
+          const year = value.getFullYear();
+          const month = String(value.getMonth() + 1).padStart(2, '0');
+          const day = String(value.getDate()).padStart(2, '0');
+          value = `${year}-${month}-${day}`;
+        }
+
+        record[header] = value;
       });
       return record;
     });
@@ -399,15 +413,29 @@ function updateRecord(timestamp, updatedData) {
   try {
     const sheet = getOrCreateSheet();
     const data = sheet.getDataRange().getValues();
+    const targetTime = new Date(timestamp).getTime();
+
+    Logger.log('Update request for timestamp: ' + timestamp);
+    Logger.log('Target time (ms): ' + targetTime);
 
     // 타임스탬프로 행 찾기
     for (let i = 1; i < data.length; i++) {
       const rowTimestamp = data[i][0];
-      const rowTimestampStr = rowTimestamp instanceof Date
-        ? rowTimestamp.toISOString()
-        : rowTimestamp.toString();
 
-      if (rowTimestampStr === timestamp || new Date(rowTimestampStr).getTime() === new Date(timestamp).getTime()) {
+      // Date 객체를 밀리초로 변환하여 비교
+      let rowTime;
+      if (rowTimestamp instanceof Date) {
+        rowTime = rowTimestamp.getTime();
+      } else {
+        rowTime = new Date(rowTimestamp).getTime();
+      }
+
+      Logger.log(`Row ${i}: ${rowTime}`);
+
+      // 밀리초 단위로 비교 (1초 오차 허용)
+      if (Math.abs(rowTime - targetTime) < 1000) {
+        Logger.log('Match found at row: ' + (i + 1));
+
         // 해당 행 업데이트
         sheet.getRange(i + 1, 2).setValue(updatedData.date);
         sheet.getRange(i + 1, 3).setValue(updatedData.name);
@@ -422,12 +450,12 @@ function updateRecord(timestamp, updatedData) {
         sheet.getRange(i + 1, 8).setValue(updatedData.workType);
         sheet.getRange(i + 1, 9).setValue(updatedData.notes);
 
-        Logger.log('Record updated: ' + timestamp);
+        Logger.log('Record updated successfully');
         return true;
       }
     }
 
-    Logger.log('Record not found: ' + timestamp);
+    Logger.log('Record not found for timestamp: ' + timestamp);
     return false;
 
   } catch (error) {
@@ -443,22 +471,31 @@ function deleteRecord(timestamp) {
   try {
     const sheet = getOrCreateSheet();
     const data = sheet.getDataRange().getValues();
+    const targetTime = new Date(timestamp).getTime();
+
+    Logger.log('Delete request for timestamp: ' + timestamp);
 
     // 타임스탬프로 행 찾기
     for (let i = 1; i < data.length; i++) {
       const rowTimestamp = data[i][0];
-      const rowTimestampStr = rowTimestamp instanceof Date
-        ? rowTimestamp.toISOString()
-        : rowTimestamp.toString();
 
-      if (rowTimestampStr === timestamp || new Date(rowTimestampStr).getTime() === new Date(timestamp).getTime()) {
+      // Date 객체를 밀리초로 변환하여 비교
+      let rowTime;
+      if (rowTimestamp instanceof Date) {
+        rowTime = rowTimestamp.getTime();
+      } else {
+        rowTime = new Date(rowTimestamp).getTime();
+      }
+
+      // 밀리초 단위로 비교 (1초 오차 허용)
+      if (Math.abs(rowTime - targetTime) < 1000) {
         sheet.deleteRow(i + 1);
-        Logger.log('Record deleted: ' + timestamp);
+        Logger.log('Record deleted successfully');
         return true;
       }
     }
 
-    Logger.log('Record not found: ' + timestamp);
+    Logger.log('Record not found for timestamp: ' + timestamp);
     return false;
 
   } catch (error) {
