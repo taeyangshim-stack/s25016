@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>조회 기능 테스트 - 근무관리</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .result {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result.success {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .result.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-box .label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .stat-box .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 조회 기능 테스트</h1>
+
+        <!-- 1. 현재 데이터 확인 -->
+        <div class="section">
+            <h2>1️⃣ 현재 저장된 데이터 확인</h2>
+            <button class="btn" onclick="checkCurrentData()">현재 데이터 확인</button>
+            <button class="btn btn-danger" onclick="clearAllData()">모든 데이터 삭제</button>
+            <div id="currentDataResult"></div>
+        </div>
+
+        <!-- 2. 샘플 데이터 생성 -->
+        <div class="section">
+            <h2>2️⃣ 샘플 데이터 생성</h2>
+            <button class="btn" onclick="generateSampleData(5)">5개 생성</button>
+            <button class="btn" onclick="generateSampleData(20)">20개 생성</button>
+            <button class="btn" onclick="generateSampleData(50)">50개 생성</button>
+            <div id="sampleDataResult"></div>
+        </div>
+
+        <!-- 3. 필터 기능 테스트 -->
+        <div class="section">
+            <h2>3️⃣ 필터 기능 테스트</h2>
+            <button class="btn" onclick="testDateFilter()">날짜 필터 테스트</button>
+            <button class="btn" onclick="testPersonFilter()">인원 필터 테스트</button>
+            <button class="btn" onclick="testLocationFilter()">장소 필터 테스트</button>
+            <div id="filterTestResult"></div>
+        </div>
+
+        <!-- 4. 통계 -->
+        <div class="section">
+            <h2>4️⃣ 데이터 통계</h2>
+            <button class="btn" onclick="showStatistics()">통계 보기</button>
+            <div id="statsResult"></div>
+        </div>
+
+        <!-- 5. 조회 페이지 열기 -->
+        <div class="section">
+            <h2>5️⃣ 조회 페이지 테스트</h2>
+            <p style="color: #666; margin-bottom: 15px;">
+                샘플 데이터를 생성한 후 조회 페이지에서 확인하세요.
+            </p>
+            <button class="btn" onclick="openQueryPage()">조회 페이지 열기</button>
+        </div>
+
+        <div class="back-link">
+            <a href="index.html">← 대시보드로</a>
+        </div>
+    </div>
+
+    <script>
+        // 현재 데이터 확인
+        function checkCurrentData() {
+            const records = JSON.parse(localStorage.getItem('workRecords') || '[]');
+            const resultDiv = document.getElementById('currentDataResult');
+
+            if (records.length === 0) {
+                resultDiv.innerHTML = `<div class="result error">
+❌ 저장된 데이터가 없습니다.
+
+샘플 데이터를 생성하거나 입력 페이지에서 데이터를 추가하세요.
+</div>`;
+                return;
+            }
+
+            const preview = records.slice(0, 5).map((r, i) =>
+                `${i + 1}. ${r.date} | ${r.name} | ${r.location} | ${r.checkIn} ~ ${r.checkOut}`
+            ).join('\n');
+
+            resultDiv.innerHTML = `<div class="result success">
+✅ 총 ${records.length}개의 기록이 있습니다.
+
+최근 5개 미리보기:
+${preview}
+
+전체 데이터 (JSON):
+${JSON.stringify(records, null, 2)}
+</div>`;
+        }
+
+        // 모든 데이터 삭제
+        function clearAllData() {
+            if (!confirm('⚠️ 모든 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.')) {
+                return;
+            }
+
+            localStorage.removeItem('workRecords');
+            alert('✅ 모든 데이터가 삭제되었습니다.');
+            checkCurrentData();
+        }
+
+        // 샘플 데이터 생성
+        function generateSampleData(count) {
+            const resultDiv = document.getElementById('sampleDataResult');
+            resultDiv.innerHTML = '<div class="result">샘플 데이터 생성 중...</div>';
+
+            const employees = ['심태양', '김철수', '이영희', '박민수'];
+            const locations = ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실'];
+            const workTypes = ['시운전', 'DeviceNet 통신', 'ROBOT↔UI 테스트', 'Hexagon 측정', '문제 해결', '문서 작업'];
+
+            const records = JSON.parse(localStorage.getItem('workRecords') || '[]');
+
+            for (let i = 0; i < count; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - Math.floor(Math.random() * 60)); // 최근 60일 내
+
+                const checkInHour = 7 + Math.floor(Math.random() * 3); // 7-9시
+                const checkOutHour = 16 + Math.floor(Math.random() * 3); // 16-18시
+
+                const record = {
+                    date: date.toISOString().split('T')[0],
+                    name: employees[Math.floor(Math.random() * employees.length)],
+                    location: locations[Math.floor(Math.random() * locations.length)],
+                    checkIn: `${String(checkInHour).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+                    checkOut: `${String(checkOutHour).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+                    workType: workTypes[Math.floor(Math.random() * workTypes.length)],
+                    notes: Math.random() > 0.5 ? '테스트 데이터입니다' : '-',
+                    timestamp: new Date(date.getTime() + i * 1000).toISOString()
+                };
+
+                records.push(record);
+            }
+
+            localStorage.setItem('workRecords', JSON.stringify(records));
+
+            resultDiv.innerHTML = `<div class="result success">
+✅ ${count}개의 샘플 데이터가 생성되었습니다!
+
+총 기록 개수: ${records.length}개
+
+생성된 샘플 예시:
+${JSON.stringify(records[records.length - 1], null, 2)}
+</div>`;
+        }
+
+        // 날짜 필터 테스트
+        function testDateFilter() {
+            const records = JSON.parse(localStorage.getItem('workRecords') || '[]');
+            const resultDiv = document.getElementById('filterTestResult');
+
+            if (records.length === 0) {
+                resultDiv.innerHTML = '<div class="result error">❌ 데이터가 없습니다. 샘플 데이터를 먼저 생성하세요.</div>';
+                return;
+            }
+
+            const today = new Date();
+            const weekAgo = new Date();
+            weekAgo.setDate(today.getDate() - 7);
+
+            const startDate = weekAgo.toISOString().split('T')[0];
+            const endDate = today.toISOString().split('T')[0];
+
+            const filtered = records.filter(r => r.date >= startDate && r.date <= endDate);
+
+            resultDiv.innerHTML = `<div class="result success">
+✅ 날짜 필터 테스트 완료
+
+기간: ${startDate} ~ ${endDate}
+전체: ${records.length}개
+필터링 결과: ${filtered.length}개
+
+필터링된 기록:
+${filtered.map(r => `${r.date} | ${r.name} | ${r.location}`).join('\n')}
+</div>`;
+        }
+
+        // 인원 필터 테스트
+        function testPersonFilter() {
+            const records = JSON.parse(localStorage.getItem('workRecords') || '[]');
+            const resultDiv = document.getElementById('filterTestResult');
+
+            if (records.length === 0) {
+                resultDiv.innerHTML = '<div class="result error">❌ 데이터가 없습니다.</div>';
+                return;
+            }
+
+            const targetPerson = '심태양';
+            const filtered = records.filter(r => r.name === targetPerson);
+
+            resultDiv.innerHTML = `<div class="result success">
+✅ 인원 필터 테스트 완료
+
+대상: ${targetPerson}
+전체: ${records.length}개
+필터링 결과: ${filtered.length}개
+
+${targetPerson}님의 기록:
+${filtered.slice(0, 10).map(r => `${r.date} | ${r.location} | ${r.checkIn} ~ ${r.checkOut}`).join('\n')}
+</div>`;
+        }
+
+        // 장소 필터 테스트
+        function testLocationFilter() {
+            const records = JSON.parse(localStorage.getItem('workRecords') || '[]');
+            const resultDiv = document.getElementById('filterTestResult');
+
+            if (records.length === 0) {
+                resultDiv.innerHTML = '<div class="result error">❌ 데이터가 없습니다.</div>';
+                return;
+            }
+
+            const targetLocation = '34bay A라인';
+            const filtered = records.filter(r => r.location === targetLocation);
+
+            resultDiv.innerHTML = `<div class="result success">
+✅ 장소 필터 테스트 완료
+
+대상: ${targetLocation}
+전체: ${records.length}개
+필터링 결과: ${filtered.length}개
+
+${targetLocation}의 기록:
+${filtered.slice(0, 10).map(r => `${r.date} | ${r.name} | ${r.checkIn} ~ ${r.checkOut}`).join('\n')}
+</div>`;
+        }
+
+        // 통계 보기
+        function showStatistics() {
+            const records = JSON.parse(localStorage.getItem('workRecords') || '[]');
+            const resultDiv = document.getElementById('statsResult');
+
+            if (records.length === 0) {
+                resultDiv.innerHTML = '<div class="result error">❌ 데이터가 없습니다.</div>';
+                return;
+            }
+
+            // 인원별 집계
+            const byPerson = {};
+            records.forEach(r => {
+                byPerson[r.name] = (byPerson[r.name] || 0) + 1;
+            });
+
+            // 장소별 집계
+            const byLocation = {};
+            records.forEach(r => {
+                byLocation[r.location] = (byLocation[r.location] || 0) + 1;
+            });
+
+            // 최근 7일 데이터
+            const today = new Date();
+            const weekAgo = new Date();
+            weekAgo.setDate(today.getDate() - 7);
+            const recentCount = records.filter(r =>
+                new Date(r.date) >= weekAgo
+            ).length;
+
+            const statsHtml = `
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="label">총 기록</div>
+                        <div class="value">${records.length}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">최근 7일</div>
+                        <div class="value">${recentCount}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">등록 인원</div>
+                        <div class="value">${Object.keys(byPerson).length}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">사용 장소</div>
+                        <div class="value">${Object.keys(byLocation).length}</div>
+                    </div>
+                </div>
+                <div class="result" style="margin-top: 20px;">
+<strong>인원별 통계:</strong>
+${Object.entries(byPerson).map(([name, count]) => `${name}: ${count}건`).join('\n')}
+
+<strong>장소별 통계:</strong>
+${Object.entries(byLocation).map(([loc, count]) => `${loc}: ${count}건`).join('\n')}
+                </div>
+            `;
+
+            resultDiv.innerHTML = statsHtml;
+        }
+
+        // 조회 페이지 열기
+        function openQueryPage() {
+            window.open('조회.html', '_blank');
+        }
+
+        // 초기 로드 시 현재 데이터 확인
+        window.addEventListener('DOMContentLoaded', function() {
+            checkCurrentData();
+        });
+    </script>
+</body>
+</html>
