@@ -350,6 +350,7 @@
             <button class="nav-tab" onclick="showTab('robot')">🤖 로봇 상하축</button>
             <button class="nav-tab" onclick="showTab('robot-ui-test')">🧪 ROBOT↔UI 테스트</button>
             <button class="nav-tab" onclick="showTab('hexagon')">📐 Hexagon</button>
+            <button class="nav-tab" onclick="showTab('work-manage')">🏭 근무관리</button>
             <button class="nav-tab" onclick="showTab('documents')">📚 문서 자료</button>
         </div>
 
@@ -469,6 +470,24 @@
                     </a>
                 </div>
 
+                <div class="card" style="border-left-color: #f39c12;">
+                    <h3><span class="emoji">🏭</span> 근무관리 시스템</h3>
+                    <div class="info-box" style="background: #fff3e6; border-left-color: #f39c12;">
+                        <h4>현장 출입 및 근무 시간 관리</h4>
+                        <p>
+                            <strong>기능:</strong> 출퇴근 기록, 통계, 조회<br>
+                            <strong>저장:</strong> Google Sheets 연동<br>
+                            <strong>알림:</strong> 자동 메일 발송
+                        </p>
+                    </div>
+                    <a href="근무관리/index.html" class="project-link" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);" target="_blank">
+                        🏭 근무관리 대시보드
+                    </a>
+                    <a href="근무관리/입력.html" class="project-link" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" target="_blank">
+                        📝 출입 기록 입력
+                    </a>
+                </div>
+
                 <div class="card">
                     <h3><span class="emoji">📁</span> 프로젝트 폴더 구조</h3>
                     <ul class="folder-structure">
@@ -476,6 +495,7 @@
                         <li><span class="folder-icon">🤖</span> 250917_상하축이슈</li>
                         <li><span class="folder-icon">📐</span> hexagon</li>
                         <li><span class="folder-icon">☁️</span> cloudinary-uploader</li>
+                        <li><span class="folder-icon">🏭</span> 근무관리</li>
                         <li><span class="folder-icon">📋</span> AGENTS.md</li>
                         <li><span class="folder-icon">📘</span> CLAUDE.md</li>
                         <li><span class="folder-icon">⚙️</span> vercel.json</li>
@@ -862,6 +882,87 @@
                         <li><span class="folder-icon">📋</span> AGENTS.md</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+
+        <!-- 근무관리 탭 -->
+        <div id="work-manage" class="tab-content">
+            <div class="highlight-box" style="background: linear-gradient(135deg, #fff3e6 0%, #ffe6cc 100%); border-left-color: #f39c12;">
+                <h2 style="color: #c87800; margin-bottom: 15px;">🏭 현장 출입 및 근무 시간 관리</h2>
+                <p style="line-height: 1.8;">
+                    S25016 프로젝트 팀원들의 현장 출입 기록과 근무 시간을 관리하는 시스템입니다.
+                    Google Sheets와 연동하여 실시간으로 기록을 저장하고, 자동으로 이메일을 발송합니다.
+                </p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>📝 빠른 입력</h3>
+                    <div class="info-box">
+                        <h4>출입 기록 작성</h4>
+                        <p>
+                            <strong>기능:</strong> 출근/퇴근 원클릭 기록<br>
+                            <strong>입력:</strong> 날짜, 인원, 위치, 시간<br>
+                            <strong>작업:</strong> 작업 내용 및 비고
+                        </p>
+                    </div>
+                    <a href="근무관리/입력.html" class="project-link" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" target="_blank">
+                        📝 출입 기록 입력하기
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>📊 대시보드</h3>
+                    <div class="info-box">
+                        <h4>통계 및 조회</h4>
+                        <p>
+                            <strong>통계:</strong> 일/주/월별 현황<br>
+                            <strong>조회:</strong> 최근 기록 확인<br>
+                            <strong>필터:</strong> 날짜/인원별 검색
+                        </p>
+                    </div>
+                    <a href="근무관리/index.html" class="project-link" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);" target="_blank">
+                        📊 근무관리 대시보드
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>⚙️ Google Sheets 연동</h3>
+                    <div class="info-box" style="background: #e8f5e9; border-left-color: #27ae60;">
+                        <h4>자동 저장 및 메일 발송</h4>
+                        <p>
+                            <strong>저장:</strong> Google Sheets 자동 기록<br>
+                            <strong>메일:</strong> 출입 시 자동 발송<br>
+                            <strong>공유:</strong> 팀원 실시간 공유
+                        </p>
+                    </div>
+                    <a href="근무관리/설정가이드.html" class="project-link" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%);" target="_blank">
+                        ⚙️ Google Sheets 설정 가이드
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3>✨ 주요 기능</h3>
+                    <ul class="folder-structure">
+                        <li><span class="folder-icon">⚡</span> 출근/퇴근 원클릭 입력</li>
+                        <li><span class="folder-icon">📊</span> 실시간 통계 대시보드</li>
+                        <li><span class="folder-icon">📧</span> 자동 이메일 발송</li>
+                        <li><span class="folder-icon">💾</span> Google Sheets 자동 저장</li>
+                        <li><span class="folder-icon">📱</span> 모바일 최적화</li>
+                        <li><span class="folder-icon">🔍</span> 날짜/인원별 필터링</li>
+                        <li><span class="folder-icon">📈</span> 근무 시간 자동 계산</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 30px; background: #e0f2fe; border-left-color: #0284c7;">
+                <h4>💡 사용 방법</h4>
+                <p style="line-height: 2;">
+                    <strong>1단계:</strong> <a href="근무관리/설정가이드.html" style="color: #0284c7; font-weight: bold;">Google Sheets 설정 가이드</a>를 따라 Google Apps Script 설정<br>
+                    <strong>2단계:</strong> 입력 페이지에서 Script URL 업데이트<br>
+                    <strong>3단계:</strong> 출입 기록 입력 시작<br>
+                    <strong>4단계:</strong> 대시보드에서 통계 확인 및 기록 조회
+                </p>
             </div>
         </div>
 

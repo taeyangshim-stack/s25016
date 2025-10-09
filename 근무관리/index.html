@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>근무관리 대시보드 - S25016</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            padding: 20px;
+            background: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            color: #333;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .nav-btn .icon {
+            font-size: 28px;
+        }
+
+        .nav-btn .text {
+            flex: 1;
+        }
+
+        .nav-btn .title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .nav-btn .desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-card .unit {
+            font-size: 16px;
+            color: #999;
+            margin-left: 5px;
+        }
+
+        .recent-records {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .recent-records h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .record-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .record-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .record-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .record-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge.check-in {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge.check-out {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge.both {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h3 {
+            color: #856404;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-box a {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .record-table {
+                font-size: 12px;
+            }
+
+            .record-table th,
+            .record-table td {
+                padding: 8px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 근무관리 대시보드</h1>
+            <p>S25016 프로젝트 현장 출입 및 근무 시간 관리</p>
+        </div>
+
+        <div id="setupInfo" class="info-box" style="display: none;">
+            <h3>⚙️ Google Sheets 연동 필요</h3>
+            <p>
+                현재 데이터는 브라우저에만 저장됩니다.<br>
+                팀원과 공유하고 메일 발송 기능을 사용하려면 <a href="설정가이드.html">Google Sheets 설정 가이드</a>를 참고하세요.
+            </p>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="입력.html" class="nav-btn">
+                <span class="icon">📝</span>
+                <div class="text">
+                    <div class="title">출입 기록</div>
+                    <div class="desc">출퇴근 시간 입력</div>
+                </div>
+            </a>
+            <a href="조회.html" class="nav-btn">
+                <span class="icon">📊</span>
+                <div class="text">
+                    <div class="title">기록 조회</div>
+                    <div class="desc">날짜별/인원별 조회</div>
+                </div>
+            </a>
+            <a href="설정가이드.html" class="nav-btn">
+                <span class="icon">⚙️</span>
+                <div class="text">
+                    <div class="title">설정 가이드</div>
+                    <div class="desc">Google Sheets 연동</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">오늘 현장 인원</div>
+                <div class="value" id="todayCount">0<span class="unit">명</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">이번 주 출입 기록</div>
+                <div class="value" id="weekCount">0<span class="unit">건</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">이번 달 출입 기록</div>
+                <div class="value" id="monthCount">0<span class="unit">건</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">총 기록</div>
+                <div class="value" id="totalCount">0<span class="unit">건</span></div>
+            </div>
+        </div>
+
+        <div class="recent-records">
+            <h2>📅 최근 출입 기록 (최근 10건)</h2>
+            <table class="record-table" id="recordTable">
+                <thead>
+                    <tr>
+                        <th>날짜</th>
+                        <th>인원</th>
+                        <th>위치</th>
+                        <th>입실</th>
+                        <th>퇴실</th>
+                        <th>작업내용</th>
+                        <th>상태</th>
+                    </tr>
+                </thead>
+                <tbody id="recordTableBody">
+                    <tr>
+                        <td colspan="7" class="no-data">
+                            기록이 없습니다. "출입 기록" 메뉴에서 기록을 추가하세요.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="back-link">
+            <a href="../index.html">← S25016 메인 대시보드로 돌아가기</a>
+        </div>
+    </div>
+
+    <script>
+        // 로컬 스토리지에서 기록 가져오기
+        function loadRecords() {
+            const records = JSON.parse(localStorage.getItem('workRecords') || '[]');
+            return records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+
+        // 통계 업데이트
+        function updateStats() {
+            const records = loadRecords();
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+
+            // 이번 주 시작일 계산
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - now.getDay());
+            weekStart.setHours(0, 0, 0, 0);
+
+            // 이번 달 시작일
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            // 오늘 현장 인원 (중복 제거)
+            const todayRecords = records.filter(r => r.date === today);
+            const todayPeople = new Set(todayRecords.map(r => r.name));
+            document.getElementById('todayCount').innerHTML = `${todayPeople.size}<span class="unit">명</span>`;
+
+            // 이번 주 출입 기록
+            const weekRecords = records.filter(r => new Date(r.date) >= weekStart);
+            document.getElementById('weekCount').innerHTML = `${weekRecords.length}<span class="unit">건</span>`;
+
+            // 이번 달 출입 기록
+            const monthRecords = records.filter(r => new Date(r.date) >= monthStart);
+            document.getElementById('monthCount').innerHTML = `${monthRecords.length}<span class="unit">건</span>`;
+
+            // 총 기록
+            document.getElementById('totalCount').innerHTML = `${records.length}<span class="unit">건</span>`;
+        }
+
+        // 테이블 업데이트
+        function updateTable() {
+            const records = loadRecords();
+            const tbody = document.getElementById('recordTableBody');
+
+            if (records.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="no-data">
+                            기록이 없습니다. "출입 기록" 메뉴에서 기록을 추가하세요.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // 최근 10건만 표시
+            const recentRecords = records.slice(0, 10);
+
+            tbody.innerHTML = recentRecords.map(record => {
+                let statusBadge = '';
+                if (record.checkIn !== '-' && record.checkOut !== '-') {
+                    statusBadge = '<span class="badge both">완료</span>';
+                } else if (record.checkIn !== '-') {
+                    statusBadge = '<span class="badge check-in">출근</span>';
+                } else {
+                    statusBadge = '<span class="badge check-out">퇴근</span>';
+                }
+
+                return `
+                    <tr>
+                        <td>${record.date}</td>
+                        <td>${record.name}</td>
+                        <td>${record.location}</td>
+                        <td>${record.checkIn}</td>
+                        <td>${record.checkOut}</td>
+                        <td>${record.workType}</td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 설정 안내 표시 여부
+        function checkSetup() {
+            const setupInfo = document.getElementById('setupInfo');
+            // Google Sheets URL이 설정되지 않았으면 안내 표시
+            // 실제로는 입력.html의 SCRIPT_URL을 확인해야 하지만, 여기서는 간단히 처리
+            const hasRecords = loadRecords().length > 0;
+            if (hasRecords) {
+                setupInfo.style.display = 'block';
+            }
+        }
+
+        // 초기 로드
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            updateTable();
+            checkSetup();
+
+            // 1분마다 갱신
+            setInterval(() => {
+                updateStats();
+                updateTable();
+            }, 60000);
+        });
+    </script>
+</body>
+</html>
