@@ -340,6 +340,57 @@
     </div>
 
     <script>
+        // 설정에서 인원/장소 목록 가져오기
+        const DEFAULT_EMPLOYEES = ['심태양', '김철수', '이영희', '박민수'];
+        const DEFAULT_LOCATIONS = ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실'];
+
+        function getEmployees() {
+            const saved = localStorage.getItem('workManagement_employees');
+            return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
+        }
+
+        function getLocations() {
+            const saved = localStorage.getItem('workManagement_locations');
+            return saved ? JSON.parse(saved) : DEFAULT_LOCATIONS;
+        }
+
+        // 페이지 로드 시 select 박스 동적 생성
+        document.addEventListener('DOMContentLoaded', function() {
+            // 인원 select 채우기
+            const nameSelect = document.getElementById('name');
+            const employees = getEmployees();
+
+            // 기존 옵션 제거 (첫 번째와 마지막 제외)
+            while (nameSelect.options.length > 1) {
+                nameSelect.remove(1);
+            }
+
+            // 동적으로 옵션 추가
+            employees.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp;
+                option.textContent = emp;
+                nameSelect.insertBefore(option, nameSelect.lastElementChild);
+            });
+
+            // 장소 select 채우기
+            const locationSelect = document.getElementById('location');
+            const locations = getLocations();
+
+            // 기존 옵션 제거 (첫 번째와 마지막 제외)
+            while (locationSelect.options.length > 1) {
+                locationSelect.remove(1);
+            }
+
+            // 동적으로 옵션 추가
+            locations.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc;
+                option.textContent = loc;
+                locationSelect.insertBefore(option, locationSelect.lastElementChild);
+            });
+        });
+
         // 현재 시간 표시
         function updateCurrentTime() {
             const now = new Date();

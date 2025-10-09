@@ -485,8 +485,25 @@
         let allRecords = [];
         let filteredRecords = [];
 
+        // 설정에서 인원/장소 목록 가져오기
+        const DEFAULT_EMPLOYEES = ['심태양', '김철수', '이영희', '박민수'];
+        const DEFAULT_LOCATIONS = ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실'];
+
+        function getEmployees() {
+            const saved = localStorage.getItem('workManagement_employees');
+            return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
+        }
+
+        function getLocations() {
+            const saved = localStorage.getItem('workManagement_locations');
+            return saved ? JSON.parse(saved) : DEFAULT_LOCATIONS;
+        }
+
         // 초기 로드
         document.addEventListener('DOMContentLoaded', function() {
+            // select 박스 동적 생성
+            populateSelects();
+
             // 기본 날짜 설정 (최근 30일)
             const today = new Date();
             const monthAgo = new Date();
@@ -497,6 +514,54 @@
 
             loadRecords();
         });
+
+        // Select 박스 채우기
+        function populateSelects() {
+            const employees = getEmployees();
+            const locations = getLocations();
+
+            // 필터 인원 select
+            const filterName = document.getElementById('filterName');
+            employees.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp;
+                option.textContent = emp;
+                filterName.appendChild(option);
+            });
+
+            // 필터 장소 select
+            const filterLocation = document.getElementById('filterLocation');
+            locations.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc;
+                option.textContent = loc;
+                filterLocation.appendChild(option);
+            });
+
+            // 수정 모달 인원 select
+            const editName = document.getElementById('editName');
+            employees.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp;
+                option.textContent = emp;
+                editName.appendChild(option);
+            });
+
+            // 수정 모달 장소 select
+            const editLocation = document.getElementById('editLocation');
+            locations.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc;
+                option.textContent = loc;
+                editLocation.appendChild(option);
+            });
+
+            // '기타' 옵션 추가
+            const otherOption = document.createElement('option');
+            otherOption.value = '기타';
+            otherOption.textContent = '기타';
+            editLocation.appendChild(otherOption);
+        }
 
         // 기록 로드
         function loadRecords() {
