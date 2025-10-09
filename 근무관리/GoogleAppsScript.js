@@ -389,6 +389,17 @@ function getAllRecords() {
           const day = String(value.getDate()).padStart(2, '0');
           value = `${year}-${month}-${day}`;
         }
+        // 입실시간, 퇴실시간은 Date 객체면 HH:MM 형식으로 변환
+        else if ((header === '입실시간' || header === '퇴실시간') && value instanceof Date) {
+          // 1899-12-30 기준일이면 시간만 추출
+          const hours = String(value.getHours()).padStart(2, '0');
+          const minutes = String(value.getMinutes()).padStart(2, '0');
+          value = `${hours}:${minutes}`;
+        }
+        // 빈 값은 '-'로 변환
+        else if (value === '' || value === null || value === undefined) {
+          value = '-';
+        }
 
         record[header] = value;
       });
