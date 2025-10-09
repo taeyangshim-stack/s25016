@@ -344,6 +344,53 @@
         const DEFAULT_EMPLOYEES = ['심태양', '김철수', '이영희', '박민수'];
         const DEFAULT_LOCATIONS = ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실'];
 
+        // Google Sheets Script URL (입력 페이지와 동일한 URL 사용)
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygAg88Vk2cJwhkDUJQPn2OO18J9IhzvF0l85otx4khWGh8y4XxAJhpQlOZnVvATxQ/exec';
+
+        // Google Sheets에서 인원 목록 가져오기
+        async function fetchEmployeesFromSheet() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getEmployees`);
+                const data = await response.json();
+
+                if (data.error) {
+                    console.warn('Google Sheets에서 인원 로드 실패, fallback 사용:', data.error);
+                    return data.fallback || DEFAULT_EMPLOYEES;
+                }
+
+                // LocalStorage에 캐시
+                localStorage.setItem('workManagement_employees', JSON.stringify(data));
+                return data;
+            } catch (error) {
+                console.error('인원 목록 로드 실패:', error);
+                // LocalStorage 또는 기본값 사용
+                const saved = localStorage.getItem('workManagement_employees');
+                return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
+            }
+        }
+
+        // Google Sheets에서 장소 목록 가져오기
+        async function fetchLocationsFromSheet() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getLocations`);
+                const data = await response.json();
+
+                if (data.error) {
+                    console.warn('Google Sheets에서 장소 로드 실패, fallback 사용:', data.error);
+                    return data.fallback || DEFAULT_LOCATIONS;
+                }
+
+                // LocalStorage에 캐시
+                localStorage.setItem('workManagement_locations', JSON.stringify(data));
+                return data;
+            } catch (error) {
+                console.error('장소 목록 로드 실패:', error);
+                // LocalStorage 또는 기본값 사용
+                const saved = localStorage.getItem('workManagement_locations');
+                return saved ? JSON.parse(saved) : DEFAULT_LOCATIONS;
+            }
+        }
+
         function getEmployees() {
             const saved = localStorage.getItem('workManagement_employees');
             return saved ? JSON.parse(saved) : DEFAULT_EMPLOYEES;
@@ -355,10 +402,13 @@
         }
 
         // 페이지 로드 시 select 박스 동적 생성
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Google Sheets에서 데이터 로드 (비동기)
+            const employees = await fetchEmployeesFromSheet();
+            const locations = await fetchLocationsFromSheet();
+
             // 인원 select 채우기
             const nameSelect = document.getElementById('name');
-            const employees = getEmployees();
 
             // 기존 옵션 제거 (첫 번째와 마지막 제외)
             while (nameSelect.options.length > 1) {
@@ -375,7 +425,6 @@
 
             // 장소 select 채우기
             const locationSelect = document.getElementById('location');
-            const locations = getLocations();
 
             // 기존 옵션 제거 (첫 번째와 마지막 제외)
             while (locationSelect.options.length > 1) {
@@ -389,6 +438,8 @@
                 option.textContent = loc;
                 locationSelect.insertBefore(option, locationSelect.lastElementChild);
             });
+
+            console.log('✅ Google Sheets에서 인원/장소 목록 로드 완료');
         });
 
         // 현재 시간 표시

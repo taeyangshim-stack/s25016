@@ -25,6 +25,8 @@ const CONFIG = {
 
   // 시트 이름
   SHEET_NAME: '출입기록',
+  SHEET_NAME_EMPLOYEES: '인원목록',
+  SHEET_NAME_LOCATIONS: '장소목록',
 
   // 메일 발송 여부 (true/false)
   SEND_EMAIL: true
@@ -73,9 +75,17 @@ function doPost(e) {
 }
 
 /**
- * 웹 앱 GET 요청 처리 (테스트용)
+ * 웹 앱 GET 요청 처리
  */
 function doGet(e) {
+  const action = e.parameter.action;
+
+  if (action === 'getEmployees') {
+    return getEmployees();
+  } else if (action === 'getLocations') {
+    return getLocations();
+  }
+
   return ContentService
     .createTextOutput('S25016 근무관리 시스템이 정상 작동 중입니다.')
     .setMimeType(ContentService.MimeType.TEXT);
@@ -358,4 +368,128 @@ function getAllRecords() {
       .createTextOutput(JSON.stringify({ error: error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// ========================================
+// 인원/장소 관리 함수
+// ========================================
+
+/**
+ * 인원 목록 가져오기
+ */
+function getEmployees() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(CONFIG.SHEET_NAME_EMPLOYEES);
+
+    // 시트가 없으면 생성
+    if (!sheet) {
+      sheet = ss.insertSheet(CONFIG.SHEET_NAME_EMPLOYEES);
+
+      // 헤더 추가
+      sheet.getRange('A1').setValue('이름');
+      sheet.getRange('A1').setBackground('#667eea');
+      sheet.getRange('A1').setFontColor('#ffffff');
+      sheet.getRange('A1').setFontWeight('bold');
+
+      // 기본 인원 추가
+      const defaultEmployees = ['심태양', '김철수', '이영희', '박민수'];
+      defaultEmployees.forEach((name, index) => {
+        sheet.getRange(index + 2, 1).setValue(name);
+      });
+
+      Logger.log('인원목록 시트가 생성되었습니다.');
+    }
+
+    // 데이터 읽기 (헤더 제외)
+    const data = sheet.getRange('A:A').getValues();
+    const employees = data
+      .flat()
+      .filter(name => name && name !== '이름')
+      .map(name => name.toString().trim());
+
+    return ContentService
+      .createTextOutput(JSON.stringify(employees))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    Logger.log('getEmployees error: ' + error.toString());
+
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        error: error.toString(),
+        fallback: ['심태양', '김철수', '이영희', '박민수']
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * 장소 목록 가져오기
+ */
+function getLocations() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(CONFIG.SHEET_NAME_LOCATIONS);
+
+    // 시트가 없으면 생성
+    if (!sheet) {
+      sheet = ss.insertSheet(CONFIG.SHEET_NAME_LOCATIONS);
+
+      // 헤더 추가
+      sheet.getRange('A1').setValue('장소');
+      sheet.getRange('A1').setBackground('#667eea');
+      sheet.getRange('A1').setFontColor('#ffffff');
+      sheet.getRange('A1').setFontWeight('bold');
+
+      // 기본 장소 추가
+      const defaultLocations = [
+        '34bay A라인',
+        '34bay B라인',
+        '35bay A라인',
+        '35bay B라인',
+        '사무실',
+        '회의실'
+      ];
+      defaultLocations.forEach((loc, index) => {
+        sheet.getRange(index + 2, 1).setValue(loc);
+      });
+
+      Logger.log('장소목록 시트가 생성되었습니다.');
+    }
+
+    // 데이터 읽기 (헤더 제외)
+    const data = sheet.getRange('A:A').getValues();
+    const locations = data
+      .flat()
+      .filter(loc => loc && loc !== '장소')
+      .map(loc => loc.toString().trim());
+
+    return ContentService
+      .createTextOutput(JSON.stringify(locations))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    Logger.log('getLocations error: ' + error.toString());
+
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        error: error.toString(),
+        fallback: ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실']
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * 테스트 함수 - 인원/장소 목록 조회 테스트
+ */
+function testGetSettings() {
+  Logger.log('=== 인원 목록 테스트 ===');
+  const employees = getEmployees();
+  Logger.log(employees.getContent());
+
+  Logger.log('\n=== 장소 목록 테스트 ===');
+  const locations = getLocations();
+  Logger.log(locations.getContent());
 }
