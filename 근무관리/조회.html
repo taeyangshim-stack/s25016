@@ -766,6 +766,10 @@
             const index = parseInt(document.getElementById('editIndex').value);
             const record = allRecords[index];
 
+            console.log('✏️ 수정 요청 시작');
+            console.log('Index:', index);
+            console.log('원본 Record:', record);
+
             const updatedData = {
                 timestamp: record.timestamp,  // 기존 타임스탬프 유지 (식별용)
                 date: document.getElementById('editDate').value,
@@ -777,8 +781,13 @@
                 notes: document.getElementById('editNotes').value || '-',
             };
 
+            console.log('수정할 데이터:', updatedData);
+            console.log('전송할 URL:', `${SCRIPT_URL}?action=update`);
+            console.log('전송 데이터:', JSON.stringify(updatedData));
+
             try {
                 // Google Sheets에 업데이트 요청
+                console.log('📡 Fetch 요청 전송 중...');
                 const response = await fetch(`${SCRIPT_URL}?action=update`, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -788,16 +797,22 @@
                     body: JSON.stringify(updatedData)
                 });
 
+                console.log('✅ Fetch 요청 완료');
+                console.log('Response type:', response.type);
+                console.log('Response status:', response.status);
+
                 closeEditModal();
 
                 // Google Sheets에서 최신 데이터 다시 로드
+                console.log('📥 데이터 재로드 중...');
                 await loadRecords();
                 applyFilter();
 
+                console.log('✅ 수정 프로세스 완료');
                 alert('✅ 기록이 수정되었습니다.');
 
             } catch (error) {
-                console.error('수정 실패:', error);
+                console.error('❌ 수정 실패:', error);
                 alert('❌ 수정에 실패했습니다: ' + error.message);
             }
         });
