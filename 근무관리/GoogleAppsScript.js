@@ -43,24 +43,44 @@ function doPost(e) {
   try {
     // JSON 데이터 파싱
     const data = JSON.parse(e.postData.contents);
+    const action = e.parameter.action;
 
-    // 스프레드시트 가져오기
-    const sheet = getOrCreateSheet();
+    if (action === 'update') {
+      // 수정 요청
+      const success = updateRecord(data.timestamp, data);
+      return ContentService
+        .createTextOutput(JSON.stringify({
+          status: success ? 'success' : 'error',
+          message: success ? '기록이 수정되었습니다.' : '기록을 찾을 수 없습니다.'
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
 
-    // 데이터 저장
-    saveRecord(sheet, data);
+    } else if (action === 'delete') {
+      // 삭제 요청
+      const success = deleteRecord(data.timestamp);
+      return ContentService
+        .createTextOutput(JSON.stringify({
+          status: success ? 'success' : 'error',
+          message: success ? '기록이 삭제되었습니다.' : '기록을 찾을 수 없습니다.'
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
 
-    // 이메일 발송
-    if (CONFIG.SEND_EMAIL) {
-      sendEmail(data);
+    } else {
+      // 기존 저장 로직 (새 기록 추가)
+      const sheet = getOrCreateSheet();
+      saveRecord(sheet, data);
+
+      if (CONFIG.SEND_EMAIL) {
+        sendEmail(data);
+      }
+
+      return ContentService
+        .createTextOutput(JSON.stringify({
+          status: 'success',
+          message: '기록이 저장되었습니다.'
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
     }
-
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        status: 'success',
-        message: '기록이 저장되었습니다.'
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
 
   } catch (error) {
     Logger.log('Error: ' + error.toString());
@@ -369,6 +389,81 @@ function getAllRecords() {
     return ContentService
       .createTextOutput(JSON.stringify({ error: error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * 기록 업데이트 (POST 요청용)
+ */
+function updateRecord(timestamp, updatedData) {
+  try {
+    const sheet = getOrCreateSheet();
+    const data = sheet.getDataRange().getValues();
+
+    // 타임스탬프로 행 찾기
+    for (let i = 1; i < data.length; i++) {
+      const rowTimestamp = data[i][0];
+      const rowTimestampStr = rowTimestamp instanceof Date
+        ? rowTimestamp.toISOString()
+        : rowTimestamp.toString();
+
+      if (rowTimestampStr === timestamp || new Date(rowTimestampStr).getTime() === new Date(timestamp).getTime()) {
+        // 해당 행 업데이트
+        sheet.getRange(i + 1, 2).setValue(updatedData.date);
+        sheet.getRange(i + 1, 3).setValue(updatedData.name);
+        sheet.getRange(i + 1, 4).setValue(updatedData.location);
+        sheet.getRange(i + 1, 5).setValue(updatedData.checkIn);
+        sheet.getRange(i + 1, 6).setValue(updatedData.checkOut);
+
+        // 근무시간 재계산
+        const workHours = calculateWorkHours(updatedData.checkIn, updatedData.checkOut);
+        sheet.getRange(i + 1, 7).setValue(workHours);
+
+        sheet.getRange(i + 1, 8).setValue(updatedData.workType);
+        sheet.getRange(i + 1, 9).setValue(updatedData.notes);
+
+        Logger.log('Record updated: ' + timestamp);
+        return true;
+      }
+    }
+
+    Logger.log('Record not found: ' + timestamp);
+    return false;
+
+  } catch (error) {
+    Logger.log('Update error: ' + error.toString());
+    return false;
+  }
+}
+
+/**
+ * 기록 삭제 (POST 요청용)
+ */
+function deleteRecord(timestamp) {
+  try {
+    const sheet = getOrCreateSheet();
+    const data = sheet.getDataRange().getValues();
+
+    // 타임스탬프로 행 찾기
+    for (let i = 1; i < data.length; i++) {
+      const rowTimestamp = data[i][0];
+      const rowTimestampStr = rowTimestamp instanceof Date
+        ? rowTimestamp.toISOString()
+        : rowTimestamp.toString();
+
+      if (rowTimestampStr === timestamp || new Date(rowTimestampStr).getTime() === new Date(timestamp).getTime()) {
+        sheet.deleteRow(i + 1);
+        Logger.log('Record deleted: ' + timestamp);
+        return true;
+      }
+    }
+
+    Logger.log('Record not found: ' + timestamp);
+    return false;
+
+  } catch (error) {
+    Logger.log('Delete error: ' + error.toString());
+    return false;
   }
 }
 

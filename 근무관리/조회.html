@@ -760,13 +760,14 @@
         }
 
         // 수정 폼 제출
-        document.getElementById('editForm').addEventListener('submit', function(e) {
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const index = parseInt(document.getElementById('editIndex').value);
+            const record = allRecords[index];
 
-            allRecords[index] = {
-                ...allRecords[index],
+            const updatedData = {
+                timestamp: record.timestamp,  // 기존 타임스탬프 유지 (식별용)
                 date: document.getElementById('editDate').value,
                 name: document.getElementById('editName').value,
                 location: document.getElementById('editLocation').value,
@@ -776,28 +777,62 @@
                 notes: document.getElementById('editNotes').value || '-',
             };
 
-            localStorage.setItem('workRecords', JSON.stringify(allRecords));
+            try {
+                // Google Sheets에 업데이트 요청
+                const response = await fetch(`${SCRIPT_URL}?action=update`, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedData)
+                });
 
-            closeEditModal();
-            loadRecords();
-            applyFilter();
+                closeEditModal();
 
-            alert('✅ 기록이 수정되었습니다.');
+                // Google Sheets에서 최신 데이터 다시 로드
+                await loadRecords();
+                applyFilter();
+
+                alert('✅ 기록이 수정되었습니다.');
+
+            } catch (error) {
+                console.error('수정 실패:', error);
+                alert('❌ 수정에 실패했습니다: ' + error.message);
+            }
         });
 
         // 기록 삭제
-        function deleteRecord(index) {
+        async function deleteRecord(index) {
             if (!confirm('정말 이 기록을 삭제하시겠습니까?')) {
                 return;
             }
 
-            allRecords.splice(index, 1);
-            localStorage.setItem('workRecords', JSON.stringify(allRecords));
+            const record = allRecords[index];
 
-            loadRecords();
-            applyFilter();
+            try {
+                // Google Sheets에 삭제 요청
+                const response = await fetch(`${SCRIPT_URL}?action=delete`, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        timestamp: record.timestamp
+                    })
+                });
 
-            alert('✅ 기록이 삭제되었습니다.');
+                // Google Sheets에서 최신 데이터 다시 로드
+                await loadRecords();
+                applyFilter();
+
+                alert('✅ 기록이 삭제되었습니다.');
+
+            } catch (error) {
+                console.error('삭제 실패:', error);
+                alert('❌ 삭제에 실패했습니다: ' + error.message);
+            }
         }
 
         // 모달 외부 클릭 시 닫기
