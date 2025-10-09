@@ -84,6 +84,8 @@ function doGet(e) {
     return getEmployees();
   } else if (action === 'getLocations') {
     return getLocations();
+  } else if (action === 'getAllRecords') {
+    return getAllRecords();
   }
 
   return ContentService

@@ -610,9 +610,48 @@
             editLocation.appendChild(otherOption);
         }
 
+        // Google Sheets에서 전체 기록 가져오기
+        async function fetchAllRecordsFromSheet() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getAllRecords`);
+                const data = await response.json();
+
+                if (data.error) {
+                    console.warn('Google Sheets에서 기록 로드 실패:', data.error);
+                    // LocalStorage fallback
+                    return JSON.parse(localStorage.getItem('workRecords') || '[]');
+                }
+
+                // 데이터 변환 (Google Sheets 형식 → 앱 형식)
+                const records = data.map(row => ({
+                    timestamp: row['타임스탬프'] || new Date().toISOString(),
+                    date: row['날짜'] || '-',
+                    name: row['인원'] || '-',
+                    location: row['위치'] || '-',
+                    checkIn: row['입실시간'] || '-',
+                    checkOut: row['퇴실시간'] || '-',
+                    workType: row['작업내용'] || '-',
+                    notes: row['비고'] || '-'
+                }));
+
+                // LocalStorage에도 캐시
+                localStorage.setItem('workRecords', JSON.stringify(records));
+
+                console.log(`✅ Google Sheets에서 ${records.length}개 기록 로드 완료`);
+                return records;
+
+            } catch (error) {
+                console.error('기록 로드 실패:', error);
+                // LocalStorage fallback
+                const saved = localStorage.getItem('workRecords');
+                return saved ? JSON.parse(saved) : [];
+            }
+        }
+
         // 기록 로드
-        function loadRecords() {
-            allRecords = JSON.parse(localStorage.getItem('workRecords') || '[]');
+        async function loadRecords() {
+            // Google Sheets에서 데이터 가져오기
+            allRecords = await fetchAllRecordsFromSheet();
             filteredRecords = [...allRecords];
             displayRecords();
         }
