@@ -810,27 +810,43 @@
 
             const record = allRecords[index];
 
+            console.log('🗑️ 삭제 요청 시작');
+            console.log('Index:', index);
+            console.log('Record:', record);
+            console.log('Timestamp:', record.timestamp);
+            console.log('전송할 URL:', `${SCRIPT_URL}?action=delete`);
+
+            const deleteData = {
+                timestamp: record.timestamp
+            };
+            console.log('전송 데이터:', JSON.stringify(deleteData));
+
             try {
                 // Google Sheets에 삭제 요청
+                console.log('📡 Fetch 요청 전송 중...');
                 const response = await fetch(`${SCRIPT_URL}?action=delete`, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        timestamp: record.timestamp
-                    })
+                    body: JSON.stringify(deleteData)
                 });
 
+                console.log('✅ Fetch 요청 완료');
+                console.log('Response type:', response.type);
+                console.log('Response status:', response.status);
+
                 // Google Sheets에서 최신 데이터 다시 로드
+                console.log('📥 데이터 재로드 중...');
                 await loadRecords();
                 applyFilter();
 
+                console.log('✅ 삭제 프로세스 완료');
                 alert('✅ 기록이 삭제되었습니다.');
 
             } catch (error) {
-                console.error('삭제 실패:', error);
+                console.error('❌ 삭제 실패:', error);
                 alert('❌ 삭제에 실패했습니다: ' + error.message);
             }
         }
