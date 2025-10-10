@@ -45,6 +45,16 @@ const MOCK_ISSUES = [
     complete_date: '',
     attachments: [],
     comments: [],
+    images: [
+      {
+        url: 'https://placehold.co/600x400/dc2626/white?text=DeviceNet+Error',
+        caption: 'DeviceNet 에러 화면'
+      },
+      {
+        url: 'https://placehold.co/600x400/3b82f6/white?text=Cable+Damage',
+        caption: '손상된 케이블'
+      }
+    ],
     created_at: '2025-01-15T09:00:00Z',
     updated_at: '2025-01-15T14:30:00Z',
     customFields: {
@@ -74,6 +84,20 @@ const MOCK_ISSUES = [
     complete_date: '',
     attachments: [],
     comments: [],
+    images: [
+      {
+        url: 'https://placehold.co/600x400/f59e0b/white?text=Robot+Interference',
+        caption: '로봇 간섭 발생 위치'
+      },
+      {
+        url: 'https://placehold.co/600x400/10b981/white?text=Safety+Zone',
+        caption: '안전 영역 설정 화면'
+      },
+      {
+        url: 'https://placehold.co/600x400/6b7280/white?text=Teaching+Point',
+        caption: '티칭 포인트 좌표'
+      }
+    ],
     created_at: '2025-01-16T08:30:00Z',
     updated_at: '2025-01-16T10:00:00Z',
     customFields: {
@@ -130,6 +154,24 @@ const MOCK_ISSUES = [
     complete_date: '2025-01-14',
     attachments: [],
     comments: [],
+    images: [
+      {
+        url: 'https://placehold.co/600x400/dc2626/white?text=Weld+Defect',
+        caption: '용접 기공 불량 (확대)'
+      },
+      {
+        url: 'https://placehold.co/600x400/f59e0b/white?text=Before+Repair',
+        caption: '수정 전'
+      },
+      {
+        url: 'https://placehold.co/600x400/10b981/white?text=After+Repair',
+        caption: '수정 후'
+      },
+      {
+        url: 'https://placehold.co/600x400/3b82f6/white?text=Gas+Flow+Setting',
+        caption: 'DeviceNet 가스 유량 파라미터'
+      }
+    ],
     created_at: '2025-01-10T10:00:00Z',
     updated_at: '2025-01-14T16:00:00Z',
     customFields: {

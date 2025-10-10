@@ -314,11 +314,7 @@ function safeJSONParse(str, defaultValue) {
 function sendEmailNotification(action, data) {
   // 담당자 이메일 설정 (실제 이메일로 변경 필요)
   const emails = {
-    '심태양': 'taeyangshim@example.com',
-    '김철수': 'chulsookim@example.com',
-    '박영희': 'youngheepark@example.com',
-    '이영수': 'youngsoolee@example.com',
-    '최민수': 'minsuchoi@example.com'
+    '심태양': 'simsun@kakao.com'
   };
 
   const ownerEmail = emails[data.owner];

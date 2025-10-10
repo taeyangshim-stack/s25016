@@ -274,6 +274,19 @@
                 <button class="btn btn-outline" onclick="refreshIssues()">
                     🔄 새로고침
                 </button>
+                <div style="position: relative; display: inline-block;">
+                    <button class="btn btn-outline" onclick="toggleAdminMenu()">
+                        ⚙️ 관리
+                    </button>
+                    <div id="adminMenu" style="display: none; position: absolute; top: 100%; left: 0; margin-top: 5px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 100; min-width: 180px;">
+                        <a href="pages/admin/categories.html" style="display: block; padding: 12px 16px; color: #374151; text-decoration: none; border-bottom: 1px solid #f3f4f6;">
+                            📂 구분 관리
+                        </a>
+                        <a href="pages/admin/owners.html" style="display: block; padding: 12px 16px; color: #374151; text-decoration: none;">
+                            👥 담당자 관리
+                        </a>
+                    </div>
+                </div>
                 <a href="/index.html" class="btn btn-outline">
                     🏠 메인 대시보드
                 </a>
@@ -453,6 +466,21 @@
         function refreshIssues() {
             loadIssues();
         }
+
+        // 관리 메뉴 토글
+        function toggleAdminMenu() {
+            const menu = document.getElementById('adminMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 메뉴 외부 클릭 시 닫기
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('adminMenu');
+            const btn = e.target.closest('button');
+            if (menu && !btn) {
+                menu.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>

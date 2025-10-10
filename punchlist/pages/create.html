@@ -179,6 +179,76 @@
             width: auto;
             margin: 0;
         }
+
+        /* 이미지 업로드 */
+        .image-upload-area {
+            border: 2px dashed var(--color-gray-300);
+            border-radius: var(--border-radius-base);
+            padding: var(--space-6);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--color-primary);
+            background: var(--color-gray-50);
+        }
+
+        .image-upload-area.dragover {
+            border-color: var(--color-primary);
+            background: var(--color-primary-light);
+        }
+
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+
+        .image-preview-item {
+            position: relative;
+            border-radius: var(--border-radius-base);
+            overflow: hidden;
+            background: var(--color-gray-100);
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .image-preview-item .remove-btn:hover {
+            background: rgba(220, 38, 38, 1);
+        }
+
+        .image-preview-item .caption-input {
+            width: 100%;
+            padding: var(--space-2);
+            font-size: var(--font-sm);
+            border: none;
+            border-top: 1px solid var(--color-gray-300);
+        }
     </style>
 </head>
 <body>
@@ -331,6 +401,24 @@
                     </div>
                 </div>
 
+                <!-- 이미지 첨부 -->
+                <div class="section-title">📷 이미지 첨부</div>
+
+                <div class="form-group">
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <div style="font-size: 48px; margin-bottom: var(--space-2);">📷</div>
+                        <div style="font-size: var(--font-lg); font-weight: var(--font-semibold); margin-bottom: var(--space-2);">
+                            이미지를 드래그하거나 클릭하여 업로드
+                        </div>
+                        <div class="helper-text">
+                            JPG, PNG, GIF 파일 지원 (최대 5MB)
+                        </div>
+                        <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+                    </div>
+
+                    <div class="image-preview-grid" id="imagePreviewGrid"></div>
+                </div>
+
                 <!-- 버튼 -->
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">
@@ -354,6 +442,7 @@
         let currentTemplate = null;
         let allTemplates = [];
         let customFieldsConfig = null;
+        let uploadedImages = []; // {file: File, dataUrl: string, caption: string}
 
         // 페이지 로드 시 실행
         document.addEventListener('DOMContentLoaded', async () => {
@@ -363,6 +452,9 @@
             // 이벤트 리스너
             document.getElementById('category').addEventListener('change', updateSubcategories);
             document.getElementById('createIssueForm').addEventListener('submit', handleSubmit);
+
+            // 이미지 업로드 이벤트
+            setupImageUpload();
 
             // 템플릿 로드
             await loadTemplates();
@@ -720,9 +812,15 @@
                 issueData.templateId = currentTemplate;
             }
 
+            // 이미지 데이터 추가
+            issueData.images = uploadedImages.map(img => ({
+                url: img.dataUrl,
+                caption: img.caption
+            }));
+
             // 빈 값 처리
             Object.keys(issueData).forEach(key => {
-                if (!issueData[key] && key !== 'customFields') {
+                if (!issueData[key] && key !== 'customFields' && key !== 'images') {
                     issueData[key] = '';
                 }
             });
@@ -754,6 +852,8 @@
                 document.getElementById('subcategory').innerHTML = '<option value="">분류를 먼저 선택하세요</option>';
                 clearCustomFields();
                 clearHelpTexts();
+                uploadedImages = [];
+                renderImagePreviews();
 
                 // 기본 템플릿 선택
                 document.querySelectorAll('.template-card').forEach((c, i) => {
@@ -765,6 +865,99 @@
                 });
                 currentTemplate = null;
             }
+        }
+
+        // 이미지 업로드 설정
+        function setupImageUpload() {
+            const uploadArea = document.getElementById('imageUploadArea');
+            const fileInput = document.getElementById('imageInput');
+
+            // 클릭 이벤트
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // 파일 선택 이벤트
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+
+            // 드래그 앤 드롭
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+        }
+
+        // 파일 처리
+        function handleFiles(files) {
+            for (const file of files) {
+                // 파일 타입 검증
+                if (!file.type.startsWith('image/')) {
+                    alert(`${file.name}은(는) 이미지 파일이 아닙니다.`);
+                    continue;
+                }
+
+                // 파일 크기 검증 (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`${file.name}의 크기가 5MB를 초과합니다.`);
+                    continue;
+                }
+
+                // 파일 읽기
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedImages.push({
+                        file: file,
+                        dataUrl: e.target.result,
+                        caption: ''
+                    });
+                    renderImagePreviews();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 이미지 미리보기 렌더링
+        function renderImagePreviews() {
+            const grid = document.getElementById('imagePreviewGrid');
+            grid.innerHTML = '';
+
+            uploadedImages.forEach((img, index) => {
+                const item = document.createElement('div');
+                item.className = 'image-preview-item';
+                item.innerHTML = `
+                    <img src="${img.dataUrl}" alt="Preview ${index + 1}">
+                    <button type="button" class="remove-btn" onclick="removeImage(${index})">×</button>
+                    <input type="text"
+                           class="caption-input"
+                           placeholder="설명 (선택)"
+                           value="${img.caption}"
+                           onchange="updateCaption(${index}, this.value)">
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // 이미지 제거
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            renderImagePreviews();
+        }
+
+        // 캡션 업데이트
+        function updateCaption(index, caption) {
+            uploadedImages[index].caption = caption;
         }
     </script>
 </body>

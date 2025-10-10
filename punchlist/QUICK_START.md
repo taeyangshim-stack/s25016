@@ -9,7 +9,7 @@
 3. 시트 이름: "S25016_펀치리스트"로 변경
 4. URL에서 SHEET_ID 복사:
    ```
-   https://docs.google.com/spreadsheets/d/[이 부분이 SHEET_ID]/edit
+   https://docs.google.com/spreadsheets/d/1EqBPn9XrA_5PTg5ks4bgFIjwiojMFDZCYaOkFJINAmE/edit
    ```
 
 ---
@@ -22,7 +22,7 @@
 4. `/punchlist/scripts/GoogleAppsScript.js` 파일 내용 복사하여 붙여넣기
 5. 18번째 줄 수정:
    ```javascript
-   const SHEET_ID = '여기에_복사한_SHEET_ID_붙여넣기';
+   const SHEET_ID = '1EqBPn9XrA_5PTg5ks4bgFIjwiojMFDZCYaOkFJINAmE';
    ```
 6. **Ctrl+S** 저장
 
@@ -68,6 +68,7 @@
    ```
    https://script.google.com/macros/s/AKfycbz.../exec
    ```
+   https://script.google.com/macros/s/AKfycbxarys6e5oeI8jt7PHeO11H2LfMW0-P2lhX-NMApVX9-Ir97jnIlgtnElu70LZnUqRa/exec
 
 ---
 
