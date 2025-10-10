@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이슈 상세 - S25016 펀치리스트</title>
+
+    <link rel="stylesheet" href="../../shared/styles/variables.css">
+    <link rel="stylesheet" href="../../shared/styles/reset.css">
+    <link rel="stylesheet" href="../../shared/styles/components.css">
+
+    <style>
+        body {
+            background: var(--color-gray-50);
+            min-height: 100vh;
+            padding: var(--space-5);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--color-white);
+            padding: var(--space-6);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-6);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-4);
+        }
+
+        .title-section h1 {
+            font-size: var(--font-2xl);
+            color: var(--color-gray-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .issue-id {
+            font-size: var(--font-base);
+            color: var(--color-gray-500);
+            font-weight: normal;
+        }
+
+        .actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--border-radius-base);
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-6);
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .card-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 2px solid var(--color-gray-200);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-4);
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: var(--font-sm);
+            color: var(--color-gray-600);
+            margin-bottom: var(--space-1);
+        }
+
+        .info-value {
+            font-size: var(--font-base);
+            color: var(--color-gray-900);
+            font-weight: var(--font-medium);
+        }
+
+        .description-section {
+            margin-top: var(--space-4);
+        }
+
+        .description-label {
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .description-text {
+            font-size: var(--font-base);
+            color: var(--color-gray-800);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            background: var(--color-gray-50);
+            padding: var(--space-4);
+            border-radius: var(--border-radius-base);
+        }
+
+        .custom-fields-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-4);
+            margin-top: var(--space-4);
+        }
+
+        .timeline {
+            list-style: none;
+            padding: 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .timeline-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-sm);
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
+            margin-bottom: var(--space-1);
+        }
+
+        .timeline-date {
+            font-size: var(--font-sm);
+            color: var(--color-gray-500);
+        }
+
+        .loading {
+            text-align: center;
+            padding: var(--space-12);
+            color: var(--color-gray-500);
+        }
+
+        .error {
+            text-align: center;
+            padding: var(--space-12);
+            color: var(--color-danger);
+        }
+
+        .overdue {
+            color: var(--color-danger);
+        }
+
+        .empty-text {
+            color: var(--color-gray-400);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loadingState" class="loading">
+            ⏳ 이슈 정보를 불러오는 중...
+        </div>
+
+        <div id="errorState" class="error" style="display: none;">
+            ⚠️ 이슈를 불러오는 데 실패했습니다.<br>
+            <a href="list.html" class="btn btn-outline" style="margin-top: var(--space-4);">목록으로 돌아가기</a>
+        </div>
+
+        <div id="contentArea" style="display: none;">
+            <!-- 헤더 -->
+            <div class="header">
+                <div class="header-top">
+                    <div class="title-section">
+                        <h1>
+                            <span class="issue-id" id="issueId"></span>
+                            <span id="issueTitle"></span>
+                        </h1>
+                        <div style="display: flex; gap: var(--space-2); margin-top: var(--space-3);">
+                            <span class="badge" id="priorityBadge"></span>
+                            <span class="badge" id="statusBadge"></span>
+                            <span class="badge" id="categoryBadge"></span>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-primary" onclick="editIssue()">✏️ 수정</button>
+                        <button class="btn btn-outline" onclick="deleteIssue()">🗑️ 삭제</button>
+                        <a href="list.html" class="btn btn-outline">📋 목록</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 콘텐츠 그리드 -->
+            <div class="content-grid">
+                <!-- 왼쪽 열 -->
+                <div>
+                    <!-- 기본 정보 -->
+                    <div class="card">
+                        <h2 class="card-title">📋 기본 정보</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">분류</span>
+                                <span class="info-value" id="category"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">세부분류</span>
+                                <span class="info-value" id="subcategory"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">우선순위</span>
+                                <span class="info-value" id="priority"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">상태</span>
+                                <span class="info-value" id="status"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 문제 상황 -->
+                    <div class="card">
+                        <h2 class="card-title">📝 문제 상황</h2>
+                        <div class="description-text" id="description"></div>
+                    </div>
+
+                    <!-- 원인 분석 -->
+                    <div class="card" id="causeCard" style="display: none;">
+                        <h2 class="card-title">🔍 원인 분석</h2>
+                        <div class="description-text" id="cause"></div>
+                    </div>
+
+                    <!-- 조치 계획 -->
+                    <div class="card" id="actionPlanCard" style="display: none;">
+                        <h2 class="card-title">🔧 조치 계획</h2>
+                        <div class="description-text" id="actionPlan"></div>
+                    </div>
+
+                    <!-- 조치 결과 -->
+                    <div class="card" id="actionResultCard" style="display: none;">
+                        <h2 class="card-title">✅ 조치 결과</h2>
+                        <div class="description-text" id="actionResult"></div>
+                    </div>
+
+                    <!-- 커스텀 필드 -->
+                    <div class="card" id="customFieldsCard" style="display: none;">
+                        <h2 class="card-title">⚙️ 추가 정보</h2>
+                        <div class="custom-fields-grid" id="customFieldsContainer"></div>
+                    </div>
+                </div>
+
+                <!-- 오른쪽 열 -->
+                <div>
+                    <!-- 담당 정보 -->
+                    <div class="card">
+                        <h2 class="card-title">👥 담당 정보</h2>
+                        <div class="info-item" style="margin-bottom: var(--space-3);">
+                            <span class="info-label">담당자</span>
+                            <span class="info-value" id="owner"></span>
+                        </div>
+                        <div class="info-item" style="margin-bottom: var(--space-3);">
+                            <span class="info-label">협의자</span>
+                            <span class="info-value" id="collaborators"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">승인자</span>
+                            <span class="info-value" id="approver"></span>
+                        </div>
+                    </div>
+
+                    <!-- 일정 정보 -->
+                    <div class="card">
+                        <h2 class="card-title">📅 일정 정보</h2>
+                        <div class="info-item" style="margin-bottom: var(--space-3);">
+                            <span class="info-label">요청일</span>
+                            <span class="info-value" id="requestDate"></span>
+                        </div>
+                        <div class="info-item" style="margin-bottom: var(--space-3);">
+                            <span class="info-label">목표 완료일</span>
+                            <span class="info-value" id="targetDate"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">실제 완료일</span>
+                            <span class="info-value" id="completeDate"></span>
+                        </div>
+                    </div>
+
+                    <!-- 타임라인 -->
+                    <div class="card">
+                        <h2 class="card-title">⏱️ 타임라인</h2>
+                        <ul class="timeline" id="timeline"></ul>
+                    </div>
+
+                    <!-- 메타 정보 -->
+                    <div class="card">
+                        <h2 class="card-title">ℹ️ 메타 정보</h2>
+                        <div class="info-item" style="margin-bottom: var(--space-3);">
+                            <span class="info-label">생성일시</span>
+                            <span class="info-value" id="createdAt"></span>
+                        </div>
+                        <div class="info-item" style="margin-bottom: var(--space-3);">
+                            <span class="info-label">수정일시</span>
+                            <span class="info-value" id="updatedAt"></span>
+                        </div>
+                        <div class="info-item" id="templateInfoItem" style="display: none;">
+                            <span class="info-label">템플릿</span>
+                            <span class="info-value" id="templateId"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../shared/scripts/utils.js"></script>
+    <script src="../scripts/config-loader.js"></script>
+    <script src="../scripts/punchlist.js"></script>
+    <script>
+        let currentIssue = null;
+
+        // 페이지 로드
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const issueId = urlParams.get('id');
+
+            if (!issueId) {
+                showError('이슈 ID가 제공되지 않았습니다.');
+                return;
+            }
+
+            await loadIssue(issueId);
+        });
+
+        // 이슈 로드
+        async function loadIssue(id) {
+            try {
+                currentIssue = await PunchListAPI.loadIssueById(id);
+                renderIssue();
+
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('contentArea').style.display = 'block';
+            } catch (error) {
+                console.error('이슈 로드 실패:', error);
+                showError('이슈를 불러오는 데 실패했습니다.');
+            }
+        }
+
+        // 이슈 렌더링
+        function renderIssue() {
+            // 헤더
+            document.getElementById('issueId').textContent = currentIssue.id;
+            document.getElementById('issueTitle').textContent = currentIssue.title;
+
+            // 배지
+            const priorityBadge = document.getElementById('priorityBadge');
+            priorityBadge.textContent = currentIssue.priority;
+            priorityBadge.className = `badge badge-priority-${currentIssue.priority}`;
+
+            const statusBadge = document.getElementById('statusBadge');
+            statusBadge.textContent = currentIssue.status;
+            statusBadge.className = `badge badge-status-${currentIssue.status}`;
+
+            const categoryBadge = document.getElementById('categoryBadge');
+            categoryBadge.textContent = `${currentIssue.category} > ${currentIssue.subcategory}`;
+            categoryBadge.style.background = '#e5e7eb';
+            categoryBadge.style.color = '#4b5563';
+
+            // 기본 정보
+            document.getElementById('category').textContent = currentIssue.category;
+            document.getElementById('subcategory').textContent = currentIssue.subcategory;
+            document.getElementById('priority').textContent = currentIssue.priority;
+            document.getElementById('status').textContent = currentIssue.status;
+
+            // 문제 상황
+            document.getElementById('description').textContent = currentIssue.description || '없음';
+
+            // 원인 분석
+            if (currentIssue.cause) {
+                document.getElementById('causeCard').style.display = 'block';
+                document.getElementById('cause').textContent = currentIssue.cause;
+            }
+
+            // 조치 계획
+            if (currentIssue.action_plan) {
+                document.getElementById('actionPlanCard').style.display = 'block';
+                document.getElementById('actionPlan').textContent = currentIssue.action_plan;
+            }
+
+            // 조치 결과
+            if (currentIssue.action_result) {
+                document.getElementById('actionResultCard').style.display = 'block';
+                document.getElementById('actionResult').textContent = currentIssue.action_result;
+            }
+
+            // 커스텀 필드
+            if (currentIssue.customFields && Object.keys(currentIssue.customFields).length > 0) {
+                renderCustomFields();
+            }
+
+            // 담당 정보
+            document.getElementById('owner').textContent = currentIssue.owner;
+            document.getElementById('collaborators').textContent = currentIssue.collaborators || '-';
+            document.getElementById('approver').textContent = currentIssue.approver || '-';
+
+            // 일정 정보
+            document.getElementById('requestDate').textContent = PunchListAPI.formatDate(currentIssue.request_date);
+
+            const targetDateEl = document.getElementById('targetDate');
+            targetDateEl.textContent = PunchListAPI.formatDate(currentIssue.target_date);
+            if (PunchListAPI.isOverdue(currentIssue)) {
+                targetDateEl.classList.add('overdue');
+                targetDateEl.textContent += ' ⚠️ 지연';
+            }
+
+            document.getElementById('completeDate').textContent = currentIssue.complete_date
+                ? PunchListAPI.formatDate(currentIssue.complete_date)
+                : '-';
+
+            // 타임라인
+            renderTimeline();
+
+            // 메타 정보
+            document.getElementById('createdAt').textContent = PunchListAPI.formatDateTime(currentIssue.created_at);
+            document.getElementById('updatedAt').textContent = PunchListAPI.formatDateTime(currentIssue.updated_at);
+
+            if (currentIssue.templateId) {
+                document.getElementById('templateInfoItem').style.display = 'block';
+                document.getElementById('templateId').textContent = currentIssue.templateId;
+            }
+        }
+
+        // 커스텀 필드 렌더링
+        function renderCustomFields() {
+            const container = document.getElementById('customFieldsContainer');
+            const customFields = currentIssue.customFields;
+
+            document.getElementById('customFieldsCard').style.display = 'block';
+
+            container.innerHTML = Object.entries(customFields)
+                .filter(([key, value]) => value !== null && value !== '' && value !== undefined)
+                .map(([key, value]) => `
+                    <div class="info-item">
+                        <span class="info-label">${formatFieldName(key)}</span>
+                        <span class="info-value">${formatFieldValue(value)}</span>
+                    </div>
+                `).join('');
+        }
+
+        // 필드명 포맷팅
+        function formatFieldName(key) {
+            const names = {
+                'estimated_cost': '예상 비용',
+                'actual_cost': '실제 비용',
+                'vendor_name': '외주업체',
+                'vendor_contact': '외주 담당자',
+                'equipment_serial': '장비 시리얼번호',
+                'risk_level': '위험도',
+                'defect_rate': '불량률',
+                'customer_impact': '고객 영향도',
+                'downtime_hours': '가동중단 시간'
+            };
+            return names[key] || key;
+        }
+
+        // 필드값 포맷팅
+        function formatFieldValue(value) {
+            if (typeof value === 'boolean') {
+                return value ? '✅ 예' : '❌ 아니오';
+            }
+            if (typeof value === 'number') {
+                return value.toLocaleString();
+            }
+            return value;
+        }
+
+        // 타임라인 렌더링
+        function renderTimeline() {
+            const timeline = document.getElementById('timeline');
+            const events = [];
+
+            // 생성
+            events.push({
+                icon: '➕',
+                title: '이슈 생성',
+                date: currentIssue.created_at
+            });
+
+            // 상태 변경 (간단한 버전)
+            if (currentIssue.status === '진행중') {
+                events.push({
+                    icon: '▶️',
+                    title: '진행 시작',
+                    date: currentIssue.updated_at
+                });
+            }
+
+            if (currentIssue.complete_date) {
+                events.push({
+                    icon: '✅',
+                    title: '작업 완료',
+                    date: currentIssue.complete_date
+                });
+            }
+
+            timeline.innerHTML = events.map(event => `
+                <li class="timeline-item">
+                    <div class="timeline-icon">${event.icon}</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">${event.title}</div>
+                        <div class="timeline-date">${PunchListAPI.formatDateTime(event.date)}</div>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // 수정
+        function editIssue() {
+            // 향후 구현: 수정 페이지로 이동
+            alert('수정 기능은 향후 구현 예정입니다.');
+        }
+
+        // 삭제
+        async function deleteIssue() {
+            if (!confirm('정말로 이 이슈를 삭제하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                await PunchListAPI.deleteIssue(currentIssue.id);
+                alert('✅ 이슈가 삭제되었습니다.');
+                window.location.href = 'list.html';
+            } catch (error) {
+                console.error('삭제 실패:', error);
+                alert('❌ 이슈 삭제에 실패했습니다.');
+            }
+        }
+
+        // 에러 표시
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorState').innerHTML = `
+                ⚠️ ${message}<br>
+                <a href="list.html" class="btn btn-outline" style="margin-top: var(--space-4);">목록으로 돌아가기</a>
+            `;
+        }
+    </script>
+</body>
+</html>

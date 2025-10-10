@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이슈 목록 - S25016 펀치리스트</title>
+
+    <link rel="stylesheet" href="../../shared/styles/variables.css">
+    <link rel="stylesheet" href="../../shared/styles/reset.css">
+    <link rel="stylesheet" href="../../shared/styles/components.css">
+
+    <style>
+        body {
+            background: var(--color-gray-50);
+            min-height: 100vh;
+            padding: var(--space-5);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--color-white);
+            padding: var(--space-6);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-6);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .header h1 {
+            font-size: var(--font-2xl);
+            color: var(--color-gray-900);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .stat-card {
+            background: var(--color-gray-50);
+            padding: var(--space-4);
+            border-radius: var(--border-radius-base);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: var(--font-2xl);
+            font-weight: var(--font-bold);
+            color: var(--color-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .stat-label {
+            font-size: var(--font-sm);
+            color: var(--color-gray-600);
+        }
+
+        .filters {
+            background: var(--color-white);
+            padding: var(--space-5);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-6);
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-base);
+            font-size: var(--font-base);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .table-container {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: var(--space-5);
+            border-bottom: 1px solid var(--color-gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--color-gray-50);
+        }
+
+        th {
+            padding: var(--space-3) var(--space-4);
+            text-align: left;
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+            font-size: var(--font-sm);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            background: var(--color-gray-100);
+        }
+
+        th .sort-icon {
+            margin-left: var(--space-1);
+            opacity: 0.5;
+        }
+
+        th.sorted .sort-icon {
+            opacity: 1;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--color-gray-100);
+            transition: var(--transition-base);
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background: var(--color-gray-50);
+        }
+
+        td {
+            padding: var(--space-3) var(--space-4);
+            font-size: var(--font-sm);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--border-radius-base);
+            font-size: var(--font-xs);
+            font-weight: var(--font-semibold);
+            white-space: nowrap;
+        }
+
+        .badge-priority-긴급 {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-priority-높음 {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .badge-priority-보통 {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-priority-낮음 {
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+
+        .badge-status-신규 {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-status-진행중 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-status-보류 {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .badge-status-완료 {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-status-검증중 {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-12) var(--space-4);
+            color: var(--color-gray-500);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: var(--space-8);
+            color: var(--color-gray-500);
+        }
+
+        .overdue {
+            color: var(--color-danger);
+            font-weight: var(--font-semibold);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-5);
+            border-top: 1px solid var(--color-gray-200);
+        }
+
+        .pagination button {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--color-gray-300);
+            background: var(--color-white);
+            border-radius: var(--border-radius-base);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: var(--color-gray-50);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            font-size: var(--font-sm);
+            color: var(--color-gray-600);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <div class="header-top">
+                <h1>📋 이슈 목록</h1>
+                <div style="display: flex; gap: var(--space-3);">
+                    <a href="create.html" class="btn btn-primary">➕ 새 이슈 등록</a>
+                    <a href="../index.html" class="btn btn-outline">🏠 대시보드</a>
+                </div>
+            </div>
+
+            <!-- 통계 -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">전체 이슈</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="progressCount">0</div>
+                    <div class="stat-label">진행중</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingCount">0</div>
+                    <div class="stat-label">보류</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completeCount">0</div>
+                    <div class="stat-label">완료</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="overdueCount">0</div>
+                    <div class="stat-label">지연</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 필터 -->
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>분류</label>
+                    <select id="filterCategory">
+                        <option value="">전체</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>세부분류</label>
+                    <select id="filterSubcategory">
+                        <option value="">전체</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>상태</label>
+                    <select id="filterStatus">
+                        <option value="">전체</option>
+                        <option value="신규">신규</option>
+                        <option value="진행중">진행중</option>
+                        <option value="보류">보류</option>
+                        <option value="완료">완료</option>
+                        <option value="검증중">검증중</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>우선순위</label>
+                    <select id="filterPriority">
+                        <option value="">전체</option>
+                        <option value="긴급">긴급</option>
+                        <option value="높음">높음</option>
+                        <option value="보통">보통</option>
+                        <option value="낮음">낮음</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>담당자</label>
+                    <select id="filterOwner">
+                        <option value="">전체</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>검색</label>
+                    <input type="text" id="searchInput" placeholder="제목, ID 검색...">
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-primary" onclick="applyFilters()">🔍 검색</button>
+                <button class="btn btn-outline" onclick="resetFilters()">🔄 초기화</button>
+            </div>
+        </div>
+
+        <!-- 테이블 -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">
+                    <span id="resultCount">0</span>개의 이슈
+                </div>
+                <div>
+                    <button class="btn btn-outline btn-sm" onclick="exportToCSV()">📥 CSV 내보내기</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortBy('id')">ID <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('title')">제목 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('category')">분류 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('subcategory')">세부분류 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('priority')">우선순위 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('status')">상태 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('owner')">담당자 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('request_date')">요청일 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('target_date')">목표일 <span class="sort-icon">↕️</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="issueTableBody">
+                        <tr>
+                            <td colspan="9" class="loading">
+                                ⏳ 데이터를 불러오는 중...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="pagination" id="pagination" style="display: none;">
+                <button id="prevBtn" onclick="changePage(-1)">◀ 이전</button>
+                <span class="pagination-info" id="pageInfo">1 / 1</span>
+                <button id="nextBtn" onclick="changePage(1)">다음 ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../shared/scripts/utils.js"></script>
+    <script src="../scripts/config-loader.js"></script>
+    <script src="../scripts/punchlist.js"></script>
+    <script>
+        let allIssues = [];
+        let filteredIssues = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+        let sortColumn = 'id';
+        let sortDirection = 'desc';
+
+        // 페이지 로드
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initFilters();
+            await loadIssues();
+        });
+
+        // 필터 초기화
+        async function initFilters() {
+            // 분류 옵션
+            const categories = await configLoader.loadCategories();
+            const categorySelect = document.getElementById('filterCategory');
+            categories.categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.name;
+                option.textContent = `${cat.icon} ${cat.name}`;
+                categorySelect.appendChild(option);
+            });
+
+            // 담당자 옵션
+            const ownerSelect = document.getElementById('filterOwner');
+            PunchListAPI.OWNERS.forEach(owner => {
+                const option = document.createElement('option');
+                option.value = owner;
+                option.textContent = owner;
+                ownerSelect.appendChild(option);
+            });
+
+            // 이벤트 리스너
+            document.getElementById('filterCategory').addEventListener('change', updateSubcategories);
+            document.getElementById('searchInput').addEventListener('input', debounce(applyFilters, 500));
+        }
+
+        // 세부분류 업데이트
+        async function updateSubcategories() {
+            const category = document.getElementById('filterCategory').value;
+            const subcategorySelect = document.getElementById('filterSubcategory');
+
+            subcategorySelect.innerHTML = '<option value="">전체</option>';
+
+            if (!category) return;
+
+            const categories = await configLoader.loadCategories();
+            const categoryData = categories.categories.find(c => c.name === category);
+
+            if (categoryData && categoryData.subcategories) {
+                categoryData.subcategories.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.name;
+                    option.textContent = sub.name;
+                    subcategorySelect.appendChild(option);
+                });
+            }
+        }
+
+        // 이슈 로드
+        async function loadIssues() {
+            try {
+                allIssues = await PunchListAPI.loadAllIssues();
+                applyFilters();
+                updateStats();
+            } catch (error) {
+                console.error('이슈 로드 실패:', error);
+                document.getElementById('issueTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="9" class="empty-state">
+                            <div class="empty-state-icon">⚠️</div>
+                            <p>이슈를 불러오는 데 실패했습니다.</p>
+                            <p style="font-size: var(--font-sm); margin-top: var(--space-2);">
+                                Google Sheets 연동을 확인해주세요.
+                            </p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // 필터 적용
+        function applyFilters() {
+            const filters = {
+                category: document.getElementById('filterCategory').value,
+                subcategory: document.getElementById('filterSubcategory').value,
+                status: document.getElementById('filterStatus').value,
+                priority: document.getElementById('filterPriority').value,
+                owner: document.getElementById('filterOwner').value,
+                search: document.getElementById('searchInput').value
+            };
+
+            filteredIssues = PunchListAPI.filterIssues(allIssues, filters);
+            sortIssues();
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+
+        // 필터 초기화
+        function resetFilters() {
+            document.getElementById('filterCategory').value = '';
+            document.getElementById('filterSubcategory').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterPriority').value = '';
+            document.getElementById('filterOwner').value = '';
+            document.getElementById('searchInput').value = '';
+
+            document.getElementById('filterSubcategory').innerHTML = '<option value="">전체</option>';
+
+            applyFilters();
+        }
+
+        // 정렬
+        function sortBy(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            // 정렬 아이콘 업데이트
+            document.querySelectorAll('th').forEach(th => th.classList.remove('sorted'));
+            event.target.closest('th').classList.add('sorted');
+
+            sortIssues();
+            renderTable();
+        }
+
+        function sortIssues() {
+            filteredIssues = PunchListAPI.sortIssues(filteredIssues, sortColumn, sortDirection);
+        }
+
+        // 테이블 렌더링
+        function renderTable() {
+            const tbody = document.getElementById('issueTableBody');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageIssues = filteredIssues.slice(start, end);
+
+            document.getElementById('resultCount').textContent = filteredIssues.length;
+
+            if (pageIssues.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <p>검색 결과가 없습니다.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = pageIssues.map(issue => {
+                const isOverdue = PunchListAPI.isOverdue(issue);
+                const targetDateClass = isOverdue ? 'overdue' : '';
+
+                return `
+                    <tr onclick="window.location.href='detail.html?id=${issue.id}'">
+                        <td><strong>${issue.id}</strong></td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${issue.title}
+                        </td>
+                        <td>${issue.category}</td>
+                        <td>${issue.subcategory}</td>
+                        <td>
+                            <span class="badge badge-priority-${issue.priority}">${issue.priority}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-status-${issue.status}">${issue.status}</span>
+                        </td>
+                        <td>${issue.owner}</td>
+                        <td>${PunchListAPI.formatDate(issue.request_date)}</td>
+                        <td class="${targetDateClass}">
+                            ${PunchListAPI.formatDate(issue.target_date)}
+                            ${isOverdue ? '⚠️' : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 통계 업데이트
+        function updateStats() {
+            const stats = PunchListAPI.calculateStats(allIssues);
+
+            document.getElementById('totalCount').textContent = stats.total;
+            document.getElementById('progressCount').textContent = stats.byStatus['진행중'] || 0;
+            document.getElementById('pendingCount').textContent = stats.byStatus['보류'] || 0;
+            document.getElementById('completeCount').textContent = stats.byStatus['완료'] || 0;
+            document.getElementById('overdueCount').textContent = stats.overdue || 0;
+        }
+
+        // 페이지네이션
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredIssues.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+
+            pagination.style.display = 'flex';
+            document.getElementById('pageInfo').textContent = `${currentPage} / ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        }
+
+        function changePage(delta) {
+            const totalPages = Math.ceil(filteredIssues.length / itemsPerPage);
+            const newPage = currentPage + delta;
+
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderTable();
+                updatePagination();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // CSV 내보내기
+        function exportToCSV() {
+            const headers = ['ID', '제목', '분류', '세부분류', '우선순위', '상태', '담당자', '요청일', '목표일'];
+            const rows = filteredIssues.map(issue => [
+                issue.id,
+                issue.title,
+                issue.category,
+                issue.subcategory,
+                issue.priority,
+                issue.status,
+                issue.owner,
+                issue.request_date,
+                issue.target_date
+            ]);
+
+            const csv = [headers, ...rows]
+                .map(row => row.map(cell => `"${cell}"`).join(','))
+                .join('\n');
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `punchlist_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // Debounce 함수
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+    </script>
+</body>
+</html>
