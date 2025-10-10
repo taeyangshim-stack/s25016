@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROBOT↔UI 테스트 통합 결과 (10/3-10/4)</title>
+  <style>
+    :root {
+      --bg: #f6f8fa;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --green: #10b981;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --blue: #3b82f6;
+      --bluegray: #64748b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Noto Sans KR, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+    }
+    h1 { font-size: 24px; margin: 0; color: #1f2937; }
+    .meta { color: var(--muted); font-size: 13px; }
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .summary-card {
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .summary-card.date1 { background: #f0f9ff; border-left: 4px solid #3b82f6; }
+    .summary-card.date2 { background: #f0fdf4; border-left: 4px solid #10b981; }
+    .summary-number { font-size: 32px; font-weight: bold; margin: 8px 0; }
+    .summary-label { font-size: 14px; color: var(--muted); }
+    .legend { margin: 8px 0 16px; font-size: 13px; color: var(--muted); }
+    .legend .label { display: inline-block; padding: 2px 8px; border-radius: 999px; margin-right: 8px; font-weight: 600; }
+    .label { padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; display: inline-block; white-space: nowrap; }
+    .label-ok { background: rgba(16,185,129,.12); color: var(--green); border: 1px solid rgba(16,185,129,.35); }
+    .label-hold { background: rgba(100,116,139,.12); color: var(--bluegray); border: 1px solid rgba(100,116,139,.35); }
+    .label-defect { background: rgba(239,68,68,.12); color: var(--red); border: 1px solid rgba(239,68,68,.35); }
+    .label-warn { background: rgba(245,158,11,.12); color: var(--amber); border: 1px solid rgba(245,158,11,.35); }
+    .label-partial { background: rgba(59,130,246,.12); color: var(--blue); border: 1px solid rgba(59,130,246,.35); }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 20px; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; }
+    thead th {
+      position: sticky; top: 0;
+      background: #fafafa; color: #111827;
+      border-bottom: 1px solid var(--border);
+      text-align: left; font-size: 13px; padding: 10px;
+    }
+    tbody td { border-top: 1px solid var(--border); padding: 10px; vertical-align: top; font-size: 14px; }
+    tbody tr:hover { background: #fcfcfc; }
+    .test-date {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .test-date.d1003 { background: #dbeafe; color: #1e40af; }
+    .test-date.d1004 { background: #dcfce7; color: #15803d; }
+    .line-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+    .line-a { background: #fef3c7; color: #92400e; border: 1px solid #fbbf24; }
+    .line-b { background: #dbeafe; color: #1e3a8a; border: 1px solid #60a5fa; }
+    .line-both { background: #e9d5ff; color: #6b21a8; border: 1px solid #c084fc; }
+    .owner-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-right: 3px;
+    }
+    .owner-ui { background: #e0f2fe; color: #075985; border: 1px solid #7dd3fc; }
+    .owner-robot { background: #fef3c7; color: #a16207; border: 1px solid #fde047; }
+    .owner-both { background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
+    .nowrap { white-space: nowrap; }
+    .muted { color: var(--muted); }
+    .note { margin-top: 12px; color: var(--muted); font-size: 13px; }
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1f2937;
+      margin: 30px 0 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+  </style>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="ROBOT↔UI 테스트 통합 결과 (2024.10.03-10.04)">
+  <meta name="version" content="251004-통합">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>ROBOT↔UI 테스트 통합 결과</h1>
+      <div class="meta">테스트 기간: 2024.10.03-10.04 · 담당: SP 심태양 · 위치: 34bay 자동용접 b라인</div>
+    </header>
+
+    <div class="summary-cards">
+      <div class="summary-card date1">
+        <div class="summary-label">10/3 테스트</div>
+        <div class="summary-number">18</div>
+        <div class="summary-label">항목</div>
+      </div>
+      <div class="summary-card date2">
+        <div class="summary-label">10/4 테스트</div>
+        <div class="summary-number">13</div>
+        <div class="summary-label">항목</div>
+      </div>
+      <div class="summary-card" style="background: #f0fdf4;">
+        <div class="summary-label">완료</div>
+        <div class="summary-number" style="color: #10b981;">11</div>
+        <div class="summary-label">항목</div>
+      </div>
+      <div class="summary-card" style="background: #dbeafe;">
+        <div class="summary-label">부분완료</div>
+        <div class="summary-number" style="color: #3b82f6;">6</div>
+        <div class="summary-label">항목</div>
+      </div>
+      <div class="summary-card" style="background: #fef3c7;">
+        <div class="summary-label">개선필요</div>
+        <div class="summary-number" style="color: #f59e0b;">9</div>
+        <div class="summary-label">항목</div>
+      </div>
+      <div class="summary-card" style="background: #fee2e2;">
+        <div class="summary-label">결함/보류</div>
+        <div class="summary-number" style="color: #ef4444;">5</div>
+        <div class="summary-label">항목</div>
+      </div>
+    </div>
+
+    <div class="legend">
+      상태 라벨:
+      <span class="label label-ok">완료</span>
+      <span class="label label-partial">부분완료</span>
+      <span class="label label-warn">확인/개선 필요</span>
+      <span class="label label-defect">결함</span>
+      <span class="label label-hold">보류</span>
+      · 테스트 일자:
+      <span class="test-date d1003">10/3</span>
+      <span class="test-date d1004">10/4</span>
+      · 라인:
+      <span class="line-badge line-a">A라인</span>
+      <span class="line-badge line-b">B라인</span>
+      <span class="line-badge line-both">공통</span>
+      · 작업 주체:
+      <span class="owner-badge owner-ui">UI</span>
+      <span class="owner-badge owner-robot">로봇</span>
+      <span class="owner-badge owner-both">협업</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="nowrap">일자</th>
+            <th class="nowrap">라인</th>
+            <th class="nowrap">작업주체</th>
+            <th class="nowrap">분류</th>
+            <th>항목</th>
+            <th class="nowrap">상태</th>
+            <th>테스트 결과 및 이슈</th>
+            <th>다음 조치</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 10/4 A라인 완료 항목 -->
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-both">공통</span></td>
+            <td><span class="owner-badge owner-ui">UI</span></td>
+            <td>속도제어</td>
+            <td>전체 설비 속도 비율 설정</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>A라인과 동일하게 B라인에서도 적용 확인</td>
+            <td class="muted">-</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>안전/근접</td>
+            <td>갠트리 X축 안전 근접거리 DB 관리</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>전원 OFF 후에도 설정값 유지 확인 (DB 정상 동작)</td>
+            <td class="muted">-</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>와이어</td>
+            <td>와이어 교체 모드</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>정상 동작 확인</td>
+            <td class="muted">-</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>데이터</td>
+            <td>갠트리 limit 데이터 DB 최신화</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>DB 업데이트 완료</td>
+            <td class="muted">-</td>
+          </tr>
+
+          <!-- 드라이런 속도 배율 - A/B 구분 -->
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>속도제어</td>
+            <td>드라이런 속도 배율 설정</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>실제 동작 확인 완료 (UI + 로봇컨트롤러 모두 정상)</td>
+            <td class="muted">-</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>속도제어</td>
+            <td>드라이런 속도 배율 설정</td>
+            <td><span class="label label-partial">부분완료</span></td>
+            <td>UI 준비 완료, 로봇컨트롤러 구현 대기 중</td>
+            <td>로봇컨트롤러(RAPID) 구현 완료</td>
+          </tr>
+
+          <!-- 10/4 A라인 부분완료/개선필요 항목 -->
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>충돌검사</td>
+            <td>갠트리 이동 전 충돌 검사</td>
+            <td><span class="label label-defect">결함</span></td>
+            <td>❌ 설정된 안전 근접거리 이내임에도 진입 가능 (심각)</td>
+            <td>UI 충돌검사 로직 긴급 리뷰 및 수정</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-both">공통</span></td>
+            <td><span class="owner-badge owner-ui">UI</span></td>
+            <td>UI/표시</td>
+            <td>갠트리 수동 이동 UI 방향 및 제한 범위 표시</td>
+            <td><span class="label label-warn">개선필요</span></td>
+            <td>기능은 구현됨. 단, 알람창을 기존 UI와 같은 디자인 창으로 적용 필요 (A/B 공통)</td>
+            <td>알람창 UI 디자인 통일성 확보</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>속도제어</td>
+            <td>와이어, 갠트리, 로봇 이동 속도</td>
+            <td><span class="label label-partial">부분완료</span></td>
+            <td>UI 동작 확인 완료, 로봇 컨트롤러 측 검증 필요</td>
+            <td>로봇 컨트롤러에서 실제 동작 확인</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>용접조건</td>
+            <td>실시간 용접 조건 변경 (전압, 피딩)</td>
+            <td><span class="label label-partial">부분완료</span></td>
+            <td>UI 확인 완료, 로봇컨트롤러 및 용접기 확인 필요</td>
+            <td>로봇컨트롤러 + 용접기 연동 테스트</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>데이터</td>
+            <td>용접 데이터 임시저장 및 되돌리기</td>
+            <td><span class="label label-warn">개선필요</span></td>
+            <td>일괄변경은 확인. 임시저장 기능 미확인<br>용접 수동제어 시 두께/매크로/각장/선후행 입력 순서 무관하게 전체 입력 시 조회 가능해야 함</td>
+            <td>입력 로직 개선 (순서 무관 조회 구현)</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>에러처리</td>
+            <td>아크에러시 인근부재 최대높이 전달</td>
+            <td><span class="label label-hold">보류</span></td>
+            <td>에러 핸들링 통합 작업으로 10/9 진행 예정</td>
+            <td>10/9 에러 핸들링 집중 진행</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-a">A라인</span></td>
+            <td>설정</td>
+            <td>매크로 설정값 일괄 변경</td>
+            <td><span class="label label-warn">확인필요</span></td>
+            <td>테스트 진행 예정</td>
+            <td>기능 검증 및 결과 정리</td>
+          </tr>
+
+          <!-- 공통/B라인 항목 -->
+          <tr>
+            <td><span class="test-date d1003">10/3</span><span class="test-date d1004">10/4</span></td>
+            <td><span class="line-badge line-both">공통</span></td>
+            <td>실행/부팅</td>
+            <td>OP PC 부팅 시 운영SW 자동 실행</td>
+            <td><span class="label label-partial">부분완료</span></td>
+            <td>✅ 자동 실행 정상 동작 (10/3, 10/4 확인)<br>⚠️ 초기 화면 최대화 미적용<br>⚠️ UI 종료 버튼 필요 (우측 상단 X는 로봇 정상 종료 불가)</td>
+            <td>1. 초기 화면 최대화 설정 추가<br>2. A라인과 같이 B라인에도 정상 종료 버튼 추가</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>이동/리미트</td>
+            <td>이동 범위 초과 시 에러 처리</td>
+            <td><span class="label label-warn">개선필요</span></td>
+            <td>동작은 하나 알람 세분화 미흡</td>
+            <td>X/Y/Z/R축 및 로봇별 상세 알람 표시</td>
+          </tr>
+
+          <!-- 10/3 B라인 개선필요 항목 -->
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>이동/리미트</td>
+            <td>수동조작: 상대/절대 이동 모드 가시성</td>
+            <td><span class="label label-warn">개선필요</span></td>
+            <td>현재 모드 구분 불명확</td>
+            <td>상태바/버튼 하이라이트/토스트 추가</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>이동/리미트</td>
+            <td>r축 충돌 방지(y 연동 리미트)</td>
+            <td><span class="label label-warn">필요</span></td>
+            <td>y 위치에 따른 r축 가용범위 제한 필요</td>
+            <td>로봇 컨트롤러: y→r 소프트리미트 함수 설계</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>UI 알람</td>
+            <td>갠트리 접근 UI 알람 처리</td>
+            <td><span class="label label-warn">개선필요</span></td>
+            <td>접근/위반 상황 알람 미흡</td>
+            <td>임계값(주의/경고/위험) 알람 설계</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>속도/배율</td>
+            <td>데이터 값 입력 후 설정</td>
+            <td><span class="label label-warn">개선필요</span></td>
+            <td>입력 vs 설정 완료 구분 불명확</td>
+            <td>'설정' 상태 표시 추가 (배지/토스트)</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>에러처리</td>
+            <td>용접 진입/터치 에러 재시도</td>
+            <td><span class="label label-hold">보류</span></td>
+            <td>10/9 보류</td>
+            <td>정책 설계/핸들링 구체화 (10/9)</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>에러처리</td>
+            <td>시뮬레이션 vs 실제 상이</td>
+            <td><span class="label label-warn">분석필요</span></td>
+            <td>통신/동기화 오류 에러 핸들링 필요</td>
+            <td>SDK 예외 매핑·알람 설계 (10/9)</td>
+          </tr>
+
+          <!-- 10/3 B라인 완료 항목 -->
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>이동/리미트</td>
+            <td>수동조작: 방향/용어 표준화</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>왼/오, 위/아래, 포스트/통로, 시계/반시계</td>
+            <td class="muted">-</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>속도/배율</td>
+            <td>와이어 절단 모션 속도 설정</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>UI→RAPID 파라미터 반영 확인</td>
+            <td class="muted">-</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>속도/배율</td>
+            <td>갠트리 이동속도</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>UI 입력값 실제 동작 확인</td>
+            <td class="muted">-</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>속도/배율</td>
+            <td>로봇 이동속도</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>UI 입력값 실제 동작 확인</td>
+            <td class="muted">-</td>
+          </tr>
+          <tr>
+            <td><span class="test-date d1003">10/3</span></td>
+            <td><span class="line-badge line-b">B라인</span></td>
+            <td>와이어</td>
+            <td>개별 로봇 와이어 커팅</td>
+            <td><span class="label label-ok">완료</span></td>
+            <td>선택 로봇 단위 커팅 동작 확인</td>
+            <td class="muted">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">📊 테스트 요약</div>
+    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+      <h3 style="margin-top: 0; color: #1f2937;">주요 발견사항</h3>
+      <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+        <li><strong style="color: #ef4444;">🔴 긴급:</strong> 갠트리 충돌 검사 미작동 (안전거리 무시하고 진입 가능)</li>
+        <li><strong style="color: #f59e0b;">🟡 개선:</strong> UI 종료 버튼 추가 필요 (로봇 정상 종료 프로세스)</li>
+        <li><strong style="color: #f59e0b;">🟡 개선:</strong> 용접 데이터 입력 로직 개선 (순서 무관 조회)</li>
+        <li><strong style="color: #10b981;">🟢 양호:</strong> 드라이런, 속도 설정, DB 관리 등 핵심 기능 정상 동작</li>
+      </ul>
+    </div>
+
+    <div class="section-title">📅 향후 일정</div>
+    <div style="background: #fffbeb; padding: 20px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+      <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+        <li><strong>10/9:</strong> 에러 핸들링 집중 진행 (아크에러, 터치에러, SDK 통신 예외)</li>
+        <li><strong>긴급:</strong> 충돌 검사 로직 수정 및 검증</li>
+        <li><strong>단기:</strong> UI 개선 (종료 버튼, 디자인 통일성, 가시성)</li>
+        <li><strong>중기:</strong> 로봇 컨트롤러 연동 검증 (속도, 용접조건 실제 반영)</li>
+      </ul>
+    </div>
+
+    <p class="note">담당: SP 심태양 | 테스트 위치: 34bay 자동용접 B라인</p>
+    <p class="note">테스트 기간: 2024.10.03-10.04 | 다음 테스트: 2024.10.09 (에러핸들링)</p>
+  </main>
+</body>
+</html>
