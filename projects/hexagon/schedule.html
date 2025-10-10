@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>일정표 — 달력 포맷 (2025년 9월)</title>
+    <style>
+      :root{
+        --bg:#0f1115; --panel:#171a23; --grid:#23283a; --text:#e6e8ee; --muted:#a8b0bf;
+        --a:#4fc3f7; --b:#ffd166; --sp:#c792ea; --done:#2ecc71; --test:#3498db; --prog:#f1c40f; --hold:#9b59b6;
+      }
+      *{box-sizing:border-box}
+      body{margin:0; background:var(--bg); color:var(--text); font:14px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, Arial, sans-serif}
+      header{padding:24px 20px; background:linear-gradient(180deg,#151826,#121520)}
+      h1{margin:0 0 6px; font-size:20px}
+      .subtitle{color:var(--muted); font-size:13px}
+      main{max-width:1100px; margin:0 auto; padding:16px}
+      .legend{display:flex; gap:10px; flex-wrap:wrap; margin:8px 0 16px}
+      .chip{display:inline-flex; align-items:center; gap:6px; padding:2px 8px; border:1px solid var(--grid); border-radius:999px; font-size:12px; background:rgba(255,255,255,.02)}
+      .dot{width:8px; height:8px; border-radius:50%}
+      .dot.a{background:var(--a)} .dot.b{background:var(--b)} .dot.sp{background:var(--sp)}
+      .badge{padding:0 6px; border-radius:999px; font-size:11px; border:1px solid var(--grid); color:#dde3ee}
+      .bdone{background:rgba(46,204,113,.15); border-color:rgba(46,204,113,.35)}
+      .btest{background:rgba(52,152,219,.15); border-color:rgba(52,152,219,.35)}
+      .bprog{background:rgba(241,196,15,.15); border-color:rgba(241,196,15,.35)}
+      .bhold{background:rgba(155,89,182,.15); border-color:rgba(155,89,182,.35)}
+      .calendar{border:1px solid var(--grid); border-radius:10px; overflow:hidden; background:var(--panel)}
+      .row{display:grid; grid-template-columns: repeat(7, 1fr)}
+      .head{background:#1a1e29; border-bottom:1px solid var(--grid)}
+      .head div{padding:10px 12px; text-align:center; color:var(--muted); font-weight:600}
+      .cell{min-height:150px; border-right:1px solid var(--grid); border-bottom:1px solid var(--grid); padding:8px}
+      .cell:last-child{border-right:0}
+      .date{color:var(--muted); font-size:12px; display:flex; align-items:center; justify-content:space-between}
+      .events{margin-top:6px; display:flex; flex-direction:column; gap:6px}
+      .event{border:1px solid var(--grid); border-radius:8px; padding:6px 8px; background:rgba(255,255,255,.02)}
+      .event .title{font-weight:600}
+      .event .meta{color:var(--muted); font-size:12px; margin-top:2px}
+      .evt-a{box-shadow:inset 2px 0 0 var(--a)}
+      .evt-b{box-shadow:inset 2px 0 0 var(--b)}
+      .evt-sp{box-shadow:inset 2px 0 0 var(--sp)}
+      .status{float:right; margin-left:6px}
+      .weeknote{color:var(--muted); font-size:12px; margin-top:6px}
+      .sep{margin:16px 0 8px; color:var(--muted)}
+      @media (max-width:920px){ .cell{min-height:120px} }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>2025년 9월 일정표</h1>
+      <div class="subtitle">달력 포맷 · A LINE / B LINE / 설비(SP) 구분</div>
+    </header>
+    <main>
+      <div class="legend">
+        <span class="chip"><span class="dot a"></span>A LINE</span>
+        <span class="chip"><span class="dot b"></span>B LINE</span>
+        <span class="chip"><span class="dot sp"></span>설비·공통(SP)</span>
+        <span class="chip"><span class="badge bprog">진행</span> 진행(진행)</span>
+        <span class="chip"><span class="badge btest">테스트</span> 테스트(테스트)</span>
+        <span class="chip"><span class="badge bdone">완료</span> 완료(완료)</span>
+        <span class="chip"><span class="badge bhold">협의/보류</span> 협의/보류</span>
+      </div>
+      <style>
+        .group{border:1px solid var(--grid); border-radius:8px; padding:6px 8px; background:rgba(255,255,255,.02); margin-top:6px}
+        .ghead{display:flex; align-items:center; gap:8px; color:var(--muted); font-weight:700; font-size:12px; margin-bottom:4px}
+        .gdot{width:10px; height:10px; border-radius:50%}
+        .ga{box-shadow:inset 2px 0 0 var(--a)} .gb{box-shadow:inset 2px 0 0 var(--b)} .gsp{box-shadow:inset 2px 0 0 var(--sp)}
+      </style>
+
+      <!-- 2025-09 달력: 일(일)~토(토) -->
+      <div class="calendar">
+        <div class="row head">
+          <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+        </div>
+        <!-- 1주차 (8월 말 비우고 9/1 월부터) -->
+        <div class="row">
+          <div class="cell"><div class="date">8/31</div></div>
+          <div class="cell"><div class="date">9/1</div></div>
+          <div class="cell"><div class="date">9/2</div></div>
+          <div class="cell"><div class="date">9/3</div></div>
+          <div class="cell"><div class="date">9/4</div></div>
+          <div class="cell"><div class="date">9/5</div></div>
+          <div class="cell"><div class="date">9/6</div></div>
+        </div>
+
+        <!-- 2주차 7~13 -->
+        <div class="row">
+          <div class="cell">
+            <div class="date">9/7</div>
+            <div class="events">
+              <div class="event evt-a">
+                <span class="status badge bprog">진행</span>
+                <div class="title">터치 보정 변수 추가</div>
+                <div class="meta">A LINE</div>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><div class="date">9/8</div></div>
+          <div class="cell"><div class="date">9/9</div></div>
+          <div class="cell"><div class="date">9/10</div></div>
+          <div class="cell"><div class="date">9/11</div></div>
+          <div class="cell"><div class="date">9/12</div></div>
+          <div class="cell"><div class="date">9/13</div></div>
+        </div>
+
+        <!-- 3주차 14~20 -->
+        <div class="row">
+          <div class="cell"><div class="date">9/14</div></div>
+          <div class="cell">
+            <div class="date">9/15</div>
+            <div class="events">
+              <div class="event evt-b">
+                <span class="status badge bprog">진행</span>
+                <div class="title">DRY RUN 준비</div>
+                <div class="meta">B LINE</div>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><div class="date">9/16</div></div>
+          <div class="cell"><div class="date">9/17</div></div>
+          <div class="cell"><div class="date">9/18</div></div>
+          <div class="cell"><div class="date">9/19</div></div>
+          <div class="cell">
+            <div class="date">9/20</div>
+            <div class="weeknote">주간: 터치 보정, 충돌방지 확인, 초기시동 간소화 등</div>
+          </div>
+        </div>
+
+        <!-- 4주차 21~27 -->
+        <div class="row">
+          <div class="cell">
+            <div class="date">9/21</div>
+            <div class="events">
+              <div class="group ga">
+                <div class="ghead"><span class="gdot a"></span>A LINE — 주간 작업(21~27)</div>
+                <div class="event evt-a"><span class="status badge bprog">진행</span><div class="title">터치 모션 동작 방식 UI 표현 개선</div></div>
+                <div class="event evt-a"><span class="status badge bprog">진행</span><div class="title">쇼크 센서 활성 시 우회 기능 구현</div></div>
+              </div>
+              <div class="group gb">
+                <div class="ghead"><span class="gdot b"></span>B LINE — 주간 작업(21~27)</div>
+                <div class="event evt-b"><span class="status badge bprog">진행</span><div class="title">실시간 용접 제어 구현</div></div>
+                <div class="event evt-b"><span class="status badge bprog">진행</span><div class="title">UI 그림 변경 및 설명 보완</div></div>
+              </div>
+              <div class="group gsp">
+                <div class="ghead"><span class="gdot sp"></span>SP · 공통</div>
+                <div class="event evt-sp"><span class="status badge bdone">완료</span><div class="title">갠트리 이동 전 충돌 점검</div><div class="meta">완료</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><div class="date">9/22</div></div>
+          <div class="cell">
+            <div class="date">9/23</div>
+            <div class="events">
+              <div class="event evt-a">
+                <span class="status badge bdone">완료</span>
+                <div class="title">아크 에러 동작 확인</div>
+                <div class="meta">A LINE · 반복 테스트</div>
+              </div>
+              <div class="event evt-a">
+                <span class="status badge bdone">완료</span>
+                <div class="title">동시 용접 테스트(244)</div>
+                <div class="meta">A LINE</div>
+              </div>
+              <div class="event evt-sp">
+                <span class="status badge bdone">완료</span>
+                <div class="title">쇼크센서 신규 교체</div>
+                <div class="meta">B1-2, A3 · SP</div>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><div class="date">9/24</div></div>
+          <div class="cell"><div class="date">9/25</div></div>
+          <div class="cell">
+            <div class="date">9/26</div>
+            <div class="events">
+              <div class="event evt-a">
+                <span class="status badge bdone">완료</span>
+                <div class="title">아크센싱(심 트레킹) 적용</div>
+                <div class="meta">A LINE</div>
+              </div>
+              <div class="event evt-b">
+                <span class="status badge bdone">완료</span>
+                <div class="title">UI 갠트리 이동방향/범위 표시</div>
+                <div class="meta">B LINE</div>
+              </div>
+              <div class="event evt-b">
+                <span class="status badge bdone">완료</span>
+                <div class="title">로봇속도 배율 % 표시</div>
+                <div class="meta">B LINE</div>
+              </div>
+            </div>
+          </div>
+          <div class="cell">
+            <div class="date">9/27</div>
+            <div class="events">
+              <div class="event evt-a">
+                <span class="status badge bdone">완료</span>
+                <div class="title">부재 높이별 용접 동작 최적화</div>
+                <div class="meta">A LINE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5주차 28~30 + 10월 1~4 -->
+        <div class="row">
+          <div class="cell">
+            <div class="date">9/28</div>
+            <div class="events">
+              <div class="group ga">
+                <div class="ghead"><span class="gdot a"></span>A LINE — 주간(28~)</div>
+                <div class="event evt-a"><span class="status badge bhold">협의/보류</span><div class="title">일정 협의 필요</div></div>
+              </div>
+              <div class="group gb">
+                <div class="ghead"><span class="gdot b"></span>B LINE — 주간(28~)</div>
+                <div class="event evt-b"><span class="status badge bprog">진행</span><div class="title">드라이런 대응</div></div>
+                <div class="event evt-b"><span class="status badge bprog">진행</span><div class="title">실 부재 용접 대응</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="cell"><div class="date">9/29</div></div>
+          <div class="cell"><div class="date">9/30</div></div>
+          <div class="cell"><div class="date">10/1</div></div>
+          <div class="cell"><div class="date">10/2</div></div>
+          <div class="cell"><div class="date">10/3</div></div>
+          <div class="cell"><div class="date">10/4</div></div>
+        </div>
+      </div>
+
+      <p class="sep">참고: 날짜가 명시되지 않은 항목은 주간 메모 또는 담당 칸에 남겨 주세요. 필요한 경우 정확한 일자 정보를 보내주시면 해당 날짜 칸으로 이동 배치하겠습니다.</p>
+    </main>
+  </body>
+  </html>
+
