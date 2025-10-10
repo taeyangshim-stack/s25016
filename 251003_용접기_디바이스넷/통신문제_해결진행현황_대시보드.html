@@ -75,6 +75,28 @@
             transform: translateY(0);
         }
 
+        .links-section {
+            background: #ffffff;
+            padding: 16px 20px;
+            text-align: center;
+            border-bottom: 1px solid #eef2f5;
+        }
+        .btn-link {
+            display: inline-block;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #2980b9 0%, #1f5fa1 100%);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            text-decoration: none;
+            margin: 4px 6px;
+            box-shadow: 0 5px 15px rgba(41, 128, 185, 0.25);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .btn-link:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(41, 128, 185, 0.35); }
+        .btn-link:active { transform: translateY(0); }
+
         .copy-status {
             margin-top: 15px;
             font-size: 0.95em;
@@ -275,6 +297,10 @@
                 📋 텍스트 복사하기
             </button>
             <div class="copy-status" id="copyStatus"></div>
+        </div>
+
+        <div class="links-section">
+            <a class="btn-link" href="251009_예상원인점검_이더넷통신.html">📎 251009 예상 원인 점검(이더넷)</a>
         </div>
 
         <div class="content">

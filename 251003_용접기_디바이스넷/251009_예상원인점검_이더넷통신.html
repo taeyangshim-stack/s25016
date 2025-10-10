@@ -147,7 +147,6 @@
             <strong>절차</strong>
             <ul>
               <li>X5↔용접기 <strong>직결</strong> / 허브 경유 <strong>단일</strong> / 허브 경유 <strong>다중</strong> 토폴로지 각각 테스트.</li>
-              <li>링크 속도/듀플렉스 <strong>강제 고정</strong> 조합 점검(100M/Full 등).</li>
               <li>여타 트래픽 차단(브로드캐스트/관리 트래픽 최소화) 후 재시험.</li>
               <li>각 시나리오별 용접 수행 → 로봇/용접기 로그 비교.</li>
             </ul>
@@ -200,23 +199,72 @@
     <section>
       <h2>결론(10/8 기준)</h2>
       <div class="card">
-        <p class="ok">이더넷 경로 관련 4개 가설은 <strong>모두 배제</strong>되었습니다.</p>
-        <p>동일 오류가 테스트 구성과 무관하게 재현되어, <strong>통신 물리/토폴로지 요인 가능성은 낮음</strong>으로 판단합니다. 현재 포커스는 <strong>용접 제어 파라미터/모드 설정(DeviceNet 전환 포함)</strong>에 맞추어 진행 중입니다.</p>
+        <p>현재 <strong>이더넷 조건만으로는</strong> 통신 이상 원인 판단 및 안정화에 <strong>한계</strong>가 있습니다.</p>
+        <p class="ok">이에 따라 <strong>DeviceNet</strong>으로 통신 방식을 전환하여 안정성을 확보하는 방향으로 진행합니다.</p>
+        <ul>
+          <li>결정론적 폴링 기반 I/O 교환으로 <strong>타이밍 일관성</strong> 우수.</li>
+          <li><strong>노이즈 내성</strong> 및 케이블링 규격이 용접 환경에 유리.</li>
+          <li>용접 파라미터/스케줄의 <strong>I/O 매핑 명확</strong>·진단 용이.</li>
+          <li>다중 장치 구성 시 <strong>충돌/브로드캐스트 영향 최소</strong>.</li>
+        </ul>
       </div>
     </section>
 
-    <section class="callout">
-      <strong>다음 단계 제안</strong>
-      <ul>
-        <li>본 초안 승인 후, 대시보드에 본 문서 링크를 추가하고 관련 타임라인/체크리스트 섹션에 요약 반영.</li>
-        <li>10/9 현장 합동 점검 결과(용접 모드, WFS/전압/스케줄 적용 상태) 추기록.</li>
-      </ul>
+    <section>
+      <h2>업데이트</h2>
+      <div class="card">
+        <p><strong>10/9</strong> · DeviceNet 통신 및 용접 조건 확인 <span class="ok">성공</span></p>
+        <ul>
+          <li>로봇 ↔ 용접기 DeviceNet 링크 정상, 용접 조건 적용 확인.</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>10/10 예정</strong></p>
+        <ul>
+          <li>DeviceNet <strong>하드와이어링 배선</strong> 확인 및 정비.</li>
+          <li>ABB 로봇 <strong>DeviceNet 타입 리빌딩</strong> 실시.</li>
+          <li>DeviceNet 관련 <strong>ArcWare 코딩</strong> 수정.</li>
+          <li>B라인 <strong>용접 테스트</strong> 실시.</li>
+        </ul>
+      </div>
     </section>
 
-    <footer>
-      문서 버전: 0.1-draft · 작성: 2024-10-09 · 파일: 251009_예상원인점검_이더넷통신.html
-    </footer>
+    <section>
+      <h2>구성 시나리오(도면)</h2>
+      <div class="card">
+        <figure>
+          <img src="img/251009_구성_x5직결_LAN_LAN3.jpg" alt="X5 직결 구성: LAN/LAN3 조건" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>X5 직결 (각각 LAN 조건, LAN3 조건)</figcaption>
+        </figure>
+        <figure>
+          <img src="img/251009_구성_허브단열_LAN_LAN3.jpg" alt="허브 경유 단열: LAN/LAN3 조건" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>허브 경유 단열 (각각 LAN 조건, LAN3 조건)</figcaption>
+        </figure>
+        <figure>
+          <img src="img/251009_구성_허브복열_LAN_LAN3.jpg" alt="허브 경유 복열: LAN/LAN3 조건" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>허브 경유 복열 (각각 LAN 조건, LAN3 조건)</figcaption>
+        </figure>
+        <figure>
+          <img src="img/251009_케이블_덕트분리.jpg" alt="케이블 확인 및 덕트 내 분리" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>케이블 확인 및 덕트 내 분리</figcaption>
+        </figure>
+        <p style="color:#7f8c8d;margin-top:8px;">이미지는 <code>251003_용접기_디바이스넷/img/</code> 폴더에 업로드해 주세요. 파일명이 다르면 <code>src</code> 경로만 맞춰주면 됩니다.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>참고자료</h2>
+      <div class="card">
+        <figure>
+          <img src="img/A라인구성.jpg" alt="A라인 네트워크 구성도" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>A라인 네트워크 구성도</figcaption>
+        </figure>
+        <figure>
+          <img src="img/B라인구성.jpg" alt="B라인 네트워크 구성도" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>B라인 네트워크 구성도</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    
   </main>
 </body>
 </html>
-
