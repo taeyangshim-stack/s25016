@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROBOT↔UI 통합 테스트 대시보드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 5px solid;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.complete {
+            border-left-color: #2ecc71;
+        }
+
+        .stat-card.warning {
+            border-left-color: #f39c12;
+        }
+
+        .stat-card.pending {
+            border-left-color: #95a5a6;
+        }
+
+        .stat-card h3 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: #3498db;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .card a {
+            display: block;
+            color: #3498db;
+            text-decoration: none;
+            padding: 10px 15px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .card a:hover {
+            background: #3498db;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-complete {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-pending {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .category-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .category-list li {
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-list li:last-child {
+            border-bottom: none;
+        }
+
+        .back-link {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 ROBOT↔UI 통합 테스트</h1>
+            <p>갠트리 로봇 시스템 UI 통합 검증 프로젝트</p>
+        </div>
+
+        <div class="content">
+            <!-- 테스트 통계 -->
+            <div class="stats-grid">
+                <div class="stat-card complete">
+                    <h3>13</h3>
+                    <p>✅ 완료</p>
+                </div>
+                <div class="stat-card warning">
+                    <h3>11</h3>
+                    <p>⚠️ 개선 필요</p>
+                </div>
+                <div class="stat-card pending">
+                    <h3>7</h3>
+                    <p>⏸️ 보류</p>
+                </div>
+                <div class="stat-card">
+                    <h3>31</h3>
+                    <p>📊 총 항목</p>
+                </div>
+            </div>
+
+            <!-- 테스트 결과 보고서 -->
+            <div class="section">
+                <h2><span class="emoji">📄</span> 테스트 결과 보고서</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>통합 테스트 결과</h3>
+                        <a href="test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html">📊 251004_통합결과.html</a>
+                        <a href="test-results/251003_에이전트_ROBOT-UI_테스트_1차결과.html">📋 251003_1차결과.html</a>
+                    </div>
+                    <div class="card">
+                        <h3>고객 발송 자료</h3>
+                        <a href="test-results/251004_고객발송_테스트결과.html">📧 251004_고객발송.html</a>
+                        <a href="test-results/251004_테스트결과_메신저보고.txt">💬 메신저 보고.txt</a>
+                    </div>
+                    <div class="card">
+                        <h3>백업 파일</h3>
+                        <a href="test-results/251004_에이전트_ROBOT-UI_테스트_통합결과_v1.html">📦 통합결과_v1.html</a>
+                        <a href="test-results/251004_에이전트_ROBOT-UI_테스트_통합결과_백업_20251004_164941.html">💾 백업_164941.html</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 테스트 문서 -->
+            <div class="section">
+                <h2><span class="emoji">📚</span> 테스트 문서</h2>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>테스트 계획</h3>
+                        <a href="docs/251003_에이전트_ROBOT-UI_테스트체크리스트.md">✅ 테스트 체크리스트</a>
+                    </div>
+                    <div class="card">
+                        <h3>이슈 분석</h3>
+                        <a href="docs/251003_에이전트_ROBOT-UI_테스트이슈_분석.md">🔍 테스트 이슈 분석</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 테스트 카테고리 -->
+            <div class="section">
+                <h2><span class="emoji">📁</span> 테스트 로그 (카테고리별)</h2>
+                <div class="card">
+                    <ul class="category-list">
+                        <li>
+                            <span>🎨 UI 가시성</span>
+                            <span class="badge badge-complete">3개 항목</span>
+                        </li>
+                        <li>
+                            <span>🔔 UI 알람</span>
+                            <span class="badge badge-warning">2개 항목</span>
+                        </li>
+                        <li>
+                            <span>⚡ 속도 배율</span>
+                            <span class="badge badge-complete">4개 항목</span>
+                        </li>
+                        <li>
+                            <span>🤖 시뮬레이션 vs 실기</span>
+                            <span class="badge badge-warning">3개 항목</span>
+                        </li>
+                        <li>
+                            <span>🚀 실행/부팅</span>
+                            <span class="badge badge-complete">3개 항목</span>
+                        </li>
+                        <li>
+                            <span>🛡️ 안전 근접</span>
+                            <span class="badge badge-complete">3개 항목</span>
+                        </li>
+                        <li>
+                            <span>❌ 에러 처리</span>
+                            <span class="badge badge-warning">4개 항목</span>
+                        </li>
+                        <li>
+                            <span>🔧 와이어</span>
+                            <span class="badge badge-complete">3개 항목</span>
+                        </li>
+                        <li>
+                            <span>📐 이동 리미트</span>
+                            <span class="badge badge-complete">3개 항목</span>
+                        </li>
+                        <li>
+                            <span>⚠️ 충돌 검사</span>
+                            <span class="badge badge-warning">3개 항목</span>
+                        </li>
+                    </ul>
+                    <div style="margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 8px;">
+                        <p style="color: #2980b9; margin: 0;">
+                            📂 상세 로그는 <a href="test-logs/251003_테스트로그_1차결과/" style="color: #3498db; font-weight: bold;">test-logs/251003_테스트로그_1차결과/</a> 폴더에서 확인하세요.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 다음 일정 -->
+            <div class="section">
+                <h2><span class="emoji">📅</span> 다음 일정</h2>
+                <div class="card">
+                    <h3>2024-10-11 (예정)</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 10px; background: #e8f4f8; border-radius: 5px; margin-bottom: 10px;">
+                            🎨 UI 알람 크기 및 위치 개선
+                        </li>
+                        <li style="padding: 10px; background: #fff3cd; border-radius: 5px; margin-bottom: 10px;">
+                            ⚡ 속도 배율 실시간 반영 개선
+                        </li>
+                        <li style="padding: 10px; background: #ffe6e6; border-radius: 5px; margin-bottom: 10px;">
+                            ❌ 에러 핸들링 강화
+                        </li>
+                        <li style="padding: 10px; background: #e8f4f8; border-radius: 5px;">
+                            🧪 2차 통합 테스트 실행
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="/index.html">← S25016 메인 대시보드로 돌아가기</a>
+        </div>
+    </div>
+</body>
+</html>
