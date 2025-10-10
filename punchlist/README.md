@@ -63,68 +63,64 @@
 - 파일 첨부
 - 이메일 알림
 
-## 폴더 구조
+## 📁 폴더 구조
 
 ```
 punchlist/
-├── index.html                  # 메인 대시보드
+├── index.html                      # 메인 대시보드
+├── QUICK_START.md                  # 빠른 시작 가이드 ⭐
+├── README.md                       # 이 파일
+│
 ├── pages/
-│   ├── create.html             # 이슈 생성
-│   ├── list.html               # 이슈 목록
-│   └── detail.html             # 이슈 상세
+│   ├── create.html                 # 이슈 생성 (템플릿 지원) ✨
+│   ├── create-basic.html           # 기본 이슈 생성 (백업)
+│   ├── list.html                   # 이슈 목록
+│   └── detail.html                 # 이슈 상세
+│
 ├── scripts/
-│   ├── punchlist.js            # 클라이언트 스크립트
-│   └── GoogleAppsScript.js     # Google Apps Script
-├── data/
-│   └── (Google Sheets 연동)
-├── templates/
-│   └── issue-template.json     # 이슈 템플릿
-└── README.md                   (이 파일)
+│   ├── punchlist.js                # 클라이언트 스크립트
+│   ├── config-loader.js            # 설정 로더 (확장성) ✨
+│   └── GoogleAppsScript.js         # Google Apps Script 백엔드
+│
+├── config/                         # 설정 파일 (확장성) ✨
+│   ├── categories.json             # 분류 체계 정의
+│   └── custom-fields.json          # 커스텀 필드 정의
+│
+├── templates/special-cases/        # 특수 케이스 템플릿 ✨
+│   ├── vendor-issue-template.json  # 외주업체 이슈
+│   ├── emergency-template.json     # 긴급 대응
+│   ├── inspection-template.json    # 정기 점검
+│   └── quality-issue-template.json # 품질 이슈
+│
+├── docs/                           # 문서 ✨
+│   ├── SETUP_GUIDE.md              # 상세 설정 가이드
+│   ├── EXTENSIBILITY_DESIGN.md     # 확장성 설계 문서
+│   └── EXTENSIBILITY_USAGE.md      # 확장 기능 사용법
+│
+├── plugins/                        # 플러그인 (향후)
+└── migrations/                     # 마이그레이션 스크립트 (향후)
 ```
 
-## 사용법
+✨ = 확장성 기능
 
-### 1. Google Sheets 설정
+## 🚀 빠른 시작
 
-1. **Google Sheets 생성**
-   - 새 스프레드시트 생성
-   - 시트 ID 복사 (URL에서 확인)
+**5분 안에 시작하기**: [QUICK_START.md](QUICK_START.md) 참조
 
-2. **Apps Script 설정**
-   ```
-   확장 프로그램 > Apps Script
-   ```
+### 기본 설정 순서
 
-3. **코드 붙여넣기**
-   - `scripts/GoogleAppsScript.js` 내용 복사
-   - Apps Script 에디터에 붙여넣기
-   - `SHEET_ID` 값을 실제 시트 ID로 변경
-
-4. **초기 설정 실행**
-   ```javascript
-   // Apps Script에서 실행
-   setupSheet()
-   ```
-
-5. **웹 앱 배포**
-   ```
-   배포 > 새 배포
-   유형: 웹 앱
-   액세스 권한: 모든 사용자
-   배포 URL 복사
-   ```
-
-6. **클라이언트 설정**
-   - `scripts/punchlist.js` 파일 열기
-   - `SCRIPT_URL` 값을 배포 URL로 변경
-
-### 2. 로컬 서버 실행
+1. **Google Sheets 생성 및 시트 ID 복사**
+2. **Google Apps Script 설정 및 배포**
+3. **클라이언트 설정 (SCRIPT_URL 업데이트)**
+4. **로컬 서버 실행 및 테스트**
 
 ```bash
 python3 -m http.server 8000
 ```
 
 브라우저: http://localhost:8000/punchlist/
+
+**상세 가이드**: [docs/SETUP_GUIDE.md](docs/SETUP_GUIDE.md)
 
 ### 3. 이슈 등록
 
@@ -305,6 +301,57 @@ python3 -m http.server 8000
 - **Email**: Gmail API (via Apps Script)
 - **공통 자산**: S25016 Shared Assets
 
+## ✨ 확장 기능 (NEW!)
+
+### 템플릿 시스템
+
+프로젝트 특성에 맞는 4종의 템플릿 제공:
+
+1. **🏢 외주업체 이슈**: ABB, Lincoln Electric 등 외주업체 작업 관리
+2. **🚨 긴급 대응**: 긴급 이슈 빠른 등록 및 에스컬레이션
+3. **🔍 정기 점검**: 일일/주간/월간/연간 점검 관리
+4. **⚠️ 품질 이슈**: 불량률 관리 및 5Why 분석
+
+### 커스텀 필드 시스템
+
+22개의 추가 필드를 조건부로 표시:
+- 비용 (예상/실제), 외주업체 정보
+- 장비 정보 (시리얼번호, 모델명)
+- 안전 (위험도, 조치사항)
+- 품질 (불량률, 검사 결과)
+- 고객 (요청번호, 클레임, 영향도)
+- 생산 (가동중단 시간, 손실량)
+
+### 확장 가능한 분류 체계
+
+JSON 설정으로 쉽게 분류 추가:
+- 기계/전기/제어 + DeviceNet 서브카테고리
+- 아이콘, 색상, 키워드 커스터마이징
+- 코드 수정 없이 확장 가능
+
+**사용법**: [docs/EXTENSIBILITY_USAGE.md](docs/EXTENSIBILITY_USAGE.md)
+
+---
+
+## 📊 주요 기능 요약
+
+| 기능 | 설명 | 상태 |
+|------|------|------|
+| 이슈 등록/수정/삭제 | CRUD 기본 기능 | ✅ |
+| 템플릿 시스템 | 4종 특수 케이스 템플릿 | ✅ |
+| 커스텀 필드 | 22개 확장 필드 | ✅ |
+| 분류 체계 | JSON 기반 동적 분류 | ✅ |
+| 필터링/검색 | 다중 조건 필터 | ✅ |
+| 통계 대시보드 | 실시간 통계 | ✅ |
+| Google Sheets 연동 | 클라우드 데이터베이스 | ✅ |
+| 이메일 알림 | 자동 알림 발송 | ✅ |
+| 댓글 시스템 | 이슈 커뮤니케이션 | ✅ |
+| 파일 첨부 | 파일 첨부 기능 | 🔜 |
+| Slack 알림 | Slack 통합 | 🔜 |
+| PDF 내보내기 | 리포트 생성 | 🔜 |
+
+---
+
 ## 담당자 정보
 
 - **프로젝트**: S25016
@@ -314,3 +361,8 @@ python3 -m http.server 8000
 ## 문의
 
 이슈 또는 개선 사항이 있으시면 펀치리스트에 등록해주세요.
+
+---
+
+**버전**: 2.0 (확장성 지원)
+**최종 업데이트**: 2024-10-10

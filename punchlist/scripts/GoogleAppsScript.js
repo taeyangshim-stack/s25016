@@ -1,14 +1,16 @@
 /**
- * S25016 펀치리스트 관리 시스템
+ * S25016 펀치리스트 관리 시스템 (확장성 지원)
  * Google Apps Script for Google Sheets Integration
  *
  * 설정 방법:
  * 1. Google Sheets 생성
  * 2. 확장 프로그램 > Apps Script 열기
  * 3. 이 코드 붙여넣기
- * 4. 배포 > 새 배포 > 웹 앱으로 배포
- * 5. 액세스 권한: "모든 사용자"
- * 6. 배포 URL을 punchlist.js의 SCRIPT_URL에 설정
+ * 4. SHEET_ID를 실제 시트 ID로 변경
+ * 5. setupSheet() 함수 실행 (초기화)
+ * 6. 배포 > 새 배포 > 웹 앱으로 배포
+ * 7. 액세스 권한: "모든 사용자"
+ * 8. 배포 URL을 punchlist.js의 SCRIPT_URL에 설정
  */
 
 // 스프레드시트 설정
@@ -93,7 +95,10 @@ function createIssue(data) {
     JSON.stringify(data.attachments || []),
     JSON.stringify(data.comments || []),
     timestamp,
-    timestamp
+    timestamp,
+    // 확장성 필드
+    JSON.stringify(data.customFields || {}),  // customFields 추가
+    data.templateId || ''  // templateId 추가
   ];
 
   sheet.appendRow(row);
@@ -134,6 +139,9 @@ function updateIssue(data) {
       sheet.getRange(i + 1, 17).setValue(JSON.stringify(data.attachments || []));
       sheet.getRange(i + 1, 18).setValue(JSON.stringify(data.comments || []));
       sheet.getRange(i + 1, 20).setValue(timestamp);
+      // 확장성 필드 업데이트
+      sheet.getRange(i + 1, 21).setValue(JSON.stringify(data.customFields || {}));
+      sheet.getRange(i + 1, 22).setValue(data.templateId || '');
 
       // 이메일 알림 발송
       sendEmailNotification('update', data);
@@ -179,27 +187,32 @@ function getAllIssues() {
   const issues = [];
 
   for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+
     issues.push({
-      id: values[i][0],
-      title: values[i][1],
-      category: values[i][2],
-      subcategory: values[i][3],
-      priority: values[i][4],
-      status: values[i][5],
-      description: values[i][6],
-      cause: values[i][7],
-      action_plan: values[i][8],
-      action_result: values[i][9],
-      owner: values[i][10],
-      collaborators: values[i][11],
-      approver: values[i][12],
-      request_date: values[i][13],
-      target_date: values[i][14],
-      complete_date: values[i][15],
-      attachments: JSON.parse(values[i][16] || '[]'),
-      comments: JSON.parse(values[i][17] || '[]'),
-      created_at: values[i][18],
-      updated_at: values[i][19]
+      id: row[0],
+      title: row[1],
+      category: row[2],
+      subcategory: row[3],
+      priority: row[4],
+      status: row[5],
+      description: row[6],
+      cause: row[7],
+      action_plan: row[8],
+      action_result: row[9],
+      owner: row[10],
+      collaborators: row[11],
+      approver: row[12],
+      request_date: row[13],
+      target_date: row[14],
+      complete_date: row[15],
+      attachments: safeJSONParse(row[16], []),
+      comments: safeJSONParse(row[17], []),
+      created_at: row[18],
+      updated_at: row[19],
+      // 확장성 필드
+      customFields: safeJSONParse(row[20], {}),
+      templateId: row[21] || ''
     });
   }
 
@@ -216,27 +229,32 @@ function getIssueById(id) {
 
   for (let i = 1; i < values.length; i++) {
     if (values[i][0] === id) {
+      const row = values[i];
+
       const issue = {
-        id: values[i][0],
-        title: values[i][1],
-        category: values[i][2],
-        subcategory: values[i][3],
-        priority: values[i][4],
-        status: values[i][5],
-        description: values[i][6],
-        cause: values[i][7],
-        action_plan: values[i][8],
-        action_result: values[i][9],
-        owner: values[i][10],
-        collaborators: values[i][11],
-        approver: values[i][12],
-        request_date: values[i][13],
-        target_date: values[i][14],
-        complete_date: values[i][15],
-        attachments: JSON.parse(values[i][16] || '[]'),
-        comments: JSON.parse(values[i][17] || '[]'),
-        created_at: values[i][18],
-        updated_at: values[i][19]
+        id: row[0],
+        title: row[1],
+        category: row[2],
+        subcategory: row[3],
+        priority: row[4],
+        status: row[5],
+        description: row[6],
+        cause: row[7],
+        action_plan: row[8],
+        action_result: row[9],
+        owner: row[10],
+        collaborators: row[11],
+        approver: row[12],
+        request_date: row[13],
+        target_date: row[14],
+        complete_date: row[15],
+        attachments: safeJSONParse(row[16], []),
+        comments: safeJSONParse(row[17], []),
+        created_at: row[18],
+        updated_at: row[19],
+        // 확장성 필드
+        customFields: safeJSONParse(row[20], {}),
+        templateId: row[21] || ''
       };
 
       return ContentService.createTextOutput(
@@ -258,7 +276,7 @@ function addComment(issueId, comment) {
 
   for (let i = 1; i < values.length; i++) {
     if (values[i][0] === issueId) {
-      const comments = JSON.parse(values[i][17] || '[]');
+      const comments = safeJSONParse(values[i][17], []);
       comments.push({
         author: comment.author,
         text: comment.text,
@@ -279,13 +297,28 @@ function addComment(issueId, comment) {
   ).setMimeType(ContentService.MimeType.JSON);
 }
 
+// 안전한 JSON 파싱 (에러 방지)
+function safeJSONParse(str, defaultValue) {
+  try {
+    if (!str || str === '') {
+      return defaultValue;
+    }
+    return JSON.parse(str);
+  } catch(e) {
+    Logger.log('JSON parse error: ' + e.toString());
+    return defaultValue;
+  }
+}
+
 // 이메일 알림 발송
 function sendEmailNotification(action, data) {
   // 담당자 이메일 설정 (실제 이메일로 변경 필요)
   const emails = {
     '심태양': 'taeyangshim@example.com',
     '김철수': 'chulsookim@example.com',
-    '박영희': 'youngheepark@example.com'
+    '박영희': 'youngheepark@example.com',
+    '이영수': 'youngsoolee@example.com',
+    '최민수': 'minsuchoi@example.com'
   };
 
   const ownerEmail = emails[data.owner];
@@ -294,34 +327,48 @@ function sendEmailNotification(action, data) {
   let subject, body;
 
   if (action === 'create') {
-    subject = `[S25016] 새 이슈 등록: ${data.title}`;
+    // 템플릿 정보 추가
+    const templateInfo = data.templateId ? `\n템플릿: ${data.templateId}` : '';
+
+    subject = `[S25016 펀치리스트] 새 이슈 등록: ${data.title}`;
     body = `
-      새로운 이슈가 등록되었습니다.
+새로운 이슈가 등록되었습니다.
 
-      이슈 ID: ${data.id}
-      제목: ${data.title}
-      분류: ${data.category} > ${data.subcategory}
-      우선순위: ${data.priority}
-      담당자: ${data.owner}
-      목표일: ${data.target_date}
+이슈 ID: ${data.id}
+제목: ${data.title}
+분류: ${data.category} > ${data.subcategory}
+우선순위: ${data.priority}
+담당자: ${data.owner}${templateInfo}
+요청일: ${data.request_date}
+목표일: ${data.target_date}
 
-      ${data.description}
+[문제 상황]
+${data.description}
+
+---
+펀치리스트 확인: http://localhost:8000/punchlist/index.html
+이슈 상세: http://localhost:8000/punchlist/pages/detail.html?id=${data.id}
     `;
   } else if (action === 'update') {
-    subject = `[S25016] 이슈 업데이트: ${data.title}`;
+    subject = `[S25016 펀치리스트] 이슈 업데이트: ${data.title}`;
     body = `
-      이슈가 업데이트되었습니다.
+이슈가 업데이트되었습니다.
 
-      이슈 ID: ${data.id}
-      제목: ${data.title}
-      상태: ${data.status}
+이슈 ID: ${data.id}
+제목: ${data.title}
+상태: ${data.status}
+우선순위: ${data.priority}
 
-      ${data.action_result}
+${data.action_result ? '[조치 결과]\n' + data.action_result : ''}
+
+---
+이슈 상세: http://localhost:8000/punchlist/pages/detail.html?id=${data.id}
     `;
   }
 
   try {
     MailApp.sendEmail(ownerEmail, subject, body);
+    Logger.log('Email sent to: ' + ownerEmail);
   } catch(e) {
     Logger.log('Email send failed: ' + e.toString());
   }
@@ -334,20 +381,136 @@ function setupSheet() {
 
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-
-    const headers = [
-      'ID', '제목', '분류', '세부분류', '우선순위', '상태',
-      '문제상황', '원인분석', '조치계획', '조치결과',
-      '담당자', '협의자', '승인자',
-      '요청일', '목표일', '완료일',
-      '첨부파일', '댓글',
-      '생성일시', '수정일시'
-    ];
-
-    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
-    sheet.setFrozenRows(1);
-
-    Logger.log('Sheet setup completed');
   }
+
+  const headers = [
+    'ID', '제목', '분류', '세부분류', '우선순위', '상태',
+    '문제상황', '원인분석', '조치계획', '조치결과',
+    '담당자', '협의자', '승인자',
+    '요청일', '목표일', '완료일',
+    '첨부파일', '댓글',
+    '생성일시', '수정일시',
+    // 확장성 컬럼
+    'customFields', 'templateId'
+  ];
+
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+  sheet.getRange(1, 1, 1, headers.length).setBackground('#4a5568');
+  sheet.getRange(1, 1, 1, headers.length).setFontColor('#ffffff');
+  sheet.setFrozenRows(1);
+
+  // 컬럼 너비 자동 조정
+  sheet.autoResizeColumns(1, headers.length);
+
+  Logger.log('Sheet initialized with headers');
+  Logger.log('Total columns: ' + headers.length);
+}
+
+// 마이그레이션: 기존 시트에 확장성 컬럼 추가
+function migrateToExtensibility() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+
+  if (!sheet) {
+    Logger.log('Sheet not found. Run setupSheet() first.');
+    return;
+  }
+
+  const lastCol = sheet.getLastColumn();
+
+  // 현재 컬럼 수 확인
+  if (lastCol < 22) {
+    // customFields 컬럼 추가 (21번째)
+    if (lastCol < 21) {
+      sheet.getRange(1, 21).setValue('customFields');
+      sheet.getRange(1, 21).setFontWeight('bold');
+      sheet.getRange(1, 21).setBackground('#4a5568');
+      sheet.getRange(1, 21).setFontColor('#ffffff');
+
+      // 기존 데이터에 빈 객체 추가
+      const lastRow = sheet.getLastRow();
+      if (lastRow > 1) {
+        for (let i = 2; i <= lastRow; i++) {
+          sheet.getRange(i, 21).setValue('{}');
+        }
+      }
+
+      Logger.log('Added customFields column');
+    }
+
+    // templateId 컬럼 추가 (22번째)
+    if (lastCol < 22) {
+      sheet.getRange(1, 22).setValue('templateId');
+      sheet.getRange(1, 22).setFontWeight('bold');
+      sheet.getRange(1, 22).setBackground('#4a5568');
+      sheet.getRange(1, 22).setFontColor('#ffffff');
+
+      // 기존 데이터에 빈 문자열 추가
+      const lastRow = sheet.getLastRow();
+      if (lastRow > 1) {
+        for (let i = 2; i <= lastRow; i++) {
+          sheet.getRange(i, 22).setValue('');
+        }
+      }
+
+      Logger.log('Added templateId column');
+    }
+
+    Logger.log('Migration completed');
+  } else {
+    Logger.log('Sheet already has extensibility columns');
+  }
+}
+
+// 통계 생성 (대시보드용)
+function generateStats() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  const values = sheet.getDataRange().getValues();
+
+  const stats = {
+    total: 0,
+    byStatus: {},
+    byCategory: {},
+    byPriority: {},
+    byTemplate: {},
+    overdue: 0
+  };
+
+  const today = new Date();
+
+  for (let i = 1; i < values.length; i++) {
+    stats.total++;
+
+    const status = values[i][5];
+    const category = values[i][2];
+    const priority = values[i][4];
+    const targetDate = new Date(values[i][14]);
+    const templateId = values[i][21];
+
+    // 상태별
+    stats.byStatus[status] = (stats.byStatus[status] || 0) + 1;
+
+    // 분류별
+    stats.byCategory[category] = (stats.byCategory[category] || 0) + 1;
+
+    // 우선순위별
+    stats.byPriority[priority] = (stats.byPriority[priority] || 0) + 1;
+
+    // 템플릿별
+    if (templateId) {
+      stats.byTemplate[templateId] = (stats.byTemplate[templateId] || 0) + 1;
+    }
+
+    // 지연 건수
+    if (status !== '완료' && targetDate < today) {
+      stats.overdue++;
+    }
+  }
+
+  Logger.log('Statistics:');
+  Logger.log(JSON.stringify(stats, null, 2));
+
+  return stats;
 }

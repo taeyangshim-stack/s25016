@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>새 이슈 등록 - S25016 펀치리스트</title>
+
+    <link rel="stylesheet" href="../../shared/styles/variables.css">
+    <link rel="stylesheet" href="../../shared/styles/reset.css">
+    <link rel="stylesheet" href="../../shared/styles/components.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: var(--space-5);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--color-primary-gradient);
+            color: var(--color-white);
+            padding: var(--space-8);
+            text-align: center;
+        }
+
+        .form-content {
+            padding: var(--space-8);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-6);
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-2);
+            color: var(--color-gray-700);
+        }
+
+        .form-group label .required {
+            color: var(--color-danger);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-base);
+            font-size: var(--font-base);
+            transition: var(--transition-base);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .button-group {
+            display: flex;
+            gap: var(--space-4);
+            margin-top: var(--space-8);
+        }
+
+        .helper-text {
+            font-size: var(--font-sm);
+            color: var(--color-gray-500);
+            margin-top: var(--space-2);
+        }
+
+        .section-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
+            margin: var(--space-8) 0 var(--space-4);
+            padding-bottom: var(--space-2);
+            border-bottom: 2px solid var(--color-gray-200);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>➕ 새 이슈 등록</h1>
+            <p>펀치리스트에 새로운 이슈를 등록합니다</p>
+        </div>
+
+        <div class="form-content">
+            <form id="createIssueForm">
+                <!-- 기본 정보 -->
+                <div class="section-title">📋 기본 정보</div>
+
+                <div class="form-group">
+                    <label>제목 <span class="required">*</span></label>
+                    <input type="text" id="title" name="title" required placeholder="이슈 제목을 입력하세요">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>분류 <span class="required">*</span></label>
+                        <select id="category" name="category" required>
+                            <option value="">선택하세요</option>
+                            <option value="기계">🔧 기계</option>
+                            <option value="전기">⚡ 전기</option>
+                            <option value="제어">💻 제어</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>세부분류 <span class="required">*</span></label>
+                        <select id="subcategory" name="subcategory" required>
+                            <option value="">분류를 먼저 선택하세요</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>우선순위 <span class="required">*</span></label>
+                        <select id="priority" name="priority" required>
+                            <option value="">선택하세요</option>
+                            <option value="긴급">🚨 긴급</option>
+                            <option value="높음">⚠️ 높음</option>
+                            <option value="보통">ℹ️ 보통</option>
+                            <option value="낮음">➖ 낮음</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>상태</label>
+                        <select id="status" name="status">
+                            <option value="신규" selected>신규</option>
+                            <option value="진행중">진행중</option>
+                            <option value="보류">보류</option>
+                            <option value="완료">완료</option>
+                            <option value="검증중">검증중</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 문제 상황 -->
+                <div class="section-title">📝 문제 상황</div>
+
+                <div class="form-group">
+                    <label>문제 상황 <span class="required">*</span></label>
+                    <textarea id="description" name="description" required placeholder="문제 상황을 상세히 기술하세요"></textarea>
+                    <div class="helper-text">발생한 문제의 현상과 영향을 구체적으로 작성하세요</div>
+                </div>
+
+                <div class="form-group">
+                    <label>원인 분석</label>
+                    <textarea id="cause" name="cause" placeholder="문제의 원인을 분석하여 작성하세요"></textarea>
+                </div>
+
+                <!-- 조치 계획 -->
+                <div class="section-title">🔧 조치 계획 및 결과</div>
+
+                <div class="form-group">
+                    <label>조치 계획</label>
+                    <textarea id="action_plan" name="action_plan" placeholder="문제 해결을 위한 조치 계획을 작성하세요"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>조치 결과</label>
+                    <textarea id="action_result" name="action_result" placeholder="조치를 실행한 후 결과를 작성하세요"></textarea>
+                </div>
+
+                <!-- 담당 정보 -->
+                <div class="section-title">👥 담당 정보</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>담당자 <span class="required">*</span></label>
+                        <select id="owner" name="owner" required>
+                            <option value="">선택하세요</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>승인자</label>
+                        <select id="approver" name="approver">
+                            <option value="">선택하세요</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>협의자</label>
+                    <input type="text" id="collaborators" name="collaborators" placeholder="협의자를 쉼표로 구분하여 입력 (예: 김철수, 박영희)">
+                    <div class="helper-text">여러 명인 경우 쉼표(,)로 구분하세요</div>
+                </div>
+
+                <!-- 일정 정보 -->
+                <div class="section-title">📅 일정 정보</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>요청일 <span class="required">*</span></label>
+                        <input type="date" id="request_date" name="request_date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>목표 완료일 <span class="required">*</span></label>
+                        <input type="date" id="target_date" name="target_date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>실제 완료일</label>
+                        <input type="date" id="complete_date" name="complete_date">
+                    </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        ✅ 이슈 등록
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        🔄 초기화
+                    </button>
+                    <a href="../index.html" class="btn btn-outline">
+                        ❌ 취소
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../shared/scripts/utils.js"></script>
+    <script src="../scripts/punchlist.js"></script>
+    <script>
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', () => {
+            initForm();
+            setDefaultDates();
+
+            // 분류 변경 이벤트
+            document.getElementById('category').addEventListener('change', updateSubcategories);
+
+            // 폼 제출 이벤트
+            document.getElementById('createIssueForm').addEventListener('submit', handleSubmit);
+        });
+
+        // 폼 초기화
+        function initForm() {
+            // 담당자 옵션
+            const ownerSelect = document.getElementById('owner');
+            const approverSelect = document.getElementById('approver');
+
+            PunchListAPI.OWNERS.forEach(owner => {
+                const option1 = document.createElement('option');
+                option1.value = owner;
+                option1.textContent = owner;
+                ownerSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = owner;
+                option2.textContent = owner;
+                approverSelect.appendChild(option2);
+            });
+        }
+
+        // 기본 날짜 설정
+        function setDefaultDates() {
+            const today = new Date().toISOString().split('T')[0];
+            const oneWeekLater = new Date();
+            oneWeekLater.setDate(oneWeekLater.getDate() + 7);
+            const targetDate = oneWeekLater.toISOString().split('T')[0];
+
+            document.getElementById('request_date').value = today;
+            document.getElementById('target_date').value = targetDate;
+        }
+
+        // 세부분류 업데이트
+        function updateSubcategories() {
+            const category = document.getElementById('category').value;
+            const subcategorySelect = document.getElementById('subcategory');
+
+            subcategorySelect.innerHTML = '<option value="">선택하세요</option>';
+
+            if (category && PunchListAPI.CATEGORIES[category]) {
+                PunchListAPI.CATEGORIES[category].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subcategorySelect.appendChild(option);
+                });
+            }
+        }
+
+        // 폼 제출
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const issueData = Object.fromEntries(formData.entries());
+
+            // 빈 값 처리
+            Object.keys(issueData).forEach(key => {
+                if (!issueData[key]) {
+                    issueData[key] = '';
+                }
+            });
+
+            try {
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = '⏳ 등록 중...';
+
+                await PunchListAPI.createIssue(issueData);
+
+                alert('✅ 이슈가 성공적으로 등록되었습니다!');
+                window.location.href = '../index.html';
+            } catch (error) {
+                console.error('이슈 등록 실패:', error);
+                alert('❌ 이슈 등록에 실패했습니다. 다시 시도해주세요.');
+
+                const submitButton = e.target.querySelector('button[type="submit"]');
+                submitButton.disabled = false;
+                submitButton.textContent = '✅ 이슈 등록';
+            }
+        }
+
+        // 폼 초기화
+        function resetForm() {
+            if (confirm('입력한 내용을 모두 초기화하시겠습니까?')) {
+                document.getElementById('createIssueForm').reset();
+                setDefaultDates();
+                document.getElementById('subcategory').innerHTML = '<option value="">분류를 먼저 선택하세요</option>';
+            }
+        }
+    </script>
+</body>
+</html>
