@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아크 불량 및 용접 조기 완료 현상 해결 체크리스트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #f39c12;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title .step-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+            background: #f39c12;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checklist {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 5px solid #3498db;
+            transition: all 0.3s ease;
+        }
+        
+        .checklist-item.critical {
+            border-left-color: #e74c3c;
+        }
+
+        .checklist-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #bdc3c7;
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .item-desc {
+            color: #34495e; /* 가독성을 위해 색상 수정 */
+            font-size: 0.95em;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+        
+        .item-action {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            color: #2c3e50; /* 가독성을 위해 텍스트 색상 명시 */
+        }
+        
+        .item-action strong {
+            color: #2980b9;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        
+        .code-block .comment { color: #bdc3c7; }
+        .code-block .keyword { color: #3498db; }
+        .code-block .value { color: #2ecc71; }
+
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #2196f3;
+            margin: 20px 0;
+            color: #1a237e; /* 진한 파란색 텍스트로 가독성 향상 */
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #f39c12;
+            margin: 20px 0;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .summary-table th, .summary-table td {
+            padding: 15px;
+            border: 1px solid #ecf0f1;
+            text-align: left;
+        }
+        .summary-table th {
+            background: #34495e;
+            color: white;
+        }
+        .summary-table td {
+            color: #2c3e50; /* 테이블 셀 텍스트 색상 지정 */
+        }
+        .summary-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 아크 불량 및 용접 조기 완료 현상 해결 체크리스트</h1>
+            <p>DeviceNet 통신 기반 ABB-Lincoln 용접 시스템 트러블슈팅</p>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <h3>🎯 문제 상황</h3>
+                <p>DeviceNet 통신 연결은 정상이지만, 용접 테스트 시 <strong>아크가 유지되지 않고</strong> 용접기에서 <strong>'Weld Complete' 신호가 즉시 발생</strong>하며 시퀀스가 조기 종료되는 현상.</p>
+                <p><strong>핵심 의심 원인:</strong> 용접 모드(CV/CC) 불일치, WFS(와이어 이송 속도) 및 전압 파라미터 설정 오류.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title"><span class="step-icon">1</span>핵심 파라미터 점검</h2>
+                <div class="checklist">
+                    <div class="checklist-item critical">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-title">1.1. 용접 모드(Welding Mode) 확인</div>
+                            <div class="item-desc">로봇 용접은 일정한 전압을 유지하고 WFS로 전류를 제어하는 <strong>CV (Constant Voltage) 모드</strong>가 필수적입니다. CC 모드로 설정 시 WFS 제어가 되지 않아 아크가 즉시 꺼집니다.</div>
+                            <div class="item-action">
+                                <strong>[확인 사항]</strong> Lincoln Power Wave Manager에서 용접 모드가 'CV'로 설정되었는지 확인하십시오.<br>
+                                <strong>[참고]</strong> `ABB_Lincoln_DeviceNet_체크리스트.html`의 'CC/CV 모드' 탭 참조.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checklist-item critical">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-title">1.2. WFS (와이어 송급 속도) 제어값 확인</div>
+                            <div class="item-desc">'WFS 제어 불가'는 현상의 직접적인 원인일 수 있습니다. 로봇이 용접기에 유효한(0이 아닌) WFS 값을 전달하는지 확인해야 합니다.</div>
+                            <div class="item-action">
+                                <strong>[확인 사항]</strong><br>
+                                1. ABB 로봇 프로그램에서 용접 시퀀스(Strike, Weld1 등)에 설정된 WFS 값이 0보다 큰 유효한 값(예: 200~400 IPM)인지 확인합니다.<br>
+                                2. 로봇 I/O 모니터링 기능으로 DeviceNet Produced Assembly의 <strong>Byte 4-5 (Analog Reference 2)</strong> 값이 정상적으로 출력되는지 확인합니다.
+                                <div class="code-block">
+<span class="comment">// Produced Assembly (ABB → Lincoln)</span>
+<span class="keyword">Byte 4-5:</span> Wire Feed Speed (WFS)
+<span class="comment">// 이 값이 0이면 아크가 유지될 수 없음</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checklist-item critical">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-title">1.3. 용접 전압(Voltage) 제어값 확인</div>
+                            <div class="item-desc">CV 모드에서는 WFS와 함께 용접 전압이 아크를 유지하는 핵심 요소입니다. 전압이 너무 낮거나 0으로 설정되면 아크가 발생하지 않거나 즉시 꺼집니다.</div>
+                            <div class="item-action">
+                                <strong>[확인 사항]</strong><br>
+                                1. ABB 로봇 프로그램에서 용접 시퀀스에 설정된 전압 값이 유효한 값(예: 20~28V)인지 확인합니다.<br>
+                                2. 로봇 I/O 모니터링으로 DeviceNet Produced Assembly의 <strong>Byte 2-3 (Analog Reference 1)</strong> 값이 정상적으로 출력되는지 확인합니다.
+                                <div class="code-block">
+<span class="comment">// Produced Assembly (ABB → Lincoln)</span>
+<span class="keyword">Byte 2-3:</span> Trim / Voltage
+<span class="comment">// CV 모드에서는 이 값이 용접 전압을 결정</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="checklist-item">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-title">1.4. 용접 시퀀스 타이머(Timer) 확인</div>
+                            <div class="item-desc">각 용접 단계(State)의 지속 시간이 0으로 설정되어 있으면 해당 단계가 즉시 건너뛰어집니다. 특히 `Weld1` 상태의 타이머가 문제될 수 있습니다.</div>
+                            <div class="item-action">
+                                <strong>[확인 사항]</strong> Lincoln Power Wave Manager 또는 Explicit Message를 통해 Weld Schedule Object(Class 101)의 타이머 설정을 확인합니다.<br>
+                                - <strong>STATE_TIMER_ENABLE (Attr 8)</strong>: Weld1(State 6)에 해당하는 비트가 활성화되어 있는지 확인.<br>
+                                - <strong>STATE_TIMER[6] (Attr 99)</strong>: Weld1 상태의 지속 시간이 0 이상으로 설정되어 있는지 확인. (또는 Weld Timer(Attr 6) 사용 여부 확인)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title"><span class="step-icon">2</span>시퀀스 신호 분석</h2>
+                <div class="checklist">
+                    <div class="checklist-item">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-title">2.1. Trigger 신호 유지(Level Sensitive) 확인</div>
+                            <div class="item-desc">용접 Trigger 신호는 용접이 진행되는 동안 계속 'ON' 상태를 유지해야 합니다(Level Sensitive). 만약 로봇이 짧은 펄스 신호만 보낸다면, 용접기는 시퀀스를 시작하자마자 종료할 수 있습니다.</div>
+                            <div class="item-action">
+                                <strong>[확인 사항]</strong> 로봇 I/O 모니터링으로 용접 시작 명령 후 <strong>Byte 0, Bit 0 (Trigger)</strong> 신호가 '1'로 유지되는지, 아니면 바로 '0'으로 바뀌는지 확인합니다.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-title">2.2. Arc Detect 신호 모니터링</div>
+                            <div class="item-desc">용접기가 아크 발생을 인지하면 'Arc Detect' 신호를 로봇에게 보냅니다. 이 신호가 아예 들어오지 않거나, 들어왔다가 바로 사라진다면 아크 착화 자체에 문제가 있다는 의미입니다.</div>
+                            <div class="item-action">
+                                <strong>[확인 사항]</strong> 로봇 I/O 모니터링으로 Consumed Assembly의 <strong>Byte 0, Bit 0 (Arc Detect)</strong> 신호의 상태 변화를 관찰합니다.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-title">2.3. 즉시 발생하는 폴트(Fault) 신호 확인</div>
+                            <div class="item-desc">Trigger와 동시에 다른 폴트 신호가 발생하면, 안전을 위해 용접 시퀀스가 중단될 수 있습니다.</div>
+                            <div class="item-action">
+                                <strong>[확인 사항]</strong> 로봇 I/O 모니터링으로 Consumed Assembly의 <strong>Byte 0 (Digital Outputs)</strong>에 다른 폴트 비트(Gas Fault, Wire Fault 등)가 활성화되는지 확인합니다.
+                                <div class="code-block">
+<span class="comment">// Consumed Assembly (Lincoln → ABB)</span>
+<span class="keyword">Byte 0, Bit 2:</span> Gas Fault
+<span class="keyword">Byte 0, Bit 3:</span> Wire Fault
+<span class="keyword">Byte 0, Bit 6:</span> Wire Stick
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title"><span class="step-icon">3</span>물리적 요인 및 환경 점검</h2>
+                 <div class="checklist">
+                    <div class="checklist-item">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-title">3.1. 와이어 및 가스 공급 확인</div>
+                            <div class="item-desc">소프트웨어 설정이 완벽해도 물리적인 공급에 문제가 있으면 아크가 유지될 수 없습니다.</div>
+                            <div class="item-action">
+                                <strong>[확인 사항]</strong><br>
+                                1. 로봇의 Cold Inch Fwd 기능을 이용해 와이어가 부드럽게 송급되는지 확인합니다.<br>
+                                2. Gas Purge 기능을 이용해 보호 가스가 정상적으로 분출되는지 확인합니다.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <div class="item-title">3.2. 용접 접지(Work Clamp) 및 토치 상태 확인</div>
+                            <div class="item-desc">불량한 접지는 매우 불안정한 아크의 주된 원인입니다.</div>
+                            <div class="item-action">
+                                <strong>[확인 사항]</strong><br>
+                                1. 용접 접지 케이블이 모재에 단단히 고정되어 있는지, 접점 부위가 깨끗한지 확인합니다.<br>
+                                2. 용접 토치의 컨택팁, 노즐 등 소모품 상태가 양호한지 확인합니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h3>📊 종합 진단표</h3>
+                <p>아래 표를 이용해 점검 결과를 기록하고 원인을 체계적으로 분석하십시오.</p>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>점검 항목</th>
+                            <th>기대 결과</th>
+                            <th>실제 결과</th>
+                            <th>조치 필요 여부</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1.1. 용접 모드</td>
+                            <td>CV (Constant Voltage)</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>1.2. WFS 제어값 (Weld1)</td>
+                            <td>> 0 (예: 250 IPM)</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>1.3. 전압 제어값 (Weld1)</td>
+                            <td>> 0 (예: 24.0 V)</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>2.1. Trigger 신호</td>
+                            <td>용접 중 '1' 유지</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>2.2. Arc Detect 신호</td>
+                            <td>Trigger 후 '1'로 변경 및 유지</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                         <tr>
+                            <td>2.3. 즉시 발생 폴트</td>
+                            <td>없음</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>3.1. 와이어/가스 공급</td>
+                            <td>정상</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>3.2. 용접 접지</td>
+                            <td>양호</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

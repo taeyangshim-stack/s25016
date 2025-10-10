@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABB-Lincoln DeviceNet 연결 체크리스트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 3px solid #27ae60;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 20px 30px;
+            cursor: pointer;
+            background: #ecf0f1;
+            border: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .nav-tab:hover {
+            background: #d5dbdb;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #27ae60;
+            border-bottom: 3px solid #27ae60;
+            margin-bottom: -3px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #27ae60;
+        }
+
+        .checklist {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #27ae60;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #27ae60;
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checkbox.checked {
+            background: #27ae60;
+            position: relative;
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 18px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .item-desc {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .priority-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .priority-high {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .priority-medium {
+            background: #f39c12;
+            color: white;
+        }
+
+        .priority-low {
+            background: #3498db;
+            color: white;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #27ae60;
+            margin: 20px 0;
+        }
+
+        .info-box h3 {
+            color: #1b5e20;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .info-box p {
+            color: #2e7d32;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #f39c12;
+            margin: 20px 0;
+        }
+
+        .warning-box h3 {
+            color: #e65100;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .warning-box p {
+            color: #ef6c00;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table th {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+
+        .code-block .comment {
+            color: #95a5a6;
+        }
+
+        .code-block .keyword {
+            color: #3498db;
+        }
+
+        .code-block .value {
+            color: #2ecc71;
+        }
+
+        .signal-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #27ae60;
+        }
+
+        .signal-card h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .signal-card .signal-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .signal-detail-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .signal-detail-label {
+            font-size: 0.85em;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .signal-detail-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .progress-indicator {
+            background: #ecf0f1;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 30px;
+            background: #27ae60;
+            border-radius: 15px;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .diagram {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .diagram svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tab {
+                min-width: 100%;
+            }
+
+            .comparison-table {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔌 ABB-Lincoln DeviceNet 연결 가이드</h1>
+            <p>로봇 컨트롤러와 용접기 간 디지털 통신 설정 및 문제 해결</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">📋 개요</button>
+            <button class="nav-tab" onclick="showTab('checklist')">✅ 체크리스트</button>
+            <button class="nav-tab" onclick="showTab('cc-cv')">⚡ CC/CV 모드</button>
+            <button class="nav-tab" onclick="showTab('digital-control')">🎮 디지털 제어</button>
+            <button class="nav-tab" onclick="showTab('troubleshooting')">🔧 문제 해결</button>
+        </div>
+
+        <!-- 개요 탭 -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">시스템 구성</h2>
+
+                <div class="info-box">
+                    <h3>🎯 목표</h3>
+                    <p><strong>ABB 로봇 컨트롤러</strong>와 <strong>Lincoln Electric Power Wave 용접기</strong>를 DeviceNet으로 연결하여 용접 전류/전압을 디지털 방식으로 제어</p>
+                </div>
+
+                <div class="diagram">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">시스템 연결 구성도</h3>
+                    <pre style="text-align: left; font-family: monospace; background: #f8f9fa; padding: 20px; border-radius: 8px; line-height: 2;">
+┌─────────────────────┐         DeviceNet         ┌──────────────────────┐
+│   ABB 로봇           │◄─────────────────────────►│  Lincoln Power Wave  │
+│   컨트롤러           │      (CAN 통신)           │  용접기               │
+│                     │                           │                      │
+│ - DeviceNet Master  │    디지털 제어 신호:       │ - DeviceNet Slave    │
+│ - I/O 모듈          │    • 용접 전류 (I)        │ - 용접 파라미터      │
+│ - 통신 설정         │    • 용접 전압 (V)        │ - 실시간 피드백      │
+└─────────────────────┘    • 와이어 속도 (WFS)    └──────────────────────┘
+                           • 시퀀스 제어
+    </pre>
+                </div>
+
+                <div class="warning-box">
+                    <h3>⚠️ 현재 상태</h3>
+                    <p><strong>문제:</strong> ABB와 Lincoln 간 DeviceNet 연결이 정상적으로 이루어지지 않음</p>
+                    <p><strong>확인 필요:</strong> 아날로그 방식과 디지털(DeviceNet) 방식의 차이점 및 설정 방법</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">통신 방식 비교</h2>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>구분</th>
+                            <th>아날로그 방식</th>
+                            <th>디지털 방식 (DeviceNet)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>신호 타입</strong></td>
+                            <td>0-10V 전압 신호</td>
+                            <td>CAN 버스 디지털 통신</td>
+                        </tr>
+                        <tr>
+                            <td><strong>배선</strong></td>
+                            <td>다수의 아날로그 선로 필요 (20+ 선)</td>
+                            <td>5선 케이블 (V+, V-, CAN_H, CAN_L, Shield)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>정밀도</strong></td>
+                            <td>낮음 (노이즈 영향)</td>
+                            <td>높음 (16비트 디지털)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>피드백</strong></td>
+                            <td>별도 아날로그 입력 필요</td>
+                            <td>실시간 양방향 통신</td>
+                        </tr>
+                        <tr>
+                            <td><strong>파라미터 수</strong></td>
+                            <td>제한적 (I/O 개수만큼)</td>
+                            <td>158개 신호 동시 제어/모니터링</td>
+                        </tr>
+                        <tr>
+                            <td><strong>진단</strong></td>
+                            <td>어려움</td>
+                            <td>용이 (에러 코드, 상태 모니터링)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>비용</strong></td>
+                            <td>낮음</td>
+                            <td>중간 (DeviceNet 모듈 필요)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>확장성</strong></td>
+                            <td>낮음</td>
+                            <td>높음 (소프트웨어로 기능 추가)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">사전 요구사항</h2>
+
+                <div class="signal-card">
+                    <h4>ABB 로봇 컨트롤러</h4>
+                    <div class="signal-details">
+                        <div class="signal-detail-item">
+                            <div class="signal-detail-label">DeviceNet Master 모듈</div>
+                            <div class="signal-detail-value">DSQC 652 (또는 호환 모듈)</div>
+                        </div>
+                        <div class="signal-detail-item">
+                            <div class="signal-detail-label">통신 속도</div>
+                            <div class="signal-detail-value">125kbps / 250kbps / 500kbps</div>
+                        </div>
+                        <div class="signal-detail-item">
+                            <div class="signal-detail-label">소프트웨어 버전</div>
+                            <div class="signal-detail-value">RobotWare 6.0 이상</div>
+                        </div>
+                        <div class="signal-detail-item">
+                            <div class="signal-detail-label">EDS 파일</div>
+                            <div class="signal-detail-value">Lincoln Power Wave EDS 필요</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="signal-card">
+                    <h4>Lincoln Power Wave 용접기</h4>
+                    <div class="signal-details">
+                        <div class="signal-detail-item">
+                            <div class="signal-detail-label">DeviceNet 인터페이스</div>
+                            <div class="signal-detail-value">내장형 (Y50031-21 사양)</div>
+                        </div>
+                        <div class="signal-detail-item">
+                            <div class="signal-detail-label">Node Address</div>
+                            <div class="signal-detail-value">0-63 (설정 가능)</div>
+                        </div>
+                        <div class="signal-detail-item">
+                            <div class="signal-detail-label">통신 속도</div>
+                            <div class="signal-detail-value">자동 감지 또는 수동 설정</div>
+                        </div>
+                        <div class="signal-detail-item">
+                            <div class="signal-detail-label">펌웨어 버전</div>
+                            <div class="signal-detail-value">최신 버전 권장</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 체크리스트 탭 -->
+        <div id="checklist" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">DeviceNet 연결 체크리스트</h2>
+
+                <div class="progress-indicator">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>진행률</span>
+                        <span id="progressText">0/30 (0%)</span>
+                    </div>
+                    <div style="background: #ecf0f1; border-radius: 15px;">
+                        <div class="progress-bar" id="progressBar" style="width: 0%;">0%</div>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">1️⃣ 하드웨어 연결 확인</h3>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">DeviceNet 케이블 규격 확인</div>
+                            <div class="item-desc">5선 케이블 (V+: Red, V-: Black, CAN_H: White, CAN_L: Blue, Shield: Drain)</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">케이블 최대 길이 확인</div>
+                            <div class="item-desc">125kbps: 500m / 250kbps: 250m / 500kbps: 100m 이내</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">종단 저항(Terminator) 설치</div>
+                            <div class="item-desc">네트워크 양 끝단에 121Ω 저항 설치 필수</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">전원 전압 확인</div>
+                            <div class="item-desc">DeviceNet 파워 서플라이 24VDC ±10% (21.6V ~ 26.4V)</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">배선 극성 확인</div>
+                            <div class="item-desc">V+, V-, CAN_H, CAN_L 연결 순서 재확인 (역접 시 통신 불가)</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">Shield(차폐선) 접지</div>
+                            <div class="item-desc">양쪽 한 곳만 접지 (노이즈 방지)</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">2️⃣ ABB 로봇 컨트롤러 설정</h3>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">DeviceNet Master 모듈 장착 확인</div>
+                            <div class="item-desc">DSQC 652 또는 호환 모듈이 컨트롤러에 정상 장착되어 있는지 확인</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">통신 속도 설정 확인</div>
+                            <div class="item-desc">ABB와 Lincoln이 동일한 Baud Rate 사용 (125k/250k/500kbps)</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">Lincoln EDS 파일 등록</div>
+                            <div class="item-desc">RobotStudio에서 Lincoln Power Wave EDS 파일 Import</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">Node Address 중복 확인</div>
+                            <div class="item-desc">네트워크 상 모든 디바이스의 주소가 고유한지 확인</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">I/O Mapping 설정</div>
+                            <div class="item-desc">Produced/Consumed Assembly 설정 (8 bytes 입출력)</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">통신 상태 LED 확인</div>
+                            <div class="item-desc">DeviceNet 모듈 LED: Green(정상) / Red(에러) / Amber(경고)</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">3️⃣ Lincoln 용접기 설정 (Power Wave Manager)</h3>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">Power Wave Manager 접속</div>
+                            <div class="item-desc">용접기 → 네트워크 설정 → DeviceNet → Power Source Controller</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">ID (Node Address) 설정</div>
+                            <div class="item-desc">화면 상단 "ID: 52" 확인 및 변경 (0-63 범위, 네트워크 내 고유 번호)</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">전원 속도 (Baud Rate) 설정</div>
+                            <div class="item-desc">"전원 속도: 500KB" 확인 → ABB와 동일하게 설정 (125KB/250KB/500KB)</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">Report Trim/Wave Outer Process Limits 체크</div>
+                            <div class="item-desc">이벤트 로그 섹션에서 "Report Trim/Wave Outer Process Limits" 체크박스 활성화</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">아날로그 입력 채널 확인 (AN 1, 2, 3)</div>
+                            <div class="item-desc">모든 아날로그 입력을 "0"으로 설정 (DeviceNet 사용 시 아날로그 비활성화)</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">와이어 포인트 입력 모드 선택</div>
+                            <div class="item-desc">"Engineering units" 선택 (Unscaled values 대신)</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">트림/와이어 제어 입력 설정</div>
+                            <div class="item-desc">"Engineering units" 선택하여 실제 물리값으로 제어</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">아날로그 출력 모드 선택</div>
+                            <div class="item-desc">"Actual WFS" 선택 (실제 와이어 송급 속도 피드백)</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">설정 적용 (설정 작용 버튼)</div>
+                            <div class="item-desc">모든 설정 완료 후 화면 하단 "설정 작용" 버튼 클릭하여 저장</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">DeviceNet 상태 확인</div>
+                            <div class="item-desc">화면 하단 상태바: "192.168.125.152 (EN1)에 연결됨" 확인</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">4️⃣ 통신 테스트</h3>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">노드 스캔 테스트</div>
+                            <div class="item-desc">ABB 컨트롤러에서 Lincoln 용접기 Node 검색 확인</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">I/O 데이터 송수신 테스트</div>
+                            <div class="item-desc">Produced Assembly(출력) 및 Consumed Assembly(입력) 동작 확인</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">전류/전압 디지털 명령 테스트</div>
+                            <div class="item-desc">ABB에서 용접 전류(I) 및 전압(V) 값을 변경하여 용접기 반응 확인</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">실시간 피드백 확인</div>
+                            <div class="item-desc">용접기의 실제 전류/전압 피드백 값이 정상적으로 ABB로 전송되는지 확인</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">에러 코드 확인</div>
+                            <div class="item-desc">DeviceNet 통신 에러 발생 시 에러 코드 및 메시지 확인</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">용접 시퀀스 테스트</div>
+                            <div class="item-desc">Idle → Strike → Weld → Burnback 전체 시퀀스 동작 확인</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+                </div>
+
+                <div class="checklist">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">5️⃣ 안전 및 품질 확인</h3>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">비상 정지 동작 확인</div>
+                            <div class="item-desc">E-Stop 시 DeviceNet 통신 및 용접 즉시 중단 확인</div>
+                        </div>
+                        <span class="priority-badge priority-high">필수</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">통신 타임아웃 설정</div>
+                            <div class="item-desc">Connection Timeout 및 Watchdog Timer 설정 확인</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">용접 품질 검증</div>
+                            <div class="item-desc">DeviceNet 제어로 실제 용접 테스트 수행 및 품질 평가</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">데이터 로깅 설정</div>
+                            <div class="item-desc">용접 파라미터 및 통신 상태 로그 저장 설정</div>
+                        </div>
+                        <span class="priority-badge priority-low">선택</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">백업 및 문서화</div>
+                            <div class="item-desc">ABB 설정 파일, Lincoln 파라미터, 배선도 백업</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+
+                    <div class="checklist-item">
+                        <div class="checkbox" onclick="toggleCheck(this)"></div>
+                        <div class="item-content">
+                            <div class="item-title">운영자 교육</div>
+                            <div class="item-desc">DeviceNet 시스템 운영 및 기본 문제 해결 교육 완료</div>
+                        </div>
+                        <span class="priority-badge priority-medium">권장</span>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="resetChecklist()">🔄 체크리스트 초기화</button>
+                    <button class="btn btn-secondary" onclick="printChecklist()">🖨️ 체크리스트 인쇄</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CC/CV 모드 탭 -->
+        <div id="cc-cv" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">CC / CV 용접 모드 이해</h2>
+
+                <div class="info-box">
+                    <h3>⚡ 용접 전원의 두 가지 제어 방식</h3>
+                    <p>용접 중 전류(Current)와 전압(Voltage)은 서로 연관되어 있으며, 둘 중 하나를 일정하게 유지하는 방식으로 용접기를 제어합니다.</p>
+                </div>
+
+                <div class="section" style="margin-top: 30px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">CC (Constant Current) - 정전류 모드</h3>
+
+                    <div class="signal-card">
+                        <h4>📊 특징</h4>
+                        <p style="line-height: 1.8; color: #2c3e50; margin-top: 10px;">
+                            용접 <strong>전류(I)</strong>를 일정하게 유지하고, 전압(V)은 아크 길이에 따라 자동으로 변화합니다.
+                        </p>
+
+                        <div class="code-block" style="margin-top: 15px;">
+<span class="keyword">제어 방식:</span>
+  I(전류) = <span class="value">설정값 (고정)</span>
+  V(전압) = <span class="value">가변 (아크 길이에 따라 자동 조절)</span>
+
+<span class="comment">// 예시</span>
+  설정 전류: <span class="value">200A</span> (고정)
+  실제 전압: <span class="value">22V ~ 28V</span> (아크 길이에 따라 변동)
+                        </div>
+
+                        <div class="signal-details" style="margin-top: 20px;">
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">주요 용도</div>
+                                <div class="signal-detail-value">TIG 용접, SMAW(피복 아크)</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">와이어 송급</div>
+                                <div class="signal-detail-value">수동 송급 (작업자가 직접 제어)</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">아크 안정성</div>
+                                <div class="signal-detail-value">높음 (전류 일정)</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">DeviceNet 제어</div>
+                                <div class="signal-detail-value">Weld Current (Amp) 파라미터 제어</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box" style="margin-top: 20px;">
+                        <h3>⚠️ CC 모드 주의사항</h3>
+                        <p>아크 길이가 변하면 전압이 크게 변동하므로, 일정한 간격 유지가 중요합니다.</p>
+                        <p>전류가 높을수록 용입이 깊어지므로, 모재 두께에 맞는 전류 설정이 필요합니다.</p>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 40px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">CV (Constant Voltage) - 정전압 모드</h3>
+
+                    <div class="signal-card">
+                        <h4>📊 특징</h4>
+                        <p style="line-height: 1.8; color: #2c3e50; margin-top: 10px;">
+                            용접 <strong>전압(V)</strong>을 일정하게 유지하고, 전류(I)는 와이어 송급 속도에 따라 자동으로 변화합니다.
+                        </p>
+
+                        <div class="code-block" style="margin-top: 15px;">
+<span class="keyword">제어 방식:</span>
+  V(전압) = <span class="value">설정값 (고정)</span>
+  I(전류) = <span class="value">가변 (WFS에 따라 자동 조절)</span>
+
+<span class="comment">// 예시</span>
+  설정 전압: <span class="value">25V</span> (고정)
+  실제 전류: <span class="value">150A ~ 250A</span> (와이어 송급 속도에 따라 변동)
+                        </div>
+
+                        <div class="signal-details" style="margin-top: 20px;">
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">주요 용도</div>
+                                <div class="signal-detail-value">MIG/MAG 용접, GMAW, FCAW</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">와이어 송급</div>
+                                <div class="signal-detail-value">자동 송급 (WFS 제어)</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">아크 안정성</div>
+                                <div class="signal-detail-value">중간 (Self-Regulation)</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">DeviceNet 제어</div>
+                                <div class="signal-detail-value">Arc Voltage (V) + WFS 파라미터 제어</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 20px;">
+                        <h3>✅ CV 모드 장점</h3>
+                        <p><strong>Self-Regulation:</strong> 아크 길이가 변해도 자동으로 보상됩니다.</p>
+                        <p><strong>높은 생산성:</strong> 와이어 자동 송급으로 연속 용접 가능합니다.</p>
+                        <p><strong>로봇 용접에 적합:</strong> 일정한 속도로 용접 가능하여 자동화에 유리합니다.</p>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 40px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">CC vs CV 비교</h3>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>구분</th>
+                                <th>CC (정전류)</th>
+                                <th>CV (정전압)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>고정 파라미터</strong></td>
+                                <td>전류 (Amperage)</td>
+                                <td>전압 (Voltage)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>가변 파라미터</strong></td>
+                                <td>전압 (아크 길이에 따라)</td>
+                                <td>전류 (WFS에 따라)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>용접 방식</strong></td>
+                                <td>TIG, SMAW</td>
+                                <td>MIG, MAG, GMAW, FCAW</td>
+                            </tr>
+                            <tr>
+                                <td><strong>와이어 송급</strong></td>
+                                <td>수동</td>
+                                <td>자동 (모터 제어)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>용입 깊이</strong></td>
+                                <td>깊음 (전류 높을수록)</td>
+                                <td>중간</td>
+                            </tr>
+                            <tr>
+                                <td><strong>스패터</strong></td>
+                                <td>적음</td>
+                                <td>중간 (설정에 따라)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>작업 난이도</strong></td>
+                                <td>높음 (숙련 필요)</td>
+                                <td>낮음 (자동화 용이)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>로봇 용접 적합성</strong></td>
+                                <td>낮음</td>
+                                <td>높음 ⭐⭐⭐</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DeviceNet 제어 신호</strong></td>
+                                <td>Weld Current (16bit)</td>
+                                <td>Arc Voltage + WFS (16bit)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="section" style="margin-top: 40px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">🎯 로봇 용접 시 권장 설정 (CV 모드)</h3>
+
+                    <div class="signal-card">
+                        <h4>DeviceNet 제어 파라미터</h4>
+
+                        <div class="code-block" style="margin-top: 15px;">
+<span class="comment">// Produced Assembly (ABB → Lincoln)</span>
+<span class="keyword">Byte 2-3:</span> Arc Voltage (V)
+  - 범위: <span class="value">0 ~ 50V</span>
+  - 분해능: <span class="value">16bit (65536 단계)</span>
+  - 예시: <span class="value">25.5V</span> → 디지털 값: <span class="value">33423</span>
+
+<span class="keyword">Byte 4-5:</span> Wire Feed Speed (WFS)
+  - 범위: <span class="value">0 ~ 1000 IPM</span> (Inch Per Minute)
+  - 분해능: <span class="value">16bit</span>
+  - 예시: <span class="value">350 IPM</span> → 디지털 값: <span class="value">22937</span>
+
+<span class="comment">// Consumed Assembly (Lincoln → ABB)</span>
+<span class="keyword">Byte 2-3:</span> Actual Voltage (V)
+  - 실제 출력 전압 피드백
+
+<span class="keyword">Byte 4-5:</span> Actual Current (A)
+  - 실제 출력 전류 피드백
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 디지털 제어 탭 -->
+        <div id="digital-control" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">디지털 제어 방식 (DeviceNet)</h2>
+
+                <div class="info-box">
+                    <h3>🎮 아날로그 vs 디지털 제어</h3>
+                    <p>기존 아날로그 방식은 0-10V 전압 신호로 용접기를 제어했으나, DeviceNet은 16비트 디지털 값으로 정밀 제어가 가능합니다.</p>
+                </div>
+
+                <div class="section" style="margin-top: 30px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">1️⃣ 디지털 제어 구조</h3>
+
+                    <div class="signal-card">
+                        <h4>Standard I/O Assembly (8 bytes)</h4>
+
+                        <h4 style="margin-top: 25px; color: #27ae60;">📤 Produced Assembly (ABB → Lincoln, 8 bytes)</h4>
+                        <p style="color: #7f8c8d; margin-bottom: 15px;">로봇 컨트롤러가 용접기에 전송하는 명령</p>
+
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Byte</th>
+                                    <th>파라미터</th>
+                                    <th>타입</th>
+                                    <th>범위</th>
+                                    <th>설명</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>0</strong></td>
+                                    <td>Digital Inputs</td>
+                                    <td>8 bits</td>
+                                    <td>0x00~0xFF</td>
+                                    <td>트리거, 가스, 인칭 등 디지털 신호</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>1</strong></td>
+                                    <td>Workpoint Number</td>
+                                    <td>8 bits</td>
+                                    <td>0~255</td>
+                                    <td>용접 프로그램 번호</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2-3</strong></td>
+                                    <td>Trim / Voltage</td>
+                                    <td>16 bits</td>
+                                    <td>0~65535</td>
+                                    <td>전압 또는 트림 값 (CV 모드 시 전압)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4-5</strong></td>
+                                    <td>Wire Feed Speed / Current</td>
+                                    <td>16 bits</td>
+                                    <td>0~65535</td>
+                                    <td>WFS (CV 모드) 또는 전류 (CC 모드)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>6-7</strong></td>
+                                    <td>Wave / Reserved</td>
+                                    <td>16 bits</td>
+                                    <td>0~65535</td>
+                                    <td>고급 파형 제어 (옵션)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4 style="margin-top: 25px; color: #3498db;">📥 Consumed Assembly (Lincoln → ABB, 8 bytes)</h4>
+                        <p style="color: #7f8c8d; margin-bottom: 15px;">용접기가 로봇 컨트롤러에 전송하는 피드백</p>
+
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Byte</th>
+                                    <th>파라미터</th>
+                                    <th>타입</th>
+                                    <th>범위</th>
+                                    <th>설명</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>0</strong></td>
+                                    <td>Digital Outputs</td>
+                                    <td>8 bits</td>
+                                    <td>0x00~0xFF</td>
+                                    <td>아크 감지, 고장 상태 등</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>1</strong></td>
+                                    <td>Sequencer State</td>
+                                    <td>8 bits</td>
+                                    <td>0~13</td>
+                                    <td>용접 시퀀스 상태 (Idle/Strike/Weld 등)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2-3</strong></td>
+                                    <td>Actual Voltage</td>
+                                    <td>16 bits</td>
+                                    <td>0~65535</td>
+                                    <td>실제 출력 전압 (V)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4-5</strong></td>
+                                    <td>Actual Current</td>
+                                    <td>16 bits</td>
+                                    <td>0~65535</td>
+                                    <td>실제 출력 전류 (A)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>6-7</strong></td>
+                                    <td>Actual WFS</td>
+                                    <td>16 bits</td>
+                                    <td>0~65535</td>
+                                    <td>실제 와이어 송급 속도 (IPM)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 40px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">2️⃣ 디지털 값 변환 공식</h3>
+
+                    <div class="signal-card">
+                        <h4>16비트 디지털 값 ↔ 실제 물리값 변환</h4>
+
+                        <div class="code-block" style="margin-top: 15px;">
+<span class="comment">// 전압(V) 변환 예시</span>
+<span class="keyword">물리값 → 디지털값:</span>
+  Digital_Value = (Physical_Value / Max_Value) × 65535
+
+  예시) 25.5V → 디지털값 계산:
+    Max_Voltage = <span class="value">50V</span>
+    Digital_Value = (25.5 / 50) × 65535 = <span class="value">33423</span>
+
+<span class="keyword">디지털값 → 물리값:</span>
+  Physical_Value = (Digital_Value / 65535) × Max_Value
+
+  예시) 디지털값 33423 → 전압 계산:
+    Voltage = (33423 / 65535) × 50 = <span class="value">25.5V</span>
+
+<span class="comment">// 전류(A) 변환 예시</span>
+  Max_Current = <span class="value">500A</span>
+  Target_Current = <span class="value">200A</span>
+  Digital_Value = (200 / 500) × 65535 = <span class="value">26214</span>
+
+<span class="comment">// WFS (Inch Per Minute) 변환 예시</span>
+  Max_WFS = <span class="value">1000 IPM</span>
+  Target_WFS = <span class="value">350 IPM</span>
+  Digital_Value = (350 / 1000) × 65535 = <span class="value">22937</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 40px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">3️⃣ ABB 로봇 프로그램 예제</h3>
+
+                    <div class="signal-card">
+                        <h4>RAPID 프로그래밍 (CV 모드 - 전압 + WFS 제어)</h4>
+
+                        <div class="code-block" style="margin-top: 15px;">
+<span class="comment">! DeviceNet 용접 제어 예제</span>
+<span class="keyword">MODULE</span> WeldControl
+
+  <span class="comment">! 용접 파라미터 변수</span>
+  <span class="keyword">VAR</span> num nVoltage := <span class="value">25.5</span>;      <span class="comment">! 목표 전압 (V)</span>
+  <span class="keyword">VAR</span> num nWFS := <span class="value">350</span>;          <span class="comment">! 와이어 송급 속도 (IPM)</span>
+  <span class="keyword">VAR</span> num nDigitalVoltage;
+  <span class="keyword">VAR</span> num nDigitalWFS;
+
+  <span class="comment">! 용접 시작</span>
+  <span class="keyword">PROC</span> StartWelding()
+
+    <span class="comment">! 전압을 16비트 디지털 값으로 변환</span>
+    nDigitalVoltage := <span class="value">(nVoltage / 50) * 65535</span>;
+
+    <span class="comment">! WFS를 16비트 디지털 값으로 변환</span>
+    nDigitalWFS := <span class="value">(nWFS / 1000) * 65535</span>;
+
+    <span class="comment">! DeviceNet Produced Assembly에 값 쓰기</span>
+    SetDO doWeldTrigger, <span class="value">1</span>;               <span class="comment">! Byte 0: 트리거 ON</span>
+    SetAO aoVoltage, nDigitalVoltage;      <span class="comment">! Byte 2-3: 전압</span>
+    SetAO aoWFS, nDigitalWFS;              <span class="comment">! Byte 4-5: WFS</span>
+
+    <span class="comment">! 용접 동작</span>
+    MoveL pWeldStart, v100, fine, tool0;
+    MoveL pWeldEnd, v50, fine, tool0;
+
+    <span class="comment">! 용접 종료</span>
+    SetDO doWeldTrigger, <span class="value">0</span>;               <span class="comment">! 트리거 OFF</span>
+
+  <span class="keyword">ENDPROC</span>
+
+  <span class="comment">! 실시간 피드백 읽기</span>
+  <span class="keyword">PROC</span> ReadWeldFeedback()
+
+    <span class="keyword">VAR</span> num nActualVoltage;
+    <span class="keyword">VAR</span> num nActualCurrent;
+
+    <span class="comment">! Consumed Assembly에서 피드백 읽기</span>
+    nActualVoltage := GetAI(aiActualVoltage);  <span class="comment">! Byte 2-3</span>
+    nActualCurrent := GetAI(aiActualCurrent);  <span class="comment">! Byte 4-5</span>
+
+    <span class="comment">! 물리값으로 변환</span>
+    nActualVoltage := <span class="value">(nActualVoltage / 65535) * 50</span>;
+    nActualCurrent := <span class="value">(nActualCurrent / 65535) * 500</span>;
+
+    TPWrite <span class="value">"Voltage: "</span> \Num:=nActualVoltage \Num:=<span class="value">"V"</span>;
+    TPWrite <span class="value">"Current: "</span> \Num:=nActualCurrent \Num:=<span class="value">"A"</span>;
+
+  <span class="keyword">ENDPROC</span>
+
+<span class="keyword">ENDMODULE</span>
+                        </div>
+                    </div>
+
+                    <div class="warning-box" style="margin-top: 20px;">
+                        <h3>⚠️ 주의사항</h3>
+                        <p>위 예제는 개념 설명용이며, 실제 ABB I/O 신호명과 매핑은 프로젝트 설정에 따라 다를 수 있습니다.</p>
+                        <p>DeviceNet I/O Mapping 설정 시 Produced/Consumed Assembly를 정확히 매핑해야 합니다.</p>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 40px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">4️⃣ 디지털 제어의 장점</h3>
+
+                    <div class="signal-card">
+                        <div class="signal-details">
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">정밀도</div>
+                                <div class="signal-detail-value">16비트 (65,536 단계) 분해능</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">노이즈 면역</div>
+                                <div class="signal-detail-value">디지털 신호로 전기 노이즈에 강함</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">실시간 피드백</div>
+                                <div class="signal-detail-value">전압, 전류, WFS 실시간 모니터링</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">배선 간소화</div>
+                                <div class="signal-detail-value">5선 케이블로 158개 신호 제어</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">원격 진단</div>
+                                <div class="signal-detail-value">에러 코드 및 상태 실시간 확인</div>
+                            </div>
+                            <div class="signal-detail-item">
+                                <div class="signal-detail-label">확장성</div>
+                                <div class="signal-detail-value">소프트웨어 업데이트로 기능 추가</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 문제 해결 탭 -->
+        <div id="troubleshooting" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">DeviceNet 연결 문제 해결</h2>
+
+                <div class="section">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">🔴 증상 1: 통신 연결 실패 (No Communication)</h3>
+
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ 물리적 연결 확인</div>
+                                <div class="item-desc">
+                                    • DeviceNet 케이블 연결 상태 확인 (CAN_H, CAN_L, V+, V- 순서)<br>
+                                    • 종단 저항(121Ω) 양 끝단 설치 확인<br>
+                                    • 케이블 손상 여부 육안 검사
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ 전원 확인</div>
+                                <div class="item-desc">
+                                    • DeviceNet 파워 서플라이 출력: 24VDC ±10%<br>
+                                    • 멀티미터로 V+ ~ V- 간 전압 측정<br>
+                                    • 과부하 또는 단락 확인
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ 통신 속도 일치 확인</div>
+                                <div class="item-desc">
+                                    • ABB Master와 Lincoln Slave의 Baud Rate 동일 설정<br>
+                                    • 125k / 250k / 500kbps 중 하나 선택<br>
+                                    • Auto Baud Rate 사용 시 충분한 초기화 시간 필요
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ Node Address 중복 확인</div>
+                                <div class="item-desc">
+                                    • 네트워크 상 모든 디바이스의 주소가 고유한지 확인<br>
+                                    • Lincoln 용접기 주소 설정 (예: Node 10)<br>
+                                    • ABB 스캐너 도구로 네트워크 노드 검색
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 30px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">🟡 증상 2: 연결은 되지만 제어 불가</h3>
+
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ I/O Mapping 확인</div>
+                                <div class="item-desc">
+                                    • Produced Assembly: ABB → Lincoln (8 bytes)<br>
+                                    • Consumed Assembly: Lincoln → ABB (8 bytes)<br>
+                                    • RobotStudio에서 I/O 신호 매핑 상태 확인
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ Power Wave Manager 설정 확인</div>
+                                <div class="item-desc">
+                                    • Power Wave Manager 실행 → DeviceNet → Power Source Controller<br>
+                                    • ID (Node Address): 네트워크 내 고유 번호 (예: 52)<br>
+                                    • 전원 속도: ABB와 동일 (125KB/250KB/500KB)<br>
+                                    • 아날로그 입력 (AN 1, 2, 3): 모두 "0" 설정 필수
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ Engineering Units 모드 확인</div>
+                                <div class="item-desc">
+                                    • "와이어 포인트 입력": Engineering units 선택<br>
+                                    • "트림/와이어 제어 입력": Engineering units 선택<br>
+                                    • Unscaled values 사용 시 값 변환 필요 (권장하지 않음)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ 아날로그 출력 설정</div>
+                                <div class="item-desc">
+                                    • "아날로그 출력": Actual WFS 선택<br>
+                                    • 실제 와이어 송급 속도 피드백을 ABB로 전송<br>
+                                    • WeldScore 대신 Actual WFS 사용 권장
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ EDS 파일 확인</div>
+                                <div class="item-desc">
+                                    • Lincoln Power Wave용 최신 EDS 파일 사용<br>
+                                    • ABB에 EDS 파일 정상 Import 확인<br>
+                                    • EDS 파일 버전과 용접기 펌웨어 버전 호환성 확인
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ 디지털 값 변환 확인</div>
+                                <div class="item-desc">
+                                    • 물리값(V, A) → 16비트 디지털 값 변환 공식 확인<br>
+                                    • 최대값 범위 확인 (전압: 0-50V, 전류: 0-500A)<br>
+                                    • ABB 프로그램에서 스케일링 로직 검증
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 30px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">🟠 증상 3: 간헐적 통신 끊김</h3>
+
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ 노이즈 확인</div>
+                                <div class="item-desc">
+                                    • Shield(차폐선) 접지 확인 (한쪽만 접지)<br>
+                                    • 고전압 케이블과 DeviceNet 케이블 분리 (최소 30cm)<br>
+                                    • 용접 시 발생하는 EMI 노이즈 차단
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ 케이블 길이 확인</div>
+                                <div class="item-desc">
+                                    • 통신 속도에 따른 최대 길이 준수<br>
+                                    • 125kbps: 500m / 250kbps: 250m / 500kbps: 100m<br>
+                                    • Drop 케이블 길이 최소화 (권장: 6m 이내)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checklist-item">
+                            <div class="item-content">
+                                <div class="item-title">✅ Timeout 설정 확인</div>
+                                <div class="item-desc">
+                                    • Connection Timeout 값 조정 (기본: 3초)<br>
+                                    • Expected Packet Rate (EPR) 설정 확인<br>
+                                    • Watchdog Timer 설정 확인
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 30px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">🔧 진단 도구 및 방법</h3>
+
+                    <div class="signal-card">
+                        <h4>ABB RobotStudio 진단</h4>
+                        <div class="code-block" style="margin-top: 15px;">
+<span class="comment">// DeviceNet 스캔 명령</span>
+1. RobotStudio → Controller → I/O System
+2. DeviceNet Network 선택
+3. "Scan Network" 클릭
+4. 검색된 노드 확인
+
+<span class="comment">// I/O 신호 모니터링</span>
+1. I/O System → Signals 탭
+2. DeviceNet 신호 실시간 모니터링
+3. Produced/Consumed Assembly 값 확인
+                        </div>
+                    </div>
+
+                    <div class="signal-card" style="margin-top: 20px;">
+                        <h4>Lincoln Power Wave Manager 진단</h4>
+                        <div class="code-block" style="margin-top: 15px;">
+<span class="comment">// Power Wave Manager 설정 확인</span>
+1. 용접기 네트워크 연결
+   - IP: 192.168.125.152 (EN1)
+   - Power Wave Manager 실행
+
+2. DeviceNet 설정 메뉴
+   - 네트워크 설정 → DeviceNet → Power Source Controller
+   - ID: 52 (Node Address)
+   - 전원 속도: 500KB
+
+3. 시스템 제어 탭
+   - 아날로그 입력 (AN 1~3): <span class="value">0</span>
+   - 와이어 포인트 입력: <span class="value">Engineering units</span>
+   - 트림/와이어 제어: <span class="value">Engineering units</span>
+   - 아날로그 출력: <span class="value">Actual WFS</span>
+
+4. 설정 저장
+   - 화면 하단 <span class="value">"설정 작용"</span> 버튼 클릭
+
+<span class="comment">// LED 상태 확인</span>
+Module Status LED:
+  - <span class="value">Green</span>: 정상 동작
+  - <span class="value">Red</span>: 에러 발생
+  - <span class="value">Off</span>: 전원 없음
+
+Network Status LED:
+  - <span class="value">Green</span>: 통신 정상
+  - <span class="value">Red</span>: 통신 에러
+  - <span class="value">Off</span>: 연결 없음
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" style="margin-top: 30px;">
+                    <h3 style="color: #2c3e50; margin-bottom: 20px;">📞 추가 지원</h3>
+
+                    <div class="info-box">
+                        <h3>연락처</h3>
+                        <p><strong>ABB 기술 지원:</strong> ABB Robotics Korea 고객지원센터</p>
+                        <p><strong>Lincoln Electric 지원:</strong> Lincoln Electric Korea 기술팀</p>
+                        <p><strong>DeviceNet 표준:</strong> ODVA (Open DeviceNet Vendor Association)</p>
+                    </div>
+
+                    <div class="warning-box" style="margin-top: 20px;">
+                        <h3>⚠️ 전문가 도움이 필요한 경우</h3>
+                        <p>• DeviceNet 네트워크 분석기로 CAN 버스 신호 확인</p>
+                        <p>• 펌웨어 업데이트 또는 다운그레이드</p>
+                        <p>• 하드웨어 고장 진단 (모듈 교체)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 탭 전환
+        function showTab(tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+
+            const tabButtons = document.querySelectorAll('.nav-tab');
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 체크박스 토글
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+            updateProgress();
+        }
+
+        // 진행률 업데이트
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checkbox');
+            const checkedCount = document.querySelectorAll('.checkbox.checked').length;
+            const totalCount = checkboxes.length;
+            const percentage = Math.round((checkedCount / totalCount) * 100);
+
+            document.getElementById('progressText').textContent = `${checkedCount}/${totalCount} (${percentage}%)`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            document.getElementById('progressBar').textContent = `${percentage}%`;
+        }
+
+        // 체크리스트 초기화
+        function resetChecklist() {
+            if (confirm('체크리스트를 초기화하시겠습니까?')) {
+                const checkboxes = document.querySelectorAll('.checkbox');
+                checkboxes.forEach(cb => cb.classList.remove('checked'));
+                updateProgress();
+            }
+        }
+
+        // 체크리스트 인쇄
+        function printChecklist() {
+            window.print();
+        }
+
+        // 페이지 로드 시
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

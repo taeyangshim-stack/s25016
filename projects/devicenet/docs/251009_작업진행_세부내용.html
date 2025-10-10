@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10/9 작업 진행 세부내용 - DeviceNet 통신 문제 해결</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .copy-section {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .btn-copy {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .copy-status {
+            margin-top: 15px;
+            font-size: 0.95em;
+            color: #3498db;
+            font-weight: bold;
+            min-height: 20px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .text-content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 5px solid #27ae60;
+            font-family: 'Malgun Gothic', sans-serif;
+            font-size: 0.95em;
+            line-height: 2;
+            color: #2c3e50;
+            white-space: pre-wrap;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #27ae60;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #27ae60;
+            margin: 20px 0;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #f39c12;
+            margin: 20px 0;
+        }
+
+        .issue-box {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #e74c3c;
+            margin: 20px 0;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .work-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+        }
+
+        .work-card h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin-top: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #27ae60 0%, #3498db 100%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 25px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #27ae60;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #27ae60;
+        }
+
+        .timeline-item.in-progress::before {
+            background: #f39c12;
+            box-shadow: 0 0 0 3px #f39c12;
+        }
+
+        .timeline-item.issue::before {
+            background: #e74c3c;
+            box-shadow: 0 0 0 3px #e74c3c;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-complete {
+            background: #27ae60;
+            color: white;
+        }
+
+        .badge-progress {
+            background: #f39c12;
+            color: white;
+        }
+
+        .badge-issue {
+            background: #e74c3c;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        table th {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .photo-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .photo-card .caption {
+            padding: 15px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 10/9 작업 진행 세부내용</h1>
+            <p>DeviceNet 통신 문제 해결 - 병행 작업 결과 보고</p>
+        </div>
+
+        <div class="copy-section">
+            <button class="btn-copy" onclick="copyToClipboard()">
+                📋 텍스트 복사하기
+            </button>
+            <div class="copy-status" id="copyStatus"></div>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <h3 style="color: #27ae60; margin-bottom: 10px;">📅 작업 정보</h3>
+                <p>
+                    <strong>일시:</strong> 2024년 10월 9일 (수)<br>
+                    <strong>참석:</strong> ABB 엔지니어 + Lincoln 엔지니어 (현장 방문)<br>
+                    <strong>작업 방식:</strong> 병행 작업 (1~2호기 파라미터 최적화 / 3호기 시스템 재구축)<br>
+                    <strong>담당:</strong> SP 심태양
+                </p>
+            </div>
+
+            <div id="textContent" class="text-content">[10/9 작업 진행 세부내용]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+■ 작업 개요
+
+▶ 작업 목표
+- 1~2호기: DeviceNet 용접 파라미터 최적화 및 테스트
+- 3호기: 시스템 완전 리빌딩 (컨트롤러-용접기 조합 검증)
+
+▶ 작업 일정
+- 시작 시간:
+- 종료 시간:
+- 총 소요 시간:
+
+▶ 참석 인원
+- ABB 엔지니어: [이름]
+- Lincoln 엔지니어: [이름]
+- 현장 담당: SP 심태양
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+■ 1~2호기 작업 내용 (용접 파라미터 최적화)
+
+【작업 1】 용접 모드(CC/CV) 설정
+───────────────────────────────────
+• 목표: 로봇 용접에 최적화된 CV 모드 설정 확인
+• 작업 내용:
+  - Lincoln Power Wave Manager 용접 모드 확인
+  - CC(Constant Current) vs CV(Constant Voltage) 비교 분석
+  - 로봇 제어 방식에 따른 최적 모드 선택
+
+• 설정 값:
+  [1호기]
+    - 용접 모드:
+    - 전압 설정:
+    - 전류 범위:
+
+  [2호기]
+    - 용접 모드:
+    - 전압 설정:
+    - 전류 범위:
+
+• 결과:
+  ✅ / ⚠️ / ❌
+
+
+【작업 2】 WFS(와이어 피딩 속도) 제어
+───────────────────────────────────
+• 목표: 로봇에서 WFS 정상 제어 확인
+• 작업 내용:
+  - DeviceNet I/O Assembly Byte 4-5 (WFS 제어 신호) 확인
+  - 16-bit Digital Value 변환 검증
+  - 실제 와이어 피딩 속도 응답 테스트
+
+• 설정 값:
+  - WFS 최소값:
+  - WFS 최대값:
+  - 제어 분해능:
+
+• 테스트 결과:
+  - 로봇 명령값: [예: 300 IPM]
+  - Digital Value: [예: (300/500)×65535 = 39321]
+  - 실제 출력:
+  - 오차율:
+
+• 결과:
+  ✅ / ⚠️ / ❌
+
+
+【작업 3】 용접 전압 파라미터 설정
+───────────────────────────────────
+• 목표: 로봇에서 용접 전압 정상 제어 확인
+• 작업 내용:
+  - DeviceNet I/O Assembly Byte 2-3 (전압 제어 신호) 확인
+  - Workpoint/Trim 방식 vs Direct Voltage 방식 비교
+  - 전압 변화에 따른 용접 품질 확인
+
+• 설정 값:
+  - 기준 전압:
+  - Trim 범위:
+  - 제어 방식:
+
+• 테스트 결과:
+  - 설정 전압:
+  - 실제 출력:
+  - 아크 안정성:
+
+• 결과:
+  ✅ / ⚠️ / ❌
+
+
+【작업 4】 용접 스케줄 매칭
+───────────────────────────────────
+• 목표: 로봇 티칭 데이터와 용접기 스케줄 동기화
+• 작업 내용:
+  - Weld Schedule Object (Class 101) 파라미터 확인
+  - 로봇 프로그램 내 스케줄 번호 매핑
+  - 각 용접 구간별 스케줄 적용 테스트
+
+• 스케줄 설정:
+  [Schedule 1]
+    - 용도:
+    - 전압:
+    - WFS:
+    - 가스 유량:
+
+  [Schedule 2]
+    - 용도:
+    - 전압:
+    - WFS:
+    - 가스 유량:
+
+• 결과:
+  ✅ / ⚠️ / ❌
+
+
+【작업 5】 실제 용접 테스트
+───────────────────────────────────
+• 목표: 설정된 파라미터로 실제 용접 실행 및 검증
+• 작업 내용:
+  - 테스트 피스 준비
+  - 용접 시퀀스 실행 (Preflow → Strike → Weld → Postflow)
+  - 용접 비드 육안 검사
+  - 아크 안정성 평가
+
+• 테스트 조건:
+  - 모재 종류:
+  - 모재 두께:
+  - 용접 속도:
+  - 자세:
+
+• 테스트 결과:
+  [1호기]
+    - 아크 착화:
+    - 아크 안정성:
+    - 비드 외관:
+    - 스패터:
+
+  [2호기]
+    - 아크 착화:
+    - 아크 안정성:
+    - 비드 외관:
+    - 스패터:
+
+• 결과:
+  ✅ / ⚠️ / ❌
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+■ 3호기 작업 내용 (시스템 재구축)
+
+【작업 1】 기존 설정 완전 삭제
+───────────────────────────────────
+• 목표: 이더넷 기반 설정 제거 및 초기화
+• 작업 내용:
+  - RobotWare 내 ArcLink 모듈 제거
+  - Ethernet 통신 설정 삭제
+  - I/O 매핑 초기화
+
+• 삭제된 설정:
+  - ArcLink 버전:
+  - Ethernet 설정:
+  - 용접기 IP 주소:
+
+• 결과:
+  ✅ / ⚠️ / ❌
+
+
+【작업 2】 DeviceNet 방식 리빌딩
+───────────────────────────────────
+• 목표: A라인과 동일한 조건(컨트롤러 1대 + 용접기 1대)으로 구성
+• 작업 내용:
+  - DeviceNet 옵션 모듈 설치
+  - Network Topology 구성 (Controller → Welder 1대만)
+  - Node Address 및 Baud Rate 설정
+  - I/O Assembly 매핑
+
+• 설정 값:
+  - Node Address:
+  - Baud Rate:
+  - Produced Assembly Size: 8 bytes
+  - Consumed Assembly Size: 8 bytes
+
+• 결과:
+  ✅ / ⚠️ / ❌
+
+
+【작업 3】 통신 연결 테스트
+───────────────────────────────────
+• 목표: DeviceNet 물리적 연결 및 데이터 송수신 확인
+• 작업 내용:
+  - DeviceNet 네트워크 스캔
+  - Node 인식 확인
+  - I/O 데이터 송수신 테스트 (Digital/Analog)
+  - 통신 오류율 모니터링
+
+• 테스트 결과:
+  - Node 인식:
+  - Digital I/O:
+  - Analog I/O:
+  - 통신 오류:
+
+• 결과:
+  ✅ / ⚠️ / ❌
+
+
+【작업 4】 A라인 조건 검증
+───────────────────────────────────
+• 목표: 컨트롤러 1대 + 용접기 1대 조건에서 통신 안정성 확인
+• 작업 내용:
+  - 장시간 통신 안정성 테스트
+  - 반복 용접 시퀀스 실행
+  - 통신 장애 재현 여부 확인
+
+• 가설 검증:
+  [가설] ABB 컨트롤러가 2대 용접기 제어 시 펌웨어 문제 발생
+  [검증 방법] 1대 구성으로 변경 후 통신 장애 재현 여부 확인
+
+• 테스트 시간:
+• 테스트 횟수:
+• 통신 장애 발생: 예 / 아니오
+
+• 결과:
+  ✅ / ⚠️ / ❌
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+■ 발견된 문제점 및 해결 방안
+
+【문제 1】
+───────────────────────────────────
+• 증상:
+
+• 원인 분석:
+
+• 해결 방법:
+
+• 적용 결과:
+
+
+【문제 2】
+───────────────────────────────────
+• 증상:
+
+• 원인 분석:
+
+• 해결 방법:
+
+• 적용 결과:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+■ 작업 완료 현황
+
+▶ 1~2호기 (용접 파라미터 최적화)
+  ✅ 용접 모드 설정
+  ✅ WFS 제어
+  ✅ 용접 전압 설정
+  ✅ 용접 스케줄 매칭
+  ✅ 실제 용접 테스트
+
+  종합 결과:
+
+▶ 3호기 (시스템 재구축)
+  ✅ 기존 설정 삭제
+  ✅ DeviceNet 리빌딩
+  ✅ 통신 연결 테스트
+  ✅ A라인 조건 검증
+
+  종합 결과:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+■ 향후 계획
+
+▶ 남은 작업
+1.
+2.
+3.
+
+▶ 다음 일정
+- 일시:
+- 작업 내용:
+
+▶ 예상 완료 시점
+- 1~2호기:
+- 3호기:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+■ 특이사항 및 건의사항
+
+•
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+작성자: SP 심태양
+작성일: 2024년 10월 9일
+프로젝트: S25016 - 34bay 자동용접 시스템</div>
+
+            <div class="section-title">📊 작업 타임라인</div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>오전 (09:00~12:00)</strong>
+                    <span class="badge badge-complete">COMPLETE</span>
+                    <div style="margin-top: 10px;">
+                        <strong>작업 내용:</strong><br>
+                        • ABB + Lincoln 엔지니어 현장 도착<br>
+                        • 작업 계획 브리핑<br>
+                        • 1~2호기: 용접 모드 설정 및 WFS 제어 테스트<br>
+                        • 3호기: 기존 설정 삭제 시작
+                    </div>
+                </div>
+
+                <div class="timeline-item in-progress">
+                    <strong>오후 (13:00~17:00)</strong>
+                    <span class="badge badge-progress">IN PROGRESS</span>
+                    <div style="margin-top: 10px;">
+                        <strong>작업 내용:</strong><br>
+                        • 1~2호기: 용접 전압, 스케줄 설정<br>
+                        • 1~2호기: 실제 용접 테스트<br>
+                        • 3호기: DeviceNet 리빌딩 및 통신 테스트<br>
+                        • 종합 평가 및 문제점 분석
+                    </div>
+                </div>
+
+                <div class="timeline-item issue">
+                    <strong>발견된 이슈</strong>
+                    <span class="badge badge-issue">ISSUE</span>
+                    <div style="margin-top: 10px;">
+                        <strong>문제 내용:</strong><br>
+                        • [이슈 내용을 여기에 기록]
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">📸 작업 사진</div>
+
+            <div class="photo-grid">
+                <div class="photo-card">
+                    <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1759963122/s25016/ujgphrthdozfryfysqza.png" alt="용접기 및 로봇 통신 에러" style="width: 100%; height: auto; max-height: 400px; object-fit: contain;">
+                    <div class="caption">
+                        <strong>용접기 및 로봇 통신 에러</strong><br>
+                        Lincoln Power Wave Manager 상태 화면
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">📋 파라미터 설정 상세</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>항목</th>
+                        <th>1호기</th>
+                        <th>2호기</th>
+                        <th>3호기</th>
+                        <th>비고</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>용접 모드</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>전압 (V)</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>WFS (IPM)</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Node Address</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Baud Rate</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>통신 상태</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>용접 테스트</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <strong>✅ 작업 완료 기준</strong><br>
+                • DeviceNet 통신 안정성: 연속 100회 이상 통신 성공<br>
+                • 용접 품질: 육안 검사 합격 (스패터 최소, 비드 균일)<br>
+                • 파라미터 제어: 설정값 대비 오차 ±5% 이내<br>
+                • 시스템 안정성: 2시간 이상 연속 운전 무장애
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ 주의사항</strong><br>
+                • 모든 설정 변경 시 반드시 기록<br>
+                • 이슈 발생 시 즉시 보고 및 문서화<br>
+                • 용접 테스트 전 안전 점검 필수<br>
+                • ABB/Lincoln 엔지니어 확인 후 최종 설정 적용
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard() {
+            const textContent = document.getElementById('textContent').innerText;
+            const statusElement = document.getElementById('copyStatus');
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textContent).then(function() {
+                    statusElement.textContent = '✅ 복사 완료! 메신저에 붙여넣기 하세요.';
+                    statusElement.style.color = '#3498db';
+
+                    setTimeout(() => {
+                        statusElement.textContent = '';
+                    }, 3000);
+                }, function(err) {
+                    statusElement.textContent = '❌ 복사 실패. 텍스트를 직접 선택하여 복사해주세요.';
+                    statusElement.style.color = '#e74c3c';
+                });
+            } else {
+                const textArea = document.createElement('textarea');
+                textArea.value = textContent;
+                textArea.style.position = 'fixed';
+                textArea.style.top = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+
+                try {
+                    document.execCommand('copy');
+                    statusElement.textContent = '✅ 복사 완료! 메신저에 붙여넣기 하세요.';
+                    statusElement.style.color = '#3498db';
+
+                    setTimeout(() => {
+                        statusElement.textContent = '';
+                    }, 3000);
+                } catch (err) {
+                    statusElement.textContent = '❌ 복사 실패. 텍스트를 직접 선택하여 복사해주세요.';
+                    statusElement.style.color = '#e74c3c';
+                }
+
+                document.body.removeChild(textArea);
+            }
+        }
+
+        // 페이지 로드 애니메이션
+        document.addEventListener('DOMContentLoaded', function() {
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateX(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
