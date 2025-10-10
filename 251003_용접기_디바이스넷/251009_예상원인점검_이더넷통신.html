@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>251009_예상 원인 점검 (로봇-용접기 Ethernet 통신)</title>
+  <style>
+    :root {
+      --fg: #2c3e50;
+      --muted: #7f8c8d;
+      --accent: #e74c3c;
+      --ok: #27ae60;
+      --warn: #f39c12;
+      --bg: #f8f9fa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Malgun Gothic", Tahoma, sans-serif;
+      color: var(--fg);
+      background: #ffffff;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    header {
+      border-bottom: 3px solid var(--accent);
+      background: linear-gradient(135deg, #ffffff 0%, #fff6f5 100%);
+      padding: 20px;
+    }
+    header h1 {
+      margin: 0 0 4px 0;
+      font-size: 1.4rem;
+    }
+    header .meta {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    main { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    section { margin: 28px 0; }
+    h2 {
+      margin: 0 0 10px 0;
+      font-size: 1.15rem;
+      border-left: 5px solid var(--accent);
+      padding-left: 10px;
+    }
+    h3 { font-size: 1.0rem; margin: 18px 0 8px 0; }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 8px 18px; }
+    code { background: #fff2ef; padding: 0 4px; border-radius: 3px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.82rem; }
+    .tag.draft { background: #ffe9e4; color: #b23b2f; border: 1px solid #ffcabf; }
+    .callout { background: var(--bg); border-left: 4px solid var(--warn); padding: 12px 14px; border-radius: 6px; }
+    .ok { color: var(--ok); font-weight: 600; }
+    .fail { color: #c0392b; font-weight: 600; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .card { background: #ffffff; border: 1px solid #eaecef; border-radius: 8px; padding: 14px; }
+    footer { margin: 30px 0 10px; color: var(--muted); font-size: 0.9rem; }
+  </style>
+  <meta name="description" content="로봇-용접기 Ethernet 통신 문제 해결을 위한 가설별 검증 절차와 관찰 결과 (검토용 초안)">
+  <meta name="robots" content="noindex">
+</head>
+<body>
+  <header>
+    <h1>예상 원인 점검 (로봇-용접기 Ethernet 통신) <span class="tag draft">검토용 초안</span></h1>
+    <div class="meta">일자: 2024-10-09 · 프로젝트: S25016 · 담당: SP 심태양</div>
+  </header>
+
+  <main>
+    <section>
+      <h2>목적</h2>
+      <p>자동용접 시스템 B라인에서 발생한 로봇-용접기 간 통신 불안정 문제의 <strong>이더넷 경로 관련 가설</strong>을 체계적으로 배제하기 위한 검증 기록입니다.</p>
+    </section>
+
+    <section>
+      <h2>공통 테스트 방법</h2>
+      <div class="card">
+        <p>각 가설은 동일한 절차로 검증했습니다. 핵심은 <strong>실제 용접 수행 → 로봇·용접기 통신 로그 대조</strong>입니다.</p>
+        <ul>
+          <li>동일 조건의 테스트 패턴으로 <strong>실제 아크 발생</strong> 포함 용접 실행.</li>
+          <li>시간 기준 통일: 로봇 컨트롤러와 용접기 HMI/제어기의 시각을 사전 동기화(±1초 이내).</li>
+          <li>로그 수집 원천:
+            <ul>
+              <li>ABB 컨트롤러: 시스템 이벤트/통신 진단, 인터페이스 오류 카운터(링크 up/down, CRC 등).</li>
+              <li>용접기: 통신 상태 이벤트, 파라미터 수신/적용 상태 및 오류 메시지.</li>
+              <li>네트워크 장치(해당 시): 허브/스위치 포트 상태, 오류 프레임 카운터.</li>
+            </ul>
+          </li>
+          <li>검증 기준: 용접 시점 ±30초 구간에서 <strong>통신 오류 이벤트의 재현 여부</strong>를 확인.</li>
+          <li>보조 계측(해당 시): 케이블 연속성/절연, 링크 속도/듀플렉스 강제, 핑 지터/손실.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>가설별 검증</h2>
+
+      <article class="card">
+        <h3>1) 케이블 단선·접촉 불량 가설</h3>
+        <div class="grid">
+          <div>
+            <strong>절차</strong>
+            <ul>
+              <li>X5 포트 ↔ 용접기 간 이더넷 케이블 <strong>신품 교체</strong>(실드 CAT6 적용).</li>
+              <li>RJ45 커넥터 체결 상태 반복 점검(라쳇 잠김 확인, 흔들림/스트레인 릴리프 확인).</li>
+              <li>연속성/핀맵 테스트(테스터) 및 <strong>와글/진동</strong> 유발 후 재확인.</li>
+              <li>용접 실행 후 로봇/용접기 통신 로그에서 동일 오류 재현 여부 확인.</li>
+            </ul>
+          </div>
+          <div>
+            <strong>관찰/결과</strong>
+            <ul>
+              <li>용접 직후 로그에 <em>동일 유형의 통신 오류</em>가 계속 기록.</li>
+              <li>링크 상태 변화 없음, 물리층 오류(예: CRC) 유의미 감소 없음.</li>
+              <li class="fail">판단: <strong>물리적 케이블 이슈 아님</strong> (개선 대상에서 제외).</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>2) 전원·통신 케이블 간섭(EMI) 가설</h3>
+        <div class="grid">
+          <div>
+            <strong>절차</strong>
+            <ul>
+              <li>전원선과 이더넷 케이블 <strong>분리 배선</strong>(교차 시 90° 유지, 평행 구간 최소화).</li>
+              <li>접지 상태 재점검(로봇 컨트롤러/용접기 섀시 접지 연속성).</li>
+              <li>필요 시 페라이트 코어 보강, 케이블 트레이 내 분리 칸 사용.</li>
+              <li>동일 용접 패턴 수행 후 통신 로그 재확인.</li>
+            </ul>
+          </div>
+          <div>
+            <strong>관찰/결과</strong>
+            <ul>
+              <li>로그 상 오류 이벤트 지속, 아크 구간과 발생 시점 상관관계 불명확.</li>
+              <li>EMI 완화 조치 전/후 <em>오류 빈도 차 미미</em>.</li>
+              <li class="fail">판단: <strong>전자 간섭 가능성 낮음</strong> (원인 후보군 제외).</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>3) LAN(X5, 192.168.125.xxx) 구성 문제 가설</h3>
+        <div class="grid">
+          <div>
+            <strong>절차</strong>
+            <ul>
+              <li>X5↔용접기 <strong>직결</strong> / 허브 경유 <strong>단일</strong> / 허브 경유 <strong>다중</strong> 토폴로지 각각 테스트.</li>
+              <li>여타 트래픽 차단(브로드캐스트/관리 트래픽 최소화) 후 재시험.</li>
+              <li>각 시나리오별 용접 수행 → 로봇/용접기 로그 비교.</li>
+            </ul>
+          </div>
+          <div>
+            <strong>관찰/결과</strong>
+            <ul>
+              <li>모든 토폴로지에서 <em>동일 오류 유형</em> 반복 기록.</li>
+              <li>지연/충돌 추정 정황 미검출, 링크 재협상 이벤트 없음.</li>
+              <li class="fail">판단: <strong>LAN 측 구성 이상 아님</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>4) LAN3(192.168.131.xxx) 네트워크 분리 가설</h3>
+        <div class="grid">
+          <div>
+            <strong>절차</strong>
+            <ul>
+              <li>VLAN 분리, 포트 재할당, X3/X5 분리 운용 등 <strong>격리 구성</strong> 적용.</li>
+              <li>관리/진단 트래픽 분리 후 동일 용접 패턴 재시험.</li>
+              <li>분리 전·후 용접 시점 로그를 동일 기준으로 대조.</li>
+            </ul>
+          </div>
+          <div>
+            <strong>관찰/결과</strong>
+            <ul>
+              <li>분리 구성에서도 오류 이벤트 <em>변동 없음</em>.</li>
+              <li class="fail">판단: <strong>네트워크 분리만으로는 원인 설명 불가</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <h2>로그 확인 항목(체크리스트)</h2>
+      <div class="card">
+        <ul>
+          <li>용접 실행 시점 ±30초 구간의 로봇/용접기 오류 이벤트 존재 여부.</li>
+          <li>링크 <em>up/down</em> 변화, 재협상, CRC/프레임 오류 카운트 증감.</li>
+          <li>파라미터 수신/적용 상태(예: WFS, 전압, 스케줄)와 오류 동시발생 여부.</li>
+          <li>허브/스위치 사용 시 포트 오류 카운터(충돌, 드롭) 유무.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>결론(10/8 기준)</h2>
+      <div class="card">
+        <p>현재 <strong>이더넷 조건만으로는</strong> 통신 이상 원인 판단 및 안정화에 <strong>한계</strong>가 있습니다.</p>
+        <p class="ok">이에 따라 <strong>DeviceNet</strong>으로 통신 방식을 전환하여 안정성을 확보하는 방향으로 진행합니다.</p>
+        <ul>
+          <li>결정론적 폴링 기반 I/O 교환으로 <strong>타이밍 일관성</strong> 우수.</li>
+          <li><strong>노이즈 내성</strong> 및 케이블링 규격이 용접 환경에 유리.</li>
+          <li>용접 파라미터/스케줄의 <strong>I/O 매핑 명확</strong>·진단 용이.</li>
+          <li>다중 장치 구성 시 <strong>충돌/브로드캐스트 영향 최소</strong>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>업데이트</h2>
+      <div class="card">
+        <p><strong>10/9</strong> · DeviceNet 통신 및 용접 조건 확인 <span class="ok">성공</span></p>
+        <ul>
+          <li>로봇 ↔ 용접기 DeviceNet 링크 정상, 용접 조건 적용 확인.</li>
+        </ul>
+        <p style="margin-top:10px;"><strong>10/10 예정</strong></p>
+        <ul>
+          <li>DeviceNet <strong>하드와이어링 배선</strong> 확인 및 정비.</li>
+          <li>ABB 로봇 <strong>DeviceNet 타입 리빌딩</strong> 실시.</li>
+          <li>DeviceNet 관련 <strong>ArcWare 코딩</strong> 수정.</li>
+          <li>B라인 <strong>용접 테스트</strong> 실시.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>구성 시나리오(도면)</h2>
+      <div class="card">
+        <figure>
+          <img src="img/251009_구성_x5직결_LAN_LAN3.jpg" alt="X5 직결 구성: LAN/LAN3 조건" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>X5 직결 (각각 LAN 조건, LAN3 조건)</figcaption>
+        </figure>
+        <figure>
+          <img src="img/251009_구성_허브단열_LAN_LAN3.jpg" alt="허브 경유 단열: LAN/LAN3 조건" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>허브 경유 단열 (각각 LAN 조건, LAN3 조건)</figcaption>
+        </figure>
+        <figure>
+          <img src="img/251009_구성_허브복열_LAN_LAN3.jpg" alt="허브 경유 복열: LAN/LAN3 조건" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>허브 경유 복열 (각각 LAN 조건, LAN3 조건)</figcaption>
+        </figure>
+        <figure>
+          <img src="img/251009_케이블_덕트분리.jpg" alt="케이블 확인 및 덕트 내 분리" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>케이블 확인 및 덕트 내 분리</figcaption>
+        </figure>
+        <p style="color:#7f8c8d;margin-top:8px;">이미지는 <code>251003_용접기_디바이스넷/img/</code> 폴더에 업로드해 주세요. 파일명이 다르면 <code>src</code> 경로만 맞춰주면 됩니다.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>참고자료</h2>
+      <div class="card">
+        <figure>
+          <img src="img/A라인구성.jpg" alt="A라인 네트워크 구성도" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>A라인 네트워크 구성도</figcaption>
+        </figure>
+        <figure>
+          <img src="img/B라인구성.jpg" alt="B라인 네트워크 구성도" style="max-width:100%;height:auto;border:1px solid #eee;border-radius:6px;">
+          <figcaption>B라인 네트워크 구성도</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    
+  </main>
+</body>
+</html>
