@@ -1,0 +1,278 @@
+{
+  "templateId": "quality-issue",
+  "name": "품질 이슈",
+  "description": "품질 불량 및 검사 관련 이슈 등록 템플릿",
+  "icon": "⚠️",
+  "version": "1.0",
+  "defaultValues": {
+    "category": "제어",
+    "priority": "높음",
+    "status": "신규"
+  },
+  "requiredFields": [
+    "title",
+    "description",
+    "owner",
+    "request_date",
+    "target_date",
+    "customFields.defect_rate",
+    "customFields.inspection_result"
+  ],
+  "recommendedFields": [
+    "customFields.production_loss",
+    "customFields.customer_impact",
+    "cause",
+    "action_plan"
+  ],
+  "customFields": {
+    "defect_rate": {
+      "enabled": true,
+      "required": true
+    },
+    "inspection_result": {
+      "enabled": true,
+      "required": true,
+      "defaultValue": "불합격"
+    },
+    "production_loss": {
+      "enabled": true,
+      "required": false
+    },
+    "customer_impact": {
+      "enabled": true,
+      "required": false,
+      "defaultValue": "중간"
+    },
+    "claim_flag": {
+      "enabled": true,
+      "required": false
+    },
+    "claim_details": {
+      "enabled": true,
+      "required": false
+    },
+    "equipment_serial": {
+      "enabled": true,
+      "required": false
+    },
+    "equipment_model": {
+      "enabled": true,
+      "required": false
+    }
+  },
+  "defectTypes": [
+    {
+      "id": "welding_defect",
+      "name": "용접 불량",
+      "subcategories": [
+        "비드 불량",
+        "기공",
+        "균열",
+        "언더컷",
+        "오버랩",
+        "스패터"
+      ]
+    },
+    {
+      "id": "dimension_defect",
+      "name": "치수 불량",
+      "subcategories": [
+        "길이 오차",
+        "각도 오차",
+        "평행도 오차",
+        "직각도 오차"
+      ]
+    },
+    {
+      "id": "assembly_defect",
+      "name": "조립 불량",
+      "subcategories": [
+        "부품 누락",
+        "잘못된 조립",
+        "볼트 체결 불량",
+        "간섭"
+      ]
+    },
+    {
+      "id": "appearance_defect",
+      "name": "외관 불량",
+      "subcategories": [
+        "스크래치",
+        "도장 불량",
+        "오염",
+        "변형"
+      ]
+    },
+    {
+      "id": "function_defect",
+      "name": "기능 불량",
+      "subcategories": [
+        "동작 불량",
+        "누유/누수",
+        "이상음",
+        "과열"
+      ]
+    }
+  ],
+  "autoActions": [
+    {
+      "trigger": "onCreate",
+      "action": "sendEmail",
+      "recipients": ["owner", "approver", "quality_manager"],
+      "emailTemplate": "quality-issue-notification",
+      "subject": "[품질 이슈] {{title}}",
+      "priority": "high"
+    },
+    {
+      "trigger": "onCreate",
+      "condition": "customFields.defect_rate > 5",
+      "action": "escalate",
+      "escalationLevel": "2단계-부장",
+      "message": "불량률 5% 초과로 에스컬레이션"
+    },
+    {
+      "trigger": "onCreate",
+      "condition": "customFields.claim_flag === true",
+      "action": "createFollowUpIssue",
+      "template": "emergency",
+      "priority": "긴급",
+      "message": "고객 클레임 발생으로 긴급 대응 필요"
+    },
+    {
+      "trigger": "statusChange",
+      "condition": "status === '완료'",
+      "action": "requireInspection",
+      "inspector": "quality_manager",
+      "message": "품질 이슈 완료 검증이 필요합니다"
+    }
+  ],
+  "notifications": {
+    "onCreate": {
+      "channels": ["email", "slack"],
+      "message": "⚠️ 품질 이슈 발생: {{title}} (불량률: {{customFields.defect_rate}}%)"
+    },
+    "onHighDefectRate": {
+      "condition": "customFields.defect_rate > 5",
+      "channels": ["email", "sms", "slack"],
+      "message": "🚨 높은 불량률 감지: {{title}} ({{customFields.defect_rate}}%)",
+      "highPriority": true
+    }
+  },
+  "workflow": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "불량 현상 확인",
+        "duration": "즉시",
+        "actions": [
+          "불량 샘플 확보",
+          "불량률 측정",
+          "사진 촬영",
+          "초기 보고"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "원인 분석 (5Why)",
+        "duration": "4시간 이내",
+        "actions": [
+          "1차 원인 파악",
+          "2차 원인 파악",
+          "3차 원인 파악",
+          "4차 원인 파악",
+          "근본 원인 도출"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "임시 조치",
+        "duration": "8시간 이내",
+        "actions": [
+          "불량품 격리",
+          "임시 대책 수립",
+          "임시 대책 실시",
+          "효과 확인"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "항구 대책",
+        "duration": "3일 이내",
+        "actions": [
+          "근본 대책 수립",
+          "재발 방지 대책",
+          "표준서 개정",
+          "교육 실시"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "효과 확인",
+        "duration": "7일 이내",
+        "actions": [
+          "불량률 재측정",
+          "품질 검증",
+          "최종 보고",
+          "완료 승인"
+        ]
+      }
+    ]
+  },
+  "helpText": {
+    "title": "발생한 품질 불량의 종류와 위치를 명시하세요",
+    "description": "불량 현상을 구체적으로 기술하세요 (언제, 어디서, 무엇이, 어떻게)",
+    "cause": "5Why 기법으로 근본 원인을 분석하세요",
+    "action_plan": "임시 조치와 항구 대책을 구분하여 작성하세요",
+    "defect_rate": "발생한 불량률을 %로 입력하세요 (불량 수량 / 전체 수량 × 100)"
+  },
+  "examples": [
+    {
+      "title": "A라인 용접 비드 불량 (기공 발생)",
+      "category": "제어",
+      "subcategory": "로봇",
+      "priority": "높음",
+      "description": "A라인 1호기 하부 용접부에 기공 발생\n- 발생 위치: 하부 프레임 용접부\n- 발생 시간: 2024-10-10 09:00\n- 발생 수량: 15개 / 100개",
+      "cause": "Why1: 기공이 발생했다\nWhy2: 가스 보호가 불충분했다\nWhy3: 가스 유량이 낮았다\nWhy4: 가스 레귤레이터 설정이 잘못되었다\nWhy5: DeviceNet 파라미터 설정 오류",
+      "action_plan": "【임시 조치】\n1. 불량품 15개 격리\n2. 가스 유량 수동 조정 (15 → 20 L/min)\n3. 재작업 실시\n\n【항구 대책】\n1. DeviceNet 가스 유량 파라미터 수정\n2. 용접 조건 표준서 개정\n3. 작업자 재교육",
+      "customFields": {
+        "defect_rate": 15,
+        "inspection_result": "불합격",
+        "production_loss": 15,
+        "customer_impact": "높음",
+        "equipment_model": "Lincoln Power Wave S500"
+      }
+    },
+    {
+      "title": "B라인 치수 불량 (길이 오차)",
+      "category": "기계",
+      "subcategory": "프레임",
+      "priority": "높음",
+      "description": "B라인 프레임 조립품 길이 오차 발생\n- 설계 치수: 2000mm\n- 실측 치수: 2005mm\n- 공차 범위: ±2mm\n- 불량 수량: 8개 / 50개",
+      "cause": "Why1: 길이가 5mm 길다\nWhy2: 용접 변형이 발생했다\nWhy3: 용접 순서가 잘못되었다\nWhy4: 작업 표준서가 없다\nWhy5: 신규 작업자 교육 미실시",
+      "action_plan": "【임시 조치】\n1. 불량품 8개 격리\n2. 치수 재측정 후 재작업\n3. 숙련자 투입\n\n【항구 대책】\n1. 용접 순서 표준서 작성\n2. 지그 개선\n3. 신규 작업자 교육 체계 수립",
+      "customFields": {
+        "defect_rate": 16,
+        "inspection_result": "불합격",
+        "production_loss": 8,
+        "customer_impact": "중간",
+        "claim_flag": false
+      }
+    }
+  ],
+  "analysisForms": {
+    "5why": {
+      "why1": "",
+      "why2": "",
+      "why3": "",
+      "why4": "",
+      "why5": "",
+      "rootCause": ""
+    },
+    "4m": {
+      "man": "작업자 관련 원인",
+      "machine": "설비/장비 관련 원인",
+      "material": "자재/소재 관련 원인",
+      "method": "방법/절차 관련 원인"
+    }
+  }
+}

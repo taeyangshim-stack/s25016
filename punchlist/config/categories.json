@@ -1,0 +1,125 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2024-10-10",
+  "description": "S25016 프로젝트 이슈 분류 체계",
+  "categories": [
+    {
+      "id": "mechanical",
+      "name": "기계",
+      "icon": "🔧",
+      "color": "#3b82f6",
+      "description": "기계 및 구조물 관련 이슈",
+      "subcategories": [
+        {
+          "id": "structure",
+          "name": "구조물",
+          "description": "프레임, 베이스 등 구조물 관련",
+          "keywords": ["프레임", "베이스", "구조", "용접"]
+        },
+        {
+          "id": "frame",
+          "name": "프레임",
+          "description": "기계 프레임 및 하우징",
+          "keywords": ["프레임", "하우징", "커버"]
+        },
+        {
+          "id": "transport",
+          "name": "이송장치",
+          "description": "컨베이어, 리프터 등 이송 관련",
+          "keywords": ["컨베이어", "리프터", "이송", "반송"]
+        },
+        {
+          "id": "custom",
+          "name": "기타",
+          "description": "기타 기계 관련 이슈",
+          "allowCustomInput": true
+        }
+      ]
+    },
+    {
+      "id": "electrical",
+      "name": "전기",
+      "icon": "⚡",
+      "color": "#f59e0b",
+      "description": "전기 및 전원 관련 이슈",
+      "subcategories": [
+        {
+          "id": "wiring",
+          "name": "배선",
+          "description": "전기 배선 및 케이블 관련",
+          "keywords": ["배선", "케이블", "전선", "결선"]
+        },
+        {
+          "id": "sensor",
+          "name": "센서",
+          "description": "각종 센서 및 스위치",
+          "keywords": ["센서", "스위치", "감지", "검출"]
+        },
+        {
+          "id": "motor",
+          "name": "모터",
+          "description": "서보모터, 스테핑모터 등",
+          "keywords": ["모터", "서보", "스테핑", "구동"]
+        },
+        {
+          "id": "power",
+          "name": "전원",
+          "description": "전원공급장치, UPS 등",
+          "keywords": ["전원", "파워", "UPS", "배전"]
+        },
+        {
+          "id": "custom",
+          "name": "기타",
+          "description": "기타 전기 관련 이슈",
+          "allowCustomInput": true
+        }
+      ]
+    },
+    {
+      "id": "control",
+      "name": "제어",
+      "icon": "💻",
+      "color": "#10b981",
+      "description": "제어 및 소프트웨어 관련 이슈",
+      "subcategories": [
+        {
+          "id": "robot",
+          "name": "로봇",
+          "description": "로봇 제어 및 프로그램",
+          "keywords": ["로봇", "ABB", "제어", "티칭", "프로그램"]
+        },
+        {
+          "id": "ui_hmi",
+          "name": "UI/HMI",
+          "description": "사용자 인터페이스 및 HMI",
+          "keywords": ["UI", "HMI", "화면", "인터페이스", "터치스크린"]
+        },
+        {
+          "id": "measurement",
+          "name": "계측",
+          "description": "측정 및 검증 관련",
+          "keywords": ["계측", "측정", "검증", "Hexagon", "정밀도"]
+        },
+        {
+          "id": "plc",
+          "name": "PLC",
+          "description": "PLC 프로그램 및 로직",
+          "keywords": ["PLC", "래더", "로직", "시퀀스"]
+        },
+        {
+          "id": "devicenet",
+          "name": "DeviceNet",
+          "description": "DeviceNet 통신 관련",
+          "keywords": ["DeviceNet", "통신", "Lincoln", "용접기"]
+        },
+        {
+          "id": "custom",
+          "name": "기타",
+          "description": "기타 제어 관련 이슈",
+          "allowCustomInput": true
+        }
+      ]
+    }
+  ],
+  "customCategories": []
+}

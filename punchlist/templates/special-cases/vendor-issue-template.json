@@ -1,0 +1,116 @@
+{
+  "templateId": "vendor-issue",
+  "name": "외주업체 이슈",
+  "description": "외주업체 관련 이슈를 등록할 때 사용하는 템플릿",
+  "icon": "🏢",
+  "version": "1.0",
+  "defaultValues": {
+    "category": "제어",
+    "priority": "높음",
+    "status": "신규"
+  },
+  "requiredFields": [
+    "title",
+    "description",
+    "owner",
+    "request_date",
+    "target_date",
+    "customFields.vendor_name",
+    "customFields.vendor_contact"
+  ],
+  "recommendedFields": [
+    "customFields.contract_no",
+    "customFields.visit_schedule",
+    "customFields.equipment_model"
+  ],
+  "customFields": {
+    "vendor_name": {
+      "enabled": true,
+      "required": true
+    },
+    "vendor_contact": {
+      "enabled": true,
+      "required": true
+    },
+    "contract_no": {
+      "enabled": true,
+      "required": false
+    },
+    "visit_schedule": {
+      "enabled": true,
+      "required": false
+    },
+    "equipment_serial": {
+      "enabled": true,
+      "required": false
+    },
+    "equipment_model": {
+      "enabled": true,
+      "required": false
+    }
+  },
+  "autoActions": [
+    {
+      "trigger": "onCreate",
+      "action": "sendEmail",
+      "recipients": ["owner", "approver"],
+      "emailTemplate": "vendor-issue-notification",
+      "subject": "[외주업체 이슈] {{title}}",
+      "priority": "high"
+    },
+    {
+      "trigger": "onCreate",
+      "action": "addTag",
+      "tags": ["외주업체", "vendor"]
+    },
+    {
+      "trigger": "statusChange",
+      "condition": "status === '완료'",
+      "action": "requireApproval",
+      "approver": "project_manager"
+    }
+  ],
+  "notifications": {
+    "onCreate": {
+      "channels": ["email", "slack"],
+      "message": "외주업체 이슈가 등록되었습니다: {{title}}"
+    },
+    "onStatusChange": {
+      "channels": ["email"],
+      "message": "외주업체 이슈 상태 변경: {{title}} ({{oldStatus}} → {{newStatus}})"
+    }
+  },
+  "helpText": {
+    "title": "외주업체와 관련된 작업 또는 이슈를 명확히 기재하세요",
+    "vendor_name": "협력하는 외주업체명을 선택하거나 입력하세요",
+    "vendor_contact": "외주업체 담당 엔지니어 이름과 연락처를 입력하세요 (예: 김엔지니어 010-1234-5678)",
+    "visit_schedule": "외주업체 엔지니어의 현장 방문 예정일을 선택하세요"
+  },
+  "examples": [
+    {
+      "title": "ABB 로봇 제어기 펌웨어 업데이트",
+      "category": "제어",
+      "subcategory": "로봇",
+      "priority": "높음",
+      "description": "IRB 6700 로봇 제어기 펌웨어를 최신 버전으로 업데이트 필요",
+      "customFields": {
+        "vendor_name": "ABB Korea",
+        "vendor_contact": "김엔지니어 (010-1234-5678)",
+        "contract_no": "ABB-2024-S25016",
+        "equipment_model": "ABB IRB 6700-200/2.60"
+      }
+    },
+    {
+      "title": "Lincoln 용접기 DeviceNet 설정 지원 요청",
+      "category": "제어",
+      "subcategory": "DeviceNet",
+      "priority": "긴급",
+      "description": "DeviceNet 통신 설정 및 파라미터 튜닝 지원 필요",
+      "customFields": {
+        "vendor_name": "Lincoln Electric",
+        "vendor_contact": "박기사님 (010-9876-5432)",
+        "equipment_model": "Power Wave S500"
+      }
+    }
+  ]
+}

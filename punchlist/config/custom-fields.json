@@ -1,0 +1,258 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2024-10-10",
+  "description": "펀치리스트 커스텀 필드 정의",
+  "fields": [
+    {
+      "id": "estimated_cost",
+      "name": "예상 비용",
+      "type": "number",
+      "unit": "원",
+      "required": false,
+      "defaultValue": 0,
+      "validation": {
+        "min": 0,
+        "max": 100000000
+      },
+      "displayCondition": {
+        "priority": ["긴급", "높음"]
+      },
+      "placeholder": "예: 5000000",
+      "helpText": "예상되는 비용을 입력하세요 (단위: 원)"
+    },
+    {
+      "id": "actual_cost",
+      "name": "실제 비용",
+      "type": "number",
+      "unit": "원",
+      "required": false,
+      "defaultValue": 0,
+      "validation": {
+        "min": 0,
+        "max": 100000000
+      },
+      "displayCondition": {
+        "status": ["완료"]
+      },
+      "placeholder": "예: 4800000",
+      "helpText": "실제 소요된 비용을 입력하세요"
+    },
+    {
+      "id": "budget_code",
+      "name": "예산 코드",
+      "type": "text",
+      "pattern": "^[A-Z0-9-]+$",
+      "required": false,
+      "placeholder": "예: S25016-CTRL-001",
+      "helpText": "예산 항목 코드를 입력하세요"
+    },
+    {
+      "id": "vendor_name",
+      "name": "외주업체",
+      "type": "select",
+      "options": [
+        "ABB Korea",
+        "Lincoln Electric",
+        "Hexagon",
+        "기타"
+      ],
+      "required": false,
+      "allowCustomInput": true,
+      "helpText": "외주업체가 관련된 경우 선택하세요"
+    },
+    {
+      "id": "vendor_contact",
+      "name": "외주 담당자",
+      "type": "text",
+      "required": false,
+      "placeholder": "예: 김엔지니어 (010-1234-5678)",
+      "displayCondition": {
+        "customFields.vendor_name": ["!= null"]
+      }
+    },
+    {
+      "id": "contract_no",
+      "name": "계약번호",
+      "type": "text",
+      "required": false,
+      "placeholder": "예: ABB-2024-S25016",
+      "displayCondition": {
+        "customFields.vendor_name": ["!= null"]
+      }
+    },
+    {
+      "id": "visit_schedule",
+      "name": "방문 예정일",
+      "type": "date",
+      "required": false,
+      "displayCondition": {
+        "customFields.vendor_name": ["!= null"]
+      }
+    },
+    {
+      "id": "equipment_serial",
+      "name": "장비 시리얼번호",
+      "type": "text",
+      "pattern": "^[A-Z0-9-]+$",
+      "placeholder": "예: ABB-IRB6700-2024-001",
+      "required": false,
+      "helpText": "관련 장비의 시리얼번호를 입력하세요"
+    },
+    {
+      "id": "equipment_model",
+      "name": "장비 모델명",
+      "type": "text",
+      "required": false,
+      "placeholder": "예: ABB IRB 6700-200/2.60"
+    },
+    {
+      "id": "manufacturer",
+      "name": "제조사",
+      "type": "select",
+      "options": [
+        "ABB",
+        "Lincoln Electric",
+        "Hexagon",
+        "Siemens",
+        "Fanuc",
+        "기타"
+      ],
+      "required": false,
+      "allowCustomInput": true
+    },
+    {
+      "id": "risk_level",
+      "name": "위험도",
+      "type": "select",
+      "options": ["상", "중", "하"],
+      "required": false,
+      "defaultValue": "하",
+      "color": {
+        "상": "#dc2626",
+        "중": "#f59e0b",
+        "하": "#10b981"
+      },
+      "helpText": "안전 또는 품질 위험도를 평가하세요"
+    },
+    {
+      "id": "safety_measures",
+      "name": "안전 조치사항",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "필요한 안전 조치사항을 기록하세요",
+      "displayCondition": {
+        "customFields.risk_level": ["상", "중"]
+      }
+    },
+    {
+      "id": "customer_request_no",
+      "name": "고객 요청번호",
+      "type": "text",
+      "required": false,
+      "placeholder": "예: CR-2024-1010",
+      "helpText": "고객사 요청번호가 있는 경우 입력하세요"
+    },
+    {
+      "id": "claim_flag",
+      "name": "클레임 여부",
+      "type": "boolean",
+      "defaultValue": false,
+      "required": false,
+      "helpText": "고객 클레임 사항인 경우 체크하세요"
+    },
+    {
+      "id": "claim_details",
+      "name": "클레임 상세",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "클레임 내용을 상세히 기록하세요",
+      "displayCondition": {
+        "customFields.claim_flag": [true]
+      }
+    },
+    {
+      "id": "defect_rate",
+      "name": "불량률",
+      "type": "number",
+      "unit": "%",
+      "required": false,
+      "validation": {
+        "min": 0,
+        "max": 100
+      },
+      "placeholder": "예: 2.5",
+      "helpText": "발생한 불량률을 입력하세요 (%)"
+    },
+    {
+      "id": "inspection_result",
+      "name": "검사 결과",
+      "type": "select",
+      "options": ["합격", "불합격", "조건부합격", "재검사필요"],
+      "required": false,
+      "color": {
+        "합격": "#10b981",
+        "불합격": "#dc2626",
+        "조건부합격": "#f59e0b",
+        "재검사필요": "#3b82f6"
+      }
+    },
+    {
+      "id": "related_issues",
+      "name": "관련 이슈 ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "예: PL-2024-001, PL-2024-005",
+      "helpText": "관련된 다른 이슈 ID를 쉼표로 구분하여 입력하세요"
+    },
+    {
+      "id": "escalation_level",
+      "name": "에스컬레이션 단계",
+      "type": "select",
+      "options": ["없음", "1단계-팀장", "2단계-부장", "3단계-임원"],
+      "defaultValue": "없음",
+      "required": false,
+      "displayCondition": {
+        "priority": ["긴급"]
+      }
+    },
+    {
+      "id": "customer_impact",
+      "name": "고객 영향도",
+      "type": "select",
+      "options": ["없음", "낮음", "중간", "높음", "심각"],
+      "defaultValue": "없음",
+      "required": false,
+      "color": {
+        "없음": "#6b7280",
+        "낮음": "#10b981",
+        "중간": "#3b82f6",
+        "높음": "#f59e0b",
+        "심각": "#dc2626"
+      }
+    },
+    {
+      "id": "downtime_hours",
+      "name": "가동중단 시간",
+      "type": "number",
+      "unit": "시간",
+      "required": false,
+      "validation": {
+        "min": 0
+      },
+      "placeholder": "예: 2.5",
+      "helpText": "라인 가동이 중단된 시간을 입력하세요 (시간)"
+    },
+    {
+      "id": "production_loss",
+      "name": "생산 손실량",
+      "type": "number",
+      "unit": "대",
+      "required": false,
+      "validation": {
+        "min": 0
+      },
+      "placeholder": "예: 150",
+      "helpText": "생산 손실 수량을 입력하세요"
+    }
+  ]
+}

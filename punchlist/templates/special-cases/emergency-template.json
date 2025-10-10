@@ -1,0 +1,201 @@
+{
+  "templateId": "emergency",
+  "name": "긴급 대응",
+  "description": "긴급 이슈 발생 시 빠른 대응을 위한 템플릿",
+  "icon": "🚨",
+  "version": "1.0",
+  "defaultValues": {
+    "priority": "긴급",
+    "status": "진행중"
+  },
+  "requiredFields": [
+    "title",
+    "description",
+    "owner",
+    "request_date",
+    "customFields.customer_impact",
+    "customFields.downtime_hours"
+  ],
+  "recommendedFields": [
+    "customFields.escalation_level",
+    "customFields.production_loss",
+    "action_plan"
+  ],
+  "customFields": {
+    "customer_impact": {
+      "enabled": true,
+      "required": true,
+      "defaultValue": "높음"
+    },
+    "escalation_level": {
+      "enabled": true,
+      "required": false,
+      "defaultValue": "1단계-팀장"
+    },
+    "downtime_hours": {
+      "enabled": true,
+      "required": true
+    },
+    "production_loss": {
+      "enabled": true,
+      "required": false
+    },
+    "risk_level": {
+      "enabled": true,
+      "required": false,
+      "defaultValue": "상"
+    },
+    "safety_measures": {
+      "enabled": true,
+      "required": false
+    },
+    "claim_flag": {
+      "enabled": true,
+      "required": false
+    }
+  },
+  "autoActions": [
+    {
+      "trigger": "onCreate",
+      "action": "sendEmail",
+      "recipients": ["owner", "approver", "project_manager"],
+      "emailTemplate": "emergency-notification",
+      "subject": "🚨 긴급 이슈 발생: {{title}}",
+      "priority": "urgent"
+    },
+    {
+      "trigger": "onCreate",
+      "action": "sendSMS",
+      "recipients": ["owner", "approver"],
+      "message": "[긴급] {{title}} - 즉시 확인 필요"
+    },
+    {
+      "trigger": "onCreate",
+      "action": "addTag",
+      "tags": ["긴급", "emergency", "high-priority"]
+    },
+    {
+      "trigger": "onCreate",
+      "action": "createFollowUp",
+      "interval": "2 hours",
+      "message": "긴급 이슈 진행 상황을 업데이트해주세요"
+    },
+    {
+      "trigger": "statusChange",
+      "condition": "status === '완료'",
+      "action": "requireApproval",
+      "approver": "project_manager",
+      "message": "긴급 이슈 완료 승인이 필요합니다"
+    }
+  ],
+  "notifications": {
+    "onCreate": {
+      "channels": ["email", "sms", "slack"],
+      "message": "🚨 긴급 이슈 발생: {{title}}",
+      "playSound": true,
+      "highPriority": true
+    },
+    "onUpdate": {
+      "channels": ["email", "slack"],
+      "message": "긴급 이슈 업데이트: {{title}}"
+    },
+    "onStatusChange": {
+      "channels": ["email", "sms", "slack"],
+      "message": "긴급 이슈 상태 변경: {{title}} ({{oldStatus}} → {{newStatus}})"
+    }
+  },
+  "workflow": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "즉시 조치",
+        "duration": "30분 이내",
+        "actions": [
+          "현장 확인",
+          "임시 조치",
+          "상황 보고"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "원인 분석",
+        "duration": "2시간 이내",
+        "actions": [
+          "원인 파악",
+          "영향 범위 확인",
+          "대책 수립"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "근본 대책",
+        "duration": "24시간 이내",
+        "actions": [
+          "근본 원인 제거",
+          "재발 방지 대책",
+          "검증"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "완료 보고",
+        "duration": "48시간 이내",
+        "actions": [
+          "처리 결과 보고",
+          "문서화",
+          "승인 요청"
+        ]
+      }
+    ]
+  },
+  "helpText": {
+    "title": "긴급 이슈의 핵심 내용을 간결하게 작성하세요",
+    "description": "발생한 문제 상황을 구체적으로 기술하세요 (현상, 발생 시간, 영향 범위)",
+    "action_plan": "즉시 취한 조치와 향후 계획을 명확히 작성하세요",
+    "customer_impact": "고객사 생산에 미치는 영향도를 평가하세요",
+    "downtime_hours": "라인이 멈춘 시간 또는 예상 복구 시간을 입력하세요"
+  },
+  "examples": [
+    {
+      "title": "B라인 용접기 DeviceNet 통신 끊김",
+      "category": "제어",
+      "subcategory": "DeviceNet",
+      "priority": "긴급",
+      "status": "진행중",
+      "description": "B라인 2호기 용접기 DeviceNet 통신이 갑자기 끊겨 생산 라인 전체가 정지된 상태입니다. 에러 코드: E-9999",
+      "action_plan": "1. 수동 모드로 전환하여 임시 생산 재개\n2. 이더넷 허브 및 케이블 점검\n3. ABB 엔지니어 긴급 지원 요청",
+      "customFields": {
+        "customer_impact": "심각",
+        "escalation_level": "2단계-부장",
+        "downtime_hours": 4,
+        "production_loss": 200,
+        "risk_level": "상"
+      }
+    },
+    {
+      "title": "A라인 로봇 상하축 간섭 발생",
+      "category": "제어",
+      "subcategory": "로봇",
+      "priority": "긴급",
+      "status": "진행중",
+      "description": "A라인 갠트리 로봇 상하축이 지그와 간섭하여 긴급 정지. 센서 손상 가능성 있음.",
+      "action_plan": "1. 긴급 정지 해제 후 수동 모드로 원위치\n2. 센서 상태 점검\n3. 상하축 티칭 포인트 재확인\n4. ABB 엔지니어 현장 지원 요청",
+      "customFields": {
+        "customer_impact": "높음",
+        "escalation_level": "1단계-팀장",
+        "downtime_hours": 2,
+        "risk_level": "상",
+        "safety_measures": "작업자 안전구역 확보, 수동 모드 전환 후 작업"
+      }
+    }
+  ],
+  "checklist": [
+    "현장 안전 확보",
+    "관리자에게 보고",
+    "즉시 조치 실시",
+    "진행 상황 기록",
+    "원인 분석 수행",
+    "재발 방지 대책 수립",
+    "완료 후 승인 요청"
+  ]
+}
