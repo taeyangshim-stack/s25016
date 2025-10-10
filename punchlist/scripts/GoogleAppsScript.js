@@ -17,30 +17,47 @@
 const SHEET_NAME = 'PunchList';
 const SHEET_ID = 'YOUR_SHEET_ID'; // Google Sheets ID로 변경
 
+// CORS 허용 헤더 추가 함수
+function createCORSResponse(data) {
+  const output = ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+
+  return output;
+}
+
 // 메인 함수 - HTTP 요청 처리
 function doPost(e) {
   try {
     const params = JSON.parse(e.postData.contents);
     const action = params.action;
 
+    let result;
     switch(action) {
       case 'create':
-        return createIssue(params.data);
+        result = createIssue(params.data);
+        break;
       case 'update':
-        return updateIssue(params.data);
+        result = updateIssue(params.data);
+        break;
       case 'delete':
-        return deleteIssue(params.id);
+        result = deleteIssue(params.id);
+        break;
       case 'getAll':
-        return getAllIssues();
+        result = getAllIssues();
+        break;
       case 'getById':
-        return getIssueById(params.id);
+        result = getIssueById(params.id);
+        break;
       case 'addComment':
-        return addComment(params.id, params.comment);
+        result = addComment(params.id, params.comment);
+        break;
       default:
-        return ContentService.createTextOutput(
+        result = ContentService.createTextOutput(
           JSON.stringify({ success: false, error: 'Invalid action' })
         ).setMimeType(ContentService.MimeType.JSON);
     }
+
+    return result;
   } catch(error) {
     return ContentService.createTextOutput(
       JSON.stringify({ success: false, error: error.toString() })
