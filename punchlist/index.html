@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S25016 펀치리스트 관리</title>
+
+    <!-- 공통 스타일 -->
+    <link rel="stylesheet" href="../shared/styles/variables.css">
+    <link rel="stylesheet" href="../shared/styles/reset.css">
+    <link rel="stylesheet" href="../shared/styles/components.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: var(--space-5);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--color-primary-gradient);
+            color: var(--color-white);
+            padding: var(--space-10);
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-5);
+            padding: var(--space-8);
+            background: var(--color-gray-50);
+        }
+
+        .stat-card {
+            background: var(--color-white);
+            padding: var(--space-6);
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+            border-left: 4px solid var(--color-primary);
+            transition: var(--transition-base);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: var(--font-bold);
+            color: var(--color-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            font-size: var(--font-sm);
+            color: var(--color-gray-600);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: var(--space-4);
+            padding: var(--space-6);
+            background: var(--color-white);
+            border-bottom: 2px solid var(--color-gray-200);
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .filter-group label {
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-base);
+            font-size: var(--font-sm);
+        }
+
+        .content {
+            padding: var(--space-8);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: var(--space-6);
+        }
+
+        .issue-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .issue-table th {
+            background: var(--color-gray-100);
+            padding: var(--space-4);
+            text-align: left;
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+            border-bottom: 2px solid var(--color-gray-300);
+            position: sticky;
+            top: 0;
+        }
+
+        .issue-table td {
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+
+        .issue-table tr:hover {
+            background: var(--color-gray-50);
+        }
+
+        .issue-id {
+            font-family: var(--font-mono);
+            font-weight: var(--font-semibold);
+            color: var(--color-primary);
+        }
+
+        .issue-title {
+            font-weight: var(--font-medium);
+            color: var(--color-gray-900);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-xs);
+            font-weight: var(--font-semibold);
+            color: var(--color-white);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: var(--space-6);
+        }
+
+        .loading {
+            text-align: center;
+            padding: var(--space-10);
+            color: var(--color-gray-500);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-16);
+            color: var(--color-gray-500);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 S25016 펀치리스트 관리</h1>
+            <p>프로젝트 이슈 추적 및 관리 시스템</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">전체 이슈</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #f59e0b;">
+                <div class="stat-number" style="color: #f59e0b;" id="progressCount">0</div>
+                <div class="stat-label">진행중</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #6b7280;">
+                <div class="stat-number" style="color: #6b7280;" id="pendingCount">0</div>
+                <div class="stat-label">보류</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #10b981;">
+                <div class="stat-number" style="color: #10b981;" id="completeCount">0</div>
+                <div class="stat-label">완료</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #dc2626;">
+                <div class="stat-number" style="color: #dc2626;" id="overdueCount">0</div>
+                <div class="stat-label">지연</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>분류</label>
+                <select id="filterCategory">
+                    <option value="all">전체</option>
+                    <option value="기계">기계</option>
+                    <option value="전기">전기</option>
+                    <option value="제어">제어</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>세부분류</label>
+                <select id="filterSubcategory">
+                    <option value="all">전체</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>상태</label>
+                <select id="filterStatus">
+                    <option value="all">전체</option>
+                    <option value="신규">신규</option>
+                    <option value="진행중">진행중</option>
+                    <option value="보류">보류</option>
+                    <option value="완료">완료</option>
+                    <option value="검증중">검증중</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>우선순위</label>
+                <select id="filterPriority">
+                    <option value="all">전체</option>
+                    <option value="긴급">긴급</option>
+                    <option value="높음">높음</option>
+                    <option value="보통">보통</option>
+                    <option value="낮음">낮음</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>담당자</label>
+                <select id="filterOwner">
+                    <option value="all">전체</option>
+                </select>
+            </div>
+
+            <div class="filter-group" style="flex: 1; min-width: 200px;">
+                <label>검색</label>
+                <input type="text" id="searchInput" placeholder="제목, 내용, ID 검색...">
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="action-buttons">
+                <a href="pages/create.html" class="btn btn-primary">
+                    ➕ 새 이슈 등록
+                </a>
+                <a href="pages/list.html" class="btn btn-secondary">
+                    📋 전체 목록 보기
+                </a>
+                <button class="btn btn-outline" onclick="refreshIssues()">
+                    🔄 새로고침
+                </button>
+                <a href="/index.html" class="btn btn-outline">
+                    🏠 메인 대시보드
+                </a>
+            </div>
+
+            <div id="loadingState" class="loading">
+                <div>⏳ 이슈를 불러오는 중...</div>
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-state-icon">📋</div>
+                <h3>등록된 이슈가 없습니다</h3>
+                <p>새 이슈를 등록하여 프로젝트 관리를 시작하세요</p>
+                <a href="pages/create.html" class="btn btn-primary" style="margin-top: var(--space-4);">
+                    ➕ 첫 이슈 등록하기
+                </a>
+            </div>
+
+            <div id="tableContainer" class="table-container" style="display: none;">
+                <table class="issue-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">ID</th>
+                            <th>제목</th>
+                            <th style="width: 100px;">분류</th>
+                            <th style="width: 100px;">세부분류</th>
+                            <th style="width: 80px;">우선순위</th>
+                            <th style="width: 80px;">상태</th>
+                            <th style="width: 100px;">담당자</th>
+                            <th style="width: 100px;">목표일</th>
+                        </tr>
+                    </thead>
+                    <tbody id="issueTableBody">
+                        <!-- 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/scripts/utils.js"></script>
+    <script src="scripts/punchlist.js"></script>
+    <script>
+        let allIssues = [];
+        let filteredIssues = [];
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', () => {
+            initFilters();
+            loadIssues();
+
+            // 필터 이벤트 리스너
+            document.getElementById('filterCategory').addEventListener('change', onFilterChange);
+            document.getElementById('filterSubcategory').addEventListener('change', applyFilters);
+            document.getElementById('filterStatus').addEventListener('change', applyFilters);
+            document.getElementById('filterPriority').addEventListener('change', applyFilters);
+            document.getElementById('filterOwner').addEventListener('change', applyFilters);
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+        });
+
+        // 필터 초기화
+        function initFilters() {
+            // 담당자 옵션
+            const ownerSelect = document.getElementById('filterOwner');
+            PunchListAPI.OWNERS.forEach(owner => {
+                const option = document.createElement('option');
+                option.value = owner;
+                option.textContent = owner;
+                ownerSelect.appendChild(option);
+            });
+        }
+
+        // 분류 변경 시 세부분류 업데이트
+        function onFilterChange() {
+            const category = document.getElementById('filterCategory').value;
+            const subcategorySelect = document.getElementById('filterSubcategory');
+
+            subcategorySelect.innerHTML = '<option value="all">전체</option>';
+
+            if (category !== 'all' && PunchListAPI.CATEGORIES[category]) {
+                PunchListAPI.CATEGORIES[category].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subcategorySelect.appendChild(option);
+                });
+            }
+
+            applyFilters();
+        }
+
+        // 이슈 로드
+        async function loadIssues() {
+            try {
+                document.getElementById('loadingState').style.display = 'block';
+                document.getElementById('tableContainer').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'none';
+
+                allIssues = await PunchListAPI.loadAllIssues();
+                filteredIssues = [...allIssues];
+
+                if (allIssues.length === 0) {
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'block';
+                } else {
+                    updateStats();
+                    applyFilters();
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('tableContainer').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('이슈 로드 실패:', error);
+                alert('이슈를 불러오는 데 실패했습니다. Google Sheets 연동을 확인해주세요.');
+                document.getElementById('loadingState').innerHTML = '<div style="color: #dc2626;">❌ 이슈 로드 실패</div>';
+            }
+        }
+
+        // 통계 업데이트
+        function updateStats() {
+            const stats = PunchListAPI.calculateStats(allIssues);
+
+            document.getElementById('totalCount').textContent = stats.total;
+            document.getElementById('progressCount').textContent = stats.byStatus['진행중'] || 0;
+            document.getElementById('pendingCount').textContent = stats.byStatus['보류'] || 0;
+            document.getElementById('completeCount').textContent = stats.byStatus['완료'] || 0;
+            document.getElementById('overdueCount').textContent = stats.overdue;
+        }
+
+        // 필터 적용
+        function applyFilters() {
+            const filters = {
+                category: document.getElementById('filterCategory').value,
+                subcategory: document.getElementById('filterSubcategory').value,
+                status: document.getElementById('filterStatus').value,
+                priority: document.getElementById('filterPriority').value,
+                owner: document.getElementById('filterOwner').value,
+                search: document.getElementById('searchInput').value
+            };
+
+            filteredIssues = PunchListAPI.filterIssues(allIssues, filters);
+            filteredIssues = PunchListAPI.sortIssues(filteredIssues, 'priority', 'asc');
+
+            renderTable();
+        }
+
+        // 테이블 렌더링
+        function renderTable() {
+            const tbody = document.getElementById('issueTableBody');
+            tbody.innerHTML = '';
+
+            if (filteredIssues.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #6b7280;">필터 조건에 맞는 이슈가 없습니다</td></tr>';
+                return;
+            }
+
+            filteredIssues.forEach(issue => {
+                const row = document.createElement('tr');
+                row.style.cursor = 'pointer';
+                row.onclick = () => window.location.href = `pages/detail.html?id=${issue.id}`;
+
+                row.innerHTML = `
+                    <td class="issue-id">${issue.id}</td>
+                    <td class="issue-title">${issue.title}</td>
+                    <td>${issue.category}</td>
+                    <td>${issue.subcategory}</td>
+                    <td>${PunchListAPI.getPriorityBadge(issue.priority)}</td>
+                    <td>${PunchListAPI.getStatusBadge(issue.status)}</td>
+                    <td>${issue.owner}</td>
+                    <td>${PunchListAPI.formatDate(issue.target_date)}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        // 새로고침
+        function refreshIssues() {
+            loadIssues();
+        }
+    </script>
+</body>
+</html>

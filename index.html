@@ -346,6 +346,7 @@
 
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="showTab('overview')">🏠 전체 개요</button>
+            <button class="nav-tab" onclick="showTab('punchlist')">📋 펀치리스트</button>
             <button class="nav-tab" onclick="showTab('devicenet')">🔌 DeviceNet</button>
             <button class="nav-tab" onclick="showTab('robot')">🤖 로봇 상하축</button>
             <button class="nav-tab" onclick="showTab('robot-ui-test')">🧪 ROBOT↔UI 테스트</button>
@@ -532,6 +533,128 @@
                     <span class="badge badge-new">URGENT</span>
                     <p>갠트리 로봇 상하축 간섭 문제 발견</p>
                     <small>시운전 중 안전 위험 요소 확인 및 긴급 대응 시작</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 펀치리스트 탭 -->
+        <div id="punchlist" class="tab-content">
+            <div class="highlight-box" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-left-color: #0284c7;">
+                <h2 style="color: #0c4a6e; margin-bottom: 15px;">📋 S25016 펀치리스트 관리</h2>
+                <p style="line-height: 1.8;">
+                    프로젝트 이슈를 체계적으로 추적하고 관리하는 펀치리스트 시스템입니다.
+                    기계/전기/제어 분류별로 이슈를 등록하고, 담당자, 일정, 조치 내용을 관리합니다.
+                </p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #0284c7;">0</div>
+                    <div class="stat-label">전체 이슈</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #f59e0b;">
+                    <div class="stat-number" style="color: #f59e0b;">0</div>
+                    <div class="stat-label">진행중</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #6b7280;">
+                    <div class="stat-number" style="color: #6b7280;">0</div>
+                    <div class="stat-label">보류</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #10b981;">
+                    <div class="stat-number" style="color: #10b981;">0</div>
+                    <div class="stat-label">완료</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #dc2626;">
+                    <div class="stat-number" style="color: #dc2626;">0</div>
+                    <div class="stat-label">지연</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card" style="border-left-color: #0284c7;">
+                    <h3><span class="emoji">📋</span> 이슈 분류 체계</h3>
+                    <div class="info-box" style="background: #eff6ff; border-left-color: #0284c7;">
+                        <h4>3가지 주요 분류</h4>
+                        <ul class="folder-structure">
+                            <li><span class="folder-icon">🔧</span> 기계 (구조물, 프레임, 이송장치)</li>
+                            <li><span class="folder-icon">⚡</span> 전기 (배선, 센서, 모터, 전원)</li>
+                            <li><span class="folder-icon">💻</span> 제어 (로봇, UI/HMI, 계측, PLC)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left-color: #8b5cf6;">
+                    <h3><span class="emoji">📊</span> 이슈 관리 항목</h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                        <p style="margin: 8px 0;"><strong>기본:</strong> ID, 제목, 분류, 우선순위, 상태</p>
+                        <p style="margin: 8px 0;"><strong>내용:</strong> 문제상황, 원인분석, 조치계획, 조치결과</p>
+                        <p style="margin: 8px 0;"><strong>담당:</strong> 담당자, 협의자, 승인자</p>
+                        <p style="margin: 8px 0;"><strong>일정:</strong> 요청일, 목표일, 완료일</p>
+                        <p style="margin: 8px 0;"><strong>기타:</strong> 첨부파일, 댓글, 이력</p>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left-color: #f59e0b;">
+                    <h3><span class="emoji">🎯</span> 주요 기능</h3>
+                    <ul class="folder-structure">
+                        <li><span class="folder-icon">➕</span> 이슈 생성 및 수정</li>
+                        <li><span class="folder-icon">🔍</span> 필터링 및 검색</li>
+                        <li><span class="folder-icon">📊</span> 통계 및 현황 분석</li>
+                        <li><span class="folder-icon">📧</span> 이메일 알림</li>
+                        <li><span class="folder-icon">💾</span> Google Sheets 연동</li>
+                        <li><span class="folder-icon">💬</span> 댓글 및 히스토리</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="border-left-color: #10b981;">
+                    <h3><span class="emoji">🚀</span> 빠른 시작</h3>
+                    <a href="punchlist/index.html" class="project-link" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);" target="_blank">
+                        📋 펀치리스트 대시보드
+                    </a>
+                    <a href="punchlist/pages/create.html" class="project-link" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" target="_blank">
+                        ➕ 새 이슈 등록
+                    </a>
+                    <a href="punchlist/README.md" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                        📖 사용 가이드
+                    </a>
+                </div>
+
+                <div class="card" style="border-left-color: #dc2626;">
+                    <h3><span class="emoji">⚙️</span> Google Sheets 설정</h3>
+                    <div class="info-box" style="background: #fee2e2; border-left-color: #dc2626;">
+                        <h4>초기 설정 필요</h4>
+                        <p>
+                            펀치리스트를 사용하려면 Google Sheets 연동이 필요합니다.<br>
+                            <strong>1.</strong> Google Sheets 생성<br>
+                            <strong>2.</strong> Apps Script 설정<br>
+                            <strong>3.</strong> 웹 앱 배포<br>
+                            <strong>4.</strong> Script URL 설정
+                        </p>
+                    </div>
+                    <a href="punchlist/scripts/GoogleAppsScript.js" class="file-link" target="_blank">
+                        📄 Apps Script 코드
+                    </a>
+                </div>
+
+                <div class="card">
+                    <h3><span class="emoji">📈</span> 워크플로우</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <strong>1단계</strong>
+                            <p>이슈 발견 및 등록</p>
+                            <small>분류 선택 → 문제 상황 작성 → 담당자 지정</small>
+                        </div>
+                        <div class="timeline-item">
+                            <strong>2단계</strong>
+                            <p>조치 계획 수립</p>
+                            <small>원인 분석 → 해결 방안 수립 → 일정 설정</small>
+                        </div>
+                        <div class="timeline-item">
+                            <strong>3단계</strong>
+                            <p>조치 실행 및 결과</p>
+                            <small>상태 업데이트 → 조치 결과 기록 → 완료 확인</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
