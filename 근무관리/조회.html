@@ -412,6 +412,7 @@
             </div>
             <form id="editForm">
                 <input type="hidden" id="editIndex">
+                <input type="hidden" id="editRowNumber">
 
                 <div class="form-group">
                     <label>날짜 *</label>
@@ -551,13 +552,9 @@
             // select 박스 동적 생성
             populateSelects(employees, locations);
 
-            // 기본 날짜 설정 (최근 30일)
-            const today = new Date();
-            const monthAgo = new Date();
-            monthAgo.setDate(today.getDate() - 30);
-
-            document.getElementById('startDate').valueAsDate = monthAgo;
-            document.getElementById('endDate').valueAsDate = today;
+            // 기본 날짜 필터를 비워 전체 기록을 표시
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
 
             loadRecords();
 
@@ -623,16 +620,22 @@
                 }
 
                 // 데이터 변환 (Google Sheets 형식 → 앱 형식)
-                const records = data.map(row => ({
-                    timestamp: row['타임스탬프'] || new Date().toISOString(),
-                    date: row['날짜'] || '-',
-                    name: row['인원'] || '-',
-                    location: row['위치'] || '-',
-                    checkIn: row['입실시간'] || '-',
-                    checkOut: row['퇴실시간'] || '-',
-                    workType: row['작업내용'] || '-',
-                    notes: row['비고'] || '-'
-                }));
+                const records = data.map(row => {
+                    const rawTimestamp = row['타임스탬프'];
+                    const rowNumber = row.rowNumber ? Number(row.rowNumber) : null;
+
+                    return {
+                        timestamp: rawTimestamp && rawTimestamp !== '-' ? rawTimestamp : '',
+                        rowNumber: rowNumber,
+                        date: row['날짜'] || '-',
+                        name: row['인원'] || '-',
+                        location: row['위치'] || '-',
+                        checkIn: row['입실시간'] || '-',
+                        checkOut: row['퇴실시간'] || '-',
+                        workType: row['작업내용'] || '-',
+                        notes: row['비고'] || '-'
+                    };
+                });
 
                 // LocalStorage에도 캐시
                 localStorage.setItem('workRecords', JSON.stringify(records));
@@ -703,12 +706,22 @@
             }
 
             // 날짜 역순 정렬
-            const sorted = [...filteredRecords].sort((a, b) =>
-                new Date(b.timestamp) - new Date(a.timestamp)
-            );
+            const sorted = [...filteredRecords].sort((a, b) => {
+                const getKey = (record) => {
+                    if (record.timestamp) {
+                        const time = new Date(record.timestamp).getTime();
+                        if (!Number.isNaN(time)) {
+                            return time;
+                        }
+                    }
+                    return record.rowNumber ? record.rowNumber : 0;
+                };
+
+                return getKey(b) - getKey(a);
+            });
 
             tbody.innerHTML = sorted.map((record, index) => {
-                const originalIndex = allRecords.findIndex(r => r.timestamp === record.timestamp);
+                const originalIndex = allRecords.indexOf(record);
 
                 let badge = '';
                 if (record.checkIn !== '-' && record.checkOut !== '-') {
@@ -742,7 +755,18 @@
         function editRecord(index) {
             const record = allRecords[index];
 
+            if (!record) {
+                alert('수정할 데이터를 찾지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.');
+                return;
+            }
+
+            if (!record.timestamp && !record.rowNumber) {
+                alert('이 기록은 식별자가 없어 브라우저에서 수정할 수 없습니다. Google Sheets에서 직접 수정하세요.');
+                return;
+            }
+
             document.getElementById('editIndex').value = index;
+            document.getElementById('editRowNumber').value = record.rowNumber || '';
             document.getElementById('editDate').value = record.date;
             document.getElementById('editName').value = record.name;
             document.getElementById('editLocation').value = record.location;
@@ -765,9 +789,11 @@
 
             const index = parseInt(document.getElementById('editIndex').value);
             const record = allRecords[index];
+            const rowNumberValue = document.getElementById('editRowNumber').value;
 
             const updatedData = {
-                timestamp: record.timestamp,
+                timestamp: record.timestamp || '',
+                rowNumber: rowNumberValue ? Number(rowNumberValue) : null,
                 date: document.getElementById('editDate').value,
                 name: document.getElementById('editName').value,
                 location: document.getElementById('editLocation').value,
@@ -784,27 +810,37 @@
                 allRecords[index] = updatedData;
                 applyFilter();
 
-                // 백그라운드에서 Google Sheets 업데이트
-                fetch(`${SCRIPT_URL}?action=update`, {
+                // Google Sheets 업데이트
+                const response = await fetch(`${SCRIPT_URL}?action=update`, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(updatedData)
-                }).then(() => {
-                    console.log('✅ Google Sheets 업데이트 완료');
-                }).catch(error => {
-                    console.error('⚠️ Google Sheets 업데이트 실패:', error);
-                    // 실패 시 데이터 다시 로드
-                    loadRecords();
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.status !== 'success') {
+                    throw new Error(result.message || 'Google Sheets 업데이트에 실패했습니다.');
+                }
+
+                console.log('✅ Google Sheets 업데이트 완료');
+                await loadRecords();
+                applyFilter();
 
                 alert('✅ 기록이 수정되었습니다.');
 
             } catch (error) {
                 console.error('❌ 수정 실패:', error);
                 alert('❌ 수정에 실패했습니다: ' + error.message);
+                await loadRecords();
+                applyFilter();
             }
         });
 
@@ -815,8 +851,19 @@
             }
 
             const record = allRecords[index];
+            if (!record) {
+                alert('삭제할 데이터를 찾지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.');
+                return;
+            }
+
+            if (!record.timestamp && !record.rowNumber) {
+                alert('이 기록은 식별자가 없어 브라우저에서 삭제할 수 없습니다. Google Sheets에서 직접 삭제하세요.');
+                return;
+            }
+
             const deleteData = {
-                timestamp: record.timestamp
+                timestamp: record.timestamp || '',
+                rowNumber: record.rowNumber || null
             };
 
             try {
@@ -824,27 +871,37 @@
                 allRecords.splice(index, 1);
                 applyFilter();
 
-                // 백그라운드에서 Google Sheets 삭제
-                fetch(`${SCRIPT_URL}?action=delete`, {
+                // Google Sheets 삭제
+                const response = await fetch(`${SCRIPT_URL}?action=delete`, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(deleteData)
-                }).then(() => {
-                    console.log('✅ Google Sheets 삭제 완료');
-                }).catch(error => {
-                    console.error('⚠️ Google Sheets 삭제 실패:', error);
-                    // 실패 시 데이터 다시 로드
-                    loadRecords();
                 });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.status !== 'success') {
+                    throw new Error(result.message || 'Google Sheets 삭제에 실패했습니다.');
+                }
+
+                console.log('✅ Google Sheets 삭제 완료');
+                await loadRecords();
+                applyFilter();
 
                 alert('✅ 기록이 삭제되었습니다.');
 
             } catch (error) {
                 console.error('❌ 삭제 실패:', error);
                 alert('❌ 삭제에 실패했습니다: ' + error.message);
+                await loadRecords();
+                applyFilter();
             }
         }
 

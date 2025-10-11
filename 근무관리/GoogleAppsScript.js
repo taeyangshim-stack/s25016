@@ -15,7 +15,7 @@
 
 const CONFIG = {
   // 이메일 수신자 (쉼표로 구분)
-  EMAIL_RECIPIENTS: 'your-email@example.com',
+  EMAIL_RECIPIENTS: 'simsun@kakao.com',
 
   // 참조(CC) 수신자 (선택사항)
   EMAIL_CC: '',
@@ -33,6 +33,28 @@ const CONFIG = {
 };
 
 // ========================================
+// 공통 응답/헬퍼 함수
+// ========================================
+
+function createJsonResponse(payload) {
+  return ContentService
+    .createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+}
+
+function createTextResponse(text, mimeType) {
+  return ContentService
+    .createTextOutput(text)
+    .setMimeType(mimeType)
+    .setHeader('Access-Control-Allow-Origin', '*')
+    .setHeader('Access-Control-Allow-Headers', 'Content-Type')
+    .setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+}
+
+// ========================================
 // 메인 함수
 // ========================================
 
@@ -47,23 +69,19 @@ function doPost(e) {
 
     if (action === 'update') {
       // 수정 요청
-      const success = updateRecord(data.timestamp, data);
-      return ContentService
-        .createTextOutput(JSON.stringify({
-          status: success ? 'success' : 'error',
-          message: success ? '기록이 수정되었습니다.' : '기록을 찾을 수 없습니다.'
-        }))
-        .setMimeType(ContentService.MimeType.JSON);
+      const success = updateRecord(data);
+      return createJsonResponse({
+        status: success ? 'success' : 'error',
+        message: success ? '기록이 수정되었습니다.' : '기록을 찾을 수 없습니다.'
+      });
 
     } else if (action === 'delete') {
       // 삭제 요청
-      const success = deleteRecord(data.timestamp);
-      return ContentService
-        .createTextOutput(JSON.stringify({
-          status: success ? 'success' : 'error',
-          message: success ? '기록이 삭제되었습니다.' : '기록을 찾을 수 없습니다.'
-        }))
-        .setMimeType(ContentService.MimeType.JSON);
+      const success = deleteRecord(data);
+      return createJsonResponse({
+        status: success ? 'success' : 'error',
+        message: success ? '기록이 삭제되었습니다.' : '기록을 찾을 수 없습니다.'
+      });
 
     } else {
       // 기존 저장 로직 (새 기록 추가)
@@ -74,23 +92,19 @@ function doPost(e) {
         sendEmail(data);
       }
 
-      return ContentService
-        .createTextOutput(JSON.stringify({
-          status: 'success',
-          message: '기록이 저장되었습니다.'
-        }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return createJsonResponse({
+        status: 'success',
+        message: '기록이 저장되었습니다.'
+      });
     }
 
   } catch (error) {
     Logger.log('Error: ' + error.toString());
 
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        status: 'error',
-        message: error.toString()
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createJsonResponse({
+      status: 'error',
+      message: error.toString()
+    });
   }
 }
 
@@ -108,9 +122,10 @@ function doGet(e) {
     return getAllRecords();
   }
 
-  return ContentService
-    .createTextOutput('S25016 근무관리 시스템이 정상 작동 중입니다.')
-    .setMimeType(ContentService.MimeType.TEXT);
+  return createTextResponse(
+    'S25016 근무관리 시스템이 정상 작동 중입니다.',
+    ContentService.MimeType.TEXT
+  );
 }
 
 // ========================================
@@ -398,32 +413,37 @@ function getAllRecords() {
         }
         // 빈 값은 '-'로 변환
         else if (value === '' || value === null || value === undefined) {
-          value = '-';
+          value = header === '타임스탬프' ? '' : '-';
         }
 
         record[header] = value;
       });
+      record.rowNumber = index + 2; // 헤더 제외 실제 시트 행 번호
       return record;
     });
 
-    return ContentService
-      .createTextOutput(JSON.stringify(records))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createJsonResponse(records);
 
   } catch (error) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ error: error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createJsonResponse({ error: error.toString() });
   }
 }
 
 /**
  * 기록 업데이트 (POST 요청용)
  */
-function updateRecord(timestamp, updatedData) {
+function updateRecord(updatedData) {
   try {
     const sheet = getOrCreateSheet();
     const data = sheet.getDataRange().getValues();
+    const rowNumber = parseInt(updatedData.rowNumber, 10);
+
+    if (!isNaN(rowNumber) && rowNumber > 1 && rowNumber <= sheet.getLastRow()) {
+      Logger.log('Update request by row number: ' + rowNumber);
+      return applyUpdateToRow(sheet, rowNumber, updatedData);
+    }
+
+    const timestamp = updatedData.timestamp;
     const targetTime = new Date(timestamp).getTime();
 
     Logger.log('Update request for timestamp: ' + timestamp);
@@ -447,22 +467,7 @@ function updateRecord(timestamp, updatedData) {
       if (Math.abs(rowTime - targetTime) < 1000) {
         Logger.log('Match found at row: ' + (i + 1));
 
-        // 해당 행 업데이트
-        sheet.getRange(i + 1, 2).setValue(updatedData.date);
-        sheet.getRange(i + 1, 3).setValue(updatedData.name);
-        sheet.getRange(i + 1, 4).setValue(updatedData.location);
-        sheet.getRange(i + 1, 5).setValue(updatedData.checkIn);
-        sheet.getRange(i + 1, 6).setValue(updatedData.checkOut);
-
-        // 근무시간 재계산
-        const workHours = calculateWorkHours(updatedData.checkIn, updatedData.checkOut);
-        sheet.getRange(i + 1, 7).setValue(workHours);
-
-        sheet.getRange(i + 1, 8).setValue(updatedData.workType);
-        sheet.getRange(i + 1, 9).setValue(updatedData.notes);
-
-        Logger.log('Record updated successfully');
-        return true;
+        return applyUpdateToRow(sheet, i + 1, updatedData);
       }
     }
 
@@ -478,10 +483,19 @@ function updateRecord(timestamp, updatedData) {
 /**
  * 기록 삭제 (POST 요청용)
  */
-function deleteRecord(timestamp) {
+function deleteRecord(deleteData) {
   try {
     const sheet = getOrCreateSheet();
     const data = sheet.getDataRange().getValues();
+    const rowNumber = parseInt(deleteData.rowNumber, 10);
+
+    if (!isNaN(rowNumber) && rowNumber > 1 && rowNumber <= sheet.getLastRow()) {
+      sheet.deleteRow(rowNumber);
+      Logger.log('Record deleted by row number: ' + rowNumber);
+      return true;
+    }
+
+    const timestamp = deleteData.timestamp;
     const targetTime = new Date(timestamp).getTime();
 
     Logger.log('Delete request for timestamp: ' + timestamp);
@@ -520,6 +534,26 @@ function deleteRecord(timestamp) {
 // ========================================
 
 /**
+ * 지정한 행에 수정 데이터 반영
+ */
+function applyUpdateToRow(sheet, rowNumber, updatedData) {
+  sheet.getRange(rowNumber, 2).setValue(updatedData.date);
+  sheet.getRange(rowNumber, 3).setValue(updatedData.name);
+  sheet.getRange(rowNumber, 4).setValue(updatedData.location);
+  sheet.getRange(rowNumber, 5).setValue(updatedData.checkIn);
+  sheet.getRange(rowNumber, 6).setValue(updatedData.checkOut);
+
+  const workHours = calculateWorkHours(updatedData.checkIn, updatedData.checkOut);
+  sheet.getRange(rowNumber, 7).setValue(workHours);
+
+  sheet.getRange(rowNumber, 8).setValue(updatedData.workType);
+  sheet.getRange(rowNumber, 9).setValue(updatedData.notes);
+
+  Logger.log('Record updated successfully at row: ' + rowNumber);
+  return true;
+}
+
+/**
  * 인원 목록 가져오기
  */
 function getEmployees() {
@@ -553,19 +587,15 @@ function getEmployees() {
       .filter(name => name && name !== '이름')
       .map(name => name.toString().trim());
 
-    return ContentService
-      .createTextOutput(JSON.stringify(employees))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createJsonResponse(employees);
 
   } catch (error) {
     Logger.log('getEmployees error: ' + error.toString());
 
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        error: error.toString(),
-        fallback: ['심태양', '김철수', '이영희', '박민수']
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createJsonResponse({
+      error: error.toString(),
+      fallback: ['심태양', '김철수', '이영희', '박민수']
+    });
   }
 }
 
@@ -610,19 +640,15 @@ function getLocations() {
       .filter(loc => loc && loc !== '장소')
       .map(loc => loc.toString().trim());
 
-    return ContentService
-      .createTextOutput(JSON.stringify(locations))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createJsonResponse(locations);
 
   } catch (error) {
     Logger.log('getLocations error: ' + error.toString());
 
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        error: error.toString(),
-        fallback: ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실']
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createJsonResponse({
+      error: error.toString(),
+      fallback: ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실']
+    });
   }
 }
 
