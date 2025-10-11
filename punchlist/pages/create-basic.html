@@ -254,9 +254,11 @@
     <script src="../../shared/scripts/utils.js"></script>
     <script src="../scripts/punchlist.js"></script>
     <script>
+        let categoryMap = {};
+
         // 페이지 로드 시 실행
-        document.addEventListener('DOMContentLoaded', () => {
-            initForm();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initForm();
             setDefaultDates();
 
             // 분류 변경 이벤트
@@ -267,12 +269,33 @@
         });
 
         // 폼 초기화
-        function initForm() {
+        async function initForm() {
+            await Promise.all([
+                PunchListAPI.ensureCategoriesLoaded(),
+                PunchListAPI.ensureOwnersLoaded()
+            ]);
+
+            const categoryConfig = PunchListAPI.getCategoryConfig();
+            categoryMap = PunchListAPI.getCategoryMap();
+
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">선택하세요</option>';
+            if (categoryConfig && Array.isArray(categoryConfig.categories)) {
+                categoryConfig.categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.name;
+                    option.textContent = cat.icon ? `${cat.icon} ${cat.name}` : cat.name;
+                    categorySelect.appendChild(option);
+                });
+            }
+
             // 담당자 옵션
             const ownerSelect = document.getElementById('owner');
             const approverSelect = document.getElementById('approver');
+            ownerSelect.innerHTML = '<option value="">선택하세요</option>';
+            approverSelect.innerHTML = '<option value="">선택하세요</option>';
 
-            PunchListAPI.OWNERS.forEach(owner => {
+            PunchListAPI.getOwnerNames().forEach(owner => {
                 const option1 = document.createElement('option');
                 option1.value = owner;
                 option1.textContent = owner;
@@ -283,6 +306,8 @@
                 option2.textContent = owner;
                 approverSelect.appendChild(option2);
             });
+
+            updateSubcategories();
         }
 
         // 기본 날짜 설정
@@ -303,8 +328,8 @@
 
             subcategorySelect.innerHTML = '<option value="">선택하세요</option>';
 
-            if (category && PunchListAPI.CATEGORIES[category]) {
-                PunchListAPI.CATEGORIES[category].forEach(sub => {
+            if (category && categoryMap[category]) {
+                categoryMap[category].forEach(sub => {
                     const option = document.createElement('option');
                     option.value = sub;
                     option.textContent = sub;

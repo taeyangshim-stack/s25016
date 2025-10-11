@@ -477,7 +477,9 @@
             const ownerSelect = document.getElementById('owner');
             const approverSelect = document.getElementById('approver');
 
-            PunchListAPI.OWNERS.forEach(owner => {
+            await PunchListAPI.ensureOwnersLoaded();
+            const ownerNames = PunchListAPI.getOwnerNames();
+            ownerNames.forEach(owner => {
                 const option1 = document.createElement('option');
                 option1.value = owner;
                 option1.textContent = owner;

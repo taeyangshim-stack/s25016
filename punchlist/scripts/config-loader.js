@@ -18,15 +18,49 @@ class ConfigLoader {
       return this.cache.categories;
     }
 
+    if (typeof window !== 'undefined' && window.PunchListAPI && typeof window.PunchListAPI.ensureCategoriesLoaded === 'function') {
+      try {
+        const apiConfig = await window.PunchListAPI.ensureCategoriesLoaded();
+        if (apiConfig) {
+          this.cache.categories = apiConfig;
+          return apiConfig;
+        }
+      } catch (error) {
+        console.warn('PunchListAPI 분류 구성 연동 실패:', error);
+      }
+    }
+
+    if (!this.cache.categories) {
+      try {
+        const apiResponse = await fetch('/api/punchlist?action=getCategories', {
+          method: 'GET',
+          cache: 'no-store'
+        });
+        if (apiResponse.ok) {
+          const apiResult = await apiResponse.json();
+          if (apiResult.success && apiResult.data) {
+            this.cache.categories = apiResult.data;
+            return apiResult.data;
+          }
+        }
+      } catch (apiError) {
+        console.warn('API 분류 구성 직접 로드 실패:', apiError);
+      }
+    }
+
     try {
-      const response = await fetch(`${this.baseUrl}/config/categories.json`);
+      const response = await fetch(`${this.baseUrl}/config/categories.json`, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
       const data = await response.json();
       this.cache.categories = data;
       return data;
     } catch (error) {
       console.error('분류 체계 로드 실패:', error);
-      // 폴백: 기본 분류 체계
-      return this.getDefaultCategories();
+      const fallback = this.getDefaultCategories();
+      this.cache.categories = fallback;
+      return fallback;
     }
   }
 

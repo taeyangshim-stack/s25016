@@ -433,6 +433,7 @@
         const itemsPerPage = 20;
         let sortColumn = 'id';
         let sortDirection = 'desc';
+        let categoryConfig = null;
 
         // 페이지 로드
         document.addEventListener('DOMContentLoaded', async () => {
@@ -443,9 +444,9 @@
         // 필터 초기화
         async function initFilters() {
             // 분류 옵션
-            const categories = await configLoader.loadCategories();
+            categoryConfig = await configLoader.loadCategories();
             const categorySelect = document.getElementById('filterCategory');
-            categories.categories.forEach(cat => {
+            categoryConfig.categories.forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat.name;
                 option.textContent = `${cat.icon} ${cat.name}`;
@@ -453,8 +454,10 @@
             });
 
             // 담당자 옵션
+            await PunchListAPI.ensureOwnersLoaded();
+            const ownerNames = PunchListAPI.getOwnerNames();
             const ownerSelect = document.getElementById('filterOwner');
-            PunchListAPI.OWNERS.forEach(owner => {
+            ownerNames.forEach(owner => {
                 const option = document.createElement('option');
                 option.value = owner;
                 option.textContent = owner;
@@ -475,8 +478,10 @@
 
             if (!category) return;
 
-            const categories = await configLoader.loadCategories();
-            const categoryData = categories.categories.find(c => c.name === category);
+            if (!categoryConfig) {
+                categoryConfig = await configLoader.loadCategories();
+            }
+            const categoryData = categoryConfig.categories.find(c => c.name === category);
 
             if (categoryData && categoryData.subcategories) {
                 categoryData.subcategories.forEach(sub => {

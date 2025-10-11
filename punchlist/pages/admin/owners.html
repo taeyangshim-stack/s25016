@@ -215,25 +215,19 @@
         let owners = [];
 
         // 페이지 로드
-        document.addEventListener('DOMContentLoaded', () => {
-            loadOwners();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadOwners();
         });
 
         // 담당자 로드
-        function loadOwners() {
-            const stored = localStorage.getItem('punchlist_owners');
-            if (stored) {
-                owners = JSON.parse(stored);
-            } else {
-                // 기본 담당자 (PunchListAPI에서 가져옴)
-                owners = PunchListAPI.OWNERS.map(name => ({
-                    id: name.toLowerCase().replace(/\s+/g, '-'),
-                    name: name,
-                    role: '담당자',
-                    department: '',
-                    phone: '',
-                    email: ''
-                }));
+        async function loadOwners() {
+            try {
+                const directory = await PunchListAPI.ensureOwnersLoaded();
+                owners = directory.map(owner => ({ ...owner }));
+            } catch (error) {
+                console.error('담당자 로드 실패:', error);
+                owners = PunchListAPI.getOwnerDirectory();
+                alert('❗ 담당자 정보를 불러오지 못했습니다. 기본 목록을 표시합니다.');
             }
             renderOwners();
         }
@@ -288,18 +282,21 @@
         }
 
         // 담당자 삭제
-        function deleteOwner(id) {
+        async function deleteOwner(id) {
             if (!confirm('이 담당자를 삭제하시겠습니까?')) {
                 return;
             }
 
             owners = owners.filter(o => o.id !== id);
-            saveOwners();
-            renderOwners();
+            try {
+                await saveOwners();
+            } catch (error) {
+                alert('❌ 변경사항을 저장하지 못했습니다. 다시 시도해주세요.');
+            }
         }
 
         // 담당자 폼 제출
-        function handleOwnerSubmit(e) {
+        async function handleOwnerSubmit(e) {
             e.preventDefault();
 
             const name = document.getElementById('ownerName').value;
@@ -332,15 +329,25 @@
                 });
             }
 
-            saveOwners();
-            renderOwners();
-            closeModal();
+            try {
+                await saveOwners();
+                closeModal();
+            } catch (error) {
+                alert('❌ 변경사항을 저장하지 못했습니다. 다시 시도해주세요.');
+            }
         }
 
         // 담당자 저장
-        function saveOwners() {
-            localStorage.setItem('punchlist_owners', JSON.stringify(owners));
-            alert('✅ 변경사항이 저장되었습니다.');
+        async function saveOwners() {
+            try {
+                const updated = await PunchListAPI.saveOwnerDirectory(owners);
+                owners = updated;
+                renderOwners();
+                alert('✅ 변경사항이 저장되었습니다.');
+            } catch (error) {
+                console.error('담당자 저장 실패:', error);
+                throw error;
+            }
         }
 
         // 모달 열기

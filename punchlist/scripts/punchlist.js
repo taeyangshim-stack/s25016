@@ -13,12 +13,14 @@ const USE_MOCK_DATA = RAW_SCRIPT_URL === 'mock';
 // 실제 요청에 사용할 URL
 const SCRIPT_URL = USE_MOCK_DATA ? '' : RAW_SCRIPT_URL;
 
-// 분류 옵션
-const CATEGORIES = {
+// 기본 분류 맵 (API 실패 시 폴백)
+const DEFAULT_CATEGORY_MAP = {
   '기계': ['구조물', '프레임', '이송장치', '기타'],
   '전기': ['배선', '센서', '모터', '전원', '기타'],
   '제어': ['로봇', 'UI/HMI', '계측', 'PLC', 'DeviceNet', '기타']
 };
+
+let CATEGORIES = { ...DEFAULT_CATEGORY_MAP };
 
 // 우선순위 옵션
 const PRIORITIES = ['긴급', '높음', '보통', '낮음'];
@@ -26,8 +28,21 @@ const PRIORITIES = ['긴급', '높음', '보통', '낮음'];
 // 상태 옵션
 const STATUSES = ['신규', '진행중', '보류', '완료', '검증중'];
 
-// 담당자 옵션 (실제 프로젝트에 맞게 수정)
-const OWNERS = ['심태양', '김철수', '박영희', '이영수', '최민수'];
+// 기본 담당자 디렉터리 (API 실패 시 폴백)
+const DEFAULT_OWNER_DIRECTORY = [
+  { id: 'owner-default-1', name: '심태양', role: '담당자', department: '생산기술팀', phone: '', email: 'simsun@kakao.com' },
+  { id: 'owner-default-2', name: '김철수', role: '담당자', department: '생산1팀', phone: '', email: '' },
+  { id: 'owner-default-3', name: '박영희', role: '담당자', department: '품질팀', phone: '', email: '' },
+  { id: 'owner-default-4', name: '이영수', role: '관리자', department: '생산기술팀', phone: '', email: '' },
+  { id: 'owner-default-5', name: '최민수', role: '담당자', department: '유지보수팀', phone: '', email: '' }
+];
+
+let ownerDirectoryCache = null;
+let ownerDirectoryPromise = null;
+let OWNERS = DEFAULT_OWNER_DIRECTORY.map(owner => owner.name);
+
+let categoryConfigCache = null;
+let categoryConfigPromise = null;
 
 // Mock 데이터
 const MOCK_ISSUES = [
@@ -212,6 +227,346 @@ const MOCK_ISSUES = [
     templateId: ''
   }
 ];
+
+function cloneOwnerDirectory(list) {
+  return (list || []).map(owner => ({
+    id: owner.id || '',
+    name: owner.name || '',
+    role: owner.role || '담당자',
+    department: owner.department || '',
+    phone: owner.phone || '',
+    email: owner.email || '',
+    created_at: owner.created_at || '',
+    updated_at: owner.updated_at || ''
+  }));
+}
+
+function updateOwnerCache(newOwners) {
+  ownerDirectoryCache = cloneOwnerDirectory(newOwners);
+  OWNERS = ownerDirectoryCache.map(owner => owner.name || '').filter(Boolean);
+}
+
+function getOwnerDirectorySnapshot() {
+  if (ownerDirectoryCache && ownerDirectoryCache.length > 0) {
+    return cloneOwnerDirectory(ownerDirectoryCache);
+  }
+  return cloneOwnerDirectory(DEFAULT_OWNER_DIRECTORY);
+}
+
+function getOwnerNamesSnapshot() {
+  if (OWNERS && OWNERS.length > 0) {
+    return [...OWNERS];
+  }
+  return DEFAULT_OWNER_DIRECTORY.map(owner => owner.name);
+}
+
+function buildCategoryMapFromConfig(config) {
+  if (!config || !Array.isArray(config.categories)) {
+    return { ...DEFAULT_CATEGORY_MAP };
+  }
+
+  const map = {};
+  config.categories.forEach(category => {
+    if (!category || !category.name) {
+      return;
+    }
+
+    map[category.name] = (category.subcategories || [])
+      .map(sub => sub.name)
+      .filter(Boolean);
+  });
+
+  return map;
+}
+
+function cloneCategoryConfig(config) {
+  if (!config) {
+    return null;
+  }
+
+  return {
+    version: config.version,
+    lastUpdated: config.lastUpdated,
+    description: config.description,
+    categories: (config.categories || []).map(category => ({
+      id: category.id,
+      name: category.name,
+      icon: category.icon,
+      color: category.color,
+      description: category.description,
+      subcategories: (category.subcategories || []).map(sub => ({
+        id: sub.id,
+        name: sub.name,
+        description: sub.description,
+        keywords: Array.isArray(sub.keywords) ? [...sub.keywords] : [],
+        allowCustomInput: !!sub.allowCustomInput
+      })),
+      created_at: category.created_at,
+      updated_at: category.updated_at
+    })),
+    customCategories: Array.isArray(config.customCategories)
+      ? config.customCategories.map(item => ({ ...item }))
+      : []
+  };
+}
+
+function updateCategoryCache(config) {
+  const baseDescription = 'S25016 프로젝트 이슈 분류 체계';
+  const sanitized =
+    config && typeof config === 'object'
+      ? cloneCategoryConfig({
+          ...config,
+          description: config.description || baseDescription
+        })
+      : null;
+
+  if (sanitized) {
+    categoryConfigCache = sanitized;
+  } else {
+    categoryConfigCache = cloneCategoryConfig({
+      version: '1.0',
+      lastUpdated: '',
+      description: baseDescription,
+      categories: [],
+      customCategories: []
+    });
+  }
+
+  CATEGORIES = buildCategoryMapFromConfig(categoryConfigCache);
+}
+
+function getCategoryConfigSnapshot() {
+  if (categoryConfigCache) {
+    return cloneCategoryConfig(categoryConfigCache);
+  }
+
+  const fallback = {
+    version: '1.0',
+    lastUpdated: '',
+    description: 'S25016 프로젝트 이슈 분류 체계',
+    categories: Object.entries(DEFAULT_CATEGORY_MAP).map(([name, subs], index) => ({
+      id: `default-${index + 1}`,
+      name,
+      icon: '',
+      color: '',
+      description: '',
+      subcategories: subs.map((subName, subIndex) => ({
+        id: `default-${index + 1}-${subIndex + 1}`,
+        name: subName,
+        description: '',
+        keywords: [],
+        allowCustomInput: subName === '기타'
+      })),
+      created_at: '',
+      updated_at: ''
+    })),
+    customCategories: []
+  };
+
+  return cloneCategoryConfig(fallback);
+}
+
+async function fetchDefaultCategoryConfigFromStatic() {
+  try {
+    const response = await fetch('/punchlist/config/categories.json', { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.warn('정적 분류 구성 로드 실패:', error);
+    return getCategoryConfigSnapshot();
+  }
+}
+
+async function ensureOwnersLoaded(forceRefresh = false) {
+  if (forceRefresh) {
+    ownerDirectoryCache = null;
+    ownerDirectoryPromise = null;
+  }
+
+  if (ownerDirectoryCache && !forceRefresh) {
+    return getOwnerDirectorySnapshot();
+  }
+
+  if (USE_MOCK_DATA) {
+    updateOwnerCache(DEFAULT_OWNER_DIRECTORY);
+    return getOwnerDirectorySnapshot();
+  }
+
+  if (!ownerDirectoryPromise) {
+    ownerDirectoryPromise = (async () => {
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=getOwners`, {
+          method: 'GET',
+          cache: 'no-store'
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const result = await response.json();
+        if (!result.success || !Array.isArray(result.data)) {
+          throw new Error(result.error || '담당자 목록 응답이 올바르지 않습니다.');
+        }
+        updateOwnerCache(result.data);
+      } catch (error) {
+        console.error('담당자 목록 로드 실패:', error);
+        if (!ownerDirectoryCache) {
+          updateOwnerCache(DEFAULT_OWNER_DIRECTORY);
+        }
+      }
+      const snapshot = getOwnerDirectorySnapshot();
+      ownerDirectoryPromise = null;
+      return snapshot;
+    })();
+  }
+
+  return ownerDirectoryPromise;
+}
+
+async function reloadOwnerDirectory() {
+  return ensureOwnersLoaded(true);
+}
+
+async function saveOwnerDirectory(owners) {
+  const payload = (owners || []).map(owner => ({
+    id: owner.id,
+    name: owner.name,
+    role: owner.role || '담당자',
+    department: owner.department || '',
+    phone: owner.phone || '',
+    email: owner.email || '',
+    created_at: owner.created_at,
+    updated_at: owner.updated_at
+  }));
+
+  if (USE_MOCK_DATA) {
+    updateOwnerCache(payload);
+    return getOwnerDirectorySnapshot();
+  }
+
+  const response = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'saveOwners',
+      owners: payload
+    })
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || `HTTP ${response.status}`);
+  }
+
+  updateOwnerCache(result.data);
+  return getOwnerDirectorySnapshot();
+}
+
+async function ensureCategoriesLoaded(forceRefresh = false) {
+  if (forceRefresh) {
+    categoryConfigCache = null;
+    categoryConfigPromise = null;
+  }
+
+  if (categoryConfigCache && !forceRefresh) {
+    return getCategoryConfigSnapshot();
+  }
+
+  if (USE_MOCK_DATA) {
+    const fallback = await fetchDefaultCategoryConfigFromStatic();
+    updateCategoryCache(fallback);
+    return getCategoryConfigSnapshot();
+  }
+
+  if (!categoryConfigPromise) {
+    categoryConfigPromise = (async () => {
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=getCategories`, {
+          method: 'GET',
+          cache: 'no-store'
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const result = await response.json();
+        if (!result.success || !result.data) {
+          throw new Error(result.error || '분류 구성 응답이 올바르지 않습니다.');
+        }
+        updateCategoryCache(result.data);
+      } catch (error) {
+        console.error('분류 구성 로드 실패:', error);
+        const fallback = await fetchDefaultCategoryConfigFromStatic();
+        updateCategoryCache(fallback);
+      }
+      const snapshot = getCategoryConfigSnapshot();
+      categoryConfigPromise = null;
+      return snapshot;
+    })();
+  }
+
+  return categoryConfigPromise;
+}
+
+async function reloadCategoryConfig() {
+  return ensureCategoriesLoaded(true);
+}
+
+async function saveCategoryConfig(config) {
+  const payload = {
+    version: config && config.version ? config.version : '1.0',
+    description: config && config.description ? config.description : 'S25016 프로젝트 이슈 분류 체계',
+    categories: (config && Array.isArray(config.categories)) ? config.categories.map(category => ({
+      id: category.id,
+      name: category.name,
+      icon: category.icon || '',
+      color: category.color || '',
+      description: category.description || '',
+      subcategories: (category.subcategories || []).map(sub => ({
+        id: sub.id,
+        name: sub.name,
+        description: sub.description || '',
+        keywords: Array.isArray(sub.keywords) ? sub.keywords : [],
+        allowCustomInput: !!sub.allowCustomInput
+      })),
+      created_at: category.created_at,
+      updated_at: category.updated_at
+    })) : [],
+    customCategories: (config && Array.isArray(config.customCategories)) ? config.customCategories : []
+  };
+
+  if (USE_MOCK_DATA) {
+    updateCategoryCache(payload);
+    return getCategoryConfigSnapshot();
+  }
+
+  const response = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'saveCategories',
+      version: payload.version,
+      description: payload.description,
+      categories: payload.categories,
+      customCategories: payload.customCategories
+    })
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || `HTTP ${response.status}`);
+  }
+
+  updateCategoryCache(result.data);
+  return getCategoryConfigSnapshot();
+}
+
+function getCategoryMapSnapshot() {
+  const entries = Object.entries(CATEGORIES).map(([key, list]) => [key, [...list]]);
+  return Object.fromEntries(entries);
+}
 
 // 전체 이슈 로드
 async function loadAllIssues() {
@@ -677,8 +1032,7 @@ function isOverdue(issue) {
   return targetDate < today;
 }
 
-// 전역 export
-window.PunchListAPI = {
+const PunchListAPIExports = {
   loadAllIssues,
   loadIssueById,
   createIssue,
@@ -697,8 +1051,30 @@ window.PunchListAPI = {
   saveToLocalStorage,
   loadFromLocalStorage,
   isOverdue,
-  CATEGORIES,
+  ensureOwnersLoaded,
+  reloadOwnerDirectory,
+  saveOwnerDirectory,
+  getOwnerDirectory: () => getOwnerDirectorySnapshot(),
+  getOwnerNames: () => getOwnerNamesSnapshot(),
+  ensureCategoriesLoaded,
+  reloadCategoryConfig,
+  saveCategoryConfig,
+  getCategoryConfig: () => getCategoryConfigSnapshot(),
+  getCategoryMap: () => getCategoryMapSnapshot(),
   PRIORITIES,
-  STATUSES,
-  OWNERS
+  STATUSES
 };
+
+Object.defineProperty(PunchListAPIExports, 'CATEGORIES', {
+  get() {
+    return getCategoryMapSnapshot();
+  }
+});
+
+Object.defineProperty(PunchListAPIExports, 'OWNERS', {
+  get() {
+    return getOwnerNamesSnapshot();
+  }
+});
+
+window.PunchListAPI = PunchListAPIExports;

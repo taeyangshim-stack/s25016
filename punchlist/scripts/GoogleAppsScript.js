@@ -17,16 +17,168 @@
 const SHEET_NAME = 'PunchList';
 const SHEET_ID = '1EqBPn9XrA_5PTg5ks4bgFIjwiojMFDZCYaOkFJINAmE'; // Google Sheets ID로 변경
 
+// 부가 시트 이름
+const SHEET_NAME_OWNERS = 'PunchListOwners';
+const SHEET_NAME_CATEGORIES = 'PunchListCategories';
+
+// 기본 담당자 목록
+const DEFAULT_OWNERS = [
+  { name: '심태양', role: '담당자', department: '생산기술팀', phone: '', email: 'simsun@kakao.com' },
+  { name: '김철수', role: '담당자', department: '생산1팀', phone: '', email: '' },
+  { name: '박영희', role: '담당자', department: '품질팀', phone: '', email: '' },
+  { name: '이영수', role: '관리자', department: '생산기술팀', phone: '', email: '' },
+  { name: '최민수', role: '담당자', department: '유지보수팀', phone: '', email: '' }
+];
+
+// 기본 분류 구성 (config/categories.json과 동기화)
+const DEFAULT_CATEGORY_CONFIG = {
+  version: '1.0',
+  lastUpdated: '2024-10-10',
+  description: 'S25016 프로젝트 이슈 분류 체계',
+  categories: [
+    {
+      id: 'mechanical',
+      name: '기계',
+      icon: '🔧',
+      color: '#3b82f6',
+      description: '기계 및 구조물 관련 이슈',
+      subcategories: [
+        {
+          id: 'structure',
+          name: '구조물',
+          description: '프레임, 베이스 등 구조물 관련',
+          keywords: ['프레임', '베이스', '구조', '용접']
+        },
+        {
+          id: 'frame',
+          name: '프레임',
+          description: '기계 프레임 및 하우징',
+          keywords: ['프레임', '하우징', '커버']
+        },
+        {
+          id: 'transport',
+          name: '이송장치',
+          description: '컨베이어, 리프터 등 이송 관련',
+          keywords: ['컨베이어', '리프터', '이송', '반송']
+        },
+        {
+          id: 'custom',
+          name: '기타',
+          description: '기타 기계 관련 이슈',
+          allowCustomInput: true
+        }
+      ]
+    },
+    {
+      id: 'electrical',
+      name: '전기',
+      icon: '⚡',
+      color: '#f59e0b',
+      description: '전기 및 전원 관련 이슈',
+      subcategories: [
+        {
+          id: 'wiring',
+          name: '배선',
+          description: '전기 배선 및 케이블 관련',
+          keywords: ['배선', '케이블', '전선', '결선']
+        },
+        {
+          id: 'sensor',
+          name: '센서',
+          description: '각종 센서 및 스위치',
+          keywords: ['센서', '스위치', '감지', '검출']
+        },
+        {
+          id: 'motor',
+          name: '모터',
+          description: '서보모터, 스테핑모터 등',
+          keywords: ['모터', '서보', '스테핑', '구동']
+        },
+        {
+          id: 'power',
+          name: '전원',
+          description: '전원공급장치, UPS 등',
+          keywords: ['전원', '파워', 'UPS', '배전']
+        },
+        {
+          id: 'custom',
+          name: '기타',
+          description: '기타 전기 관련 이슈',
+          allowCustomInput: true
+        }
+      ]
+    },
+    {
+      id: 'control',
+      name: '제어',
+      icon: '💻',
+      color: '#10b981',
+      description: '제어 및 소프트웨어 관련 이슈',
+      subcategories: [
+        {
+          id: 'robot',
+          name: '로봇',
+          description: '로봇 제어 및 프로그램',
+          keywords: ['로봇', 'ABB', '제어', '티칭', '프로그램']
+        },
+        {
+          id: 'ui_hmi',
+          name: 'UI/HMI',
+          description: '사용자 인터페이스 및 HMI',
+          keywords: ['UI', 'HMI', '화면', '인터페이스', '터치스크린']
+        },
+        {
+          id: 'measurement',
+          name: '계측',
+          description: '측정 및 검증 관련',
+          keywords: ['계측', '측정', '검증', 'Hexagon', '정밀도']
+        },
+        {
+          id: 'plc',
+          name: 'PLC',
+          description: 'PLC 프로그램 및 로직',
+          keywords: ['PLC', '래더', '로직', '시퀀스']
+        },
+        {
+          id: 'devicenet',
+          name: 'DeviceNet',
+          description: 'DeviceNet 통신 관련',
+          keywords: ['DeviceNet', '통신', 'Lincoln', '용접기']
+        },
+        {
+          id: 'custom',
+          name: '기타',
+          description: '기타 제어 관련 이슈',
+          allowCustomInput: true
+        }
+      ]
+    }
+  ],
+  customCategories: []
+};
+
 // CORS 허용 헤더 추가 함수
 function createCORSResponse(data) {
   const output = ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
-
-  output.setHeader('Access-Control-Allow-Origin', '*');
-  output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  output.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  // TextOutput#setHeader is no longer available; CORS headers are added by the Vercel proxy layer.
 
   return output;
+}
+
+function generateTimestamp() {
+  return new Date().toISOString();
+}
+
+function generateOwnerId() {
+  return 'OWNER-' + Utilities.getUuid().split('-')[0].toUpperCase();
+}
+
+function generateCategoryId(name) {
+  if (name) {
+    return name.toString().trim().toLowerCase().replace(/\s+/g, '-');
+  }
+  return 'category-' + Utilities.getUuid().split('-')[0];
 }
 
 // 메인 함수 - HTTP 요청 처리
@@ -55,6 +207,12 @@ function doPost(e) {
       case 'addComment':
         result = addComment(params.id, params.comment);
         break;
+      case 'saveOwners':
+        result = saveOwnersData(params.owners || []);
+        break;
+      case 'saveCategories':
+        result = saveCategoriesData(params);
+        break;
       default:
         return createCORSResponse({ success: false, error: 'Invalid action' });
     }
@@ -72,6 +230,10 @@ function doGet(e) {
     return createCORSResponse(getAllIssues());
   } else if (action === 'getById') {
     return createCORSResponse(getIssueById(e.parameter.id));
+  } else if (action === 'getOwners') {
+    return createCORSResponse({ success: true, data: getOwnersData() });
+  } else if (action === 'getCategories') {
+    return createCORSResponse({ success: true, data: getCategoriesConfig() });
   }
 
   return createCORSResponse({ success: false, error: 'Invalid action' });
@@ -79,6 +241,363 @@ function doGet(e) {
 
 function doOptions() {
   return createCORSResponse({ success: true });
+}
+
+// -----------------------------
+// 담당자 / 분류 관리 헬퍼 함수
+// -----------------------------
+
+function getOrCreateOwnersSheet() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  let sheet = ss.getSheetByName(SHEET_NAME_OWNERS);
+
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME_OWNERS);
+    initializeOwnersSheet(sheet);
+  }
+
+  return sheet;
+}
+
+function initializeOwnersSheet(sheet) {
+  const headers = ['id', 'name', 'role', 'department', 'phone', 'email', 'created_at', 'updated_at'];
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+  sheet.getRange(1, 1, 1, headers.length).setBackground('#2563eb');
+  sheet.getRange(1, 1, 1, headers.length).setFontColor('#ffffff');
+  sheet.setFrozenRows(1);
+
+  const now = generateTimestamp();
+  const rows = DEFAULT_OWNERS.map(owner => [
+    generateOwnerId(),
+    owner.name,
+    owner.role || '담당자',
+    owner.department || '',
+    owner.phone || '',
+    owner.email || '',
+    now,
+    now
+  ]);
+
+  if (rows.length > 0) {
+    sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+  }
+}
+
+function readOwnersFromSheet(sheet) {
+  const values = sheet.getDataRange().getValues();
+  const owners = [];
+
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    if (!row[0] || !row[1]) {
+      continue;
+    }
+    owners.push({
+      id: row[0],
+      name: row[1],
+      role: row[2] || '담당자',
+      department: row[3] || '',
+      phone: row[4] || '',
+      email: row[5] || '',
+      created_at: row[6] || '',
+      updated_at: row[7] || ''
+    });
+  }
+
+  return owners;
+}
+
+function writeOwnersToSheet(sheet, owners) {
+  const headersCount = 8;
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow > 1) {
+    sheet.deleteRows(2, lastRow - 1);
+  }
+
+  if (owners.length === 0) {
+    return;
+  }
+
+  sheet.insertRowsAfter(1, owners.length);
+  const rows = owners.map(owner => [
+    owner.id,
+    owner.name,
+    owner.role || '담당자',
+    owner.department || '',
+    owner.phone || '',
+    owner.email || '',
+    owner.created_at,
+    owner.updated_at
+  ]);
+
+  sheet.getRange(2, 1, rows.length, headersCount).setValues(rows);
+}
+
+function getOwnersData() {
+  const sheet = getOrCreateOwnersSheet();
+  let owners = readOwnersFromSheet(sheet);
+
+  if (owners.length === 0) {
+    const now = generateTimestamp();
+    owners = DEFAULT_OWNERS.map(owner => ({
+      id: generateOwnerId(),
+      name: owner.name,
+      role: owner.role || '담당자',
+      department: owner.department || '',
+      phone: owner.phone || '',
+      email: owner.email || '',
+      created_at: now,
+      updated_at: now
+    }));
+    writeOwnersToSheet(sheet, owners);
+  }
+
+  return owners;
+}
+
+function saveOwnersData(ownersPayload) {
+  try {
+    const sheet = getOrCreateOwnersSheet();
+    const existing = {};
+    readOwnersFromSheet(sheet).forEach(owner => {
+      existing[owner.id] = owner;
+    });
+
+    const now = generateTimestamp();
+    const sanitized = (ownersPayload || [])
+      .filter(item => item && item.name)
+      .map(item => {
+        const existingOwner = item.id ? existing[item.id] : null;
+        const id = item.id || generateOwnerId();
+        return {
+          id: id,
+          name: item.name,
+          role: item.role || '담당자',
+          department: item.department || '',
+          phone: item.phone || '',
+          email: item.email || '',
+          created_at: existingOwner ? existingOwner.created_at : (item.created_at || now),
+          updated_at: now
+        };
+      });
+
+    writeOwnersToSheet(sheet, sanitized);
+
+    return { success: true, data: sanitized };
+  } catch (error) {
+    Logger.log('saveOwnersData error: ' + error.toString());
+    return { success: false, error: error.toString() };
+  }
+}
+
+function getOrCreateCategoriesSheet() {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  let sheet = ss.getSheetByName(SHEET_NAME_CATEGORIES);
+
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME_CATEGORIES);
+    initializeCategoriesSheet(sheet);
+  }
+
+  return sheet;
+}
+
+function initializeCategoriesSheet(sheet) {
+  const headers = ['id', 'name', 'icon', 'color', 'description', 'subcategories', 'created_at', 'updated_at'];
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+  sheet.getRange(1, 1, 1, headers.length).setBackground('#047857');
+  sheet.getRange(1, 1, 1, headers.length).setFontColor('#ffffff');
+  sheet.setFrozenRows(1);
+
+  const now = generateTimestamp();
+  const seeded = DEFAULT_CATEGORY_CONFIG.categories.map(category => ({
+    id: category.id || generateCategoryId(category.name),
+    name: category.name,
+    icon: category.icon || '',
+    color: category.color || '',
+    description: category.description || '',
+    subcategories: category.subcategories || [],
+    created_at: now,
+    updated_at: now
+  }));
+
+  if (seeded.length > 0) {
+    sheet.getRange(2, 1, seeded.length, headers.length).setValues(
+      seeded.map(category => [
+        category.id,
+        category.name,
+        category.icon,
+        category.color,
+        category.description,
+        JSON.stringify(category.subcategories || []),
+        category.created_at,
+        category.updated_at
+      ])
+    );
+  }
+}
+
+function readCategoriesFromSheet(sheet) {
+  const values = sheet.getDataRange().getValues();
+  const categories = [];
+
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    if (!row[0] || !row[1]) {
+      continue;
+    }
+
+    categories.push({
+      id: row[0],
+      name: row[1],
+      icon: row[2] || '',
+      color: row[3] || '',
+      description: row[4] || '',
+      subcategories: safeJSONParse(row[5], []),
+      created_at: row[6] || '',
+      updated_at: row[7] || ''
+    });
+  }
+
+  return categories;
+}
+
+function writeCategoriesToSheet(sheet, categories) {
+  const headersCount = 8;
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow > 1) {
+    sheet.deleteRows(2, lastRow - 1);
+  }
+
+  if (categories.length === 0) {
+    return;
+  }
+
+  sheet.insertRowsAfter(1, categories.length);
+  const rows = categories.map(category => [
+    category.id,
+    category.name,
+    category.icon || '',
+    category.color || '',
+    category.description || '',
+    JSON.stringify(category.subcategories || []),
+    category.created_at,
+    category.updated_at
+  ]);
+
+  sheet.getRange(2, 1, rows.length, headersCount).setValues(rows);
+}
+
+function getCategoriesConfig() {
+  const sheet = getOrCreateCategoriesSheet();
+  let categories = readCategoriesFromSheet(sheet);
+
+  if (categories.length === 0) {
+    const now = generateTimestamp();
+    categories = DEFAULT_CATEGORY_CONFIG.categories.map(category => ({
+      id: category.id || generateCategoryId(category.name),
+      name: category.name,
+      icon: category.icon || '',
+      color: category.color || '',
+      description: category.description || '',
+      subcategories: category.subcategories || [],
+      created_at: now,
+      updated_at: now
+    }));
+    writeCategoriesToSheet(sheet, categories);
+  }
+
+  const lastUpdated = categories.reduce((latest, category) => {
+    if (!category.updated_at) {
+      return latest;
+    }
+    if (!latest) {
+      return category.updated_at;
+    }
+    return category.updated_at > latest ? category.updated_at : latest;
+  }, '');
+
+  return {
+    version: DEFAULT_CATEGORY_CONFIG.version,
+    lastUpdated: lastUpdated || DEFAULT_CATEGORY_CONFIG.lastUpdated,
+    description: DEFAULT_CATEGORY_CONFIG.description,
+    categories: categories.map(category => ({
+      id: category.id,
+      name: category.name,
+      icon: category.icon,
+      color: category.color,
+      description: category.description,
+      subcategories: category.subcategories,
+      created_at: category.created_at,
+      updated_at: category.updated_at
+    })),
+    customCategories: DEFAULT_CATEGORY_CONFIG.customCategories || []
+  };
+}
+
+function saveCategoriesData(configPayload) {
+  try {
+    const sheet = getOrCreateCategoriesSheet();
+    const existingMap = {};
+    readCategoriesFromSheet(sheet).forEach(category => {
+      existingMap[category.id] = category;
+    });
+
+    const now = generateTimestamp();
+    const categoriesInput = (configPayload && configPayload.categories) ? configPayload.categories : [];
+    const sanitized = categoriesInput
+      .filter(category => category && category.name)
+      .map(category => {
+        const id = category.id || generateCategoryId(category.name);
+        const existing = existingMap[id];
+        const subcategories = (category.subcategories || []).map(sub => ({
+          id: sub.id || generateCategoryId(sub.name),
+          name: sub.name,
+          description: sub.description || '',
+          keywords: sub.keywords || [],
+          allowCustomInput: !!sub.allowCustomInput
+        }));
+
+        return {
+          id: id,
+          name: category.name,
+          icon: category.icon || '',
+          color: category.color || '',
+          description: category.description || '',
+          subcategories: subcategories,
+          created_at: existing ? existing.created_at : (category.created_at || now),
+          updated_at: now
+        };
+      });
+
+    writeCategoriesToSheet(sheet, sanitized);
+
+    const config = {
+      version: configPayload && configPayload.version ? configPayload.version : DEFAULT_CATEGORY_CONFIG.version,
+      lastUpdated: now,
+      description: (configPayload && configPayload.description) ? configPayload.description : DEFAULT_CATEGORY_CONFIG.description,
+      categories: sanitized.map(category => ({
+        id: category.id,
+        name: category.name,
+        icon: category.icon,
+        color: category.color,
+        description: category.description,
+        subcategories: category.subcategories,
+        created_at: category.created_at,
+        updated_at: category.updated_at
+      })),
+      customCategories: configPayload && configPayload.customCategories ? configPayload.customCategories : []
+    };
+
+    return { success: true, data: config };
+  } catch (error) {
+    Logger.log('saveCategoriesData error: ' + error.toString());
+    return { success: false, error: error.toString() };
+  }
 }
 
 // 이슈 생성

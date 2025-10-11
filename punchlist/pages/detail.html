@@ -685,11 +685,11 @@
                 return;
             }
 
-            setupEditForm();
+            await setupEditForm();
             await loadIssue(issueId);
         });
 
-        function setupEditForm() {
+        async function setupEditForm() {
             if (editFormInitialized) return;
 
             const statusSelect = document.getElementById('editStatus');
@@ -715,7 +715,8 @@
             }
 
             if (ownerSelect) {
-                PunchListAPI.OWNERS.forEach(owner => {
+                await PunchListAPI.ensureOwnersLoaded();
+                PunchListAPI.getOwnerNames().forEach(owner => {
                     const option = document.createElement('option');
                     option.value = owner;
                     option.textContent = owner;

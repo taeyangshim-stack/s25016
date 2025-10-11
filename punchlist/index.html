@@ -332,11 +332,13 @@
     <script>
         let allIssues = [];
         let filteredIssues = [];
+        let categoryMap = {};
+        let ownerOptions = [];
 
         // 페이지 로드 시 실행
-        document.addEventListener('DOMContentLoaded', () => {
-            initFilters();
-            loadIssues();
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initFilters();
+            await loadIssues();
 
             // 필터 이벤트 리스너
             document.getElementById('filterCategory').addEventListener('change', onFilterChange);
@@ -348,15 +350,48 @@
         });
 
         // 필터 초기화
-        function initFilters() {
-            // 담당자 옵션
+        async function initFilters() {
+            try {
+                await Promise.all([
+                    PunchListAPI.ensureCategoriesLoaded(),
+                    PunchListAPI.ensureOwnersLoaded()
+                ]);
+            } catch (error) {
+                console.warn('필터 데이터 로드 중 경고:', error);
+            }
+
+            categoryMap = PunchListAPI.getCategoryMap();
+            ownerOptions = PunchListAPI.getOwnerNames();
+
+            // 분류 옵션 구성
+            const categorySelect = document.getElementById('filterCategory');
+            const previousCategory = categorySelect.value;
+            categorySelect.innerHTML = '<option value="all">전체</option>';
+            Object.keys(categoryMap).forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                categorySelect.appendChild(option);
+            });
+
+            if (previousCategory && categoryMap[previousCategory]) {
+                categorySelect.value = previousCategory;
+            } else {
+                categorySelect.value = 'all';
+            }
+
+            // 담당자 옵션 구성
             const ownerSelect = document.getElementById('filterOwner');
-            PunchListAPI.OWNERS.forEach(owner => {
+            ownerSelect.innerHTML = '<option value="all">전체</option>';
+            ownerOptions.forEach(owner => {
                 const option = document.createElement('option');
                 option.value = owner;
                 option.textContent = owner;
                 ownerSelect.appendChild(option);
             });
+
+            // 세부분류 초기화
+            onFilterChange();
         }
 
         // 분류 변경 시 세부분류 업데이트
@@ -366,8 +401,8 @@
 
             subcategorySelect.innerHTML = '<option value="all">전체</option>';
 
-            if (category !== 'all' && PunchListAPI.CATEGORIES[category]) {
-                PunchListAPI.CATEGORIES[category].forEach(sub => {
+            if (category !== 'all' && categoryMap[category]) {
+                categoryMap[category].forEach(sub => {
                     const option = document.createElement('option');
                     option.value = sub;
                     option.textContent = sub;
