@@ -39,19 +39,13 @@ const CONFIG = {
 function createJsonResponse(payload) {
   return ContentService
     .createTextOutput(JSON.stringify(payload))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type')
-    .setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function createTextResponse(text, mimeType) {
   return ContentService
     .createTextOutput(text)
-    .setMimeType(mimeType)
-    .setHeader('Access-Control-Allow-Origin', '*')
-    .setHeader('Access-Control-Allow-Headers', 'Content-Type')
-    .setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    .setMimeType(mimeType);
 }
 
 // ========================================
@@ -126,6 +120,13 @@ function doGet(e) {
     'S25016 근무관리 시스템이 정상 작동 중입니다.',
     ContentService.MimeType.TEXT
   );
+}
+
+/**
+ * 웹 앱 OPTIONS 요청 처리 (CORS 프리플라이트)
+ */
+function doOptions() {
+  return createTextResponse('', ContentService.MimeType.TEXT);
 }
 
 // ========================================
@@ -388,10 +389,10 @@ function getAllRecords() {
 
     // 헤더 제외
     const headers = data[0];
-    const records = data.slice(1).map(row => {
+    const records = data.slice(1).map((row, rowIndex) => {
       const record = {};
-      headers.forEach((header, index) => {
-        let value = row[index];
+      headers.forEach((header, columnIndex) => {
+        let value = row[columnIndex];
 
         // 타임스탬프는 ISO 문자열로 변환
         if (header === '타임스탬프' && value instanceof Date) {
@@ -418,7 +419,7 @@ function getAllRecords() {
 
         record[header] = value;
       });
-      record.rowNumber = index + 2; // 헤더 제외 실제 시트 행 번호
+      record.rowNumber = rowIndex + 2; // 헤더 제외 실제 시트 행 번호
       return record;
     });
 
