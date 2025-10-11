@@ -67,10 +67,33 @@ module.exports = async (req, res) => {
 
   if (method === 'POST') {
     fetchOptions.headers['Content-Type'] = 'application/json';
-    const payload =
-      req.body && typeof req.body === 'object'
-        ? { ...req.body }
-        : {};
+    let payload = {};
+
+    if (req.body && typeof req.body === 'object') {
+      payload = { ...req.body };
+    } else {
+      payload = await new Promise((resolve, reject) => {
+        let raw = '';
+        req.on('data', chunk => {
+          raw += chunk;
+        });
+        req.on('end', () => {
+          if (!raw) {
+            resolve({});
+            return;
+          }
+          try {
+            resolve(JSON.parse(raw));
+          } catch (error) {
+            reject(error);
+          }
+        });
+        req.on('error', reject);
+      }).catch(error => {
+        console.error('Failed to parse request body:', error);
+        return {};
+      });
+    }
 
     // body에 action이 있다면 제거 (쿼리로 전달됨)
     delete payload.action;
