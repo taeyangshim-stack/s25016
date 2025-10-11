@@ -3,7 +3,7 @@
  */
 
 // Google Apps Script URL (배포 후 업데이트 필요)
-const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxarys6e5oeI8jt7PHeO11H2LfMW0-P2lhX-NMApVX9-Ir97jnIlgtnElu70LZnUqRa/exec';
 
 // Mock 모드 (Google Sheets 설정 전 테스트용)
 const USE_MOCK_DATA = SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL';

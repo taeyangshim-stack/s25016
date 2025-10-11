@@ -15,7 +15,7 @@
 
 // 스프레드시트 설정
 const SHEET_NAME = 'PunchList';
-const SHEET_ID = 'YOUR_SHEET_ID'; // Google Sheets ID로 변경
+const SHEET_ID = '1EqBPn9XrA_5PTg5ks4bgFIjwiojMFDZCYaOkFJINAmE'; // Google Sheets ID로 변경
 
 // CORS 허용 헤더 추가 함수
 function createCORSResponse(data) {
@@ -359,8 +359,8 @@ function sendEmailNotification(action, data) {
 ${data.description}
 
 ---
-펀치리스트 확인: http://localhost:8000/punchlist/index.html
-이슈 상세: http://localhost:8000/punchlist/pages/detail.html?id=${data.id}
+펀치리스트 확인: https://s2501602.vercel.app/punchlist/index.html
+이슈 상세: https://s2501602.vercel.app/punchlist/pages/detail.html?id=${data.id}
     `;
   } else if (action === 'update') {
     subject = `[S25016 펀치리스트] 이슈 업데이트: ${data.title}`;
@@ -375,7 +375,7 @@ ${data.description}
 ${data.action_result ? '[조치 결과]\n' + data.action_result : ''}
 
 ---
-이슈 상세: http://localhost:8000/punchlist/pages/detail.html?id=${data.id}
+이슈 상세: https://s2501602.vercel.app/punchlist/pages/detail.html?id=${data.id}
     `;
   }
 
