@@ -287,6 +287,113 @@
             background: rgba(0, 0, 0, 0.8);
         }
 
+        .edit-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            z-index: 1200;
+            padding: var(--space-6);
+            overflow-y: auto;
+        }
+
+        .edit-modal.active {
+            display: block;
+        }
+
+        .edit-modal .modal-card {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            max-width: 720px;
+            margin: 0 auto;
+            padding: var(--space-6);
+        }
+
+        .edit-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .edit-modal-title {
+            font-size: var(--font-xl);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: var(--font-2xl);
+            color: var(--color-gray-500);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .modal-close-btn:hover {
+            color: var(--color-gray-700);
+        }
+
+        .edit-form .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .edit-form .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .edit-form .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .edit-form label {
+            font-size: var(--font-sm);
+            color: var(--color-gray-600);
+            font-weight: var(--font-medium);
+        }
+
+        .edit-form input,
+        .edit-form select,
+        .edit-form textarea {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-base);
+            font-size: var(--font-base);
+            transition: var(--transition-base);
+        }
+
+        .edit-form input:focus,
+        .edit-form select:focus,
+        .edit-form textarea:focus {
+            border-color: var(--color-primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        .edit-form textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .edit-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-3);
+            margin-top: var(--space-6);
+        }
+
+        .edit-form-actions .btn {
+            min-width: 120px;
+        }
+
         .modal-caption {
             position: absolute;
             bottom: 0;
@@ -469,11 +576,104 @@
         </div>
     </div>
 
+    <!-- 이슈 수정 모달 -->
+    <div class="edit-modal" id="editIssueModal">
+        <div class="modal-card">
+            <div class="edit-modal-header">
+                <h2 class="edit-modal-title">이슈 수정</h2>
+                <button type="button" class="modal-close-btn" onclick="closeEditModal()">×</button>
+            </div>
+            <form id="editIssueForm" class="edit-form">
+                <div class="form-row">
+                    <div class="form-group full">
+                        <label for="editTitle">제목</label>
+                        <input type="text" id="editTitle" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPriority">우선순위</label>
+                        <select id="editPriority"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editStatus">상태</label>
+                        <select id="editStatus"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editOwner">담당자</label>
+                        <select id="editOwner"></select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editCollaborators">협의자</label>
+                        <input type="text" id="editCollaborators">
+                    </div>
+                    <div class="form-group">
+                        <label for="editApprover">승인자</label>
+                        <input type="text" id="editApprover">
+                    </div>
+                </div>
+
+                    <div class="form-row">
+                    <div class="form-group">
+                        <label for="editRequestDate">요청일</label>
+                        <input type="date" id="editRequestDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="editTargetDate">목표일</label>
+                        <input type="date" id="editTargetDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="editCompleteDate">완료일</label>
+                        <input type="date" id="editCompleteDate">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full">
+                        <label for="editDescription">문제 상황</label>
+                        <textarea id="editDescription"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full">
+                        <label for="editCause">원인 분석</label>
+                        <textarea id="editCause"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full">
+                        <label for="editActionPlan">조치 계획</label>
+                        <textarea id="editActionPlan"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full">
+                        <label for="editActionResult">조치 결과</label>
+                        <textarea id="editActionResult"></textarea>
+                    </div>
+                </div>
+
+                <div class="edit-form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+                    <button type="submit" class="btn btn-primary">💾 변경 사항 저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../../shared/scripts/utils.js"></script>
     <script src="../scripts/config-loader.js"></script>
     <script src="../scripts/punchlist.js"></script>
     <script>
         let currentIssue = null;
+        let editFormInitialized = false;
 
         // 페이지 로드
         document.addEventListener('DOMContentLoaded', async () => {
@@ -485,8 +685,51 @@
                 return;
             }
 
+            setupEditForm();
             await loadIssue(issueId);
         });
+
+        function setupEditForm() {
+            if (editFormInitialized) return;
+
+            const statusSelect = document.getElementById('editStatus');
+            const prioritySelect = document.getElementById('editPriority');
+            const ownerSelect = document.getElementById('editOwner');
+
+            if (statusSelect) {
+                PunchListAPI.STATUSES.forEach(status => {
+                    const option = document.createElement('option');
+                    option.value = status;
+                    option.textContent = status;
+                    statusSelect.appendChild(option);
+                });
+            }
+
+            if (prioritySelect) {
+                PunchListAPI.PRIORITIES.forEach(priority => {
+                    const option = document.createElement('option');
+                    option.value = priority;
+                    option.textContent = priority;
+                    prioritySelect.appendChild(option);
+                });
+            }
+
+            if (ownerSelect) {
+                PunchListAPI.OWNERS.forEach(owner => {
+                    const option = document.createElement('option');
+                    option.value = owner;
+                    option.textContent = owner;
+                    ownerSelect.appendChild(option);
+                });
+            }
+
+            const editForm = document.getElementById('editIssueForm');
+            if (editForm) {
+                editForm.addEventListener('submit', handleEditSubmit);
+            }
+
+            editFormInitialized = true;
+        }
 
         // 이슈 로드
         async function loadIssue(id) {
@@ -706,10 +949,159 @@
             `).join('');
         }
 
+        function setSelectValue(selectId, value) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+
+            if (value && !Array.from(select.options).some(option => option.value === value)) {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                select.appendChild(option);
+            }
+
+            select.value = value || '';
+        }
+
+        function normalizeDate(value) {
+            if (!value) return '';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                return value;
+            }
+
+            const parsed = new Date(value);
+            if (Number.isNaN(parsed.getTime())) {
+                return '';
+            }
+
+            const year = parsed.getFullYear();
+            const month = String(parsed.getMonth() + 1).padStart(2, '0');
+            const day = String(parsed.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function populateEditForm() {
+            if (!currentIssue) return;
+
+            const titleInput = document.getElementById('editTitle');
+            if (titleInput) {
+                titleInput.value = currentIssue.title || '';
+            }
+
+            setSelectValue('editPriority', currentIssue.priority || '');
+            setSelectValue('editStatus', currentIssue.status || '');
+            setSelectValue('editOwner', currentIssue.owner || '');
+
+            const collaboratorsInput = document.getElementById('editCollaborators');
+            if (collaboratorsInput) {
+                collaboratorsInput.value = currentIssue.collaborators || '';
+            }
+
+            const approverInput = document.getElementById('editApprover');
+            if (approverInput) {
+                approverInput.value = currentIssue.approver || '';
+            }
+
+            const requestDateInput = document.getElementById('editRequestDate');
+            if (requestDateInput) {
+                requestDateInput.value = normalizeDate(currentIssue.request_date);
+            }
+
+            const targetDateInput = document.getElementById('editTargetDate');
+            if (targetDateInput) {
+                targetDateInput.value = normalizeDate(currentIssue.target_date);
+            }
+
+            const completeDateInput = document.getElementById('editCompleteDate');
+            if (completeDateInput) {
+                completeDateInput.value = normalizeDate(currentIssue.complete_date);
+            }
+
+            const descriptionInput = document.getElementById('editDescription');
+            if (descriptionInput) {
+                descriptionInput.value = currentIssue.description || '';
+            }
+
+            const causeInput = document.getElementById('editCause');
+            if (causeInput) {
+                causeInput.value = currentIssue.cause || '';
+            }
+
+            const actionPlanInput = document.getElementById('editActionPlan');
+            if (actionPlanInput) {
+                actionPlanInput.value = currentIssue.action_plan || '';
+            }
+
+            const actionResultInput = document.getElementById('editActionResult');
+            if (actionResultInput) {
+                actionResultInput.value = currentIssue.action_result || '';
+            }
+        }
+
+        function openEditModal() {
+            populateEditForm();
+            const modal = document.getElementById('editIssueModal');
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('editIssueModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        async function handleEditSubmit(event) {
+            event.preventDefault();
+
+            if (!currentIssue) return;
+
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            const originalLabel = submitButton.textContent;
+            submitButton.disabled = true;
+            submitButton.textContent = '⏳ 저장 중...';
+
+            const updatedIssue = {
+                ...currentIssue,
+                title: document.getElementById('editTitle').value.trim(),
+                priority: document.getElementById('editPriority').value,
+                status: document.getElementById('editStatus').value,
+                owner: document.getElementById('editOwner').value,
+                collaborators: document.getElementById('editCollaborators').value,
+                approver: document.getElementById('editApprover').value,
+                request_date: document.getElementById('editRequestDate').value,
+                target_date: document.getElementById('editTargetDate').value,
+                complete_date: document.getElementById('editCompleteDate').value,
+                description: document.getElementById('editDescription').value,
+                cause: document.getElementById('editCause').value,
+                action_plan: document.getElementById('editActionPlan').value,
+                action_result: document.getElementById('editActionResult').value
+            };
+
+            try {
+                const result = await PunchListAPI.updateIssue(updatedIssue);
+                if (!result.success) {
+                    throw new Error(result.error || '업데이트에 실패했습니다.');
+                }
+
+                alert('✅ 이슈가 수정되었습니다.');
+                closeEditModal();
+                currentIssue = await PunchListAPI.loadIssueById(updatedIssue.id);
+                renderIssue();
+            } catch (error) {
+                console.error('이슈 수정 실패:', error);
+                alert('❌ 이슈 수정에 실패했습니다: ' + error.message);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = originalLabel;
+            }
+        }
+
         // 수정
         function editIssue() {
-            // 향후 구현: 수정 페이지로 이동
-            alert('수정 기능은 향후 구현 예정입니다.');
+            openEditModal();
         }
 
         // 삭제

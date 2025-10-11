@@ -2,11 +2,16 @@
  * S25016 펀치리스트 클라이언트 스크립트
  */
 
-// Google Apps Script URL (배포 후 업데이트 필요)
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxarys6e5oeI8jt7PHeO11H2LfMW0-P2lhX-NMApVX9-Ir97jnIlgtnElu70LZnUqRa/exec';
+// Google Apps Script URL → Vercel 프록시를 기본값으로 사용
+const RAW_SCRIPT_URL = (typeof window !== 'undefined' && window.PUNCHLIST_API_URL)
+  ? window.PUNCHLIST_API_URL
+  : '/api/punchlist';
 
-// Mock 모드 (Google Sheets 설정 전 테스트용)
-const USE_MOCK_DATA = SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+// Mock 모드 (테스트 전용)
+const USE_MOCK_DATA = RAW_SCRIPT_URL === 'mock';
+
+// 실제 요청에 사용할 URL
+const SCRIPT_URL = USE_MOCK_DATA ? '' : RAW_SCRIPT_URL;
 
 // 분류 옵션
 const CATEGORIES = {
@@ -221,9 +226,12 @@ async function loadAllIssues() {
   // 실제 API 호출
   try {
     const response = await fetch(`${SCRIPT_URL}?action=getAll`, {
-      method: 'GET',
-      mode: 'cors'
+      method: 'GET'
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
 
     const result = await response.json();
 
@@ -258,9 +266,12 @@ async function loadIssueById(id) {
   // 실제 API 호출
   try {
     const response = await fetch(`${SCRIPT_URL}?action=getById&id=${id}`, {
-      method: 'GET',
-      mode: 'cors'
+      method: 'GET'
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
 
     const result = await response.json();
 
@@ -299,7 +310,6 @@ async function createIssue(issueData) {
   try {
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -309,8 +319,17 @@ async function createIssue(issueData) {
       })
     });
 
-    // no-cors 모드에서는 응답을 읽을 수 없으므로 성공으로 간주
-    return { success: true };
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || '이슈 생성에 실패했습니다.');
+    }
+
+    return result;
   } catch (error) {
     console.error('이슈 생성 실패:', error);
     throw error;
@@ -342,7 +361,6 @@ async function updateIssue(issueData) {
   try {
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -352,7 +370,17 @@ async function updateIssue(issueData) {
       })
     });
 
-    return { success: true };
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || '이슈 수정에 실패했습니다.');
+    }
+
+    return result;
   } catch (error) {
     console.error('이슈 수정 실패:', error);
     throw error;
@@ -380,7 +408,6 @@ async function deleteIssue(id) {
   try {
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -390,7 +417,17 @@ async function deleteIssue(id) {
       })
     });
 
-    return { success: true };
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || '이슈 삭제에 실패했습니다.');
+    }
+
+    return result;
   } catch (error) {
     console.error('이슈 삭제 실패:', error);
     throw error;
@@ -402,7 +439,6 @@ async function addComment(issueId, author, text) {
   try {
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -416,7 +452,17 @@ async function addComment(issueId, author, text) {
       })
     });
 
-    return { success: true };
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.error || '댓글 추가에 실패했습니다.');
+    }
+
+    return result;
   } catch (error) {
     console.error('댓글 추가 실패:', error);
     throw error;

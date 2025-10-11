@@ -22,6 +22,10 @@ function createCORSResponse(data) {
   const output = ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
 
+  output.setHeader('Access-Control-Allow-Origin', '*');
+  output.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  output.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+
   return output;
 }
 
@@ -52,16 +56,12 @@ function doPost(e) {
         result = addComment(params.id, params.comment);
         break;
       default:
-        result = ContentService.createTextOutput(
-          JSON.stringify({ success: false, error: 'Invalid action' })
-        ).setMimeType(ContentService.MimeType.JSON);
+        return createCORSResponse({ success: false, error: 'Invalid action' });
     }
 
-    return result;
+    return createCORSResponse(result);
   } catch(error) {
-    return ContentService.createTextOutput(
-      JSON.stringify({ success: false, error: error.toString() })
-    ).setMimeType(ContentService.MimeType.JSON);
+    return createCORSResponse({ success: false, error: error.toString() });
   }
 }
 
@@ -69,14 +69,16 @@ function doGet(e) {
   const action = e.parameter.action;
 
   if (action === 'getAll') {
-    return getAllIssues();
+    return createCORSResponse(getAllIssues());
   } else if (action === 'getById') {
-    return getIssueById(e.parameter.id);
+    return createCORSResponse(getIssueById(e.parameter.id));
   }
 
-  return ContentService.createTextOutput(
-    JSON.stringify({ success: false, error: 'Invalid action' })
-  ).setMimeType(ContentService.MimeType.JSON);
+  return createCORSResponse({ success: false, error: 'Invalid action' });
+}
+
+function doOptions() {
+  return createCORSResponse({ success: true });
 }
 
 // 이슈 생성
@@ -123,9 +125,7 @@ function createIssue(data) {
   // 이메일 알림 발송
   sendEmailNotification('create', { id, ...data });
 
-  return ContentService.createTextOutput(
-    JSON.stringify({ success: true, id: id })
-  ).setMimeType(ContentService.MimeType.JSON);
+  return { success: true, id: id };
 }
 
 // 이슈 수정
@@ -163,15 +163,11 @@ function updateIssue(data) {
       // 이메일 알림 발송
       sendEmailNotification('update', data);
 
-      return ContentService.createTextOutput(
-        JSON.stringify({ success: true })
-      ).setMimeType(ContentService.MimeType.JSON);
+      return { success: true };
     }
   }
 
-  return ContentService.createTextOutput(
-    JSON.stringify({ success: false, error: 'Issue not found' })
-  ).setMimeType(ContentService.MimeType.JSON);
+  return { success: false, error: 'Issue not found' };
 }
 
 // 이슈 삭제
@@ -184,15 +180,11 @@ function deleteIssue(id) {
     if (values[i][0] === id) {
       sheet.deleteRow(i + 1);
 
-      return ContentService.createTextOutput(
-        JSON.stringify({ success: true })
-      ).setMimeType(ContentService.MimeType.JSON);
+      return { success: true };
     }
   }
 
-  return ContentService.createTextOutput(
-    JSON.stringify({ success: false, error: 'Issue not found' })
-  ).setMimeType(ContentService.MimeType.JSON);
+  return { success: false, error: 'Issue not found' };
 }
 
 // 전체 이슈 조회
@@ -233,9 +225,7 @@ function getAllIssues() {
     });
   }
 
-  return ContentService.createTextOutput(
-    JSON.stringify({ success: true, data: issues })
-  ).setMimeType(ContentService.MimeType.JSON);
+  return { success: true, data: issues };
 }
 
 // ID로 이슈 조회
@@ -274,15 +264,11 @@ function getIssueById(id) {
         templateId: row[21] || ''
       };
 
-      return ContentService.createTextOutput(
-        JSON.stringify({ success: true, data: issue })
-      ).setMimeType(ContentService.MimeType.JSON);
+      return { success: true, data: issue };
     }
   }
 
-  return ContentService.createTextOutput(
-    JSON.stringify({ success: false, error: 'Issue not found' })
-  ).setMimeType(ContentService.MimeType.JSON);
+  return { success: false, error: 'Issue not found' };
 }
 
 // 댓글 추가
@@ -303,15 +289,11 @@ function addComment(issueId, comment) {
       sheet.getRange(i + 1, 18).setValue(JSON.stringify(comments));
       sheet.getRange(i + 1, 20).setValue(new Date().toISOString());
 
-      return ContentService.createTextOutput(
-        JSON.stringify({ success: true })
-      ).setMimeType(ContentService.MimeType.JSON);
+      return { success: true };
     }
   }
 
-  return ContentService.createTextOutput(
-    JSON.stringify({ success: false, error: 'Issue not found' })
-  ).setMimeType(ContentService.MimeType.JSON);
+  return { success: false, error: 'Issue not found' };
 }
 
 // 안전한 JSON 파싱 (에러 방지)
