@@ -27,6 +27,12 @@
     { "source": "/punchlist/pages/detail", "destination": "/punchlist/pages/detail.html" },
     { "source": "/punchlist/pages/create", "destination": "/punchlist/pages/create.html" },
     { "source": "/punchlist/pages/admin/categories", "destination": "/punchlist/pages/admin/categories.html" },
-    { "source": "/punchlist/pages/admin/owners", "destination": "/punchlist/pages/admin/owners.html" }
+    { "source": "/punchlist/pages/admin/owners", "destination": "/punchlist/pages/admin/owners.html" },
+    { "source": "/projects/work-management", "destination": "/projects/work-management/index.html" },
+    { "source": "/projects/work-management/pages/input", "destination": "/projects/work-management/pages/input.html" },
+    { "source": "/projects/work-management/pages/query", "destination": "/projects/work-management/pages/query.html" },
+    { "source": "/projects/work-management/pages/settings", "destination": "/projects/work-management/pages/settings.html" },
+    { "source": "/projects/work-management/pages/입력", "destination": "/projects/work-management/pages/input.html" },
+    { "source": "/projects/work-management/pages/조회", "destination": "/projects/work-management/pages/query.html" }
   ]
 }
