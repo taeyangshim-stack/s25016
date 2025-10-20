@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>로봇 백업 변경점 상세 분석 보고서 (2025-10-15)</title>
+  <style>
+    body { font-family: "Segoe UI", "Malgun Gothic", sans-serif; margin: 0; padding: 0; color: #34495e; background: #f0f2f5; }
+    .container { max-width: 1200px; margin: 20px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    h1 { font-size: 32px; color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 15px; margin-bottom: 20px; }
+    h2 { font-size: 26px; color: #2980b9; border-left: 5px solid #3498db; padding-left: 15px; margin-top: 50px; }
+    h3 { font-size: 20px; color: #2c3e50; margin-top: 30px; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 40px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    th, td { border: 1px solid #dfe6e9; padding: 12px 15px; text-align: left; vertical-align: top; }
+    th { background-color: #3498db; color: white; font-size: 16px; }
+    tr:nth-child(even) { background-color: #f8f9f9; }
+    .overall-summary, .insight-section { background-color: #eaf5ff; border: 1px solid #aed6f1; padding: 20px; border-radius: 5px; margin-bottom: 30px; font-size: 16px; line-height: 1.6; }
+    .insight-section h2 { margin-top: 0; font-size: 24px; border: none; padding-left: 0; }
+    .insight-section ul { list-style-type: disc; padding-left: 25px; }
+    .insight-section li { margin-bottom: 12px; line-height: 1.6; }
+    .file-section { border: 1px solid #dfe6e9; border-radius: 8px; margin-top: 20px; overflow: hidden; }
+    .analysis-box { background-color: #f8f9f9; padding: 20px; border-bottom: 1px solid #dfe6e9; }
+    .analysis-box h4 { margin-top: 0; font-size: 18px; color: #34495e; }
+    .analysis-box ul { padding-left: 20px; margin-bottom: 0; }
+    .analysis-box li { margin-bottom: 10px; line-height: 1.5; }
+    .diff-container { font-family: Consolas, 'Courier New', monospace; overflow-x: auto; background: #fdfdfd; }
+    .diff-container pre { margin: 0; padding: 15px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word;}
+    .diff-line { display: block; }
+    .diff-line.add { background-color: #e6ffed; }
+    .diff-line.del { background-color: #ffeef0; }
+    .diff-line.meta { color: #6a737d; background-color: #f1f8ff; }
+    strong { color: #c0392b; }
+  </style>
+  <script>
+    function formatDiff(diffText) {
+      return diffText.split('\n').map(line => {
+        let className = '';
+        let content = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') || ' ';
+        if (line.startsWith('+')) {
+          className = 'add';
+        } else if (line.startsWith('-')) {
+          className = 'del';
+        } else if (line.startsWith('diff --git') || line.startsWith('index') || line.startsWith('---') || line.startsWith('+++') || line.startsWith('@@')) {
+          className = 'meta';
+        }
+        return `<span class="diff-line ${className}">${content}</span>`;
+      }).join('');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const diffs = document.querySelectorAll('.diff-data');
+      diffs.forEach(diffElem => {
+        const pre = diffElem.querySelector('pre');
+        const formatted = formatDiff(pre.textContent);
+        pre.innerHTML = formatted;
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>로봇 백업 변경점 상세 분석 보고서</h1>
+    <div class="overall-summary">
+      <p><strong>분석 요약:</strong> 이번 업데이트는 단순 값 수정이 아니라 <strong>용접 품질 개선, 로봇 동작 재조정, 시스템 안정성 강화</strong>를 위한 중요한 변경들이 포함되어 있습니다. 3대의 로봇 모두에게 일관된 용접 품질 및 동작 기준을 적용하고, 변경된 작업 환경에 맞춰 로봇의 움직임과 기준점을 재설정했으며, 안전을 위한 동기화 로직과 새로운 기능들이 추가되었습니다.</p>
+    </div>
+
+    <h2>변경 이력 요약</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>변경일</th>
+          <th>로봇</th>
+          <th>변경 파일</th>
+          <th>주요 변경 내용</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2025-10-16</td>
+          <td>1호기</td>
+          <td>Rob1_MainModule.mod</td>
+          <td>용접 조건 상향 및 동작 좌표 재설정, 동기화 로직 추가</td>
+        </tr>
+        <tr>
+          <td>2025-10-16</td>
+          <td>1호기</td>
+          <td>Head_Data.mod</td>
+          <td><strong>용접 출력 활성화</strong> 및 작업 공간 재설정</td>
+        </tr>
+        <tr>
+          <td>2025-10-16</td>
+          <td>2호기</td>
+          <td>Rob1_MainModule.mod</td>
+          <td>대기 용접 조건 변경 및 <strong>신규 용접 절차(t_weld1) 추가</strong></td>
+        </tr>
+        <tr>
+          <td>2025-10-16</td>
+          <td>2호기</td>
+          <td>Head_Data.mod</td>
+          <td>유지보수 위치 변경 및 기본 용접 조건 수정</td>
+        </tr>
+        <tr>
+          <td>2025-10-16</td>
+          <td>2호기</td>
+          <td>EIO.cfg</td>
+          <td>티칭 포인트 설정을 위한 신규 I/O 신호 추가</td>
+        </tr>
+        <tr>
+          <td>2025-10-16</td>
+          <td>3호기</td>
+          <td>Rob1_MainModule.mod</td>
+          <td>용접 조건 상향 및 <strong>신규 테스트 모듈(test251015.mod) 추가</strong></td>
+        </tr>
+        <tr>
+          <td>2025-10-16</td>
+          <td>3호기</td>
+          <td>T_ROB1_Function.mod</td>
+          <td>로봇 간 협동 동작을 위한 신규 작업 좌표계 추가</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Robot 1 Section -->
+    <div id="robot1">
+      <h2>1호기 (1200-526402) 상세 분석</h2>
+      <div class="file-section">
+        <h3>RAPID/TASK1/PROGMOD/Rob1_MainModule.mod</h3>
+        <div class="analysis-box">
+          <h4>분석</h4>
+          <ul>
+            <li><strong>용접 조건 변경:</strong> 핵심 용접 파라미터(<code>welddata</code>)의 특정 값이 <strong>380에서 430으로 상향 조정</strong>되었습니다.</li>
+            <li><strong>위빙(Weaving) 패턴 비활성화:</strong> <code>weave13</code> 데이터가 0으로 초기화되어 특정 구간의 위빙 동작이 비활성화되었습니다.</li>
+            <li><strong>동작 좌표 재설정:</strong> 용접 시작/종료 지점(<code>edgedata</code>)과 검색 경로(<code>pSearchStart</code>, <code>pSearchEnd</code>)의 좌표가 새로운 값으로 변경되었습니다.</li>
+            <li><strong>동기화 로직 추가:</strong> 용접 동작 전 <code>WaitUntil bRobSwap=CCW;</code> 조건문이 추가되어 안전성이 강화되었습니다.</li>
+          </ul>
+        </div>
+        <div class="diff-container">
+          <div class="diff-data"><pre>diff --git a/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod b/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
+index b3b8031..9f75d13 100644
+--- a/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
++++ b/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
+@@ -115,10 +115,10 @@ MODULE Rob1_MainModule
+     PERS zonedata zTargetZone;
+ 
+     TASK PERS welddata wdTrap:=[10,0,[5,0,38,240,0,400,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata wd1:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata wd2:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata wd3:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata wd4:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata wd1:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata wd2:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata wd3:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata wd4:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd5:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd6:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd7:=[8.33333,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+</pre></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Robot 2 Section -->
+    <div id="robot2">
+      <h2>2호기 (1200-526404) 상세 분석</h2>
+      <div class="file-section">
+        <h3>RAPID/TASK1/PROGMOD/Rob1_MainModule.mod</h3>
+        <div class="analysis-box">
+          <h4>분석</h4>
+          <ul>
+            <li><strong>대기 용접 조건 변경:</strong> <code>Holdwd</code> 파라미터의 첫 번째 값이 8.66에서 <strong>0.01로 변경</strong>되어, 용접 시작 전 대기 상태의 조건을 최소화했습니다.</li>
+            <li><strong>신규 용접 절차 추가:</strong> <code>t_weld1</code> 이라는 새로운 용접 프로시저(PROC)와 관련 변수들이 추가되어 새로운 용접 공정을 테스트할 수 있게 되었습니다.</li>
+          </ul>
+        </div>
+        <div class="diff-container">
+          <div class="diff-data"><pre>diff --git a/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod b/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
+index 3c165c3..87705e4 100644
+--- a/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
++++ b/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
+@@ -156,16 +156,16 @@ MODULE Rob1_MainModule
+     TASK PERS welddata wd39:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd40:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+ 
+-    TASK PERS welddata Holdwd1:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd2:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd3:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd4:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd5:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd6:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd7:=[8.33333,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd8:=[7.5,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd9:=[7.5,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd10:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd1:=[0.01,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd2:=[0.01,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd3:=[0.01,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd4:=[0.01,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd5:=[0.01,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd6:=[0.01,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd7:=[0.01,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd8:=[0.01,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd9:=[0.01,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd10:=[0.01,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+ 
+     !!! weave data !!!
+     TASK PERS weavedata weaveTrap:=[1,2,3,3,0,0,0,0,0,0,0,0,0,0,0];
+</pre></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Robot 3 Section -->
+    <div id="robot3">
+      <h2>3호기 (1200-526406) 상세 분석</h2>
+      <div class="file-section">
+        <h3>RAPID/TASK1/PROGMOD/T_ROB1_Function.mod</h3>
+        <div class="analysis-box">
+          <h4>분석</h4>
+          <ul>
+            <li><strong>작업 좌표계 추가:</strong> <code>wobj1</code>, <code>wobj2</code> 등 다른 로봇(GantryRob_7, ROB_2)을 기준으로 하는 새로운 작업 좌표계가 추가되었습니다. 이는 로봇 간의 협동 동작이나 좌표 변환의 정밀도를 높이기 위한 설정입니다.</li>
+          </ul>
+        </div>
+        <div class="diff-container">
+          <div class="diff-data"><pre>diff --git a/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/RAPID/TASK1/PROGMOD/T_ROB1_Function.mod b/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/RAPID/TASK1/PROGMOD/T_ROB1_Function.mod
+index 957a2da..d19e9ec 100644
+--- a/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/RAPID/TASK1/PROGMOD/T_ROB1_Function.mod
++++ b/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/RAPID/TASK1/PROGMOD/T_ROB1_Function.mod
+@@ -1,4 +1,6 @@
+ MODULE T_ROB1_Function
++    TASK PERS wobjdata wobj1:=["FALSE","FALSE","GantryRob_7",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
++    TASK PERS wobjdata wobj2:=["FALSE","FALSE","ROB_2",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
+     FUNC num TouchLimit(num Standard,num comparison)
+         VAR num result;
+         IF Standard<=comparison result:=Standard;
+</pre></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

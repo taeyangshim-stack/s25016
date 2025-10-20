@@ -433,6 +433,9 @@
                     <a href="projects/robot-vertical-axis/dashboard.html" class="project-link project-link-robot" target="_blank">
                         🎯 상하축 이슈 대시보드
                     </a>
+                    <a href="projects/robot-backup/index.html" class="project-link project-link-robot" target="_blank">
+                        🗂️ 로봇 백업 업데이트 인덱스 (2025-10-15)
+                    </a>
                     <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
                         🧪 ROBOT↔UI 테스트 통합 결과 (10/3-10/4)
                     </a>
@@ -829,6 +832,29 @@
                         <a href="250917_상하축이슈/05_문서자료/251013_Codex_리포지터리_리뷰.html" class="file-link" target="_blank">📄 251013 B라인 용접 이슈 히스토리</a>
                         <a href="250917_상하축이슈/05_문서자료/251013_SP_로봇백업비교.html" class="file-link" target="_blank">📄 251013 로봇 백업 비교 보고서</a>
                     </div>
+                </div>
+
+                <div class="card" style="border-left-color: #ef4444;">
+                    <h3>🗂️ 최신 로봇 백업 (2025-10-15)</h3>
+                    <div class="info-box" style="background: #fee2e2; border-left-color: #e11d48;">
+                        <h4 style="color: #9f1239;">📌 공통 업데이트</h4>
+                        <p style="line-height: 1.7;">
+                            3대 컨트롤러 백업을 동일 타임스탬프(20:48~20:50)로 갱신했습니다.
+                            용접 품질을 위한 기준값을 재정렬하고, 갠트리·헤드 좌표 및 I/O 세팅을 현장 조건에 맞춰 통일했습니다.
+                        </p>
+                    </div>
+                    <ul class="folder-structure">
+                        <li><span class="folder-icon">1️⃣</span> <strong>1200-526402 (1호기)</strong> — 용접 전류 430A로 상향, Edge 검색 좌표 재계산, Touch 로봇 교대 대기(WaitUntil bRobSwap) 추가</li>
+                        <li><span class="folder-icon">2️⃣</span> <strong>1200-526404 (2호기)</strong> — Hold 용접 데이터 초기화, 티칭 포인트용 DI/DO 신호 등록, gantry 시험 루틴(t_weld1·rweldG) 배포</li>
+                        <li><span class="folder-icon">3️⃣</span> <strong>1200-526406 (3호기)</strong> — 공통 용접 속도 테이블 적용, 신규 작업 좌표계·Routine3 테스트 시퀀스 추가, Head_MainModule 무한 루프(while 1=1) 동작 재검증 필요</li>
+                    </ul>
+                    <div style="margin-top: 15px;">
+                        <a href="projects/robot-backup/robot_backup_detailed_report.html" class="file-link" target="_blank">📄 상세 분석 보고서</a>
+                        <a href="projects/robot-backup/robot_backup_comparison_report.html" class="file-link" target="_blank">📊 백업 비교 리포트</a>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #6b7280;">
+                        📁 원본 경로: <code>robot)badkup/1200-52640x_BACKUP_2025-10-15_No_x</code>
+                    </p>
                 </div>
             </div>
         </div>

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>로봇 백업 비교 보고서 (2025-10-15)</title>
+  <style>
+    body { font-family: "Segoe UI", "Malgun Gothic", sans-serif; margin: 40px; color: #2c3e50; background: #f8f9fa; }
+    h1 { font-size: 28px; color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+    h2 { font-size: 22px; color: #2980b9; border-left: 4px solid #3498db; padding-left: 10px; margin-top: 40px; }
+    h3 { font-size: 18px; color: #34495e; margin-top: 25px; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px;}
+    .summary { background-color: #ecf0f1; border: 1px solid #bdc3c7; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-size: 16px; }
+    .diff-container { font-family: Consolas, monospace; border: 1px solid #ccc; border-radius: 5px; overflow-x: auto; background: #fff; margin-top: 15px;}
+    .diff-container pre { margin: 0; padding: 10px; font-size: 14px; line-height: 1.4; }
+    .diff-line.add { background-color: #e6ffed; color: #22863a; }
+    .diff-line.del { background-color: #ffeef0; color: #b31d28; }
+    .diff-line.meta { color: #6a737d; font-weight: bold; }
+  </style>
+  <script>
+    function formatDiff(diffText) {
+      return diffText.split('\n').map(line => {
+        let className = '';
+        let content = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        if (line.startsWith('+')) {
+          className = 'add';
+        } else if (line.startsWith('-')) {
+          className = 'del';
+        } else if (line.startsWith('diff --git') || line.startsWith('index') || line.startsWith('---') || line.startsWith('+++') || line.startsWith('@@')) {
+          className = 'meta';
+        }
+        return `<div class="diff-line ${className}">${content}</div>`;
+      }).join('');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const diffs = document.querySelectorAll('.diff-data');
+      diffs.forEach(diffElem => {
+        const pre = diffElem.querySelector('pre');
+        const formatted = formatDiff(pre.textContent);
+        pre.innerHTML = formatted;
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>로봇 백업 비교 보고서</h1>
+  <p class="summary"><strong>비교 기준일:</strong> 2025-10-15<br><strong>비교 대상:</strong> 각 로봇의 Git에 저장된 '기존 백업'과 현재 파일 시스템의 '신규 백업'</p>
+
+  <div id="robot1">
+    <h2>1호기 (1200-526402) 변경점</h2>
+    <p><strong>요약:</strong> 9개 파일에서 125개 라인 추가, 116개 라인 삭제</p>
+    <div class="diff-container">
+      <div class="diff-data">
+        <pre>
+diff --git a/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/BACKINFO/backinfo.txt b/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/BACKINFO/backinfo.txt
+index 2164fa2..4ba0833 100644
+--- a/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/BACKINFO/backinfo.txt
++++ b/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/BACKINFO/backinfo.txt
+@@ -1,8 +1,8 @@
+ #
+ # Generated backup file, do not edit.
+ #
+-# Originally at: /hd0a/TEMP/backup.264590
+-# 2025-10-15  10:41:46
++# Originally at: /hd0a/TEMP/backup.613354
++# 2025-10-15  20:48:44
+ #
+ >>SYSTEM_ID:
+ 1200-526402
+diff --git a/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/BACKINFO/fpsystem.xml b/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/BACKINFO/fpsystem.xml
+index fb76e19..e0ab5ef 100644
+--- a/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/BACKINFO/fpsystem.xml
++++ b/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/BACKINFO/fpsystem.xml
+@@ -2,15 +2,27 @@
+ <!--Comments: Settings for the FlexPendant.-->
+ <FP>
+   <USER name="">
++    <DATA id="ViewInManFull">
++      <PROP name="text" value="PARAM_TXT_VIEWINMANFULL" />
++      <PROP name="dll" value="" />
++      <PROP name="type" value="" />
++    </DATA>
+     <DATA id="ViewInAuto">
+       <PROP name="text" value="PARAM_TXT_VIEWINAUTO" />
+       <PROP name="dll" value="TpsViewProductionWnd.dll" />
+       <PROP name="type" value="ABB.Robotics.Tps.Production.TpsViewProductionWnd" />
+     </DATA>
++    <DATA id="GoToPosition ROB_1">
++      <PROP name="FilterScope" value="All" />
++      <PROP name="FilterString" value="" />
++    </DATA>
+     <DATA id="IO View">
+       <PROP name="Configurations file" value="/hd0a/1200-526402/INTERNAL/FPConfigurations.xml" />
+       <PROP name="Signal view layout" value="ValueLabelType" />
+     </DATA>
++    <DATA id="CtrlPnl Configuration">
++      <PROP name="LASTPATH" value="/hd0a/1200-526402/HOME/" />
++    </DATA>
+     <DATA id="UASViewLevel">
+       <PROP name="text" value="PARAM_TXT_UASVIEWLEVEL" />
+       <PROP name="level" value="Msg" />
+@@ -25,18 +37,16 @@
+       <PROP name="IncrementToggle" value="Medium" />
+       <PROP name="MechUnitPanelList" value=" ROB_1, ROB_2, GantryRob_7, ELM_X" />
+     </DATA>
+-    <DATA id="Backup Restore">
+-      <PROP name="LastPath" value="/USB/Samsung_Ins/" />
+-    </DATA>
+     <DATA id="Programmable Key_2">
+       <PROP name="type" value="Output" />
+       <PROP name="allowInAuto" value="No" />
+       <PROP name="pressed" value="PressRelease" />
+       <PROP name="target" value="ln2do04_ColdInchRev" />
+     </DATA>
+-    <DATA id="GoToPosition ROB_1">
+-      <PROP name="FilterScope" value="All" />
+-      <PROP name="FilterString" value="" />
++    <DATA id="ViewInManual">
++      <PROP name="text" value="PARAM_TXT_VIEWINMANUAL" />
++      <PROP name="dll" value="" />
++      <PROP name="type" value="" />
+     </DATA>
+     <DATA id="ChangeInstruction">
+       <PROP name="Last Assignment DataType" value="pos" />
+@@ -46,28 +56,19 @@
+       <PROP name="ModulePath" value="/USB/" />
+       <PROP name="ShowOnlyServiceRoutines" value="True" />
+     </DATA>
+-    <DATA id="ViewInManual">
+-      <PROP name="text" value="PARAM_TXT_VIEWINMANUAL" />
+-      <PROP name="dll" value="" />
+-      <PROP name="type" value="" />
+-    </DATA>
+-    <DATA id="UserSettings">
+-      <PROP name="RapidEditorFontIndex" value="5" />
+-      <PROP name="LoadFileFilterIndex" value="1" />
++    <DATA id="Backup Restore">
++      <PROP name="LastPath" value="/USB/Samsung_Ins/" />
+     </DATA>
+     <DATA id="Show">
+       <PROP name="default" value="CtrlName" />
+     </DATA>
+-    <DATA id="CtrlPnl Configuration">
+-      <PROP name="LASTPATH" value="/hd0a/1200-526402/HOME/" />
+-    </DATA>
+     <DATA id="ABB.Robotics.Tps.FileExplorer.TpsViewFileExplorer">
+       <PROP name="LASTPATH" value="/hd0a/1200-526402/HOME/" />
+     </DATA>
++    <DATA id="UserSettings">
++      <PROP name="RapidEditorFontIndex" value="5" />
++      <PROP name="LoadFileFilterIndex" value="1" />
++    </DATA>
+     <DATA id="AdditionalTestView">
+       <PROP name="TestView" value="ABB.Robotics.Processes.Gap.TpsViewGapUI,ABB.Robotics.Processes.LTC.LTCStartView,ABB.Robotics.ProductionScreen.ProductionScreen" />
+     </DATA>
+@@ -79,7 +80,7 @@
+       <PROP name="IO Category filter" value="" />
+       <PROP name="IOFilterValue" value="100" />
+       <PROP name="Digital Input Filter" value="PI" />
+-      <PROP name="Digital Output Filter" value="" />
++      <PROP name="Digital Output Filter" value="LN" />
+       <PROP name="Analog Input Filter" value="" />
+       <PROP name="Analog Output Filter" value="" />
+       <PROP name="Group Input Filter" value="" />
+@@ -104,13 +105,12 @@
+     <DATA id="Programmable Key_4">
+       <PROP name="type" value="Output" />
+       <PROP name="allowInAuto" value="No" />
+-      <PROP name="pressed" value="Pulse" />
++      <PROP name="pressed" value="PressRelease" />
+       <PROP name="target" value="po53_SetTeachingPoint" />
+     </DATA>
+-    <DATA id="ViewInManFull">
+-      <PROP name="text" value="PARAM_TXT_VIEWINMANFULL" />
+-      <PROP name="dll" value="" />
+-      <PROP name="type" value="" />
++    <DATA id="ViewInManFull">
++      <PROP name="text" value="PARAM_TXT_VIEWINMANFULL" />
++      <PROP name="dll" value="" />
++      <PROP name="type" value="" />
+     </DATA>
+   </USER>
+ </FP>
+diff --git a/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod b/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
+index b3b8031..9f75d13 100644
+--- a/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
++++ b/robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
+@@ -115,10 +115,10 @@ MODULE Rob1_MainModule
+     PERS zonedata zTargetZone;
+ 
+     TASK PERS welddata wdTrap:=[10,0,[5,0,38,240,0,400,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata wd1:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata wd2:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata wd3:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata wd4:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata wd1:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata wd2:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata wd3:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata wd4:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd5:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd6:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd7:=[8.33333,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+@@ -154,12 +154,12 @@ MODULE Rob1_MainModule
+     TASK PERS welddata wd37:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd38:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd39:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata wd40:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata wd40:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
+ 
+-    TASK PERS welddata Holdwd1:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd2:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd3:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd4:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd1:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd2:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd3:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd4:=[8.66667,0,[5,0,38,0,0,430,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata Holdwd5:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata Holdwd6:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata Holdwd7:=[8.33333,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+@@ -181,7 +181,7 @@ MODULE Rob1_MainModule
+     TASK PERS weavedata weave10:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+     TASK PERS weavedata weave11:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+     TASK PERS weavedata weave12:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+-    TASK PERS weavedata weave13:=[1,0,5,5,0,0,0,0,0,0,0,0,0,0,0];
++    TASK PERS weavedata weave13:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+     TASK PERS weavedata weave14:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+     TASK PERS weavedata weave15:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+     TASK PERS weavedata weave16:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+@@ -264,8 +264,8 @@ MODULE Rob1_MainModule
+     PERS num nMacro010{2}:=[4,4];
+     PERS num nMacro001{2}:=[4,4];
+     PERS bool bEndSearchComplete;
+-    PERS edgedata edgeStart{2}:=[[[1493.02,2968.34,-3.10968],50,50,50,12,0,0],[[1493.02,2968.34,-3.10968],50,50,50,12,0,0]];
+-    PERS edgedata edgeEnd{2}:=[[[2144,2961.35,-0.890747],50,50,50,12,0,0],[[2144,2961.35,-0.890747],50,50,50,12,0,0]];
++    PERS edgedata edgeStart{2}:=[[[1387.33,4705.06,-2.95972],50,50,50,12,0,0],[[1387.33,4705.06,-2.95972],50,50,50,12,0,0]];
++    PERS edgedata edgeEnd{2}:=[[[1936.84,4688.28,0.491089],50,50,50,12,0,0],[[1936.84,4688.28,0.491089],50,50,50,12,0,0]];
+     PERS corrorder corrStart{10}:=[[20,30,10,25,40,10,15,30,10,2],[20,30,10,25,40,10,15,30,10,0],[-15,-30,-10,25,40,10,15,30,10,2],[0,0,0,25,40,10,15,30,10,0],[0,0,0,25,40,10,15,30,10,0],[-15,-30,-10,25,40,10,15,30,10,0],[999,0,0,0,0,0,0,0,0,0],[999,0,0,0,0,0,0,0,0,0],[999,0,0,25,40,10,15,30,30,10],[999,0,0,0,0,0,0,0,0,0]];
+     PERS corrorder corrEnd{10}:=[[20,30,10,25,40,10,15,30,10,2],[20,30,10,25,40,10,15,30,10,0],[-15,-30,-10,25,40,10,15,30,10,2],[0,0,0,25,40,10,15,30,10,0],[0,0,0,25,40,10,15,40,10,0],[-15,-30,-10,25,40,10,15,30,10,0],[999,0,0,25,40,10,15,30,10,0],[999,0,0,0,0,0,0,0,0,0],[0,0,0,25,40,10,15,30,10,0],[0,0,0,0,0,0,0,0,0,0]];
+     PERS pos pCorredStartPos{2};
+@@ -289,8 +289,8 @@ MODULE Rob1_MainModule
+     ! 264.966;
+     PERS num nWeldLineLength_R1;
+     ! 264.966;
+-    PERS robtarget pSearchStart:=[[0,-25,9.15241],[0.270598,-0.653282,-0.653282,-0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+-    PERS robtarget pSearchEnd:=[[0,15,9.15241],[0.270598,-0.653282,-0.653282,-0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
++    PERS robtarget pSearchStart:=[[0,25,10.0641],[0.270598,0.653282,-0.653282,0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
++    PERS robtarget pSearchEnd:=[[0,-15,10.0641],[0.270598,0.653282,-0.653282,0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+     TASK PERS string TouchErrorDirSub:="Start_Y";
+     TASK PERS string TouchErrorDirMain:="Ready";
+     PERS num nTouchRetryCount{2};
+@@ -298,7 +298,7 @@ MODULE Rob1_MainModule
+     TASK PERS num RetryDepthData{3}:=[10,10,10];
+     PERS robtarget pWeldPosR1{40}:=[[[-3,7,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.31,9E+09,9E+09]],[[-3,7,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.31,9E+09,9E+09]],[[-3,-4.5,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.31,9E+09,9E+09]],[[15,-1,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.34,9E+09,9E+09]],[[200,-1,1],[0.270598,-0.653282,-0.653282,-0.270598],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.72,9E+09,9E+09]],[[1390,-1.00592,0.996463],[0.270597,-0.653283,-0.653281,-0.270597],[0,0,-1,1],[-8707.81,-8707.8,1477.15,1033.13,9E+09,9E+09]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[15,-1,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.34,9E+09,9E+09]]];
+     PERS num nRobCorrSpaceHeight;
+-    PERS pos pCorredPosBuffer:=[0.00223281,-1.14699,9.21601];
++    PERS pos pCorredPosBuffer:=[0.0106113,-4.35376,10.0352];
+     PERS bool bWireTouch1;
+     CONST robtarget pNull:=[[0,0,0],[1,0,0,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+ 
+@@ -363,6 +363,7 @@ MODULE Rob1_MainModule
+     TRAP trapMoveG_PosHold
+         rTrapNoWeldMove;
+     ENDTRAP
++    
+     TRAP trapMoveHome_RBT1
+         VAR robtarget pTemp;
+         StopMove;
+@@ -1468,7 +1469,7 @@ MODULE Rob1_MainModule
+         VAR speeddata vTempSlow;
+         vTempFast:=[nWireCutSpeed,100,nWireCutSpeed,100];
+         vTempSlow:=[nWireCutSpeed/3,100,nWireCutSpeed/3,100];
+-        PulseDO\PLength:=2.25, ln1do03_ColdInchFwd;
++        PulseDO\PLength:=2.25,ln1do03_ColdInchFwd;
+         WaitTime 2.25;
+ 
+         MoveAbsJ jWireCut4\NoEOffs,vTempFast,z50,tWeld1;
+@@ -1504,7 +1505,7 @@ MODULE Rob1_MainModule
+         IDelete inumMoveG_PosHold;
+         StopMove;
+         ClearPath;
+-!        StorePath;
++        !        StorePath;
+ 
+         i:=nRunningStep{1};
+         nTempMmps:=Welds1{i}.cpm/6;
+@@ -1518,7 +1519,7 @@ MODULE Rob1_MainModule
+             MoveL Offs(pWeldTemp,0,0,0),vWeldTemp,fine,tWeld1\WObj:=wobjWeldLine1;
+         ENDWHILE
+         ConfL\On;
+-!        RestoPath;
++        !        RestoPath;
+         StartMove;
+     ENDPROC
+ 
+@@ -1546,7 +1547,7 @@ MODULE Rob1_MainModule
+         ISignalDO intTouch_1,1,iErrorDuringEntry;
+         ISleep iErrorDuringEntry;
+ 
+-!        bRobSwap:=bRobSwap;
++        !        bRobSwap:=bRobSwap;
+         IF bRobSwap=FALSE then
+             edgestartBuffer1:=edgestart{1};
+             edgeEndBuffer1:=edgeEnd{1};
+@@ -1947,7 +1948,7 @@ MODULE Rob1_MainModule
+         VAR num nCorrX_Store;
+         VAR num nCorrY_Store;
+         VAR num nCorrZ_Store;
+-
++        WaitUntil bRobSwap=CCW;
+         IF (isStartPos=bStart) THEN
+             nCorrX_Store:=nCorrX_Store_Start{1};
+             nCorrY_Store:=nCorrY_Store_Start{1};
+@@ -1967,6 +1968,7 @@ MODULE Rob1_MainModule
+             ENDIF
+         ENDIF
+         !!! Search weld X edge !!!
++        WaitUntil bRobSwap=CCW;
+         IF (isStartPos=bStart) THEN
+             pSearchStart.rot:=Welds1{1}.position.rot;
+             IF (CCW=FALSE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+@@ -2010,7 +2012,7 @@ MODULE Rob1_MainModule
+         VAR num nCorrX_Store;
+         VAR num nCorrY_Store;
+         VAR num nCorrZ_Store;
+-
++        WaitUntil bRobSwap=CCW;
+         IF (isStartPos=bStart) THEN
+             nCorrX_Store:=nCorrX_Store_Start{1};
+             nCorrY_Store:=nCorrY_Store_Start{1};
+@@ -2024,6 +2026,7 @@ MODULE Rob1_MainModule
+         IF (TouchErrorDirMain=dirErrorCheck AND 0<nTouchRetryCount{1}) Depth:=Depth+(RetryDepthData{2}*nTouchRetryCount{1});
+ 
+         !!! Search weld Y edge !!!
++        WaitUntil bRobSwap=CCW;
+         IF (isStartPos=bStart) THEN
+             pSearchStart.rot:=Welds1{1}.position.rot;
+             IF (CCW=FALSE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+@@ -2067,7 +2070,7 @@ MODULE Rob1_MainModule
+         VAR num nCorrX_Store;
+         VAR num nCorrY_Store;
+         VAR num nCorrZ_Store;
+-
++        WaitUntil bRobSwap=CCW;
+         IF (isStartPos=bStart) THEN
+             nCorrX_Store:=nCorrX_Store_Start{1};
+             nCorrY_Store:=nCorrY_Store_Start{1};
+@@ -2162,7 +2165,7 @@ MODULE Rob1_MainModule
+         IDelete iMoveHome_RBT1;
+         StopMove;
+         ClearPath;
+-!        StorePath;
++        !        StorePath;
+ 
+         pTemp:=CRobT("T_ROB1"	Tool:=tWeld1	WObj:=wobjWeldLine1);
+         MoveL RelTool(pTemp,0,0,-10),vTargetSpeed,fine,tWeld1\WObj:=wobjWeldLine1;
+@@ -2264,11 +2267,12 @@ MODULE Rob1_MainModule
+         !        ENDWHILE
+         !        WaitUntil siLn1TouchActive=1;
+     ENDPROC
+-    PROC Routine2()
+-        !MoveJ [[0.00,-981.00,441.17],[0.500023,0.499965,0.499976,-0.500035],[-2,-1,-1,3],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]], v1000, z50, tool0;
+-        MoveJ [[108.02,-60.36,1234.26],[0.999902,-4.89881E-05,0.00119087,0.0139356],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]], v1000, z50, tool0;
+-        ArcLStart [[104.89,-111.30,1250.20],[0.999957,-0.00419242,-0.00819774,-0.00108332],[-1,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]], v1000, seam2, weld4\Weave:=weave13, fine, tool0\Track:=track0;
+-        ArcLEnd [[103.78,-201.31,1253.82],[0.999957,-0.00417299,-0.00819318,-0.00107114],[-1,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]], v1000, seam2, weld4\Weave:=weave13, fine, tool0\Track:=track0;
+-        MoveL [[107.94,-145.13,1234.24],[0.999902,-1.1923E-05,0.00121583,0.0139771],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]], v1000, z50, tool0;
+-    ENDPROC
++    PROC Routine2()
++        !MoveJ [[0.00,-981.00,441.17],[0.500023,0.499965,0.499976,-0.500035],[-2,-1,-1,3],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]], v1000, z50, tool0;
++        MoveJ [[108.02,-60.36,1234.26],[0.999902,-4.89881E-05,0.00119087,0.0139356],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]],v1000,z50,tool0;
++        ArcLStart [[104.89,-111.30,1250.20],[0.999957,-0.00419242,-0.00819774,-0.00108332],[-1,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]],v1000,seam2,weld4\Weave:=weave13,fine,tool0\Track:=track0;
++        ArcLEnd [[103.78,-201.31,1253.82],[0.999957,-0.00417299,-0.00819318,-0.00107114],[-1,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]],v1000,seam2,weld4\Weave:=weave13,fine,tool0\Track:=track0;
++        MoveL [[107.94,-145.13,1234.24],[0.999902,-1.1923E-05,0.00121583,0.0139771],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]],v1000,z50,tool0;
++    ENDPROC
+ ENDMODULE
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <div id="robot2">
+    <h2>2호기 (1200-526404) 변경점</h2>
+    <p><strong>요약:</strong> 12개 파일에서 129개 라인 추가, 85개 라인 삭제</p>
+    <div class="diff-container">
+      <div class="diff-data">
+        <pre>
+diff --git a/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/BACKINFO/backinfo.txt b/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/BACKINFO/backinfo.txt
+index c331a05..ba64104 100644
+--- a/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/BACKINFO/backinfo.txt
++++ b/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/BACKINFO/backinfo.txt
+@@ -1,8 +1,8 @@
+ #
+ # Generated backup file, do not edit.
+ #
+-# Originally at: /hd0a/TEMP/backup.001496
+-# 2025-10-15  10:51:35
++# Originally at: /hd0a/TEMP/backup.671309
++# 2025-10-15  20:50:03
+ #
+ >>SYSTEM_ID:
+ 1200-526404
+diff --git a/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/BACKINFO/fpsystem.xml b/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/BACKINFO/fpsystem.xml
+index 70a9bae..a0bd6dd 100644
+--- a/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/BACKINFO/fpsystem.xml
++++ b/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/BACKINFO/fpsystem.xml
+@@ -41,6 +41,10 @@
+     <DATA id="ChangeInstruction">
+       <PROP name="Last Assignment DataType" value="num" />
+     </DATA>
++    <DATA id="GoToPosition ROB_2">
++      <PROP name="FilterScope" value="All" />
++      <PROP name="FilterString" value="" />
++    </DATA>
+     <DATA id="Program Editor">
+       <PROP name="HideDeclarations" value="False" />
+       <PROP name="ShowOnlyServiceRoutines" value="False" />
+@@ -105,10 +109,10 @@
+       <PROP name="target" value="" />
+     </DATA>
+     <DATA id="Programmable Key_4">
+-      <PROP name="type" value="None" />
++      <PROP name="type" value="Output" />
+       <PROP name="allowInAuto" value="No" />
+-      <PROP name="pressed" value="" />
+-      <PROP name="target" value="" />
++      <PROP name="pressed" value="PressRelease" />
++      <PROP name="target" value="po53_SetTeachingPoint" />
+     </DATA>
+     <DATA id="ViewInManFull">
+       <PROP name="text" value="PARAM_TXT_VIEWINMANFULL" />
+diff --git a/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod b/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
+index 3c165c3..87705e4 100644
+--- a/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
++++ b/robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/RAPID/TASK1/PROGMOD/Rob1_MainModule.mod
+@@ -156,16 +156,16 @@ MODULE Rob1_MainModule
+     TASK PERS welddata wd39:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+     TASK PERS welddata wd40:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+ 
+-    TASK PERS welddata Holdwd1:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd2:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd3:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd4:=[8.66667,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd5:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd6:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd7:=[8.33333,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd8:=[7.5,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd9:=[7.5,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
+-    TASK PERS welddata Holdwd10:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd1:=[0.01,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd2:=[0.01,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd3:=[0.01,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd4:=[0.01,0,[5,0,38,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd5:=[0.01,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd6:=[0.01,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd7:=[0.01,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd8:=[0.01,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd9:=[0.01,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS welddata Holdwd10:=[0.01,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+ 
+     !!! weave data !!!
+     TASK PERS weavedata weaveTrap:=[1,2,3,3,0,0,0,0,0,0,0,0,0,0,0];
+@@ -264,8 +264,8 @@ MODULE Rob1_MainModule
+     PERS num nMacro010{2}:=[4,4];
+     PERS num nMacro001{2}:=[4,4];
+     PERS bool bEndSearchComplete;
+-    PERS edgedata edgeStart{2}:=[[[8649.89,2940.12,-0.490234],50,50,50,12,0,0],[[8649.89,2940.12,-0.490234],50,50,50,12,0,0]];
+-    PERS edgedata edgeEnd{2}:=[[[8120.32,2891.98,-1.93024],50,50,50,12,0,0],[[8120.32,2891.98,-1.93024],50,50,50,12,0,0]];
++    PERS edgedata edgeStart{2}:=[[[10697.2,4873.46,-1.02087],50,50,50,12,0,0],[[10697.2,4873.46,-1.02087],50,50,50,12,0,0]];
++    PERS edgedata edgeEnd{2}:=[[[11264.4,4891.99,-2.02161],50,50,50,12,0,0],[[11264.4,4891.99,-2.02161],50,50,50,12,0,0]];
+     PERS corrorder corrStart{10}:=[[20,30,10,25,40,10,15,30,10,2],[20,30,10,25,40,10,15,30,10,0],[-15,-30,-10,25,40,10,15,30,10,2],[0,0,0,25,40,10,15,30,10,0],[0,0,0,25,40,20,15,30,20,0],[-15,-30,-10,25,40,10,15,30,10,0],[999,0,0,0,0,0,0,0,0,0],[999,0,0,0,0,0,0,0,0,0],[999,0,0,25,40,10,15,30,30,10],[999,0,0,0,0,0,0,0,0,0]];
+     PERS corrorder corrEnd{10}:=[[20,30,10,25,40,10,15,30,10,2],[20,30,10,25,40,10,15,30,10,0],[-15,-30,-10,25,40,10,15,30,10,2],[0,0,0,25,40,10,15,30,10,0],[0,0,0,25,40,20,15,40,20,0],[-15,-30,-10,25,40,10,15,30,10,0],[999,0,0,25,40,10,15,30,10,0],[999,0,0,0,0,0,0,0,0,0],[0,0,0,25,40,10,15,30,10,0],[0,0,0,0,0,0,0,0,0,0]];
+     PERS pos pCorredStartPos{2};
+@@ -289,8 +289,8 @@ MODULE Rob1_MainModule
+     ! 264.966;
+     PERS num nWeldLineLength_R1;
+     ! 264.966;
+-    PERS robtarget pSearchStart:=[[0,-25,7.67266],[0.270598,-0.653282,-0.653282,-0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+-    PERS robtarget pSearchEnd:=[[0,15,7.67266],[0.270598,-0.653282,-0.653282,-0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
++    PERS robtarget pSearchStart:=[[0,25,6.20736],[0.270598,0.653282,-0.653282,0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
++    PERS robtarget pSearchEnd:=[[0,-15,6.20736],[0.270598,0.653282,-0.653282,0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+     TASK PERS string TouchErrorDirSub:="Start_Y";
+     TASK PERS string TouchErrorDirMain:="Ready";
+     PERS num nTouchRetryCount{2};
+@@ -298,7 +298,7 @@ MODULE Rob1_MainModule
+     TASK PERS num RetryDepthData{3}:=[10,10,10];
+     PERS robtarget pWeldPosR1{40}:=[[[-3,7,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.31,9E+09,9E+09]],[[-3,7,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.31,9E+09,9E+09]],[[-3,-4.5,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.31,9E+09,9E+09]],[[15,-1,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.34,9E+09,9E+09]],[[200,-1,1],[0.270598,-0.653282,-0.653282,-0.270598],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.72,9E+09,9E+09]],[[1390,-1.00592,0.996463],[0.270597,-0.653283,-0.653281,-0.270597],[0,0,-1,1],[-8707.81,-8707.8,1477.15,1033.13,9E+09,9E+09]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[15,-1,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.34,9E+09,9E+09]]];
+     PERS num nRobCorrSpaceHeight;
+-    PERS pos pCorredPosBuffer:=[0.00217424,-3.49286,7.70427];
++    PERS pos pCorredPosBuffer:=[-0.0187587,3.59548,6.24937];
+     PERS bool bWireTouch1;
+     CONST robtarget pNull:=[[0,0,0],[1,0,0,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+ 
+@@ -340,6 +340,13 @@ MODULE Rob1_MainModule
+     PERS num nBreakPoint{2};
+     PERS bool btouchTimeOut{2};
+     PERS bool bWeldOutputDisable;
++    TASK PERS seamdata tsm1:=[0.5,0.5,[0,0,32,0,0,380,0,0,0],0,0,0,0,0,[0,0,0,0,0,0,0,0,0],0,1,[0,0,32,0,0,380,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
++    TASK PERS welddata twel1:=[0.01,0,[0,0,32,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    CONST robtarget p10:=[[9646.02,5367.14,1098.73],[0.000127632,0.99996,-0.00820973,-0.00350012],[-1,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
++    CONST robtarget p20:=[[9648.07,5402.56,1092.32],[0.000102269,0.999962,-0.00800323,-0.00353187],[-1,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
++    TASK PERS seamdata tsm2:=[0,0,[0,0,0,0,0,0,0,0,0],0,0,0,0,0,[0,0,0,0,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
++    TASK PERS welddata tweld2:=[10,0,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
++    TASK PERS weavedata tweave1:=[1,2,2,2,0,0,0,0,0,0,0,0,0,0,0];
+ 
+     TRAP trapOutGantryHold
+         IDelete intOutGantryHold;
+@@ -1946,7 +1953,7 @@ MODULE Rob1_MainModule
+         VAR num nCorrX_Store;
+         VAR num nCorrY_Store;
+         VAR num nCorrZ_Store;
+-
++        WaitUntil bRobSwap=CCW;
+         IF (isStartPos=bStart) THEN
+             nCorrX_Store:=nCorrX_Store_Start{1};
+             nCorrY_Store:=nCorrY_Store_Start{1};
+@@ -1966,6 +1973,7 @@ MODULE Rob1_MainModule
+             ENDIF
+         ENDIF
+         !!! Search weld X edge !!!
++        WaitUntil bRobSwap=CCW;
+         IF (isStartPos=bStart) THEN
+             pSearchStart.rot:=Welds1{1}.position.rot;
+             IF (CCW=FALSE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+@@ -2009,7 +2017,7 @@ MODULE Rob1_MainModule
+         VAR num nCorrX_Store;
+         VAR num nCorrY_Store;
+         VAR num nCorrZ_Store;
+-
++        WaitUntil bRobSwap=CCW;
+         IF (isStartPos=bStart) THEN
+             nCorrX_Store:=nCorrX_Store_Start{1};
+             nCorrY_Store:=nCorrY_Store_Start{1};
+@@ -2024,6 +2032,7 @@ MODULE Rob1_MainModule
+         IF (TouchErrorDirMain=dirErrorCheck AND 0<nTouchRetryCount{1}) Depth:=Depth+(RetryDepthData{2}*nTouchRetryCount{1});
+ 
+         !!! Search weld Y edge !!!
++         WaitUntil bRobSwap=CCW;       
+         IF (isStartPos=bStart) THEN
+             pSearchStart.rot:=Welds1{1}.position.rot;
+             IF (CCW=FALSE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+@@ -2066,7 +2075,7 @@ MODULE Rob1_MainModule
+         VAR num nCorrX_Store;
+         VAR num nCorrY_Store;
+         VAR num nCorrZ_Store;
+-
++        WaitUntil bRobSwap=CCW;
+         IF (isStartPos=bStart) THEN
+             nCorrX_Store:=nCorrX_Store_Start{1};
+             nCorrY_Store:=nCorrY_Store_Start{1};
+@@ -2079,6 +2088,7 @@ MODULE Rob1_MainModule
+         TouchErrorDirSub:=dirErrorCheck;
+         IF (TouchErrorDirMain=dirErrorCheck AND 0<nTouchRetryCount{1}) Depth:=Depth+(RetryDepthData{3}*nTouchRetryCount{1});
+         !!! Search weld Z edge !!!
++         WaitUntil bRobSwap=CCW;       
+         IF (isStartPos=bStart) THEN
+             pSearchStart.rot:=Welds1{1}.position.rot;
+             IF (CCW=FALSE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+@@ -2264,4 +2274,8 @@ MODULE Rob1_MainModule
+         !        ENDWHILE
+         !        WaitUntil siLn1TouchActive=1;
+     ENDPROC
++    PROC t_weld1()
++        ArcLStart p10, v1000, tsm1, twel1\Weave:=tweave1, fine, tWeldGun\WObj:=WobjFloor;
++        ArcLEnd p20, v1000, tsm1, twel1\Weave:=tweave1, fine, tWeldGun\WObj:=WobjFloor;
++    ENDPROC
+ ENDMODULE
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <div id="robot3">
+    <h2>3호기 (1200-526406) 변경점</h2>
+    <p><strong>요약:</strong> 13개 파일에서 173개 라인 추가, 131개 라인 삭제</p>
+    <div class="diff-container">
+      <div class="diff-data">
+        <pre>
+diff --git a/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/backinfo.txt b/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/backinfo.txt
+index 6b5c0b5..88aceac 100644
+--- a/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/backinfo.txt
++++ b/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/backinfo.txt
+@@ -1,8 +1,8 @@
+ #
+ # Generated backup file, do not edit.
+ #
+-# Originally at: /hd0a/TEMP/backup.578950
+-# 2025-10-15  10:45:15
++# Originally at: /hd0a/TEMP/backup.593157
++# 2025-10-15  20:50:58
+ #
+ >>SYSTEM_ID:
+ 1200-526406
+@@ -82,6 +82,7 @@ PROGMOD/T_ROB1_Function.mod @
+ SYSMOD/user.sys @ 
+ SYSMOD/BE_User.sys @ 
+ SYSMOD/LINKEDM.sys @ HIDDEN
++PROGMOD/test251015.mod @ 
+ PROGMOD/testtttt.mod @ 
+ PROGMOD/Rob1_MainModule.mod @ 
+ PROGMOD/Rob1_TeachingData.mod @ 
+diff --git a/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/fpsystem.xml b/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/fpsystem.xml
+index f1008fb..dc1b1c0 100644
+--- a/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/fpsystem.xml
++++ b/robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/fpsystem.xml
+@@ -2,20 +2,11 @@
+ <!--Comments: Settings for the FlexPendant.-->
+ <FP>
+   <USER name="">
+-    <DATA id="ViewInManFull">
+-      <PROP name="text" value="PARAM_TXT_VIEWINMANFULL" />
+-      <PROP name="dll" value="" />
+-      <PROP name="type" value="" />
+-    </DATA>
+     <DATA id="ViewInAuto">
+       <PROP name="text" value="PARAM_TXT_VIEWINAUTO" />
+       <PROP name="dll" value="TpsViewProductionWnd.dll" />
+       <PROP name="type" value="ABB.Robotics.Tps.Production.TpsViewProductionWnd" />
+     </DATA>
+-    <DATA id="GoToPosition ROB_1">
+-      <PROP name="FilterScope" value="All" />
+-      <PROP name="FilterString" value="" />
+-    </DATA>
+     <DATA id="IO View">
+       <PROP name="Configurations file" value="/hd0a/1200_Gan/INTERNAL/FPConfigurations.xml" />
+       <PROP name="Signal view layout" value="Default" />
+@@ -24,6 +15,9 @@
+       <PROP name="FilterScope" value="All" />
+       <PROP name="FilterString" value="" />
+     </DATA>
++    <DATA id="Calibration view">
++      <PROP name="Load Motor Calib path" value="" />
++    </DATA>
+     <DATA id="UASViewLevel">
+       <PROP name="text" value="PARAM_TXT_UASVIEWLEVEL" />
+       <PROP name="level" value="Msg" />
+@@ -38,30 +32,41 @@
+       <PROP name="IncrementToggle" value="Medium" />
+       <PROP name="MechUnitPanelList" value=" ROB_1, ROB_2, GantryRob_7, ELM_X" />
+     </DATA>
++    <DATA id="Backup Restore">
++      <PROP name="LastPath" value="/USB/Samsung_Ins/R3/" />
++    </DATA>
+     <DATA id="Programmable Key_2">
+       <PROP name="type" value="Output" />
+       <PROP name="allowInAuto" value="No" />
+       <PROP name="pressed" value="PressRelease" />
+       <PROP name="target" value="soAwManFeedRev" />
+     </DATA>
+-    <DATA id="ViewInManual">
+-      <PROP name="text" value="PARAM_TXT_VIEWINMANUAL" />
+-      <PROP name="dll" value="" />
+-      <PROP name="type" value="" />
++    <DATA id="GoToPosition ROB_1">
++      <PROP name="FilterScope" value="All" />
++      <PROP name="FilterString" value="" />
++    </DATA>
++    <DATA id="ChangeInstruction">
++      <PROP name="Last Assignment DataType" value="num" />
+     </DATA>
+     <DATA id="Program Editor">
+-      <PROP name="HideDeclarations" value="False" />
++      <PROP name="HideDeclarations" value="True" />
+       <PROP name="ShowOnlyServiceRoutines" value="False" />
+-      <PROP name="ModulePath" value="ctrl:/hd0a/BACKUP/Old/" />
++      <PROP name="ModulePath" value="ctrl:/hd0a/1200-526406/HOME/" />
+     </DATA>
+-    <DATA id="ABB.Robotics.Tps.FileExplorer.TpsViewFileExplorer">
+-      <PROP name="LASTPATH" value="/hd0a/BACKUP/Old/" />
++    <DATA id="ViewInManual">
++      <PROP name="text" value="PARAM_TXT_VIEWINMANUAL" />
++      <PROP name="dll" value="" />
++      <PROP name="type" value="" />
++    </DATA>
++    <DATA id="UserSettings">
++      <PROP name="RapidEditorFontIndex" value="5" />
++      <PROP name="LoadFileFilterIndex" value="1" />
++    </DATA>
+     <DATA id="Show">
+       <PROP name="default" value="CtrlName" />
+     </DATA>
+-    <DATA id="Backup Restore">
+-      <PROP name="LastPath" value="ctrl:/hd0a/BACKUP/" />
++    <DATA id="ABB.Robotics.Tps.FileExplorer.TpsViewFileExplorer">
++      <PROP name="LASTPATH" value="/hd0a/BACKUP/Old/" />
+     </DATA>
+     <DATA id="CtrlPnl Configuration">
+       <PROP name="LASTPATH" value="/hd0a/1200-526406/HOME/" />
+@@ -70,12 +75,16 @@
+       <PROP name="filter" value="" />
+       <PROP name="device" value="" />
+     </DATA>
+-    <DATA id="Programmable Key_4">
+-      <PROP name="type" value="None" />
+-      <PROP name="allowInAuto" value="No" />
+-      <PROP name="pressed" value="" />
+-      <PROP name="target" value="" />
++    <DATA id="Programmable Key_4">
++      <PROP name="type" value="None" />
++      <PROP name="allowInAuto" value="No" />
++      <PROP name="pressed" value="" />
++      <PROP name="target" value="" />
++    </DATA>
++    <DATA id="ViewInManFull">
++      <PROP name="text" value="PARAM_TXT_VIEWINMANFULL" />
++      <PROP name="dll" value="" />
++      <PROP name="type" value="" />
+     </DATA>
+   </USER>
+ </FP>
+        </pre>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
