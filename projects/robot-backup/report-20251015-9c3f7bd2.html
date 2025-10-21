@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>로봇 백업 업데이트 인덱스 (2025-10-15)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", "Malgun Gothic", sans-serif; background: linear-gradient(135deg, #4a90e2 0%, #1f3b73 100%); min-height: 100vh; padding: 30px; color: #1f2933; }
+    .container { max-width: 1180px; margin: 0 auto; background: #ffffff; border-radius: 18px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2); overflow: hidden; }
+    header { background: linear-gradient(135deg, #1f3b73 0%, #103054 100%); padding: 40px 50px; color: #f8fafc; }
+    header h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 12px; }
+    header p { font-size: 1.05rem; line-height: 1.7; opacity: 0.9; }
+    .meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+    .meta span { background: rgba(15, 118, 255, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); color: #e0f2fe; padding: 6px 14px; border-radius: 999px; font-size: 0.9rem; letter-spacing: 0.02em; }
+    main { padding: 35px 50px 50px; }
+    .action-bar { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; }
+    .action-button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 22px; border-radius: 10px; text-decoration: none; font-size: 1rem; font-weight: 600; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .action-button.primary { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25); }
+    .action-button.secondary { background: #e2e8f0; color: #1f2937; }
+    .action-button:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(15, 23, 42, 0.2); }
+    .summary-card { background: #f1f5f9; border-left: 6px solid #2563eb; border-radius: 12px; padding: 24px 28px; margin-bottom: 35px; line-height: 1.7; }
+    .summary-card strong { color: #1d4ed8; }
+    .robot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; margin-bottom: 35px; }
+    .robot-card { background: #ffffff; border-radius: 14px; box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0; padding: 24px; }
+    .robot-card h2 { font-size: 1.3rem; margin-bottom: 12px; color: #0f172a; }
+    .robot-card h2 span { font-size: 2rem; margin-right: 10px; }
+    .robot-card ul { margin-left: 18px; line-height: 1.6; color: #334155; }
+    .robot-card li { margin-bottom: 10px; }
+    .file-list { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 28px; }
+    .file-list h3 { font-size: 1.2rem; color: #0f172a; margin-bottom: 16px; }
+    .file-list ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .file-list a { display: block; padding: 12px 16px; background: #ffffff; border: 1px solid #cbd5f5; border-radius: 10px; text-decoration: none; color: #1d4ed8; font-weight: 600; transition: transform 0.2s ease; }
+    .file-list a:hover { transform: translateY(-2px); box-shadow: 0 12px 18px rgba(37, 99, 235, 0.16); }
+    footer { margin-top: 40px; font-size: 0.9rem; color: #475569; line-height: 1.6; }
+    code { background: rgba(148, 163, 184, 0.15); padding: 2px 6px; border-radius: 6px; font-size: 0.9rem; }
+    @media (max-width: 720px) {
+      header { padding: 32px 26px; }
+      main { padding: 28px 26px 40px; }
+      .action-bar { flex-direction: column; align-items: stretch; }
+      .action-button { width: 100%; justify-content: center; }
+      .file-list ul { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>ABB 로봇 백업 업데이트 (2025-10-15)</h1>
+      <p>세 대의 갠트리 로봇 백업을 동일 시점으로 재수집하고, 용접 조건·검색 경로·I/O 정의를 현장 최신 상태에 맞춰 정비했습니다. 이 페이지는 업데이트 내역과 보고서 링크, 그리고 원본 백업 경로를 빠르게 확인할 수 있도록 구성된 프로젝트 인덱스입니다.</p>
+      <div class="meta">
+        <span>백업 일시: 2025-10-15 20:48~20:50</span>
+        <span>대상: 1200-526402 · 526404 · 526406</span>
+        <span>작업자: Codex Agent</span>
+      </div>
+    </header>
+    <main>
+      <div class="action-bar">
+        <a class="action-button primary" href="robot_backup_detailed_report.html" target="_blank">📄 상세 분석 보고서 열기</a>
+        <a class="action-button secondary" href="robot_backup_comparison_report.html" target="_blank">📊 Git Diff 비교 보기</a>
+      </div>
+      <section class="summary-card">
+        <p><strong>핵심 요약:</strong> 공통 용접 속도를 430A 기준으로 재정립하고, Touch 센서 및 갠트리 좌표를 재보정해 라인 간 편차를 줄였습니다. 2호기는 티칭 포인트 보조 신호와 시험 루틴을 신규 등록했고, 3호기는 테스트 모듈과 헤드 제어 루틴을 정리해 장비 간 동기화 로직을 강화했습니다.</p>
+      </section>
+      <section class="robot-grid" aria-label="로봇별 주요 변경 사항">
+        <article class="robot-card">
+          <h2><span>1️⃣</span>1200-526402 (1호기)</h2>
+          <ul>
+            <li>주요 용접 데이터(<code>wd1~wd4</code>)를 430A로 상향 조정하여 열 투입을 확보했습니다.</li>
+            <li>에지 검색 좌표와 스톱 포인트를 전면 재측정하고 위빙 패턴을 정리했습니다.</li>
+            <li><code>WaitUntil bRobSwap=CCW;</code>를 추가해 로봇 교대 시 신호 안정성을 확보했습니다.</li>
+          </ul>
+        </article>
+        <article class="robot-card">
+          <h2><span>2️⃣</span>1200-526404 (2호기)</h2>
+          <ul>
+            <li>Hold 용접 데이터를 초기화하고 시험 루틴(<code>t_weld1</code>, <code>rweldG</code>)을 배포했습니다.</li>
+            <li>티칭 포인트용 DI/DO 신호를 신규 등록하여 현장 재교정을 단순화했습니다.</li>
+            <li>FlexPendant 사용자 설정과 생산 화면 구성을 현장 운영 방식에 맞춰 재정렬했습니다.</li>
+          </ul>
+        </article>
+        <article class="robot-card">
+          <h2><span>3️⃣</span>1200-526406 (3호기)</h2>
+          <ul>
+            <li>공통 용접 속도 테이블과 경로 좌표계를 맞추어 라인 간 일관성을 확보했습니다.</li>
+            <li>테스트 모듈(<code>test251015.mod</code>)과 갠트리 정밀 점검 루틴을 추가했습니다.</li>
+            <li><code>Head_MainModule.mod</code>의 무한 루프 동작을 재검증해야 함을 보고서에 명시했습니다.</li>
+          </ul>
+        </article>
+      </section>
+      <section class="file-list" aria-label="백업 파일 위치">
+        <h3>원본 백업 경로</h3>
+        <ul>
+          <li><a href="../../robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/" target="_blank">📁 1200-526402_BACKUP_2025-10-15-No_1</a></li>
+          <li><a href="../../robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/" target="_blank">📁 1200-526404_BACKUP_2025-10-15_No_2</a></li>
+          <li><a href="../../robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/" target="_blank">📁 1200-526406_BACKUP_2025-10-15_No_3</a></li>
+        </ul>
+      </section>
+      <footer>
+        <p>👣 추천 절차: 보고서에서 변경 내역을 확인한 뒤, 필요 시 <code>RAPID/TASK*/PROGMOD</code> 모듈을 다운로드해 오프라인 검증을 진행하세요. 시스템 파라미터 변경분은 <code>SYSPAR</code> 폴더 단위 복원으로 관리하는 것을 권장합니다.</p>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S25016 프로젝트 통합 대시보드</title>
+    <script>
+        (function () {
+            var TOKEN = 'c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1';
+            var STORAGE_KEY = 's25016-dashboard-auth';
+            var params = new URLSearchParams(window.location.search);
+            var provided = params.get('auth');
+            if (provided === TOKEN) {
+                sessionStorage.setItem(STORAGE_KEY, TOKEN);
+                if (typeof window.history.replaceState === 'function') {
+                    params.delete('auth');
+                    var cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
+                return;
+            }
+            if (sessionStorage.getItem(STORAGE_KEY) === TOKEN) {
+                return;
+            }
+            document.documentElement.innerHTML = '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><title>접근 제한</title><style>body{margin:0;padding:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:\'Segoe UI\',sans-serif;text-align:center;} .box{max-width:420px;padding:32px;background:rgba(15,23,42,0.85);border-radius:16px;box-shadow:0 25px 70px rgba(15,23,42,0.35);} h1{font-size:1.8rem;margin-bottom:12px;} p{line-height:1.6;font-size:1rem;color:#94a3b8;} code{display:inline-block;margin-top:18px;padding:8px 14px;border-radius:999px;background:rgba(96,165,250,0.12);color:#bfdbfe;font-size:0.95rem;}</style></head><body><div class=\"box\"><h1>접근이 제한된 페이지입니다</h1><p>유효한 인증 토큰이 확인되지 않았습니다.<br>지정된 공유 링크로 다시 접속해 주세요.</p><code>문의: 내부 담당자</code></div></body></html>';
+        })();
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -433,7 +454,7 @@
                     <a href="projects/robot-vertical-axis/dashboard.html" class="project-link project-link-robot" target="_blank">
                         🎯 상하축 이슈 대시보드
                     </a>
-                    <a href="projects/robot-backup/index.html" class="project-link project-link-robot" target="_blank">
+                    <a href="projects/robot-backup/report-20251015-9c3f7bd2.html" class="project-link project-link-robot" target="_blank">
                         🗂️ 로봇 백업 업데이트 인덱스 (2025-10-15)
                     </a>
                     <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
@@ -487,7 +508,7 @@
                     <a href="projects/work-management/index.html" class="project-link" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);" target="_blank">
                         🏭 근무관리 대시보드
                     </a>
-                    <a href="projects/work-management/pages/입력.html" class="project-link" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" target="_blank">
+                    <a href="projects/work-management/pages/input.html" class="project-link" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" target="_blank">
                         📝 출입 기록 입력
                     </a>
                 </div>
@@ -1069,7 +1090,7 @@
                             <strong>작업:</strong> 작업 내용 및 비고
                         </p>
                     </div>
-                    <a href="projects/work-management/pages/입력.html" class="project-link" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" target="_blank">
+                    <a href="projects/work-management/pages/input.html" class="project-link" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" target="_blank">
                         📝 출입 기록 입력하기
                     </a>
                 </div>
