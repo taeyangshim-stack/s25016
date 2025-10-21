@@ -103,7 +103,7 @@ module.exports = async (req, res) => {
     console.error('업로드 오류:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message || 'General Error'
     });
   }
 };
