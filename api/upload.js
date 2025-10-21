@@ -5,7 +5,7 @@
  */
 
 const cloudinary = require('cloudinary').v2;
-const { formidable } = require('formidable');
+const formidable = require('formidable');
 
 // Cloudinary 설정
 cloudinary.config({
@@ -17,7 +17,7 @@ cloudinary.config({
 // formidable 파서
 const parseForm = (req) => {
   return new Promise((resolve, reject) => {
-    const form = formidable({ multiples: false });
+    const form = formidable();
 
     form.parse(req, (err, fields, files) => {
       if (err) reject(err);
