@@ -68,9 +68,9 @@ module.exports = async (req, res) => {
 
     const folder = fields.folder || process.env.CLOUDINARY_UPLOAD_FOLDER || 's25016';
 
-    const tempPath = file.filepath || file.path;
+    const tempPath = file.filepath || file.path || file._writeStream?._path;
     if (!tempPath) {
-      throw new Error('업로드된 파일 경로를 확인할 수 없습니다.');
+      throw new Error(`업로드된 파일 경로를 확인할 수 없습니다. file keys: ${Object.keys(file)}`);
     }
 
     // 파일을 Buffer로 읽기
