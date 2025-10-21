@@ -5,7 +5,7 @@
  */
 
 const cloudinary = require('cloudinary').v2;
-const formidable = require('formidable');
+const { IncomingForm } = require('formidable');
 
 // Cloudinary 설정
 cloudinary.config({
@@ -17,7 +17,7 @@ cloudinary.config({
 // formidable 파서
 const parseForm = (req) => {
   return new Promise((resolve, reject) => {
-    const form = formidable();
+    const form = new IncomingForm();
 
     form.parse(req, (err, fields, files) => {
       if (err) reject(err);
@@ -67,7 +67,7 @@ module.exports = async (req, res) => {
     const folder = fields.folder || process.env.CLOUDINARY_UPLOAD_FOLDER || 's25016';
 
     // 파일을 Buffer로 읽기
-    const buffer = await fileToBuffer(file.filepath);
+    const buffer = await fileToBuffer(file.filepath || file.path);
 
     // Base64로 변환
     const b64 = buffer.toString('base64');
@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
     // 성공 응답
     res.status(200).json({
       success: true,
-      file: file.originalFilename,
+      file: file.originalFilename || file.name,
       url: result.secure_url,
       public_id: result.public_id,
       format: result.format,
