@@ -59,15 +59,22 @@ module.exports = async (req, res) => {
     // 폼 데이터 파싱
     const { fields, files } = await parseForm(req);
 
-    if (!files.file) {
+    const fileField = files.file ?? Object.values(files)[0];
+    const file = Array.isArray(fileField) ? fileField[0] : fileField;
+
+    if (!file) {
       return res.status(400).json({ error: '파일이 없습니다.' });
     }
 
-    const file = files.file;
     const folder = fields.folder || process.env.CLOUDINARY_UPLOAD_FOLDER || 's25016';
 
+    const tempPath = file.filepath || file.path;
+    if (!tempPath) {
+      throw new Error('업로드된 파일 경로를 확인할 수 없습니다.');
+    }
+
     // 파일을 Buffer로 읽기
-    const buffer = await fileToBuffer(file.filepath || file.path);
+    const buffer = await fileToBuffer(tempPath);
 
     // Base64로 변환
     const b64 = buffer.toString('base64');
