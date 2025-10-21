@@ -55,7 +55,8 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: '파일이 없습니다.' });
     }
 
-    const folder = fields.folder || process.env.CLOUDINARY_UPLOAD_FOLDER || 's25016';
+    const folderField = fields.folder ?? process.env.CLOUDINARY_UPLOAD_FOLDER ?? 's25016';
+    const folder = Array.isArray(folderField) ? folderField[0] : folderField;
 
     const tempPath = file.filepath || file.path || file._writeStream?._path;
     if (!tempPath) {
