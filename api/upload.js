@@ -5,7 +5,7 @@
  */
 
 const cloudinary = require('cloudinary').v2;
-const formidable = require('formidable');
+const { formidable } = require('formidable');
 
 // Cloudinary 설정
 cloudinary.config({
