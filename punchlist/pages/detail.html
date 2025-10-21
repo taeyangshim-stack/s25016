@@ -175,6 +175,131 @@
             margin-bottom: var(--space-1);
         }
 
+        .image-upload-area {
+            border: 2px dashed var(--color-gray-300);
+            border-radius: var(--border-radius-base);
+            padding: var(--space-6);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-base);
+            background: var(--color-gray-50);
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary-light);
+        }
+
+        .image-upload-area.dragover {
+            border-color: var(--color-primary);
+            background: rgba(99, 102, 241, 0.12);
+        }
+
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+
+        .image-preview-item {
+            position: relative;
+            border-radius: var(--border-radius-base);
+            overflow: hidden;
+            background: var(--color-gray-100);
+            box-shadow: inset 0 0 0 1px var(--color-gray-200);
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .preview-wrapper {
+            position: relative;
+        }
+
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(220, 38, 38, 0.92);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .image-preview-item .remove-btn:hover {
+            background: rgba(220, 38, 38, 1);
+        }
+
+        .image-status {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: var(--font-xs);
+            font-weight: var(--font-semibold);
+            color: #fff;
+            background: rgba(15, 23, 42, 0.75);
+        }
+
+        .image-status.success { background: rgba(16, 185, 129, 0.85); }
+        .image-status.uploading { background: rgba(59, 130, 246, 0.85); }
+        .image-status.error { background: rgba(239, 68, 68, 0.9); }
+
+        .image-preview-item .caption-input {
+            width: 100%;
+            padding: var(--space-2);
+            font-size: var(--font-sm);
+            border: none;
+            border-top: 1px solid var(--color-gray-200);
+        }
+
+        .caption-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 8px;
+            background: rgba(255, 255, 255, 0.9);
+            border-top: 1px solid var(--color-gray-200);
+            font-size: var(--font-xs);
+            gap: var(--space-2);
+        }
+
+        .caption-actions button {
+            border: none;
+            background: none;
+            color: var(--color-primary);
+            cursor: pointer;
+            font-size: var(--font-xs);
+            padding: 0;
+        }
+
+        .caption-actions button:hover {
+            text-decoration: underline;
+        }
+
+        #editImageUploadMessage {
+            margin-top: var(--space-3);
+            font-size: var(--font-sm);
+            color: var(--color-gray-500);
+        }
+
+        #editImageUploadMessage.error {
+            color: #e11d48;
+        }
+
         .timeline-date {
             font-size: var(--font-sm);
             color: var(--color-gray-500);
@@ -660,6 +785,22 @@
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group full">
+                        <label>이미지 첨부</label>
+                        <div class="image-upload-area" id="editImageUploadArea">
+                            <div style="font-size: 40px; margin-bottom: var(--space-2);">📷</div>
+                            <div style="font-size: var(--font-base); font-weight: var(--font-semibold); margin-bottom: var(--space-1);">
+                                이미지를 드래그하거나 클릭하여 추가
+                            </div>
+                            <div class="helper-text">JPG, PNG, GIF, WEBP 지원 · 최대 5MB</div>
+                            <input type="file" id="editImageInput" accept="image/*" multiple style="display:none;">
+                        </div>
+                        <div class="image-preview-grid" id="editImagePreviewGrid"></div>
+                        <div id="editImageUploadMessage" class="helper-text"></div>
+                    </div>
+                </div>
+
                 <div class="edit-form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
                     <button type="submit" class="btn btn-primary">💾 변경 사항 저장</button>
@@ -674,6 +815,266 @@
     <script>
         let currentIssue = null;
         let editFormInitialized = false;
+        const PLACEHOLDER_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+        const CLOUDINARY_UPLOAD_FOLDER = 's25016/punchlist';
+        let editUploadedImages = [];
+
+        function getEditSubmitButton() {
+            return document.querySelector('#editIssueForm button[type="submit"]');
+        }
+
+        function isEditUploading() {
+            return editUploadedImages.some(img => img.status === 'uploading');
+        }
+
+        function getEditStatusText(status) {
+            const map = {
+                success: '업로드 완료',
+                uploading: '업로드 중',
+                error: '업로드 실패'
+            };
+            return map[status] || status;
+        }
+
+        function updateEditImageUploadStatus() {
+            const messageEl = document.getElementById('editImageUploadMessage');
+            if (!messageEl) return;
+
+            const uploadingCount = editUploadedImages.filter(img => img.status === 'uploading').length;
+            const errorCount = editUploadedImages.filter(img => img.status === 'error').length;
+            const successCount = editUploadedImages.filter(img => img.status === 'success').length;
+
+            messageEl.classList.remove('error');
+
+            if (uploadingCount > 0) {
+                messageEl.textContent = `이미지 ${uploadingCount}개 업로드 중입니다...`;
+            } else if (errorCount > 0) {
+                messageEl.textContent = `이미지 ${errorCount}개 업로드에 실패했습니다. 재시도하거나 삭제해 주세요.`;
+                messageEl.classList.add('error');
+            } else if (successCount > 0) {
+                messageEl.textContent = `이미지 ${successCount}개가 저장 대상으로 설정되었습니다.`;
+            } else {
+                messageEl.textContent = '';
+            }
+
+            const submitButton = getEditSubmitButton();
+            if (submitButton && submitButton.dataset.locked !== 'true') {
+                submitButton.disabled = uploadingCount > 0;
+                if (uploadingCount > 0) {
+                    submitButton.textContent = '⏳ 이미지 업로드 중...';
+                } else if (!submitButton.disabled) {
+                    submitButton.textContent = '💾 변경 사항 저장';
+                }
+            }
+        }
+
+        function renderEditImagePreviews() {
+            const grid = document.getElementById('editImagePreviewGrid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            if (editUploadedImages.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1 / -1; text-align:center; color:#7f8c8d; padding:40px;">등록된 이미지가 없습니다.</p>';
+                updateEditImageUploadStatus();
+                return;
+            }
+
+            editUploadedImages.forEach((img, index) => {
+                const item = document.createElement('div');
+                item.className = 'image-preview-item';
+                const imageSrc = img.dataUrl || img.url || PLACEHOLDER_IMAGE;
+                const errorInfo = img.status === 'error' ? `<div class="helper-text" style="color:#e11d48; padding:4px 0;">${img.error}</div>` : '';
+
+                const actionButtons = [
+                    img.status === 'error' ? `<button type="button" onclick="retryEditImageUpload(${index})">재시도</button>` : '',
+                    img.status === 'success' && img.url ? `<button type="button" onclick="copyEditImageUrl(${index})">URL 복사</button>` : ''
+                ].filter(Boolean).join(' ');
+
+                item.innerHTML = `
+                    <div class="preview-wrapper">
+                        <span class="image-status ${img.status}">${getEditStatusText(img.status)}</span>
+                        <img src="${imageSrc}" alt="Edit Preview ${index + 1}">
+                        <button type="button" class="remove-btn" onclick="removeEditImage(${index})">×</button>
+                    </div>
+                    <input type="text" class="caption-input" placeholder="설명 (선택)" value="${img.caption || ''}" onchange="updateEditCaption(${index}, this.value)">
+                    <div class="caption-actions">
+                        <span>${img.url ? '링크 저장됨' : getEditStatusText(img.status)}</span>
+                        <div>${actionButtons}</div>
+                    </div>
+                    ${errorInfo}
+                `;
+                grid.appendChild(item);
+            });
+
+            updateEditImageUploadStatus();
+        }
+
+        function resetEditImagesFromCurrentIssue() {
+            editUploadedImages = Array.isArray(currentIssue?.images)
+                ? currentIssue.images.map(img => ({
+                    file: null,
+                    dataUrl: img.url || PLACEHOLDER_IMAGE,
+                    caption: img.caption || '',
+                    status: 'success',
+                    url: img.url || '',
+                    publicId: img.public_id || '',
+                    error: '',
+                    existing: true
+                }))
+                : [];
+            renderEditImagePreviews();
+        }
+
+        function removeEditImage(index) {
+            editUploadedImages.splice(index, 1);
+            renderEditImagePreviews();
+        }
+
+        function updateEditCaption(index, caption) {
+            if (editUploadedImages[index]) {
+                editUploadedImages[index].caption = caption;
+            }
+        }
+
+        async function copyEditImageUrl(index) {
+            const image = editUploadedImages[index];
+            if (!image || !image.url) return;
+            try {
+                await navigator.clipboard.writeText(image.url);
+                alert('📋 이미지 URL이 복사되었습니다.');
+            } catch (error) {
+                console.error('URL 복사 실패:', error);
+                alert('❌ URL 복사에 실패했습니다.');
+            }
+        }
+
+        function retryEditImageUpload(index) {
+            const image = editUploadedImages[index];
+            if (!image || !image.file) return;
+            image.status = 'uploading';
+            image.error = '';
+            renderEditImagePreviews();
+            uploadEditImageToCloudinary(index);
+        }
+
+        function setupEditImageUpload() {
+            const uploadArea = document.getElementById('editImageUploadArea');
+            const fileInput = document.getElementById('editImageInput');
+            if (!uploadArea || !fileInput) return;
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', (e) => {
+                handleEditFiles(e.target.files);
+                fileInput.value = '';
+            });
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                handleEditFiles(e.dataTransfer.files);
+            });
+
+            updateEditImageUploadStatus();
+        }
+
+        function handleEditFiles(fileList) {
+            const files = Array.from(fileList || []);
+
+            files.forEach(file => {
+                if (!file.type.startsWith('image/')) {
+                    alert(`${file.name}은(는) 이미지 파일이 아닙니다.`);
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`${file.name}의 크기가 5MB를 초과합니다.`);
+                    return;
+                }
+
+                const record = {
+                    file,
+                    dataUrl: PLACEHOLDER_IMAGE,
+                    caption: '',
+                    status: 'uploading',
+                    url: '',
+                    publicId: '',
+                    error: ''
+                };
+
+                editUploadedImages.push(record);
+                const index = editUploadedImages.length - 1;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    editUploadedImages[index].dataUrl = e.target.result;
+                    renderEditImagePreviews();
+                };
+                reader.readAsDataURL(file);
+
+                renderEditImagePreviews();
+                uploadEditImageToCloudinary(index);
+            });
+
+            updateEditImageUploadStatus();
+        }
+
+        async function uploadEditImageToCloudinary(index) {
+            const image = editUploadedImages[index];
+            if (!image) return;
+
+            image.status = 'uploading';
+            image.error = '';
+            renderEditImagePreviews();
+
+            const formData = new FormData();
+            formData.append('file', image.file);
+            formData.append('folder', CLOUDINARY_UPLOAD_FOLDER);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text || `HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (!result.success || !result.url) {
+                    throw new Error(result.error || '업로드 실패');
+                }
+
+                image.status = 'success';
+                image.url = result.url;
+                image.publicId = result.public_id || '';
+            } catch (error) {
+                console.error('이미지 업로드 실패:', error);
+                image.status = 'error';
+                image.error = error.message || '업로드 실패';
+                image.url = '';
+                image.publicId = '';
+            }
+
+            renderEditImagePreviews();
+        }
+
+        window.removeEditImage = removeEditImage;
+        window.updateEditCaption = updateEditCaption;
+        window.retryEditImageUpload = retryEditImageUpload;
+        window.copyEditImageUrl = copyEditImageUrl;
 
         // 페이지 로드
         document.addEventListener('DOMContentLoaded', async () => {
@@ -728,6 +1129,8 @@
             if (editForm) {
                 editForm.addEventListener('submit', handleEditSubmit);
             }
+
+            setupEditImageUpload();
 
             editFormInitialized = true;
         }
@@ -1037,6 +1440,8 @@
             if (actionResultInput) {
                 actionResultInput.value = currentIssue.action_result || '';
             }
+
+            resetEditImagesFromCurrentIssue();
         }
 
         function openEditModal() {
@@ -1063,6 +1468,35 @@
             const originalLabel = submitButton.textContent;
             submitButton.disabled = true;
             submitButton.textContent = '⏳ 저장 중...';
+            submitButton.dataset.locked = 'true';
+
+            if (isEditUploading()) {
+                alert('이미지 업로드가 완료될 때까지 기다려주세요.');
+                submitButton.disabled = false;
+                submitButton.textContent = originalLabel;
+                submitButton.dataset.locked = '';
+                return;
+            }
+
+            const failedImages = editUploadedImages.filter(img => img.status === 'error');
+            if (failedImages.length > 0) {
+                const proceed = confirm('업로드에 실패한 이미지가 있습니다. 실패한 이미지는 제외하고 저장할까요?');
+                if (!proceed) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalLabel;
+                    submitButton.dataset.locked = '';
+                    return;
+                }
+            }
+
+            const successfulImages = editUploadedImages.filter(img => img.status === 'success' && img.url);
+            const attachments = successfulImages.map(img => ({
+                type: 'image',
+                url: img.url,
+                caption: img.caption || '',
+                fileName: img.file ? img.file.name : '',
+                public_id: img.publicId || ''
+            }));
 
             const updatedIssue = {
                 ...currentIssue,
@@ -1078,7 +1512,14 @@
                 description: document.getElementById('editDescription').value,
                 cause: document.getElementById('editCause').value,
                 action_plan: document.getElementById('editActionPlan').value,
-                action_result: document.getElementById('editActionResult').value
+                action_result: document.getElementById('editActionResult').value,
+                attachments,
+                images: attachments.map(att => ({
+                    url: att.url,
+                    caption: att.caption,
+                    public_id: att.public_id,
+                    fileName: att.fileName || ''
+                }))
             };
 
             try {
@@ -1097,6 +1538,8 @@
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = originalLabel;
+                submitButton.dataset.locked = '';
+                updateEditImageUploadStatus();
             }
         }
 
