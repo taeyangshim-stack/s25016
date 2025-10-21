@@ -26,17 +26,6 @@ const parseForm = (req) => {
   });
 };
 
-// 파일을 Buffer로 읽기
-const fileToBuffer = (filePath) => {
-  return new Promise((resolve, reject) => {
-    const fs = require('fs');
-    fs.readFile(filePath, (err, data) => {
-      if (err) reject(err);
-      resolve(data);
-    });
-  });
-};
-
 module.exports = async (req, res) => {
   // CORS 헤더
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -73,15 +62,15 @@ module.exports = async (req, res) => {
       throw new Error(`업로드된 파일 경로를 확인할 수 없습니다. file keys: ${Object.keys(file)}`);
     }
 
-    // 파일을 Buffer로 읽기
-    const buffer = await fileToBuffer(tempPath);
+    console.log('Cloudinary upload request:', {
+      folder,
+      mimetype: file.mimetype,
+      size: file.size,
+      path: tempPath
+    });
 
-    // Base64로 변환
-    const b64 = buffer.toString('base64');
-    const dataURI = `data:${file.mimetype};base64,${b64}`;
-
-    // Cloudinary에 업로드
-    const result = await cloudinary.uploader.upload(dataURI, {
+    // Cloudinary에 업로드 (임시 파일 경로 직접 전달)
+    const result = await cloudinary.uploader.upload(tempPath, {
       folder: folder,
       use_filename: true,
       unique_filename: false,
@@ -100,7 +89,13 @@ module.exports = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('업로드 오류:', error);
+    console.error('업로드 오류 상세:', {
+      message: error.message,
+      name: error.name,
+      http_code: error.http_code,
+      response: error.response?.body,
+      stack: error.stack
+    });
     res.status(500).json({
       success: false,
       error: error.message || 'General Error'
