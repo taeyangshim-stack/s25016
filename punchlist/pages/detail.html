@@ -134,6 +134,27 @@
             border-radius: var(--border-radius-base);
         }
 
+        .primary-image {
+            margin-top: var(--space-4);
+            border-radius: var(--border-radius-base);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .primary-image img {
+            width: 100%;
+            display: block;
+            max-height: 420px;
+            object-fit: cover;
+        }
+
+        .primary-image-caption {
+            font-size: var(--font-sm);
+            color: var(--color-gray-500);
+            padding: var(--space-3);
+            background: var(--color-gray-100);
+        }
+
         .custom-fields-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -596,6 +617,12 @@
                     <div class="card">
                         <h2 class="card-title">📝 문제 상황</h2>
                         <div class="description-text" id="description"></div>
+                        <div id="primaryImageWrapper" style="display: none;">
+                            <div class="primary-image">
+                                <img id="primaryImage" src="" alt="첨부 이미지">
+                            </div>
+                            <div class="primary-image-caption" id="primaryImageCaption"></div>
+                        </div>
                     </div>
 
                     <!-- 원인 분석 -->
@@ -1177,6 +1204,25 @@
 
             // 문제 상황
             document.getElementById('description').textContent = currentIssue.description || '없음';
+            const primaryWrapper = document.getElementById('primaryImageWrapper');
+            const primaryImage = document.getElementById('primaryImage');
+            const primaryCaption = document.getElementById('primaryImageCaption');
+
+            if (currentIssue.images && currentIssue.images.length > 0) {
+                const firstImage = currentIssue.images[0];
+                if (primaryImage) {
+                    primaryImage.src = firstImage.url || '';
+                    primaryImage.alt = firstImage.caption || currentIssue.title || '첨부 이미지';
+                }
+                if (primaryCaption) {
+                    primaryCaption.textContent = firstImage.caption || '이미지 첨부';
+                }
+                if (primaryWrapper) {
+                    primaryWrapper.style.display = firstImage.url ? 'block' : 'none';
+                }
+            } else if (primaryWrapper) {
+                primaryWrapper.style.display = 'none';
+            }
 
             // 원인 분석
             if (currentIssue.cause) {
@@ -1204,6 +1250,9 @@
             // 이미지 갤러리
             if (currentIssue.images && currentIssue.images.length > 0) {
                 renderImages();
+            } else {
+                const imagesCard = document.getElementById('imagesCard');
+                if (imagesCard) imagesCard.style.display = 'none';
             }
 
             // 담당 정보
