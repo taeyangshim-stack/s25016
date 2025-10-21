@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 ABB 로봇 동기화 이슈 보고서 - S25016</title>
+    <script>
+        (function () {
+            var TOKEN = 'c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1';
+            var STORAGE_KEY = 's25016-dashboard-auth';
+            var params = new URLSearchParams(window.location.search);
+            var provided = params.get('auth');
+            if (provided === TOKEN) {
+                sessionStorage.setItem(STORAGE_KEY, TOKEN);
+                if (typeof window.history.replaceState === 'function') {
+                    params.delete('auth');
+                    var cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
+                return;
+            }
+            if (sessionStorage.getItem(STORAGE_KEY) === TOKEN) {
+                return;
+            }
+            document.documentElement.innerHTML = '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><title>접근 제한</title><style>body{margin:0;padding:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:\'Segoe UI\',sans-serif;text-align:center;} .box{max-width:420px;padding:32px;background:rgba(15,23,42,0.85);border-radius:16px;box-shadow:0 25px 70px rgba(15,23,42,0.35);} h1{font-size:1.8rem;margin-bottom:12px;} p{line-height:1.6;font-size:1rem;color:#94a3b8;} code{display:inline-block;margin-top:18px;padding:8px 14px;border-radius:999px;background:rgba(96,165,250,0.12);color:#bfdbfe;font-size:0.95rem;}</style></head><body><div class=\"box\"><h1>접근이 제한된 페이지입니다</h1><p>유효한 인증 토큰이 확인되지 않았습니다.<br>지정된 공유 링크로 다시 접속해 주세요.</p><code>문의: 내부 담당자</code></div></body></html>';
+        })();
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .alert-banner {
+            background: #fef2f2;
+            border-left: 6px solid #dc2626;
+            padding: 25px;
+            margin: 30px;
+            border-radius: 8px;
+        }
+        .alert-banner h2 {
+            color: #991b1b;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        .content {
+            padding: 40px;
+        }
+        .issue-card {
+            background: #fff5f5;
+            border: 2px solid #fecaca;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        .issue-card h3 {
+            color: #dc2626;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .comparison-table th {
+            background: #dc2626;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .comparison-table tr:hover {
+            background: #fef2f2;
+        }
+        .diff-highlight {
+            background: #fee2e2;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #991b1b;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .recommendation {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 6px solid #2563eb;
+            margin: 30px 0;
+        }
+        .recommendation h3 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #dc2626;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .status-critical {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 ABB 로봇 동기화 이슈 보고서</h1>
+            <p>3대 로봇 백업 파일 불일치 분석 - 2025-10-22</p>
+        </div>
+
+        <div class="alert-banner">
+            <h2>⚠️ 긴급 조치 필요</h2>
+            <p style="font-size: 1.1em; line-height: 1.8; color: #7f1d1d;">
+                <strong>3대의 ABB 로봇이 동일한 작업을 수행해야 하지만, 백업 파일 분석 결과
+                라이선스 및 용접 파라미터가 서로 다릅니다.</strong><br>
+                이는 생산 불량, 품질 편차, 장비 오작동의 원인이 될 수 있습니다.
+            </p>
+        </div>
+
+        <div class="content">
+            <!-- Issue 1: License -->
+            <div class="issue-card">
+                <h3>🔐 이슈 #1: 라이선스 파일 불일치 <span class="status-badge status-critical">심각</span></h3>
+                <p style="margin-bottom: 20px;">
+                    <strong>예상:</strong> 각 로봇이 자기 시리얼 번호의 라이선스만 보유<br>
+                    <strong>실제:</strong> 다른 로봇의 라이선스가 혼재되어 있음
+                </p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>호기</th>
+                            <th>시리얼 번호</th>
+                            <th>보유 라이선스</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1호기</strong></td>
+                            <td>1200-526402</td>
+                            <td>
+                                526402, 526402_RobotWare, 526403<br>
+                                <span class="diff-highlight">526404, 526404_RobotWare, 526405</span>
+                            </td>
+                            <td><span class="status-badge status-critical">이상</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>2호기</strong></td>
+                            <td>1200-526404</td>
+                            <td>
+                                526404, 526404_RobotWare<br>
+                                <span class="diff-highlight">526405</span>
+                            </td>
+                            <td><span class="status-badge status-warning">확인 필요</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>3호기</strong></td>
+                            <td>1200-526406</td>
+                            <td>
+                                526406, 526406_RobotWare<br>
+                                <span class="diff-highlight">526407</span>
+                            </td>
+                            <td><span class="status-badge status-warning">확인 필요</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                    <h4 style="color: #dc2626; margin-bottom: 10px;">📍 파일 위치</h4>
+                    <div class="code-block">
+robot)badkup/1200-526402_BACKUP_2025-10-15-No_1/BACKINFO/license/<br>
+robot)badkup/1200-526404_BACKUP_2025-10-15_No_2/BACKINFO/license/<br>
+robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/license/
+                    </div>
+                </div>
+
+                <div style="background: #fffbeb; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #f59e0b;">
+                    <h4 style="color: #92400e; margin-bottom: 10px;">❓ 의문사항</h4>
+                    <ul style="margin-left: 20px; line-height: 1.8; color: #78350f;">
+                        <li><strong>526403, 526405, 526407은 무엇인가?</strong> (존재하지 않는 로봇?)</li>
+                        <li>1호기에 왜 2호기 라이선스(526404)가 있는가?</li>
+                        <li>각 호기에 +1 시리얼 라이선스가 있는 이유는?</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Issue 2: RAPID Parameters -->
+            <div class="issue-card">
+                <h3>⚙️ 이슈 #2: 용접 파라미터 불일치 <span class="status-badge status-critical">심각</span></h3>
+                <p style="margin-bottom: 20px;">
+                    <strong>파일:</strong> RAPID/TASK1/PROGMOD/Rob1_MainModule.mod<br>
+                    <strong>문제:</strong> 1호기와 2호기의 용접 파라미터 및 좌표가 다름
+                </p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>파라미터</th>
+                            <th>1호기</th>
+                            <th>2호기</th>
+                            <th>차이</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>용접 전류(?)</strong></td>
+                            <td>345</td>
+                            <td class="diff-highlight">380</td>
+                            <td>+35 (약 10% 증가)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>edgeStart X좌표</strong></td>
+                            <td>5796.09</td>
+                            <td class="diff-highlight">12209.3</td>
+                            <td>+6413.21 (완전히 다른 위치!)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>edgeStart Y좌표</strong></td>
+                            <td>1866.46</td>
+                            <td class="diff-highlight">2871.22</td>
+                            <td>+1004.76</td>
+                        </tr>
+                        <tr>
+                            <td><strong>edgeStart Z좌표</strong></td>
+                            <td>7.01575</td>
+                            <td class="diff-highlight">8.43746</td>
+                            <td>+1.42171</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                    <h4 style="color: #dc2626; margin-bottom: 10px;">📝 코드 비교</h4>
+
+                    <p style="font-weight: bold; margin-bottom: 10px;">1호기 (라인 118-121):</p>
+                    <div class="code-block">
+TASK PERS welddata wd1:=[8.66667,0,[5,0,37,250,0,<strong style="color: #fbbf24;">345</strong>,0,0,0],[0,0,0,0,0,0,0,0,0]];<br>
+TASK PERS welddata wd2:=[8.66667,0,[5,0,37,250,0,<strong style="color: #fbbf24;">345</strong>,0,0,0],[0,0,0,0,0,0,0,0,0]];
+                    </div>
+
+                    <p style="font-weight: bold; margin: 20px 0 10px;">2호기 (라인 118-121):</p>
+                    <div class="code-block">
+TASK PERS welddata wd1:=[8.66667,0,[5,0,37,250,0,<strong style="color: #ef4444;">380</strong>,0,0,0],[0,0,0,0,0,0,0,0,0]];<br>
+TASK PERS welddata wd2:=[8.66667,0,[5,0,37,250,0,<strong style="color: #ef4444;">380</strong>,0,0,0],[0,0,0,0,0,0,0,0,0]];
+                    </div>
+
+                    <p style="font-weight: bold; margin: 20px 0 10px;">좌표 비교 (라인 267-268):</p>
+                    <div class="code-block">
+1호기: PERS edgedata edgeStart{2}:=[[[<strong style="color: #fbbf24;">5796.09, 1866.46, 7.01575</strong>],50,50,0,12,0,0], ...]<br>
+2호기: PERS edgedata edgeStart{2}:=[[[<strong style="color: #ef4444;">12209.3, 2871.22, 8.43746</strong>],50,50,0,12,0,0], ...]
+                    </div>
+                </div>
+
+                <div style="background: #fee2e2; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #dc2626;">
+                    <h4 style="color: #991b1b; margin-bottom: 10px;">💥 영향</h4>
+                    <ul style="margin-left: 20px; line-height: 1.8; color: #7f1d1d;">
+                        <li><strong>품질 편차:</strong> 용접 전류가 다르면 용접 강도가 달라짐</li>
+                        <li><strong>위치 오류:</strong> 좌표가 완전히 다름 (5000대 vs 12000대)</li>
+                        <li><strong>생산 불일치:</strong> 같은 제품을 만들 수 없음</li>
+                        <li><strong>프로그램 혼재 가능성:</strong> 다른 프로젝트의 프로그램이 섞였을 수 있음</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Issue 3: Program Consistency -->
+            <div class="issue-card">
+                <h3>✅ 확인된 정상 사항</h3>
+                <p style="margin-bottom: 15px;">다행히 일부 모듈은 동일합니다:</p>
+                <ul style="margin-left: 25px; line-height: 1.8;">
+                    <li><strong>Head_MoveControl.mod:</strong> 3대 모두 동일 (MD5 해시 일치)</li>
+                    <li><strong>TASK8 모듈 구조:</strong> 동일한 파일 구조</li>
+                    <li><strong>파일 개수:</strong> 전반적으로 유사</li>
+                </ul>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="recommendation">
+                <h3>💡 권장 조치사항</h3>
+                <ol style="margin-left: 25px; line-height: 2; color: #1e3a8a;">
+                    <li>
+                        <strong>긴급 현장 확인:</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>3대 로봇이 실제 같은 작업을 하는지 재확인</li>
+                            <li>1호기/2호기가 다른 라인에 있는지 확인</li>
+                            <li>526403, 526405, 526407의 정체 파악</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 15px;">
+                        <strong>라이선스 정리:</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>각 로봇에 올바른 라이선스만 적용</li>
+                            <li>불필요한 라이선스 파일 제거</li>
+                            <li>ABB에 문의하여 정상 라이선스 구조 확인</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 15px;">
+                        <strong>RAPID 프로그램 동기화:</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>마스터 프로그램 선정 (품질 검증된 버전)</li>
+                            <li>3대에 동일한 프로그램 배포</li>
+                            <li>용접 파라미터 통일 (345 또는 380 중 선택)</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 15px;">
+                        <strong>백업 프로세스 개선:</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>백업 전 체크리스트 작성 (라이선스, 프로그램 버전 확인)</li>
+                            <li>Git 커밋 시 변경 이유 명확히 기록</li>
+                            <li>정기적인 동기화 상태 점검</li>
+                        </ul>
+                    </li>
+                    <li style="margin-top: 15px;">
+                        <strong>다음 백업 시 확인:</strong>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>10월 21일 백업부터 이 문제 해결 여부 확인</li>
+                            <li>Git diff로 변경사항 면밀히 검토</li>
+                            <li>이상 발견 시 즉시 보고</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Summary -->
+            <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-top: 30px;">
+                <h3 style="color: #1f2937; margin-bottom: 20px;">📋 요약</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: white;">
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;"><strong>발견 일시</strong></td>
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;">2025-10-22 (Git 히스토리 분석 중)</td>
+                    </tr>
+                    <tr style="background: #fef2f2;">
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;"><strong>심각도</strong></td>
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;"><span class="status-badge status-critical">높음</span></td>
+                    </tr>
+                    <tr style="background: white;">
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;"><strong>영향 범위</strong></td>
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;">3대 전체 (1200-526402/404/406)</td>
+                    </tr>
+                    <tr style="background: white;">
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;"><strong>주요 이슈</strong></td>
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;">
+                            ① 라이선스 혼재<br>
+                            ② 용접 파라미터 불일치 (345 vs 380)<br>
+                            ③ 작업 좌표 완전 상이
+                        </td>
+                    </tr>
+                    <tr style="background: white;">
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;"><strong>다음 단계</strong></td>
+                        <td style="padding: 15px; border: 1px solid #e5e7eb;">현장 확인 → 라이선스 정리 → 프로그램 동기화</td>
+                    </tr>
+                </table>
+            </div>
+
+            <a href="index.html" class="back-button">← 통합 대시보드로 돌아가기</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('로봇 동기화 이슈 보고서 로드 완료');
+            console.log('분석 기준일: 2025-10-22');
+        });
+    </script>
+</body>
+</html>
