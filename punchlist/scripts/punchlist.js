@@ -28,6 +28,51 @@ const PRIORITIES = ['긴급', '높음', '보통', '낮음'];
 // 상태 옵션
 const STATUSES = ['신규', '진행중', '보류', '완료', '검증중'];
 
+const IMAGE_URL_REGEX = /\.(png|jpe?g|gif|webp|svg)$/i;
+
+function isImageAttachment(attachment = {}) {
+  if (!attachment) return false;
+  if (attachment.type) {
+    return attachment.type === 'image';
+  }
+  if (attachment.url) {
+    const cleanUrl = attachment.url.split('?')[0];
+    return IMAGE_URL_REGEX.test(cleanUrl);
+  }
+  return false;
+}
+
+function normalizeIssue(issue) {
+  if (!issue || typeof issue !== 'object') {
+    return issue;
+  }
+
+  const cloned = { ...issue };
+  const attachments = Array.isArray(cloned.attachments) ? cloned.attachments : [];
+
+  const imageEntries = attachments
+    .filter(isImageAttachment)
+    .map(att => ({
+      url: att.url || '',
+      caption: att.caption || '',
+      public_id: att.public_id || '',
+      fileName: att.fileName || att.name || ''
+    }));
+
+  if (Array.isArray(cloned.images) && cloned.images.length > 0 && imageEntries.length === 0) {
+    cloned.images = cloned.images.map(img => ({
+      url: img.url || '',
+      caption: img.caption || '',
+      public_id: img.public_id || '',
+      fileName: img.fileName || ''
+    }));
+  } else {
+    cloned.images = imageEntries;
+  }
+
+  return cloned;
+}
+
 // 기본 담당자 디렉터리 (API 실패 시 폴백)
 const DEFAULT_OWNER_DIRECTORY = [
   { id: 'owner-default-1', name: '심태양', role: '담당자', department: '생산기술팀', phone: '', email: 'simsun@kakao.com' },
@@ -227,6 +272,10 @@ const MOCK_ISSUES = [
     templateId: ''
   }
 ];
+
+MOCK_ISSUES.forEach((issue, index) => {
+  MOCK_ISSUES[index] = normalizeIssue(issue);
+});
 
 function cloneOwnerDirectory(list) {
   return (list || []).map(owner => ({
@@ -574,7 +623,7 @@ async function loadAllIssues() {
   if (USE_MOCK_DATA) {
     console.log('🔧 Mock 모드: 테스트 데이터 사용 중');
     return new Promise(resolve => {
-      setTimeout(() => resolve([...MOCK_ISSUES]), 300);
+      setTimeout(() => resolve([...MOCK_ISSUES].map(normalizeIssue)), 300);
     });
   }
 
@@ -591,7 +640,9 @@ async function loadAllIssues() {
     const result = await response.json();
 
     if (result.success) {
-      return result.data;
+      return Array.isArray(result.data)
+        ? result.data.map(normalizeIssue)
+        : [];
     } else {
       throw new Error(result.error);
     }
@@ -610,7 +661,7 @@ async function loadIssueById(id) {
       setTimeout(() => {
         const issue = MOCK_ISSUES.find(i => i.id === id);
         if (issue) {
-          resolve({...issue});
+          resolve(normalizeIssue({...issue}));
         } else {
           reject(new Error('Issue not found'));
         }
@@ -631,7 +682,7 @@ async function loadIssueById(id) {
     const result = await response.json();
 
     if (result.success) {
-      return result.data;
+      return normalizeIssue(result.data);
     } else {
       throw new Error(result.error);
     }
@@ -648,13 +699,15 @@ async function createIssue(issueData) {
     console.log('🔧 Mock 모드: 이슈 생성 시뮬레이션');
     return new Promise(resolve => {
       setTimeout(() => {
+        const attachments = Array.isArray(issueData.attachments) ? issueData.attachments : [];
         const newIssue = {
           id: `PL-2025-${String(MOCK_ISSUES.length + 1).padStart(3, '0')}`,
           ...issueData,
+          attachments,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
-        MOCK_ISSUES.push(newIssue);
+        MOCK_ISSUES.push(normalizeIssue(newIssue));
         console.log('✅ Mock 이슈 생성:', newIssue.id);
         resolve({ success: true, id: newIssue.id });
       }, 500);
@@ -700,11 +753,13 @@ async function updateIssue(issueData) {
       setTimeout(() => {
         const index = MOCK_ISSUES.findIndex(i => i.id === issueData.id);
         if (index !== -1) {
-          MOCK_ISSUES[index] = {
+          const attachments = Array.isArray(issueData.attachments) ? issueData.attachments : MOCK_ISSUES[index].attachments || [];
+          MOCK_ISSUES[index] = normalizeIssue({
             ...MOCK_ISSUES[index],
             ...issueData,
+            attachments,
             updated_at: new Date().toISOString()
-          };
+          });
           console.log('✅ Mock 이슈 수정:', issueData.id);
         }
         resolve({ success: true });
