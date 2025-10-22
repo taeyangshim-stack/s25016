@@ -326,6 +326,65 @@
             color: var(--color-gray-500);
         }
 
+        .change-log {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .change-log-item {
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--border-radius-base);
+            padding: var(--space-3);
+            background: var(--color-gray-50);
+        }
+
+        .change-log-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--font-xs);
+            color: var(--color-gray-600);
+            margin-bottom: var(--space-2);
+        }
+
+        .change-log-changes {
+            margin: 0;
+            padding-left: var(--space-4);
+            color: var(--color-gray-800);
+            font-size: var(--font-sm);
+        }
+
+        .change-log-changes li {
+            margin-bottom: var(--space-1);
+        }
+
+        .change-field {
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+        }
+
+        .change-diff {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .change-before {
+            color: var(--color-gray-500);
+            text-decoration: line-through;
+        }
+
+        .change-after {
+            color: var(--color-primary);
+            font-weight: var(--font-semibold);
+        }
+
+        .change-summary {
+            margin-top: var(--space-2);
+            font-size: var(--font-sm);
+            color: var(--color-gray-700);
+        }
+
         .loading {
             text-align: center;
             padding: var(--space-12);
@@ -576,6 +635,7 @@
                             <span class="badge" id="priorityBadge"></span>
                             <span class="badge" id="statusBadge"></span>
                             <span class="badge" id="categoryBadge"></span>
+                            <span class="badge" id="lineBadge"></span>
                         </div>
                     </div>
                     <div class="actions">
@@ -601,6 +661,10 @@
                             <div class="info-item">
                                 <span class="info-label">세부분류</span>
                                 <span class="info-value" id="subcategory"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">라인 분류</span>
+                                <span class="info-value" id="lineClassificationValue"></span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">우선순위</span>
@@ -698,6 +762,12 @@
                         <ul class="timeline" id="timeline"></ul>
                     </div>
 
+                    <!-- 변경 이력 -->
+                    <div class="card" id="changeLogCard" style="display: none;">
+                        <h2 class="card-title">🛠 변경 이력</h2>
+                        <ul class="change-log" id="changeLogList"></ul>
+                    </div>
+
                     <!-- 메타 정보 -->
                     <div class="card">
                         <h2 class="card-title">ℹ️ 메타 정보</h2>
@@ -755,6 +825,13 @@
                     <div class="form-group">
                         <label for="editOwner">담당자</label>
                         <select id="editOwner"></select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editLineClassification">라인 분류</label>
+                        <select id="editLineClassification"></select>
                     </div>
                 </div>
 
@@ -1195,10 +1272,12 @@
             categoryBadge.textContent = `${currentIssue.category} > ${currentIssue.subcategory}`;
             categoryBadge.style.background = '#e5e7eb';
             categoryBadge.style.color = '#4b5563';
+            applyLineBadge(document.getElementById('lineBadge'), currentIssue.line_classification);
 
             // 기본 정보
             document.getElementById('category').textContent = currentIssue.category;
             document.getElementById('subcategory').textContent = currentIssue.subcategory;
+            document.getElementById('lineClassificationValue').textContent = currentIssue.line_classification || '-';
             document.getElementById('priority').textContent = currentIssue.priority;
             document.getElementById('status').textContent = currentIssue.status;
 
@@ -1276,6 +1355,7 @@
 
             // 타임라인
             renderTimeline();
+            renderChangeLog();
 
             // 메타 정보
             document.getElementById('createdAt').textContent = PunchListAPI.formatDateTime(currentIssue.created_at);
@@ -1294,8 +1374,10 @@
 
             document.getElementById('customFieldsCard').style.display = 'block';
 
+            const excludedFields = ['line_classification', 'change_log'];
+
             container.innerHTML = Object.entries(customFields)
-                .filter(([key, value]) => value !== null && value !== '' && value !== undefined)
+                .filter(([key, value]) => !excludedFields.includes(key) && value !== null && value !== '' && value !== undefined)
                 .map(([key, value]) => `
                     <div class="info-item">
                         <span class="info-label">${formatFieldName(key)}</span>
@@ -1367,15 +1449,15 @@
             const timeline = document.getElementById('timeline');
             const events = [];
 
-            // 생성
-            events.push({
-                icon: '➕',
-                title: '이슈 생성',
-                date: currentIssue.created_at
-            });
+            if (currentIssue.created_at) {
+                events.push({
+                    icon: '➕',
+                    title: '이슈 생성',
+                    date: currentIssue.created_at
+                });
+            }
 
-            // 상태 변경 (간단한 버전)
-            if (currentIssue.status === '진행중') {
+            if (currentIssue.status === '진행중' && currentIssue.updated_at) {
                 events.push({
                     icon: '▶️',
                     title: '진행 시작',
@@ -1391,7 +1473,26 @@
                 });
             }
 
-            timeline.innerHTML = events.map(event => `
+            const changeLogEntries = getChangeLog()
+                .filter(entry => entry && entry.action !== 'create' && entry.timestamp);
+
+            changeLogEntries.forEach(entry => {
+                const labels = Array.isArray(entry.changes) && entry.changes.length > 0
+                    ? entry.changes.map(change => change.label || change.field || '').filter(Boolean).join(', ')
+                    : '세부 변경';
+
+                events.push({
+                    icon: '🛠️',
+                    title: `변경: ${labels}`,
+                    date: entry.timestamp
+                });
+            });
+
+            const sortedEvents = events
+                .filter(event => event.date && !Number.isNaN(new Date(event.date).getTime()))
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            timeline.innerHTML = sortedEvents.map(event => `
                 <li class="timeline-item">
                     <div class="timeline-icon">${event.icon}</div>
                     <div class="timeline-content">
@@ -1400,6 +1501,226 @@
                     </div>
                 </li>
             `).join('');
+        }
+
+        function getChangeLog() {
+            if (currentIssue && Array.isArray(currentIssue.change_log)) {
+                return currentIssue.change_log;
+            }
+            if (currentIssue && currentIssue.customFields && Array.isArray(currentIssue.customFields.change_log)) {
+                return currentIssue.customFields.change_log;
+            }
+            return [];
+        }
+
+        function renderChangeLog() {
+            const card = document.getElementById('changeLogCard');
+            const list = document.getElementById('changeLogList');
+
+            if (!card || !list) {
+                return;
+            }
+
+            const log = getChangeLog();
+
+            if (!log || log.length === 0) {
+                card.style.display = 'block';
+                list.innerHTML = '<li class="change-log-item empty-text">변경 이력이 없습니다.</li>';
+                return;
+            }
+
+            card.style.display = 'block';
+
+            const sortedLog = [...log].sort((a, b) => {
+                const dateA = new Date(a.timestamp || a.date || 0).getTime();
+                const dateB = new Date(b.timestamp || b.date || 0).getTime();
+                return dateB - dateA;
+            });
+
+            list.innerHTML = sortedLog.map(renderChangeLogItem).join('');
+        }
+
+        function renderChangeLogItem(entry) {
+            const timestamp = entry.timestamp || entry.date || '';
+            const author = entry.author || '시스템';
+            const summary = entry.summary || '';
+            const changes = Array.isArray(entry.changes) ? entry.changes : [];
+
+            const changeItems = changes.map(change => {
+                const label = escapeHtml(change.label || change.field || '');
+                const before = escapeHtml(formatChangeDisplayValue(change.before));
+                const after = escapeHtml(formatChangeDisplayValue(change.after));
+                return `<li><span class="change-field">${label}</span> <span class="change-diff"><span class="change-before">${before}</span> → <span class="change-after">${after}</span></span></li>`;
+            }).join('');
+
+            const changesHtml = changeItems
+                ? `<ul class="change-log-changes">${changeItems}</ul>`
+                : '<div class="empty-text">세부 변경 정보 없음</div>';
+
+            const summaryHtml = summary
+                ? `<div class="change-summary">${escapeMultiline(summary)}</div>`
+                : '';
+
+            return `
+                <li class="change-log-item">
+                    <div class="change-log-meta">
+                        <span>${PunchListAPI.formatDateTime(timestamp)}</span>
+                      <span>${escapeHtml(author)}</span>
+                    </div>
+                    ${changesHtml}
+                    ${summaryHtml}
+                </li>
+            `;
+        }
+
+        function formatChangeDisplayValue(value) {
+            if (value === null || value === undefined) {
+                return '-';
+            }
+            if (typeof value === 'string') {
+                const trimmed = value.trim();
+                return trimmed === '' ? '-' : trimmed;
+            }
+            if (Array.isArray(value)) {
+                return value.length === 0 ? '-' : value.join(', ');
+            }
+            return String(value);
+        }
+
+        function escapeHtml(text) {
+            if (text === null || text === undefined) {
+                return '';
+            }
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function escapeMultiline(text) {
+            return escapeHtml(text).replace(/\n/g, '<br>');
+        }
+
+        function computeIssueChanges(previousIssue, nextIssue) {
+            if (!previousIssue || !nextIssue) {
+                return [];
+            }
+
+            const trackedFields = [
+                { key: 'title', label: '제목' },
+                { key: 'line_classification', label: '라인 분류' },
+                { key: 'priority', label: '우선순위' },
+                { key: 'status', label: '상태' },
+                { key: 'owner', label: '담당자' },
+                { key: 'collaborators', label: '협의자' },
+                { key: 'approver', label: '승인자' },
+                { key: 'request_date', label: '요청일' },
+                { key: 'target_date', label: '목표일' },
+                { key: 'complete_date', label: '완료일' },
+                { key: 'description', label: '문제 상황' },
+                { key: 'cause', label: '원인 분석' },
+                { key: 'action_plan', label: '조치 계획' },
+                { key: 'action_result', label: '조치 결과' }
+            ];
+
+            const changes = [];
+
+            trackedFields.forEach(({ key, label }) => {
+                const beforeValue = normalizeChangeValue(previousIssue[key]);
+                const afterValue = normalizeChangeValue(nextIssue[key]);
+                if (beforeValue !== afterValue) {
+                    changes.push({
+                        field: key,
+                        label,
+                        before: beforeValue,
+                        after: afterValue
+                    });
+                }
+            });
+
+            return changes;
+        }
+
+        function normalizeChangeValue(value) {
+            if (value === null || value === undefined) {
+                return '';
+            }
+            if (typeof value === 'string') {
+                return value.trim();
+            }
+            if (Array.isArray(value)) {
+                return value.join(', ');
+            }
+            return String(value);
+        }
+
+        function buildUpdatedChangeLog(existingLog, changes) {
+            const base = Array.isArray(existingLog) ? [...existingLog] : [];
+
+            if (!changes || changes.length === 0) {
+                return base;
+            }
+
+            const summaryLines = changes.map(change => {
+                const before = formatChangeDisplayValue(change.before);
+                const after = formatChangeDisplayValue(change.after);
+                return `${change.label}: ${before} → ${after}`;
+            });
+
+            base.push({
+                timestamp: new Date().toISOString(),
+                author: '시스템',
+                action: 'update',
+                summary: summaryLines.join('\n'),
+                changes
+            });
+
+            return base;
+        }
+
+        function applyLineBadge(element, line) {
+            if (!element) return;
+            const colors = {
+                'A라인': '#2563eb',
+                'B라인': '#9333ea',
+                'A/B라인': '#16a34a'
+            };
+
+            element.className = 'badge';
+
+            if (line) {
+                element.textContent = line;
+                element.style.background = colors[line] || '#4b5563';
+                element.style.color = '#ffffff';
+            } else {
+                element.textContent = '라인 미지정';
+                element.style.background = '#e5e7eb';
+                element.style.color = '#4b5563';
+            }
+        }
+
+        function populateLineSelect(selectId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+
+            const previousValue = select.value;
+
+            select.innerHTML = '<option value="">선택하세요</option>';
+            (PunchListAPI.LINE_TYPES || []).forEach(line => {
+                const option = document.createElement('option');
+                option.value = line;
+                option.textContent = line;
+                select.appendChild(option);
+            });
+
+            if (previousValue && !Array.from(select.options).some(option => option.value === previousValue)) {
+                const option = document.createElement('option');
+                option.value = previousValue;
+                option.textContent = previousValue;
+                select.appendChild(option);
+            }
         }
 
         function setSelectValue(selectId, value) {
@@ -1441,9 +1762,11 @@
                 titleInput.value = currentIssue.title || '';
             }
 
+            populateLineSelect('editLineClassification');
             setSelectValue('editPriority', currentIssue.priority || '');
             setSelectValue('editStatus', currentIssue.status || '');
             setSelectValue('editOwner', currentIssue.owner || '');
+            setSelectValue('editLineClassification', currentIssue.line_classification || '');
 
             const collaboratorsInput = document.getElementById('editCollaborators');
             if (collaboratorsInput) {
@@ -1553,6 +1876,7 @@
                 priority: document.getElementById('editPriority').value,
                 status: document.getElementById('editStatus').value,
                 owner: document.getElementById('editOwner').value,
+                line_classification: document.getElementById('editLineClassification').value,
                 collaborators: document.getElementById('editCollaborators').value,
                 approver: document.getElementById('editApprover').value,
                 request_date: document.getElementById('editRequestDate').value,
@@ -1570,6 +1894,18 @@
                     fileName: att.fileName || ''
                 }))
             };
+
+            const updatedCustomFields = { ...(currentIssue.customFields || {}) };
+            updatedCustomFields.line_classification = updatedIssue.line_classification || '';
+            const detectedChanges = computeIssueChanges(currentIssue, updatedIssue);
+            if (detectedChanges.length > 0) {
+                updatedCustomFields.change_log = buildUpdatedChangeLog(updatedCustomFields.change_log, detectedChanges);
+            } else if (Array.isArray(updatedCustomFields.change_log)) {
+                updatedCustomFields.change_log = [...updatedCustomFields.change_log];
+            } else {
+                updatedCustomFields.change_log = [];
+            }
+            updatedIssue.customFields = updatedCustomFields;
 
             try {
                 const result = await PunchListAPI.updateIssue(updatedIssue);
@@ -1599,18 +1935,7 @@
 
         // 삭제
         async function deleteIssue() {
-            if (!confirm('정말로 이 이슈를 삭제하시겠습니까?')) {
-                return;
-            }
-
-            try {
-                await PunchListAPI.deleteIssue(currentIssue.id);
-                alert('✅ 이슈가 삭제되었습니다.');
-                window.location.href = 'list.html';
-            } catch (error) {
-                console.error('삭제 실패:', error);
-                alert('❌ 이슈 삭제에 실패했습니다.');
-            }
+            alert('🚫 현재는 이슈를 삭제할 수 없습니다. 필요한 경우 관리자에게 문의하세요.');
         }
 
         // 에러 표시

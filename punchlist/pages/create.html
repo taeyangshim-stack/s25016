@@ -359,6 +359,16 @@
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label>라인 분류 <span class="required">*</span></label>
+                        <select id="lineClassification" name="line_classification" required>
+                            <option value="">선택하세요</option>
+                        </select>
+                        <div class="helper-text">이슈가 발생한 라인을 선택하세요</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
                         <label>우선순위 <span class="required">*</span></label>
                         <select id="priority" name="priority" required>
                             <option value="">선택하세요</option>
@@ -580,6 +590,17 @@
                 option.textContent = `${cat.icon} ${cat.name}`;
                 categorySelect.appendChild(option);
             });
+
+            const lineSelect = document.getElementById('lineClassification');
+            if (lineSelect) {
+                lineSelect.innerHTML = '<option value="">선택하세요</option>';
+                (PunchListAPI.LINE_TYPES || []).forEach(line => {
+                    const option = document.createElement('option');
+                    option.value = line;
+                    option.textContent = line;
+                    lineSelect.appendChild(option);
+                });
+            }
 
             // 담당자 옵션
             const ownerSelect = document.getElementById('owner');
@@ -952,6 +973,31 @@
                 fileName: att.fileName || ''
             }));
 
+            issueData.customFields = issueData.customFields || {};
+            issueData.line_classification = issueData.line_classification || '';
+            issueData.customFields.line_classification = issueData.line_classification;
+
+            const creationChanges = [
+                { field: 'title', label: '제목', before: '-', after: issueData.title || '' },
+                { field: 'line_classification', label: '라인 분류', before: '-', after: issueData.line_classification || '' },
+                { field: 'status', label: '상태', before: '-', after: issueData.status || '신규' },
+                { field: 'priority', label: '우선순위', before: '-', after: issueData.priority || '' }
+            ].filter(change => change.after);
+
+            const creationLogEntry = {
+                timestamp: new Date().toISOString(),
+                author: issueData.owner || '시스템',
+                action: 'create',
+                summary: '이슈 최초 등록',
+                changes: creationChanges
+            };
+
+            const existingLog = Array.isArray(issueData.customFields.change_log)
+                ? [...issueData.customFields.change_log]
+                : [];
+            existingLog.push(creationLogEntry);
+            issueData.customFields.change_log = existingLog;
+
             // 빈 값 처리
             Object.keys(issueData).forEach(key => {
                 if (!issueData[key] && key !== 'customFields' && key !== 'images') {
@@ -987,6 +1033,10 @@
                 document.getElementById('createIssueForm').reset();
                 setDefaultDates();
                 document.getElementById('subcategory').innerHTML = '<option value="">분류를 먼저 선택하세요</option>';
+                const lineSelect = document.getElementById('lineClassification');
+                if (lineSelect) {
+                    lineSelect.value = '';
+                }
                 clearCustomFields();
                 clearHelpTexts();
                 uploadedImages = [];

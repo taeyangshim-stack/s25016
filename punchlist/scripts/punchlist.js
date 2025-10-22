@@ -8,7 +8,12 @@ const RAW_SCRIPT_URL = (typeof window !== 'undefined' && window.PUNCHLIST_API_UR
   : '/api/punchlist';
 
 // Mock 모드 (테스트 전용)
-const USE_MOCK_DATA = RAW_SCRIPT_URL === 'mock';
+const USE_MOCK_DATA = RAW_SCRIPT_URL === 'mock'
+  || (typeof window !== 'undefined'
+    && window.location
+    && ['localhost', '127.0.0.1'].includes(window.location.hostname)
+    && window.location.port === '8000'
+    && RAW_SCRIPT_URL === '/api/punchlist');
 
 // 실제 요청에 사용할 URL
 const SCRIPT_URL = USE_MOCK_DATA ? '' : RAW_SCRIPT_URL;
@@ -24,6 +29,9 @@ let CATEGORIES = { ...DEFAULT_CATEGORY_MAP };
 
 // 우선순위 옵션
 const PRIORITIES = ['긴급', '높음', '보통', '낮음'];
+
+// 라인 분류 옵션
+const LINE_TYPES = ['A라인', 'B라인', 'A/B라인'];
 
 // 상태 옵션
 const STATUSES = ['신규', '진행중', '보류', '완료', '검증중'];
@@ -48,6 +56,7 @@ function normalizeIssue(issue) {
   }
 
   const cloned = { ...issue };
+  const customFields = cloned.customFields || {};
   const attachments = Array.isArray(cloned.attachments) ? cloned.attachments : [];
 
   const imageEntries = attachments
@@ -69,6 +78,15 @@ function normalizeIssue(issue) {
   } else {
     cloned.images = imageEntries;
   }
+
+  cloned.line_classification = cloned.line_classification || customFields.line_classification || '';
+  const changeLog = Array.isArray(customFields.change_log) ? customFields.change_log : [];
+  cloned.customFields = {
+    ...customFields,
+    line_classification: cloned.line_classification,
+    change_log: changeLog
+  };
+  cloned.change_log = changeLog;
 
   return cloned;
 }
@@ -123,6 +141,18 @@ const MOCK_ISSUES = [
     created_at: '2025-01-15T09:00:00Z',
     updated_at: '2025-01-15T14:30:00Z',
     customFields: {
+      line_classification: 'B라인',
+      change_log: [
+        {
+          timestamp: '2025-01-15T10:30:00Z',
+          author: '시스템',
+          action: 'update',
+          summary: '상태: 신규 → 진행중',
+          changes: [
+            { field: 'status', label: '상태', before: '신규', after: '진행중' }
+          ]
+        }
+      ],
       customer_impact: '심각',
       downtime_hours: 4,
       production_loss: 200,
@@ -166,6 +196,18 @@ const MOCK_ISSUES = [
     created_at: '2025-01-16T08:30:00Z',
     updated_at: '2025-01-16T10:00:00Z',
     customFields: {
+      line_classification: 'A라인',
+      change_log: [
+        {
+          timestamp: '2025-01-16T09:30:00Z',
+          author: '시스템',
+          action: 'update',
+          summary: '우선순위: 긴급 → 높음',
+          changes: [
+            { field: 'priority', label: '우선순위', before: '긴급', after: '높음' }
+          ]
+        }
+      ],
       vendor_name: 'ABB Korea',
       vendor_contact: '김엔지니어 (010-1234-5678)',
       risk_level: '상'
@@ -194,6 +236,8 @@ const MOCK_ISSUES = [
     created_at: '2025-01-17T07:00:00Z',
     updated_at: '2025-01-17T07:00:00Z',
     customFields: {
+      line_classification: 'A라인',
+      change_log: [],
       equipment_serial: 'ABB-IRB6700-2024-001',
       equipment_model: 'ABB IRB 6700-200/2.60',
       manufacturer: 'ABB'
@@ -240,6 +284,19 @@ const MOCK_ISSUES = [
     created_at: '2025-01-10T10:00:00Z',
     updated_at: '2025-01-14T16:00:00Z',
     customFields: {
+      line_classification: 'A라인',
+      change_log: [
+        {
+          timestamp: '2025-01-13T18:00:00Z',
+          author: '시스템',
+          action: 'update',
+          summary: '상태: 진행중 → 완료',
+          changes: [
+            { field: 'status', label: '상태', before: '진행중', after: '완료' },
+            { field: 'complete_date', label: '완료일', before: '', after: '2025-01-14' }
+          ]
+        }
+      ],
       defect_rate: 15,
       inspection_result: '합격',
       production_loss: 15,
@@ -268,7 +325,10 @@ const MOCK_ISSUES = [
     comments: [],
     created_at: '2025-01-18T09:00:00Z',
     updated_at: '2025-01-18T09:00:00Z',
-    customFields: {},
+    customFields: {
+      line_classification: 'B라인',
+      change_log: []
+    },
     templateId: ''
   }
 ];
@@ -648,7 +708,8 @@ async function loadAllIssues() {
     }
   } catch (error) {
     console.error('이슈 로드 실패:', error);
-    throw error;
+    console.warn('⚠️ API 응답이 없어 Mock 데이터로 대체합니다. 로컬 개발 중이면 backend 설정을 확인하세요.');
+    return [...MOCK_ISSUES].map(normalizeIssue);
   }
 }
 
@@ -688,6 +749,11 @@ async function loadIssueById(id) {
     }
   } catch (error) {
     console.error('이슈 로드 실패:', error);
+    const fallback = MOCK_ISSUES.find(issue => issue.id === id);
+    if (fallback) {
+      console.warn('⚠️ API 응답이 없어 Mock 데이터로 대체합니다. 로컬 개발 중이면 backend 설정을 확인하세요.');
+      return normalizeIssue({ ...fallback });
+    }
     throw error;
   }
 }
@@ -946,6 +1012,11 @@ function getPriorityBadge(priority) {
 function filterIssues(issues, filters) {
   let filtered = [...issues];
 
+  // 라인 분류 필터
+  if (filters.line && filters.line !== 'all') {
+    filtered = filtered.filter(issue => (issue.line_classification || '') === filters.line);
+  }
+
   // 분류 필터
   if (filters.category && filters.category !== 'all') {
     filtered = filtered.filter(issue => issue.category === filters.category);
@@ -1011,6 +1082,31 @@ function sortIssues(issues, sortBy, sortOrder = 'asc') {
   });
 
   return sorted;
+}
+
+function isRecentlyUpdated(issue, hours = 72) {
+  if (!issue) return false;
+  const timestamp = issue.updated_at || issue.updatedAt || '';
+  if (!timestamp) return false;
+
+  const updatedAt = new Date(timestamp);
+  if (Number.isNaN(updatedAt.getTime())) {
+    return false;
+  }
+
+  const thresholdMs = hours * 60 * 60 * 1000;
+  return (Date.now() - updatedAt.getTime()) <= thresholdMs;
+}
+
+function getLineBadge(line) {
+  if (!line) return '';
+  const colors = {
+    'A라인': '#0284c7',
+    'B라인': '#9333ea',
+    'A/B라인': '#16a34a'
+  };
+  const background = colors[line] || '#4b5563';
+  return `<span class="badge" style="background: ${background};">${line}</span>`;
 }
 
 // 통계 계산
@@ -1100,12 +1196,14 @@ const PunchListAPIExports = {
   getStatusColor,
   getStatusBadge,
   getPriorityBadge,
+  getLineBadge,
   filterIssues,
   sortIssues,
   calculateStats,
   saveToLocalStorage,
   loadFromLocalStorage,
   isOverdue,
+  isRecentlyUpdated,
   ensureOwnersLoaded,
   reloadOwnerDirectory,
   saveOwnerDirectory,
@@ -1117,7 +1215,8 @@ const PunchListAPIExports = {
   getCategoryConfig: () => getCategoryConfigSnapshot(),
   getCategoryMap: () => getCategoryMapSnapshot(),
   PRIORITIES,
-  STATUSES
+  STATUSES,
+  LINE_TYPES
 };
 
 Object.defineProperty(PunchListAPIExports, 'CATEGORIES', {
