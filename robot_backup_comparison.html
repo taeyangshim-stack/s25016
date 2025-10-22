@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABB 로봇 백업 비교 보고서 - S25016</title>
+    <script>
+        (function () {
+            var TOKEN = 'c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1';
+            var STORAGE_KEY = 's25016-dashboard-auth';
+            var params = new URLSearchParams(window.location.search);
+            var provided = params.get('auth');
+            if (provided === TOKEN) {
+                sessionStorage.setItem(STORAGE_KEY, TOKEN);
+                if (typeof window.history.replaceState === 'function') {
+                    params.delete('auth');
+                    var cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
+                return;
+            }
+            if (sessionStorage.getItem(STORAGE_KEY) === TOKEN) {
+                return;
+            }
+            document.documentElement.innerHTML = '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><title>접근 제한</title><style>body{margin:0;padding:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:\'Segoe UI\',sans-serif;text-align:center;} .box{max-width:420px;padding:32px;background:rgba(15,23,42,0.85);border-radius:16px;box-shadow:0 25px 70px rgba(15,23,42,0.35);} h1{font-size:1.8rem;margin-bottom:12px;} p{line-height:1.6;font-size:1rem;color:#94a3b8;} code{display:inline-block;margin-top:18px;padding:8px 14px;border-radius:999px;background:rgba(96,165,250,0.12);color:#bfdbfe;font-size:0.95rem;}</style></head><body><div class=\"box\"><h1>접근이 제한된 페이지입니다</h1><p>유효한 인증 토큰이 확인되지 않았습니다.<br>지정된 공유 링크로 다시 접속해 주세요.</p><code>문의: 내부 담당자</code></div></body></html>';
+        })();
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .breadcrumb {
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .breadcrumb a {
+            color: #4a90e2;
+            text-decoration: none;
+        }
+        .content {
+            padding: 40px;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #4a90e2;
+        }
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .comparison-table th {
+            background: #4a90e2;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 2px;
+        }
+        .badge-added { background: #d1fae5; color: #065f46; }
+        .badge-deleted { background: #fee2e2; color: #991b1b; }
+        .badge-modified { background: #fef3c7; color: #92400e; }
+        .badge-same { background: #e0e7ff; color: #3730a3; }
+        .badge-diff { background: #ffedd5; color: #9a3412; }
+        .highlight-box {
+            background: #fffbeb;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+            margin: 20px 0;
+        }
+        .highlight-box h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+        .file-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .file-list li {
+            margin: 5px 0;
+            padding: 5px;
+        }
+        .robot-section {
+            margin: 30px 0;
+            padding: 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .robot-section h3 {
+            color: #4a90e2;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #4a90e2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 ABB 로봇 백업 비교 보고서</h1>
+            <p>10/15 → 10/21 변경사항 & 호기별 차이점 분석</p>
+        </div>
+
+        <div class="breadcrumb">
+            <a href="index.html">← 통합 대시보드</a> / <strong>로봇 백업 비교</strong>
+        </div>
+
+        <div class="content">
+            <!-- Summary -->
+            <div class="section">
+                <h2>📋 요약</h2>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">3대</div>
+                        <div class="stat-label">로봇</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">10/21</div>
+                        <div class="stat-label">백업 일자</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">16개</div>
+                        <div class="stat-label">공통 프로그램</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3개</div>
+                        <div class="stat-label">3호기만 보유</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 변경사항 분석 -->
+            <div class="section" style="border-left-color: #f59e0b;">
+                <h2>🔄 10/15 → 10/21 변경사항</h2>
+
+                <div class="highlight-box">
+                    <h4>⚠️ 주요 변경 내용</h4>
+                    <p><strong>공통 변경:</strong> 1/2호기에서 테스트 파일 및 TASK5/TASK6 삭제<br>
+                    <strong>3호기:</strong> 파일 삭제 없음, 수정만 진행</p>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>호기</th>
+                            <th>추가</th>
+                            <th>삭제</th>
+                            <th>수정</th>
+                            <th>주요 변경</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1호기</strong></td>
+                            <td><span class="badge badge-added">+62 파일</span></td>
+                            <td><span class="badge badge-deleted">-17 파일</span></td>
+                            <td><span class="badge badge-modified">6 파일</span></td>
+                            <td>
+                                • 라이선스 정리 (526404, 526405 제거)<br>
+                                • HOME/5fc255e4/ 신규 추가 (40개)<br>
+                                • TASK5/TASK6 전체 삭제
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>2호기</strong></td>
+                            <td><span class="badge badge-added">0 파일</span></td>
+                            <td><span class="badge badge-deleted">-15 파일</span></td>
+                            <td><span class="badge badge-modified">4 파일</span></td>
+                            <td>
+                                • TASK5/TASK6 전체 삭제<br>
+                                • 테스트 파일 정리<br>
+                                • TASK8 Teaching.mod 삭제
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>3호기</strong></td>
+                            <td><span class="badge badge-added">0 파일</span></td>
+                            <td><span class="badge badge-deleted">0 파일</span></td>
+                            <td><span class="badge badge-modified">5 파일</span></td>
+                            <td>
+                                • 파일 구조 유지 ✅<br>
+                                • MainModule 업데이트만 진행<br>
+                                • 가장 안정적 변경
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="robot-section">
+                    <h3>🗑️ 삭제된 RAPID 프로그램 (1/2호기 공통)</h3>
+                    <div class="file-list">
+                        <strong>TASK1/TASK2 테스트 파일:</strong>
+                        <ul>
+                            <li>• M1_TouchTEST.mod</li>
+                            <li>• testtt.mod</li>
+                            <li>• testttttt.mod</li>
+                            <li>• testweldR2.mod (1호기만)</li>
+                        </ul>
+
+                        <strong>TASK5 (Gantry):</strong>
+                        <ul>
+                            <li>• Gantry_CheckPrecision.mod</li>
+                            <li>• Gantry_MainModule.mod</li>
+                            <li>• testtt.mod</li>
+                            <li>• LINKEDM.sys (2호기만)</li>
+                        </ul>
+
+                        <strong>TASK6 (Head - 전체):</strong>
+                        <ul>
+                            <li>• Head_Camera.mod</li>
+                            <li>• Head_Command.mod</li>
+                            <li>• Head_Data.mod</li>
+                            <li>• Head_Function.mod</li>
+                            <li>• Head_MainModule.mod</li>
+                            <li>• Head_MoveControl.mod</li>
+                        </ul>
+
+                        <strong>기타:</strong>
+                        <ul>
+                            <li>• TASK7/Static.mod</li>
+                            <li>• TASK8/Teaching.mod</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4>💡 의미</h4>
+                        <p><strong>TASK5/TASK6 삭제:</strong> Gantry 및 Head 기능이 TASK7/TASK8로 통합되었습니다.<br>
+                        <strong>결과:</strong> TASK6이 비활성화되고, TASK8이 Head 제어를 담당하게 되었습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 호기별 차이점 -->
+            <div class="section" style="border-left-color: #10b981;">
+                <h2>🔍 현재 호기별 차이점 (10/21 기준)</h2>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>구분</th>
+                            <th>1호기</th>
+                            <th>2호기</th>
+                            <th>3호기</th>
+                            <th>차이점</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>라이선스</strong></td>
+                            <td>526402 + 526403</td>
+                            <td>526404 + 526405</td>
+                            <td>526406 + 526407</td>
+                            <td><span class="badge badge-same">동일 구조</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>RAPID 프로그램 수</strong></td>
+                            <td>16개</td>
+                            <td>16개</td>
+                            <td>19개 (+3)</td>
+                            <td><span class="badge badge-diff">3호기만 다름</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK1 테스트 파일</strong></td>
+                            <td>없음</td>
+                            <td>없음</td>
+                            <td>
+                                • test251015.mod<br>
+                                • testtttt.mod
+                            </td>
+                            <td><span class="badge badge-diff">3호기만 보유</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK2 테스트 파일</strong></td>
+                            <td>없음</td>
+                            <td>없음</td>
+                            <td>testttttt.mod</td>
+                            <td><span class="badge badge-diff">3호기만 보유</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK5</strong></td>
+                            <td>삭제됨</td>
+                            <td>삭제됨</td>
+                            <td>삭제됨</td>
+                            <td><span class="badge badge-same">동일</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK6</strong></td>
+                            <td>삭제됨</td>
+                            <td>삭제됨</td>
+                            <td>삭제됨</td>
+                            <td><span class="badge badge-same">동일</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK7 (Gantry)</strong></td>
+                            <td>
+                                • Gantry_CheckPrecision<br>
+                                • Gantry_MainModule
+                            </td>
+                            <td>
+                                • Gantry_CheckPrecision<br>
+                                • Gantry_MainModule
+                            </td>
+                            <td>
+                                • Gantry_CheckPrecision<br>
+                                • Gantry_MainModule<br>
+                                • testtt.mod
+                            </td>
+                            <td><span class="badge badge-diff">3호기 테스트 파일 포함</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK8 (Head)</strong></td>
+                            <td>6개 모듈</td>
+                            <td>6개 모듈</td>
+                            <td>6개 모듈</td>
+                            <td><span class="badge badge-same">동일</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK9 (Static)</strong></td>
+                            <td>Static.mod</td>
+                            <td>Static.mod</td>
+                            <td>Static.mod</td>
+                            <td><span class="badge badge-same">동일</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK10</strong></td>
+                            <td>Teaching.mod</td>
+                            <td>Teaching.mod</td>
+                            <td>Teaching.mod</td>
+                            <td><span class="badge badge-same">동일</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="robot-section">
+                    <h3>📌 3호기만 보유한 파일 (테스트용)</h3>
+                    <div class="file-list">
+                        <ul>
+                            <li><strong>TASK1/PROGMOD/test251015.mod</strong> - 10/15 테스트 프로그램</li>
+                            <li><strong>TASK1/PROGMOD/testtttt.mod</strong> - 테스트 프로그램</li>
+                            <li><strong>TASK2/PROGMOD/testttttt.mod</strong> - 테스트 프로그램</li>
+                            <li><strong>TASK7/PROGMOD/testtt.mod</strong> - Gantry 테스트</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <h4>💡 3호기의 역할</h4>
+                        <p>
+                            <strong>추론:</strong> 3호기는 <strong>테스트 및 검증용 로봇</strong>으로 사용되고 있습니다.<br>
+                            <strong>근거:</strong> 1/2호기에는 없는 테스트 프로그램 4개 보유<br>
+                            <strong>권장:</strong> 정식 운영 전 3호기에서 테스트 완료 후 1/2호기 배포
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 공통 프로그램 -->
+            <div class="section">
+                <h2>✅ 3대 공통 보유 프로그램 (10/21 기준)</h2>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>TASK</th>
+                            <th>프로그램</th>
+                            <th>기능</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="3"><strong>TASK1</strong><br>(ROB1)</td>
+                            <td>Rob1_MainModule.mod</td>
+                            <td>ROB1 메인 프로그램</td>
+                        </tr>
+                        <tr>
+                            <td>Rob1_TeachingData.mod</td>
+                            <td>ROB1 티칭 데이터</td>
+                        </tr>
+                        <tr>
+                            <td>T_ROB1_Function.mod</td>
+                            <td>ROB1 함수</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3"><strong>TASK2</strong><br>(ROB2)</td>
+                            <td>Rob2_MainModule.mod</td>
+                            <td>ROB2 메인 프로그램</td>
+                        </tr>
+                        <tr>
+                            <td>Rob2_TeachingData.mod</td>
+                            <td>ROB2 티칭 데이터</td>
+                        </tr>
+                        <tr>
+                            <td>T_ROB2_Function.mod</td>
+                            <td>ROB2 함수</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2"><strong>TASK7</strong><br>(Gantry)</td>
+                            <td>Gantry_CheckPrecision.mod</td>
+                            <td>갠트리 정밀도 체크</td>
+                        </tr>
+                        <tr>
+                            <td>Gantry_MainModule.mod</td>
+                            <td>갠트리 메인 프로그램</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="6"><strong>TASK8</strong><br>(Head)</td>
+                            <td>Head_Camera.mod</td>
+                            <td>비전 카메라 제어</td>
+                        </tr>
+                        <tr>
+                            <td>Head_Command.mod</td>
+                            <td>헤드 명령 처리</td>
+                        </tr>
+                        <tr>
+                            <td>Head_Data.mod</td>
+                            <td>헤드 데이터</td>
+                        </tr>
+                        <tr>
+                            <td>Head_Function.mod</td>
+                            <td>헤드 함수</td>
+                        </tr>
+                        <tr>
+                            <td>Head_MainModule.mod</td>
+                            <td>헤드 메인 프로그램</td>
+                        </tr>
+                        <tr>
+                            <td>Head_MoveControl.mod</td>
+                            <td>헤드 모션 제어 (1,914줄)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK9</strong></td>
+                            <td>Static.mod</td>
+                            <td>정적 데이터/설정</td>
+                        </tr>
+                        <tr>
+                            <td><strong>TASK10</strong></td>
+                            <td>Teaching.mod</td>
+                            <td>티칭 기능</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 권장사항 -->
+            <div class="section" style="border-left-color: #3b82f6; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);">
+                <h2>💡 권장사항</h2>
+
+                <div class="robot-section" style="background: white;">
+                    <h3>1. 동기화 관리</h3>
+                    <ul style="margin-left: 25px; line-height: 1.8;">
+                        <li><strong>3호기 테스트 파일:</strong> 정식 배포 여부 결정 필요
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>배포 O: 1/2호기에도 동일 파일 복사</li>
+                                <li>배포 X: 3호기에서 파일 삭제</li>
+                            </ul>
+                        </li>
+                        <li><strong>RAPID 프로그램:</strong> 주기적으로 3대 동기화 상태 점검</li>
+                        <li><strong>백업 주기:</strong> 변경 시마다 Git 커밋하여 이력 추적</li>
+                    </ul>
+                </div>
+
+                <div class="robot-section" style="background: white;">
+                    <h3>2. 다음 백업 시 확인사항</h3>
+                    <ul style="margin-left: 25px; line-height: 1.8;">
+                        <li>1/2/3호기 프로그램 개수 일치 여부</li>
+                        <li>테스트 파일 정리 여부 (test*, *test* 파일명)</li>
+                        <li>MainModule 파라미터 일치 여부 (용접 전류, 좌표 등)</li>
+                        <li>TASK 구조 동일 여부</li>
+                    </ul>
+                </div>
+
+                <div class="robot-section" style="background: white;">
+                    <h3>3. Git 활용</h3>
+                    <ul style="margin-left: 25px; line-height: 1.8;">
+                        <li><strong>비교:</strong> <code>git diff [커밋1]..[커밋2]</code>로 변경 확인</li>
+                        <li><strong>복구:</strong> 문제 발생 시 <code>git checkout [커밋]</code>로 롤백</li>
+                        <li><strong>이력:</strong> <code>git log --oneline -- robot)badkup/</code>로 추적</li>
+                    </ul>
+                </div>
+            </div>
+
+            <a href="index.html" class="back-button">← 통합 대시보드로 돌아가기</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('로봇 백업 비교 보고서 로드 완료');
+            console.log('분석 기준일: 2025-10-22');
+        });
+    </script>
+</body>
+</html>
