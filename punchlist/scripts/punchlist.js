@@ -38,6 +38,15 @@ const STATUSES = ['신규', '진행중', '보류', '완료', '검증중'];
 
 const IMAGE_URL_REGEX = /\.(png|jpe?g|gif|webp|svg)$/i;
 
+function generateCommentId() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `C-${crypto.randomUUID()}`;
+  }
+  const randomPart = Math.random().toString(36).slice(2, 10).toUpperCase();
+  const timePart = Date.now().toString(36).toUpperCase();
+  return `C-${timePart}-${randomPart}`;
+}
+
 function isImageAttachment(attachment = {}) {
   if (!attachment) return false;
   if (attachment.type) {
@@ -87,6 +96,39 @@ function normalizeIssue(issue) {
     change_log: changeLog
   };
   cloned.change_log = changeLog;
+  cloned.comments = normalizeComments(cloned.comments);
+
+  return cloned;
+}
+
+function normalizeComments(comments) {
+  if (!Array.isArray(comments)) {
+    return [];
+  }
+  return comments
+    .map((comment, index) => normalizeComment(comment, index))
+    .filter(Boolean);
+}
+
+function normalizeComment(comment, index = 0) {
+  if (!comment || typeof comment !== 'object') {
+    return null;
+  }
+
+  const now = new Date().toISOString();
+  const cloned = { ...comment };
+  const baseId = cloned.id || cloned.comment_id || cloned.uuid;
+  const fallbackSource = cloned.created_at || cloned.timestamp || cloned.updated_at || now;
+  const fallbackId = typeof fallbackSource === 'string'
+    ? fallbackSource.replace(/[^0-9A-Za-z]/g, '')
+    : `${Date.now()}`;
+  cloned.id = baseId || `C-${fallbackId || (index + 1)}-${index + 1}`;
+  cloned.author = (cloned.author || '').toString();
+  cloned.text = (cloned.text || '').toString();
+  const created = cloned.created_at || cloned.timestamp || now;
+  cloned.created_at = created;
+  cloned.updated_at = cloned.updated_at || created;
+  cloned.is_deleted = Boolean(cloned.is_deleted);
 
   return cloned;
 }
@@ -127,7 +169,24 @@ const MOCK_ISSUES = [
     target_date: '2025-01-20',
     complete_date: '',
     attachments: [],
-    comments: [],
+    comments: [
+      {
+        id: 'C-PL-2025-001-01',
+        author: '심태양',
+        text: 'DeviceNet 허브는 금일 교체 예정입니다.',
+        created_at: '2025-01-15T10:45:00Z',
+        updated_at: '2025-01-15T10:45:00Z',
+        is_deleted: false
+      },
+      {
+        id: 'C-PL-2025-001-02',
+        author: '김철수',
+        text: '예비 허브 재고 확인 완료했습니다.',
+        created_at: '2025-01-15T11:10:00Z',
+        updated_at: '2025-01-15T11:10:00Z',
+        is_deleted: false
+      }
+    ],
     images: [
       {
         url: 'https://placehold.co/600x400/dc2626/white?text=DeviceNet+Error',
@@ -178,7 +237,16 @@ const MOCK_ISSUES = [
     target_date: '2025-01-18',
     complete_date: '',
     attachments: [],
-    comments: [],
+    comments: [
+      {
+        id: 'C-PL-2025-002-01',
+        author: '심태양',
+        text: 'ABB 쪽에 현장 지원 요청 전달했습니다.',
+        created_at: '2025-01-16T09:05:00Z',
+        updated_at: '2025-01-16T09:05:00Z',
+        is_deleted: false
+      }
+    ],
     images: [
       {
         url: 'https://placehold.co/600x400/f59e0b/white?text=Robot+Interference',
@@ -232,7 +300,16 @@ const MOCK_ISSUES = [
     target_date: '2025-01-19',
     complete_date: '',
     attachments: [],
-    comments: [],
+    comments: [
+      {
+        id: 'C-PL-2025-003-01',
+        author: '박영희',
+        text: '점검 체크리스트 공유 부탁드립니다.',
+        created_at: '2025-01-17T08:00:00Z',
+        updated_at: '2025-01-17T08:00:00Z',
+        is_deleted: false
+      }
+    ],
     created_at: '2025-01-17T07:00:00Z',
     updated_at: '2025-01-17T07:00:00Z',
     customFields: {
@@ -262,7 +339,16 @@ const MOCK_ISSUES = [
     target_date: '2025-01-13',
     complete_date: '2025-01-14',
     attachments: [],
-    comments: [],
+    comments: [
+      {
+        id: 'C-PL-2025-004-01',
+        author: '김철수',
+        text: '재작업 후 품질검사 완료. 결과 공유드립니다.',
+        created_at: '2025-01-14T16:10:00Z',
+        updated_at: '2025-01-14T16:10:00Z',
+        is_deleted: false
+      }
+    ],
     images: [
       {
         url: 'https://placehold.co/600x400/dc2626/white?text=Weld+Defect',
@@ -911,7 +997,33 @@ async function deleteIssue(id) {
 }
 
 // 댓글 추가
-async function addComment(issueId, author, text) {
+async function addComment(issueId, authorOrPayload, maybeText) {
+  const payload = typeof authorOrPayload === 'object'
+    ? { ...authorOrPayload }
+    : { author: authorOrPayload, text: maybeText };
+
+  if (!payload || !payload.author || !payload.text) {
+    throw new Error('작성자와 내용을 입력해 주세요.');
+  }
+
+  if (USE_MOCK_DATA) {
+    const issue = MOCK_ISSUES.find(i => i.id === issueId);
+    if (!issue) {
+      throw new Error('해당 이슈를 찾을 수 없습니다.');
+    }
+    const now = new Date().toISOString();
+    const newComment = normalizeComment({
+      id: generateCommentId(),
+      author: payload.author,
+      text: payload.text,
+      created_at: now,
+      updated_at: now,
+      is_deleted: false
+    });
+    issue.comments = normalizeComments([...issue.comments, newComment]);
+    return { success: true, comment: newComment };
+  }
+
   try {
     const response = await fetch(SCRIPT_URL, {
       method: 'POST',
@@ -922,8 +1034,8 @@ async function addComment(issueId, author, text) {
         action: 'addComment',
         id: issueId,
         comment: {
-          author: author,
-          text: text
+          author: payload.author,
+          text: payload.text
         }
       })
     });
@@ -938,9 +1050,115 @@ async function addComment(issueId, author, text) {
       throw new Error(result.error || '댓글 추가에 실패했습니다.');
     }
 
-    return result;
+    const comment = normalizeComment(result.comment);
+    return { success: true, comment };
   } catch (error) {
     console.error('댓글 추가 실패:', error);
+    throw error;
+  }
+}
+
+async function updateComment(issueId, commentId, text) {
+  if (!text) {
+    throw new Error('내용을 입력해 주세요.');
+  }
+
+  if (USE_MOCK_DATA) {
+    const issue = MOCK_ISSUES.find(i => i.id === issueId);
+    if (!issue) {
+      throw new Error('해당 이슈를 찾을 수 없습니다.');
+    }
+    const idx = issue.comments.findIndex(comment => comment.id === commentId);
+    if (idx === -1) {
+      throw new Error('댓글을 찾을 수 없습니다.');
+    }
+    const updated = {
+      ...issue.comments[idx],
+      text,
+      updated_at: new Date().toISOString()
+    };
+    issue.comments.splice(idx, 1, normalizeComment(updated));
+    return { success: true, comment: issue.comments[idx] };
+  }
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'updateComment',
+        id: issueId,
+        comment: {
+          id: commentId,
+          text
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || '댓글 수정에 실패했습니다.');
+    }
+
+    const comment = normalizeComment(result.comment);
+    return { success: true, comment };
+  } catch (error) {
+    console.error('댓글 수정 실패:', error);
+    throw error;
+  }
+}
+
+async function deleteComment(issueId, commentId) {
+  if (USE_MOCK_DATA) {
+    const issue = MOCK_ISSUES.find(i => i.id === issueId);
+    if (!issue) {
+      throw new Error('해당 이슈를 찾을 수 없습니다.');
+    }
+    const idx = issue.comments.findIndex(comment => comment.id === commentId);
+    if (idx === -1) {
+      throw new Error('댓글을 찾을 수 없습니다.');
+    }
+    const updated = {
+      ...issue.comments[idx],
+      is_deleted: true,
+      updated_at: new Date().toISOString()
+    };
+    issue.comments.splice(idx, 1, normalizeComment(updated));
+    return { success: true, comment: issue.comments[idx] };
+  }
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'deleteComment',
+        id: issueId,
+        commentId
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || '댓글 삭제에 실패했습니다.');
+    }
+
+    const comment = normalizeComment(result.comment);
+    return { success: true, comment };
+  } catch (error) {
+    console.error('댓글 삭제 실패:', error);
     throw error;
   }
 }
@@ -1190,6 +1408,8 @@ const PunchListAPIExports = {
   updateIssue,
   deleteIssue,
   addComment,
+  updateComment,
+  deleteComment,
   formatDate,
   formatDateTime,
   getPriorityColor,

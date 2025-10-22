@@ -181,6 +181,10 @@ function generateCategoryId(name) {
   return 'category-' + Utilities.getUuid().split('-')[0];
 }
 
+function generateCommentId() {
+  return 'C-' + Utilities.getUuid();
+}
+
 // 메인 함수 - HTTP 요청 처리
 function doPost(e) {
   try {
@@ -206,6 +210,12 @@ function doPost(e) {
         break;
       case 'addComment':
         result = addComment(params.id, params.comment);
+        break;
+      case 'updateComment':
+        result = updateComment(params.id, params.comment);
+        break;
+      case 'deleteComment':
+        result = deleteComment(params.id, params.commentId);
         break;
       case 'saveOwners':
         result = saveOwnersData(params.owners || []);
@@ -631,7 +641,7 @@ function createIssue(data) {
     data.target_date,
     data.complete_date || '',
     JSON.stringify(data.attachments || []),
-    JSON.stringify(data.comments || []),
+    JSON.stringify(normalizeCommentsData(data.comments || [])),
     timestamp,
     timestamp,
     // 확장성 필드
@@ -673,7 +683,7 @@ function updateIssue(data) {
       sheet.getRange(i + 1, 15).setValue(data.target_date);
       sheet.getRange(i + 1, 16).setValue(data.complete_date);
       sheet.getRange(i + 1, 17).setValue(JSON.stringify(data.attachments || []));
-      sheet.getRange(i + 1, 18).setValue(JSON.stringify(data.comments || []));
+      sheet.getRange(i + 1, 18).setValue(JSON.stringify(normalizeCommentsData(data.comments || [])));
       sheet.getRange(i + 1, 20).setValue(timestamp);
       // 확장성 필드 업데이트
       sheet.getRange(i + 1, 21).setValue(JSON.stringify(data.customFields || {}));
@@ -735,7 +745,7 @@ function getAllIssues() {
       target_date: row[14],
       complete_date: row[15],
       attachments: safeJSONParse(row[16], []),
-      comments: safeJSONParse(row[17], []),
+      comments: normalizeCommentsData(safeJSONParse(row[17], [])),
       created_at: row[18],
       updated_at: row[19],
       // 확장성 필드
@@ -769,18 +779,18 @@ function getIssueById(id) {
         action_plan: row[8],
         action_result: row[9],
         owner: row[10],
-        collaborators: row[11],
-        approver: row[12],
-        request_date: row[13],
-        target_date: row[14],
-        complete_date: row[15],
-        attachments: safeJSONParse(row[16], []),
-        comments: safeJSONParse(row[17], []),
-        created_at: row[18],
-        updated_at: row[19],
-        // 확장성 필드
-        customFields: safeJSONParse(row[20], {}),
-        templateId: row[21] || ''
+      collaborators: row[11],
+      approver: row[12],
+      request_date: row[13],
+      target_date: row[14],
+      complete_date: row[15],
+      attachments: safeJSONParse(row[16], []),
+      comments: normalizeCommentsData(safeJSONParse(row[17], [])),
+      created_at: row[18],
+      updated_at: row[19],
+      // 확장성 필드
+      customFields: safeJSONParse(row[20], {}),
+      templateId: row[21] || ''
       };
 
       return { success: true, data: issue };
@@ -795,20 +805,104 @@ function addComment(issueId, comment) {
   const ss = SpreadsheetApp.openById(SHEET_ID);
   const sheet = ss.getSheetByName(SHEET_NAME);
   const values = sheet.getDataRange().getValues();
+  const author = comment && comment.author ? String(comment.author).trim() : '';
+  const text = comment && comment.text ? String(comment.text).trim() : '';
+
+  if (!author || !text) {
+    return { success: false, error: '작성자와 내용을 입력해주세요.' };
+  }
 
   for (let i = 1; i < values.length; i++) {
     if (values[i][0] === issueId) {
-      const comments = safeJSONParse(values[i][17], []);
-      comments.push({
-        author: comment.author,
-        text: comment.text,
-        timestamp: new Date().toISOString()
-      });
+      let comments = normalizeCommentsData(safeJSONParse(values[i][17], []));
+      const now = generateTimestamp();
+      const newComment = {
+        id: generateCommentId(),
+        author,
+        text,
+        created_at: now,
+        updated_at: now,
+        is_deleted: false
+      };
+      comments.push(newComment);
 
       sheet.getRange(i + 1, 18).setValue(JSON.stringify(comments));
-      sheet.getRange(i + 1, 20).setValue(new Date().toISOString());
+      sheet.getRange(i + 1, 20).setValue(now);
 
-      return { success: true };
+      return { success: true, comment: newComment };
+    }
+  }
+
+  return { success: false, error: 'Issue not found' };
+}
+
+function updateComment(issueId, comment) {
+  if (!comment || !comment.id) {
+    return { success: false, error: '댓글 ID가 필요합니다.' };
+  }
+
+  const text = comment.text ? String(comment.text).trim() : '';
+  if (!text) {
+    return { success: false, error: '내용을 입력해주세요.' };
+  }
+
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  const values = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < values.length; i++) {
+    if (values[i][0] === issueId) {
+      const comments = normalizeCommentsData(safeJSONParse(values[i][17], []));
+      const index = comments.findIndex(item => item.id === comment.id);
+      if (index === -1) {
+        return { success: false, error: '댓글을 찾을 수 없습니다.' };
+      }
+
+      const now = generateTimestamp();
+      comments[index] = {
+        ...comments[index],
+        text,
+        updated_at: now
+      };
+
+      sheet.getRange(i + 1, 18).setValue(JSON.stringify(comments));
+      sheet.getRange(i + 1, 20).setValue(now);
+
+      return { success: true, comment: comments[index] };
+    }
+  }
+
+  return { success: false, error: 'Issue not found' };
+}
+
+function deleteComment(issueId, commentId) {
+  if (!commentId) {
+    return { success: false, error: '댓글 ID가 필요합니다.' };
+  }
+
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  const values = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < values.length; i++) {
+    if (values[i][0] === issueId) {
+      const comments = normalizeCommentsData(safeJSONParse(values[i][17], []));
+      const index = comments.findIndex(item => item.id === commentId);
+      if (index === -1) {
+        return { success: false, error: '댓글을 찾을 수 없습니다.' };
+      }
+
+      const now = generateTimestamp();
+      comments[index] = {
+        ...comments[index],
+        is_deleted: true,
+        updated_at: now
+      };
+
+      sheet.getRange(i + 1, 18).setValue(JSON.stringify(comments));
+      sheet.getRange(i + 1, 20).setValue(now);
+
+      return { success: true, comment: comments[index] };
     }
   }
 
@@ -826,6 +920,41 @@ function safeJSONParse(str, defaultValue) {
     Logger.log('JSON parse error: ' + e.toString());
     return defaultValue;
   }
+}
+
+function normalizeCommentsData(comments) {
+  if (!Array.isArray(comments)) {
+    return [];
+  }
+
+  const now = generateTimestamp();
+
+  return comments
+    .map((comment, index) => {
+      if (!comment || typeof comment !== 'object') {
+        return null;
+      }
+
+      const baseId = comment.id || comment.comment_id || comment.uuid;
+      const fallbackSource = comment.created_at || comment.timestamp || comment.updated_at || now;
+      const fallbackId = typeof fallbackSource === 'string'
+        ? fallbackSource.replace(/[^0-9A-Za-z]/g, '')
+        : `${index + 1}`;
+
+      const id = baseId || `C-${fallbackId}-${index + 1}`;
+      const createdAt = comment.created_at || comment.timestamp || now;
+      const updatedAt = comment.updated_at || createdAt;
+
+      return {
+        id: id,
+        author: comment.author ? String(comment.author) : '',
+        text: comment.text ? String(comment.text) : '',
+        created_at: createdAt,
+        updated_at: updatedAt,
+        is_deleted: comment.is_deleted === true
+      };
+    })
+    .filter(Boolean);
 }
 
 // 이메일 알림 발송
