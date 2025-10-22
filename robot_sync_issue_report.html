@@ -161,21 +161,26 @@
         </div>
 
         <div class="alert-banner">
-            <h2>⚠️ 긴급 조치 필요</h2>
-            <p style="font-size: 1.1em; line-height: 1.8; color: #7f1d1d;">
-                <strong>3대의 ABB 로봇이 동일한 작업을 수행해야 하지만, 백업 파일 분석 결과
-                라이선스 및 용접 파라미터가 서로 다릅니다.</strong><br>
-                이는 생산 불량, 품질 편차, 장비 오작동의 원인이 될 수 있습니다.
+            <h2>✅ 이슈 해결 완료 (2025-10-21 백업)</h2>
+            <p style="font-size: 1.1em; line-height: 1.8; color: #065f46; background: #d1fae5; padding: 15px; border-radius: 8px;">
+                <strong>10/21 백업에서 1호기 라이선스 문제가 해결되었습니다!</strong><br>
+                2호기 라이선스(526404, 526405)가 정상적으로 제거되었으며,<br>
+                현재 3대 모두 정상 라이선스 구조를 유지하고 있습니다. ✅
+            </p>
+            <p style="font-size: 1em; line-height: 1.8; color: #7f1d1d; margin-top: 15px;">
+                <strong>⚠️ 주의:</strong> 10/15 백업에서 발견된 이슈는 아래 내용을 참고하세요.
             </p>
         </div>
 
         <div class="content">
             <!-- Issue 1: License -->
-            <div class="issue-card">
-                <h3>🔐 이슈 #1: 라이선스 파일 불일치 <span class="status-badge status-critical">심각</span></h3>
+            <div class="issue-card" style="background: #f0fdf4; border-color: #86efac;">
+                <h3>🔐 이슈 #1: 라이선스 파일 불일치 <span class="status-badge" style="background: #d1fae5; color: #065f46;">해결완료</span></h3>
                 <p style="margin-bottom: 20px;">
-                    <strong>예상:</strong> 각 로봇이 자기 시리얼 번호의 라이선스만 보유<br>
-                    <strong>실제:</strong> 다른 로봇의 라이선스가 혼재되어 있음
+                    <strong>ABB 로봇 구조:</strong> 1대의 컨트롤러(시리얼)에 2개의 로봇 라이선스 필요<br>
+                    <strong>정상:</strong> 526402 + 526403, 526404 + 526405, 526406 + 526407<br>
+                    <strong>10/15 문제:</strong> 1호기에 2호기 라이선스 포함 (백업 실수)<br>
+                    <strong style="color: #065f46;">✅ 10/21 해결:</strong> 잘못된 라이선스 제거됨
                 </p>
 
                 <table class="comparison-table">
@@ -183,37 +188,37 @@
                         <tr>
                             <th>호기</th>
                             <th>시리얼 번호</th>
-                            <th>보유 라이선스</th>
-                            <th>상태</th>
+                            <th>필요 라이선스</th>
+                            <th>10/15 백업 (문제)</th>
+                            <th>10/21 백업 (해결)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr style="background: #f0fdf4;">
                             <td><strong>1호기</strong></td>
                             <td>1200-526402</td>
-                            <td>
-                                526402, 526402_RobotWare, 526403<br>
-                                <span class="diff-highlight">526404, 526404_RobotWare, 526405</span>
+                            <td>526402 + 526403</td>
+                            <td style="background: #fee2e2;">
+                                526402, 526403 ✅<br>
+                                <span class="diff-highlight">+ 526404, 526405 ❌</span>
                             </td>
-                            <td><span class="status-badge status-critical">이상</span></td>
+                            <td style="background: #d1fae5;">
+                                <strong style="color: #065f46;">526402, 526403만 보유 ✅</strong>
+                            </td>
                         </tr>
-                        <tr>
+                        <tr style="background: #f0fdf4;">
                             <td><strong>2호기</strong></td>
                             <td>1200-526404</td>
-                            <td>
-                                526404, 526404_RobotWare<br>
-                                <span class="diff-highlight">526405</span>
-                            </td>
-                            <td><span class="status-badge status-warning">확인 필요</span></td>
+                            <td>526404 + 526405</td>
+                            <td>526404, 526405 ✅</td>
+                            <td>526404, 526405 ✅</td>
                         </tr>
-                        <tr>
+                        <tr style="background: #f0fdf4;">
                             <td><strong>3호기</strong></td>
                             <td>1200-526406</td>
-                            <td>
-                                526406, 526406_RobotWare<br>
-                                <span class="diff-highlight">526407</span>
-                            </td>
-                            <td><span class="status-badge status-warning">확인 필요</span></td>
+                            <td>526406 + 526407</td>
+                            <td>526406, 526407 ✅</td>
+                            <td>526406, 526407 ✅</td>
                         </tr>
                     </tbody>
                 </table>
@@ -228,11 +233,12 @@ robot)badkup/1200-526406_BACKUP_2025-10-15_No_3/BACKINFO/license/
                 </div>
 
                 <div style="background: #fffbeb; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #f59e0b;">
-                    <h4 style="color: #92400e; margin-bottom: 10px;">❓ 의문사항</h4>
+                    <h4 style="color: #92400e; margin-bottom: 10px;">💡 원인 분석</h4>
                     <ul style="margin-left: 20px; line-height: 1.8; color: #78350f;">
-                        <li><strong>526403, 526405, 526407은 무엇인가?</strong> (존재하지 않는 로봇?)</li>
-                        <li>1호기에 왜 2호기 라이선스(526404)가 있는가?</li>
-                        <li>각 호기에 +1 시리얼 라이선스가 있는 이유는?</li>
+                        <li><strong>ABB 멀티로봇 시스템:</strong> 1개 컨트롤러에 2개 로봇 암 연결 구조</li>
+                        <li><strong>정상 라이선스:</strong> 526402+526403 (1호기), 526404+526405 (2호기), 526406+526407 (3호기)</li>
+                        <li><strong>1호기 이상:</strong> 백업 시 2호기 라이선스 폴더가 함께 복사된 것으로 추정</li>
+                        <li><strong>2/3호기:</strong> 라이선스 구조 정상 ✅</li>
                     </ul>
                 </div>
             </div>
