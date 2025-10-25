@@ -77,6 +77,30 @@ function doPost(e) {
         message: success ? '기록이 삭제되었습니다.' : '기록을 찾을 수 없습니다.'
       });
 
+    } else if (action === 'bulkCreate') {
+        const results = bulkCreateRecords(data);
+        const successCount = results.filter(r => r.status === 'success').length;
+        return createJsonResponse({
+            status: 'success',
+            message: `${successCount}개의 기록이 성공적으로 추가되었습니다.`
+        });
+
+    } else if (action === 'bulkUpdate') {
+        const results = bulkUpdateRecords(data);
+        const successCount = results.filter(r => r.status === 'success').length;
+        return createJsonResponse({
+            status: 'success',
+            message: `${successCount}개의 기록이 성공적으로 수정되었습니다.`
+        });
+
+    } else if (action === 'bulkDelete') {
+        const results = bulkDeleteRecords(data);
+        const successCount = results.filter(r => r.status === 'success').length;
+        return createJsonResponse({
+            status: 'success',
+            message: `${successCount}개의 기록이 성공적으로 삭제되었습니다.`
+        });
+
     } else {
       // 기존 저장 로직 (새 기록 추가)
       const sheet = getOrCreateSheet();
@@ -349,6 +373,86 @@ function createEmailBody(data) {
 
   return html;
 }
+
+// ========================================
+// 일괄 처리 함수
+// ========================================
+
+/**
+ * 여러 기록 일괄 생성
+ */
+function bulkCreateRecords(records) {
+  const sheet = getOrCreateSheet();
+  const results = [];
+
+  records.forEach(data => {
+    try {
+      saveRecord(sheet, data);
+      results.push({ status: 'success', data: data });
+    } catch (error) {
+      Logger.log('Bulk create error for record: ' + JSON.stringify(data) + ' | Error: ' + error.toString());
+      results.push({ status: 'error', data: data, error: error.toString() });
+    }
+  });
+
+  return results;
+}
+
+/**
+ * 여러 기록 일괄 수정
+ */
+function bulkUpdateRecords(records) {
+  const sheet = getOrCreateSheet();
+  const results = [];
+
+  records.forEach(updatedData => {
+    try {
+      const rowNumber = parseInt(updatedData.rowNumber, 10);
+      if (!isNaN(rowNumber) && rowNumber > 1 && rowNumber <= sheet.getLastRow()) {
+        const success = applyUpdateToRow(sheet, rowNumber, updatedData);
+        results.push({ status: success ? 'success' : 'error', data: updatedData });
+      } else {
+        results.push({ status: 'error', data: updatedData, message: '유효하지 않은 행 번호입니다.' });
+      }
+    } catch (error) {
+      Logger.log('Bulk update error for record: ' + JSON.stringify(updatedData) + ' | Error: ' + error.toString());
+      results.push({ status: 'error', data: updatedData, error: error.toString() });
+    }
+  });
+
+  return results;
+}
+
+/**
+ * 여러 기록 일괄 삭제
+ */
+function bulkDeleteRecords(records) {
+  const sheet = getOrCreateSheet();
+  const results = [];
+  
+  // 행 번호를 내림차순으로 정렬하여 삭제 시 인덱스가 꼬이는 것을 방지
+  const sortedRecords = records.sort((a, b) => parseInt(b.rowNumber, 10) - parseInt(a.rowNumber, 10));
+
+  sortedRecords.forEach(deleteData => {
+    try {
+      const rowNumber = parseInt(deleteData.rowNumber, 10);
+      // 행 번호 유효성 검사를 getLastRow() 호출 전에 수행
+      if (!isNaN(rowNumber) && rowNumber > 1) {
+        sheet.deleteRow(rowNumber);
+        results.push({ status: 'success', data: deleteData });
+        Logger.log('Record deleted by row number: ' + rowNumber);
+      } else {
+         results.push({ status: 'error', data: deleteData, message: '유효하지 않은 행 번호입니다.' });
+      }
+    } catch (error) {
+      Logger.log('Bulk delete error for record: ' + JSON.stringify(deleteData) + ' | Error: ' + error.toString());
+      results.push({ status: 'error', data: deleteData, error: error.toString() });
+    }
+  });
+
+  return results;
+}
+
 
 // ========================================
 // 유틸리티 함수

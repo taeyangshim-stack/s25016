@@ -371,6 +371,7 @@
             <button class="nav-tab" onclick="showTab('devicenet')">🔌 DeviceNet</button>
             <button class="nav-tab" onclick="showTab('robot')">🤖 로봇 상하축</button>
             <button class="nav-tab" onclick="showTab('robot-ui-test')">🧪 ROBOT↔UI 테스트</button>
+            <button class="nav-tab" onclick="showTab('eventlog')">📊 이벤트 로그</button>
             <button class="nav-tab" onclick="showTab('hexagon')">📐 Hexagon</button>
             <button class="nav-tab" onclick="showTab('work-manage')">🏭 근무관리</button>
             <button class="nav-tab" onclick="showTab('documents')">📚 문서 자료</button>
@@ -1033,6 +1034,86 @@
                             <strong>📊 백업 파일:</strong> 자동 생성 (타임스탬프 포함)
                         </p>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 이벤트 로그 탭 -->
+        <div id="eventlog" class="tab-content">
+            <div class="highlight-box" style="background: linear-gradient(135deg, #e6f3ff 0%, #cce6ff 100%); border-left-color: #4a90e2;">
+                <h2 style="color: #4a90e2; margin-bottom: 15px;">📊 B_Line EventMessage 로그 분석</h2>
+                <p><strong>로봇 시스템 이벤트 로그 통합 분석</strong></p>
+                <p>1호기, 2호기, 3호기의 EventMessage 로그를 자동 분석하여 에러 패턴, 활동 통계, 데이터 품질을 시각화합니다.</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>📈 로그 분석 대시보드</h3>
+                    <p>실시간 로그 통계 및 시각화</p>
+                    <p style="margin-top: 15px;">
+                        <a href="B_Line_EventMessage_Report.html" class="file-link" style="display: inline-block; margin: 5px 0;">
+                            🔗 분석 리포트 열기
+                        </a>
+                    </p>
+                    <div class="info-box" style="margin-top: 20px;">
+                        <h4>주요 기능</h4>
+                        <ul style="padding-left: 20px; margin-top: 10px;">
+                            <li>호기별 로그 통계 (에러/정보)</li>
+                            <li>날짜별 활동 타임라인</li>
+                            <li>데이터 품질 분석</li>
+                            <li>빈 파일 비율 통계</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔍 로그 분석 스크립트</h3>
+                    <p>Python 자동 분석 도구</p>
+                    <div class="info-box" style="margin-top: 15px;">
+                        <h4>실행 방법</h4>
+                        <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; margin-top: 10px;">cd B_Line_EventMessage
+python3 log_analyzer.py</pre>
+                        <p style="margin-top: 15px; font-size: 0.9em; color: #555;">
+                            분석 결과는 <code style="background: #ecf0f1; padding: 2px 8px; border-radius: 3px;">analysis/log_analysis_latest.json</code>에 저장됩니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📂 로그 폴더 구조</h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 15px; font-family: monospace; font-size: 0.9em;">
+                        <div>📁 B_Line_EventMessage/</div>
+                        <div style="padding-left: 20px;">├── 1호기 EventMessage/</div>
+                        <div style="padding-left: 20px;">├── 2호기 EventMessage/</div>
+                        <div style="padding-left: 20px;">├── 3호기 EventMessage/</div>
+                        <div style="padding-left: 20px;">├── analysis/ <span style="color: #27ae60;">← JSON 통계</span></div>
+                        <div style="padding-left: 20px;">└── log_analyzer.py <span style="color: #27ae60;">← 분석 스크립트</span></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 최근 통계 (요약)</h3>
+                    <div class="stats-grid" style="margin-top: 15px;">
+                        <div class="stat-card">
+                            <div class="stat-number">744</div>
+                            <div class="stat-label">총 로그 파일</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">443</div>
+                            <div class="stat-label">데이터 파일</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">301</div>
+                            <div class="stat-label">빈 파일</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">117.6</div>
+                            <div class="stat-label">MB</div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 15px; font-size: 0.85em; color: #7f8c8d; text-align: center;">
+                        최종 업데이트: 2025-10-23 (18일간 로그)
+                    </p>
                 </div>
             </div>
         </div>
