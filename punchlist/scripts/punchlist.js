@@ -1341,13 +1341,9 @@ function isRecentlyUpdated(issue, hours = 72) {
 
 function getLineBadge(line) {
   if (!line) return '';
-  const colors = {
-    'A라인': '#0284c7',
-    'B라인': '#9333ea',
-    'A/B라인': '#16a34a'
-  };
-  const background = colors[line] || '#4b5563';
-  return `<span class="badge" style="background: ${background};">${line}</span>`;
+  // 가독성 개선: 라인별 색상 뱃지 클래스 사용
+  const lineClass = line.replace(/\//g, '_'); // "A/B라인" -> "A_B라인"
+  return `<span class="line-badge badge-${lineClass}">${line}</span>`;
 }
 
 // 통계 계산

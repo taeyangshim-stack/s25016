@@ -251,6 +251,76 @@
             color: #3730a3;
         }
 
+        /* ===== 가독성 개선: 우선순위별 행 배경색 ===== */
+        tbody tr.priority-긴급 {
+            background: #fef2f2 !important;
+            border-left: 4px solid #dc2626;
+        }
+
+        tbody tr.priority-긴급:hover {
+            background: #fee2e2 !important;
+        }
+
+        tbody tr.priority-높음 {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+        }
+
+        tbody tr.priority-높음:hover {
+            background: #fef3c7;
+        }
+
+        tbody tr.priority-보통 {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+        }
+
+        tbody tr.priority-보통:hover {
+            background: #dbeafe;
+        }
+
+        tbody tr.priority-낮음 {
+            background: #f9fafb;
+            border-left: 4px solid #9ca3af;
+        }
+
+        tbody tr.priority-낮음:hover {
+            background: #f3f4f6;
+        }
+
+        /* 라인별 색상 뱃지 */
+        .line-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 11px;
+            display: inline-block;
+        }
+
+        .line-badge.badge-A라인 {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .line-badge.badge-B라인 {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        .line-badge.badge-공통 {
+            background: #e5e7eb;
+            color: #374151;
+            border: 1px solid #9ca3af;
+        }
+
+        .line-badge.badge-A_B라인 {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #16a34a;
+        }
+
         .empty-state {
             text-align: center;
             padding: var(--space-12) var(--space-4);
@@ -651,7 +721,13 @@
                 const isOverdue = PunchListAPI.isOverdue(issue);
                 const targetDateClass = isOverdue ? 'overdue' : '';
                 const isRecent = PunchListAPI.isRecentlyUpdated(issue);
-                const rowClassAttr = isRecent ? ' class="recent-update"' : '';
+
+                // 가독성 개선: 우선순위 클래스 추가
+                const priorityClass = `priority-${issue.priority}`;
+                const rowClasses = [priorityClass];
+                if (isRecent) rowClasses.push('recent-update');
+                const rowClassAttr = ` class="${rowClasses.join(' ')}"`;
+
                 const lineCell = issue.line_classification
                     ? PunchListAPI.getLineBadge(issue.line_classification)
                     : '<span class="badge" style="background: #e5e7eb; color: #4b5563;">미지정</span>';

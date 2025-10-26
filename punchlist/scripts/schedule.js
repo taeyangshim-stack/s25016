@@ -339,8 +339,9 @@
       const durationDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / DAY_MS) || 1);
 
       const bar = document.createElement('div');
-      bar.className = 'gantt-bar';
-      bar.style.background = PunchListAPI.getStatusColor(issue.status);
+      // 가독성 개선: 우선순위별 클래스 추가
+      bar.className = `gantt-bar priority-${issue.priority || '보통'}`;
+
       const leftPercent = Math.min(100, Math.max(0, (offsetDays / totalDays) * 100));
       let widthPercent = (durationDays / totalDays) * 100;
       widthPercent = Math.max(2, Math.min(100 - leftPercent, widthPercent));
@@ -348,7 +349,30 @@
       bar.style.width = `${widthPercent}%`;
       bar.dataset.range = `${formatMonthDay(start)} ~ ${formatMonthDay(end)}`;
       bar.title = `${issue.title}\n${bar.dataset.range}`;
-      bar.textContent = issue.line_classification || issue.subcategory || issue.owner || '';
+
+      // 가독성 개선: 간트 바 내부 정보 밀도 증가
+      const priorityIcons = {
+        '긴급': '🚨',
+        '높음': '⚠️',
+        '보통': '📌',
+        '낮음': '📎'
+      };
+      const priorityIcon = priorityIcons[issue.priority] || '📌';
+      const shortId = (issue.id || '').replace('PL-', '').replace(/^202[0-9]-/, '');
+      const lineLabel = issue.line_classification || '';
+
+      bar.innerHTML = `
+        <div class="bar-content">
+          <span class="bar-priority-icon">${priorityIcon}</span>
+          <span class="bar-id">#${shortId}</span>
+          <span class="bar-title">${issue.title}</span>
+        </div>
+        <div class="bar-meta">
+          ${lineLabel ? `<span>🏭 ${lineLabel}</span>` : ''}
+          ${issue.owner ? `<span>👤 ${issue.owner}</span>` : ''}
+        </div>
+      `;
+
       bar.setAttribute('tabindex', '0');
       bar.addEventListener('click', () => openIssueDetail(issue.id));
       bar.addEventListener('keypress', event => {
