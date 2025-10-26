@@ -38,6 +38,30 @@
             margin-bottom: var(--space-3);
         }
 
+        .header-actions {
+            margin-top: var(--space-4);
+            display: flex;
+            justify-content: center;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+        }
+
+        .header-actions a {
+            text-decoration: none;
+            color: var(--color-primary);
+            background: var(--color-white);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--border-radius-full);
+            font-weight: var(--font-semibold);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-base);
+        }
+
+        .header-actions a:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -184,6 +208,10 @@
         <div class="header">
             <h1>📋 S25016 펀치리스트 관리</h1>
             <p>프로젝트 이슈 추적 및 관리 시스템</p>
+            <div class="header-actions">
+                <a href="pages/list.html">📑 이슈 목록</a>
+                <a href="pages/schedule.html">📅 일정표 보기</a>
+            </div>
         </div>
 
         <div class="stats-grid" id="statsGrid">

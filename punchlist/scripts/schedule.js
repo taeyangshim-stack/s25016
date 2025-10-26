@@ -349,6 +349,13 @@
       bar.dataset.range = `${formatMonthDay(start)} ~ ${formatMonthDay(end)}`;
       bar.title = `${issue.title}\n${bar.dataset.range}`;
       bar.textContent = issue.line_classification || issue.subcategory || issue.owner || '';
+      bar.setAttribute('tabindex', '0');
+      bar.addEventListener('click', () => openIssueDetail(issue.id));
+      bar.addEventListener('keypress', event => {
+        if (event.key === 'Enter') {
+          openIssueDetail(issue.id);
+        }
+      });
 
       track.appendChild(bar);
       row.appendChild(info);
@@ -405,23 +412,37 @@
 
       if (issues.length === 0) {
         const empty = document.createElement('div');
-        empty.className = 'day-card';
-        empty.style.borderLeftColor = '#e5e7eb';
-        empty.innerHTML = '<p>등록된 일정 없음</p>';
+        empty.className = 'day-card day-card-empty';
+        empty.innerHTML = '<p class="day-card-meta">등록된 일정 없음</p>';
         list.appendChild(empty);
       } else {
         issues.forEach(issue => {
           const card = document.createElement('div');
           card.className = 'day-card';
           card.style.borderLeftColor = PunchListAPI.getPriorityColor(issue.priority);
+          const statusColor = PunchListAPI.getStatusColor(issue.status);
+          const lineLabel = issue.line_classification || issue.subcategory || '라인 미정';
+          const summaryLine = [issue.owner || '담당 미정', lineLabel].join(' · ');
+          const targetDate = parseDateValue(issue.target_date);
+          const secondaryLine = targetDate
+            ? `목표 ${formatMonthDay(targetDate)}`
+            : (issue.subcategory ? `설비 ${issue.subcategory}` : '');
+
           card.innerHTML = `
-            <h4>${issue.title}</h4>
-            <p>${issue.owner || '-'} · ${issue.status}</p>
-            <div class="labels">
-              <span class="badge-line">${issue.line_classification || '라인 미정'}</span>
-              <span class="badge-line" style="background:#ede9fe;color:#5b21b6;">${issue.subcategory || '설비 미정'}</span>
+            <div class="day-card-header">
+              <span class="status-pill" style="border-color:${statusColor};color:${statusColor};">${issue.status || '-'}</span>
+              <span class="day-card-title">${issue.title}</span>
             </div>
+            <p class="day-card-meta">${summaryLine}</p>
+            ${secondaryLine ? `<p class="day-card-meta subtle">${secondaryLine}</p>` : ''}
           `;
+          card.setAttribute('tabindex', '0');
+          card.addEventListener('click', () => openIssueDetail(issue.id));
+          card.addEventListener('keypress', event => {
+            if (event.key === 'Enter') {
+              openIssueDetail(issue.id);
+            }
+          });
           list.appendChild(card);
         });
       }
@@ -553,6 +574,14 @@
     return parseDateValue(issue.request_date)
       || parseDateValue(issue.target_date)
       || parseDateValue(issue.complete_date);
+  }
+
+  function openIssueDetail(issueId) {
+    if (!issueId) {
+      return;
+    }
+    const detailUrl = `detail.html?id=${encodeURIComponent(issueId)}`;
+    window.open(detailUrl, '_blank');
   }
 
   const DAY_MS = 24 * 60 * 60 * 1000;
