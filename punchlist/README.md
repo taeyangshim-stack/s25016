@@ -75,7 +75,8 @@ punchlist/
 │   ├── create.html                 # 이슈 생성 (템플릿 지원) ✨
 │   ├── create-basic.html           # 기본 이슈 생성 (백업)
 │   ├── list.html                   # 이슈 목록
-│   └── detail.html                 # 이슈 상세
+│   ├── detail.html                 # 이슈 상세
+│   └── schedule.html               # 간트 & 주간 캘린더 일정표 ⭐
 │
 ├── scripts/
 │   ├── punchlist.js                # 클라이언트 스크립트

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일정표 - S25016 펀치리스트</title>
+
+    <link rel="stylesheet" href="../../shared/styles/variables.css">
+    <link rel="stylesheet" href="../../shared/styles/reset.css">
+    <link rel="stylesheet" href="../../shared/styles/components.css">
+
+    <style>
+        :root {
+            --gantt-row-height: 64px;
+        }
+
+        body {
+            background: var(--color-gray-100);
+            min-height: 100vh;
+            padding: var(--space-6);
+        }
+
+        .page {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: var(--color-white);
+            padding: var(--space-8);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--space-6);
+        }
+
+        .page-header h1 {
+            font-size: var(--font-3xl);
+            color: var(--color-gray-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .page-header p {
+            color: var(--color-gray-600);
+            margin-bottom: var(--space-4);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+        }
+
+        .header-actions a {
+            text-decoration: none;
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--border-radius-full);
+            font-weight: var(--font-semibold);
+            color: var(--color-white);
+            background: var(--color-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+
+        .filters-card {
+            background: var(--color-white);
+            padding: var(--space-6);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-6);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .filter-group label {
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+        }
+
+        .filter-group select,
+        .filter-group input {
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-base);
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-base);
+        }
+
+        .filter-actions {
+            margin-top: var(--space-4);
+            display: flex;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--border-radius-full);
+            border: none;
+            font-weight: var(--font-semibold);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .btn-secondary {
+            background: var(--color-gray-100);
+            color: var(--color-gray-800);
+        }
+
+        .view-card {
+            background: var(--color-white);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--space-6);
+            overflow: hidden;
+        }
+
+        .view-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--color-gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .view-header h2 {
+            font-size: var(--font-xl);
+            color: var(--color-gray-900);
+        }
+
+        .view-header p {
+            color: var(--color-gray-500);
+        }
+
+        .meta-chips {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+
+        .meta-chip {
+            background: var(--color-gray-100);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-sm);
+            color: var(--color-gray-700);
+        }
+
+        .meta-chip strong {
+            color: var(--color-gray-900);
+            margin-left: var(--space-1);
+        }
+
+        .meta-chip.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .gantt-wrapper {
+            padding: var(--space-6);
+        }
+
+        .gantt-axis {
+            display: grid;
+            grid-auto-flow: column;
+            gap: 0;
+            border-bottom: 1px solid var(--color-gray-200);
+            margin-bottom: var(--space-4);
+            font-size: var(--font-xs);
+            color: var(--color-gray-500);
+            text-align: center;
+        }
+
+        .gantt-axis span {
+            padding-bottom: var(--space-2);
+            border-right: 1px dashed var(--color-gray-200);
+        }
+
+        .gantt-axis span:last-child {
+            border-right: none;
+        }
+
+        .gantt-body {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .gantt-row {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: var(--space-4);
+            align-items: center;
+        }
+
+        .gantt-row-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .gantt-row-info h3 {
+            font-size: var(--font-md);
+            color: var(--color-gray-900);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+        }
+
+        .gantt-row-info .meta {
+            font-size: var(--font-sm);
+            color: var(--color-gray-500);
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+
+        .gantt-bar-track {
+            position: relative;
+            height: var(--gantt-row-height);
+            border-radius: var(--border-radius-lg);
+            background: var(--color-gray-100);
+            overflow: hidden;
+        }
+
+        .gantt-bar {
+            position: absolute;
+            top: 10px;
+            height: calc(var(--gantt-row-height) - 20px);
+            border-radius: var(--border-radius-lg);
+            color: var(--color-white);
+            font-size: var(--font-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 var(--space-2);
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease;
+            min-width: 6%;
+        }
+
+        .gantt-bar:hover {
+            transform: translateY(-2px);
+        }
+
+        .gantt-bar::after {
+            content: attr(data-range);
+            position: absolute;
+            bottom: -20px;
+            right: 0;
+            font-size: var(--font-2xs);
+            color: var(--color-gray-600);
+        }
+
+        .week-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(120px, 1fr));
+            gap: var(--space-3);
+            padding: var(--space-6);
+        }
+
+        .day-column {
+            background: var(--color-gray-50);
+            border-radius: var(--border-radius-lg);
+            display: flex;
+            flex-direction: column;
+            min-height: 220px;
+        }
+
+        .day-header {
+            padding: var(--space-3);
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+
+        .day-header strong {
+            display: block;
+            color: var(--color-gray-900);
+        }
+
+        .day-header span {
+            font-size: var(--font-sm);
+            color: var(--color-gray-500);
+        }
+
+        .day-list {
+            padding: var(--space-3);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            flex: 1;
+        }
+
+        .day-card {
+            background: var(--color-white);
+            border-radius: var(--border-radius-base);
+            padding: var(--space-3);
+            border-left: 4px solid var(--color-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .day-card h4 {
+            font-size: var(--font-sm);
+            margin-bottom: var(--space-1);
+            color: var(--color-gray-900);
+        }
+
+        .day-card p {
+            font-size: var(--font-xs);
+            color: var(--color-gray-500);
+            margin-bottom: var(--space-1);
+        }
+
+        .day-card .labels {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+
+        .badge-line {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 0 var(--space-2);
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-2xs);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--space-6);
+            color: var(--color-gray-500);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            .gantt-row {
+                grid-template-columns: 1fr;
+            }
+
+            .week-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="page-header">
+            <h1>📅 펀치리스트 일정표</h1>
+            <p>전체 이슈를 기준으로 간트 타임라인과 주간 캘린더를 함께 확인할 수 있습니다.</p>
+            <div class="header-actions">
+                <a href="../index.html">← 대시보드로 돌아가기</a>
+                <a href="list.html">📋 이슈 목록 보기</a>
+            </div>
+        </header>
+
+        <section class="filters-card">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="searchInput">검색</label>
+                    <input type="text" id="searchInput" placeholder="ID, 제목, 내용으로 검색">
+                </div>
+                <div class="filter-group">
+                    <label for="categoryFilter">분류</label>
+                    <select id="categoryFilter">
+                        <option value="all">전체</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="subcategoryFilter">세부분류</label>
+                    <select id="subcategoryFilter" disabled>
+                        <option value="all">전체</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="statusFilter">상태</label>
+                    <select id="statusFilter">
+                        <option value="all">전체</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="priorityFilter">우선순위</label>
+                    <select id="priorityFilter">
+                        <option value="all">전체</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="ownerFilter">담당자</label>
+                    <select id="ownerFilter">
+                        <option value="all">전체</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="lineFilter">라인/설비</label>
+                    <select id="lineFilter">
+                        <option value="all">전체</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" id="resetFilters">필터 초기화</button>
+            </div>
+        </section>
+
+        <section class="view-card">
+            <div class="view-header">
+                <div>
+                    <h2>간트 타임라인</h2>
+                    <p id="timelineRangeLabel">기간 계산 중...</p>
+                </div>
+                <div class="meta-chips">
+                    <span class="meta-chip">표시 건수<strong id="issueCount">0</strong></span>
+                    <span class="meta-chip warning">지연<strong id="overdueCount">0</strong></span>
+                </div>
+            </div>
+            <div class="gantt-wrapper">
+                <div id="ganttLoading" class="empty-state">데이터를 불러오는 중입니다...</div>
+                <div id="ganttEmpty" class="empty-state hidden">조건에 맞는 이슈가 없습니다.</div>
+                <div class="gantt-axis" id="ganttAxis"></div>
+                <div class="gantt-body" id="ganttBody"></div>
+            </div>
+        </section>
+
+        <section class="view-card">
+            <div class="view-header">
+                <div>
+                    <h2>주간 캘린더</h2>
+                    <p>선택된 주간 일정으로 담당자와 라인 계획을 확인하세요.</p>
+                </div>
+                <div class="week-controls">
+                    <button class="btn btn-secondary" id="prevWeek">← 이전 주</button>
+                    <strong id="weekRangeLabel"></strong>
+                    <button class="btn btn-secondary" id="nextWeek">다음 주 →</button>
+                    <button class="btn btn-primary" id="resetWeek">이번 주</button>
+                </div>
+            </div>
+            <div id="weekLoading" class="empty-state">주간 데이터를 준비하는 중입니다...</div>
+            <div id="weekEmpty" class="empty-state hidden">해당 주간에 표시할 이슈가 없습니다.</div>
+            <div class="week-grid" id="weekGrid"></div>
+        </section>
+    </div>
+
+    <script src="../scripts/punchlist.js"></script>
+    <script src="../scripts/schedule.js"></script>
+</body>
+</html>
