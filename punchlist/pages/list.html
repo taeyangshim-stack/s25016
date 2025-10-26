@@ -321,6 +321,185 @@
             border: 1px solid #16a34a;
         }
 
+        /* ===== Week 2: 테이블 레이아웃 개선 ===== */
+        /* 우선순위 컬럼 - 아이콘 중심 */
+        .priority-cell {
+            text-align: center;
+            padding: 8px 4px !important;
+        }
+
+        .priority-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .priority-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .priority-text {
+            font-size: 10px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        /* ID/제목 컬럼 - 2줄 레이아웃 */
+        .issue-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 12px 16px !important;
+        }
+
+        .issue-id {
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .issue-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.4;
+            /* 2줄까지 표시 */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .issue-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            color: #4b5563;
+        }
+
+        /* 라인·분류 컬럼 */
+        .line-category-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .line-category-cell .line-badge {
+            margin-bottom: 2px;
+        }
+
+        .line-category-cell .category-text {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        /* 일정 컬럼 - 화살표 표시 */
+        .schedule-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .schedule-date {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .schedule-arrow {
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        .schedule-overdue {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        /* 액션 컬럼 */
+        .action-cell {
+            text-align: center;
+            padding: 8px !important;
+        }
+
+        .action-btn {
+            padding: 4px 12px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #4b5563;
+            color: white;
+            border-color: #4b5563;
+        }
+
+        /* 테이블 행 높이 조절 */
+        tbody tr {
+            height: auto;
+            min-height: 70px;
+        }
+
+        tbody td {
+            vertical-align: middle;
+        }
+
+        /* 필터 프리셋 버튼 */
+        .filter-presets {
+            display: flex;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+            padding: var(--space-4);
+            background: var(--color-gray-50);
+            border-radius: var(--border-radius-lg);
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: var(--space-2) var(--space-4);
+            background: white;
+            border: 2px solid var(--color-gray-300);
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .preset-btn:hover {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .preset-btn.active {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
         .empty-state {
             text-align: center;
             padding: var(--space-12) var(--space-4);
@@ -415,6 +594,25 @@
 
         <!-- 필터 -->
         <div class="filters">
+            <!-- 필터 프리셋 버튼 -->
+            <div class="filter-presets">
+                <button class="preset-btn" onclick="applyPreset('urgent-b')">
+                    🚨 긴급 이슈 (B라인)
+                </button>
+                <button class="preset-btn" onclick="applyPreset('my-issues')">
+                    👤 내 담당 이슈
+                </button>
+                <button class="preset-btn" onclick="applyPreset('overdue')">
+                    ⚠️ 지연 중인 이슈
+                </button>
+                <button class="preset-btn" onclick="applyPreset('this-week')">
+                    📅 이번 주 마감
+                </button>
+                <button class="preset-btn" onclick="resetFilters()">
+                    🔄 전체 보기
+                </button>
+            </div>
+
             <div class="filter-row">
                 <div class="filter-group">
                     <label>분류</label>
@@ -487,22 +685,19 @@
                 <table>
                     <thead>
                         <tr>
-                            <th onclick="sortBy('id')">ID <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('title')">제목 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('line_classification')">라인 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('category')">분류 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('subcategory')">세부분류 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('priority')">우선순위 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('status')">상태 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('owner')">담당자 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('request_date')">요청일 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('target_date')">목표일 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('updated_at')">최근 변경 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('priority')" style="width: 80px; text-align: center;">우선순위 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('title')" style="min-width: 280px;">ID · 제목 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('line_classification')" style="width: 140px;">라인 · 분류 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('status')" style="width: 100px;">상태 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('owner')" style="width: 100px;">담당자 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('target_date')" style="width: 180px;">일정 (요청→목표) <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('updated_at')" style="width: 120px;">최근 변경 <span class="sort-icon">↕️</span></th>
+                            <th style="width: 80px; text-align: center;">액션</th>
                         </tr>
                     </thead>
                     <tbody id="issueTableBody">
                         <tr>
-                            <td colspan="11" class="loading">
+                            <td colspan="8" class="loading">
                                 ⏳ 데이터를 불러오는 중...
                             </td>
                         </tr>
@@ -672,6 +867,62 @@
 
             document.getElementById('filterSubcategory').innerHTML = '<option value="">전체</option>';
 
+            // 프리셋 버튼 활성화 초기화
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+
+            applyFilters();
+        }
+
+        // 필터 프리셋 적용
+        function applyPreset(presetType) {
+            // 먼저 모든 필터 초기화
+            resetFilters();
+
+            // 프리셋 버튼 활성화 표시
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const today = new Date();
+            const weekLater = new Date(today);
+            weekLater.setDate(weekLater.getDate() + 7);
+
+            switch(presetType) {
+                case 'urgent-b':
+                    // 긴급 이슈 (B라인)
+                    document.getElementById('filterPriority').value = '긴급';
+                    document.getElementById('filterLine').value = 'B라인';
+                    break;
+
+                case 'my-issues':
+                    // 내 담당 이슈 (심태양)
+                    document.getElementById('filterOwner').value = '심태양';
+                    break;
+
+                case 'overdue':
+                    // 지연 중인 이슈 - 완료되지 않은 + 목표일 지난 이슈
+                    // 이 경우 JavaScript 필터링으로 처리
+                    filteredIssues = allIssues.filter(issue => {
+                        return issue.status !== '완료' && PunchListAPI.isOverdue(issue);
+                    });
+                    sortIssues();
+                    currentPage = 1;
+                    renderTable();
+                    updatePagination();
+                    return;
+
+                case 'this-week':
+                    // 이번 주 마감 - 목표일이 오늘부터 7일 이내
+                    filteredIssues = allIssues.filter(issue => {
+                        const targetDate = new Date(issue.target_date);
+                        return targetDate >= today && targetDate <= weekLater;
+                    });
+                    sortIssues();
+                    currentPage = 1;
+                    renderTable();
+                    updatePagination();
+                    return;
+            }
+
             applyFilters();
         }
 
@@ -708,7 +959,7 @@
             if (pageIssues.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="11" class="empty-state">
+                        <td colspan="8" class="empty-state">
                             <div class="empty-state-icon">📭</div>
                             <p>검색 결과가 없습니다.</p>
                         </td>
@@ -719,7 +970,6 @@
 
             tbody.innerHTML = pageIssues.map(issue => {
                 const isOverdue = PunchListAPI.isOverdue(issue);
-                const targetDateClass = isOverdue ? 'overdue' : '';
                 const isRecent = PunchListAPI.isRecentlyUpdated(issue);
 
                 // 가독성 개선: 우선순위 클래스 추가
@@ -728,38 +978,71 @@
                 if (isRecent) rowClasses.push('recent-update');
                 const rowClassAttr = ` class="${rowClasses.join(' ')}"`;
 
+                // 우선순위 아이콘
+                const priorityIcons = {
+                    '긴급': '🚨',
+                    '높음': '⚠️',
+                    '보통': '📌',
+                    '낮음': '📎'
+                };
+                const priorityIcon = priorityIcons[issue.priority] || '📌';
+
+                // 라인 뱃지
                 const lineCell = issue.line_classification
                     ? PunchListAPI.getLineBadge(issue.line_classification)
-                    : '<span class="badge" style="background: #e5e7eb; color: #4b5563;">미지정</span>';
+                    : '<span class="line-badge" style="background: #e5e7eb; color: #4b5563;">미지정</span>';
+
+                // 최근 변경 표시
                 const updatedLabel = PunchListAPI.formatDateTime(issue.updated_at);
                 const recentIndicator = isRecent
                     ? '<span class="recent-indicator" title="최근 72시간 내 업데이트">🆕</span>'
                     : '';
 
+                // 일정 표시 (요청일 → 목표일)
+                const requestDate = PunchListAPI.formatDate(issue.request_date);
+                const targetDate = PunchListAPI.formatDate(issue.target_date);
+                const scheduleClass = isOverdue ? 'schedule-overdue' : 'schedule-date';
+
                 return `
-                    <tr${rowClassAttr} onclick="window.location.href='detail.html?id=${issue.id}'">
-                        <td><strong>${issue.id}</strong></td>
-                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            ${issue.title}
+                    <tr${rowClassAttr}>
+                        <td class="priority-cell">
+                            <div class="priority-indicator">
+                                <span class="priority-icon">${priorityIcon}</span>
+                                <span class="priority-text">${issue.priority}</span>
+                            </div>
                         </td>
-                        <td>${lineCell}</td>
-                        <td>${issue.category}</td>
-                        <td>${issue.subcategory}</td>
+                        <td class="issue-cell">
+                            <div class="issue-id">${issue.id}</div>
+                            <div class="issue-title">${issue.title}</div>
+                            <div class="issue-tags">
+                                ${issue.category ? `<span class="tag">${issue.category}</span>` : ''}
+                            </div>
+                        </td>
                         <td>
-                            <span class="badge badge-priority-${issue.priority}">${issue.priority}</span>
+                            <div class="line-category-cell">
+                                ${lineCell}
+                                <span class="category-text">${issue.subcategory || '-'}</span>
+                            </div>
                         </td>
                         <td>
                             <span class="badge badge-status-${issue.status}">${issue.status}</span>
                         </td>
-                        <td>${issue.owner}</td>
-                        <td>${PunchListAPI.formatDate(issue.request_date)}</td>
-                        <td class="${targetDateClass}">
-                            ${PunchListAPI.formatDate(issue.target_date)}
-                            ${isOverdue ? '⚠️' : ''}
+                        <td>${issue.owner || '-'}</td>
+                        <td>
+                            <div class="schedule-cell">
+                                <span class="schedule-date">${requestDate}</span>
+                                <span class="schedule-arrow">→</span>
+                                <span class="${scheduleClass}">${targetDate}${isOverdue ? ' ⚠️' : ''}</span>
+                            </div>
                         </td>
                         <td>
                             ${updatedLabel}
                             ${recentIndicator}
+                        </td>
+                        <td class="action-cell">
+                            <button class="action-btn" onclick="event.stopPropagation(); window.location.href='detail.html?id=${issue.id}'">
+                                상세
+                            </button>
                         </td>
                     </tr>
                 `;
