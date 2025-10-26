@@ -3,6 +3,11 @@
  */
 
 // Google Apps Script URL → Vercel 프록시를 기본값으로 사용
+const DIRECT_SCRIPT_FALLBACK =
+  (typeof window !== 'undefined' && window.PUNCHLIST_DIRECT_URL)
+    ? window.PUNCHLIST_DIRECT_URL
+    : 'https://script.google.com/macros/s/AKfycbxarys6e5oeI8jt7PHeO11H2LfMW0-P2lhX-NMApVX9-Ir97jnIlgtnElu70LZnUqRa/exec';
+
 const RAW_SCRIPT_URL = (typeof window !== 'undefined' && window.PUNCHLIST_API_URL)
   ? window.PUNCHLIST_API_URL
   : '/api/punchlist';
@@ -773,10 +778,32 @@ async function loadAllIssues() {
     });
   }
 
-  // 실제 API 호출
+  const primaryResult = await requestIssueList(SCRIPT_URL);
+  if (primaryResult) {
+    return primaryResult;
+  }
+
+  if (SCRIPT_URL !== DIRECT_SCRIPT_FALLBACK) {
+    const fallbackResult = await requestIssueList(DIRECT_SCRIPT_FALLBACK);
+    if (fallbackResult) {
+      return fallbackResult;
+    }
+  }
+
+  console.warn('⚠️ API 응답이 없어 Mock 데이터로 대체합니다. backend 설정 또는 Google Apps Script 권한을 확인하세요.');
+  return [...MOCK_ISSUES].map(normalizeIssue);
+}
+
+async function requestIssueList(baseUrl) {
+  if (!baseUrl) {
+    return null;
+  }
+
   try {
-    const response = await fetch(`${SCRIPT_URL}?action=getAll`, {
-      method: 'GET'
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    const response = await fetch(`${baseUrl}${separator}action=getAll`, {
+      method: 'GET',
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -784,18 +811,14 @@ async function loadAllIssues() {
     }
 
     const result = await response.json();
-
-    if (result.success) {
-      return Array.isArray(result.data)
-        ? result.data.map(normalizeIssue)
-        : [];
-    } else {
-      throw new Error(result.error);
+    if (!result.success || !Array.isArray(result.data)) {
+      throw new Error(result.error || '응답 형식이 올바르지 않습니다.');
     }
+
+    return result.data.map(normalizeIssue);
   } catch (error) {
-    console.error('이슈 로드 실패:', error);
-    console.warn('⚠️ API 응답이 없어 Mock 데이터로 대체합니다. 로컬 개발 중이면 backend 설정을 확인하세요.');
-    return [...MOCK_ISSUES].map(normalizeIssue);
+    console.error(`[PunchListAPI] 이슈 로드 실패 (${baseUrl}):`, error);
+    return null;
   }
 }
 
