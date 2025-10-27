@@ -248,6 +248,10 @@ function doGet(e) {
     return createCORSResponse({ success: true, data: getOwnersData() });
   } else if (action === 'getCategories') {
     return createCORSResponse({ success: true, data: getCategoriesConfig() });
+  } else if (action === 'getEmployees') {
+    return createCORSResponse(getEmployees());
+  } else if (action === 'getLocations') {
+    return createCORSResponse(getLocations());
   }
 
   return createCORSResponse({ success: false, error: 'Invalid action' });
@@ -1247,4 +1251,33 @@ function generateStats() {
   Logger.log(JSON.stringify(stats, null, 2));
 
   return stats;
+}
+
+// Work Management 관련 함수
+// 직원 목록 조회
+function getEmployees() {
+  // 기본 직원 목록 (필요시 별도 시트에서 읽도록 확장 가능)
+  const employeeList = [
+    '심태양',
+    '김철수',
+    '박영희',
+    '이영수',
+    '최민수'
+  ];
+
+  return employeeList;
+}
+
+// 위치 목록 조회
+function getLocations() {
+  // 기본 위치 목록 (필요시 별도 시트에서 읽도록 확장 가능)
+  const locationList = [
+    '34bay A라인',
+    '34bay B라인',
+    '사무실',
+    '회의실',
+    '현장'
+  ];
+
+  return locationList;
 }
