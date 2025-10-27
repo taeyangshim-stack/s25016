@@ -599,9 +599,6 @@
                 <button class="preset-btn" onclick="applyPreset('urgent-b')">
                     🚨 긴급 이슈 (B라인)
                 </button>
-                <button class="preset-btn" onclick="applyPreset('my-issues')">
-                    👤 내 담당 이슈
-                </button>
                 <button class="preset-btn" onclick="applyPreset('overdue')">
                     ⚠️ 지연 중인 이슈
                 </button>
@@ -891,11 +888,6 @@
                     // 긴급 이슈 (B라인)
                     document.getElementById('filterPriority').value = '긴급';
                     document.getElementById('filterLine').value = 'B라인';
-                    break;
-
-                case 'my-issues':
-                    // 내 담당 이슈 (심태양)
-                    document.getElementById('filterOwner').value = '심태양';
                     break;
 
                 case 'overdue':

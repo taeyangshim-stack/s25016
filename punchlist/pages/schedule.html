@@ -332,6 +332,130 @@
             color: var(--color-gray-600);
         }
 
+        /* ===== Week 3: 간트 차트 그룹핑 ===== */
+        .group-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .group-controls label {
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+        }
+
+        .group-controls select {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-base);
+            font-size: var(--font-sm);
+        }
+
+        .gantt-group {
+            margin-bottom: var(--space-6);
+        }
+
+        .gantt-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-4) var(--space-5);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: var(--border-radius-lg);
+            margin-bottom: var(--space-3);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+        }
+
+        .gantt-group-header:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .gantt-group-header.collapsed {
+            margin-bottom: 0;
+            border-radius: var(--border-radius-lg);
+        }
+
+        .gantt-group-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            font-size: var(--font-lg);
+            font-weight: var(--font-bold);
+        }
+
+        .gantt-group-toggle {
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .gantt-group-header.collapsed .gantt-group-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .gantt-group-stats {
+            display: flex;
+            gap: var(--space-4);
+            font-size: var(--font-sm);
+        }
+
+        .group-stat {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            padding: var(--space-1) var(--space-2);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-base);
+        }
+
+        .group-stat-value {
+            font-weight: var(--font-bold);
+        }
+
+        .gantt-group-body {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+        }
+
+        .gantt-group-body.collapsed {
+            max-height: 0 !important;
+            opacity: 0;
+        }
+
+        /* 라인별 그룹 색상 */
+        .gantt-group-header.group-A라인 {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .gantt-group-header.group-B라인 {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .gantt-group-header.group-공통 {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        }
+
+        /* 우선순위별 그룹 색상 */
+        .gantt-group-header.group-긴급 {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        }
+
+        .gantt-group-header.group-높음 {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .gantt-group-header.group-보통 {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .gantt-group-header.group-낮음 {
+            background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+        }
+
         .week-controls {
             display: flex;
             align-items: center;
@@ -526,6 +650,20 @@
                 </div>
             </div>
             <div class="gantt-wrapper">
+                <!-- 그룹핑 컨트롤 -->
+                <div class="group-controls">
+                    <label for="groupBySelect">📊 그룹 기준:</label>
+                    <select id="groupBySelect">
+                        <option value="none">그룹 없음</option>
+                        <option value="line">라인별</option>
+                        <option value="owner">담당자별</option>
+                        <option value="priority">우선순위별</option>
+                        <option value="status">상태별</option>
+                    </select>
+                    <button class="btn btn-secondary btn-sm" id="expandAllGroups">모두 펼치기</button>
+                    <button class="btn btn-secondary btn-sm" id="collapseAllGroups">모두 접기</button>
+                </div>
+
                 <div id="ganttLoading" class="empty-state">데이터를 불러오는 중입니다...</div>
                 <div id="ganttEmpty" class="empty-state hidden">조건에 맞는 이슈가 없습니다.</div>
                 <div class="gantt-axis" id="ganttAxis"></div>
