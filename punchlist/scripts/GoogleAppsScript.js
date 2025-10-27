@@ -197,9 +197,6 @@ function doPost(e) {
       case 'create':
         result = createIssue(params.data);
         break;
-      case 'bulkCreate':
-        result = bulkCreateIssues(params.issues || []);
-        break;
       case 'update':
         result = updateIssue(params.data);
         break;
@@ -248,10 +245,6 @@ function doGet(e) {
     return createCORSResponse({ success: true, data: getOwnersData() });
   } else if (action === 'getCategories') {
     return createCORSResponse({ success: true, data: getCategoriesConfig() });
-  } else if (action === 'getEmployees') {
-    return createCORSResponse(getEmployees());
-  } else if (action === 'getLocations') {
-    return createCORSResponse(getLocations());
   }
 
   return createCORSResponse({ success: false, error: 'Invalid action' });
@@ -663,93 +656,6 @@ function createIssue(data) {
   sendEmailNotification('create', { id, ...data });
 
   return { success: true, id: id };
-}
-
-// 이슈 일괄 생성
-function bulkCreateIssues(issuesData) {
-  if (!Array.isArray(issuesData) || issuesData.length === 0) {
-    return { success: false, error: '등록할 이슈 데이터가 없습니다.' };
-  }
-
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_NAME);
-  const year = new Date().getFullYear();
-  const timestamp = new Date().toISOString();
-
-  const createdIssues = [];
-  const failedIssues = [];
-
-  try {
-    // 일괄 처리를 위해 현재 lastRow 가져오기
-    let currentLastRow = sheet.getLastRow();
-
-    issuesData.forEach((data, index) => {
-      try {
-        // ID 자동 생성 (PL-YYYY-NNN)
-        const num = String(currentLastRow + index).padStart(3, '0');
-        const id = `PL-${year}-${num}`;
-
-        const row = [
-          id,
-          data.title || '',
-          data.category || '',
-          data.subcategory || '',
-          data.priority || '보통',
-          data.status || '신규',
-          data.description || '',
-          data.cause || '',
-          data.action_plan || '',
-          data.action_result || '',
-          data.owner || '',
-          data.collaborators || '',
-          data.approver || '',
-          data.request_date || '',
-          data.target_date || '',
-          data.complete_date || '',
-          JSON.stringify(data.attachments || []),
-          JSON.stringify(normalizeCommentsData(data.comments || [])),
-          timestamp,
-          timestamp,
-          JSON.stringify(data.customFields || {}),
-          data.templateId || ''
-        ];
-
-        sheet.appendRow(row);
-        createdIssues.push({ id, title: data.title });
-
-        // 이메일 알림 발송 (선택적)
-        if (data.owner) {
-          try {
-            sendEmailNotification('create', { id, ...data });
-          } catch(emailError) {
-            Logger.log(`Email notification failed for ${id}: ${emailError.toString()}`);
-          }
-        }
-      } catch(rowError) {
-        failedIssues.push({
-          index: index + 1,
-          title: data.title || '제목 없음',
-          error: rowError.toString()
-        });
-      }
-    });
-
-    return {
-      success: true,
-      created: createdIssues.length,
-      failed: failedIssues.length,
-      createdIssues: createdIssues,
-      failedIssues: failedIssues,
-      message: `총 ${issuesData.length}건 중 ${createdIssues.length}건 성공, ${failedIssues.length}건 실패`
-    };
-  } catch(error) {
-    return {
-      success: false,
-      error: error.toString(),
-      created: createdIssues.length,
-      createdIssues: createdIssues
-    };
-  }
 }
 
 // 이슈 수정
@@ -1251,33 +1157,4 @@ function generateStats() {
   Logger.log(JSON.stringify(stats, null, 2));
 
   return stats;
-}
-
-// Work Management 관련 함수
-// 직원 목록 조회
-function getEmployees() {
-  // 기본 직원 목록 (필요시 별도 시트에서 읽도록 확장 가능)
-  const employeeList = [
-    '심태양',
-    '김철수',
-    '박영희',
-    '이영수',
-    '최민수'
-  ];
-
-  return employeeList;
-}
-
-// 위치 목록 조회
-function getLocations() {
-  // 기본 위치 목록 (필요시 별도 시트에서 읽도록 확장 가능)
-  const locationList = [
-    '34bay A라인',
-    '34bay B라인',
-    '사무실',
-    '회의실',
-    '현장'
-  ];
-
-  return locationList;
 }

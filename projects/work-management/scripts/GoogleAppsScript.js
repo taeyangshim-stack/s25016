@@ -136,6 +136,15 @@ function doGet(e) {
     .setMimeType(ContentService.MimeType.TEXT);
 }
 
+/**
+ * 웹 앱 OPTIONS 요청 처리 (CORS preflight)
+ */
+function doOptions(e) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ success: true }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 // ========================================
 // 스프레드시트 관련 함수
 // ========================================
