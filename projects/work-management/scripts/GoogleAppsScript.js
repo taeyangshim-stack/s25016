@@ -32,6 +32,29 @@ const CONFIG = {
   SEND_EMAIL: true
 };
 
+// CORS 헤더 정의
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': 'https://s2501602.vercel.app',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Max-Age': '3600'
+};
+
+/**
+ * JSON 응답을 생성하고 CORS 헤더를 추가
+ */
+function createCorsResponse(payload) {
+  const output = ContentService
+    .createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON);
+
+  Object.keys(CORS_HEADERS).forEach(header => {
+    output.setHeader(header, CORS_HEADERS[header]);
+  });
+
+  return output;
+}
+
 // ========================================
 // 메인 함수
 // ========================================
@@ -48,46 +71,42 @@ function doPost(e) {
     if (action === 'update') {
       // 수정 요청
       const success = updateRecord(data.timestamp, data);
-      return ContentService
-        .createTextOutput(JSON.stringify({
-          status: success ? 'success' : 'error',
-          message: success ? '기록이 수정되었습니다.' : '기록을 찾을 수 없습니다.'
-        }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return createCorsResponse({
+        status: success ? 'success' : 'error',
+        message: success ? '기록이 수정되었습니다.' : '기록을 찾을 수 없습니다.'
+      });
 
     } else if (action === 'delete') {
       // 삭제 요청
       const success = deleteRecord(data.timestamp);
-      return ContentService
-        .createTextOutput(JSON.stringify({
-          status: success ? 'success' : 'error',
-          message: success ? '기록이 삭제되었습니다.' : '기록을 찾을 수 없습니다.'
-        }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return createCorsResponse({
+        status: success ? 'success' : 'error',
+        message: success ? '기록이 삭제되었습니다.' : '기록을 찾을 수 없습니다.'
+      });
 
     } else if (action === 'bulkCreate') {
         const results = bulkCreateRecords(data);
         const successCount = results.filter(r => r.status === 'success').length;
-        return ContentService.createTextOutput(JSON.stringify({
+        return createCorsResponse({
             status: 'success',
             message: `${successCount}개의 기록이 성공적으로 추가되었습니다.`
-        })).setMimeType(ContentService.MimeType.JSON);
+        });
 
     } else if (action === 'bulkUpdate') {
         const results = bulkUpdateRecords(data);
         const successCount = results.filter(r => r.status === 'success').length;
-        return ContentService.createTextOutput(JSON.stringify({
+        return createCorsResponse({
             status: 'success',
             message: `${successCount}개의 기록이 성공적으로 수정되었습니다.`
-        })).setMimeType(ContentService.MimeType.JSON);
+        });
 
     } else if (action === 'bulkDelete') {
         const results = bulkDeleteRecords(data);
         const successCount = results.filter(r => r.status === 'success').length;
-        return ContentService.createTextOutput(JSON.stringify({
+        return createCorsResponse({
             status: 'success',
             message: `${successCount}개의 기록이 성공적으로 삭제되었습니다.`
-        })).setMimeType(ContentService.MimeType.JSON);
+        });
     } else {
       // 기존 저장 로직 (새 기록 추가)
       const sheet = getOrCreateSheet();
@@ -97,23 +116,19 @@ function doPost(e) {
         sendEmail(data);
       }
 
-      return ContentService
-        .createTextOutput(JSON.stringify({
-          status: 'success',
-          message: '기록이 저장되었습니다.'
-        }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return createCorsResponse({
+        status: 'success',
+        message: '기록이 저장되었습니다.'
+      });
     }
 
   } catch (error) {
     Logger.log('Error: ' + error.toString());
 
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        status: 'error',
-        message: error.toString()
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createCorsResponse({
+      status: 'error',
+      message: error.toString()
+    });
   }
 }
 
@@ -131,18 +146,17 @@ function doGet(e) {
     return getAllRecords();
   }
 
-  return ContentService
-    .createTextOutput('S25016 근무관리 시스템이 정상 작동 중입니다.')
-    .setMimeType(ContentService.MimeType.TEXT);
+  return createCorsResponse({
+    status: 'ok',
+    message: 'S25016 근무관리 시스템이 정상 작동 중입니다.'
+  });
 }
 
 /**
  * 웹 앱 OPTIONS 요청 처리 (CORS preflight)
  */
 function doOptions(e) {
-  return ContentService
-    .createTextOutput(JSON.stringify({ success: true }))
-    .setMimeType(ContentService.MimeType.JSON);
+  return createCorsResponse({ success: true });
 }
 
 // ========================================
@@ -438,14 +452,10 @@ function getAllRecords() {
       return record;
     });
 
-    return ContentService
-      .createTextOutput(JSON.stringify(records))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createCorsResponse(records);
 
   } catch (error) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ error: error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createCorsResponse({ error: error.toString() });
   }
 }
 
@@ -680,19 +690,15 @@ function getEmployees() {
       .filter(name => name && name !== '이름')
       .map(name => name.toString().trim());
 
-    return ContentService
-      .createTextOutput(JSON.stringify(employees))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createCorsResponse(employees);
 
   } catch (error) {
     Logger.log('getEmployees error: ' + error.toString());
 
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        error: error.toString(),
-        fallback: ['심태양', '김철수', '이영희', '박민수']
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createCorsResponse({
+      error: error.toString(),
+      fallback: ['심태양', '김철수', '이영희', '박민수']
+    });
   }
 }
 
@@ -737,19 +743,15 @@ function getLocations() {
       .filter(loc => loc && loc !== '장소')
       .map(loc => loc.toString().trim());
 
-    return ContentService
-      .createTextOutput(JSON.stringify(locations))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createCorsResponse(locations);
 
   } catch (error) {
     Logger.log('getLocations error: ' + error.toString());
 
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        error: error.toString(),
-        fallback: ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실']
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return createCorsResponse({
+      error: error.toString(),
+      fallback: ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실']
+    });
   }
 }
 
