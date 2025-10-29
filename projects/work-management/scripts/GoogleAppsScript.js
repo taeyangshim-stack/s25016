@@ -32,27 +32,13 @@ const CONFIG = {
   SEND_EMAIL: true
 };
 
-// CORS 헤더 정의
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': 'https://s2501602.vercel.app',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Max-Age': '3600'
-};
-
 /**
  * JSON 응답을 생성하고 CORS 헤더를 추가
  */
 function createCorsResponse(payload) {
-  const output = ContentService
+  return ContentService
     .createTextOutput(JSON.stringify(payload))
     .setMimeType(ContentService.MimeType.JSON);
-
-  Object.keys(CORS_HEADERS).forEach(header => {
-    output.setHeader(header, CORS_HEADERS[header]);
-  });
-
-  return output;
 }
 
 // ========================================
