@@ -575,21 +575,42 @@ function bulkCreateRecords(records) {
 function bulkUpdateRecords(records) {
   const sheet = getOrCreateSheet();
   const results = [];
+  const lastRow = sheet.getLastRow();
 
-  records.forEach(updatedData => {
+  Logger.log(`Bulk update: ${records.length} records, sheet lastRow: ${lastRow}`);
+
+  records.forEach((updatedData, index) => {
     try {
       const rowNumber = parseInt(updatedData.rowNumber, 10);
-      if (!isNaN(rowNumber) && rowNumber > 1 && rowNumber <= sheet.getLastRow()) {
-        const success = applyUpdateToRow(sheet, rowNumber, updatedData);
-        results.push({ status: success ? 'success' : 'error', data: updatedData });
-      } else {
-        results.push({ status: 'error', data: updatedData, message: '유효하지 않은 행 번호입니다.' });
+
+      // 상세 로깅
+      Logger.log(`[${index}] rowNumber: ${rowNumber}, valid: ${!isNaN(rowNumber) && rowNumber > 1}`);
+
+      if (isNaN(rowNumber)) {
+        results.push({ status: 'error', data: updatedData, message: 'rowNumber가 숫자가 아닙니다.' });
+        return;
       }
+
+      if (rowNumber <= 1) {
+        results.push({ status: 'error', data: updatedData, message: '헤더 행은 수정할 수 없습니다.' });
+        return;
+      }
+
+      if (rowNumber > lastRow) {
+        Logger.log(`Warning: rowNumber ${rowNumber} > lastRow ${lastRow}, attempting update anyway`);
+      }
+
+      const success = applyUpdateToRow(sheet, rowNumber, updatedData);
+      results.push({ status: success ? 'success' : 'error', data: updatedData });
+
     } catch (error) {
       Logger.log('Bulk update error for record: ' + JSON.stringify(updatedData) + ' | Error: ' + error.toString());
       results.push({ status: 'error', data: updatedData, error: error.toString() });
     }
   });
+
+  const successCount = results.filter(r => r.status === 'success').length;
+  Logger.log(`Bulk update complete: ${successCount}/${records.length} successful`);
 
   return results;
 }

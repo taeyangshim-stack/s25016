@@ -258,18 +258,24 @@
                 return;
             }
 
-            tbody.innerHTML = allRecords.map(record => `
-                <tr data-row-number="${record.rowNumber}" data-timestamp="${record.timestamp || record['타임스탬프'] || ''}">
-                    <td class="action-cell"><input type="checkbox"></td>
-                    <td><input type="date" value="${record['날짜'] || ''}"></td>
-                    <td>${createSelectHTML(employees, record['인원'])}</td>
-                    <td>${createSelectHTML(locations, record['위치'])}</td>
-                    <td><input type="time" value="${record['입실시간'] === '-' ? '' : record['입실시간']}"></td>
-                    <td><input type="time" value="${record['퇴실시간'] === '-' ? '' : record['퇴실시간']}"></td>
-                    <td><input type="text" value="${record['작업내용'] === '-' ? '' : record['작업내용']}"></td>
-                    <td><input type="text" value="${record['비고'] === '-' ? '' : record['비고']}"></td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = allRecords.map(record => {
+                // timestamp를 안전하게 처리
+                const timestamp = record.timestamp || record['타임스탬프'] || '';
+                const safeTimestamp = (timestamp && timestamp !== 'undefined') ? timestamp : '';
+
+                return `
+                    <tr data-row-number="${record.rowNumber}" data-timestamp="${safeTimestamp}">
+                        <td class="action-cell"><input type="checkbox"></td>
+                        <td><input type="date" value="${record['날짜'] || ''}"></td>
+                        <td>${createSelectHTML(employees, record['인원'])}</td>
+                        <td>${createSelectHTML(locations, record['위치'])}</td>
+                        <td><input type="time" value="${record['입실시간'] === '-' ? '' : record['입실시간']}"></td>
+                        <td><input type="time" value="${record['퇴실시간'] === '-' ? '' : record['퇴실시간']}"></td>
+                        <td><input type="text" value="${record['작업내용'] === '-' ? '' : record['작업내용']}"></td>
+                        <td><input type="text" value="${record['비고'] === '-' ? '' : record['비고']}"></td>
+                    </tr>
+                `;
+            }).join('');
 
             updateSortIcons();
         }
@@ -340,9 +346,11 @@
             const rows = document.querySelectorAll('#bulkEditTable tbody tr');
             const recordsToUpdate = Array.from(rows).map(row => {
                 const cells = row.cells;
+                const timestamp = row.dataset.timestamp;
+
                 return {
                     rowNumber: row.dataset.rowNumber,
-                    timestamp: row.dataset.timestamp || '',
+                    timestamp: (timestamp && timestamp !== 'undefined') ? timestamp : '',
                     date: cells[1].querySelector('input').value,
                     name: cells[2].querySelector('select').value,
                     location: cells[3].querySelector('select').value,
@@ -351,30 +359,34 @@
                     workType: cells[6].querySelector('input').value || '-',
                     notes: cells[7].querySelector('input').value || '-',
                 };
-            });
+            }).filter(record => record.rowNumber); // rowNumber가 있는 것만 필터링
 
             if (recordsToUpdate.length === 0) {
                 alert('수정할 기록이 없습니다.');
                 return;
             }
 
-            if (!confirm('모든 변경사항을 저장하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+            if (!confirm(`${recordsToUpdate.length}개의 기록을 저장하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
 
-            showStatus('저장 중...', 'info');
+            showStatus(`저장 중... (${recordsToUpdate.length}개)`, 'info');
 
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=bulkUpdate`, {
                     method: 'POST',
-                    mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(recordsToUpdate)
                 });
-                const result = await response.json();
-                if (result.status !== 'success') throw new Error(result.message);
 
-                showStatus('✅ 모든 변경사항이 성공적으로 저장되었습니다.', 'success');
-                loadAllRecords();
+                const result = await response.json();
+
+                console.log('서버 응답:', result);
+
+                if (result.status !== 'success') throw new Error(result.message || 'Unknown error');
+
+                showStatus(`✅ ${result.message || '모든 변경사항이 성공적으로 저장되었습니다.'}`, 'success');
+                await loadAllRecords();
             } catch (error) {
+                console.error('일괄 수정 실패:', error);
                 showStatus(`❌ 저장 실패: ${error.message}`, 'error');
             }
         }
