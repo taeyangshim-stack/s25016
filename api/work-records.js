@@ -70,7 +70,7 @@ module.exports = async (req, res) => {
     let payload = {};
 
     if (req.body && typeof req.body === 'object') {
-      payload = { ...req.body };
+      payload = Array.isArray(req.body) ? req.body : { ...req.body };
     } else {
       payload = await new Promise((resolve, reject) => {
         let raw = '';
@@ -95,8 +95,10 @@ module.exports = async (req, res) => {
       });
     }
 
-    // body에 action이 있다면 제거 (쿼리로 전달됨)
-    delete payload.action;
+    if (!Array.isArray(payload)) {
+      delete payload.action;
+    }
+
     fetchOptions.body = JSON.stringify(payload);
   }
 
