@@ -1255,6 +1255,43 @@
                 handleEditFiles(e.dataTransfer.files);
             });
 
+            // 클립보드 붙여넣기 지원 (Ctrl+V)
+            document.addEventListener('paste', (e) => {
+                // 텍스트 입력 필드에서 붙여넣기하는 경우 제외
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                    return;
+                }
+
+                const items = e.clipboardData?.items;
+                if (!items) return;
+
+                // 클립보드에서 이미지 찾기
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.startsWith('image/')) {
+                        e.preventDefault();
+
+                        const file = items[i].getAsFile();
+                        if (file) {
+                            // 파일명 생성 (현재 시간)
+                            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                            const ext = file.type.split('/')[1] || 'png';
+                            const renamedFile = new File([file], `clipboard-${timestamp}.${ext}`, {
+                                type: file.type
+                            });
+
+                            handleEditFiles([renamedFile]);
+
+                            // 시각적 피드백
+                            uploadArea.style.background = '#e8f5e9';
+                            setTimeout(() => {
+                                uploadArea.style.background = '';
+                            }, 500);
+                        }
+                        break;
+                    }
+                }
+            });
+
             updateEditImageUploadStatus();
         }
 
