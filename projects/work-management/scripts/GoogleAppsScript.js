@@ -405,10 +405,10 @@ function getAllRecords() {
 
     // 헤더 제외
     const headers = data[0];
-    const records = data.slice(1).map(row => {
+    const records = data.slice(1).map((row, rowIndex) => {
       const record = {};
-      headers.forEach((header, index) => {
-        let value = row[index];
+      headers.forEach((header, colIndex) => {
+        let value = row[colIndex];
 
         // 타임스탬프는 ISO 문자열로 변환
         if (header === '타임스탬프' && value instanceof Date) {
@@ -435,6 +435,7 @@ function getAllRecords() {
 
         record[header] = value;
       });
+      record.rowNumber = rowIndex + 2; // 헤더를 제외한 실제 시트 행 번호
       return record;
     });
 
