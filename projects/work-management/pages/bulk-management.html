@@ -230,7 +230,17 @@
                 const records = await response.json();
                 if (records.error) throw new Error(records.error);
 
-                allRecords = records.sort((a, b) => (b.rowNumber || 0) - (a.rowNumber || 0));
+                const enrichedRecords = records.map((record, index) => {
+                    if (!record.rowNumber) {
+                        record.rowNumber = index + 2;
+                    }
+                    if (!record.timestamp && record['타임스탬프']) {
+                        record.timestamp = record['타임스탬프'];
+                    }
+                    return record;
+                });
+
+                allRecords = enrichedRecords.sort((a, b) => (b.rowNumber || 0) - (a.rowNumber || 0));
                 sortColumn = null; // 정렬 초기화
                 sortDirection = 'asc';
                 renderRecords();
@@ -249,7 +259,7 @@
             }
 
             tbody.innerHTML = allRecords.map(record => `
-                <tr data-row-number="${record.rowNumber}" data-timestamp="${record.timestamp}">
+                <tr data-row-number="${record.rowNumber}" data-timestamp="${record.timestamp || record['타임스탬프'] || ''}">
                     <td class="action-cell"><input type="checkbox"></td>
                     <td><input type="date" value="${record['날짜'] || ''}"></td>
                     <td>${createSelectHTML(employees, record['인원'])}</td>
@@ -332,7 +342,7 @@
                 const cells = row.cells;
                 return {
                     rowNumber: row.dataset.rowNumber,
-                    timestamp: row.dataset.timestamp,
+                    timestamp: row.dataset.timestamp || '',
                     date: cells[1].querySelector('input').value,
                     name: cells[2].querySelector('select').value,
                     location: cells[3].querySelector('select').value,
