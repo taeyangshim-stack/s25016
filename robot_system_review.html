@@ -8,8 +8,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
         .reveal {
             font-family: 'Noto Sans KR', 'Segoe UI', 'Malgun Gothic', sans-serif;
+        }
+        .reveal .slides {
+            width: 100% !important;
+            height: 100% !important;
         }
         .reveal h1 {
             font-size: 2.5em;
@@ -655,11 +664,13 @@
             hash: true,
             slideNumber: true,
             transition: 'slide',
-            width: 1280,
-            height: 720,
-            margin: 0.1,
+            width: 1920,
+            height: 1080,
+            margin: 0.04,
             minScale: 0.2,
-            maxScale: 2.0
+            maxScale: 2.0,
+            center: true,
+            embedded: false
         });
     </script>
 </body>
