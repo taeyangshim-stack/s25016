@@ -33,6 +33,9 @@
     { "source": "/projects/work-management/pages/query", "destination": "/projects/work-management/pages/query.html" },
     { "source": "/projects/work-management/pages/settings", "destination": "/projects/work-management/pages/settings.html" },
     { "source": "/projects/work-management/pages/입력", "destination": "/projects/work-management/pages/input.html" },
-    { "source": "/projects/work-management/pages/조회", "destination": "/projects/work-management/pages/query.html" }
+    { "source": "/projects/work-management/pages/조회", "destination": "/projects/work-management/pages/query.html" },
+    { "source": "/robot-review-ko", "destination": "/robot_system_review_ko.html" },
+    { "source": "/robot-review-en", "destination": "/robot_system_review_en.html" },
+    { "source": "/robot-review", "destination": "/robot_system_review_ko.html" }
   ]
 }
