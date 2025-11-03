@@ -185,7 +185,7 @@
     <div class="container">
         <div class="header">
             <h1>📊 ABB 로봇 백업 비교 보고서</h1>
-            <p>10/15 → 10/21 변경사항 & 호기별 차이점 분석</p>
+            <p>10/15 → 10/21 → 10/31 변경사항 & 호기별 차이점 분석</p>
         </div>
 
         <div class="breadcrumb">
@@ -202,17 +202,26 @@
                         <div class="stat-label">로봇</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">10/21</div>
-                        <div class="stat-label">백업 일자</div>
+                        <div class="stat-number">10/31</div>
+                        <div class="stat-label">최신 백업</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">16개</div>
                         <div class="stat-label">공통 프로그램</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">3개</div>
+                        <div class="stat-number">4개</div>
                         <div class="stat-label">3호기만 보유</div>
                     </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h4>📅 백업 타임라인</h4>
+                    <p>
+                        <strong>2025-10-15:</strong> 초기 백업 (No_1, No_2, No_3)<br>
+                        <strong>2025-10-21:</strong> 중간 분석 시점<br>
+                        <strong>2025-10-31:</strong> 최신 백업 (B1, B2, B3) ✅
+                    </p>
                 </div>
             </div>
 
@@ -317,9 +326,69 @@
                 </div>
             </div>
 
+            <div class="section" style="border-left-color: #10b981;">
+                <h2>🆕 10/21 → 10/31 변경사항</h2>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>호기</th>
+                            <th>추가</th>
+                            <th>삭제</th>
+                            <th>수정</th>
+                            <th>주요 변경</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1호기</strong></td>
+                            <td><span class="badge badge-added">+0</span></td>
+                            <td><span class="badge badge-deleted">-0</span></td>
+                            <td><span class="badge badge-modified">10 파일</span></td>
+                            <td>
+                                • Gantry/Head에 <code>nMoveid</code> 추적과 <code>WaitRob\ZeroSpeed</code> 동기화 추가<br>
+                                • Head 경로 데이터(좌표, 두께, corrorder, cycle time) 전면 재튜닝<br>
+                                • ArcLink 복구 시 soLn1* 신호 일괄 초기화 + <code>bEnableWeldSkip</code>으로 홀드 제어
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>2호기</strong></td>
+                            <td><span class="badge badge-added">+0</span></td>
+                            <td><span class="badge badge-deleted">-0</span></td>
+                            <td><span class="badge badge-modified">8 파일</span></td>
+                            <td>
+                                • 1호기와 동일한 Head/Gantry 재튜닝 및 ArcLink 리셋 절차 적용<br>
+                                • <code>sdo/sdi_T_Rob*_StopProc</code> 신설, 메인모듈에서 PulseDO로 정지 명령 명시화<br>
+                                • vSync·로봇/갠트리 기준 자세 재보정으로 동시 이동 시 흔들림 감소
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>3호기</strong></td>
+                            <td><span class="badge badge-added">+0</span></td>
+                            <td><span class="badge badge-deleted">-0</span></td>
+                            <td><span class="badge badge-modified">9 파일</span></td>
+                            <td>
+                                • 2호기와 동일한 StopProc/Head/Gantry 개선 + 테스트 모듈 4개 유지 (총 20개)<br>
+                                • <code>sdo_TRob{1,2}_ArcStop</code> DO + 인터럽트로 상호 ArcStop 신호 교차 제어<br>
+                                • <code>sdo/sdi_PP_To_Main</code> DI/DO 등록, 헤드 취소 시 ArcStop 및 플래그 리셋
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box">
+                    <h4>✅ 공통 개선 사항</h4>
+                    <p>
+                        <strong>Head/Gantry:</strong> <code>nMoveid</code> 기반 SyncMove 관리와 <code>WaitRob\ZeroSpeed</code> 대기 추가로 다축 동기 안정화<br>
+                        <strong>경로 데이터:</strong> wobj, corrorder, edge, 두께, 모션 스텝, cycle time 재정의로 새 시편 좌표에 맞춤<br>
+                        <strong>ArcLink 복구:</strong> Lincoln 제어 신호 일괄 리셋 + <code>bEnableWeldSkip</code>으로 생산/테스트 전환 시 Hold 신호 제어
+                    </p>
+                </div>
+            </div>
+
             <!-- 호기별 차이점 -->
             <div class="section" style="border-left-color: #10b981;">
-                <h2>🔍 현재 호기별 차이점 (10/21 기준)</h2>
+                <h2>🔍 현재 호기별 차이점 (10/31 기준)</h2>
 
                 <table class="comparison-table">
                     <thead>
@@ -343,8 +412,29 @@
                             <td><strong>RAPID 프로그램 수</strong></td>
                             <td>16개</td>
                             <td>16개</td>
-                            <td>19개 (+3)</td>
-                            <td><span class="badge badge-diff">3호기만 다름</span></td>
+                            <td>20개 (+4 테스트)</td>
+                            <td><span class="badge badge-diff">3호기 테스트 4개 유지</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>StopProc 핸드셰이크</strong></td>
+                            <td>기존 soLn1/2StopProc 사용</td>
+                            <td><code>sdo/sdi_T_Rob1/2_StopProc</code> 추가</td>
+                            <td>StopProc DO/DI + 헤드 취소 시 자동 리셋</td>
+                            <td><span class="badge badge-diff">2/3호기만 신규 DO/DI</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>ArcStop 인터럽트</strong></td>
+                            <td>없음</td>
+                            <td>없음</td>
+                            <td><code>sdo_TRob1/2_ArcStop</code> + 인터럽트</td>
+                            <td><span class="badge badge-diff">3호기만 보유</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>PP_To_Main 신호</strong></td>
+                            <td>없음</td>
+                            <td>없음</td>
+                            <td><code>sdo/sdi_PP_To_Main</code> 예약</td>
+                            <td><span class="badge badge-diff">3호기만 보유</span></td>
                         </tr>
                         <tr>
                             <td><strong>TASK1 테스트 파일</strong></td>
@@ -396,16 +486,16 @@
                         </tr>
                         <tr>
                             <td><strong>TASK8 (Head)</strong></td>
-                            <td>6개 모듈</td>
-                            <td>6개 모듈</td>
-                            <td>6개 모듈</td>
+                            <td>6개 모듈 (데이터 재튜닝)</td>
+                            <td>6개 모듈 (데이터 재튜닝)</td>
+                            <td>6개 모듈 (데이터 재튜닝)</td>
                             <td><span class="badge badge-same">동일</span></td>
                         </tr>
                         <tr>
                             <td><strong>TASK9 (Static)</strong></td>
-                            <td>Static.mod</td>
-                            <td>Static.mod</td>
-                            <td>Static.mod</td>
+                            <td>Static.mod (<code>bEnableWeldSkip</code> 추가)</td>
+                            <td>Static.mod (<code>bEnableWeldSkip</code> 추가)</td>
+                            <td>Static.mod (<code>bEnableWeldSkip</code> 추가)</td>
                             <td><span class="badge badge-same">동일</span></td>
                         </tr>
                         <tr>
@@ -433,8 +523,8 @@
                         <h4>💡 3호기의 역할</h4>
                         <p>
                             <strong>추론:</strong> 3호기는 <strong>테스트 및 검증용 로봇</strong>으로 사용되고 있습니다.<br>
-                            <strong>근거:</strong> 1/2호기에는 없는 테스트 프로그램 4개 보유<br>
-                            <strong>권장:</strong> 정식 운영 전 3호기에서 테스트 완료 후 1/2호기 배포
+                            <strong>근거:</strong> 1/2호기에는 없는 테스트 프로그램 4개 + ArcStop/PP_To_Main 신규 신호 보유<br>
+                            <strong>권장:</strong> ArcStop 인터럽트 및 StopProc 연동을 3호기에서 검증한 뒤 1/2호기에 단계적 적용
                         </p>
                     </div>
                 </div>
@@ -442,7 +532,7 @@
 
             <!-- 공통 프로그램 -->
             <div class="section">
-                <h2>✅ 3대 공통 보유 프로그램 (10/21 기준)</h2>
+                <h2>✅ 3대 공통 보유 프로그램 (10/31 기준)</h2>
 
                 <table class="comparison-table">
                     <thead>
@@ -522,6 +612,64 @@
                             <td><strong>TASK10</strong></td>
                             <td>Teaching.mod</td>
                             <td>티칭 기능</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section" style="border-left-color: #6366f1;">
+                <h2>🧾 업데이트 히스토리</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>날짜</th>
+                            <th>범위</th>
+                            <th>RAPID 변경</th>
+                            <th>I/O · 시스템 설정</th>
+                            <th>기타</th>
+                            <th>작성자</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>2025-10-21</strong></td>
+                            <td>초판 (10/15 → 10/21)</td>
+                            <td>
+                                • 1/2호기 TASK5·TASK6 전면 삭제, Gantry/Head 기능 TASK7·8로 통합<br>
+                                • 3호기 테스트 모듈(4개) 유지, 메인모듈 소폭 수정<br>
+                                • Rob1/Rob2/TASK7/TASK8 기준 프로그램 구성 정리
+                            </td>
+                            <td>
+                                • 1호기 HOME/5fc255e4 구조 추가, 라이선스 파일 정비<br>
+                                • ArcLink Lincoln 설정 및 장비별 신호 매핑 현행화<br>
+                                • MultiMove 구성/RobotWare 6.16 버전 명시
+                            </td>
+                            <td>
+                                • 비교 HTML 초판 제작, 삭제 파일 목록화<br>
+                                • 3호기 테스트 로봇 역할 정의<br>
+                                • 분석 명령어 레퍼런스 최초 추가
+                            </td>
+                            <td>Claude Code (Anthropic)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2025-11-03</strong></td>
+                            <td>확장 (10/21 → 10/31)</td>
+                            <td>
+                                • Head/Gantry 전 모듈에 <code>nMoveid</code>·<code>WaitRob\ZeroSpeed</code> 동기화 도입<br>
+                                • Rob1/Rob2 MainModule에 Lincoln ArcLink 재가동 루틴(soLn* 리셋) 추가<br>
+                                • <code>bEnableWeldSkip</code>으로 Gantry 홀드 로직 분기, corrorder/wobj/edge 재튜닝
+                            </td>
+                            <td>
+                                • B2/B3에 <code>sdo/sdi_T_Rob*_StopProc</code> 신규 할당, PulseDO 연동<br>
+                                • 3호기에 <code>sdo_TRob{1,2}_ArcStop</code> DO 및 인터럽트, <code>sdo/sdi_PP_To_Main</code> 예약<br>
+                                • 기존 StopProc 신호와의 교차 제어 구조 업데이트
+                            </td>
+                            <td>
+                                • 백업 타임라인·히스토리 섹션 추가<br>
+                                • 호기별 차이점 표를 10/31 기준으로 재작성<br>
+                                • ArcStop 인터럽트 테스트 권장사항 명시
+                            </td>
+                            <td>Codex (OpenAI)</td>
                         </tr>
                     </tbody>
                 </table>
