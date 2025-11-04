@@ -202,7 +202,7 @@
                         <div class="stat-label">로봇</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">10/31</div>
+                        <div class="stat-number">11/03</div>
                         <div class="stat-label">최신 백업</div>
                     </div>
                     <div class="stat-card">
@@ -220,7 +220,8 @@
                     <p>
                         <strong>2025-10-15:</strong> 초기 백업 (No_1, No_2, No_3)<br>
                         <strong>2025-10-21:</strong> 중간 분석 시점<br>
-                        <strong>2025-10-31:</strong> 최신 백업 (B1, B2, B3) ✅
+                        <strong>2025-10-31:</strong> 최신 백업 (B1, B2, B3)<br>
+                        <strong>2025-11-03:</strong> B-Line 재티칭 백업 (B1, B2, B3, B3 Swap) ✅
                     </p>
                 </div>
             </div>
@@ -386,9 +387,62 @@
                 </div>
             </div>
 
+            <div class="section" style="border-left-color: #3b82f6;">
+                <h2>⚙️ 10/31 → 11/03 변경사항</h2>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>호기</th>
+                            <th>추가</th>
+                            <th>삭제</th>
+                            <th>수정</th>
+                            <th>주요 변경</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1호기</strong></td>
+                            <td><span class="badge badge-added">+0</span></td>
+                            <td><span class="badge badge-deleted">-0</span></td>
+                            <td><span class="badge badge-modified">8 파일</span></td>
+                            <td>
+                                • 새 용접선 좌표(Edge/Wobj/Extax) 4,0xx mm 대역으로 재정렬<br>
+                                • SyncMove 기본값 복원: <code>stCommand="MoveJgJ"</code>, <code>zSync</code> 재확장, 실좌표 <code>jGantry</code> 적용<br>
+                                • StopProc 신호를 <code>sdi/sdo_T_Rob*</code>로 재배선하고 <code>StartMain</code>/<code>ReStart</code> DO/DI 추가<br>
+                                • <code>so_MoveG_PosHold</code> 잔류 시 대기, 트랩/MoveHome 구간에 <code>Stop;</code> 및 <code>nStartThick</code> 상한 검사 도입
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>2호기</strong></td>
+                            <td><span class="badge badge-added">+0</span></td>
+                            <td><span class="badge badge-deleted">-0</span></td>
+                            <td><span class="badge badge-modified">9 파일</span></td>
+                            <td>
+                                • 1호기와 동일한 좌표·SyncMove 패치 및 StopProc 재배선 적용<br>
+                                • <code>sdo/sdi_PP_Main</code>, <code>sdo/sdi_ReStart</code> 신설로 HMI에서 Main/모터 재시작 제어<br>
+                                • <code>bRBT_PP_Main</code> 상태 플래그를 Head/Teaching 모듈에 추가해 StartMain 승인 흐름 기록<br>
+                                • StopProc Pulse 후 <code>Stop;</code> 처리로 재가동 전 안전 정지 보장
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>3호기</strong></td>
+                            <td><span class="badge badge-added">+0</span></td>
+                            <td><span class="badge badge-deleted">-0</span></td>
+                            <td><span class="badge badge-modified">7 파일</span></td>
+                            <td>
+                                • 용접선 기준을 18 m대 좌표로 재배치, <code>zSync</code>·<code>jGantry</code> 기준자세 업데이트<br>
+                                • <code>Static</code> 토크/포즈 재측정, <code>Head_MoveControl</code> 두께 검사·Stop 가드 추가<br>
+                                • 기존 ArcStop/PP_To_Main 구조 유지, <strong>SwapWeldData_wfs0</strong> 백업(21:40)으로 WFS=0 세트 별도 제공
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
             <!-- 호기별 차이점 -->
             <div class="section" style="border-left-color: #10b981;">
-                <h2>🔍 현재 호기별 차이점 (10/31 기준)</h2>
+                <h2>🔍 현재 호기별 차이점 (11/03 기준)</h2>
 
                 <table class="comparison-table">
                     <thead>
@@ -417,10 +471,17 @@
                         </tr>
                         <tr>
                             <td><strong>StopProc 핸드셰이크</strong></td>
-                            <td>기존 soLn1/2StopProc 사용</td>
-                            <td><code>sdo/sdi_T_Rob1/2_StopProc</code> 추가</td>
-                            <td>StopProc DO/DI + 헤드 취소 시 자동 리셋</td>
-                            <td><span class="badge badge-diff">2/3호기만 신규 DO/DI</span></td>
+                            <td><code>sdo/sdi_T_Rob1/2_StopProc</code></td>
+                            <td><code>sdo/sdi_T_Rob1/2_StopProc</code></td>
+                            <td><code>sdo/sdi_T_Rob1/2_StopProc</code></td>
+                            <td><span class="badge badge-same">동일 (Cross_sdi_* 구성)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>StartMain/재기동</strong></td>
+                            <td><code>sdo/sdi_PP_Main</code>, <code>sdo/sdi_ReStart</code></td>
+                            <td><code>sdo/sdi_PP_Main</code>, <code>sdo/sdi_ReStart</code></td>
+                            <td><code>sdo/sdi_PP_To_Main</code>만 사용</td>
+                            <td><span class="badge badge-diff">3호기만 ReStart 미구현</span></td>
                         </tr>
                         <tr>
                             <td><strong>ArcStop 인터럽트</strong></td>
@@ -431,10 +492,10 @@
                         </tr>
                         <tr>
                             <td><strong>PP_To_Main 신호</strong></td>
-                            <td>없음</td>
-                            <td>없음</td>
-                            <td><code>sdo/sdi_PP_To_Main</code> 예약</td>
-                            <td><span class="badge badge-diff">3호기만 보유</span></td>
+                            <td><code>sdo/sdi_PP_Main</code> (Main 실행)</td>
+                            <td><code>sdo/sdi_PP_Main</code> (Main 실행)</td>
+                            <td><code>sdo/sdi_PP_To_Main</code> (S/W 강제 복귀)</td>
+                            <td><span class="badge badge-diff">3호기만 별도 PP_To_Main</span></td>
                         </tr>
                         <tr>
                             <td><strong>TASK1 테스트 파일</strong></td>
@@ -452,6 +513,13 @@
                             <td>없음</td>
                             <td>testttttt.mod</td>
                             <td><span class="badge badge-diff">3호기만 보유</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>특수 백업 세트</strong></td>
+                            <td>정규 B1 (20:40)</td>
+                            <td>정규 B2 (20:40)</td>
+                            <td>정규 B3 + <em>SwapWeldData_wfs0</em> (21:40)</td>
+                            <td><span class="badge badge-diff">3호기만 WFS 0 스왑본</span></td>
                         </tr>
                         <tr>
                             <td><strong>TASK5</strong></td>
@@ -523,8 +591,8 @@
                         <h4>💡 3호기의 역할</h4>
                         <p>
                             <strong>추론:</strong> 3호기는 <strong>테스트 및 검증용 로봇</strong>으로 사용되고 있습니다.<br>
-                            <strong>근거:</strong> 1/2호기에는 없는 테스트 프로그램 4개 + ArcStop/PP_To_Main 신규 신호 보유<br>
-                            <strong>권장:</strong> ArcStop 인터럽트 및 StopProc 연동을 3호기에서 검증한 뒤 1/2호기에 단계적 적용
+                            <strong>근거:</strong> 1/2호기에는 없는 테스트 프로그램 4개, ArcStop/PP_To_Main 전용 신호, <em>SwapWeldData_wfs0</em> 백업까지 보유<br>
+                            <strong>권장:</strong> ArcStop 인터럽트·PP_To_Main·WFS 0 스왑본을 3호기에서 검증 후 필요 시 1/2호기에 이식
                         </p>
                     </div>
                 </div>
@@ -532,7 +600,7 @@
 
             <!-- 공통 프로그램 -->
             <div class="section">
-                <h2>✅ 3대 공통 보유 프로그램 (10/31 기준)</h2>
+                <h2>✅ 3대 공통 보유 프로그램 (11/03 기준)</h2>
 
                 <table class="comparison-table">
                     <thead>
@@ -632,6 +700,41 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <td><strong>2025-11-05</strong></td>
+                            <td>현장 테스트</td>
+                            <td>
+                                • 3호기 <em>SwapWeldData_wfs0</em> 세트로 WFS=0 운전 검증 진행<br>
+                                • StopProc/SyncMove 재튜닝 모듈(Function/Main/MoveControl) 테스트 상태 기록
+                            </td>
+                            <td>
+                                • <code>sdi/sdo_T_Rob*</code>, <code>sdo/sdi_PP_Main</code>, <code>sdo/sdi_ReStart</code> 핸드셰이크 실기 확인 중<br>
+                                • 추가 설정 변경 없음
+                            </td>
+                            <td>
+                                • HTML 히스토리 보강 (테스트 항목만 정리)<br>
+                                • 비교 페이지 본문은 기존 11/03 기준 유지
+                            </td>
+                            <td>Codex (OpenAI)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2025-11-04</strong></td>
+                            <td>패치 (10/31 → 11/03)</td>
+                            <td>
+                                • B1/B2/B3 용접선 좌표·<code>wobj</code>·<code>pSearch</code> 전면 재튜닝, <code>nStartThick</code> 초과 시 <code>Stop;</code> 가드<br>
+                                • SyncMove 기본값(<code>stCommand="MoveJgJ"</code>, <code>zSync</code>) 복원, <code>so_MoveG_PosHold</code> 잔류 시 대기 로직 추가<br>
+                                • B3 Swap 백업 포함, WFS 0 적용 세트로 테스트 분리
+                            </td>
+                            <td>
+                                • StopProc 교차신호를 <code>sdi/sdo_T_Rob*</code>로 통합, HMS <code>StartMain</code>/<code>ReStart</code> DO/DI 신설 (B1/B2)<br>
+                                • ArcStop·PP_To_Main 구조 재검토 (B3 유지), StatusWeld·Torque 재계산
+                            </td>
+                            <td>
+                                • 11/03 백업 섹션과 히스토리 갱신, SwapWeldData_wfs0 명시<br>
+                                • 호기별 차이점/신호 표 최신화
+                            </td>
+                            <td>Codex (OpenAI)</td>
+                        </tr>
+                        <tr>
                             <td><strong>2025-10-21</strong></td>
                             <td>초판 (10/15 → 10/21)</td>
                             <td>
@@ -720,7 +823,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('로봇 백업 비교 보고서 로드 완료');
-            console.log('분석 기준일: 2025-10-22');
+            console.log('분석 기준일: 2025-11-04');
         });
     </script>
 </body>
