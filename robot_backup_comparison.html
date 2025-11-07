@@ -185,7 +185,7 @@
     <div class="container">
         <div class="header">
             <h1>📊 ABB 로봇 백업 비교 보고서</h1>
-            <p>10/15 → 10/21 → 10/31 변경사항 & 호기별 차이점 분석</p>
+            <p>10/15 → 10/21 → 10/31 → 11/05 변경사항 & 호기별 차이점 분석</p>
         </div>
 
         <div class="breadcrumb">
@@ -202,7 +202,7 @@
                         <div class="stat-label">로봇</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">11/03</div>
+                        <div class="stat-number">11/05</div>
                         <div class="stat-label">최신 백업</div>
                     </div>
                     <div class="stat-card">
@@ -210,7 +210,7 @@
                         <div class="stat-label">공통 프로그램</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">4개</div>
+                        <div class="stat-number">1개</div>
                         <div class="stat-label">3호기만 보유</div>
                     </div>
                 </div>
@@ -221,7 +221,8 @@
                         <strong>2025-10-15:</strong> 초기 백업 (No_1, No_2, No_3)<br>
                         <strong>2025-10-21:</strong> 중간 분석 시점<br>
                         <strong>2025-10-31:</strong> 최신 백업 (B1, B2, B3)<br>
-                        <strong>2025-11-03:</strong> B-Line 재티칭 백업 (B1, B2, B3, B3 Swap) ✅
+                        <strong>2025-11-03:</strong> B-Line 통합 백업 (3대 로봇 + B3 Swap) ✅<br>
+                        <strong>2025-11-05:</strong> 운영 백업 (B1 21:20, B2 21:20, B3_BeforeSettingPlanB 09:00) 🔥
                     </p>
                 </div>
             </div>
@@ -387,7 +388,7 @@
                 </div>
             </div>
 
-            <div class="section" style="border-left-color: #3b82f6;">
+            <div class="section" style="border-left-color: #8b5cf6;">
                 <h2>⚙️ 10/31 → 11/03 변경사항</h2>
 
                 <table class="comparison-table">
@@ -440,9 +441,150 @@
                 </table>
             </div>
 
+            <!-- 11/03 → 11/05 변경사항 -->
+            <div class="section" style="border-left-color: #3b82f6;">
+                <h2>🆕 10/31 → 11/05 변경사항 (최신)</h2>
+
+                <div class="highlight-box">
+                    <h4>⚠️ 중요 변경 사항</h4>
+                    <p>
+                        <strong>I/O 신호 체계:</strong> PP 모드 메인 실행 및 재시작 신호 추가 (sdi_PP_Main, sdi_ReStart)<br>
+                        <strong>데이터 구조:</strong> Seamdata 및 매크로 배열 2차원화 (A라인/B라인 독립 관리)<br>
+                        <strong>용접 최적화:</strong> 1/2호기 13% 감속, 3호기 Hold 속도 극저속(0.01mm/s) 설정<br>
+                        <strong>3호기 특이:</strong> 테스트 파일 3개 삭제, "BeforeSettingPlanB" 백업으로 롤백 포인트 확보
+                    </p>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>호기</th>
+                            <th>추가</th>
+                            <th>삭제</th>
+                            <th>수정</th>
+                            <th>주요 변경</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1호기</strong></td>
+                            <td><span class="badge badge-added">+0</span></td>
+                            <td><span class="badge badge-deleted">-1 파일</span></td>
+                            <td><span class="badge badge-modified">12 파일</span></td>
+                            <td>
+                                • I/O 신호 8개 추가 (<code>sdi_PP_Main</code>, <code>sdi_ReStart</code>, <code>sdi_T_Rob1/2_StopProc</code>)<br>
+                                • 용접 속도 13% 감속 (10→8.67 mm/s), 전압/전류 증가 (40.5V, 280A)<br>
+                                • Seamdata 배열화 (<code>smDefault_1{2}</code>), 런타임 버퍼 추가<br>
+                                • Edge 좌표 X축 +3.9m 이동, Search 범위 재조정<br>
+                                • 매크로 토치 모션 2차원 배열 전환 (<code>macroAutoStartA{2,10}</code>)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>2호기</strong></td>
+                            <td><span class="badge badge-added">+0</span></td>
+                            <td><span class="badge badge-deleted">-0</span></td>
+                            <td><span class="badge badge-modified">12 파일</span></td>
+                            <td>
+                                • I/O 신호 4개 추가 (<code>sdi_PP_Main</code>, <code>sdi_ReStart</code>만, StopProc 제외)<br>
+                                • 1호기와 동일한 용접 파라미터 및 데이터 구조 변경<br>
+                                • Gantry_MainModule 디버그 <code>stop;</code> 명령 제거<br>
+                                • Teaching.mod에 <code>bRBT_PP_Main</code> 플래그 추가
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>3호기</strong></td>
+                            <td><span class="badge badge-added">+0</span></td>
+                            <td><span class="badge badge-deleted">-3 파일</span></td>
+                            <td><span class="badge badge-modified">7 파일</span></td>
+                            <td>
+                                • 테스트 파일 3개 삭제 (test251015.mod, testtttt.mod, testttttt.mod)<br>
+                                • <strong>Hold 용접 속도 극저속 설정 (10→0.01 mm/s, 1000배 감소)</strong> ⚠️<br>
+                                • 용접 전류 명시적 설정 (270A, 255A, 225A, 120A 등)<br>
+                                • Edge 좌표 X축 +5.5m 이동 (1호기보다 1.6m 더 먼 위치)<br>
+                                • ExitCycle 이중 실행 방지 안전 로직 추가
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="robot-section">
+                    <h3>📦 Bline_BACKUP_2025-11-03_2040 분석</h3>
+                    <div class="highlight-box">
+                        <h4>🔍 백업 구성</h4>
+                        <p>
+                            이 백업은 <strong>B라인 전체 시스템 통합 백업</strong>으로 3대 로봇을 동시에 포함합니다:<br><br>
+                            • 1200-526402 (1호기) - 2025-11-03 20:40<br>
+                            • 1200-526404 (2호기) - 2025-11-03 20:40<br>
+                            • 1200-526406 (3호기) - 2025-11-03 20:40<br>
+                            • 1200-526406 (3호기 특수) - 2025-11-03 21:40 <code>SwapWeldData_wfs0</code> ✨
+                        </p>
+                    </div>
+                    <div class="file-list">
+                        <strong>용도 추정:</strong>
+                        <ul>
+                            <li>• 통합 배포 패키지 - 3대 로봇 동시 배포용</li>
+                            <li>• 일일 백업 루틴 - 11/03 작업 종료 시점 스냅샷</li>
+                            <li>• 3호기 실험 기록 - Wire Feed Speed 0 설정 테스트 버전</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="robot-section">
+                    <h3>🚨 중요 발견사항 및 권고</h3>
+
+                    <div class="highlight-box" style="border-left-color: #ef4444;">
+                        <h4>🔴 Critical: 3호기 Hold 속도 극저속 설정</h4>
+                        <p>
+                            <strong>현상:</strong> Holdwd1-4 속도 10 mm/s → 0.01 mm/s (1000배 감소)<br>
+                            <strong>영향:</strong> 홀드 시간 1000배 증가, 열 집중으로 인한 변형/번아웃 위험<br>
+                            <strong>권고:</strong> 의도적 설정인지 확인 필요, 1/2호기(8.67mm/s)와 동기화 검토
+                        </p>
+                    </div>
+
+                    <div class="highlight-box" style="border-left-color: #f59e0b;">
+                        <h4>⚠️ Warning: I/O 신호 추가 불일치</h4>
+                        <p>
+                            <strong>현상:</strong> 1호기만 <code>sdi_T_Rob1/2_StopProc</code> 신호 보유<br>
+                            <strong>영향:</strong> 호기 간 정지 로직 불일치, 크로스 커넥션 동작 차이<br>
+                            <strong>권고:</strong> 2/3호기에도 동일 신호 추가 또는 1호기 전용 기능으로 문서화
+                        </p>
+                    </div>
+
+                    <div class="highlight-box" style="border-left-color: #f59e0b;">
+                        <h4>⚠️ Warning: Edge Detection 워크피스 위치 차이</h4>
+                        <p>
+                            <strong>현상:</strong> 3호기가 1호기보다 X축 +1.6m 더 먼 위치 (1호기: +3.9m, 3호기: +5.5m)<br>
+                            <strong>영향:</strong> 3대 로봇이 서로 다른 워크피스 작업 중, 동기화 티칭 불가<br>
+                            <strong>권고:</strong> 워크피스 위치 표준화 또는 호기별 작업 영역 명확히 정의
+                        </p>
+                    </div>
+
+                    <div class="highlight-box" style="border-left-color: #3b82f6;">
+                        <h4>ℹ️ Info: Seamdata 배열화로 인한 호환성</h4>
+                        <p>
+                            <strong>현상:</strong> <code>smDefault_1</code> → <code>smDefault_1{2}</code> 배열 전환<br>
+                            <strong>영향:</strong> 구 백업으로 롤백 시 컴파일 오류 가능<br>
+                            <strong>권고:</strong> 롤백 계획 수립 시 seamdata 구조 변환 스크립트 필요, 또는 11/03 Bline 백업을 롤백 포인트로 지정
+                        </p>
+                    </div>
+
+                    <div class="highlight-box" style="border-left-color: #8b5cf6;">
+                        <h4>🔮 "BeforeSettingPlanB" 백업의 의미</h4>
+                        <p>
+                            <strong>백업 시점:</strong> 2025-11-05 09:00 (1/2호기는 21:20, 12시간 차이)<br>
+                            <strong>추정 의미:</strong> 플랜 B 설정 이전 상태 보존 (롤백 포인트)<br>
+                            <strong>추정 시나리오:</strong><br>
+                            &nbsp;&nbsp;• 플랜 A: 현재 A라인/B라인 개별 용접 조건<br>
+                            &nbsp;&nbsp;• 플랜 B: 통합 또는 새로운 용접 전략 (미확인)<br>
+                            <strong>권고:</strong> 플랜 B 내용 확인 및 문서화, 11/05 09:00 이후 변경사항 추적 필요
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <!-- 호기별 차이점 -->
             <div class="section" style="border-left-color: #10b981;">
-                <h2>🔍 현재 호기별 차이점 (11/03 기준)</h2>
+                <h2>🔍 현재 호기별 차이점 (11/05 기준)</h2>
 
                 <table class="comparison-table">
                     <thead>
@@ -466,8 +608,8 @@
                             <td><strong>RAPID 프로그램 수</strong></td>
                             <td>16개</td>
                             <td>16개</td>
-                            <td>20개 (+4 테스트)</td>
-                            <td><span class="badge badge-diff">3호기 테스트 4개 유지</span></td>
+                            <td>17개 (+1 테스트)</td>
+                            <td><span class="badge badge-diff">3호기 테스트 1개 유지 (testtt.mod)</span></td>
                         </tr>
                         <tr>
                             <td><strong>StopProc 핸드셰이크</strong></td>
@@ -501,18 +643,15 @@
                             <td><strong>TASK1 테스트 파일</strong></td>
                             <td>없음</td>
                             <td>없음</td>
-                            <td>
-                                • test251015.mod<br>
-                                • testtttt.mod
-                            </td>
-                            <td><span class="badge badge-diff">3호기만 보유</span></td>
+                            <td>없음 (11/05 삭제됨)</td>
+                            <td><span class="badge badge-same">동일 (정리 완료)</span></td>
                         </tr>
                         <tr>
                             <td><strong>TASK2 테스트 파일</strong></td>
                             <td>없음</td>
                             <td>없음</td>
-                            <td>testttttt.mod</td>
-                            <td><span class="badge badge-diff">3호기만 보유</span></td>
+                            <td>없음 (11/05 삭제됨)</td>
+                            <td><span class="badge badge-same">동일 (정리 완료)</span></td>
                         </tr>
                         <tr>
                             <td><strong>특수 백업 세트</strong></td>
@@ -580,19 +719,20 @@
                     <h3>📌 3호기만 보유한 파일 (테스트용)</h3>
                     <div class="file-list">
                         <ul>
-                            <li><strong>TASK1/PROGMOD/test251015.mod</strong> - 10/15 테스트 프로그램</li>
-                            <li><strong>TASK1/PROGMOD/testtttt.mod</strong> - 테스트 프로그램</li>
-                            <li><strong>TASK2/PROGMOD/testttttt.mod</strong> - 테스트 프로그램</li>
-                            <li><strong>TASK7/PROGMOD/testtt.mod</strong> - Gantry 테스트</li>
+                            <li><strong>TASK7/PROGMOD/testtt.mod</strong> - Gantry 테스트 (유일)</li>
+                            <li><del>TASK1/PROGMOD/test251015.mod</del> - 11/05 삭제됨</li>
+                            <li><del>TASK1/PROGMOD/testtttt.mod</del> - 11/05 삭제됨</li>
+                            <li><del>TASK2/PROGMOD/testttttt.mod</del> - 11/05 삭제됨</li>
                         </ul>
                     </div>
 
                     <div class="highlight-box">
-                        <h4>💡 3호기의 역할</h4>
+                        <h4>💡 3호기의 역할 (11/05 업데이트)</h4>
                         <p>
                             <strong>추론:</strong> 3호기는 <strong>테스트 및 검증용 로봇</strong>으로 사용되고 있습니다.<br>
-                            <strong>근거:</strong> 1/2호기에는 없는 테스트 프로그램 4개, ArcStop/PP_To_Main 전용 신호, <em>SwapWeldData_wfs0</em> 백업까지 보유<br>
-                            <strong>권장:</strong> ArcStop 인터럽트·PP_To_Main·WFS 0 스왑본을 3호기에서 검증 후 필요 시 1/2호기에 이식
+                            <strong>근거:</strong> Hold 속도 극저속 설정, ArcStop/PP_To_Main 전용 신호, <em>SwapWeldData_wfs0</em> 백업, <em>BeforeSettingPlanB</em> 롤백 포인트<br>
+                            <strong>변경:</strong> TASK1/2 테스트 파일 정리 완료 (3개 삭제), TASK7 테스트만 유지<br>
+                            <strong>권장:</strong> ArcStop 인터럽트·PP_To_Main·Hold 극저속 설정을 3호기에서 검증 후 필요 시 1/2호기에 이식
                         </p>
                     </div>
                 </div>
@@ -699,6 +839,29 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td><strong>2025-11-07</strong></td>
+                            <td>최신 백업 (10/31 → 11/05)</td>
+                            <td>
+                                • 1/2호기 용접 속도 13% 감속 (10→8.67 mm/s), 전압/전류 최적화 (40.5V, 280A)<br>
+                                • 3호기 Hold 속도 극저속 설정 (10→0.01 mm/s), 테스트 파일 3개 삭제<br>
+                                • Seamdata 및 매크로 배열 2차원화 (A라인/B라인 독립 관리)<br>
+                                • Edge 좌표 대폭 이동 (1호기 +3.9m, 3호기 +5.5m), ExitCycle 안전 로직 추가
+                            </td>
+                            <td>
+                                • 1호기 I/O 신호 8개 추가 (<code>sdi_PP_Main</code>, <code>sdi_ReStart</code>, <code>sdi_T_Rob1/2_StopProc</code>)<br>
+                                • 2호기 I/O 신호 4개 추가 (<code>sdi_PP_Main</code>, <code>sdi_ReStart</code>)<br>
+                                • Gantry_MainModule 디버그 <code>stop;</code> 제거, Teaching.mod <code>bRBT_PP_Main</code> 추가<br>
+                                • <strong>Bline_BACKUP_2025-11-03_2040</strong> 통합 백업 분석 추가 (3대 로봇 + Swap)
+                            </td>
+                            <td>
+                                • 11/05 백업 섹션 신규 추가, 호기별 차이점 업데이트<br>
+                                • 3호기 "BeforeSettingPlanB" 백업 의미 해석 및 권고사항<br>
+                                • Critical/Warning 이슈 5개 항목화 (Hold 극저속, I/O 불일치, 좌표 차이 등)<br>
+                                • 백업 타임라인 전체 정리 (10/15→11/05)
+                            </td>
+                            <td>Claude Code (Anthropic)</td>
+                        </tr>
                         <tr>
                             <td><strong>2025-11-05</strong></td>
                             <td>현장 테스트</td>
@@ -823,7 +986,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('로봇 백업 비교 보고서 로드 완료');
-            console.log('분석 기준일: 2025-11-04');
+            console.log('분석 기준일: 2025-11-07 (최신 업데이트)');
+            console.log('백업 범위: 2025-10-15 ~ 2025-11-05');
         });
     </script>
 </body>
