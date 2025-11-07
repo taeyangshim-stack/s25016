@@ -448,9 +448,9 @@
                 <div class="highlight-box">
                     <h4>⚠️ 중요 변경 사항</h4>
                     <p>
-                        <strong>I/O 신호 체계:</strong> PP 모드 메인 실행 및 재시작 신호 추가 (sdi_PP_Main, sdi_ReStart)<br>
+                        <strong>I/O 신호 체계:</strong> PP 모드/재시작 신호 추가, StopProc 신호 3대 통일 완료<br>
                         <strong>데이터 구조:</strong> Seamdata 및 매크로 배열 2차원화 (A라인/B라인 독립 관리)<br>
-                        <strong>용접 최적화:</strong> 1/2호기 13% 감속, 3호기 Hold 속도 극저속(0.01mm/s) 설정<br>
+                        <strong>용접 최적화:</strong> 1/2호기 13% 감속, 3호기 Hold 속도 극저속(0.01mm/s) 설정 🔴<br>
                         <strong>3호기 특이:</strong> 테스트 파일 3개 삭제, "BeforeSettingPlanB" 백업으로 롤백 포인트 확보
                     </p>
                 </div>
@@ -541,21 +541,23 @@
                         </p>
                     </div>
 
-                    <div class="highlight-box" style="border-left-color: #f59e0b;">
-                        <h4>⚠️ Warning: I/O 신호 추가 불일치</h4>
+                    <div class="highlight-box" style="border-left-color: #10b981;">
+                        <h4>✅ 해결됨: I/O 신호 통일 완료</h4>
                         <p>
-                            <strong>현상:</strong> 1호기만 <code>sdi_T_Rob1/2_StopProc</code> 신호 보유<br>
-                            <strong>영향:</strong> 호기 간 정지 로직 불일치, 크로스 커넥션 동작 차이<br>
-                            <strong>권고:</strong> 2/3호기에도 동일 신호 추가 또는 1호기 전용 기능으로 문서화
+                            <strong>10/31 상태:</strong> 2/3호기만 <code>sdi_T_Rob1/2_StopProc</code> 신호 보유, 1호기 없음<br>
+                            <strong>11/05 업데이트:</strong> 1호기에 동일 신호 추가됨 → <strong>3대 모두 통일</strong> ✅<br>
+                            <strong>기능:</strong> Rob1↔Rob2 정지 상태 크로스 커넥션 핸드셰이크<br>
+                            <strong>결과:</strong> 호기 간 정지 로직 일치, 동기화 안전성 향상
                         </p>
                     </div>
 
-                    <div class="highlight-box" style="border-left-color: #f59e0b;">
-                        <h4>⚠️ Warning: Edge Detection 워크피스 위치 차이</h4>
+                    <div class="highlight-box" style="border-left-color: #3b82f6;">
+                        <h4>ℹ️ Info: X축 좌표 차이 (물리적 배치)</h4>
                         <p>
-                            <strong>현상:</strong> 3호기가 1호기보다 X축 +1.6m 더 먼 위치 (1호기: +3.9m, 3호기: +5.5m)<br>
-                            <strong>영향:</strong> 3대 로봇이 서로 다른 워크피스 작업 중, 동기화 티칭 불가<br>
-                            <strong>권고:</strong> 워크피스 위치 표준화 또는 호기별 작업 영역 명확히 정의
+                            <strong>시스템 구성:</strong> 1/2/3호기가 하나의 X축 갠트리 레일을 공유<br>
+                            <strong>X좌표 차이:</strong> 1호기(6.7m) → 2호기(~14m) → 3호기(21.2m) 순서로 배치<br>
+                            <strong>좌표 이동:</strong> 10/31→11/05 간 워크피스 재배치 반영 (1호기 +3.9m, 3호기 +5.5m)<br>
+                            <strong>의미:</strong> X좌표 차이는 각 로봇의 물리적 설치 위치를 반영한 정상 설정 ✅
                         </p>
                     </div>
 
