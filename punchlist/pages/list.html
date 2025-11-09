@@ -665,6 +665,25 @@
                 <button class="btn btn-primary" onclick="applyFilters()">🔍 검색</button>
                 <button class="btn btn-outline" onclick="resetFilters()">🔄 초기화</button>
             </div>
+
+            <div class="filter-row" style="margin-top: var(--space-4); border-top: 1px solid var(--color-gray-200); padding-top: var(--space-4);">
+                <div class="filter-group">
+                    <label>정렬 시 제외할 항목 (열)</label>
+                    <select id="excludeSortColumn" onchange="updateExcludeValueOptions()">
+                        <option value="">선택 안함</option>
+                        <option value="status">상태</option>
+                        <option value="priority">우선순위</option>
+                        <option value="owner">담당자</option>
+                        <option value="line_classification">라인 분류</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>정렬 시 제외할 항목 (값)</label>
+                    <select id="excludeSortValue">
+                        <option value="">선택 안함</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <!-- 테이블 -->
@@ -727,6 +746,9 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await initFilters();
             await loadIssues();
+            
+            document.getElementById('excludeSortColumn').addEventListener('change', applyFilters);
+            document.getElementById('excludeSortValue').addEventListener('change', applyFilters);
         });
 
         // 필터 초기화
@@ -861,6 +883,8 @@
             document.getElementById('filterOwner').value = '';
             document.getElementById('filterLine').value = '';
             document.getElementById('searchInput').value = '';
+            document.getElementById('excludeSortColumn').value = '';
+            document.getElementById('excludeSortValue').value = '';
 
             document.getElementById('filterSubcategory').innerHTML = '<option value="">전체</option>';
 
@@ -929,14 +953,51 @@
 
             // 정렬 아이콘 업데이트
             document.querySelectorAll('th').forEach(th => th.classList.remove('sorted'));
-            event.target.closest('th').classList.add('sorted');
+            const thElement = event.target.closest('th');
+            if (thElement) {
+                thElement.classList.add('sorted');
+            }
+
 
             sortIssues();
             renderTable();
         }
 
         function sortIssues() {
-            filteredIssues = PunchListAPI.sortIssues(filteredIssues, sortColumn, sortDirection);
+            const excludeColumn = document.getElementById('excludeSortColumn').value;
+            const excludeValue = document.getElementById('excludeSortValue').value;
+            filteredIssues = PunchListAPI.sortIssues(filteredIssues, sortColumn, sortDirection, { excludeColumn, excludeValue });
+        }
+        
+        function updateExcludeValueOptions() {
+            const column = document.getElementById('excludeSortColumn').value;
+            const valueSelect = document.getElementById('excludeSortValue');
+            valueSelect.innerHTML = '<option value="">선택 안함</option>';
+
+            if (!column) return;
+
+            let options = [];
+            switch (column) {
+                case 'status':
+                    options = PunchListAPI.STATUSES;
+                    break;
+                case 'priority':
+                    options = PunchListAPI.PRIORITIES;
+                    break;
+                case 'owner':
+                    options = PunchListAPI.getOwnerNames();
+                    break;
+                case 'line_classification':
+                    options = PunchListAPI.LINE_TYPES;
+                    break;
+            }
+
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt;
+                option.textContent = opt;
+                valueSelect.appendChild(option);
+            });
         }
 
         // 테이블 렌더링

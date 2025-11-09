@@ -1297,10 +1297,18 @@ function filterIssues(issues, filters) {
 }
 
 // 정렬
-function sortIssues(issues, sortBy, sortOrder = 'asc') {
+function sortIssues(issues, sortBy, sortOrder = 'asc', options = {}) {
   const sorted = [...issues];
+  const { excludeColumn, excludeValue } = options;
 
   sorted.sort((a, b) => {
+    if (excludeColumn && excludeValue) {
+      const aExcluded = a[excludeColumn] === excludeValue;
+      const bExcluded = b[excludeColumn] === excludeValue;
+      if (aExcluded && !bExcluded) return 1;
+      if (!aExcluded && bExcluded) return -1;
+    }
+
     let aVal = a[sortBy];
     let bVal = b[sortBy];
 
