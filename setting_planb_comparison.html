@@ -5,239 +5,264 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Setting Plan B 전·후 비교 (3호기)</title>
     <style>
-        :root {
-            color-scheme: dark;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            margin: 0;
-            font-family: "Pretendard", "Segoe UI", Arial, sans-serif;
-            background: #0f172a;
-            color: #e2e8f0;
-            line-height: 1.6;
-        }
-        a {
-            color: #38bdf8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
         }
         .container {
-            max-width: 960px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 32px 18px 48px;
-        }
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            color: #f8fafc;
-        }
-        h2 {
-            margin-top: 36px;
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-            color: #cbd5f5;
-        }
-        .summary {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid #1e293b;
+            background: #fff;
             border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: #fff;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+        }
+        .breadcrumb {
+            padding: 18px 40px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .breadcrumb a {
+            color: #357abd;
+            text-decoration: none;
+        }
+        .content {
+            padding: 40px;
+        }
+        .section {
+            margin-bottom: 36px;
+            padding: 26px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 5px solid #4a90e2;
+        }
+        .section h2 {
+            margin-bottom: 12px;
+            color: #1f2933;
         }
         .stat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 18px;
             margin-top: 18px;
         }
         .stat-card {
-            border-radius: 14px;
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(14, 165, 233, 0.08));
-            border: 1px solid rgba(14, 165, 233, 0.35);
+            background: #fff;
+            border-radius: 12px;
             padding: 18px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
         }
         .stat-card h3 {
-            margin: 0;
             font-size: 0.9rem;
-            color: #bae6fd;
+            color: #64748b;
+            text-transform: uppercase;
             letter-spacing: 0.04em;
         }
         .stat-card p {
-            margin: 8px 0 0;
+            margin-top: 8px;
             font-size: 1.35rem;
-            color: #f8fafc;
+            color: #1f2933;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 16px;
-            font-size: 0.95rem;
+            margin-top: 12px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
         }
         th, td {
-            border: 1px solid #1e293b;
-            padding: 12px 14px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
             vertical-align: top;
+            font-size: 0.95rem;
         }
         th {
-            background: rgba(30, 41, 59, 0.7);
-            color: #cbd5f5;
+            background: #4a90e2;
+            color: #fff;
             font-weight: 600;
         }
         tr:nth-child(even) td {
-            background: rgba(30, 41, 59, 0.35);
+            background: #f9fafb;
         }
         .badge {
             display: inline-block;
-            padding: 2px 8px;
+            padding: 2px 10px;
             border-radius: 999px;
-            font-size: 0.75rem;
-            letter-spacing: 0.03em;
+            font-size: 0.8rem;
+            margin-right: 6px;
         }
-        .badge-before {
-            background: rgba(248, 113, 113, 0.18);
-            border: 1px solid rgba(248, 113, 113, 0.4);
-            color: #fecaca;
-        }
-        .badge-after {
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid rgba(34, 197, 94, 0.4);
-            color: #bbf7d0;
-        }
+        .badge-before { background: #fee2e2; color: #991b1b; }
+        .badge-after { background: #def7ec; color: #046c4e; }
         .callout {
-            margin-top: 28px;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid #1d4ed8;
-            border-radius: 16px;
-            padding: 18px;
+            background: #fffced;
+            border-left: 5px solid #f59e0b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 18px;
         }
         .callout h3 {
-            margin: 0 0 8px;
-            color: #93c5fd;
+            margin-bottom: 10px;
+            color: #92400e;
         }
-        @media (max-width: 640px) {
+        .callout ol {
+            margin-left: 20px;
+            color: #4b5563;
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .content { padding: 20px; }
             table, thead, tbody, tr, th, td {
                 display: block;
             }
-            th {
-                position: absolute;
-                left: -999rem;
-            }
+            th { position: absolute; left: -999rem; }
             td {
-                border: 1px solid #1e293b;
-                margin-bottom: 10px;
-                background: rgba(15, 23, 42, 0.6);
+                border: none;
+                border-bottom: 1px solid #e5e7eb;
+                background: #fff;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Setting Plan B 적용 전·후 비교 (3호기)</h1>
-        <p class="summary">
-            <strong>비교 대상:</strong> <code>1200-526406_BACKUP_2025-11-05_0900_B3_BeforeSettingPlanB</code> vs <code>1200-526406_BACKUP_2025-11-05_2120_B3</code><br>
-            <strong>초점:</strong> RAPID 모듈 구조, SYSPAR/EIO I/O 매핑, HOME/Arc 환경
-        </p>
-
-        <div class="stat-grid">
-            <div class="stat-card">
-                <h3>RAPID 모듈 수</h3>
-                <p><span class="badge badge-before">Before</span> 17 → <span class="badge badge-after">After</span> 3</p>
-            </div>
-            <div class="stat-card">
-                <h3>주요 모듈 라인 수</h3>
-                <p>Rob1 MainModule 2,499줄 → 18줄</p>
-            </div>
-            <div class="stat-card">
-                <h3>DeviceNet 내부 I/O</h3>
-                <p>기본 매핑 → +63개 EXTCTL 신호</p>
-            </div>
+        <div class="header">
+            <h1>Setting Plan B 적용 전·후 비교 (3호기)</h1>
+            <p>11/05 09:00 백업 대비 21:20 적용본의 구조 변화를 정리했습니다.</p>
         </div>
+        <div class="breadcrumb">
+            <a href="index.html">← 메인 대시보드</a> / <a href="robot_backup_comparison.html">로봇 백업 비교</a> / <strong>Setting Plan B 비교</strong>
+        </div>
+        <div class="content">
+            <div class="section">
+                <h2>요약</h2>
+                <p><strong>비교 대상:</strong> <code>1200-526406_BACKUP_2025-11-05_0900_B3_BeforeSettingPlanB</code> vs <code>1200-526406_BACKUP_2025-11-05_2120_B3</code></p>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <h3>RAPID 모듈 수</h3>
+                        <p><span class="badge badge-before">Before</span> 17 → <span class="badge badge-after">After</span> 3</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>MainModule 라인 수</h3>
+                        <p>Rob1 2,499줄 → 18줄<br>Rob2 2,563줄 → 21줄</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>DeviceNet 신호</h3>
+                        <p>기존 매핑 → +63개 EXTCTL/pos/ref 신호</p>
+                    </div>
+                </div>
+            </div>
 
-        <h2>1. RAPID 프로그램 변화</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>항목</th>
-                    <th>Before (09:00)</th>
-                    <th>After (21:20)</th>
-                    <th>영향</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Task1 MainModule</td>
-                    <td>2,499줄, <code>Rob1_MainModule.mod</code> 전체 용접/Sync/오차 처리 로직 포함</td>
-                    <td>18줄, <code>MainModule.mod</code> 스켈레톤만 남김</td>
-                    <td>기존 용접 시퀀스·<code>Welds1{}</code> 데이터 테이블 및 Trap 로직 모두 제거됨</td>
-                </tr>
-                <tr>
-                    <td>Task2 MainModule</td>
-                    <td>2,563줄, ROB2 전체 시퀀스 유지</td>
-                    <td>21줄, 최소화된 <code>MainModule.mod</code></td>
-                    <td>ROB2 전용 용접 스텝, 대기 루프, ArcLink 복구 코드 삭제</td>
-                </tr>
-                <tr>
-                    <td>헤드/갠트리 모듈</td>
-                    <td><code>Head_*</code> 6개, <code>Gantry_*</code> 2개, 테스트 모듈(<code>testtt.mod</code>) 포함</td>
-                    <td>모두 제거, Task7에는 <code>Static.mod</code> 1개만 잔존</td>
-                    <td>Setting Plan B 이후 갠트리·헤드 제어를 외부 장치나 다른 태스크로 이관한 것으로 추정</td>
-                </tr>
-                <tr>
-                    <td>테스트 자산</td>
-                    <td><code>testtt.mod</code>, <code>test251015.mod</code> 등 총 4개</td>
-                    <td>모두 삭제</td>
-                    <td>현장 테스트용 시퀀스가 제외되어 Rollback 시 별도 복원이 필요</td>
-                </tr>
-            </tbody>
-        </table>
+            <div class="section">
+                <h2>1. RAPID 프로그램 변화</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>항목</th>
+                            <th>Before (09:00)</th>
+                            <th>After (21:20)</th>
+                            <th>영향</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Task1 MainModule</td>
+                            <td>2,499줄, <code>Rob1_MainModule.mod</code> 전체 용접/Sync/Trap 보유</td>
+                            <td>18줄, <code>MainModule.mod</code> 스켈레톤만 잔존</td>
+                            <td>용접 시퀀스, 테스트 Step, Trap 로직 모두 제거 → 기존 동작 필요 시 복구 필수</td>
+                        </tr>
+                        <tr>
+                            <td>Task2 MainModule</td>
+                            <td>2,563줄, ROB2 세부 로직 유지</td>
+                            <td>21줄, 최소 스켈레톤</td>
+                            <td>ROB2 용접 스텝/ArcLink 복구/Busy Loop 모두 삭제</td>
+                        </tr>
+                        <tr>
+                            <td>갠트리/헤드 모듈</td>
+                            <td><code>Gantry_*</code> 2개 + <code>Head_*</code> 6개 + 테스트 모듈 보유</td>
+                            <td>Task7에 <code>Static.mod</code> 1개만 남음</td>
+                            <td>갠트리/헤드 제어를 외부 장치 혹은 다른 태스크로 이관한 것으로 추정</td>
+                        </tr>
+                        <tr>
+                            <td>테스트 자산</td>
+                            <td><code>testtt.mod</code>, <code>test251015.mod</code> 등 총 4개</td>
+                            <td>모두 삭제</td>
+                            <td>테스트 루틴 제거로 추후 검증 시 별도 복원이 필요</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <h2>2. SYSPAR/EIO.cfg 차이</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>신규/변경 항목</th>
-                    <th>Before</th>
-                    <th>After</th>
-                    <th>해석</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Cross 커플링</td>
-                    <td>기존 StopProc·ManWireFeed 위주</td>
-                    <td><code>EXTCTL1~3</code>, <code>Enable_*</code> 등 18개 Cross 항목 추가</td>
-                    <td>외부 포지션 컨트롤러(가상 축?)와의 참조/피드백 연결을 새로 구성</td>
-                </tr>
-                <tr>
-                    <td>DeviceNet Internal Device</td>
-                    <td>기본 크기</td>
-                    <td>입·출력 각각 64바이트로 확대</td>
-                    <td>대량의 GI/GO 신호를 매핑하기 위한 용량 확장</td>
-                </tr>
-                <tr>
-                    <td>신규 GI/GO/DI/DO</td>
-                    <td>미정의</td>
-                    <td><code>pos{1..3}_fdb</code>, <code>pos{1..3}_ref</code>, <code>unit{1..3}_enable/ready</code> 등 63개 추가</td>
-                    <td>Plan B에서 정의한 3개의 가상 유닛에 대한 위치 피드백/명령 채널 구성</td>
-                </tr>
-            </tbody>
-        </table>
+            <div class="section">
+                <h2>2. SYSPAR/EIO.cfg 차이</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>신규/변경 항목</th>
+                            <th>Before</th>
+                            <th>After</th>
+                            <th>해석</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Cross 커플링</td>
+                            <td>StopProc / ManWireFeed 중심</td>
+                            <td><code>EXTCTL1~3</code>, <code>Enable_* / pos*_ref</code> 등 18개 Cross 항목 추가</td>
+                            <td>외부 포지션 컨트롤러와의 참조/피드백 동기화 신호 구성</td>
+                        </tr>
+                        <tr>
+                            <td>DeviceNet Internal Device</td>
+                            <td>기본 입·출력 사이즈</td>
+                            <td><code>-OutputSize 64</code>, <code>-InputSize 64</code>로 확장</td>
+                            <td>대량의 GI/GO 신호를 처리하기 위한 버퍼 확대</td>
+                        </tr>
+                        <tr>
+                            <td>GI/GO/DI/DO 매핑</td>
+                            <td>pos/ref 관련 신호 없음</td>
+                            <td><code>pos{1..3}_fdb/ref</code>, <code>unit{1..3}_enable/ready</code>, <code>ext_ctrl*_master_input</code> 등 63개 추가</td>
+                            <td>Setting Plan B에서 요구하는 3개 축의 위치 명령/피드백 채널 정의</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <h2>3. HOME / Arc</h2>
-        <p>
-            <strong>무변경:</strong> 두 백업의 <code>HOME/Arc/LincolnData/</code> 및 기타 HOME 하위 폴더가 동일합니다.
-            Setting Plan B는 RAPID 및 I/O 구조에 집중되었으며, 용접 모드 XML (<code>T_ROB1_LincolnModes.xml</code>,
-            <code>T_ROB2_LincolnModes.xml</code>)은 그대로 유지됩니다.
-        </p>
+            <div class="section">
+                <h2>3. HOME / Arc</h2>
+                <p>
+                    <strong>변경 없음:</strong> 두 백업의 <code>HOME/Arc/LincolnData/T_ROB1_LincolnModes.xml</code>,
+                    <code>T_ROB2_LincolnModes.xml</code> 및 나머지 HOME 하위 구성은 byte-level 동일합니다.
+                    Setting Plan B 변경은 RAPID 및 I/O 구조에 집중되어 있습니다.
+                </p>
+            </div>
 
-        <div class="callout">
-            <h3>다음 단계 권장</h3>
-            <ol>
-                <li><strong>RAPID 복구 여부 결정:</strong> 기존
-                    <code>Head_*</code>/테스트 모듈이 필요하다면 09:00 백업에서 선택적으로 복원하거나,
-                    Plan B 사양서에 따라 대체 로직을 명시해 주세요.</li>
-                <li><strong>DeviceNet 신호 검증:</strong> <code>pos{1..3}_ref</code> / <code>pos{1..3}_fdb</code> 매핑이
-                    실제 외부 장치와 일치하는지 I/O 모니터로 확인해야 합니다.</li>
-                <li><strong>Rollback 포인트 지정:</strong> 11/05 09:00 백업은 Setting Plan B 이전 유일본이므로,
-                    안전한 롤백 포인트로 별도 보관하시길 권장합니다.</li>
-            </ol>
+            <div class="section">
+                <h2>4. 후속 권장 사항</h2>
+                <div class="callout">
+                    <h3>조치 제안</h3>
+                    <ol>
+                        <li><strong>RAPID 복구 여부 판단:</strong> 기존 헤드/테스트 루틴이 필요하면 09:00 백업을 롤백 포인트로 보관하거나 일부 모듈만 취사 복구하세요.</li>
+                        <li><strong>DeviceNet 신호 검증:</strong> <code>pos_ref</code>와 <code>pos_fdb</code>가 실제 장비에서 올바르게 대응하는지 I/O 모니터로 확인해야 합니다.</li>
+                        <li><strong>문서화:</strong> Setting Plan B로 인해 제거·추가된 항목을 작업 지침서/Plan B 사양서에 반영해 차후 혼선을 줄이세요.</li>
+                    </ol>
+                </div>
+            </div>
         </div>
     </div>
 </body>
