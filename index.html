@@ -534,17 +534,22 @@
                     <div class="info-box" style="background: #fdf2f8; border-left-color: #ec4899;">
                         <h4>용접 모션 시각화 및 분석</h4>
                         <p>
-                            <strong>기능:</strong> TCP 경로 2D 시각화, 타임라인 재생<br>
-                            <strong>뷰:</strong> 평면도(XY), 측면도(XZ)<br>
-                            <strong>분석:</strong> 토치 간 거리, 충돌 위험 감지
+                            <strong>기능:</strong> TCP 경로 3D 시각화, 타임라인 재생<br>
+                            <strong>뷰:</strong> 평면도(XY), 측면도(XZ), 정면도(YZ)<br>
+                            <strong>분석:</strong> T바 형상, R축 회전, 위빙, 토치 벡터, 비전 포인트
                         </p>
                     </div>
+                    <a href="advanced_motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="project-link" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);" target="_blank">
+                        🏭 고급 모션 뷰어 (XYZR + T바)
+                    </a>
                     <a href="motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="project-link" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);" target="_blank">
-                        🎬 모션 뷰어 열기
+                        🎬 간단 모션 뷰어
                     </a>
                     <div style="margin-top: 15px;">
-                        <a href="sample_data/motion_case1.csv" class="file-link" download>📊 샘플 데이터 1 (정상)</a>
-                        <a href="sample_data/motion_case2_collision_risk.csv" class="file-link" download>⚠️ 샘플 데이터 2 (충돌위험)</a>
+                        <h4 style="font-size: 13px; color: #666; margin-bottom: 8px;">샘플 데이터:</h4>
+                        <a href="sample_data/welding_case1_basic.csv" class="file-link" download>📊 Case1: 기본 용접</a>
+                        <a href="sample_data/welding_case2_robot_swap.csv" class="file-link" download>⚠️ Case2: 로봇 스왑 (R>90°)</a>
+                        <a href="sample_data/welding_case3_alternating.csv" class="file-link" download>🔄 Case3: 교차 용접</a>
                     </div>
                 </div>
 

@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고급 용접 모션 뷰어 | XYZR 갠트리 + 듀얼 로봇</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+            padding: 15px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+        }
+
+        select, button, input[type="file"] {
+            padding: 6px 12px;
+            border: 2px solid #1e3a8a;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button {
+            background: #1e3a8a;
+            color: white;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #1e40af;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        select {
+            background: white;
+        }
+
+        .views-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .view-box {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fafafa;
+        }
+
+        .view-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 8px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            background: white;
+        }
+
+        .timeline-container {
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .timeline-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .timeline-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1e3a8a;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .timeline-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1e3a8a;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border: none;
+        }
+
+        .timeline-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .data-display {
+            padding: 15px;
+            background: white;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .data-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #1e3a8a;
+        }
+
+        .data-item.warning {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .data-item.danger {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+
+        .data-item.info {
+            border-left-color: #2196f3;
+            background: #e3f2fd;
+        }
+
+        .data-item.success {
+            border-left-color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .data-item-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .data-item-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            justify-content: center;
+            flex-wrap: wrap;
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .file-drop-zone {
+            padding: 30px;
+            margin: 15px;
+            border: 3px dashed #1e3a8a;
+            border-radius: 12px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-drop-zone:hover {
+            background: #e8eaf6;
+            border-color: #1e40af;
+        }
+
+        .file-drop-zone.drag-over {
+            background: #e8eaf6;
+            border-color: #1e40af;
+            transform: scale(1.02);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            margin: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #c62828;
+        }
+
+        @media (max-width: 1400px) {
+            .views-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .views-container {
+                grid-template-columns: 1fr;
+            }
+
+            .data-display {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 고급 용접 모션 뷰어 - XYZR 갠트리 + 듀얼 로봇 시스템</h1>
+            <p>T바 양면 필렛 용접 | R축 회전 | 위빙 모션 | 비전 포인트 | 로봇 스왑</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="caseSelect">케이스 선택:</label>
+                <select id="caseSelect">
+                    <option value="">-- CSV 파일을 로드하세요 --</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="fileInput">CSV 로드:</label>
+                <input type="file" id="fileInput" accept=".csv" multiple>
+            </div>
+
+            <div class="control-group">
+                <button id="playBtn" disabled>▶ 재생</button>
+                <button id="pauseBtn" disabled>⏸ 일시정지</button>
+                <button id="resetBtn" disabled>⏮ 처음으로</button>
+            </div>
+
+            <div class="control-group">
+                <label for="speedSelect">속도:</label>
+                <select id="speedSelect">
+                    <option value="0.25">0.25x</option>
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="2">2x</option>
+                    <option value="5">5x</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label><input type="checkbox" id="showVisionPoints" checked> 비전 포인트</label>
+                <label><input type="checkbox" id="showWeaving" checked> 위빙</label>
+                <label><input type="checkbox" id="showTBar" checked> T바 형상</label>
+                <label><input type="checkbox" id="showVectors" checked> 토치 벡터</label>
+            </div>
+        </div>
+
+        <div id="dropZone" class="file-drop-zone">
+            <h3>📁 CSV 파일을 여기에 드래그 앤 드롭</h3>
+            <p>또는 위의 "CSV 로드" 버튼을 클릭하세요</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #666;">
+                필수 컬럼: Time, Gantry_X/Y/Z/R, TCP1/2_X/Y/Z, TCP1/2_VX/VY/VZ, Weaving1/2, Motion_Type, Robot_Swap
+            </p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f44336;"></div>
+                <span>TCP1 (Robot1)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #2196f3;"></div>
+                <span>TCP2 (Robot2)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4caf50;"></div>
+                <span>R축 중심</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff9800;"></div>
+                <span>로봇 베이스 (±488mm)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #9c27b0;"></div>
+                <span>비전 포인트</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #795548;"></div>
+                <span>T바 (12T 웹)</span>
+            </div>
+        </div>
+
+        <div class="views-container">
+            <div class="view-box">
+                <div class="view-header">평면도 (X-Y View) - 탑뷰</div>
+                <canvas id="canvasXY" width="600" height="600"></canvas>
+            </div>
+            <div class="view-box">
+                <div class="view-header">측면도 (X-Z View) - 사이드뷰</div>
+                <canvas id="canvasXZ" width="600" height="600"></canvas>
+            </div>
+            <div class="view-box">
+                <div class="view-header">정면도 (Y-Z View) - 프론트뷰</div>
+                <canvas id="canvasYZ" width="600" height="600"></canvas>
+            </div>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline-label">타임라인</div>
+            <input type="range" id="timelineSlider" class="timeline-slider" min="0" max="100" value="0" disabled>
+            <div class="timeline-info">
+                <span id="currentTime">00:00.0</span>
+                <span id="motionTypeDisplay">-</span>
+                <span id="totalTime">00:00.0</span>
+            </div>
+        </div>
+
+        <div class="data-display" id="dataDisplay">
+            <div class="data-item">
+                <div class="data-item-label">갠트리 X</div>
+                <div class="data-item-value" id="gantryX">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">갠트리 Y</div>
+                <div class="data-item-value" id="gantryY">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">갠트리 Z</div>
+                <div class="data-item-value" id="gantryZ">-</div>
+            </div>
+            <div class="data-item info" id="gantryRItem">
+                <div class="data-item-label">갠트리 R (회전각)</div>
+                <div class="data-item-value" id="gantryR">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">TCP1 위치</div>
+                <div class="data-item-value" id="tcp1Pos">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">TCP2 위치</div>
+                <div class="data-item-value" id="tcp2Pos">-</div>
+            </div>
+            <div class="data-item" id="distanceItem">
+                <div class="data-item-label">토치 간 거리</div>
+                <div class="data-item-value" id="torchDistance">-</div>
+            </div>
+            <div class="data-item info">
+                <div class="data-item-label">모션 타입</div>
+                <div class="data-item-value" id="motionType">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">위빙 진폭 (TCP1)</div>
+                <div class="data-item-value" id="weaving1">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">위빙 진폭 (TCP2)</div>
+                <div class="data-item-value" id="weaving2">-</div>
+            </div>
+            <div class="data-item" id="robotSwapItem">
+                <div class="data-item-label">로봇 스왑</div>
+                <div class="data-item-value" id="robotSwap">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">사이클 타임</div>
+                <div class="data-item-value" id="cycleTime">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let motionData = {};
+        let currentCase = null;
+        let currentFrameIndex = 0;
+        let isPlaying = false;
+        let animationId = null;
+        let playbackSpeed = 1.0;
+        let lastUpdateTime = 0;
+
+        // 체크박스 상태
+        let showVisionPoints = true;
+        let showWeaving = true;
+        let showTBar = true;
+        let showVectors = true;
+
+        // DOM 요소
+        const fileInput = document.getElementById('fileInput');
+        const caseSelect = document.getElementById('caseSelect');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const speedSelect = document.getElementById('speedSelect');
+        const timelineSlider = document.getElementById('timelineSlider');
+        const dropZone = document.getElementById('dropZone');
+
+        const canvasXY = document.getElementById('canvasXY');
+        const canvasXZ = document.getElementById('canvasXZ');
+        const canvasYZ = document.getElementById('canvasYZ');
+        const ctxXY = canvasXY.getContext('2d');
+        const ctxXZ = canvasXZ.getContext('2d');
+        const ctxYZ = canvasYZ.getContext('2d');
+
+        // 체크박스 이벤트
+        document.getElementById('showVisionPoints').addEventListener('change', (e) => {
+            showVisionPoints = e.target.checked;
+            updateDisplay();
+        });
+        document.getElementById('showWeaving').addEventListener('change', (e) => {
+            showWeaving = e.target.checked;
+            updateDisplay();
+        });
+        document.getElementById('showTBar').addEventListener('change', (e) => {
+            showTBar = e.target.checked;
+            updateDisplay();
+        });
+        document.getElementById('showVectors').addEventListener('change', (e) => {
+            showVectors = e.target.checked;
+            updateDisplay();
+        });
+
+        // 인증 체크
+        function checkAuth() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authToken = urlParams.get('auth');
+            const validToken = 'c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1';
+
+            if (authToken !== validToken) {
+                document.body.innerHTML = '<div style="text-align:center; padding:100px;"><h1>⛔ 접근 권한이 없습니다</h1><p>올바른 인증 토큰이 필요합니다.</p></div>';
+                return false;
+            }
+            return true;
+        }
+
+        // CSV 파싱
+        function parseCSV(text, filename) {
+            const lines = text.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+
+            const frames = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                if (values.length !== headers.length) continue;
+
+                const frame = {};
+                headers.forEach((header, index) => {
+                    const val = values[index];
+                    // 숫자 변환
+                    frame[header] = isNaN(val) ? val : parseFloat(val);
+                });
+                frames.push(frame);
+            }
+
+            const caseName = filename.replace('.csv', '');
+            motionData[caseName] = frames;
+
+            const option = document.createElement('option');
+            option.value = caseName;
+            option.textContent = caseName;
+            caseSelect.appendChild(option);
+
+            return caseName;
+        }
+
+        // 파일 로드 이벤트
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            loadFiles(files);
+        });
+
+        // 드래그 앤 드롭
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.csv'));
+            loadFiles(files);
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        function loadFiles(files) {
+            if (files.length === 0) return;
+
+            dropZone.innerHTML = '<div class="loading">📂 파일 로딩 중...</div>';
+
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        parseCSV(e.target.result, file.name);
+                        loaded++;
+
+                        if (loaded === files.length) {
+                            dropZone.style.display = 'none';
+                            caseSelect.selectedIndex = 1;
+                            caseSelect.dispatchEvent(new Event('change'));
+                        }
+                    } catch (error) {
+                        dropZone.innerHTML = `<div class="error">❌ ${file.name} 로드 실패: ${error.message}</div>`;
+                    }
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        // 케이스 선택
+        caseSelect.addEventListener('change', (e) => {
+            const caseName = e.target.value;
+            if (!caseName || !motionData[caseName]) return;
+
+            currentCase = caseName;
+            currentFrameIndex = 0;
+            isPlaying = false;
+
+            const frames = motionData[currentCase];
+            timelineSlider.max = frames.length - 1;
+            timelineSlider.value = 0;
+
+            enableControls();
+            updateDisplay();
+        });
+
+        function enableControls() {
+            playBtn.disabled = false;
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+            timelineSlider.disabled = false;
+        }
+
+        // 재생 컨트롤
+        playBtn.addEventListener('click', () => {
+            isPlaying = true;
+            lastUpdateTime = performance.now();
+            animate();
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            isPlaying = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            isPlaying = false;
+            currentFrameIndex = 0;
+            timelineSlider.value = 0;
+            updateDisplay();
+        });
+
+        speedSelect.addEventListener('change', (e) => {
+            playbackSpeed = parseFloat(e.target.value);
+        });
+
+        timelineSlider.addEventListener('input', (e) => {
+            currentFrameIndex = parseInt(e.target.value);
+            updateDisplay();
+        });
+
+        // 애니메이션
+        function animate(currentTime) {
+            if (!isPlaying) return;
+
+            const deltaTime = currentTime - lastUpdateTime;
+            const frames = motionData[currentCase];
+
+            const frameInterval = 500 / playbackSpeed;
+
+            if (deltaTime >= frameInterval) {
+                currentFrameIndex++;
+
+                if (currentFrameIndex >= frames.length) {
+                    currentFrameIndex = frames.length - 1;
+                    isPlaying = false;
+                    return;
+                }
+
+                timelineSlider.value = currentFrameIndex;
+                updateDisplay();
+                lastUpdateTime = currentTime;
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // 화면 업데이트
+        function updateDisplay() {
+            if (!currentCase || !motionData[currentCase]) return;
+
+            const frames = motionData[currentCase];
+            const frame = frames[currentFrameIndex];
+
+            // 데이터 표시
+            document.getElementById('gantryX').textContent = `${frame.Gantry_X.toFixed(1)} mm`;
+            document.getElementById('gantryY').textContent = `${frame.Gantry_Y.toFixed(1)} mm`;
+            document.getElementById('gantryZ').textContent = `${frame.Gantry_Z.toFixed(1)} mm`;
+            document.getElementById('gantryR').textContent = `${frame.Gantry_R.toFixed(1)}°`;
+
+            // R축 경고
+            const gantryRItem = document.getElementById('gantryRItem');
+            gantryRItem.className = 'data-item info';
+            if (Math.abs(frame.Gantry_R) > 100) {
+                gantryRItem.classList.add('danger');
+            } else if (Math.abs(frame.Gantry_R) > 90) {
+                gantryRItem.classList.add('warning');
+            }
+
+            document.getElementById('tcp1Pos').textContent =
+                `(${frame.TCP1_X.toFixed(0)}, ${frame.TCP1_Y.toFixed(0)}, ${frame.TCP1_Z.toFixed(0)})`;
+            document.getElementById('tcp2Pos').textContent =
+                `(${frame.TCP2_X.toFixed(0)}, ${frame.TCP2_Y.toFixed(0)}, ${frame.TCP2_Z.toFixed(0)})`;
+
+            // 토치 간 거리 계산
+            const dx = frame.TCP2_X - frame.TCP1_X;
+            const dy = frame.TCP2_Y - frame.TCP1_Y;
+            const dz = frame.TCP2_Z - frame.TCP1_Z;
+            const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+            const distanceItem = document.getElementById('distanceItem');
+            distanceItem.className = 'data-item';
+            if (distance < 300) {
+                distanceItem.classList.add('danger');
+            } else if (distance < 500) {
+                distanceItem.classList.add('warning');
+            }
+            document.getElementById('torchDistance').textContent = `${distance.toFixed(1)} mm`;
+
+            // 모션 타입
+            const motionType = frame.Motion_Type || 'IDLE';
+            document.getElementById('motionType').textContent = motionType;
+            document.getElementById('motionTypeDisplay').textContent = motionType;
+
+            // 위빙
+            document.getElementById('weaving1').textContent = `${frame.Weaving1 || 0} mm`;
+            document.getElementById('weaving2').textContent = `${frame.Weaving2 || 0} mm`;
+
+            // 로봇 스왑
+            const robotSwap = frame.Robot_Swap || 0;
+            const robotSwapItem = document.getElementById('robotSwapItem');
+            robotSwapItem.className = 'data-item';
+            if (robotSwap === 1) {
+                robotSwapItem.classList.add('warning');
+                document.getElementById('robotSwap').textContent = '⚠️ SWAP';
+            } else {
+                robotSwapItem.classList.add('success');
+                document.getElementById('robotSwap').textContent = '✓ 정상';
+            }
+
+            // 시간 표시
+            document.getElementById('currentTime').textContent = formatTime(frame.Time);
+            document.getElementById('totalTime').textContent = formatTime(frames[frames.length - 1].Time);
+            document.getElementById('cycleTime').textContent = formatTime(frames[frames.length - 1].Time);
+
+            // 캔버스 그리기
+            drawXYView(frames, currentFrameIndex);
+            drawXZView(frames, currentFrameIndex);
+            drawYZView(frames, currentFrameIndex);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = (seconds % 60).toFixed(1);
+            return `${mins.toString().padStart(2, '0')}:${secs.padStart(4, '0')}`;
+        }
+
+        // XY 평면도 그리기
+        function drawXYView(frames, currentIndex) {
+            const width = canvasXY.width;
+            const height = canvasXY.height;
+
+            ctxXY.clearRect(0, 0, width, height);
+
+            const allX = frames.flatMap(f => [f.Gantry_X, f.TCP1_X, f.TCP2_X]);
+            const allY = frames.flatMap(f => [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y]);
+            const minX = Math.min(...allX) - 100;
+            const maxX = Math.max(...allX) + 100;
+            const minY = Math.min(...allY) - 100;
+            const maxY = Math.max(...allY) + 100;
+
+            const margin = 50;
+            const scaleX = (width - 2 * margin) / (maxX - minX);
+            const scaleY = (height - 2 * margin) / (maxY - minY);
+            const scale = Math.min(scaleX, scaleY);
+
+            function toCanvasX(x) {
+                return margin + (x - minX) * scale;
+            }
+
+            function toCanvasY(y) {
+                return height - margin - (y - minY) * scale;
+            }
+
+            // 그리드
+            ctxXY.strokeStyle = '#e0e0e0';
+            ctxXY.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const x = margin + (width - 2 * margin) * i / 10;
+                const y = margin + (height - 2 * margin) * i / 10;
+                ctxXY.beginPath();
+                ctxXY.moveTo(x, margin);
+                ctxXY.lineTo(x, height - margin);
+                ctxXY.stroke();
+                ctxXY.beginPath();
+                ctxXY.moveTo(margin, y);
+                ctxXY.lineTo(width - margin, y);
+                ctxXY.stroke();
+            }
+
+            const currentFrame = frames[currentIndex];
+
+            // T바 형상 (12T 두께, 가운데 위치)
+            if (showTBar) {
+                const rAngle = currentFrame.Gantry_R * Math.PI / 180;
+                const gx = currentFrame.Gantry_X;
+                const gy = currentFrame.Gantry_Y;
+
+                // T바 웹 (세로) - 12mm 두께
+                const webThickness = 12;
+                const webHalfT = webThickness / 2;
+
+                ctxXY.fillStyle = 'rgba(121, 85, 72, 0.3)';
+                ctxXY.strokeStyle = '#795548';
+                ctxXY.lineWidth = 2;
+
+                // R축 회전을 고려한 T바 렌더링
+                ctxXY.save();
+                ctxXY.translate(toCanvasX(gx), toCanvasY(gy));
+                ctxXY.rotate(-rAngle);
+
+                // 웹 중심선에서 ±6mm
+                ctxXY.fillRect(-5 * scale, -750 * scale, 10 * scale, 1500 * scale);
+                ctxXY.strokeRect(-5 * scale, -750 * scale, 10 * scale, 1500 * scale);
+
+                ctxXY.restore();
+            }
+
+            // R축 중심 (갠트리 중심)
+            ctxXY.fillStyle = '#4caf50';
+            ctxXY.beginPath();
+            ctxXY.arc(toCanvasX(currentFrame.Gantry_X), toCanvasY(currentFrame.Gantry_Y), 8, 0, Math.PI * 2);
+            ctxXY.fill();
+
+            // 로봇 베이스 위치 (±488mm from R center)
+            const rAngle = currentFrame.Gantry_R * Math.PI / 180;
+            const robot1BaseX = currentFrame.Gantry_X - 488 * Math.cos(rAngle);
+            const robot1BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rAngle);
+            const robot2BaseX = currentFrame.Gantry_X + 488 * Math.cos(rAngle);
+            const robot2BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rAngle);
+
+            ctxXY.fillStyle = '#ff9800';
+            ctxXY.beginPath();
+            ctxXY.arc(toCanvasX(robot1BaseX), toCanvasY(robot1BaseY), 6, 0, Math.PI * 2);
+            ctxXY.fill();
+            ctxXY.beginPath();
+            ctxXY.arc(toCanvasX(robot2BaseX), toCanvasY(robot2BaseY), 6, 0, Math.PI * 2);
+            ctxXY.fill();
+
+            // 경로 그리기 (TCP1 - 빨강)
+            ctxXY.strokeStyle = '#f44336';
+            ctxXY.lineWidth = 2;
+            ctxXY.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const x = toCanvasX(frames[i].TCP1_X);
+                const y = toCanvasY(frames[i].TCP1_Y);
+                if (i === 0) {
+                    ctxXY.moveTo(x, y);
+                } else {
+                    ctxXY.lineTo(x, y);
+                }
+            }
+            ctxXY.stroke();
+
+            // 경로 그리기 (TCP2 - 파랑)
+            ctxXY.strokeStyle = '#2196f3';
+            ctxXY.lineWidth = 2;
+            ctxXY.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const x = toCanvasX(frames[i].TCP2_X);
+                const y = toCanvasY(frames[i].TCP2_Y);
+                if (i === 0) {
+                    ctxXY.moveTo(x, y);
+                } else {
+                    ctxXY.lineTo(x, y);
+                }
+            }
+            ctxXY.stroke();
+
+            // 위빙 표시
+            if (showWeaving && (currentFrame.Weaving1 !== 0 || currentFrame.Weaving2 !== 0)) {
+                ctxXY.strokeStyle = 'rgba(244, 67, 54, 0.3)';
+                ctxXY.lineWidth = Math.abs(currentFrame.Weaving1) * scale * 2;
+                ctxXY.beginPath();
+                ctxXY.arc(toCanvasX(currentFrame.TCP1_X), toCanvasY(currentFrame.TCP1_Y),
+                         Math.abs(currentFrame.Weaving1) * scale, 0, Math.PI * 2);
+                ctxXY.stroke();
+
+                ctxXY.strokeStyle = 'rgba(33, 150, 243, 0.3)';
+                ctxXY.lineWidth = Math.abs(currentFrame.Weaving2) * scale * 2;
+                ctxXY.beginPath();
+                ctxXY.arc(toCanvasX(currentFrame.TCP2_X), toCanvasY(currentFrame.TCP2_Y),
+                         Math.abs(currentFrame.Weaving2) * scale, 0, Math.PI * 2);
+                ctxXY.stroke();
+            }
+
+            // TCP1 (빨강)
+            ctxXY.fillStyle = '#f44336';
+            ctxXY.beginPath();
+            ctxXY.arc(toCanvasX(currentFrame.TCP1_X), toCanvasY(currentFrame.TCP1_Y), 10, 0, Math.PI * 2);
+            ctxXY.fill();
+
+            // TCP2 (파랑)
+            ctxXY.fillStyle = '#2196f3';
+            ctxXY.beginPath();
+            ctxXY.arc(toCanvasX(currentFrame.TCP2_X), toCanvasY(currentFrame.TCP2_Y), 10, 0, Math.PI * 2);
+            ctxXY.fill();
+
+            // 토치 방향 벡터
+            if (showVectors && currentFrame.TCP1_VX !== undefined) {
+                const vectorLen = 50 * scale;
+
+                // TCP1 벡터
+                ctxXY.strokeStyle = '#f44336';
+                ctxXY.lineWidth = 3;
+                ctxXY.beginPath();
+                ctxXY.moveTo(toCanvasX(currentFrame.TCP1_X), toCanvasY(currentFrame.TCP1_Y));
+                ctxXY.lineTo(
+                    toCanvasX(currentFrame.TCP1_X + currentFrame.TCP1_VX * 50),
+                    toCanvasY(currentFrame.TCP1_Y + currentFrame.TCP1_VY * 50)
+                );
+                ctxXY.stroke();
+
+                // TCP2 벡터
+                ctxXY.strokeStyle = '#2196f3';
+                ctxXY.beginPath();
+                ctxXY.moveTo(toCanvasX(currentFrame.TCP2_X), toCanvasY(currentFrame.TCP2_Y));
+                ctxXY.lineTo(
+                    toCanvasX(currentFrame.TCP2_X + currentFrame.TCP2_VX * 50),
+                    toCanvasY(currentFrame.TCP2_Y + currentFrame.TCP2_VY * 50)
+                );
+                ctxXY.stroke();
+            }
+
+            // 비전 포인트 (첫 프레임에서 추출)
+            if (showVisionPoints && currentIndex === 0) {
+                const firstFrame = frames[0];
+                const lastFrame = frames[frames.length - 1];
+
+                ctxXY.fillStyle = '#9c27b0';
+                ctxXY.font = '10px Arial';
+
+                // Start1, End1
+                ctxXY.beginPath();
+                ctxXY.arc(toCanvasX(firstFrame.TCP1_X), toCanvasY(firstFrame.TCP1_Y), 8, 0, Math.PI * 2);
+                ctxXY.fill();
+                ctxXY.fillText('S1', toCanvasX(firstFrame.TCP1_X) + 12, toCanvasY(firstFrame.TCP1_Y));
+
+                ctxXY.beginPath();
+                ctxXY.arc(toCanvasX(lastFrame.TCP1_X), toCanvasY(lastFrame.TCP1_Y), 8, 0, Math.PI * 2);
+                ctxXY.fill();
+                ctxXY.fillText('E1', toCanvasX(lastFrame.TCP1_X) + 12, toCanvasY(lastFrame.TCP1_Y));
+
+                // Start2, End2
+                ctxXY.beginPath();
+                ctxXY.arc(toCanvasX(firstFrame.TCP2_X), toCanvasY(firstFrame.TCP2_Y), 8, 0, Math.PI * 2);
+                ctxXY.fill();
+                ctxXY.fillText('S2', toCanvasX(firstFrame.TCP2_X) + 12, toCanvasY(firstFrame.TCP2_Y));
+
+                ctxXY.beginPath();
+                ctxXY.arc(toCanvasX(lastFrame.TCP2_X), toCanvasY(lastFrame.TCP2_Y), 8, 0, Math.PI * 2);
+                ctxXY.fill();
+                ctxXY.fillText('E2', toCanvasX(lastFrame.TCP2_X) + 12, toCanvasY(lastFrame.TCP2_Y));
+            }
+
+            // 축 라벨
+            ctxXY.fillStyle = '#333';
+            ctxXY.font = '14px Arial';
+            ctxXY.fillText('X →', width - 40, height - 10);
+            ctxXY.fillText('Y ↑', 10, 20);
+        }
+
+        // XZ 측면도 그리기
+        function drawXZView(frames, currentIndex) {
+            const width = canvasXZ.width;
+            const height = canvasXZ.height;
+
+            ctxXZ.clearRect(0, 0, width, height);
+
+            const allX = frames.flatMap(f => [f.Gantry_X, f.TCP1_X, f.TCP2_X]);
+            const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z]);
+            const minX = Math.min(...allX) - 100;
+            const maxX = Math.max(...allX) + 100;
+            const minZ = Math.min(...allZ) - 100;
+            const maxZ = Math.max(...allZ) + 100;
+
+            const margin = 50;
+            const scaleX = (width - 2 * margin) / (maxX - minX);
+            const scaleZ = (height - 2 * margin) / (maxZ - minZ);
+            const scale = Math.min(scaleX, scaleZ);
+
+            function toCanvasX(x) {
+                return margin + (x - minX) * scale;
+            }
+
+            function toCanvasZ(z) {
+                return height - margin - (z - minZ) * scale;
+            }
+
+            // 그리드
+            ctxXZ.strokeStyle = '#e0e0e0';
+            ctxXZ.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const x = margin + (width - 2 * margin) * i / 10;
+                const z = margin + (height - 2 * margin) * i / 10;
+                ctxXZ.beginPath();
+                ctxXZ.moveTo(x, margin);
+                ctxXZ.lineTo(x, height - margin);
+                ctxXZ.stroke();
+                ctxXZ.beginPath();
+                ctxXZ.moveTo(margin, z);
+                ctxXZ.lineTo(width - margin, z);
+                ctxXZ.stroke();
+            }
+
+            const currentFrame = frames[currentIndex];
+
+            // T바 형상 (측면에서는 웹만 보임)
+            if (showTBar) {
+                const gx = currentFrame.Gantry_X;
+                const gz = currentFrame.Gantry_Z;
+
+                ctxXZ.fillStyle = 'rgba(121, 85, 72, 0.3)';
+                ctxXZ.strokeStyle = '#795548';
+                ctxXZ.lineWidth = 2;
+                ctxXZ.fillRect(toCanvasX(gx - 750), toCanvasZ(gz), 1500 * scale, 200 * scale);
+                ctxXZ.strokeRect(toCanvasX(gx - 750), toCanvasZ(gz), 1500 * scale, 200 * scale);
+            }
+
+            // 갠트리 중심 (녹색)
+            ctxXZ.fillStyle = '#4caf50';
+            ctxXZ.beginPath();
+            ctxXZ.arc(toCanvasX(currentFrame.Gantry_X), toCanvasZ(currentFrame.Gantry_Z), 8, 0, Math.PI * 2);
+            ctxXZ.fill();
+
+            // 경로 그리기 (TCP1 - 빨강)
+            ctxXZ.strokeStyle = '#f44336';
+            ctxXZ.lineWidth = 2;
+            ctxXZ.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const x = toCanvasX(frames[i].TCP1_X);
+                const z = toCanvasZ(frames[i].TCP1_Z);
+                if (i === 0) {
+                    ctxXZ.moveTo(x, z);
+                } else {
+                    ctxXZ.lineTo(x, z);
+                }
+            }
+            ctxXZ.stroke();
+
+            // 경로 그리기 (TCP2 - 파랑)
+            ctxXZ.strokeStyle = '#2196f3';
+            ctxXZ.lineWidth = 2;
+            ctxXZ.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const x = toCanvasX(frames[i].TCP2_X);
+                const z = toCanvasZ(frames[i].TCP2_Z);
+                if (i === 0) {
+                    ctxXZ.moveTo(x, z);
+                } else {
+                    ctxXZ.lineTo(x, z);
+                }
+            }
+            ctxXZ.stroke();
+
+            // TCP1 (빨강)
+            ctxXZ.fillStyle = '#f44336';
+            ctxXZ.beginPath();
+            ctxXZ.arc(toCanvasX(currentFrame.TCP1_X), toCanvasZ(currentFrame.TCP1_Z), 10, 0, Math.PI * 2);
+            ctxXZ.fill();
+
+            // TCP2 (파랑)
+            ctxXZ.fillStyle = '#2196f3';
+            ctxXZ.beginPath();
+            ctxXZ.arc(toCanvasX(currentFrame.TCP2_X), toCanvasZ(currentFrame.TCP2_Z), 10, 0, Math.PI * 2);
+            ctxXZ.fill();
+
+            // 축 라벨
+            ctxXZ.fillStyle = '#333';
+            ctxXZ.font = '14px Arial';
+            ctxXZ.fillText('X →', width - 40, height - 10);
+            ctxXZ.fillText('Z ↑', 10, 20);
+        }
+
+        // YZ 정면도 그리기
+        function drawYZView(frames, currentIndex) {
+            const width = canvasYZ.width;
+            const height = canvasYZ.height;
+
+            ctxYZ.clearRect(0, 0, width, height);
+
+            const allY = frames.flatMap(f => [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y]);
+            const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z]);
+            const minY = Math.min(...allY) - 100;
+            const maxY = Math.max(...allY) + 100;
+            const minZ = Math.min(...allZ) - 100;
+            const maxZ = Math.max(...allZ) + 100;
+
+            const margin = 50;
+            const scaleY = (width - 2 * margin) / (maxY - minY);
+            const scaleZ = (height - 2 * margin) / (maxZ - minZ);
+            const scale = Math.min(scaleY, scaleZ);
+
+            function toCanvasY(y) {
+                return margin + (y - minY) * scale;
+            }
+
+            function toCanvasZ(z) {
+                return height - margin - (z - minZ) * scale;
+            }
+
+            // 그리드
+            ctxYZ.strokeStyle = '#e0e0e0';
+            ctxYZ.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin + (width - 2 * margin) * i / 10;
+                const z = margin + (height - 2 * margin) * i / 10;
+                ctxYZ.beginPath();
+                ctxYZ.moveTo(y, margin);
+                ctxYZ.lineTo(y, height - margin);
+                ctxYZ.stroke();
+                ctxYZ.beginPath();
+                ctxYZ.moveTo(margin, z);
+                ctxYZ.lineTo(width - margin, z);
+                ctxYZ.stroke();
+            }
+
+            const currentFrame = frames[currentIndex];
+
+            // T바 형상 (정면에서 T 형태)
+            if (showTBar) {
+                const gy = currentFrame.Gantry_Y;
+                const gz = currentFrame.Gantry_Z;
+
+                ctxYZ.fillStyle = 'rgba(121, 85, 72, 0.3)';
+                ctxYZ.strokeStyle = '#795548';
+                ctxYZ.lineWidth = 2;
+
+                // 하단 평판
+                ctxYZ.fillRect(toCanvasY(gy - 150), toCanvasZ(gz), 300 * scale, 20 * scale);
+                ctxYZ.strokeRect(toCanvasY(gy - 150), toCanvasZ(gz), 300 * scale, 20 * scale);
+
+                // 세로 웹 (12T)
+                ctxYZ.fillRect(toCanvasY(gy - 6), toCanvasZ(gz + 20), 12 * scale, 180 * scale);
+                ctxYZ.strokeRect(toCanvasY(gy - 6), toCanvasZ(gz + 20), 12 * scale, 180 * scale);
+            }
+
+            // R축 중심
+            ctxYZ.fillStyle = '#4caf50';
+            ctxYZ.beginPath();
+            ctxYZ.arc(toCanvasY(currentFrame.Gantry_Y), toCanvasZ(currentFrame.Gantry_Z), 8, 0, Math.PI * 2);
+            ctxYZ.fill();
+
+            // 로봇 베이스 위치 (Y축 기준으로 ±488mm 표시)
+            const rAngle = currentFrame.Gantry_R * Math.PI / 180;
+            const robot1BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rAngle);
+            const robot2BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rAngle);
+
+            ctxYZ.fillStyle = '#ff9800';
+            ctxYZ.beginPath();
+            ctxYZ.arc(toCanvasY(robot1BaseY), toCanvasZ(currentFrame.Gantry_Z), 6, 0, Math.PI * 2);
+            ctxYZ.fill();
+            ctxYZ.beginPath();
+            ctxYZ.arc(toCanvasY(robot2BaseY), toCanvasZ(currentFrame.Gantry_Z), 6, 0, Math.PI * 2);
+            ctxYZ.fill();
+
+            // 경로 그리기 (TCP1 - 빨강)
+            ctxYZ.strokeStyle = '#f44336';
+            ctxYZ.lineWidth = 2;
+            ctxYZ.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const y = toCanvasY(frames[i].TCP1_Y);
+                const z = toCanvasZ(frames[i].TCP1_Z);
+                if (i === 0) {
+                    ctxYZ.moveTo(y, z);
+                } else {
+                    ctxYZ.lineTo(y, z);
+                }
+            }
+            ctxYZ.stroke();
+
+            // 경로 그리기 (TCP2 - 파랑)
+            ctxYZ.strokeStyle = '#2196f3';
+            ctxYZ.lineWidth = 2;
+            ctxYZ.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const y = toCanvasY(frames[i].TCP2_Y);
+                const z = toCanvasZ(frames[i].TCP2_Z);
+                if (i === 0) {
+                    ctxYZ.moveTo(y, z);
+                } else {
+                    ctxYZ.lineTo(y, z);
+                }
+            }
+            ctxYZ.stroke();
+
+            // TCP1 (빨강)
+            ctxYZ.fillStyle = '#f44336';
+            ctxYZ.beginPath();
+            ctxYZ.arc(toCanvasY(currentFrame.TCP1_Y), toCanvasZ(currentFrame.TCP1_Z), 10, 0, Math.PI * 2);
+            ctxYZ.fill();
+
+            // TCP2 (파랑)
+            ctxYZ.fillStyle = '#2196f3';
+            ctxYZ.beginPath();
+            ctxYZ.arc(toCanvasY(currentFrame.TCP2_Y), toCanvasZ(currentFrame.TCP2_Z), 10, 0, Math.PI * 2);
+            ctxYZ.fill();
+
+            // 축 라벨
+            ctxYZ.fillStyle = '#333';
+            ctxYZ.font = '14px Arial';
+            ctxYZ.fillText('Y →', width - 40, height - 10);
+            ctxYZ.fillText('Z ↑', 10, 20);
+        }
+
+        // 초기화
+        if (checkAuth()) {
+            console.log('✅ 인증 완료');
+
+            // 샘플 데이터 자동 로드
+            const sampleFiles = [
+                'sample_data/welding_case1_basic.csv',
+                'sample_data/welding_case2_robot_swap.csv',
+                'sample_data/welding_case3_alternating.csv'
+            ];
+
+            // 로컬 테스트용 안내
+            console.log('샘플 파일을 드래그 앤 드롭하거나 "CSV 로드" 버튼을 클릭하세요:');
+            console.log('- welding_case1_basic.csv (기본 용접)');
+            console.log('- welding_case2_robot_swap.csv (로봇 스왑)');
+            console.log('- welding_case3_alternating.csv (교차 용접)');
+        }
+    </script>
+</body>
+</html>
