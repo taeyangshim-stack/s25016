@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>듀얼 토치 용접 모션 뷰어 | S25016</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
+
+        select, button, input[type="file"] {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        select {
+            background: white;
+        }
+
+        .views-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .view-box {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fafafa;
+        }
+
+        .view-header {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            background: white;
+            cursor: crosshair;
+        }
+
+        .timeline-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .timeline-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .timeline-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .timeline-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border: none;
+        }
+
+        .timeline-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .data-display {
+            padding: 20px;
+            background: white;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .data-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .data-item.warning {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .data-item.danger {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+
+        .data-item-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .data-item-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .file-drop-zone {
+            padding: 40px;
+            margin: 20px;
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-drop-zone:hover {
+            background: #e8eaf6;
+            border-color: #5568d3;
+        }
+
+        .file-drop-zone.drag-over {
+            background: #e8eaf6;
+            border-color: #5568d3;
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .views-container {
+                grid-template-columns: 1fr;
+            }
+
+            .data-display {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 듀얼 토치 용접 모션 뷰어</h1>
+            <p>XYZR 갠트리 + 2개 로봇 TCP 경로 시각화 및 분석 도구</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="caseSelect">케이스 선택:</label>
+                <select id="caseSelect">
+                    <option value="">-- CSV 파일을 로드하세요 --</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="fileInput">CSV 로드:</label>
+                <input type="file" id="fileInput" accept=".csv" multiple>
+            </div>
+
+            <div class="control-group">
+                <button id="playBtn" disabled>▶ 재생</button>
+                <button id="pauseBtn" disabled>⏸ 일시정지</button>
+                <button id="resetBtn" disabled>⏮ 처음으로</button>
+            </div>
+
+            <div class="control-group">
+                <label for="speedSelect">속도:</label>
+                <select id="speedSelect">
+                    <option value="0.25">0.25x</option>
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="2">2x</option>
+                    <option value="5">5x</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="dropZone" class="file-drop-zone">
+            <h3>📁 CSV 파일을 여기에 드래그 앤 드롭</h3>
+            <p>또는 위의 "CSV 로드" 버튼을 클릭하세요</p>
+            <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                필수 컬럼: Time, Gantry_X, Gantry_Y, Gantry_Z, Gantry_R, TCP1_X, TCP1_Y, TCP1_Z, TCP2_X, TCP2_Y, TCP2_Z
+            </p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f44336;"></div>
+                <span>TCP1 (토치 1)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #2196f3;"></div>
+                <span>TCP2 (토치 2)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4caf50;"></div>
+                <span>갠트리 중심</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff9800;"></div>
+                <span>경고 거리 (< 500mm)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f44336;"></div>
+                <span>위험 거리 (< 300mm)</span>
+            </div>
+        </div>
+
+        <div class="views-container">
+            <div class="view-box">
+                <div class="view-header">평면도 (X-Y View)</div>
+                <canvas id="canvasXY" width="600" height="600"></canvas>
+            </div>
+            <div class="view-box">
+                <div class="view-header">측면도 (X-Z View)</div>
+                <canvas id="canvasXZ" width="600" height="600"></canvas>
+            </div>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline-label">타임라인</div>
+            <input type="range" id="timelineSlider" class="timeline-slider" min="0" max="100" value="0" disabled>
+            <div class="timeline-info">
+                <span id="currentTime">00:00.0</span>
+                <span id="totalTime">00:00.0</span>
+            </div>
+        </div>
+
+        <div class="data-display" id="dataDisplay">
+            <div class="data-item">
+                <div class="data-item-label">갠트리 X</div>
+                <div class="data-item-value" id="gantryX">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">갠트리 Y</div>
+                <div class="data-item-value" id="gantryY">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">갠트리 Z</div>
+                <div class="data-item-value" id="gantryZ">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">갠트리 R (회전)</div>
+                <div class="data-item-value" id="gantryR">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">TCP1 위치</div>
+                <div class="data-item-value" id="tcp1Pos">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">TCP2 위치</div>
+                <div class="data-item-value" id="tcp2Pos">-</div>
+            </div>
+            <div class="data-item" id="distanceItem">
+                <div class="data-item-label">토치 간 거리</div>
+                <div class="data-item-value" id="torchDistance">-</div>
+            </div>
+            <div class="data-item">
+                <div class="data-item-label">사이클 타임</div>
+                <div class="data-item-value" id="cycleTime">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let motionData = {};
+        let currentCase = null;
+        let currentFrameIndex = 0;
+        let isPlaying = false;
+        let animationId = null;
+        let playbackSpeed = 1.0;
+        let lastUpdateTime = 0;
+
+        // DOM 요소
+        const fileInput = document.getElementById('fileInput');
+        const caseSelect = document.getElementById('caseSelect');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const speedSelect = document.getElementById('speedSelect');
+        const timelineSlider = document.getElementById('timelineSlider');
+        const dropZone = document.getElementById('dropZone');
+
+        const canvasXY = document.getElementById('canvasXY');
+        const canvasXZ = document.getElementById('canvasXZ');
+        const ctxXY = canvasXY.getContext('2d');
+        const ctxXZ = canvasXZ.getContext('2d');
+
+        // 인증 체크
+        function checkAuth() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authToken = urlParams.get('auth');
+            const validToken = 'c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1';
+
+            if (authToken !== validToken) {
+                document.body.innerHTML = '<div style="text-align:center; padding:100px;"><h1>⛔ 접근 권한이 없습니다</h1><p>올바른 인증 토큰이 필요합니다.</p></div>';
+                return false;
+            }
+            return true;
+        }
+
+        // CSV 파싱
+        function parseCSV(text, filename) {
+            const lines = text.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+
+            // 필수 컬럼 검증
+            const requiredColumns = ['Time', 'Gantry_X', 'Gantry_Y', 'Gantry_Z', 'Gantry_R',
+                                     'TCP1_X', 'TCP1_Y', 'TCP1_Z', 'TCP2_X', 'TCP2_Y', 'TCP2_Z'];
+            const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+
+            if (missingColumns.length > 0) {
+                throw new Error(`필수 컬럼 누락: ${missingColumns.join(', ')}`);
+            }
+
+            const frames = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                if (values.length !== headers.length) continue;
+
+                const frame = {};
+                headers.forEach((header, index) => {
+                    frame[header] = values[index];
+                });
+                frames.push(frame);
+            }
+
+            const caseName = filename.replace('.csv', '');
+            motionData[caseName] = frames;
+
+            // 케이스 선택 옵션 추가
+            const option = document.createElement('option');
+            option.value = caseName;
+            option.textContent = caseName;
+            caseSelect.appendChild(option);
+
+            return caseName;
+        }
+
+        // 파일 로드 이벤트
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            loadFiles(files);
+        });
+
+        // 드래그 앤 드롭
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.csv'));
+            loadFiles(files);
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        function loadFiles(files) {
+            if (files.length === 0) return;
+
+            dropZone.innerHTML = '<div class="loading">📂 파일 로딩 중...</div>';
+
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        parseCSV(e.target.result, file.name);
+                        loaded++;
+
+                        if (loaded === files.length) {
+                            dropZone.style.display = 'none';
+                            caseSelect.selectedIndex = 1;
+                            caseSelect.dispatchEvent(new Event('change'));
+                        }
+                    } catch (error) {
+                        dropZone.innerHTML = `<div class="error">❌ ${file.name} 로드 실패: ${error.message}</div>`;
+                    }
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        // 케이스 선택
+        caseSelect.addEventListener('change', (e) => {
+            const caseName = e.target.value;
+            if (!caseName || !motionData[caseName]) return;
+
+            currentCase = caseName;
+            currentFrameIndex = 0;
+            isPlaying = false;
+
+            const frames = motionData[currentCase];
+            timelineSlider.max = frames.length - 1;
+            timelineSlider.value = 0;
+
+            enableControls();
+            updateDisplay();
+        });
+
+        function enableControls() {
+            playBtn.disabled = false;
+            pauseBtn.disabled = false;
+            resetBtn.disabled = false;
+            timelineSlider.disabled = false;
+        }
+
+        // 재생 컨트롤
+        playBtn.addEventListener('click', () => {
+            isPlaying = true;
+            lastUpdateTime = performance.now();
+            animate();
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            isPlaying = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            isPlaying = false;
+            currentFrameIndex = 0;
+            timelineSlider.value = 0;
+            updateDisplay();
+        });
+
+        speedSelect.addEventListener('change', (e) => {
+            playbackSpeed = parseFloat(e.target.value);
+        });
+
+        timelineSlider.addEventListener('input', (e) => {
+            currentFrameIndex = parseInt(e.target.value);
+            updateDisplay();
+        });
+
+        // 애니메이션
+        function animate(currentTime) {
+            if (!isPlaying) return;
+
+            const deltaTime = currentTime - lastUpdateTime;
+            const frames = motionData[currentCase];
+
+            // 프레임 속도 계산 (가정: 0.5초 간격)
+            const frameInterval = 500 / playbackSpeed;
+
+            if (deltaTime >= frameInterval) {
+                currentFrameIndex++;
+
+                if (currentFrameIndex >= frames.length) {
+                    currentFrameIndex = frames.length - 1;
+                    isPlaying = false;
+                    return;
+                }
+
+                timelineSlider.value = currentFrameIndex;
+                updateDisplay();
+                lastUpdateTime = currentTime;
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // 화면 업데이트
+        function updateDisplay() {
+            if (!currentCase || !motionData[currentCase]) return;
+
+            const frames = motionData[currentCase];
+            const frame = frames[currentFrameIndex];
+
+            // 데이터 표시
+            document.getElementById('gantryX').textContent = `${frame.Gantry_X.toFixed(1)} mm`;
+            document.getElementById('gantryY').textContent = `${frame.Gantry_Y.toFixed(1)} mm`;
+            document.getElementById('gantryZ').textContent = `${frame.Gantry_Z.toFixed(1)} mm`;
+            document.getElementById('gantryR').textContent = `${frame.Gantry_R.toFixed(1)}°`;
+
+            document.getElementById('tcp1Pos').textContent =
+                `(${frame.TCP1_X.toFixed(0)}, ${frame.TCP1_Y.toFixed(0)}, ${frame.TCP1_Z.toFixed(0)})`;
+            document.getElementById('tcp2Pos').textContent =
+                `(${frame.TCP2_X.toFixed(0)}, ${frame.TCP2_Y.toFixed(0)}, ${frame.TCP2_Z.toFixed(0)})`;
+
+            // 토치 간 거리 계산
+            const dx = frame.TCP2_X - frame.TCP1_X;
+            const dy = frame.TCP2_Y - frame.TCP1_Y;
+            const dz = frame.TCP2_Z - frame.TCP1_Z;
+            const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+            const distanceItem = document.getElementById('distanceItem');
+            distanceItem.className = 'data-item';
+            if (distance < 300) {
+                distanceItem.classList.add('danger');
+            } else if (distance < 500) {
+                distanceItem.classList.add('warning');
+            }
+            document.getElementById('torchDistance').textContent = `${distance.toFixed(1)} mm`;
+
+            // 시간 표시
+            document.getElementById('currentTime').textContent = formatTime(frame.Time);
+            document.getElementById('totalTime').textContent = formatTime(frames[frames.length - 1].Time);
+            document.getElementById('cycleTime').textContent = formatTime(frames[frames.length - 1].Time);
+
+            // 캔버스 그리기
+            drawXYView(frames, currentFrameIndex);
+            drawXZView(frames, currentFrameIndex);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = (seconds % 60).toFixed(1);
+            return `${mins.toString().padStart(2, '0')}:${secs.padStart(4, '0')}`;
+        }
+
+        // XY 평면도 그리기
+        function drawXYView(frames, currentIndex) {
+            const width = canvasXY.width;
+            const height = canvasXY.height;
+
+            ctxXY.clearRect(0, 0, width, height);
+
+            // 좌표 범위 계산
+            const allX = frames.flatMap(f => [f.Gantry_X, f.TCP1_X, f.TCP2_X]);
+            const allY = frames.flatMap(f => [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y]);
+            const minX = Math.min(...allX);
+            const maxX = Math.max(...allX);
+            const minY = Math.min(...allY);
+            const maxY = Math.max(...allY);
+
+            const margin = 50;
+            const scaleX = (width - 2 * margin) / (maxX - minX);
+            const scaleY = (height - 2 * margin) / (maxY - minY);
+            const scale = Math.min(scaleX, scaleY);
+
+            function toCanvasX(x) {
+                return margin + (x - minX) * scale;
+            }
+
+            function toCanvasY(y) {
+                return height - margin - (y - minY) * scale;
+            }
+
+            // 그리드
+            ctxXY.strokeStyle = '#e0e0e0';
+            ctxXY.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const x = margin + (width - 2 * margin) * i / 10;
+                const y = margin + (height - 2 * margin) * i / 10;
+                ctxXY.beginPath();
+                ctxXY.moveTo(x, margin);
+                ctxXY.lineTo(x, height - margin);
+                ctxXY.stroke();
+                ctxXY.beginPath();
+                ctxXY.moveTo(margin, y);
+                ctxXY.lineTo(width - margin, y);
+                ctxXY.stroke();
+            }
+
+            // 경로 그리기 (TCP1 - 빨강)
+            ctxXY.strokeStyle = '#f44336';
+            ctxXY.lineWidth = 2;
+            ctxXY.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const x = toCanvasX(frames[i].TCP1_X);
+                const y = toCanvasY(frames[i].TCP1_Y);
+                if (i === 0) {
+                    ctxXY.moveTo(x, y);
+                } else {
+                    ctxXY.lineTo(x, y);
+                }
+            }
+            ctxXY.stroke();
+
+            // 경로 그리기 (TCP2 - 파랑)
+            ctxXY.strokeStyle = '#2196f3';
+            ctxXY.lineWidth = 2;
+            ctxXY.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const x = toCanvasX(frames[i].TCP2_X);
+                const y = toCanvasY(frames[i].TCP2_Y);
+                if (i === 0) {
+                    ctxXY.moveTo(x, y);
+                } else {
+                    ctxXY.lineTo(x, y);
+                }
+            }
+            ctxXY.stroke();
+
+            // 현재 위치
+            const currentFrame = frames[currentIndex];
+
+            // 갠트리 중심 (녹색)
+            ctxXY.fillStyle = '#4caf50';
+            ctxXY.beginPath();
+            ctxXY.arc(toCanvasX(currentFrame.Gantry_X), toCanvasY(currentFrame.Gantry_Y), 8, 0, Math.PI * 2);
+            ctxXY.fill();
+
+            // TCP1 (빨강)
+            ctxXY.fillStyle = '#f44336';
+            ctxXY.beginPath();
+            ctxXY.arc(toCanvasX(currentFrame.TCP1_X), toCanvasY(currentFrame.TCP1_Y), 10, 0, Math.PI * 2);
+            ctxXY.fill();
+
+            // TCP2 (파랑)
+            ctxXY.fillStyle = '#2196f3';
+            ctxXY.beginPath();
+            ctxXY.arc(toCanvasX(currentFrame.TCP2_X), toCanvasY(currentFrame.TCP2_Y), 10, 0, Math.PI * 2);
+            ctxXY.fill();
+
+            // 토치 간 거리선
+            const dx = currentFrame.TCP2_X - currentFrame.TCP1_X;
+            const dy = currentFrame.TCP2_Y - currentFrame.TCP1_Y;
+            const dz = currentFrame.TCP2_Z - currentFrame.TCP1_Z;
+            const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+            if (distance < 500) {
+                ctxXY.strokeStyle = distance < 300 ? '#f44336' : '#ff9800';
+                ctxXY.lineWidth = 3;
+                ctxXY.setLineDash([5, 5]);
+                ctxXY.beginPath();
+                ctxXY.moveTo(toCanvasX(currentFrame.TCP1_X), toCanvasY(currentFrame.TCP1_Y));
+                ctxXY.lineTo(toCanvasX(currentFrame.TCP2_X), toCanvasY(currentFrame.TCP2_Y));
+                ctxXY.stroke();
+                ctxXY.setLineDash([]);
+            }
+
+            // 축 라벨
+            ctxXY.fillStyle = '#333';
+            ctxXY.font = '14px Arial';
+            ctxXY.fillText('X →', width - 40, height - 10);
+            ctxXY.fillText('Y ↑', 10, 20);
+        }
+
+        // XZ 측면도 그리기
+        function drawXZView(frames, currentIndex) {
+            const width = canvasXZ.width;
+            const height = canvasXZ.height;
+
+            ctxXZ.clearRect(0, 0, width, height);
+
+            // 좌표 범위 계산
+            const allX = frames.flatMap(f => [f.Gantry_X, f.TCP1_X, f.TCP2_X]);
+            const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z]);
+            const minX = Math.min(...allX);
+            const maxX = Math.max(...allX);
+            const minZ = Math.min(...allZ);
+            const maxZ = Math.max(...allZ);
+
+            const margin = 50;
+            const scaleX = (width - 2 * margin) / (maxX - minX);
+            const scaleZ = (height - 2 * margin) / (maxZ - minZ);
+            const scale = Math.min(scaleX, scaleZ);
+
+            function toCanvasX(x) {
+                return margin + (x - minX) * scale;
+            }
+
+            function toCanvasZ(z) {
+                return height - margin - (z - minZ) * scale;
+            }
+
+            // 그리드
+            ctxXZ.strokeStyle = '#e0e0e0';
+            ctxXZ.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const x = margin + (width - 2 * margin) * i / 10;
+                const z = margin + (height - 2 * margin) * i / 10;
+                ctxXZ.beginPath();
+                ctxXZ.moveTo(x, margin);
+                ctxXZ.lineTo(x, height - margin);
+                ctxXZ.stroke();
+                ctxXZ.beginPath();
+                ctxXZ.moveTo(margin, z);
+                ctxXZ.lineTo(width - margin, z);
+                ctxXZ.stroke();
+            }
+
+            // 경로 그리기 (TCP1 - 빨강)
+            ctxXZ.strokeStyle = '#f44336';
+            ctxXZ.lineWidth = 2;
+            ctxXZ.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const x = toCanvasX(frames[i].TCP1_X);
+                const z = toCanvasZ(frames[i].TCP1_Z);
+                if (i === 0) {
+                    ctxXZ.moveTo(x, z);
+                } else {
+                    ctxXZ.lineTo(x, z);
+                }
+            }
+            ctxXZ.stroke();
+
+            // 경로 그리기 (TCP2 - 파랑)
+            ctxXZ.strokeStyle = '#2196f3';
+            ctxXZ.lineWidth = 2;
+            ctxXZ.beginPath();
+            for (let i = 0; i <= currentIndex; i++) {
+                const x = toCanvasX(frames[i].TCP2_X);
+                const z = toCanvasZ(frames[i].TCP2_Z);
+                if (i === 0) {
+                    ctxXZ.moveTo(x, z);
+                } else {
+                    ctxXZ.lineTo(x, z);
+                }
+            }
+            ctxXZ.stroke();
+
+            // 현재 위치
+            const currentFrame = frames[currentIndex];
+
+            // 갠트리 중심 (녹색)
+            ctxXZ.fillStyle = '#4caf50';
+            ctxXZ.beginPath();
+            ctxXZ.arc(toCanvasX(currentFrame.Gantry_X), toCanvasZ(currentFrame.Gantry_Z), 8, 0, Math.PI * 2);
+            ctxXZ.fill();
+
+            // TCP1 (빨강)
+            ctxXZ.fillStyle = '#f44336';
+            ctxXZ.beginPath();
+            ctxXZ.arc(toCanvasX(currentFrame.TCP1_X), toCanvasZ(currentFrame.TCP1_Z), 10, 0, Math.PI * 2);
+            ctxXZ.fill();
+
+            // TCP2 (파랑)
+            ctxXZ.fillStyle = '#2196f3';
+            ctxXZ.beginPath();
+            ctxXZ.arc(toCanvasX(currentFrame.TCP2_X), toCanvasZ(currentFrame.TCP2_Z), 10, 0, Math.PI * 2);
+            ctxXZ.fill();
+
+            // 축 라벨
+            ctxXZ.fillStyle = '#333';
+            ctxXZ.font = '14px Arial';
+            ctxXZ.fillText('X →', width - 40, height - 10);
+            ctxXZ.fillText('Z ↑', 10, 20);
+        }
+
+        // 초기화
+        if (checkAuth()) {
+            console.log('✅ 인증 완료');
+        }
+    </script>
+</body>
+</html>
