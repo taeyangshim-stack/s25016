@@ -1073,6 +1073,34 @@
             ctxXZ.arc(toCanvasX(currentFrame.Gantry_X), toCanvasZ(currentFrame.Gantry_Z), 8, 0, Math.PI * 2);
             ctxXZ.fill();
 
+            // 로봇 베이스 위치 (X축 기준: Robot1 = +488*sin, Robot2 = -488*sin)
+            const rAngle = currentFrame.Gantry_R * Math.PI / 180;
+            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.sin(rAngle);
+            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.sin(rAngle);
+
+            // 바디 프레임 (두 로봇 연결하는 바)
+            ctxXZ.strokeStyle = '#ff6f00';
+            ctxXZ.lineWidth = 8;
+            ctxXZ.beginPath();
+            ctxXZ.moveTo(toCanvasX(robot1BaseX), toCanvasZ(currentFrame.Gantry_Z));
+            ctxXZ.lineTo(toCanvasX(robot2BaseX), toCanvasZ(currentFrame.Gantry_Z));
+            ctxXZ.stroke();
+
+            // 로봇 베이스 (주황색 점)
+            ctxXZ.fillStyle = '#ff9800';
+            ctxXZ.beginPath();
+            ctxXZ.arc(toCanvasX(robot1BaseX), toCanvasZ(currentFrame.Gantry_Z), 6, 0, Math.PI * 2);
+            ctxXZ.fill();
+            ctxXZ.beginPath();
+            ctxXZ.arc(toCanvasX(robot2BaseX), toCanvasZ(currentFrame.Gantry_Z), 6, 0, Math.PI * 2);
+            ctxXZ.fill();
+
+            // 로봇 베이스 라벨
+            ctxXZ.fillStyle = '#ff6f00';
+            ctxXZ.font = 'bold 12px Arial';
+            ctxXZ.fillText('R1', toCanvasX(robot1BaseX) + 10, toCanvasZ(currentFrame.Gantry_Z) - 10);
+            ctxXZ.fillText('R2', toCanvasX(robot2BaseX) + 10, toCanvasZ(currentFrame.Gantry_Z) - 10);
+
             // 경로 그리기 (TCP1 - 빨강)
             ctxXZ.strokeStyle = '#f44336';
             ctxXZ.lineWidth = 2;
@@ -1195,11 +1223,20 @@
             ctxYZ.arc(toCanvasY(currentFrame.Gantry_Y), toCanvasZ(currentFrame.Gantry_Z), 8, 0, Math.PI * 2);
             ctxYZ.fill();
 
-            // 로봇 베이스 위치 (Y축 기준으로 ±488mm 표시)
+            // 로봇 베이스 위치 (Y축 기준 회전: Robot1 = +488mm, Robot2 = -488mm)
             const rAngle = currentFrame.Gantry_R * Math.PI / 180;
-            const robot1BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rAngle);
-            const robot2BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rAngle);
+            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.cos(rAngle);
+            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.cos(rAngle);
 
+            // 바디 프레임 (두 로봇 연결하는 바)
+            ctxYZ.strokeStyle = '#ff6f00';
+            ctxYZ.lineWidth = 8;
+            ctxYZ.beginPath();
+            ctxYZ.moveTo(toCanvasY(robot1BaseY), toCanvasZ(currentFrame.Gantry_Z));
+            ctxYZ.lineTo(toCanvasY(robot2BaseY), toCanvasZ(currentFrame.Gantry_Z));
+            ctxYZ.stroke();
+
+            // 로봇 베이스 (주황색 점)
             ctxYZ.fillStyle = '#ff9800';
             ctxYZ.beginPath();
             ctxYZ.arc(toCanvasY(robot1BaseY), toCanvasZ(currentFrame.Gantry_Z), 6, 0, Math.PI * 2);
@@ -1207,6 +1244,12 @@
             ctxYZ.beginPath();
             ctxYZ.arc(toCanvasY(robot2BaseY), toCanvasZ(currentFrame.Gantry_Z), 6, 0, Math.PI * 2);
             ctxYZ.fill();
+
+            // 로봇 베이스 라벨
+            ctxYZ.fillStyle = '#ff6f00';
+            ctxYZ.font = 'bold 12px Arial';
+            ctxYZ.fillText('R1', toCanvasY(robot1BaseY) + 10, toCanvasZ(currentFrame.Gantry_Z) - 10);
+            ctxYZ.fillText('R2', toCanvasY(robot2BaseY) + 10, toCanvasZ(currentFrame.Gantry_Z) - 10);
 
             // 경로 그리기 (TCP1 - 빨강)
             ctxYZ.strokeStyle = '#f44336';
