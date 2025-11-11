@@ -847,20 +847,40 @@
             ctxXY.arc(toCanvasX(currentFrame.Gantry_X), toCanvasY(currentFrame.Gantry_Y), 8, 0, Math.PI * 2);
             ctxXY.fill();
 
-            // 로봇 베이스 위치 (±488mm from R center)
+            // 로봇 베이스 위치 (R축 중심에서 ±488mm)
             const rAngle = currentFrame.Gantry_R * Math.PI / 180;
-            const robot1BaseX = currentFrame.Gantry_X - 488 * Math.cos(rAngle);
-            const robot1BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rAngle);
-            const robot2BaseX = currentFrame.Gantry_X + 488 * Math.cos(rAngle);
-            const robot2BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rAngle);
+            // Y축 기준으로 회전: Robot1 = +488mm, Robot2 = -488mm
+            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.sin(rAngle);
+            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.cos(rAngle);
+            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.sin(rAngle);
+            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.cos(rAngle);
+
+            // 바디 프레임 (두 로봇을 연결하는 바)
+            ctxXY.strokeStyle = '#ff6f00';
+            ctxXY.lineWidth = 8;
+            ctxXY.beginPath();
+            ctxXY.moveTo(toCanvasX(robot1BaseX), toCanvasY(robot1BaseY));
+            ctxXY.lineTo(toCanvasX(robot2BaseX), toCanvasY(robot2BaseY));
+            ctxXY.stroke();
+
+            // 로봇 베이스 점
+            ctxXY.fillStyle = '#ff9800';
+            ctxXY.beginPath();
+            ctxXY.arc(toCanvasX(robot1BaseX), toCanvasY(robot1BaseY), 8, 0, Math.PI * 2);
+            ctxXY.fill();
+
+            // 로봇 베이스 라벨
+            ctxXY.fillStyle = '#333';
+            ctxXY.font = 'bold 11px Arial';
+            ctxXY.fillText('R1', toCanvasX(robot1BaseX) + 12, toCanvasY(robot1BaseY) + 4);
 
             ctxXY.fillStyle = '#ff9800';
             ctxXY.beginPath();
-            ctxXY.arc(toCanvasX(robot1BaseX), toCanvasY(robot1BaseY), 6, 0, Math.PI * 2);
+            ctxXY.arc(toCanvasX(robot2BaseX), toCanvasY(robot2BaseY), 8, 0, Math.PI * 2);
             ctxXY.fill();
-            ctxXY.beginPath();
-            ctxXY.arc(toCanvasX(robot2BaseX), toCanvasY(robot2BaseY), 6, 0, Math.PI * 2);
-            ctxXY.fill();
+
+            ctxXY.fillStyle = '#333';
+            ctxXY.fillText('R2', toCanvasX(robot2BaseX) + 12, toCanvasY(robot2BaseY) + 4);
 
             // 경로 그리기 (TCP1 - 빨강)
             ctxXY.strokeStyle = '#f44336';

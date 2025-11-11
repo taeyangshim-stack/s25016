@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎬 듀얼 토치 모션 뷰어 인덱스</title>
+  <script>
+    (function () {
+      var TOKEN = 'c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1';
+      var STORAGE_KEY = 's25016-dashboard-auth';
+      var params = new URLSearchParams(window.location.search);
+      var provided = params.get('auth');
+      if (provided === TOKEN) {
+        sessionStorage.setItem(STORAGE_KEY, TOKEN);
+        if (typeof window.history.replaceState === 'function') {
+          params.delete('auth');
+          var cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+        return;
+      }
+      if (sessionStorage.getItem(STORAGE_KEY) === TOKEN) {
+        return;
+      }
+      document.documentElement.innerHTML = '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><title>접근 제한</title><style>body{margin:0;padding:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:\\'Segoe UI\\',sans-serif;text-align:center;} .box{max-width:420px;padding:32px;background:rgba(15,23,42,0.85);border-radius:16px;box-shadow:0 25px 70px rgba(15,23,42,0.35);} h1{font-size:1.8rem;margin-bottom:12px;} p{line-height:1.6;font-size:1rem;color:#94a3b8;} code{display:inline-block;margin-top:18px;padding:8px 14px;border-radius:999px;background:rgba(96,165,250,0.12);color:#bfdbfe;font-size:0.95rem;}</style></head><body><div class="box"><h1>접근이 제한된 페이지입니다</h1><p>유효한 인증 토큰이 확인되지 않았습니다.<br>지정된 공유 링크로 다시 접속해 주세요.</p><code>문의: 내부 담당자</code></div></body></html>';
+    })();
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #0f172a;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 25px 50px rgba(15, 23, 42, 0.25);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+      color: #fff;
+      padding: 42px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 2.3rem;
+      margin-bottom: 10px;
+    }
+    .header p {
+      font-size: 1rem;
+      color: #ffe4f1;
+    }
+    .breadcrumb {
+      padding: 18px 40px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .breadcrumb a {
+      color: #db2777;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .content { padding: 40px; }
+    .section {
+      margin-bottom: 36px;
+      padding: 28px;
+      background: #fdf2f8;
+      border-radius: 14px;
+      border-left: 5px solid #ec4899;
+    }
+    .section h2 {
+      font-size: 1.4rem;
+      margin-bottom: 14px;
+    }
+    .section p { line-height: 1.6; color: #4a5568; }
+    .link-card {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 16px;
+    }
+    .link-card a {
+      flex: 1 1 280px;
+      text-decoration: none;
+      padding: 18px;
+      border-radius: 12px;
+      color: #fff;
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      box-shadow: 0 12px 24px rgba(79, 70, 229, 0.3);
+      transition: transform 0.2s;
+    }
+    .link-card a:hover { transform: translateY(-3px); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+    }
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    th {
+      background: #ec4899;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td { background: #f9fafb; }
+    code {
+      background: #e0e7ff;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .note {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: #fff8f0;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 768px) {
+      .content { padding: 24px; }
+      .section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎬 듀얼 토치 모션 뷰어 인덱스</h1>
+      <p>XYZR 갠트리 + 2대 로봇 직선 용접 모션 케이스 리뷰 허브</p>
+    </div>
+    <div class="breadcrumb">
+      <a href="index.html">← 메인 대시보드</a> / <strong>Motion Viewer Index</strong>
+    </div>
+    <div class="content">
+      <div class="section">
+        <h2>1. 공식 뷰어 링크</h2>
+        <p>외부 협력자가 관리 중인 최신 모션 뷰어입니다. 파일 자체는 수정하지 말고 아래 링크로 접속해 리뷰를 진행합니다.</p>
+        <div class="link-card">
+          <a href="https://s2501602.vercel.app/motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" target="_blank" rel="noopener">
+            🎥 실사용 모션 뷰어 (Vercel) →
+          </a>
+        </div>
+        <div class="note">
+          링크는 토큰 파라미터가 포함된 전용 URL입니다. 공유 시 토큰이 제거되지 않았는지 확인하세요.
+        </div>
+      </div>
+      <div class="section">
+        <h2>2. 샘플 데이터 패키지</h2>
+        <p>웹 뷰어 또는 추후 개발 중인 파서에서 바로 활용할 수 있는 샘플 데이터를 정리했습니다.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>파일</th>
+              <th>설명</th>
+              <th>적용 케이스</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="sample_data/welding_case1_basic.csv" download>sample_data/welding_case1_basic.csv</a></td>
+              <td>1500mm 직선, Option A 기본 케이스</td>
+              <td>간단 모션 뷰어 테스트</td>
+            </tr>
+            <tr>
+              <td><a href="sample_data/welding_case2_robot_swap.csv" download>sample_data/welding_case2_robot_swap.csv</a></td>
+              <td>R축 90° 초과로 로봇 스왑 발생 케이스</td>
+              <td>스왑 로직 검증</td>
+            </tr>
+            <tr>
+              <td><a href="sample_data/welding_case3_alternating.csv" download>sample_data/welding_case3_alternating.csv</a></td>
+              <td>교차 용접 케이스, Option B 대칭</td>
+              <td>교대 운용 시뮬레이션</td>
+            </tr>
+            <tr>
+              <td><a href="sample_data/motion_case1.csv" download>sample_data/motion_case1.csv</a></td>
+              <td>초기 위빙 파라미터 검증용</td>
+              <td>위빙/토치 벡터 시각화</td>
+            </tr>
+            <tr>
+              <td><a href="sample_data/motion_case2_collision_risk.csv" download>sample_data/motion_case2_collision_risk.csv</a></td>
+              <td>충돌 여유거리 확인 케이스</td>
+              <td>안전 분석</td>
+            </tr>
+            <tr>
+              <td><a href="sample_data/vision_points.json" download>sample_data/vision_points.json</a></td>
+              <td>비전 기반 4포인트 보정 좌표</td>
+              <td>비전 하이라이트 연동</td>
+            </tr>
+            <tr>
+              <td><a href="250917_상하축이슈/04_작업진행/251111_codex_robotstudio_motion_samples.csv" download>251111_codex_robotstudio_motion_samples.csv</a></td>
+              <td>RobotStudio 스타일 로그 샘플 (Case A/B)</td>
+              <td>신규 파서/웹 뷰어 연동</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <h2>3. 사용 가이드</h2>
+        <p>샘플 데이터를 뷰어에 연결할 때 아래 순서를 권장합니다.</p>
+        <ol style="margin-left: 20px; color: #4a5568; line-height: 1.6;">
+          <li>위 CSV/JSON 중 대상 케이스를 선택해 다운로드합니다.</li>
+          <li>뷰어 내 <strong>데이터 업로드</strong> 또는 <strong>URL 불러오기</strong> 기능을 이용해 파일을 로드합니다.</li>
+          <li>케이스 토글 · 로봇 필터 · R축 각도 그래프를 켠 뒤, TCP/위빙/비전 포인트를 순서대로 검토합니다.</li>
+          <li>리뷰 메모는 <code>250917_상하축이슈/04_작업진행</code> 폴더 내 신규 노트(YYMMDD_작성자_제목)로 기록하세요.</li>
+        </ol>
+        <div class="note">
+          추후 실제 로그를 수집하면 동일 포맷(CSV/JSON)을 유지해 이 인덱스에만 추가하면 전체 팀이 같은 링크/데이터를 공유할 수 있습니다.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
