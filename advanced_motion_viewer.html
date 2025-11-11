@@ -814,28 +814,29 @@
 
             const currentFrame = frames[currentIndex];
 
-            // T바 형상 (12T 두께, 가운데 위치)
+            // T바 형상 (12T 두께, 고정 위치)
             if (showTBar) {
-                const rAngle = currentFrame.Gantry_R * Math.PI / 180;
-                const gx = currentFrame.Gantry_X;
-                const gy = currentFrame.Gantry_Y;
+                // T바는 고정 위치 (첫 프레임에서 가져옴)
+                const tbarX = frames[0].TBar_Center_X || 1000;
+                const tbarY = frames[0].TBar_Center_Y || 500;
+                const rAngle = frames[0].Gantry_R * Math.PI / 180;
 
                 // T바 웹 (세로) - 12mm 두께
                 const webThickness = 12;
-                const webHalfT = webThickness / 2;
+                const webLength = 1000;  // 1000mm 길이
 
                 ctxXY.fillStyle = 'rgba(121, 85, 72, 0.3)';
                 ctxXY.strokeStyle = '#795548';
                 ctxXY.lineWidth = 2;
 
-                // R축 회전을 고려한 T바 렌더링
+                // T바는 X축 방향으로 놓여 있음
                 ctxXY.save();
-                ctxXY.translate(toCanvasX(gx), toCanvasY(gy));
+                ctxXY.translate(toCanvasX(tbarX), toCanvasY(tbarY));
                 ctxXY.rotate(-rAngle);
 
                 // 웹 중심선에서 ±6mm
-                ctxXY.fillRect(-5 * scale, -750 * scale, 10 * scale, 1500 * scale);
-                ctxXY.strokeRect(-5 * scale, -750 * scale, 10 * scale, 1500 * scale);
+                ctxXY.fillRect(-webLength/2 * scale, -webThickness/2 * scale, webLength * scale, webThickness * scale);
+                ctxXY.strokeRect(-webLength/2 * scale, -webThickness/2 * scale, webLength * scale, webThickness * scale);
 
                 ctxXY.restore();
             }
@@ -1029,16 +1030,21 @@
 
             const currentFrame = frames[currentIndex];
 
-            // T바 형상 (측면에서는 웹만 보임)
+            // T바 형상 (측면에서는 웹 + 하단 평판)
             if (showTBar) {
-                const gx = currentFrame.Gantry_X;
-                const gz = currentFrame.Gantry_Z;
+                // T바는 고정 위치 (첫 프레임에서 가져옴)
+                const tbarX = frames[0].TBar_Center_X || 1000;
+                const tbarZ = frames[0].TBar_Center_Z || 100;
+                const webLength = 1000;  // X 방향 1000mm
+                const webHeight = 200;   // Z 방향 200mm
 
                 ctxXZ.fillStyle = 'rgba(121, 85, 72, 0.3)';
                 ctxXZ.strokeStyle = '#795548';
                 ctxXZ.lineWidth = 2;
-                ctxXZ.fillRect(toCanvasX(gx - 750), toCanvasZ(gz), 1500 * scale, 200 * scale);
-                ctxXZ.strokeRect(toCanvasX(gx - 750), toCanvasZ(gz), 1500 * scale, 200 * scale);
+
+                // T바는 X축 방향으로 1000mm, Z축으로 200mm
+                ctxXZ.fillRect(toCanvasX(tbarX - webLength/2), toCanvasZ(tbarZ + webHeight), webLength * scale, webHeight * scale);
+                ctxXZ.strokeRect(toCanvasX(tbarX - webLength/2), toCanvasZ(tbarZ + webHeight), webLength * scale, webHeight * scale);
             }
 
             // 갠트리 중심 (녹색)
@@ -1141,22 +1147,26 @@
 
             const currentFrame = frames[currentIndex];
 
-            // T바 형상 (정면에서 T 형태)
+            // T바 형상 (정면에서 T 형태 - 고정 위치)
             if (showTBar) {
-                const gy = currentFrame.Gantry_Y;
-                const gz = currentFrame.Gantry_Z;
+                // T바는 고정 위치 (첫 프레임에서 가져옴)
+                const tbarY = frames[0].TBar_Center_Y || 500;
+                const tbarZ = frames[0].TBar_Center_Z || 100;
+                const plateWidth = 300;   // 하단 평판 폭 300mm
+                const webThickness = 12;  // 웹 두께 12mm
+                const webHeight = 200;    // 웹 높이 200mm
 
                 ctxYZ.fillStyle = 'rgba(121, 85, 72, 0.3)';
                 ctxYZ.strokeStyle = '#795548';
                 ctxYZ.lineWidth = 2;
 
-                // 하단 평판
-                ctxYZ.fillRect(toCanvasY(gy - 150), toCanvasZ(gz), 300 * scale, 20 * scale);
-                ctxYZ.strokeRect(toCanvasY(gy - 150), toCanvasZ(gz), 300 * scale, 20 * scale);
+                // 하단 평판 (Y축 중심에서 ±150mm)
+                ctxYZ.fillRect(toCanvasY(tbarY - plateWidth/2), toCanvasZ(tbarZ), plateWidth * scale, 20 * scale);
+                ctxYZ.strokeRect(toCanvasY(tbarY - plateWidth/2), toCanvasZ(tbarZ), plateWidth * scale, 20 * scale);
 
-                // 세로 웹 (12T)
-                ctxYZ.fillRect(toCanvasY(gy - 6), toCanvasZ(gz + 20), 12 * scale, 180 * scale);
-                ctxYZ.strokeRect(toCanvasY(gy - 6), toCanvasZ(gz + 20), 12 * scale, 180 * scale);
+                // 세로 웹 (12T, 중심선 기준)
+                ctxYZ.fillRect(toCanvasY(tbarY - webThickness/2), toCanvasZ(tbarZ + 20), webThickness * scale, webHeight * scale);
+                ctxYZ.strokeRect(toCanvasY(tbarY - webThickness/2), toCanvasZ(tbarZ + 20), webThickness * scale, webHeight * scale);
             }
 
             // R축 중심
