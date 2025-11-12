@@ -526,101 +526,222 @@
             return true;
         }
 
-        // CSV 파싱
+        // CSV 파싱 - 비전 데이터로부터 프레임 자동 생성
         function parseCSV(text, filename) {
             const lines = text.trim().split('\n');
             const headers = lines[0].split(',').map(h => h.trim());
 
+            // 비전 데이터 읽기 (1행만)
+            if (lines.length < 2) {
+                console.error('❌ CSV 데이터가 없습니다');
+                return;
+            }
+
+            const values = lines[1].split(',').map(v => v.trim());
+            const visionData = {};
+            headers.forEach((header, index) => {
+                const val = values[index];
+                visionData[header] = isNaN(val) || val === '' ? val : parseFloat(val);
+            });
+
+            // 비전 4포인트 추출
+            const S1 = { x: visionData.Vision_Start1_X, y: visionData.Vision_Start1_Y, z: visionData.Vision_Start1_Z };
+            const E1 = { x: visionData.Vision_End1_X, y: visionData.Vision_End1_Y, z: visionData.Vision_End1_Z };
+            const S2 = { x: visionData.Vision_Start2_X, y: visionData.Vision_Start2_Y, z: visionData.Vision_Start2_Z };
+            const E2 = { x: visionData.Vision_End2_X, y: visionData.Vision_End2_Y, z: visionData.Vision_End2_Z };
+
+            const weldingSpeed = visionData.Welding_Speed || 100; // mm/s
+            const weavingAmplitude = visionData.Weaving_Amplitude || 6; // mm
+            const approachHeight = visionData.Approach_Height || 1200; // mm
+            const retractHeight = visionData.Retract_Height || 1200; // mm
+            const frameInterval = visionData.Frame_Interval || 0.5; // 초
+
+            console.log('📊 비전 데이터 로드:');
+            console.log(`   Start1: (${S1.x}, ${S1.y}, ${S1.z})`);
+            console.log(`   End1: (${E1.x}, ${E1.y}, ${E1.z})`);
+            console.log(`   용접 속도: ${weldingSpeed} mm/s`);
+            console.log(`   프레임 간격: ${frameInterval} s`);
+
+            // T-bar 속성 계산
+            const TBar_Center_X = (S1.x + E1.x + S2.x + E2.x) / 4;
+            const TBar_Center_Y = (S1.y + E1.y + S2.y + E2.y) / 4;
+            const TBar_Center_Z = (S1.z + E1.z + S2.z + E2.z) / 4;
+            const webVec = { x: E1.x - S1.x, y: E1.y - S1.y };
+            const webAngle = Math.atan2(webVec.y, webVec.x);
+            const webThickness = Math.sqrt((S2.x-S1.x)**2 + (S2.y-S1.y)**2);
+
+            // R축 각도 (웹에 수직)
+            const rAxisAngle = webAngle + Math.PI / 2;
+            const rAxisAngleDeg = rAxisAngle * 180 / Math.PI;
+
+            console.log('✅ T-bar 자동 계산:');
+            console.log(`   중심: (${TBar_Center_X.toFixed(1)}, ${TBar_Center_Y.toFixed(1)}, ${TBar_Center_Z.toFixed(1)})`);
+            console.log(`   웹 각도: ${(webAngle * 180 / Math.PI).toFixed(1)}°`);
+            console.log(`   R축 각도: ${rAxisAngleDeg.toFixed(1)}°`);
+            console.log(`   웹 두께: ${webThickness.toFixed(1)}mm`);
+
+            // 용접 거리 및 시간 계산
+            const weldDistance = Math.sqrt((E1.x-S1.x)**2 + (E1.y-S1.y)**2);
+            const weldTime = weldDistance / weldingSpeed;
+            const numWeldFrames = Math.ceil(weldTime / frameInterval);
+
+            console.log('⏱️ 용접 경로 계산:');
+            console.log(`   거리: ${weldDistance.toFixed(1)}mm`);
+            console.log(`   소요 시간: ${weldTime.toFixed(1)}초`);
+            console.log(`   프레임 수: ${numWeldFrames}개`);
+
+            // 프레임 생성
             const frames = [];
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim());
-                if (values.length !== headers.length) continue;
+            let currentTime = 0;
+            let frameIndex = 0;
 
-                const frame = {};
-                headers.forEach((header, index) => {
-                    const val = values[index];
-                    // 숫자 변환
-                    frame[header] = isNaN(val) ? val : parseFloat(val);
+            // 헬퍼 함수: 선형 보간
+            function lerp(start, end, ratio) {
+                return start + (end - start) * ratio;
+            }
+
+            // 헬퍼 함수: 갠트리 위치 계산
+            function calculateGantryPosition(tcp1, tcp2, rAngleDeg) {
+                const rAngleRad = rAngleDeg * Math.PI / 180;
+                const gantryX = (tcp1.x + tcp2.x) / 2;
+                const gantryY = (tcp1.y + tcp2.y) / 2;
+                return { x: gantryX, y: gantryY };
+            }
+
+            // 1. APPROACH 프레임 (접근)
+            const approachDuration = 0.5; // 0.5초
+            const numApproachFrames = Math.ceil(approachDuration / frameInterval);
+
+            for (let i = 0; i <= numApproachFrames; i++) {
+                const ratio = i / numApproachFrames;
+                const tcp1 = { x: S1.x, y: S1.y, z: lerp(approachHeight, S1.z, ratio) };
+                const tcp2 = { x: S2.x, y: S2.y, z: lerp(approachHeight, S2.z, ratio) };
+                const gantry = calculateGantryPosition(tcp1, tcp2, rAxisAngleDeg);
+
+                frames.push({
+                    Time: currentTime,
+                    Gantry_X: gantry.x,
+                    Gantry_Y: gantry.y,
+                    Gantry_Z: approachHeight,
+                    Gantry_R: rAxisAngleDeg,
+                    TCP1_X: tcp1.x, TCP1_Y: tcp1.y, TCP1_Z: tcp1.z,
+                    TCP1_VX: Math.cos(webAngle), TCP1_VY: Math.sin(webAngle), TCP1_VZ: 0,
+                    Weaving1: 0,
+                    TCP2_X: tcp2.x, TCP2_Y: tcp2.y, TCP2_Z: tcp2.z,
+                    TCP2_VX: Math.cos(webAngle), TCP2_VY: Math.sin(webAngle), TCP2_VZ: 0,
+                    Weaving2: 0,
+                    Motion_Type: 'APPROACH',
+                    Robot_Swap: 0,
+                    TBar_Center_X, TBar_Center_Y, TBar_Center_Z,
+                    TBar_Web_Angle: webAngle,
+                    TBar_Web_Thickness: webThickness
                 });
-                frames.push(frame);
+                currentTime += frameInterval;
             }
 
-            // 빈 비전 포인트를 첫 프레임 값으로 자동 채우기
-            if (frames.length > 0 && frames[0].Vision_Start1_X !== undefined && frames[0].Vision_Start1_X !== '') {
-                const visionKeys = [
-                    'Vision_Start1_X', 'Vision_Start1_Y', 'Vision_Start1_Z',
-                    'Vision_End1_X', 'Vision_End1_Y', 'Vision_End1_Z',
-                    'Vision_Start2_X', 'Vision_Start2_Y', 'Vision_Start2_Z',
-                    'Vision_End2_X', 'Vision_End2_Y', 'Vision_End2_Z'
-                ];
+            // 2. WELD 프레임 (용접, 위빙 적용)
+            for (let i = 0; i <= numWeldFrames; i++) {
+                const ratio = i / numWeldFrames;
 
-                for (let i = 1; i < frames.length; i++) {
-                    visionKeys.forEach(key => {
-                        if (frames[i][key] === undefined || frames[i][key] === '' || isNaN(frames[i][key])) {
-                            frames[i][key] = frames[0][key];
-                        }
-                    });
-                }
-                console.log(`✅ 비전 포인트 자동 채우기 완료 (${frames.length-1}개 프레임)`);
-            }
-
-            // 비전 포인트로부터 T-bar 중심 및 각도 자동 계산
-            if (frames.length > 0 && frames[0].Vision_Start1_X !== undefined && frames[0].Vision_Start1_X !== '') {
-                const firstFrame = frames[0];
-
-                // 4개의 비전 포인트
-                const S1 = {
-                    x: firstFrame.Vision_Start1_X,
-                    y: firstFrame.Vision_Start1_Y,
-                    z: firstFrame.Vision_Start1_Z
+                // 선형 보간
+                const tcp1_base = {
+                    x: lerp(S1.x, E1.x, ratio),
+                    y: lerp(S1.y, E1.y, ratio),
+                    z: S1.z
                 };
-                const E1 = {
-                    x: firstFrame.Vision_End1_X,
-                    y: firstFrame.Vision_End1_Y,
-                    z: firstFrame.Vision_End1_Z
-                };
-                const S2 = {
-                    x: firstFrame.Vision_Start2_X,
-                    y: firstFrame.Vision_Start2_Y,
-                    z: firstFrame.Vision_Start2_Z
-                };
-                const E2 = {
-                    x: firstFrame.Vision_End2_X,
-                    y: firstFrame.Vision_End2_Y,
-                    z: firstFrame.Vision_End2_Z
+                const tcp2_base = {
+                    x: lerp(S2.x, E2.x, ratio),
+                    y: lerp(S2.y, E2.y, ratio),
+                    z: S2.z
                 };
 
-                // T-bar 중심 계산 (4개 포인트의 중점)
-                const TBar_Center_X = (S1.x + E1.x + S2.x + E2.x) / 4;
-                const TBar_Center_Y = (S1.y + E1.y + S2.y + E2.y) / 4;
-                const TBar_Center_Z = (S1.z + E1.z + S2.z + E2.z) / 4;
+                // 위빙 (정현파)
+                const weavingPhase = (frameIndex * Math.PI / 2); // 90도씩 위상 변화
+                const weaving1 = Math.sin(weavingPhase) * weavingAmplitude;
+                const weaving2 = -weaving1; // 반대 위상
 
-                // 웹 방향 계산 (Start1 -> End1 벡터)
-                const webVec = {
-                    x: E1.x - S1.x,
-                    y: E1.y - S1.y
-                };
-                const webAngle = Math.atan2(webVec.y, webVec.x); // 라디안
+                const tcp1 = { ...tcp1_base };
+                const tcp2 = { ...tcp2_base };
+                const gantry = calculateGantryPosition(tcp1, tcp2, rAxisAngleDeg);
 
-                // 웹 두께 계산 (Start1과 Start2 사이 거리)
-                const dx = S2.x - S1.x;
-                const dy = S2.y - S1.y;
-                const webThickness = Math.sqrt(dx*dx + dy*dy);
-
-                // 모든 프레임에 T-bar 정보 추가
-                frames.forEach(frame => {
-                    frame.TBar_Center_X = TBar_Center_X;
-                    frame.TBar_Center_Y = TBar_Center_Y;
-                    frame.TBar_Center_Z = TBar_Center_Z;
-                    frame.TBar_Web_Angle = webAngle;
-                    frame.TBar_Web_Thickness = webThickness;
+                frames.push({
+                    Time: currentTime,
+                    Gantry_X: gantry.x,
+                    Gantry_Y: gantry.y,
+                    Gantry_Z: approachHeight,
+                    Gantry_R: rAxisAngleDeg,
+                    TCP1_X: tcp1.x, TCP1_Y: tcp1.y, TCP1_Z: tcp1.z,
+                    TCP1_VX: Math.cos(webAngle), TCP1_VY: Math.sin(webAngle), TCP1_VZ: 0,
+                    Weaving1: weaving1,
+                    TCP2_X: tcp2.x, TCP2_Y: tcp2.y, TCP2_Z: tcp2.z,
+                    TCP2_VX: Math.cos(webAngle), TCP2_VY: Math.sin(webAngle), TCP2_VZ: 0,
+                    Weaving2: weaving2,
+                    Motion_Type: 'WELD',
+                    Robot_Swap: 0,
+                    TBar_Center_X, TBar_Center_Y, TBar_Center_Z,
+                    TBar_Web_Angle: webAngle,
+                    TBar_Web_Thickness: webThickness
                 });
-
-                console.log('✅ T-bar 자동 계산 완료:');
-                console.log(`   중심: (${TBar_Center_X.toFixed(1)}, ${TBar_Center_Y.toFixed(1)}, ${TBar_Center_Z.toFixed(1)})`);
-                console.log(`   웹 각도: ${(webAngle * 180 / Math.PI).toFixed(1)}°`);
-                console.log(`   웹 두께: ${webThickness.toFixed(1)}mm`);
+                currentTime += frameInterval;
+                frameIndex++;
             }
+
+            // 3. RETRACT 프레임 (후퇴)
+            const retractDuration = 0.5; // 0.5초
+            const numRetractFrames = Math.ceil(retractDuration / frameInterval);
+
+            for (let i = 0; i <= numRetractFrames; i++) {
+                const ratio = i / numRetractFrames;
+                const tcp1 = { x: E1.x, y: E1.y, z: lerp(E1.z, retractHeight, ratio) };
+                const tcp2 = { x: E2.x, y: E2.y, z: lerp(E2.z, retractHeight, ratio) };
+                const gantry = calculateGantryPosition(tcp1, tcp2, rAxisAngleDeg);
+
+                frames.push({
+                    Time: currentTime,
+                    Gantry_X: gantry.x,
+                    Gantry_Y: gantry.y,
+                    Gantry_Z: retractHeight,
+                    Gantry_R: rAxisAngleDeg,
+                    TCP1_X: tcp1.x, TCP1_Y: tcp1.y, TCP1_Z: tcp1.z,
+                    TCP1_VX: 0, TCP1_VY: 0, TCP1_VZ: 1,
+                    Weaving1: 0,
+                    TCP2_X: tcp2.x, TCP2_Y: tcp2.y, TCP2_Z: tcp2.z,
+                    TCP2_VX: 0, TCP2_VY: 0, TCP2_VZ: 1,
+                    Weaving2: 0,
+                    Motion_Type: 'RETRACT',
+                    Robot_Swap: 0,
+                    TBar_Center_X, TBar_Center_Y, TBar_Center_Z,
+                    TBar_Web_Angle: webAngle,
+                    TBar_Web_Thickness: webThickness
+                });
+                currentTime += frameInterval;
+            }
+
+            // 4. IDLE 프레임 (대기)
+            frames.push({
+                Time: currentTime,
+                Gantry_X: frames[frames.length-1].Gantry_X,
+                Gantry_Y: frames[frames.length-1].Gantry_Y,
+                Gantry_Z: retractHeight,
+                Gantry_R: rAxisAngleDeg,
+                TCP1_X: E1.x, TCP1_Y: E1.y, TCP1_Z: retractHeight,
+                TCP1_VX: 0, TCP1_VY: 0, TCP1_VZ: 0,
+                Weaving1: 0,
+                TCP2_X: E2.x, TCP2_Y: E2.y, TCP2_Z: retractHeight,
+                TCP2_VX: 0, TCP2_VY: 0, TCP2_VZ: 0,
+                Weaving2: 0,
+                Motion_Type: 'IDLE',
+                Robot_Swap: 0,
+                TBar_Center_X, TBar_Center_Y, TBar_Center_Z,
+                TBar_Web_Angle: webAngle,
+                TBar_Web_Thickness: webThickness
+            });
+
+            console.log(`✅ 프레임 생성 완료: 총 ${frames.length}개`);
+            console.log(`   APPROACH: ${numApproachFrames+1}개`);
+            console.log(`   WELD: ${numWeldFrames+1}개`);
+            console.log(`   RETRACT: ${numRetractFrames+1}개`);
+            console.log(`   IDLE: 1개`);
 
             const caseName = filename.replace('.csv', '');
             motionData[caseName] = frames;
