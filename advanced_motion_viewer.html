@@ -545,8 +545,27 @@
                 frames.push(frame);
             }
 
+            // 빈 비전 포인트를 첫 프레임 값으로 자동 채우기
+            if (frames.length > 0 && frames[0].Vision_Start1_X !== undefined && frames[0].Vision_Start1_X !== '') {
+                const visionKeys = [
+                    'Vision_Start1_X', 'Vision_Start1_Y', 'Vision_Start1_Z',
+                    'Vision_End1_X', 'Vision_End1_Y', 'Vision_End1_Z',
+                    'Vision_Start2_X', 'Vision_Start2_Y', 'Vision_Start2_Z',
+                    'Vision_End2_X', 'Vision_End2_Y', 'Vision_End2_Z'
+                ];
+
+                for (let i = 1; i < frames.length; i++) {
+                    visionKeys.forEach(key => {
+                        if (frames[i][key] === undefined || frames[i][key] === '' || isNaN(frames[i][key])) {
+                            frames[i][key] = frames[0][key];
+                        }
+                    });
+                }
+                console.log(`✅ 비전 포인트 자동 채우기 완료 (${frames.length-1}개 프레임)`);
+            }
+
             // 비전 포인트로부터 T-bar 중심 및 각도 자동 계산
-            if (frames.length > 0 && frames[0].Vision_Start1_X !== undefined) {
+            if (frames.length > 0 && frames[0].Vision_Start1_X !== undefined && frames[0].Vision_Start1_X !== '') {
                 const firstFrame = frames[0];
 
                 // 4개의 비전 포인트
@@ -1138,10 +1157,15 @@
                 // T바는 고정 위치 (첫 프레임에서 가져옴)
                 const tbarX = frames[0].TBar_Center_X || 1000;
                 const tbarZ = frames[0].TBar_Center_Z || 0;  // 바닥면
-                const tbarRAngle = frames[0].Gantry_R * Math.PI / 180;
 
-                // 웹 방향 = R축 - 90° (R축은 웹과 수직)
-                const webAngle = tbarRAngle - Math.PI / 2;
+                // 웹 방향: 비전으로부터 자동 계산된 값 사용, 없으면 R축-90° 사용
+                let webAngle;
+                if (frames[0].TBar_Web_Angle !== undefined) {
+                    webAngle = frames[0].TBar_Web_Angle; // 자동 계산된 웹 각도
+                } else {
+                    const rAngle = frames[0].Gantry_R * Math.PI / 180;
+                    webAngle = rAngle - Math.PI / 2; // 폴백: R축 - 90°
+                }
 
                 const webLength = 1000;  // 웹 길이 1000mm
                 const plateThickness = 20;  // 평판 두께
@@ -1153,6 +1177,7 @@
 
                 // XZ 측면도에서 웹의 X방향 투영 길이: |sin(webAngle)| * webLength
                 const projectedLength = webLength * Math.abs(Math.sin(webAngle));
+                console.log(`🔍 XZ 뷰 - webAngle: ${(webAngle * 180 / Math.PI).toFixed(1)}°, projectedLength: ${projectedLength.toFixed(1)}mm`);
 
                 // 평판 (Z=0~20, 바닥에 놓임)
                 ctxXZ.fillRect(toCanvasX(tbarX - projectedLength/2), toCanvasZ(tbarZ + plateThickness),
@@ -1306,10 +1331,15 @@
                 // T바는 고정 위치 (첫 프레임에서 가져옴)
                 const tbarY = frames[0].TBar_Center_Y || 500;
                 const tbarZ = frames[0].TBar_Center_Z || 0;  // 바닥면
-                const tbarRAngle = frames[0].Gantry_R * Math.PI / 180;
 
-                // 웹 방향 = R축 - 90° (R축은 웹과 수직)
-                const webAngle = tbarRAngle - Math.PI / 2;
+                // 웹 방향: 비전으로부터 자동 계산된 값 사용, 없으면 R축-90° 사용
+                let webAngle;
+                if (frames[0].TBar_Web_Angle !== undefined) {
+                    webAngle = frames[0].TBar_Web_Angle; // 자동 계산된 웹 각도
+                } else {
+                    const rAngle = frames[0].Gantry_R * Math.PI / 180;
+                    webAngle = rAngle - Math.PI / 2; // 폴백: R축 - 90°
+                }
 
                 const plateWidth = 300;   // 평판 폭 300mm
                 const plateThickness = 20;  // 평판 두께
@@ -1324,6 +1354,7 @@
                 // YZ 정면도에서 웹의 Y 방향 투영: |cos(webAngle)| * webLength
                 const projectedWidth = Math.abs(webLength * Math.cos(webAngle));
                 const displayWidth = Math.max(projectedWidth, webThickness); // 최소 12mm
+                console.log(`🔍 YZ 뷰 - webAngle: ${(webAngle * 180 / Math.PI).toFixed(1)}°, projectedWidth: ${projectedWidth.toFixed(1)}mm, displayWidth: ${displayWidth.toFixed(1)}mm`);
 
                 // 평판 (Z=0~20, 바닥에 놓임, Y축 중심 ±150mm)
                 ctxYZ.fillRect(toCanvasY(tbarY - plateWidth/2), toCanvasZ(tbarZ + plateThickness),
