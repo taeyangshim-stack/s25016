@@ -977,14 +977,14 @@
             // 로봇 베이스 위치를 포함한 범위 계산
             const allX = frames.flatMap(f => {
                 const rAngle = f.Gantry_R * Math.PI / 180;
-                const r1X = f.Gantry_X + 488 * Math.sin(rAngle);
-                const r2X = f.Gantry_X - 488 * Math.sin(rAngle);
+                const r1X = f.Gantry_X + 488 * Math.cos(rAngle);
+                const r2X = f.Gantry_X - 488 * Math.cos(rAngle);
                 return [f.Gantry_X, f.TCP1_X, f.TCP2_X, r1X, r2X];
             });
             const allY = frames.flatMap(f => {
                 const rAngle = f.Gantry_R * Math.PI / 180;
-                const r1Y = f.Gantry_Y + 488 * Math.cos(rAngle);
-                const r2Y = f.Gantry_Y - 488 * Math.cos(rAngle);
+                const r1Y = f.Gantry_Y + 488 * Math.sin(rAngle);
+                const r2Y = f.Gantry_Y - 488 * Math.sin(rAngle);
                 return [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y, r1Y, r2Y];
             });
             const minX = Math.min(...allX) - 200;
@@ -1066,11 +1066,11 @@
 
             // 로봇 베이스 위치 (R축 중심에서 ±488mm)
             const rAngle = currentFrame.Gantry_R * Math.PI / 180;
-            // Y축 기준으로 회전: Robot1 = +488mm, Robot2 = -488mm
-            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.sin(rAngle);
-            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.cos(rAngle);
-            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.sin(rAngle);
-            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.cos(rAngle);
+            // R축 각도에 따라 회전: Robot1 = +488mm, Robot2 = -488mm
+            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.cos(rAngle);
+            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rAngle);
+            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.cos(rAngle);
+            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rAngle);
 
             // 바디 프레임 (두 로봇을 연결하는 바)
             ctxXY.strokeStyle = '#ff6f00';
@@ -1232,8 +1232,8 @@
             // 로봇 베이스 및 T-bar를 포함한 범위 계산
             const allX = frames.flatMap(f => {
                 const rAngle = f.Gantry_R * Math.PI / 180;
-                const r1X = f.Gantry_X + 488 * Math.sin(rAngle);
-                const r2X = f.Gantry_X - 488 * Math.sin(rAngle);
+                const r1X = f.Gantry_X + 488 * Math.cos(rAngle);
+                const r2X = f.Gantry_X - 488 * Math.cos(rAngle);
                 return [f.Gantry_X, f.TCP1_X, f.TCP2_X, r1X, r2X];
             });
             const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z, 0, 220]);
@@ -1319,10 +1319,10 @@
             ctxXZ.arc(toCanvasX(currentFrame.Gantry_X), toCanvasZ(currentFrame.Gantry_Z), 8, 0, Math.PI * 2);
             ctxXZ.fill();
 
-            // 로봇 베이스 위치 (X축 기준: Robot1 = +488*sin, Robot2 = -488*sin)
+            // 로봇 베이스 위치 (X축 투영: Robot1 = +488*cos(R), Robot2 = -488*cos(R))
             const rAngle = currentFrame.Gantry_R * Math.PI / 180;
-            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.sin(rAngle);
-            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.sin(rAngle);
+            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.cos(rAngle);
+            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.cos(rAngle);
 
             // 바디 프레임 (두 로봇 연결하는 바)
             ctxXZ.strokeStyle = '#ff6f00';
@@ -1406,8 +1406,8 @@
             // 로봇 베이스 및 T-bar를 포함한 범위 계산
             const allY = frames.flatMap(f => {
                 const rAngle = f.Gantry_R * Math.PI / 180;
-                const r1Y = f.Gantry_Y + 488 * Math.cos(rAngle);
-                const r2Y = f.Gantry_Y - 488 * Math.cos(rAngle);
+                const r1Y = f.Gantry_Y + 488 * Math.sin(rAngle);
+                const r2Y = f.Gantry_Y - 488 * Math.sin(rAngle);
                 return [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y, r1Y, r2Y];
             });
             const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z, 0, 220]);
@@ -1496,10 +1496,10 @@
             ctxYZ.arc(toCanvasY(currentFrame.Gantry_Y), toCanvasZ(currentFrame.Gantry_Z), 8, 0, Math.PI * 2);
             ctxYZ.fill();
 
-            // 로봇 베이스 위치 (Y축 기준 회전: Robot1 = +488mm, Robot2 = -488mm)
+            // 로봇 베이스 위치 (Y축 투영: Robot1 = +488*sin(R), Robot2 = -488*sin(R))
             const rAngle = currentFrame.Gantry_R * Math.PI / 180;
-            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.cos(rAngle);
-            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.cos(rAngle);
+            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rAngle);
+            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rAngle);
 
             // 바디 프레임 (두 로봇 연결하는 바)
             ctxYZ.strokeStyle = '#ff6f00';
