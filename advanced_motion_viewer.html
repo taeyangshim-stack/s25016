@@ -832,6 +832,9 @@
                 const tbarY = frames[0].TBar_Center_Y || 500;
                 const rAngle = frames[0].Gantry_R * Math.PI / 180;
 
+                // 웹 방향 = R축 - 90° (R축은 웹과 수직)
+                const webAngle = rAngle - Math.PI / 2;
+
                 // T바 웹 (세로) - 12mm 두께
                 const webThickness = 12;
                 const webLength = 1000;  // 1000mm 길이
@@ -840,10 +843,10 @@
                 ctxXY.strokeStyle = '#795548';
                 ctxXY.lineWidth = 2;
 
-                // T바는 X축 방향으로 놓여 있음
+                // T바 웹 방향으로 회전
                 ctxXY.save();
                 ctxXY.translate(toCanvasX(tbarX), toCanvasY(tbarY));
-                ctxXY.rotate(-rAngle);
+                ctxXY.rotate(-webAngle);
 
                 // 웹 중심선에서 ±6mm
                 ctxXY.fillRect(-webLength/2 * scale, -webThickness/2 * scale, webLength * scale, webThickness * scale);
@@ -1073,6 +1076,10 @@
                 const tbarX = frames[0].TBar_Center_X || 1000;
                 const tbarZ = frames[0].TBar_Center_Z || 0;  // 바닥면
                 const tbarRAngle = frames[0].Gantry_R * Math.PI / 180;
+
+                // 웹 방향 = R축 - 90° (R축은 웹과 수직)
+                const webAngle = tbarRAngle - Math.PI / 2;
+
                 const webLength = 1000;  // 웹 길이 1000mm
                 const plateThickness = 20;  // 평판 두께
                 const webHeight = 200;   // 웹 높이 200mm
@@ -1081,8 +1088,8 @@
                 ctxXZ.strokeStyle = '#795548';
                 ctxXZ.lineWidth = 2;
 
-                // XZ 측면도에서 웹의 투영 길이: cos(R) * webLength
-                const projectedLength = webLength * Math.cos(tbarRAngle);
+                // XZ 측면도에서 웹의 투영 길이: cos(webAngle) * webLength
+                const projectedLength = webLength * Math.cos(webAngle);
 
                 // 평판 (Z=0~20, 바닥에 놓임)
                 ctxXZ.fillRect(toCanvasX(tbarX - projectedLength/2), toCanvasZ(tbarZ + plateThickness),
@@ -1237,6 +1244,10 @@
                 const tbarY = frames[0].TBar_Center_Y || 500;
                 const tbarZ = frames[0].TBar_Center_Z || 0;  // 바닥면
                 const tbarRAngle = frames[0].Gantry_R * Math.PI / 180;
+
+                // 웹 방향 = R축 - 90° (R축은 웹과 수직)
+                const webAngle = tbarRAngle - Math.PI / 2;
+
                 const plateWidth = 300;   // 평판 폭 300mm
                 const plateThickness = 20;  // 평판 두께
                 const webThickness = 12;  // 웹 두께 12mm
@@ -1247,8 +1258,8 @@
                 ctxYZ.strokeStyle = '#795548';
                 ctxYZ.lineWidth = 2;
 
-                // YZ 정면도에서 웹의 Y 방향 투영: sin(R) * webLength
-                const projectedWidth = Math.abs(webLength * Math.sin(tbarRAngle));
+                // YZ 정면도에서 웹의 Y 방향 투영: sin(webAngle) * webLength
+                const projectedWidth = Math.abs(webLength * Math.sin(webAngle));
                 const displayWidth = Math.max(projectedWidth, webThickness); // 최소 12mm
 
                 // 평판 (Z=0~20, 바닥에 놓임, Y축 중심 ±150mm)
