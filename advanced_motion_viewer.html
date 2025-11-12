@@ -776,12 +776,23 @@
 
             ctxXY.clearRect(0, 0, width, height);
 
-            const allX = frames.flatMap(f => [f.Gantry_X, f.TCP1_X, f.TCP2_X]);
-            const allY = frames.flatMap(f => [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y]);
-            const minX = Math.min(...allX) - 100;
-            const maxX = Math.max(...allX) + 100;
-            const minY = Math.min(...allY) - 100;
-            const maxY = Math.max(...allY) + 100;
+            // 로봇 베이스 위치를 포함한 범위 계산
+            const allX = frames.flatMap(f => {
+                const rAngle = f.Gantry_R * Math.PI / 180;
+                const r1X = f.Gantry_X + 488 * Math.sin(rAngle);
+                const r2X = f.Gantry_X - 488 * Math.sin(rAngle);
+                return [f.Gantry_X, f.TCP1_X, f.TCP2_X, r1X, r2X];
+            });
+            const allY = frames.flatMap(f => {
+                const rAngle = f.Gantry_R * Math.PI / 180;
+                const r1Y = f.Gantry_Y + 488 * Math.cos(rAngle);
+                const r2Y = f.Gantry_Y - 488 * Math.cos(rAngle);
+                return [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y, r1Y, r2Y];
+            });
+            const minX = Math.min(...allX) - 200;
+            const maxX = Math.max(...allX) + 200;
+            const minY = Math.min(...allY) - 200;
+            const maxY = Math.max(...allY) + 200;
 
             const margin = 50;
             const scaleX = (width - 2 * margin) / (maxX - minX);
@@ -1012,11 +1023,17 @@
 
             ctxXZ.clearRect(0, 0, width, height);
 
-            const allX = frames.flatMap(f => [f.Gantry_X, f.TCP1_X, f.TCP2_X]);
-            const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z]);
-            const minX = Math.min(...allX) - 100;
-            const maxX = Math.max(...allX) + 100;
-            const minZ = Math.min(...allZ) - 100;
+            // 로봇 베이스 및 T-bar를 포함한 범위 계산
+            const allX = frames.flatMap(f => {
+                const rAngle = f.Gantry_R * Math.PI / 180;
+                const r1X = f.Gantry_X + 488 * Math.sin(rAngle);
+                const r2X = f.Gantry_X - 488 * Math.sin(rAngle);
+                return [f.Gantry_X, f.TCP1_X, f.TCP2_X, r1X, r2X];
+            });
+            const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z, 0, 220]);
+            const minX = Math.min(...allX) - 200;
+            const maxX = Math.max(...allX) + 200;
+            const minZ = Math.min(...allZ) - 50;
             const maxZ = Math.max(...allZ) + 100;
 
             const margin = 50;
@@ -1050,14 +1067,15 @@
 
             const currentFrame = frames[currentIndex];
 
-            // T바 형상 (측면에서는 웹 + 하단 평판)
+            // T바 형상 (측면: 평판 하면=Z0(바닥), 평판 상면=Z20(용접선), 웹=Z20~220)
             if (showTBar) {
                 // T바는 고정 위치 (첫 프레임에서 가져옴)
                 const tbarX = frames[0].TBar_Center_X || 1000;
-                const tbarZ = frames[0].TBar_Center_Z || 100;
+                const tbarZ = frames[0].TBar_Center_Z || 0;  // 바닥면
                 const tbarRAngle = frames[0].Gantry_R * Math.PI / 180;
                 const webLength = 1000;  // 웹 길이 1000mm
-                const webHeight = 200;   // Z 방향 높이
+                const plateThickness = 20;  // 평판 두께
+                const webHeight = 200;   // 웹 높이 200mm
 
                 ctxXZ.fillStyle = 'rgba(121, 85, 72, 0.3)';
                 ctxXZ.strokeStyle = '#795548';
@@ -1066,9 +1084,17 @@
                 // XZ 측면도에서 웹의 투영 길이: cos(R) * webLength
                 const projectedLength = webLength * Math.cos(tbarRAngle);
 
-                // T바 웹 (측면에서 보이는 투영)
-                ctxXZ.fillRect(toCanvasX(tbarX - projectedLength/2), toCanvasZ(tbarZ + webHeight), Math.abs(projectedLength * scale), webHeight * scale);
-                ctxXZ.strokeRect(toCanvasX(tbarX - projectedLength/2), toCanvasZ(tbarZ + webHeight), Math.abs(projectedLength * scale), webHeight * scale);
+                // 평판 (Z=0~20, 바닥에 놓임)
+                ctxXZ.fillRect(toCanvasX(tbarX - projectedLength/2), toCanvasZ(tbarZ + plateThickness),
+                              Math.abs(projectedLength * scale), plateThickness * scale);
+                ctxXZ.strokeRect(toCanvasX(tbarX - projectedLength/2), toCanvasZ(tbarZ + plateThickness),
+                                Math.abs(projectedLength * scale), plateThickness * scale);
+
+                // 웹 (Z=20~220, 평판 상면에서 위로)
+                ctxXZ.fillRect(toCanvasX(tbarX - projectedLength/2), toCanvasZ(tbarZ + plateThickness + webHeight),
+                              Math.abs(projectedLength * scale), webHeight * scale);
+                ctxXZ.strokeRect(toCanvasX(tbarX - projectedLength/2), toCanvasZ(tbarZ + plateThickness + webHeight),
+                                Math.abs(projectedLength * scale), webHeight * scale);
             }
 
             // 갠트리 중심 (녹색)
@@ -1161,11 +1187,17 @@
 
             ctxYZ.clearRect(0, 0, width, height);
 
-            const allY = frames.flatMap(f => [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y]);
-            const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z]);
-            const minY = Math.min(...allY) - 100;
-            const maxY = Math.max(...allY) + 100;
-            const minZ = Math.min(...allZ) - 100;
+            // 로봇 베이스 및 T-bar를 포함한 범위 계산
+            const allY = frames.flatMap(f => {
+                const rAngle = f.Gantry_R * Math.PI / 180;
+                const r1Y = f.Gantry_Y + 488 * Math.cos(rAngle);
+                const r2Y = f.Gantry_Y - 488 * Math.cos(rAngle);
+                return [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y, r1Y, r2Y];
+            });
+            const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z, 0, 220]);
+            const minY = Math.min(...allY) - 200;
+            const maxY = Math.max(...allY) + 200;
+            const minZ = Math.min(...allZ) - 50;
             const maxZ = Math.max(...allZ) + 100;
 
             const margin = 50;
@@ -1199,13 +1231,14 @@
 
             const currentFrame = frames[currentIndex];
 
-            // T바 형상 (정면에서 T 형태 - 고정 위치)
+            // T바 형상 (정면: 평판 하면=Z0(바닥), 평판 상면=Z20(용접선), 웹=Z20~220)
             if (showTBar) {
                 // T바는 고정 위치 (첫 프레임에서 가져옴)
                 const tbarY = frames[0].TBar_Center_Y || 500;
-                const tbarZ = frames[0].TBar_Center_Z || 100;
+                const tbarZ = frames[0].TBar_Center_Z || 0;  // 바닥면
                 const tbarRAngle = frames[0].Gantry_R * Math.PI / 180;
-                const plateWidth = 300;   // 하단 평판 폭 300mm
+                const plateWidth = 300;   // 평판 폭 300mm
+                const plateThickness = 20;  // 평판 두께
                 const webThickness = 12;  // 웹 두께 12mm
                 const webLength = 1000;   // 웹 길이 1000mm
                 const webHeight = 200;    // 웹 높이 200mm
@@ -1218,13 +1251,17 @@
                 const projectedWidth = Math.abs(webLength * Math.sin(tbarRAngle));
                 const displayWidth = Math.max(projectedWidth, webThickness); // 최소 12mm
 
-                // 하단 평판 (Y축 중심에서 ±150mm)
-                ctxYZ.fillRect(toCanvasY(tbarY - plateWidth/2), toCanvasZ(tbarZ), plateWidth * scale, 20 * scale);
-                ctxYZ.strokeRect(toCanvasY(tbarY - plateWidth/2), toCanvasZ(tbarZ), plateWidth * scale, 20 * scale);
+                // 평판 (Z=0~20, 바닥에 놓임, Y축 중심 ±150mm)
+                ctxYZ.fillRect(toCanvasY(tbarY - plateWidth/2), toCanvasZ(tbarZ + plateThickness),
+                              plateWidth * scale, plateThickness * scale);
+                ctxYZ.strokeRect(toCanvasY(tbarY - plateWidth/2), toCanvasZ(tbarZ + plateThickness),
+                                plateWidth * scale, plateThickness * scale);
 
-                // 세로 웹 (각도에 따라 폭이 달라짐)
-                ctxYZ.fillRect(toCanvasY(tbarY - displayWidth/2), toCanvasZ(tbarZ + 20), displayWidth * scale, webHeight * scale);
-                ctxYZ.strokeRect(toCanvasY(tbarY - displayWidth/2), toCanvasZ(tbarZ + 20), displayWidth * scale, webHeight * scale);
+                // 웹 (Z=20~220, 평판 상면에서 위로, 각도에 따라 폭이 달라짐)
+                ctxYZ.fillRect(toCanvasY(tbarY - displayWidth/2), toCanvasZ(tbarZ + plateThickness + webHeight),
+                              displayWidth * scale, webHeight * scale);
+                ctxYZ.strokeRect(toCanvasY(tbarY - displayWidth/2), toCanvasZ(tbarZ + plateThickness + webHeight),
+                                displayWidth * scale, webHeight * scale);
             }
 
             // R축 중심
