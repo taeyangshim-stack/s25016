@@ -545,6 +545,64 @@
                 frames.push(frame);
             }
 
+            // 비전 포인트로부터 T-bar 중심 및 각도 자동 계산
+            if (frames.length > 0 && frames[0].Vision_Start1_X !== undefined) {
+                const firstFrame = frames[0];
+
+                // 4개의 비전 포인트
+                const S1 = {
+                    x: firstFrame.Vision_Start1_X,
+                    y: firstFrame.Vision_Start1_Y,
+                    z: firstFrame.Vision_Start1_Z
+                };
+                const E1 = {
+                    x: firstFrame.Vision_End1_X,
+                    y: firstFrame.Vision_End1_Y,
+                    z: firstFrame.Vision_End1_Z
+                };
+                const S2 = {
+                    x: firstFrame.Vision_Start2_X,
+                    y: firstFrame.Vision_Start2_Y,
+                    z: firstFrame.Vision_Start2_Z
+                };
+                const E2 = {
+                    x: firstFrame.Vision_End2_X,
+                    y: firstFrame.Vision_End2_Y,
+                    z: firstFrame.Vision_End2_Z
+                };
+
+                // T-bar 중심 계산 (4개 포인트의 중점)
+                const TBar_Center_X = (S1.x + E1.x + S2.x + E2.x) / 4;
+                const TBar_Center_Y = (S1.y + E1.y + S2.y + E2.y) / 4;
+                const TBar_Center_Z = (S1.z + E1.z + S2.z + E2.z) / 4;
+
+                // 웹 방향 계산 (Start1 -> End1 벡터)
+                const webVec = {
+                    x: E1.x - S1.x,
+                    y: E1.y - S1.y
+                };
+                const webAngle = Math.atan2(webVec.y, webVec.x); // 라디안
+
+                // 웹 두께 계산 (Start1과 Start2 사이 거리)
+                const dx = S2.x - S1.x;
+                const dy = S2.y - S1.y;
+                const webThickness = Math.sqrt(dx*dx + dy*dy);
+
+                // 모든 프레임에 T-bar 정보 추가
+                frames.forEach(frame => {
+                    frame.TBar_Center_X = TBar_Center_X;
+                    frame.TBar_Center_Y = TBar_Center_Y;
+                    frame.TBar_Center_Z = TBar_Center_Z;
+                    frame.TBar_Web_Angle = webAngle;
+                    frame.TBar_Web_Thickness = webThickness;
+                });
+
+                console.log('✅ T-bar 자동 계산 완료:');
+                console.log(`   중심: (${TBar_Center_X.toFixed(1)}, ${TBar_Center_Y.toFixed(1)}, ${TBar_Center_Z.toFixed(1)})`);
+                console.log(`   웹 각도: ${(webAngle * 180 / Math.PI).toFixed(1)}°`);
+                console.log(`   웹 두께: ${webThickness.toFixed(1)}mm`);
+            }
+
             const caseName = filename.replace('.csv', '');
             motionData[caseName] = frames;
 
@@ -830,10 +888,15 @@
                 // T바는 고정 위치 (첫 프레임에서 가져옴)
                 const tbarX = frames[0].TBar_Center_X || 1000;
                 const tbarY = frames[0].TBar_Center_Y || 500;
-                const rAngle = frames[0].Gantry_R * Math.PI / 180;
 
-                // 웹 방향 = R축 - 90° (R축은 웹과 수직)
-                const webAngle = rAngle - Math.PI / 2;
+                // 웹 방향: 비전으로부터 자동 계산된 값 사용, 없으면 R축-90° 사용
+                let webAngle;
+                if (frames[0].TBar_Web_Angle !== undefined) {
+                    webAngle = frames[0].TBar_Web_Angle; // 자동 계산된 웹 각도
+                } else {
+                    const rAngle = frames[0].Gantry_R * Math.PI / 180;
+                    webAngle = rAngle - Math.PI / 2; // 폴백: R축 - 90°
+                }
 
                 // T바 웹 (세로) - 12mm 두께
                 const webThickness = 12;
@@ -1088,8 +1151,8 @@
                 ctxXZ.strokeStyle = '#795548';
                 ctxXZ.lineWidth = 2;
 
-                // XZ 측면도에서 웹의 투영 길이: cos(webAngle) * webLength
-                const projectedLength = webLength * Math.cos(webAngle);
+                // XZ 측면도에서 웹의 X방향 투영 길이: |sin(webAngle)| * webLength
+                const projectedLength = webLength * Math.abs(Math.sin(webAngle));
 
                 // 평판 (Z=0~20, 바닥에 놓임)
                 ctxXZ.fillRect(toCanvasX(tbarX - projectedLength/2), toCanvasZ(tbarZ + plateThickness),
@@ -1258,8 +1321,8 @@
                 ctxYZ.strokeStyle = '#795548';
                 ctxYZ.lineWidth = 2;
 
-                // YZ 정면도에서 웹의 Y 방향 투영: sin(webAngle) * webLength
-                const projectedWidth = Math.abs(webLength * Math.sin(webAngle));
+                // YZ 정면도에서 웹의 Y 방향 투영: |cos(webAngle)| * webLength
+                const projectedWidth = Math.abs(webLength * Math.cos(webAngle));
                 const displayWidth = Math.max(projectedWidth, webThickness); // 최소 12mm
 
                 // 평판 (Z=0~20, 바닥에 놓임, Y축 중심 ±150mm)
