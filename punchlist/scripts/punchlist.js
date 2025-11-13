@@ -421,6 +421,58 @@ const MOCK_ISSUES = [
       change_log: []
     },
     templateId: ''
+  },
+  {
+    id: 'PL-2025-021',
+    title: '[A] 사용자 편의성 UI 개선',
+    category: '제어',
+    subcategory: 'UI/HMI',
+    priority: '낮음',
+    status: '진행중',
+    description: '사용자 편의성을 위한 글자, 버튼 크기 확대 등.',
+    cause: '',
+    action_plan: '',
+    action_result: '',
+    owner: '박주한',
+    collaborators: '이상주',
+    approver: '이동혁',
+    request_date: '2025-10-23',
+    target_date: '2025-10-31',
+    complete_date: '',
+    attachments: [],
+    comments: [],
+    images: [
+      {
+        url: '../docs/운영SW 진행상황_A라인_251112/A_09_편의성가시성개선.png',
+        caption: 'A라인 UI 편의성 개선 화면'
+      },
+      {
+        url: '../docs/운영SW 진행상황_B라인_251112/B_06_편의성가시성개선.png',
+        caption: 'B라인 UI 기준 비교'
+      }
+    ],
+    created_at: '2025-10-23T09:32:00+09:00',
+    updated_at: '2025-10-23T09:32:00+09:00',
+    customFields: {
+      line_classification: 'A라인',
+      change_log: [
+        {
+          timestamp: '2025-10-23T09:32:00+09:00',
+          author: '박주한',
+          action: 'create',
+          summary: '이슈 최초 등록',
+          changes: [
+            { field: 'title', label: '제목', before: '-', after: '[A] 사용자 편의성 UI 개선' },
+            { field: 'status', label: '상태', before: '-', after: '진행중' },
+            { field: 'priority', label: '우선순위', before: '-', after: '낮음' },
+            { field: 'line_classification', label: '라인 분류', before: '-', after: 'A라인' }
+          ]
+        }
+      ],
+      ui_focus: '글자/버튼 가독성 강화',
+      requester: 'SHI'
+    },
+    templateId: 'ui-enhancement'
   }
 ];
 

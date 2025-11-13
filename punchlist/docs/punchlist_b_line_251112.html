@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>운영SW 배포 진행상황 - B라인 (251112)</title>
+  <script>
+    (function () {
+      var TOKEN = 'c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1';
+      var STORAGE_KEY = 's25016-dashboard-auth';
+      var params = new URLSearchParams(window.location.search);
+      var provided = params.get('auth');
+      if (provided === TOKEN) {
+        sessionStorage.setItem(STORAGE_KEY, TOKEN);
+        if (typeof window.history.replaceState === 'function') {
+          params.delete('auth');
+          var cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+        return;
+      }
+      if (sessionStorage.getItem(STORAGE_KEY) === TOKEN) {
+        return;
+      }
+      document.documentElement.innerHTML = '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><title>접근 제한</title><style>body{margin:0;padding:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:\\'Segoe UI\\',sans-serif;text-align:center;} .box{max-width:420px;padding:32px;background:rgba(15,23,42,0.85);border-radius:16px;box-shadow:0 25px 70px rgba(15,23,42,0.35);} h1{font-size:1.8rem;margin-bottom:12px;} p{line-height:1.6;font-size:1rem;color:#94a3b8;} code{display:inline-block;margin-top:18px;padding:8px 14px;border-radius:999px;background:rgba(96,165,250,0.12);color:#bfdbfe;font-size:0.95rem;}</style></head><body><div class="box"><h1>접근이 제한된 페이지입니다</h1><p>유효한 인증 토큰이 확인되지 않았습니다.<br>지정된 공유 링크로 다시 접속해 주세요.</p><code>문의: 내부 담당자</code></div></body></html>';
+    })();
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+      min-height: 100vh;
+      padding: 24px;
+      color: #0f172a;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: #fff;
+      padding: 48px;
+      text-align: center;
+    }
+    .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    .header p { color: #cffafe; }
+    .breadcrumb {
+      padding: 18px 40px;
+      background: #e0f2fe;
+      border-bottom: 1px solid #bae6fd;
+      font-size: 0.95rem;
+    }
+    .breadcrumb a {
+      color: #0369a1;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .content { padding: 40px; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+    .stat-label { font-size: 0.95rem; color: #0c4a6e; }
+    .stat-value { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin-top: 6px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 35px;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+    }
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      font-size: 0.95rem;
+      vertical-align: top;
+    }
+    th {
+      background: #0284c7;
+      color: #fff;
+    }
+    tr:nth-child(even) td { background: #f0f9ff; }
+    .section {
+      margin-bottom: 32px;
+      padding: 24px;
+      border-radius: 14px;
+      background: #f0f9ff;
+      border-left: 6px solid #0ea5e9;
+    }
+    .section h2 {
+      color: #075985;
+      margin-bottom: 12px;
+      font-size: 1.4rem;
+    }
+    .section h3 {
+      color: #0f172a;
+      margin: 16px 0 8px;
+      font-size: 1.1rem;
+    }
+    .as-is, .to-be {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 8px;
+      box-shadow: inset 0 1px 0 rgba(15,23,42,0.05);
+    }
+    .as-is h4, .to-be h4 { margin-bottom: 8px; font-size: 1rem; color: #475569; }
+    ul { margin-left: 20px; line-height: 1.7; color: #334155; }
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .tag-ui { background: #bae6fd; color: #075985; }
+    .tag-logic { background: #fee2e2; color: #b91c1c; }
+    .metadata {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+      color: #475569;
+      margin-top: 6px;
+    }
+    @media (max-width: 768px) {
+      .content { padding: 24px; }
+      .breadcrumb { padding: 14px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>운영SW 배포 진행상황 - B라인</h1>
+      <p>갠트리 용접 자동화 시스템 | 2025-11-12 배포분</p>
+    </div>
+    <div class="breadcrumb">
+      <a href="../../index.html">← 메인 대시보드</a> / <strong>펀치리스트 B라인 (251112)</strong>
+    </div>
+    <div class="content">
+      <div class="summary-grid">
+        <div class="stat-card">
+          <div class="stat-label">요청 조직</div>
+          <div class="stat-value">SHI</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">담당</div>
+          <div class="stat-value">박주한 (디파인시스템)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">요청·구현 일정</div>
+          <div class="stat-value">11/12 동시</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">배포 항목 수</div>
+          <div class="stat-value">6건</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>분류</th>
+            <th>항목명</th>
+            <th>핵심 설명</th>
+            <th>배포</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>UI</td>
+            <td>속도 파라미터 설정</td>
+            <td>실속도 모니터링 도입 및 Speeddata 4필드 셋업 허용</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>UI</td>
+            <td>엑셀 데이터 제어</td>
+            <td>엑셀 업로드 여부 기반 초기화, 기준값 호출 버튼 추가</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>UI</td>
+            <td>심데이터 추가 칼럼 구성</td>
+            <td>Ign_Move_Delay, ScrapeStart 칼럼 관리 및 로봇 전달</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>UI</td>
+            <td>편의성 및 가시성 개선</td>
+            <td>체크박스 셀 선택, 칼럼 텍스트 잘림 개선</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>로직</td>
+            <td>아크 에러 시 RAPID 제어</td>
+            <td>운영SW가 Stop→PP to Main→Run 순으로 RAPID 복귀 제어</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>로직</td>
+            <td>계측 홈 / 기본 Z홈 구분</td>
+            <td>기본/계측 Z홈을 구분하고 관제SW RPC로 계측 Z홈 호출</td>
+            <td>11/12</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section">
+        <h2>세부 펀치리스트</h2>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>1. 속도 파라미터 설정</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>실속도 모니터링 기능 부재.</li>
+              <li>로봇 및 갠트리 속도를 UI에서 제어하기 어려움.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>실속도 모니터링 도입.</li>
+              <li>Speeddata 4개 필드를 모두 열람·셋업 가능.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>2. 엑셀 데이터 제어</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>엑셀 불러오기 시 삭제 여부만 묻고 실제 업로드 여부와 상관없이 토치/심데이터 초기화.</li>
+              <li>특정 경로 파일을 수동으로 찾아야 함.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>파일 업로드 여부에 따라 데이터 초기화.</li>
+              <li>기준값 호출 버튼을 통해 지정 경로 엑셀 즉시 접근.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>3. 심데이터 추가 칼럼 구성</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li><code>Ign_Move_Delay</code>, <code>ScrapeStart</code> 값을 관리할 칼럼이 없음.</li>
+              <li>용접 전/후 처리 시간을 세부 조정 불가.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>해당 컬럼을 심데이터 테이블에 추가.</li>
+              <li>내부 DB 및 RAPID에 전달하여 로봇이 시간제어 가능.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>4. 편의성 및 가시성 개선</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>체크박스가 작고 클릭 정밀도가 낮음.</li>
+              <li>컬럼명이 셀보다 좁아 텍스트가 잘림.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>해당 셀을 클릭하면 체크박스 선택/해제.</li>
+              <li>칼럼 폭 조정 및 텍스트 래핑으로 가시성 확보.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-logic">로직</span>5. 아크 에러 시 RAPID 제어</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>아크 에러 발생 시 로봇 자체 StopProcess, ExitCycle 로직에 의존.</li>
+              <li>운영SW 관점에서 일관된 복구 시나리오가 없음.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>운영SW가 RAPID를 직접 제어하여 Stop → PP to Main → Run 순으로 복구.</li>
+              <li>아크 에러 이후 동일 시나리오로 재시작 가능.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-logic">로직</span>6. 계측 홈 / 기본 Z홈 구분</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>기본 Z홈이 사이클 타임 개선 요구로 수정되어 계측 카메라를 가리는 자세.</li>
+              <li>계측 홈과 기본 Z홈을 구분할 수 없어 추가 동작 구성 불가.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>기본 Z홈과 계측 Z홈을 구분 (예: 커맨드 102 / 110).</li>
+              <li>계측 Z홈은 관제SW에서 <code>RequestReleaseRobotArm</code> RPC로 명시적으로 호출.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>운영SW 배포 진행상황 - A라인 (251112)</title>
+  <script>
+    (function () {
+      var TOKEN = 'c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1';
+      var STORAGE_KEY = 's25016-dashboard-auth';
+      var params = new URLSearchParams(window.location.search);
+      var provided = params.get('auth');
+      if (provided === TOKEN) {
+        sessionStorage.setItem(STORAGE_KEY, TOKEN);
+        if (typeof window.history.replaceState === 'function') {
+          params.delete('auth');
+          var cleanUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+        return;
+      }
+      if (sessionStorage.getItem(STORAGE_KEY) === TOKEN) {
+        return;
+      }
+      document.documentElement.innerHTML = '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><title>접근 제한</title><style>body{margin:0;padding:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:\\'Segoe UI\\',sans-serif;text-align:center;} .box{max-width:420px;padding:32px;background:rgba(15,23,42,0.85);border-radius:16px;box-shadow:0 25px 70px rgba(15,23,42,0.35);} h1{font-size:1.8rem;margin-bottom:12px;} p{line-height:1.6;font-size:1rem;color:#94a3b8;} code{display:inline-block;margin-top:18px;padding:8px 14px;border-radius:999px;background:rgba(96,165,250,0.12);color:#bfdbfe;font-size:0.95rem;}</style></head><body><div class="box"><h1>접근이 제한된 페이지입니다</h1><p>유효한 인증 토큰이 확인되지 않았습니다.<br>지정된 공유 링크로 다시 접속해 주세요.</p><code>문의: 내부 담당자</code></div></body></html>';
+    })();
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+      min-height: 100vh;
+      padding: 24px;
+      color: #0f172a;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #fff;
+      padding: 48px;
+      text-align: center;
+    }
+    .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    .header p { color: #dbeafe; }
+    .content { padding: 40px; }
+    .breadcrumb {
+      padding: 18px 40px;
+      background: #eff6ff;
+      border-bottom: 1px solid #cfe0ff;
+      font-size: 0.95rem;
+    }
+    .breadcrumb a {
+      color: #1d4ed8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+    .stat-label { font-size: 0.95rem; color: #1e3a8a; }
+    .stat-value { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin-top: 6px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 35px;
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+    }
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      font-size: 0.95rem;
+      vertical-align: top;
+    }
+    th {
+      background: #1d4ed8;
+      color: #fff;
+    }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .section {
+      margin-bottom: 32px;
+      padding: 24px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border-left: 6px solid #2563eb;
+    }
+    .section h2 {
+      color: #1e3a8a;
+      margin-bottom: 12px;
+      font-size: 1.4rem;
+    }
+    .section h3 {
+      color: #0f172a;
+      margin: 16px 0 8px;
+      font-size: 1.1rem;
+    }
+    .as-is, .to-be {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 8px;
+      box-shadow: inset 0 1px 0 rgba(15,23,42,0.05);
+    }
+    .as-is h4, .to-be h4 {
+      margin-bottom: 8px;
+      font-size: 1rem;
+      color: #475569;
+    }
+    ul { margin-left: 20px; line-height: 1.7; color: #334155; }
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .tag-ui { background: #dbeafe; color: #1e40af; }
+    .tag-logic { background: #fee2e2; color: #b91c1c; }
+    .metadata {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+      color: #475569;
+      margin-top: 6px;
+    }
+    @media (max-width: 768px) {
+      .content { padding: 24px; }
+      .breadcrumb { padding: 14px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>운영SW 배포 진행상황 - A라인</h1>
+      <p>갠트리 용접 자동화 시스템 | 2025-11-12 배포분</p>
+    </div>
+    <div class="breadcrumb">
+      <a href="../../index.html">← 메인 대시보드</a> / <strong>펀치리스트 A라인 (251112)</strong>
+    </div>
+    <div class="content">
+      <div class="summary-grid">
+        <div class="stat-card">
+          <div class="stat-label">요청 조직</div>
+          <div class="stat-value">SHI</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">담당</div>
+          <div class="stat-value">박주한 (디파인시스템)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">요청·구현 일정</div>
+          <div class="stat-value">11/12 동시</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">배포 항목 수</div>
+          <div class="stat-value">7건</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>분류</th>
+            <th>항목명</th>
+            <th>핵심 설명</th>
+            <th>배포</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>로직</td>
+            <td>알람 다수 발생 시 UI 프리징 해소</td>
+            <td>펜던트 알람 처리 스레드를 UI와 분리하여 다중 Warning에서도 UI 프리징 방지</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>UI</td>
+            <td>속도 파라미터 설정</td>
+            <td>갠트리/로봇 실속도 모니터링 도입 및 Speeddata 4필드 전부 설정 가능하게 개선</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>UI</td>
+            <td>DB 데이터 저장 오류 현상 개선</td>
+            <td>백업 파일명을 hhmmss 단위로 생성해 중복 저장 오류 제거</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>UI</td>
+            <td>엑셀 데이터 제어</td>
+            <td>엑셀 업로드 여부에 따라 토치/심데이터 초기화, 기준값 호출 버튼 신설</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>UI</td>
+            <td>심데이터 추가 칼럼 구성</td>
+            <td>Ign_Move_Delay, ScrapeStart 칼럼 추가 및 로봇 전달</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>UI</td>
+            <td>심데이터 선후행 구분 추가 (A라인)</td>
+            <td>선·후행 구분 필드 도입으로 심데이터 조건 인지</td>
+            <td>11/12</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>UI</td>
+            <td>편의성 및 가시성 개선</td>
+            <td>체크박스 셀 선택 동기화, 컬럼 텍스트 잘림 해소</td>
+            <td>11/12</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section">
+        <h2>세부 펀치리스트</h2>
+
+        <div>
+          <h3><span class="tag tag-logic">로직</span>1. 알람 다수 발생 시 UI 프리징 해소</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+            <span>상태: 11/12 배포</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>펜던트 알람 처리 스레드가 명시적으로 구분되지 않아 UI 스레드와 혼선.</li>
+              <li>다수 Warning 수신 시 UI 프리징 위험 존재.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>펜던트 알람 처리 스레드를 UI와 분리해 혼선 방지.</li>
+              <li>동시 경보 발생 시에도 UI 프리징 없이 로그 확인 가능.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>2. 속도 파라미터 설정</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+            <span>상태: 11/12 배포</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>실속도 모니터링 기능이 없어 로봇/갠트리 실제 속도를 확인 불가.</li>
+              <li>각 속도 파라미터를 UI에서 제어하기 어려움.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>실속도 모니터링 화면 도입.</li>
+              <li>Speeddata 4개 필드를 모두 열람/셋업 가능하도록 변경.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>3. DB 데이터 저장 오류 현상 개선</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>설정뷰 매크로 편집 탭에서 데이터 가져오기/저장 시 오류 발생.</li>
+              <li>백업 파일명이 <code>xxxx.hhmm.backup</code> 형식이라 동일 분 단위 저장 시 중복으로 실패.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>데이터 가져오기/저장 시 백업 파일명을 hhmmss 단위로 생성.</li>
+              <li>동일 분 내 반복 저장에도 파일 충돌 없이 백업 유지.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>4. 엑셀 데이터 제어</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>엑셀 불러오기 시 데이터 삭제 여부만 확인하고 실제 업로드 여부와 무관하게 토치 모션/심데이터 초기화.</li>
+              <li>작업자가 특정 경로의 파일을 기억해야 하는 번거로움.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>실제 파일 업로드 여부에 따라 토치 모션과 심데이터를 초기화.</li>
+              <li>기준값 호출 버튼을 신설해 지정 경로의 엑셀을 즉시 열람/호출.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>5. 심데이터 추가 칼럼 구성</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li><code>Ign_Move_Delay</code>, <code>ScrapeStart</code> 값을 UI에서 관리할 방법이 없음.</li>
+              <li>로봇 전달용 추가 데이터 필요.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>해당 칼럼을 심데이터 테이블에 추가하고 내부 DB 및 RAPID로 전달.</li>
+              <li>이물질 제거/피딩 지연 등 세부 동작 제어 가능.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>6. 심데이터 선후행 구분 추가 (A라인)</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>토치 모션에는 선/후행 구분이 있으나 심데이터에는 구분 정보가 없음.</li>
+              <li>용접선 선후행을 별도 조건으로 인지하기 어려움.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>심데이터에 선/후행 플래그를 추가해 상황별 데이터를 분리 관리.</li>
+              <li>A라인 한정 요구사항으로 UI/내부 DB 반영.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3><span class="tag tag-ui">UI</span>7. 편의성 및 가시성 개선</h3>
+          <div class="metadata">
+            <span>요청: SHI</span>
+            <span>담당: 박주한</span>
+          </div>
+          <div class="as-is">
+            <h4>AS-IS</h4>
+            <ul>
+              <li>체크박스가 작아 정확한 클릭이 어려움.</li>
+              <li>테이블 칼럼명이 셀보다 작아 글자가 잘리는 문제.</li>
+            </ul>
+          </div>
+          <div class="to-be">
+            <h4>TO-BE</h4>
+            <ul>
+              <li>셀 선택만으로 체크박스 선택/해제가 가능하도록 변경.</li>
+              <li>칼럼 폭, 글자 줄바꿈을 조정해 가시성 확보.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

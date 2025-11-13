@@ -155,6 +155,33 @@
             background: var(--color-gray-100);
         }
 
+        .dual-image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-4);
+        }
+
+        .dual-image-grid figure {
+            margin: 0;
+            background: var(--color-gray-50);
+            border-radius: var(--border-radius-base);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .dual-image-grid img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .dual-image-grid figcaption {
+            font-size: var(--font-sm);
+            color: var(--color-gray-600);
+            padding: var(--space-3);
+        }
+
         .custom-fields-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -834,6 +861,24 @@
                         </div>
                     </div>
 
+                    <div class="card" id="uiImprovementCard" style="display: none;">
+                        <h2 class="card-title">🎨 A/B 라인 UI 편의성 비교</h2>
+                        <p style="color: var(--color-gray-700); line-height: 1.6; margin-bottom: var(--space-3);">
+                            운영 SW 배포 자료 기준으로 A라인과 B라인 UI 편의성 개선안을 동시에 확인할 수 있도록 데모 이미지를 고정 노출합니다.
+                            글자, 버튼 크기 확대 및 테이블 가독성 향상 요구사항 검토 시 참고하세요.
+                        </p>
+                        <div class="dual-image-grid">
+                            <figure>
+                                <img src="../docs/운영SW 진행상황_A라인_251112/A_09_편의성가시성개선.png" alt="A라인 UI 편의성 개선">
+                                <figcaption>🅰️ A라인 – 체크박스 셀 선택 동기화, 컬럼 글자 잘림 개선</figcaption>
+                            </figure>
+                            <figure>
+                                <img src="../docs/운영SW 진행상황_B라인_251112/B_06_편의성가시성개선.png" alt="B라인 UI 편의성 개선">
+                                <figcaption>🅱️ B라인 – 동일 항목 적용 전후 대비로 기준안 확인</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+
                     <!-- 원인 분석 -->
                     <div class="card" id="causeCard" style="display: none;">
                         <h2 class="card-title">🔍 원인 분석</h2>
@@ -1509,6 +1554,11 @@
                 }
             } else if (primaryWrapper) {
                 primaryWrapper.style.display = 'none';
+            }
+
+            const uiCard = document.getElementById('uiImprovementCard');
+            if (uiCard) {
+                uiCard.style.display = currentIssue.id === 'PL-2025-021' ? 'block' : 'none';
             }
 
             // 원인 분석
