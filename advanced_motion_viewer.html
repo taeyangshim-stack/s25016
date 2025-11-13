@@ -221,6 +221,9 @@
             font-size: 16px;
             font-weight: 600;
             color: #333;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            min-width: 120px;
+            text-align: right;
         }
 
         .legend {
@@ -910,9 +913,9 @@
             }
 
             document.getElementById('tcp1Pos').textContent =
-                `(${frame.TCP1_X.toFixed(0)}, ${frame.TCP1_Y.toFixed(0)}, ${frame.TCP1_Z.toFixed(0)})`;
+                `(${frame.TCP1_X.toFixed(1)}, ${frame.TCP1_Y.toFixed(1)}, ${frame.TCP1_Z.toFixed(1)})`;
             document.getElementById('tcp2Pos').textContent =
-                `(${frame.TCP2_X.toFixed(0)}, ${frame.TCP2_Y.toFixed(0)}, ${frame.TCP2_Z.toFixed(0)})`;
+                `(${frame.TCP2_X.toFixed(1)}, ${frame.TCP2_Y.toFixed(1)}, ${frame.TCP2_Z.toFixed(1)})`;
 
             // 토치 간 거리 계산
             const dx = frame.TCP2_X - frame.TCP1_X;
@@ -935,8 +938,8 @@
             document.getElementById('motionTypeDisplay').textContent = motionType;
 
             // 위빙
-            document.getElementById('weaving1').textContent = `${frame.Weaving1 || 0} mm`;
-            document.getElementById('weaving2').textContent = `${frame.Weaving2 || 0} mm`;
+            document.getElementById('weaving1').textContent = `${(frame.Weaving1 || 0).toFixed(1)} mm`;
+            document.getElementById('weaving2').textContent = `${(frame.Weaving2 || 0).toFixed(1)} mm`;
 
             // 로봇 스왑
             const robotSwap = frame.Robot_Swap || 0;
