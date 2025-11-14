@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABB 로봇 프로그래밍 발주 사양서 - 삼성중공업 34bay B라인</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+            line-height: 1.8;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 4px solid #007bff;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #007bff;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 10px;
+        }
+        .header .meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .header .meta-item {
+            background-color: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .meta-item strong {
+            color: #007bff;
+            margin-right: 5px;
+        }
+
+        h2 {
+            color: #007bff;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 6px solid #007bff;
+            padding-left: 15px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #28a745;
+            padding-left: 12px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #495057;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 14px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #e9ecef; }
+
+        .macro-structure td {
+            background-color: #e6f7ff;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+        }
+        .code-list td:nth-child(1) {
+            font-weight: bold;
+            color: #dc3545;
+            width: 15%;
+            text-align: center;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .image-container .caption {
+            margin-top: 10px;
+            font-size: 0.95em;
+            color: #666;
+            font-style: italic;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+        .checklist li {
+            padding: 10px 10px 10px 40px;
+            margin: 8px 0;
+            background-color: white;
+            border-left: 4px solid #28a745;
+            border-radius: 5px;
+            position: relative;
+        }
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 12px;
+            font-size: 1.3em;
+            color: #28a745;
+        }
+
+        .highlight-box {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .highlight-box strong {
+            color: #856404;
+        }
+
+        .info-box {
+            background-color: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .info-box strong {
+            color: #0c5460;
+        }
+
+        .warning-box {
+            background-color: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .warning-box strong {
+            color: #721c24;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        li {
+            margin: 8px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+        .badge-primary { background-color: #007bff; color: white; }
+        .badge-success { background-color: #28a745; color: white; }
+        .badge-warning { background-color: #ffc107; color: #333; }
+        .badge-danger { background-color: #dc3545; color: white; }
+        .badge-info { background-color: #17a2b8; color: white; }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 3px solid #007bff;
+            text-align: center;
+            color: #666;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 헤더 -->
+    <div class="header">
+        <h1>ABB 로봇 프로그래밍 발주 사양서</h1>
+        <div class="subtitle">삼성중공업 34bay 자동용접 시스템 B라인</div>
+        <div class="meta">
+            <div class="meta-item"><strong>프로젝트:</strong> S25016</div>
+            <div class="meta-item"><strong>시스템:</strong> Two Torch 용접 로봇</div>
+            <div class="meta-item"><strong>발주처:</strong> 삼성중공업</div>
+            <div class="meta-item"><strong>작성일:</strong> 2025-11-14</div>
+        </div>
+    </div>
+
+    <!-- 목차 -->
+    <div class="section">
+        <h2>📋 목차</h2>
+        <ol style="font-size: 1.1em; line-height: 2;">
+            <li><a href="#section1">프로젝트 개요</a></li>
+            <li><a href="#section2">시스템 기본 정보</a></li>
+            <li><a href="#section3">작업 범위 정의 및 로봇 동작 요구사항</a></li>
+            <li><a href="#section4">통신 인터페이스</a></li>
+            <li><a href="#section5">센서 및 주변 장치</a></li>
+            <li><a href="#section6">안전 및 보호 기능</a></li>
+            <li><a href="#section7">프로그램 구조 요구사항</a></li>
+            <li><a href="#section8">테스팅 및 검증</a></li>
+            <li><a href="#section9">문서 및 교육</a></li>
+            <li><a href="#section10">프로젝트 일정 및 관리</a></li>
+            <li><a href="#appendix">부록: Plan A 참고 자료</a></li>
+        </ol>
+    </div>
+
+    <!-- 1. 프로젝트 개요 -->
+    <div id="section1" class="section">
+        <h2>1. 프로젝트 개요</h2>
+
+        <h3>1.1 목적</h3>
+        <p>삼성중공업 34bay B라인의 Two Torch 용접 로봇 시스템에 대한 <strong>Plan B 방식</strong>의 로봇 프로그래밍을 개발하여, 현재 3-Task 준동기화 방식의 안정성 및 성능을 개선합니다.</p>
+
+        <div class="highlight-box">
+            <strong>핵심 개선 목표:</strong>
+            <ul>
+                <li>갠트리를 Robot1의 외부축으로 통합하여 <strong>하드웨어 동기화</strong> 구현</li>
+                <li>3-Task 구조를 <strong>2-Task 구조</strong>로 단순화</li>
+                <li>반복 정밀도 <strong>±0.1mm</strong> 달성</li>
+                <li>소프트웨어 복잡도 감소 및 유지보수성 향상</li>
+            </ul>
+        </div>
+
+        <h3>1.2 적용 범위</h3>
+        <ul>
+            <li><strong>대상 시스템:</strong> 34bay B라인 Two Torch 용접 로봇 시스템</li>
+            <li><strong>로봇 구성:</strong> ABB 로봇 2대 (ROB_1 + 외부축 4축, ROB_2)</li>
+            <li><strong>용접 방식:</strong> Two Torch 동시 용접</li>
+            <li><strong>제어기:</strong> ABB IRC5 컨트롤러</li>
+        </ul>
+
+        <h3>1.3 프로젝트 기대 효과</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>Plan A (현재)</th>
+                    <th>Plan B (목표)</th>
+                    <th>개선 효과</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>메카니컬 유닛</td>
+                    <td>3개</td>
+                    <td>2개</td>
+                    <td>구조 단순화</td>
+                </tr>
+                <tr>
+                    <td>RAPID Task</td>
+                    <td>3개</td>
+                    <td>2개</td>
+                    <td>프로그램 복잡도 감소</td>
+                </tr>
+                <tr>
+                    <td>동기화 방식</td>
+                    <td>소프트웨어 신호</td>
+                    <td>하드웨어 자동 보간</td>
+                    <td>타이밍 신뢰성 향상</td>
+                </tr>
+                <tr>
+                    <td>좌표 변환</td>
+                    <td>수동 함수 필요</td>
+                    <td>제어기 자동 처리</td>
+                    <td>코드 단순화</td>
+                </tr>
+                <tr>
+                    <td>반복 정밀도</td>
+                    <td>±0.2mm</td>
+                    <td>±0.1mm</td>
+                    <td>정밀도 2배 향상</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <strong>📌 참고 문서:</strong> 상세 Plan B 사양은
+            <a href="https://s2501602.vercel.app/planb_specification.html" target="_blank">Plan B 사양서</a>를 참조하시기 바랍니다.
+        </div>
+    </div>
+
+    <!-- 2. 시스템 기본 정보 -->
+    <div id="section2" class="section">
+        <h2>2. 시스템 기본 정보</h2>
+
+        <h3>2.1 로봇 시스템 구성</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>사양</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>로봇 모델</td>
+                    <td>ABB 산업용 로봇 (6축)</td>
+                    <td>ROB_1, ROB_2</td>
+                </tr>
+                <tr>
+                    <td>컨트롤러</td>
+                    <td>ABB IRC5</td>
+                    <td>MultiMove 기능 지원</td>
+                </tr>
+                <tr>
+                    <td>외부축 구성</td>
+                    <td>4축 (X, Y, Z, R)</td>
+                    <td>ROB_1에 통합</td>
+                </tr>
+                <tr>
+                    <td>드라이브 모듈</td>
+                    <td>Drive 7-10 (외부축)<br>Drive 11-16 (ROB_2)</td>
+                    <td>총 10개 축 제어</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2.2 외부축 사양 (Plan B)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>축 명칭</th>
+                    <th>타입</th>
+                    <th>동작 범위</th>
+                    <th>용도</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>eax_a (X축)</td>
+                    <td>선형</td>
+                    <td>±5000mm</td>
+                    <td>좌우 이동</td>
+                </tr>
+                <tr>
+                    <td>eax_b (Y축)</td>
+                    <td>선형</td>
+                    <td>±3000mm</td>
+                    <td>전후 이동</td>
+                </tr>
+                <tr>
+                    <td>eax_c (Z축)</td>
+                    <td>선형</td>
+                    <td>0~2000mm</td>
+                    <td>상하 이동</td>
+                </tr>
+                <tr>
+                    <td>eax_d (R축)</td>
+                    <td>회전</td>
+                    <td>±180°</td>
+                    <td>회전</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <strong>좌표계 연결 순서:</strong><br>
+            World Frame → eax_a → eax_b → eax_c → eax_d → ROB_1 Base
+        </div>
+
+        <h3>2.3 시스템 레이아웃</h3>
+        <ul class="checklist">
+            <li>34bay B라인 자동용접 셀 레이아웃 도면 제공 필요</li>
+            <li>로봇 베이스 좌표계 정의 (World Coordinate)</li>
+            <li>외부축 설치 위치 및 원점 정의</li>
+            <li>안전 펜스 및 작업 영역 도면</li>
+            <li>A라인과의 간섭 검토 구역 명시</li>
+        </ul>
+    </div>
+
+    <!-- 3. 작업 범위 정의 및 로봇 동작 요구사항 -->
+    <div id="section3" class="section">
+        <h2>3. 작업 범위 정의 및 로봇 동작 요구사항</h2>
+
+        <div class="highlight-box">
+            <strong>⚠️ 중요:</strong> 본 섹션은 Two Torch 용접 Macro 정의를 기반으로 작성되었습니다.
+            모든 용접 패스는 ABC 코드 체계를 따라야 합니다.
+        </div>
+
+        <h3>3.1 Two Torch 용접 Macro (ABC) 정의</h3>
+        <p>B-라인의 Two Torch 용접은 <strong>Macro 코드 체계</strong>를 사용하여 각 용접선의 형상과 시작/끝 처리 방식을 정의합니다.</p>
+
+        <h4>3.1.1 Macro 기본 구조</h4>
+        <p>Macro는 <span class="badge badge-primary">A (형상)</span> <span class="badge badge-success">B (시작)</span> <span class="badge badge-warning">C (끝)</span> 세 가지 코드로 구성됩니다.</p>
+
+        <div class="image-container">
+            <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1763085303/s25016/cvc0cknoe1xrjhqba5d1oqute.png" alt="용접 매크로 정의 구조 그림 (A, B, C 정의)">
+            <div class="caption">그림 1: 용접 Macro ABC 정의 구조</div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                </tr>
+            </thead>
+            <tbody class="macro-structure">
+                <tr>
+                    <td>Two Torch 용접선 형상</td>
+                    <td>시작점 용접 Type</td>
+                    <td>끝점 용접 Type</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>3.1.2 A: 용접선 형상 코드 (Two Torch 전용)</h4>
+        <p>B-라인에서 사용되는 2개 토치 부재의 형상 코드입니다.</p>
+        <table class="code-list">
+            <thead>
+                <tr>
+                    <th>코드</th>
+                    <th>정의</th>
+                    <th>설명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2</td>
+                    <td>Two Torch 직선 부재</td>
+                    <td>직선 구간 용접 (가장 일반적)</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Two Torch Arc 부재</td>
+                    <td>곡선(원호) 구간 용접</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Two Torch 경사 부재</td>
+                    <td>경사진(Sloped) 구간 용접</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>3.1.3 B/C: 시작점 및 끝점 용접 Type 상세</h4>
+        <p>그림 2에 나타난 시작/끝 지점에서의 이음매 처리 방식을 정의합니다.</p>
+
+        <div class="image-container">
+            <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1763085305/s25016/skeontqnofxp9wmo8ue6j64bl.png" alt="용접 매크로 시작/끝점 Type 상세 정의 그림 (0, 1, 2, 4, 5, 8, 9)">
+            <div class="caption">그림 2: 시작/끝점 Type 상세 정의 (0, 1, 2, 4, 5, 8, 9)</div>
+        </div>
+
+        <table class="code-list">
+            <thead>
+                <tr>
+                    <th>코드</th>
+                    <th>정의</th>
+                    <th>핵심 처리 방식</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0</td>
+                    <td>Open Type</td>
+                    <td>열린 시작/종료 처리 (일반적인 끝단)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Closed Type</td>
+                    <td>닫힌 시작/종료 처리 (밀봉형 끝단)</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Snip Type</td>
+                    <td>이음매 끝단 잘라내기 처리 (모서리 처리)</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Divided Type</td>
+                    <td>중간 간섭 등으로 인한 분할 처리</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Closed-Open Type</td>
+                    <td>한쪽은 닫고 다른 한쪽은 여는 복합 처리</td>
+                </tr>
+                <tr>
+                    <td>8/9</td>
+                    <td>Joint First/Second</td>
+                    <td>이음매 처리 우선순위 지정</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>3.1.4 Macro 해석 예시</h4>
+        <div class="info-box">
+            <strong>예시: Macro 코드 220</strong>
+            <ul>
+                <li><strong>2 (A):</strong> Two Torch <span class="badge badge-primary">직선 부재</span></li>
+                <li><strong>2 (B):</strong> 시작점은 <span class="badge badge-success">Closed Type</span>으로 처리</li>
+                <li><strong>0 (C):</strong> 끝점은 <span class="badge badge-warning">Open Type</span>으로 처리</li>
+            </ul>
+            <p><strong>의미:</strong> 직선 구간을 용접하며, 시작점은 밀봉 처리하고 끝점은 열린 상태로 마무리합니다.</p>
+        </div>
+
+        <h3>3.2 로봇 동작 요구사항</h3>
+
+        <div class="info-box">
+            <strong>📌 Plan B 사양서 기반 개발:</strong>
+            <p>로봇 동작 요구사항은 <a href="https://s2501602.vercel.app/planb_specification.html" target="_blank"><strong>Plan B 사양서</strong></a>의 내용을 기준으로 개발합니다.</p>
+            <p>Plan B의 핵심 개념인 <strong>하드웨어 동기화</strong>, <strong>외부축 통합</strong>, <strong>2-Task 구조</strong>를 반드시 적용하며,
+            상세 기술 사양 및 구현 방법은 해당 문서를 참조하시기 바랍니다.</p>
+        </div>
+
+        <h4>3.2.1 핵심 동작 요구사항</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>요구사항</th>
+                    <th>Plan B 참조</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>외부축 통합</strong></td>
+                    <td>갠트리 4축(X, Y, Z, R)을 ROB_1의 외부축으로 통합</td>
+                    <td>하드웨어 구성 섹션</td>
+                </tr>
+                <tr>
+                    <td><strong>동기화 방식</strong></td>
+                    <td>하드웨어 자동 보간 (제어기 내부 동기화)</td>
+                    <td>시스템 구성 비교 섹션</td>
+                </tr>
+                <tr>
+                    <td><strong>좌표 변환</strong></td>
+                    <td>제어기 자동 처리 (수동 함수 불필요)</td>
+                    <td>소프트웨어 변경사항 섹션</td>
+                </tr>
+                <tr>
+                    <td><strong>모션 명령</strong></td>
+                    <td>MoveL/MoveJ에 외부축 좌표 통합 (robtarget.extax)</td>
+                    <td>RAPID 프로그램 수정 섹션</td>
+                </tr>
+                <tr>
+                    <td><strong>용접 경로</strong></td>
+                    <td>Macro ABC 코드 기반 경로 생성 (직선/곡선/경사)</td>
+                    <td>용접 파라미터 섹션</td>
+                </tr>
+                <tr>
+                    <td><strong>Two Torch</strong></td>
+                    <td>ROB_1 + ROB_2 협조 동작 (WaitSyncTask)</td>
+                    <td>테스트 계획 Phase 3</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>3.2.2 모션 시퀀스 (Plan B 방식)</h4>
+        <ol>
+            <li><strong>초기 위치 이동:</strong> robtarget (로봇 + 외부축 통합)으로 하드웨어 동기화 이동</li>
+            <li><strong>용접 시작:</strong> ArcLink XT 아크 점화 + Macro B 코드 시작점 처리</li>
+            <li><strong>용접 진행:</strong> 외부축 자동 이동 + TCP 위빙 + Macro A 경로 추종</li>
+            <li><strong>용접 종료:</strong> Macro C 코드 끝점 처리 + 아크 소호</li>
+            <li><strong>복귀:</strong> 안전 위치 복귀</li>
+        </ol>
+
+        <h4>3.2.3 동작 제약 조건</h4>
+        <ul class="checklist">
+            <li><strong>상하축 간섭 회피:</strong> 기존 이슈 대책 반영 (참조: 250917_상하축이슈/02_대책수립/)</li>
+            <li><strong>Zone 데이터:</strong> 정밀 구간 Zone 0~5, 일반 이동 Zone 10~50</li>
+            <li><strong>속도 제한:</strong> 안전 영역별 차등 적용 (작업 영역 내 100mm/s 이하)</li>
+            <li><strong>간섭 회피:</strong> A라인 로봇과의 안전 거리 유지</li>
+            <li><strong>원점 복귀:</strong> 프로그램 시작/종료 시 필수</li>
+            <li><strong>정밀도 목표:</strong> 반복 정밀도 ±0.2mm (목표 ±0.1mm)</li>
+        </ul>
+
+        <div class="highlight-box">
+            <strong>⚠️ 중요:</strong>
+            <ul>
+                <li>Plan B의 <strong>데이터 구조 변경</strong> (Welds1{}.extax 통합) 필수 적용</li>
+                <li>Plan A의 좌표 변환 함수 (<code>fnPoseToExtax</code>, <code>fnCoordToJoint</code>) 사용 금지</li>
+                <li>TASK7 (Gantry) 생성 불가 - 외부축으로만 구현</li>
+                <li>상세 구현 방법은 <a href="https://s2501602.vercel.app/planb_specification.html" target="_blank">Plan B 사양서</a> 필독</li>
+            </ul>
+        </div>
+
+        <h3>3.3 용접 데이터 파라미터</h3>
+        <div class="info-box">
+            <strong>📌 기존 파라미터 유지:</strong>
+            <ul>
+                <li><strong>welddata:</strong> 40개 세트 (속도, 전압, 전류)</li>
+                <li><strong>weavedata:</strong> 40개 세트 (타입, 폭, 높이, 빈도)</li>
+                <li>Plan A에서 검증된 용접 조건을 Plan B에 그대로 적용</li>
+            </ul>
+        </div>
+
+        <h3>3.4 데이터 구조 변경 (Plan B)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Plan A</th>
+                    <th>Plan B</th>
+                    <th>변경 사항</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Welds1{} + WeldsG{}</td>
+                    <td>Welds1{}.extax</td>
+                    <td>갠트리 좌표를 robtarget에 통합</td>
+                </tr>
+                <tr>
+                    <td>MoveL + fnCoordToJoint()</td>
+                    <td>MoveL (외부축 자동)</td>
+                    <td>좌표 변환 함수 제거</td>
+                </tr>
+                <tr>
+                    <td>3개 Task 동기화</td>
+                    <td>2개 Task WaitSyncTask</td>
+                    <td>Task 단순화</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 4. 통신 인터페이스 -->
+    <div id="section4" class="section">
+        <h2>4. 통신 인터페이스</h2>
+
+        <h3>4.1 용접기 통신 (ArcLink XT)</h3>
+        <div class="info-box">
+            <strong>📌 용접기 통신 방식:</strong>
+            <ul>
+                <li><strong>통신 프로토콜:</strong> ABB ArcLink XT</li>
+                <li><strong>용접기:</strong> Lincoln Electric Power Wave</li>
+                <li><strong>인터페이스:</strong> 로봇 컨트롤러와 용접기 간 직접 통신</li>
+                <li>참고 자료: <a href="./251003_용접기_디바이스넷/DeviceNet_Signals_Table.html" target="_blank">기존 신호 테이블</a> (158개 신호)</li>
+            </ul>
+        </div>
+
+        <h4>4.1.1 ArcLink XT 통신 요구사항</h4>
+        <ul class="checklist">
+            <li>ABB ArcLink XT 프로토콜 설정 및 구성</li>
+            <li>용접기 제어 신호 매핑 (시작/정지/전류/전압/와이어 속도)</li>
+            <li>용접기 상태 피드백 신호 (준비, 아크 ON/OFF, 에러)</li>
+            <li>용접 파라미터 전송 (welddata, weavedata)</li>
+            <li>에러 코드 매핑 및 처리</li>
+        </ul>
+
+        <h4>4.1.2 용접 시작/종료 인터록 시퀀스 (ArcLink XT)</h4>
+        <ol>
+            <li>로봇 → 용접기: 용접 준비 신호 (ArcLink XT 명령)</li>
+            <li>용접기 → 로봇: 준비 완료 확인</li>
+            <li>로봇 → 용접기: 아크 시작 명령 + 용접 파라미터</li>
+            <li>용접기 → 로봇: 아크 ON 피드백</li>
+            <li>용접 진행 중 실시간 모니터링 (전류/전압)</li>
+            <li>로봇 → 용접기: 아크 종료 명령</li>
+            <li>용접기 → 로봇: 아크 OFF 확인</li>
+        </ol>
+
+        <div class="highlight-box">
+            <strong>💡 ArcLink XT 장점:</strong>
+            <ul>
+                <li>로봇 컨트롤러와 용접기 간 직접 통신으로 안정성 향상</li>
+                <li>복잡한 I/O 배선 불필요</li>
+                <li>용접 파라미터 실시간 전송 및 조정 가능</li>
+                <li>ABB 표준 용접 패키지와 완벽 호환</li>
+            </ul>
+        </div>
+
+        <h3>4.2 PLC 통신</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>사양</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>프로토콜</td>
+                    <td>Profinet / Ethernet/IP</td>
+                    <td>프로젝트 사양 확인 필요</td>
+                </tr>
+                <tr>
+                    <td>통신 주기</td>
+                    <td>10ms 이하</td>
+                    <td>실시간 제어</td>
+                </tr>
+                <tr>
+                    <td>데이터 교환</td>
+                    <td>I/O 신호 + 상태 워드</td>
+                    <td>Robot Ready, Program Running 등</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>4.3 UI 통신 인터페이스 (Plan B 변경 사항)</h3>
+        <div class="highlight-box">
+            <strong>⚠️ Plan B 변경 포인트:</strong>
+            <ul>
+                <li>응답 신호: <code>stReact{3}</code> → <code>stReact{2}</code> (2개 Task만)</li>
+                <li>TASK8 명령 처리: 로봇 위치 + 외부축 좌표 <strong>통합 전달</strong></li>
+                <li>I/O 신호 대부분 유지, <code>so_MoveG_PosHold</code> 제거 가능</li>
+            </ul>
+        </div>
+
+        <h3>4.4 에러 핸들링</h3>
+        <div class="info-box">
+            <strong>📌 참고 자료:</strong> <a href="./251004_에러핸들링/" target="_blank">251004_에러핸들링</a> 폴더의 자료 활용
+        </div>
+        <ul class="checklist">
+            <li>용접기 에러 코드 처리 로직</li>
+            <li>로봇 모션 에러 복구 시퀀스</li>
+            <li>통신 타임아웃 처리</li>
+            <li>비상 정지 후 복구 절차</li>
+            <li>에러 로그 저장 및 UI 전송</li>
+        </ul>
+    </div>
+
+    <!-- 5. 센서 및 주변 장치 -->
+    <div id="section5" class="section">
+        <h2>5. 센서 및 주변 장치</h2>
+
+        <h3>5.1 용접 토치</h3>
+        <ul class="checklist">
+            <li>Two Torch 사양 (2개 토치 동시 사용)</li>
+            <li>토치 모델 및 제조사 명시</li>
+            <li>케이블 길이 및 라우팅</li>
+            <li>Tool Center Point (TCP) 캘리브레이션</li>
+        </ul>
+
+        <h3>5.2 센싱 시스템</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>센서</th>
+                    <th>용도</th>
+                    <th>요구사항</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>아크 센싱</td>
+                    <td>용접 품질 모니터링</td>
+                    <td>전류/전압 실시간 피드백</td>
+                </tr>
+                <tr>
+                    <td>심 트래킹</td>
+                    <td>용접선 추종</td>
+                    <td>레이저/터치 센싱 (사양 확인 필요)</td>
+                </tr>
+                <tr>
+                    <td>충돌 감지</td>
+                    <td>안전 보호</td>
+                    <td>Force/Torque 센서 또는 전류 모니터링</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>5.3 주변 장치</h3>
+        <ul class="checklist">
+            <li>와이어 커터 및 클리너 스테이션</li>
+            <li>와이어 피더 (2개, Two Torch용)</li>
+            <li>가스 공급 장치</li>
+            <li>툴 체인저 (필요시)</li>
+        </ul>
+    </div>
+
+    <!-- 6. 안전 및 보호 기능 -->
+    <div id="section6" class="section">
+        <h2>6. 안전 및 보호 기능</h2>
+
+        <h3>6.1 안전 구역 정의</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>영역</th>
+                    <th>설명</th>
+                    <th>제한 사항</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>작업 영역</td>
+                    <td>정상 용접 작업 공간</td>
+                    <td>속도 100mm/s 이하</td>
+                </tr>
+                <tr>
+                    <td>제한 영역</td>
+                    <td>간섭 가능 영역</td>
+                    <td>속도 50mm/s 이하, 모니터링 강화</td>
+                </tr>
+                <tr>
+                    <td>금지 영역</td>
+                    <td>절대 진입 불가</td>
+                    <td>SafeMove 기능으로 차단</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>6.2 안전 기능 (ABB SafeMove)</h3>
+        <ul class="checklist">
+            <li>축별 위치 제한 (Axis Range Limitation)</li>
+            <li>작업 영역 제한 (Tool Orientation, Workspace Limitation)</li>
+            <li>속도 제한 (Speed Limitation)</li>
+            <li>안전 정지 (Safe Stop)</li>
+        </ul>
+
+        <h3>6.3 충돌 및 비상 처리</h3>
+        <div class="warning-box">
+            <strong>⚠️ 필수 요구사항:</strong>
+            <ul>
+                <li>충돌 감지 시 즉시 정지 및 알람</li>
+                <li>비상 정지 버튼 동작 확인</li>
+                <li>복구 모드 진입 절차</li>
+                <li>수동 조작 모드 (Manual Mode)</li>
+            </ul>
+        </div>
+
+        <h3>6.4 듀얼 로봇 간섭 방지</h3>
+        <div class="info-box">
+            <strong>📌 참고:</strong> <a href="./250917_상하축이슈/" target="_blank">상하축 이슈 대시보드</a> 참조
+            <ul>
+                <li>ROB_1과 ROB_2의 최소 안전 거리 유지</li>
+                <li>WaitSyncTask를 활용한 협조 동작</li>
+                <li>A라인 로봇과의 간섭 체크</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 7. 프로그램 구조 요구사항 -->
+    <div id="section7" class="section">
+        <h2>7. 프로그램 구조 요구사항</h2>
+
+        <div class="highlight-box">
+            <strong>📌 참고 자료:</strong>
+            <ul>
+                <li><strong>Plan B 구조:</strong> 2-Task 체계 (본 사양서 기준)</li>
+                <li><strong>Plan A 구조:</strong> 3-Task 체계 (참고용)</li>
+                <li>백업 위치: <code>/home/qwe/works/s25016/robot)badkup/1200-526404_BACKUP_2025-11-05_2120_B2</code></li>
+            </ul>
+        </div>
+
+        <h3>7.1 Plan B 프로그램 구조 (제안)</h3>
+
+        <h4>7.1.1 Task 구성</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>역할</th>
+                    <th>주요 모듈</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>T_ROB1</td>
+                    <td>ROB_1 + 외부축 4축 통합 제어</td>
+                    <td>MainModule, WeldingModule, MotionModule</td>
+                </tr>
+                <tr>
+                    <td>T_ROB2</td>
+                    <td>ROB_2 독립 제어</td>
+                    <td>MainModule, WeldingModule</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>7.1.2 모듈 구조 (권장)</h4>
+        <ul>
+            <li><strong>MainModule:</strong> 메인 프로그램 진입점, 초기화, UI 통신</li>
+            <li><strong>WeldingModule:</strong> 용접 시퀀스, Macro ABC 처리 로직</li>
+            <li><strong>MotionModule:</strong> 로봇 모션 제어, 외부축 통합 동작</li>
+            <li><strong>IOModule:</strong> I/O 신호 처리, ArcLink XT 통신</li>
+            <li><strong>DataModule:</strong> robtarget 배열 (Welds1{}.extax 통합)</li>
+            <li><strong>ErrorModule:</strong> 에러 핸들링 및 복구 로직</li>
+        </ul>
+
+        <h4>7.1.3 주요 변경 사항 (Plan A → Plan B)</h4>
+        <div class="warning-box">
+            <strong>🔴 삭제 대상:</strong>
+            <ul>
+                <li>TASK7 (Gantry_MainModule) 전체 제거</li>
+                <li>함수: <code>fnPoseToExtax()</code>, <code>fnCoordToJoint()</code></li>
+                <li>신호: <code>so_MoveG_PosHold</code></li>
+                <li>배열: <code>WeldsG{}</code> (Welds1{}.extax로 통합)</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <strong>✅ 단순화 효과:</strong>
+            <ul>
+                <li>좌표 변환 함수 불필요 (제어기 자동 처리)</li>
+                <li>Task 간 동기화 신호 감소</li>
+                <li>코드 라인 수 약 30% 감소 예상</li>
+            </ul>
+        </div>
+
+        <h3>7.2 파라미터 관리</h3>
+        <ul class="checklist">
+            <li>welddata 및 weavedata는 CSV 파일 또는 별도 모듈로 관리</li>
+            <li>Macro ABC 코드와 robtarget 매핑 테이블</li>
+            <li>제품별 프로그램 전환 방식 (품종 관리)</li>
+            <li>캘리브레이션 데이터 저장 및 로드</li>
+        </ul>
+
+        <h3>7.3 로그 및 디버깅</h3>
+        <ul class="checklist">
+            <li>용접 사이클별 로그 기록 (시작/종료 시간, Macro 코드)</li>
+            <li>에러 발생 시 상태 저장</li>
+            <li>디버깅 모드 (드라이런, 스텝 실행)</li>
+        </ul>
+
+        <h3>7.4 Plan A 참고 구조 (현재 시스템)</h3>
+        <div class="info-box">
+            <strong>📌 Plan A 백업 참조:</strong> 기존 3-Task 구조를 참고하되, Plan B 방식으로 재구성 권장
+            <ul>
+                <li>백업 파일 개수: 약 360개 모듈 (.mod, .sys 포함)</li>
+                <li>주요 설정: SYSPAR/*.cfg, HOME/*.sys</li>
+                <li>Lincoln Electric Arc 설정: HOME/Arc/LincolnData/</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 8. 테스팅 및 검증 -->
+    <div id="section8" class="section">
+        <h2>8. 테스팅 및 검증</h2>
+
+        <h3>8.1 테스트 계획 (4단계)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Phase</th>
+                    <th>내용</th>
+                    <th>합격 기준</th>
+                    <th>예상 기간</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Phase 1</td>
+                    <td>외부축 단독 동작 테스트</td>
+                    <td>각 축 정상 작동, 위치 정밀도 ±0.5mm</td>
+                    <td>2일</td>
+                </tr>
+                <tr>
+                    <td>Phase 2</td>
+                    <td>ROB_1+외부축 통합 테스트</td>
+                    <td>동기화 오차 &lt;10ms, 반복정밀도 ±0.2mm</td>
+                    <td>3일</td>
+                </tr>
+                <tr>
+                    <td>Phase 3</td>
+                    <td>ROB_1+ROB_2 협조 동작</td>
+                    <td>WaitSyncTask 정상 동작, 간섭 없음</td>
+                    <td>3일</td>
+                </tr>
+                <tr>
+                    <td>Phase 4</td>
+                    <td>통합 시스템 검증</td>
+                    <td>반복정밀도 ±0.2mm, 사이클 타임 ±10%</td>
+                    <td>2일</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>8.2 시뮬레이션</h3>
+        <ul class="checklist">
+            <li>ABB RobotStudio 시뮬레이션 파일 제공</li>
+            <li>외부축 통합 모델 검증</li>
+            <li>간섭 체크 (ROB_1, ROB_2, 외부축, 주변 장치)</li>
+            <li>사이클 타임 시뮬레이션</li>
+        </ul>
+
+        <h3>8.3 정밀도 검증</h3>
+        <div class="info-box">
+            <strong>📌 참고:</strong> <a href="./hexagon/robot-accuracy.html" target="_blank">Hexagon 측정 프로젝트</a>
+            <ul>
+                <li>반복 정밀도: ±0.2mm (목표 ±0.1mm)</li>
+                <li>절대 정밀도: ±1mm 이내</li>
+                <li>측정 방법: Hexagon 레이저 트래커 또는 측정 시스템</li>
+                <li>측정 포인트: 최소 20개 지점</li>
+            </ul>
+        </div>
+
+        <h3>8.4 용접 품질 검증</h3>
+        <ul class="checklist">
+            <li>비드 폭 및 높이 일관성</li>
+            <li>용입 깊이 검사</li>
+            <li>기공 및 결함 육안 검사</li>
+            <li>Macro ABC 코드별 결과 비교</li>
+        </ul>
+
+        <h3>8.5 인수 테스트 (FAT/SAT)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>기준</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>반복 정밀도</td>
+                    <td>±0.2mm 이내</td>
+                    <td>50회 반복 측정</td>
+                </tr>
+                <tr>
+                    <td>사이클 타임</td>
+                    <td>기존 대비 ±10% 이내</td>
+                    <td>연속 10사이클 평균</td>
+                </tr>
+                <tr>
+                    <td>용접 품질</td>
+                    <td>육안 검사 합격</td>
+                    <td>샘플 10개</td>
+                </tr>
+                <tr>
+                    <td>안전 기능</td>
+                    <td>모든 안전 신호 정상 동작</td>
+                    <td>비상 정지, SafeMove 등</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 9. 문서 및 교육 -->
+    <div id="section9" class="section">
+        <h2>9. 문서 및 교육</h2>
+
+        <h3>9.1 납품 문서</h3>
+        <ul class="checklist">
+            <li>RAPID 프로그램 소스 코드 전체 (주석 포함)</li>
+            <li>시스템 구성도 (하드웨어, 소프트웨어)</li>
+            <li>I/O 매핑 테이블 (Excel 또는 PDF)</li>
+            <li>파라미터 설정 가이드 (welddata, weavedata)</li>
+            <li>Macro ABC 코드 해석 매뉴얼</li>
+            <li>백업 및 복원 절차서</li>
+            <li>트러블슈팅 가이드</li>
+            <li>RobotStudio 시뮬레이션 파일</li>
+        </ul>
+
+        <h3>9.2 매뉴얼</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>매뉴얼</th>
+                    <th>내용</th>
+                    <th>형식</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>조작 매뉴얼</td>
+                    <td>일상 운전 절차, UI 사용법</td>
+                    <td>한글 PDF + 영문 PDF</td>
+                </tr>
+                <tr>
+                    <td>유지보수 매뉴얼</td>
+                    <td>정기 점검, 부품 교체, 캘리브레이션</td>
+                    <td>한글 PDF</td>
+                </tr>
+                <tr>
+                    <td>프로그래밍 가이드</td>
+                    <td>RAPID 코드 수정, 파라미터 변경</td>
+                    <td>한글 PDF + 샘플 코드</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>9.3 교육 계획</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>과정</th>
+                    <th>대상</th>
+                    <th>시간</th>
+                    <th>내용</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>운영자 교육</td>
+                    <td>현장 운전자</td>
+                    <td>4시간</td>
+                    <td>시스템 조작, 이상 대응, 안전</td>
+                </tr>
+                <tr>
+                    <td>유지보수 교육</td>
+                    <td>정비 담당자</td>
+                    <td>8시간</td>
+                    <td>트러블슈팅, 백업/복원, 파라미터 조정</td>
+                </tr>
+                <tr>
+                    <td>고급 프로그래밍</td>
+                    <td>엔지니어</td>
+                    <td>16시간</td>
+                    <td>RAPID 코딩, Macro 수정, 외부축 설정</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>9.4 기술 지원</h3>
+        <ul class="checklist">
+            <li>시운전 기간 중 상주 지원 (2-4주)</li>
+            <li>원격 지원 (전화, 이메일, 원격 접속)</li>
+            <li>하자 보수 기간: 1년</li>
+            <li>정기 점검 방문 (연 2회 권장)</li>
+        </ul>
+    </div>
+
+    <!-- 10. 프로젝트 일정 및 관리 -->
+    <div id="section10" class="section">
+        <h2>10. 프로젝트 일정 및 관리</h2>
+
+        <h3>10.1 개발 일정 (집중 진행 2주 + 시운전 2-4주)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>기간</th>
+                    <th>단계</th>
+                    <th>주요 활동</th>
+                    <th>산출물</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Day 1-2</td>
+                    <td>설계 및 준비</td>
+                    <td>외부축 설정, 백업, 환경 구축</td>
+                    <td>시스템 구성 파일</td>
+                </tr>
+                <tr>
+                    <td>Day 3-4</td>
+                    <td>기본 프로그래밍</td>
+                    <td>RAPID 모듈 작성, 캘리브레이션</td>
+                    <td>MainModule, MotionModule</td>
+                </tr>
+                <tr>
+                    <td>Day 5-7</td>
+                    <td>통합 테스트</td>
+                    <td>외부축 테스트, 협조 동작 검증</td>
+                    <td>테스트 리포트 (Phase 1-2)</td>
+                </tr>
+                <tr>
+                    <td>Day 8-10</td>
+                    <td>성능 검증</td>
+                    <td>정밀도 측정, 용접 테스트</td>
+                    <td>테스트 리포트 (Phase 3-4)</td>
+                </tr>
+                <tr>
+                    <td>11/18~12/13</td>
+                    <td>시운전 (2-4주)</td>
+                    <td>현장 안정화, 미세 조정, 교육</td>
+                    <td>최종 검수 보고서</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>10.2 마일스톤</h3>
+        <ul>
+            <li><span class="badge badge-primary">M1</span> 외부축 설정 완료 (Day 2)</li>
+            <li><span class="badge badge-primary">M2</span> RAPID 프로그램 1차 완성 (Day 5)</li>
+            <li><span class="badge badge-primary">M3</span> Phase 1-2 테스트 통과 (Day 7)</li>
+            <li><span class="badge badge-primary">M4</span> Phase 3-4 테스트 통과 (Day 10)</li>
+            <li><span class="badge badge-success">M5</span> 시운전 완료 및 인수 (12/13)</li>
+        </ul>
+
+        <h3>10.3 검수 기준</h3>
+        <div class="info-box">
+            <strong>최종 검수 통과 조건:</strong>
+            <ul>
+                <li>✅ 반복 정밀도 ±0.2mm 이내 (50회 측정)</li>
+                <li>✅ 사이클 타임 기존 대비 ±10% 이내</li>
+                <li>✅ 모든 안전 기능 정상 동작</li>
+                <li>✅ 용접 품질 육안 검사 합격 (샘플 10개)</li>
+                <li>✅ 문서 및 교육 완료</li>
+            </ul>
+        </div>
+
+        <h3>10.4 롤백 조건 (집중 진행 기간만)</h3>
+        <div class="warning-box">
+            <strong>⚠️ Plan A 복원 조건 (11/15까지만 적용):</strong>
+            <ul>
+                <li>반복 정밀도 &gt;±0.2mm</li>
+                <li>사이클 타임 +10% 초과</li>
+                <li>하드웨어 동기화 또는 외부축 제어 실패</li>
+                <li>11/15까지 기본 동작 검증 미완료</li>
+            </ul>
+            <p><strong>※ 시운전 기간(11/18~12/13)에는 롤백 조건 미적용</strong> (안정화 과정으로 간주)</p>
+        </div>
+
+        <h3>10.5 담당자</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>역할</th>
+                    <th>담당자</th>
+                    <th>소속</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ABB 시스템 설계</td>
+                    <td>황동호 팀장</td>
+                    <td>ABB</td>
+                </tr>
+                <tr>
+                    <td>ABB RAPID 프로그래밍</td>
+                    <td>유대영 차장</td>
+                    <td>ABB</td>
+                </tr>
+                <tr>
+                    <td>프로젝트 총괄</td>
+                    <td>SP 심태양</td>
+                    <td>삼성중공업</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box" style="margin-top: 20px;">
+            <strong>💡 외부 전문가 어레인지 가능:</strong>
+            <p>프로젝트 요구사항에 따라 ABB 공인 파트너 또는 로봇 프로그래밍 전문가를 별도로 어레인지할 수 있습니다.
+            특정 전문가 또는 업체 선호 사항이 있을 경우 프로젝트 협의 시 요청 가능합니다.</p>
+        </div>
+    </div>
+
+    <!-- 부록: Plan A 참고 자료 -->
+    <div id="appendix" class="section">
+        <h2>부록: Plan A 참고 자료</h2>
+
+        <div class="info-box">
+            <strong>📌 Plan A 백업 위치:</strong><br>
+            <code>/home/qwe/works/s25016/robot)badkup/1200-526404_BACKUP_2025-11-05_2120_B2</code>
+        </div>
+
+        <h3>A.1 Plan A 시스템 개요</h3>
+        <ul>
+            <li><strong>구조:</strong> 3-Task 체계 (T_ROB1, T_ROB2, T_GANTRY)</li>
+            <li><strong>메카니컬 유닛:</strong> 3개 (ROB_1, ROB_2, Gantry)</li>
+            <li><strong>동기화 방식:</strong> 소프트웨어 신호 기반 (so_MoveG_PosHold 등)</li>
+            <li><strong>좌표 변환:</strong> 수동 함수 (fnPoseToExtax, fnCoordToJoint)</li>
+        </ul>
+
+        <h3>A.2 Plan A 프로그램 구조 (참고용)</h3>
+        <ul>
+            <li><strong>총 모듈 수:</strong> 약 360개 (.mod, .sys 포함)</li>
+            <li><strong>주요 설정 파일:</strong>
+                <ul>
+                    <li>SYSPAR/*.cfg (시스템 파라미터)</li>
+                    <li>HOME/*.sys (사용자 시스템 모듈)</li>
+                    <li>HOME/Arc/LincolnData/ (Lincoln Electric 용접기 설정)</li>
+                </ul>
+            </li>
+            <li><strong>데이터 구조:</strong>
+                <ul>
+                    <li>Welds1{} - ROB_1 로봇 좌표</li>
+                    <li>WeldsG{} - 갠트리 좌표 (별도 배열)</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>A.3 Plan A → Plan B 마이그레이션 가이드</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Plan A 요소</th>
+                    <th>Plan B 변환</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TASK7 (Gantry)</td>
+                    <td>삭제</td>
+                    <td>외부축으로 통합</td>
+                </tr>
+                <tr>
+                    <td>WeldsG{}</td>
+                    <td>Welds1{}.extax</td>
+                    <td>robtarget에 통합</td>
+                </tr>
+                <tr>
+                    <td>fnPoseToExtax()</td>
+                    <td>삭제</td>
+                    <td>제어기 자동 변환</td>
+                </tr>
+                <tr>
+                    <td>fnCoordToJoint()</td>
+                    <td>삭제</td>
+                    <td>제어기 자동 변환</td>
+                </tr>
+                <tr>
+                    <td>so_MoveG_PosHold</td>
+                    <td>삭제</td>
+                    <td>하드웨어 동기화로 대체</td>
+                </tr>
+                <tr>
+                    <td>stReact{3}</td>
+                    <td>stReact{2}</td>
+                    <td>Task 수 감소</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>A.4 Plan A 장단점 분석</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>장점</th>
+                    <th>단점</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>✅ 기존 검증된 시스템</td>
+                    <td>❌ 소프트웨어 동기화 불안정성</td>
+                </tr>
+                <tr>
+                    <td>✅ 현장 운영 경험 축적</td>
+                    <td>❌ 좌표 변환 함수로 인한 복잡도</td>
+                </tr>
+                <tr>
+                    <td>✅ 백업 및 복원 용이</td>
+                    <td>❌ 3-Task 구조로 유지보수 어려움</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>❌ 반복 정밀도 제한 (±0.2mm)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="highlight-box">
+            <strong>💡 권장 사항:</strong>
+            <ul>
+                <li>Plan A 백업은 <strong>참고용</strong>으로만 활용</li>
+                <li>새로운 프로그래밍은 <strong>Plan B 구조</strong>를 기본으로 개발</li>
+                <li>Plan A의 welddata, weavedata, Macro 로직은 <strong>재사용</strong> 가능</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p><strong>문서 버전:</strong> 1.0</p>
+        <p><strong>최종 수정일:</strong> 2025-11-14</p>
+        <p><strong>작성:</strong> SP 심태양 | <strong>프로젝트:</strong> S25016</p>
+        <p style="margin-top: 20px; font-size: 0.9em; color: #999;">
+            이 문서는 ABB 로봇 프로그래밍 발주를 위한 기술 사양서입니다.<br>
+            문의사항은 프로젝트 담당자에게 연락 바랍니다.
+        </p>
+    </div>
+</div>
+
+</body>
+</html>
