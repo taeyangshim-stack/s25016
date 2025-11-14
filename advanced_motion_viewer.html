@@ -571,16 +571,31 @@
             const TBar_Center_Z = (S1.z + E1.z + S2.z + E2.z) / 4;
             const webVec = { x: E1.x - S1.x, y: E1.y - S1.y };
             const webAngle = Math.atan2(webVec.y, webVec.x);
+            const webAngleDeg = webAngle * 180 / Math.PI;
             const webThickness = Math.sqrt((S2.x-S1.x)**2 + (S2.y-S1.y)**2);
 
-            // R축 각도 (웹에 수직)
-            const rAxisAngle = webAngle + Math.PI / 2;
-            const rAxisAngleDeg = rAxisAngle * 180 / Math.PI;
+            // R축 각도 = 웹 각도 (같음!)
+            // R축 프레임(물리적 구조물)은 항상 웹과 수직 = webAngle + 90°
+            let rAxisAngle = webAngle;
+            let rAxisAngleDeg = webAngleDeg;
+            let robotSwap = false;
+
+            // 로봇 스왑 로직: 웹 > 90° 또는 웹 < -90°
+            if (webAngleDeg > 90) {
+                rAxisAngle = webAngle - Math.PI;  // -180°
+                rAxisAngleDeg = webAngleDeg - 180;
+                robotSwap = true;
+            } else if (webAngleDeg < -90) {
+                rAxisAngle = webAngle + Math.PI;  // +180°
+                rAxisAngleDeg = webAngleDeg + 180;
+                robotSwap = true;
+            }
 
             console.log('✅ T-bar 자동 계산:');
             console.log(`   중심: (${TBar_Center_X.toFixed(1)}, ${TBar_Center_Y.toFixed(1)}, ${TBar_Center_Z.toFixed(1)})`);
-            console.log(`   웹 각도: ${(webAngle * 180 / Math.PI).toFixed(1)}°`);
+            console.log(`   웹 각도: ${webAngleDeg.toFixed(1)}°`);
             console.log(`   R축 각도: ${rAxisAngleDeg.toFixed(1)}°`);
+            console.log(`   로봇 스왑: ${robotSwap ? '✅ (Robot1↔2)' : '❌'}`);
             console.log(`   웹 두께: ${webThickness.toFixed(1)}mm`);
 
             // 용접 거리 및 시간 계산
@@ -617,8 +632,15 @@
 
             for (let i = 0; i <= numApproachFrames; i++) {
                 const ratio = i / numApproachFrames;
-                const tcp1 = { x: S1.x, y: S1.y, z: lerp(approachHeight, S1.z, ratio) };
-                const tcp2 = { x: S2.x, y: S2.y, z: lerp(approachHeight, S2.z, ratio) };
+
+                // 로봇 스왑에 따른 TCP 할당
+                // 정상: Robot1=a용접선(S1), Robot2=b용접선(S2)
+                // 스왑: Robot1=b용접선(S2), Robot2=a용접선(S1)
+                const tcp1_src = robotSwap ? S2 : S1;
+                const tcp2_src = robotSwap ? S1 : S2;
+
+                const tcp1 = { x: tcp1_src.x, y: tcp1_src.y, z: lerp(approachHeight, tcp1_src.z, ratio) };
+                const tcp2 = { x: tcp2_src.x, y: tcp2_src.y, z: lerp(approachHeight, tcp2_src.z, ratio) };
                 const gantry = calculateGantryPosition(tcp1, tcp2, rAxisAngleDeg);
 
                 frames.push({
@@ -634,7 +656,7 @@
                     TCP2_VX: Math.cos(webAngle), TCP2_VY: Math.sin(webAngle), TCP2_VZ: 0,
                     Weaving2: 0,
                     Motion_Type: 'APPROACH',
-                    Robot_Swap: 0,
+                    Robot_Swap: robotSwap ? 1 : 0,
                     TBar_Center_X, TBar_Center_Y, TBar_Center_Z,
                     TBar_Web_Angle: webAngle,
                     TBar_Web_Thickness: webThickness
@@ -646,16 +668,23 @@
             for (let i = 0; i <= numWeldFrames; i++) {
                 const ratio = i / numWeldFrames;
 
-                // 선형 보간
+                // 로봇 스왑에 따른 TCP 할당 및 선형 보간
+                // 정상: Robot1=S1→E1, Robot2=S2→E2
+                // 스왑: Robot1=S2→E2, Robot2=S1→E1
+                const tcp1_start = robotSwap ? S2 : S1;
+                const tcp1_end = robotSwap ? E2 : E1;
+                const tcp2_start = robotSwap ? S1 : S2;
+                const tcp2_end = robotSwap ? E1 : E2;
+
                 const tcp1_base = {
-                    x: lerp(S1.x, E1.x, ratio),
-                    y: lerp(S1.y, E1.y, ratio),
-                    z: S1.z
+                    x: lerp(tcp1_start.x, tcp1_end.x, ratio),
+                    y: lerp(tcp1_start.y, tcp1_end.y, ratio),
+                    z: tcp1_start.z
                 };
                 const tcp2_base = {
-                    x: lerp(S2.x, E2.x, ratio),
-                    y: lerp(S2.y, E2.y, ratio),
-                    z: S2.z
+                    x: lerp(tcp2_start.x, tcp2_end.x, ratio),
+                    y: lerp(tcp2_start.y, tcp2_end.y, ratio),
+                    z: tcp2_start.z
                 };
 
                 // 위빙 (정현파)
@@ -680,7 +709,7 @@
                     TCP2_VX: Math.cos(webAngle), TCP2_VY: Math.sin(webAngle), TCP2_VZ: 0,
                     Weaving2: weaving2,
                     Motion_Type: 'WELD',
-                    Robot_Swap: 0,
+                    Robot_Swap: robotSwap ? 1 : 0,
                     TBar_Center_X, TBar_Center_Y, TBar_Center_Z,
                     TBar_Web_Angle: webAngle,
                     TBar_Web_Thickness: webThickness
@@ -695,8 +724,13 @@
 
             for (let i = 0; i <= numRetractFrames; i++) {
                 const ratio = i / numRetractFrames;
-                const tcp1 = { x: E1.x, y: E1.y, z: lerp(E1.z, retractHeight, ratio) };
-                const tcp2 = { x: E2.x, y: E2.y, z: lerp(E2.z, retractHeight, ratio) };
+
+                // 로봇 스왑에 따른 TCP 할당
+                const tcp1_src = robotSwap ? E2 : E1;
+                const tcp2_src = robotSwap ? E1 : E2;
+
+                const tcp1 = { x: tcp1_src.x, y: tcp1_src.y, z: lerp(tcp1_src.z, retractHeight, ratio) };
+                const tcp2 = { x: tcp2_src.x, y: tcp2_src.y, z: lerp(tcp2_src.z, retractHeight, ratio) };
                 const gantry = calculateGantryPosition(tcp1, tcp2, rAxisAngleDeg);
 
                 frames.push({
@@ -712,7 +746,7 @@
                     TCP2_VX: 0, TCP2_VY: 0, TCP2_VZ: 1,
                     Weaving2: 0,
                     Motion_Type: 'RETRACT',
-                    Robot_Swap: 0,
+                    Robot_Swap: robotSwap ? 1 : 0,
                     TBar_Center_X, TBar_Center_Y, TBar_Center_Z,
                     TBar_Web_Angle: webAngle,
                     TBar_Web_Thickness: webThickness
@@ -721,20 +755,23 @@
             }
 
             // 4. IDLE 프레임 (대기)
+            const tcp1_final = robotSwap ? E2 : E1;
+            const tcp2_final = robotSwap ? E1 : E2;
+
             frames.push({
                 Time: currentTime,
                 Gantry_X: frames[frames.length-1].Gantry_X,
                 Gantry_Y: frames[frames.length-1].Gantry_Y,
                 Gantry_Z: retractHeight,
                 Gantry_R: rAxisAngleDeg,
-                TCP1_X: E1.x, TCP1_Y: E1.y, TCP1_Z: retractHeight,
+                TCP1_X: tcp1_final.x, TCP1_Y: tcp1_final.y, TCP1_Z: retractHeight,
                 TCP1_VX: 0, TCP1_VY: 0, TCP1_VZ: 0,
                 Weaving1: 0,
-                TCP2_X: E2.x, TCP2_Y: E2.y, TCP2_Z: retractHeight,
+                TCP2_X: tcp2_final.x, TCP2_Y: tcp2_final.y, TCP2_Z: retractHeight,
                 TCP2_VX: 0, TCP2_VY: 0, TCP2_VZ: 0,
                 Weaving2: 0,
                 Motion_Type: 'IDLE',
-                Robot_Swap: 0,
+                Robot_Swap: robotSwap ? 1 : 0,
                 TBar_Center_X, TBar_Center_Y, TBar_Center_Z,
                 TBar_Web_Angle: webAngle,
                 TBar_Web_Thickness: webThickness
@@ -980,14 +1017,16 @@
             // 로봇 베이스 위치를 포함한 범위 계산
             const allX = frames.flatMap(f => {
                 const rAngle = f.Gantry_R * Math.PI / 180;
-                const r1X = f.Gantry_X + 488 * Math.cos(rAngle);
-                const r2X = f.Gantry_X - 488 * Math.cos(rAngle);
+                const rFrameAngle = rAngle + Math.PI / 2;  // R축 프레임 방향
+                const r1X = f.Gantry_X + 488 * Math.cos(rFrameAngle);
+                const r2X = f.Gantry_X - 488 * Math.cos(rFrameAngle);
                 return [f.Gantry_X, f.TCP1_X, f.TCP2_X, r1X, r2X];
             });
             const allY = frames.flatMap(f => {
                 const rAngle = f.Gantry_R * Math.PI / 180;
-                const r1Y = f.Gantry_Y + 488 * Math.sin(rAngle);
-                const r2Y = f.Gantry_Y - 488 * Math.sin(rAngle);
+                const rFrameAngle = rAngle + Math.PI / 2;  // R축 프레임 방향
+                const r1Y = f.Gantry_Y + 488 * Math.sin(rFrameAngle);
+                const r2Y = f.Gantry_Y - 488 * Math.sin(rFrameAngle);
                 return [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y, r1Y, r2Y];
             });
             const minX = Math.min(...allX) - 200;
@@ -1068,12 +1107,13 @@
             ctxXY.fill();
 
             // 로봇 베이스 위치 (R축 중심에서 ±488mm)
+            // R축 프레임은 웹에 수직 = Gantry_R + 90°
             const rAngle = currentFrame.Gantry_R * Math.PI / 180;
-            // R축 각도에 따라 회전: Robot1 = +488mm, Robot2 = -488mm
-            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.cos(rAngle);
-            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rAngle);
-            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.cos(rAngle);
-            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rAngle);
+            const rFrameAngle = rAngle + Math.PI / 2;  // R축 프레임 방향
+            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.cos(rFrameAngle);
+            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rFrameAngle);
+            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.cos(rFrameAngle);
+            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rFrameAngle);
 
             // 바디 프레임 (두 로봇을 연결하는 바)
             ctxXY.strokeStyle = '#ff6f00';
@@ -1235,8 +1275,9 @@
             // 로봇 베이스 및 T-bar를 포함한 범위 계산
             const allX = frames.flatMap(f => {
                 const rAngle = f.Gantry_R * Math.PI / 180;
-                const r1X = f.Gantry_X + 488 * Math.cos(rAngle);
-                const r2X = f.Gantry_X - 488 * Math.cos(rAngle);
+                const rFrameAngle = rAngle + Math.PI / 2;  // R축 프레임 방향
+                const r1X = f.Gantry_X + 488 * Math.cos(rFrameAngle);
+                const r2X = f.Gantry_X - 488 * Math.cos(rFrameAngle);
                 return [f.Gantry_X, f.TCP1_X, f.TCP2_X, r1X, r2X];
             });
             const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z, 0, 220]);
@@ -1322,10 +1363,12 @@
             ctxXZ.arc(toCanvasX(currentFrame.Gantry_X), toCanvasZ(currentFrame.Gantry_Z), 8, 0, Math.PI * 2);
             ctxXZ.fill();
 
-            // 로봇 베이스 위치 (X축 투영: Robot1 = +488*cos(R), Robot2 = -488*cos(R))
+            // 로봇 베이스 위치 (X축 투영)
+            // R축 프레임 = Gantry_R + 90°
             const rAngle = currentFrame.Gantry_R * Math.PI / 180;
-            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.cos(rAngle);
-            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.cos(rAngle);
+            const rFrameAngle = rAngle + Math.PI / 2;
+            const robot1BaseX = currentFrame.Gantry_X + 488 * Math.cos(rFrameAngle);
+            const robot2BaseX = currentFrame.Gantry_X - 488 * Math.cos(rFrameAngle);
 
             // 바디 프레임 (두 로봇 연결하는 바)
             ctxXZ.strokeStyle = '#ff6f00';
@@ -1409,8 +1452,9 @@
             // 로봇 베이스 및 T-bar를 포함한 범위 계산
             const allY = frames.flatMap(f => {
                 const rAngle = f.Gantry_R * Math.PI / 180;
-                const r1Y = f.Gantry_Y + 488 * Math.sin(rAngle);
-                const r2Y = f.Gantry_Y - 488 * Math.sin(rAngle);
+                const rFrameAngle = rAngle + Math.PI / 2;  // R축 프레임 방향
+                const r1Y = f.Gantry_Y + 488 * Math.sin(rFrameAngle);
+                const r2Y = f.Gantry_Y - 488 * Math.sin(rFrameAngle);
                 return [f.Gantry_Y, f.TCP1_Y, f.TCP2_Y, r1Y, r2Y];
             });
             const allZ = frames.flatMap(f => [f.Gantry_Z, f.TCP1_Z, f.TCP2_Z, 0, 220]);
@@ -1499,10 +1543,12 @@
             ctxYZ.arc(toCanvasY(currentFrame.Gantry_Y), toCanvasZ(currentFrame.Gantry_Z), 8, 0, Math.PI * 2);
             ctxYZ.fill();
 
-            // 로봇 베이스 위치 (Y축 투영: Robot1 = +488*sin(R), Robot2 = -488*sin(R))
+            // 로봇 베이스 위치 (Y축 투영)
+            // R축 프레임 = Gantry_R + 90°
             const rAngle = currentFrame.Gantry_R * Math.PI / 180;
-            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rAngle);
-            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rAngle);
+            const rFrameAngle = rAngle + Math.PI / 2;
+            const robot1BaseY = currentFrame.Gantry_Y + 488 * Math.sin(rFrameAngle);
+            const robot2BaseY = currentFrame.Gantry_Y - 488 * Math.sin(rFrameAngle);
 
             // 바디 프레임 (두 로봇 연결하는 바)
             ctxYZ.strokeStyle = '#ff6f00';

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>B-라인 (Two Torch) 용접 Macro 정의 - 그림 중심 재구성</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; padding: 20px; background-color: #f0f8ff; }
+        .container { max-width: 800px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+        h1 { color: #007bff; border-bottom: 3px solid #007bff; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+        h2 { color: #34495e; margin-top: 25px; border-left: 5px solid #28a745; padding-left: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #007bff; color: white; font-weight: bold; }
+        .macro-structure td { background-color: #e6f7ff; font-size: 1.1em; font-weight: bold; }
+        .code-list td:nth-child(1) { font-weight: bold; color: #dc3545; width: 10%; }
+        .code-list td:nth-child(3) { text-align: left; }
+        .image-container { text-align: center; margin: 20px 0; }
+        .image-container img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>B-라인 (Two Torch) 용접 Macro (ABC) 정의 - 그림 중심</h1>
+        <p>이 자료는 B-라인의 **Two Torch (2개 토치)** 기반 용접 Macro 정의를 제공된 그림을 중심으로 재구성한 것입니다.</p>
+
+        <h2>1. Macro 기본 구조 및 정의 요소 (그림 1)</h2>
+        <p>Macro는 **A (형상) B (시작) C (끝)** 세 가지 코드로 구성됩니다.</p>
+        
+        <div class="image-container">
+            <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1763085303/s25016/cvc0cknoe1xrjhqba5d1oqute.png" alt="용접 매크로 정의 구조 그림 (A, B, C 정의)">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                </tr>
+            </thead>
+            <tbody class="macro-structure">
+                <tr>
+                    <td>Two Torch 용접선 형상</td>
+                    <td>시작점 용접 Type</td>
+                    <td>끝점 용접 Type</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        ---
+        
+        <h2>2. A: 용접선 형상 (Two Torch 전용 코드)</h2>
+        <p>B-라인에서 사용되는 2개 토치 부재의 형상 코드입니다.</p>
+        <table class="code-list">
+            <thead>
+                <tr>
+                    <th>코드</th>
+                    <th>정의</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>**2**</td><td>Two Torch **직선** 부재</td></tr>
+                <tr><td>**4**</td><td>Two Torch **Arc** 부재 (곡선)</td></tr>
+                <tr><td>**6**</td><td>Two Torch **경사** 부재 (Sloped)</td></tr>
+            </tbody>
+        </table>
+        
+        ---
+
+        <h2>3. B/C: 시작점 및 끝점 용접 Type 상세 (그림 2)</h2>
+        <p>그림 2에 나타난 시작/끝 지점에서의 이음매 처리 방식을 정의합니다.</p>
+
+        <div class="image-container">
+            <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1763085305/s25016/skeontqnofxp9wmo8ue6j64bl.png" alt="용접 매크로 시작/끝점 Type 상세 정의 그림 (0, 1, 2, 4, 5, 8, 9)">
+        </div>
+        
+        <table class="code-list">
+            <thead>
+                <tr>
+                    <th>코드</th>
+                    <th>정의</th>
+                    <th>핵심 처리 방식</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>0</td><td>Open Type</td><td>열린 시작/종료 처리</td></tr>
+                <tr><td>2</td><td>Closed Type</td><td>닫힌 시작/종료 처리 (밀봉)</td></tr>
+                <tr><td>1</td><td>Snip Type</td><td>이음매 끝단 잘라내기 처리</td></tr>
+                <tr><td>4</td><td>Divided Type</td><td>중간 간섭 등으로 인한 분할 처리</td></tr>
+                <tr><td>5</td><td>Closed-Open Type</td><td>한쪽은 닫고 다른 한쪽은 여는 복합 처리</td></tr>
+                <tr><td>8/9</td><td>Joint First/Second</td><td>이음매 처리 우선순위 지정</td></tr>
+            </tbody>
+        </table>
+
+        ---
+
+        <h2>4. Macro 해석 예시</h2>
+        <p><strong>Macro 코드: 220</strong></p>
+        <ul>
+            <li>**2 (A):** Two Torch 직선 부재</li>
+            <li>**2 (B):** 시작점은 Closed Type으로 처리</li>
+            <li>**0 (C):** 끝점은 Open Type으로 처리</li>
+        </ul>
+
+    </div>
+
+</body>
+</html>
