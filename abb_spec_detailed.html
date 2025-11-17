@@ -462,7 +462,7 @@
                         <ol>
                             <li>순차 용접 방식으로 변경 (Two Torch 동시 사용 포기)</li>
                             <li>해당 매크로 제외 (우선순위 낮은 경우)</li>
-                            <li>추가 개발 시도 (비용 및 일정 재협의)</li>
+                            <li>추가 개발 시도 (일정 재협의)</li>
                         </ol>
                     </li>
                     <li><strong>협의 프로세스:</strong> 매크로 200 개발 착수 전 기술 검토 → 문제 확인 시 즉시 보고 → 3일 내 대안 제시 → 고객 승인 후 진행</li>
@@ -492,10 +492,6 @@
                         <td><strong>매크로 구현</strong></td>
                         <td><strong>매크로 244 (우선순위)</strong> 100% 동작<br>
                         매크로 200, 211, 222, 255: 협의 후 결정</td>
-                    </tr>
-                    <tr>
-                        <td><strong>동기화 정밀도</strong></td>
-                        <td>ROB_1, ROB_2 TCP 상대 위치 오차 <strong>±2mm 이내</strong></td>
                     </tr>
                     <tr>
                         <td><strong>안전 기능</strong></td>
@@ -544,224 +540,224 @@
                     <tr class="class-1">
                         <td class="index-col">1</td>
                         <td>(갠트리별) 글로벌 홈 이동</td>
-                        <td>HEAD/Head_Command.mod<br><code>prGlobalHome()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>MOVE_TO_WORLDHOME</code></td>
                         <td>갠트리를 외부축으로 통합, TASK7 삭제 필요</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">2</td>
                         <td>계측용 Z홈 이동</td>
-                        <td>HEAD/Head_Command.mod<br><code>prMeasureHome()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>MOVE_TO_MeasurementHOME</code></td>
                         <td>외부축 좌표 통합 (robtarget.extax)</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">3</td>
                         <td>로봇 1 티칭 자세</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prTeachingPose()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>MOVE_TO_TEACHING_R1</code></td>
                         <td>외부축 포함 티칭 자세 정의</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">4</td>
                         <td>로봇 2 티칭 자세</td>
-                        <td>T_ROB2/MainModule.mod<br><code>prTeachingPose()</code></td>
+                        <td>T_ROB2/MainModule.mod<br><code>MOVE_TO_TEACHING_R2</code></td>
                         <td>SERVO TOOL CONTROL 고려 필요</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">5</td>
                         <td>절대위치로 갠트리 이동</td>
-                        <td>HEAD/Head_Command.mod<br><code>MoveJgJ()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>MOVE_ABS_GANTRY</code></td>
                         <td>외부축 MoveJ로 단순화, TASK7 제거</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">6</td>
                         <td>상대 위치로 갠트리 이동</td>
-                        <td>HEAD/Head_Command.mod<br><code>MovePgJ()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>MOVE_INC_GANTRY</code></td>
                         <td>좌표 변환 함수 제거, 직접 계산</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">7</td>
                         <td>일반 Z홈 자세 이동</td>
-                        <td>HEAD/Head_Command.mod<br><code>prZHome()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>MOVE_TO_ZHOME</code></td>
                         <td>외부축 통합 좌표로 재정의</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">8</td>
                         <td>용접 수행</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWelding()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WELD</code></td>
                         <td>SyncMove 기반 재작성</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">9</td>
                         <td>용접 모션 수행</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWeldingMotion()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WELD_MOTION</code></td>
                         <td>아크 없이 모션만, 2-Task 동기화</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">10</td>
                         <td>보정 기능을 사용한 용접 수행</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWeldingWithTouch()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WELD_CORR</code></td>
                         <td>터치 보정 + 용접, 외부축 고려</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">11</td>
                         <td>보정 기능을 사용한 용접 모션 수행</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWeldingMotionWithTouch()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WELD_MOTION_CORR</code></td>
                         <td>터치 보정 + 모션</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">12</td>
                         <td>용접 수행(작업자 입력 정보 사용)</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWeldingUI()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WELD_MM</code></td>
                         <td>UI 통신 (stReact{2}로 변경)</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">13</td>
                         <td>용접 모션 수행(작업자 입력 정보 사용)</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWeldingMotionUI()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WELD_MOTION_MM</code></td>
                         <td>UI 통신</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">14</td>
                         <td>보정 기능을 사용한 용접 수행(작업자 입력 정보 사용)</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWeldingWithTouchUI()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WELD_CORR_MM</code></td>
                         <td>UI 통신 + 터치 보정</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">15</td>
                         <td>보정 기능을 사용한 용접 모션 수행(작업자 입력 정보 사용)</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWeldingMotionWithTouchUI()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WELD_MOTION_CORR_MM</code></td>
                         <td>UI 통신 + 터치 보정</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">16</td>
                         <td>카메라 커버 전부 열기</td>
-                        <td>HEAD/Head_Command.mod<br><code>prCameraOpenAll()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>CAMERA_DOOR_OPEN</code></td>
                         <td>I/O 제어만, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">17</td>
                         <td>카메라 커버 전부 닫기</td>
-                        <td>HEAD/Head_Command.mod<br><code>prCameraCloseAll()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>CAMERA_DOOR_CLOSE</code></td>
                         <td>I/O 제어만, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-del">
                         <td class="index-col">18</td>
                         <td>카메라 블로워 동작</td>
-                        <td>(주석 처리됨)</td>
+                        <td>(주석 처리됨)<br><code>CAMERA_BLOW_ON</code></td>
                         <td>Plan B에서 제외</td>
                         <td><span class="badge badge-secondary">-</span></td>
                     </tr>
                     <tr class="class-del">
                         <td class="index-col">19</td>
                         <td>카메라 블로워 차단</td>
-                        <td>(주석 처리됨)</td>
+                        <td>(주석 처리됨)<br><code>CAMERA_BLOW_OFF</code></td>
                         <td>Plan B에서 제외</td>
                         <td><span class="badge badge-secondary">-</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">20</td>
                         <td>1번 카메라 커버 열기</td>
-                        <td>HEAD/Head_Command.mod<br><code>prCameraOpen1()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>CAMERA1_DOOR_OPEN</code></td>
                         <td>I/O 제어, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">21</td>
                         <td>1번 카메라 커버 닫기</td>
-                        <td>HEAD/Head_Command.mod<br><code>prCameraClose1()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>CAMERA1_DOOR_CLOSE</code></td>
                         <td>I/O 제어, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">22</td>
                         <td>2번 카메라 커버 열기</td>
-                        <td>HEAD/Head_Command.mod<br><code>prCameraOpen2()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>CAMERA2_DOOR_OPEN</code></td>
                         <td>I/O 제어, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">23</td>
                         <td>2번 카메라 커버 닫기</td>
-                        <td>HEAD/Head_Command.mod<br><code>prCameraClose2()</code></td>
+                        <td>HEAD/Head_Command.mod<br><code>CAMERA2_DOOR_CLOSE</code></td>
                         <td>I/O 제어, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">24</td>
                         <td>모든 로봇 와이어 커팅</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWireCutAll()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WIRE_CUT</code></td>
                         <td>2-Task 동기화 필요</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-a">
                         <td class="index-col">25</td>
                         <td>와이어 클리닝(1/2 호기 구분)</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWireCleaning()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WIRE_CLEAN</code></td>
                         <td>신규 장비, 신규 개발 필요</td>
                         <td><span class="badge badge-danger">A</span></td>
                     </tr>
                     <tr class="class-a">
                         <td class="index-col">26</td>
                         <td>토치 TCP 체크(BullsEye)</td>
-                        <td>(미구현)</td>
+                        <td>(미구현)<br><code>WIRE_BULLSEYE_CHECK</code></td>
                         <td>ABB BullsEye 시스템 신규 통합</td>
                         <td><span class="badge badge-danger">A</span></td>
                     </tr>
                     <tr class="class-a">
                         <td class="index-col">27</td>
                         <td>토치 TCP 업데이트(BullsEye)</td>
-                        <td>(미구현)</td>
+                        <td>(미구현)<br><code>WIRE_BULLSEYE_UPDATE</code></td>
                         <td>ABB BullsEye 시스템 신규 통합</td>
                         <td><span class="badge badge-danger">A</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">28</td>
                         <td>와이어 교체 모드 진입</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWireChangeMode()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>WIRE_ReplacementMode</code></td>
                         <td>외부축 고려 재작성</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">29</td>
                         <td>1번 로봇 와이어 커팅</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prWireCut1()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>ROB1_WIRE_CUT</code></td>
                         <td>외부축 고려</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">30</td>
                         <td>2번 로봇 와이어 커팅</td>
-                        <td>T_ROB2/MainModule.mod<br><code>prWireCut2()</code></td>
+                        <td>T_ROB2/MainModule.mod<br><code>ROB2_WIRE_CUT</code></td>
                         <td>ROB_2만 해당, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">31</td>
                         <td>홀 카메라 기반 갠트리 X축 원점 계측</td>
-                        <td>HEAD/Head_Measure.mod<br><code>prMeasureHall()</code></td>
+                        <td>HEAD/Head_Measure.mod<br><code>HOLE_CHECK</code></td>
                         <td>외부축 원점 설정 로직 재작성</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-a">
                         <td class="index-col">32</td>
                         <td>LDS 기반 갠트리 X/Y/Z축 원점 계측</td>
-                        <td>(미구현)</td>
+                        <td>(미구현)<br><code>LDS_CHECK</code></td>
                         <td>LDS 센서 신규 통합</td>
                         <td><span class="badge badge-danger">A</span></td>
                     </tr>
@@ -783,77 +779,77 @@
                     <tr class="class-1">
                         <td class="index-col">33</td>
                         <td>글로벌 좌표 기반 각도 계산</td>
-                        <td>HEAD/Head_Function.mod<br><code>fnCalcAngle()</code></td>
+                        <td>HEAD/Head_Function.mod<br><code>CalcAngleFromPos</code></td>
                         <td>외부축 통합 좌표계 기준으로 재계산</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">34</td>
                         <td>각 로봇 현 TCP를 글로벌 기준으로 계산</td>
-                        <td>HEAD/Head_Function.mod<br><code>CalcCurrentTcp()</code></td>
-                        <td><strong>삭제 대상</strong> - 제어기 자동 계산</td>
+                        <td>HEAD/Head_Function.mod<br><code>CalcCurrentTcp</code></td>
+                        <td>Task가 2개로 줄면서 신규 코드 필요</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">35</td>
                         <td>법선 벡터 계산</td>
-                        <td>HEAD/Head_Function.mod<br><code>fnNormalVector()</code></td>
+                        <td>HEAD/Head_Function.mod<br><code>CalcNormalVector</code></td>
                         <td>수학 함수, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">36</td>
                         <td>선분 시작점으로부터 입력 거리만큼 끝점으로 이동한 위치 계산</td>
-                        <td>HEAD/Head_Function.mod<br><code>fnPointOnLine()</code></td>
+                        <td>HEAD/Head_Function.mod<br><code>CalcPosOnLine</code></td>
                         <td>수학 함수, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">37</td>
                         <td>조인트값 기준 갠트리 현 글로벌 좌표계 상 위치 계산</td>
-                        <td>HEAD/Head_Function.mod<br><code>fnJointToCoord()</code></td>
-                        <td><strong>삭제 대상</strong> - 제어기 자동 계산</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnJointToCoord</code></td>
+                        <td>Task가 2개로 변경되면서 새로운 알고리즘 코딩 필요</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">38</td>
                         <td>글로벌 좌표계 위치 기준 갠트리 목표 조인트 계산</td>
-                        <td>HEAD/Head_Function.mod<br><code>fnCoordToJoint()</code></td>
-                        <td><strong>삭제 대상</strong> - 제어기 자동 계산</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnCoordToJoint</code></td>
+                        <td>Task가 2개로 변경되면서 새로운 알고리즘 코딩 필요</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-a">
                         <td class="index-col">39</td>
                         <td>브레이크 포인트(용접 중 작업 각 변화) 위치 계산</td>
-                        <td>HEAD/Head_MoveControl.mod<br><code>fnBreakPoint()</code></td>
+                        <td>HEAD/Head_MoveControl.mod<br><code>DefineWeldPosOnBreakPoints</code></td>
                         <td>외부축 포함 재계산 로직 필요</td>
                         <td><span class="badge badge-danger">A</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">40</td>
                         <td>특정 범위 이내의 값의 경우에만 변수 업데이트</td>
-                        <td>HEAD/Head_Function.mod<br><code>fnLimitUpdate()</code></td>
+                        <td>HEAD/Head_Function.mod<br><code>Limit</code></td>
                         <td>유틸리티 함수, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">41</td>
                         <td>갠트리 및 로봇 조인트 타겟 그룹 생성</td>
-                        <td>HEAD/Head_Function.mod<br><code>fnCreateJointTarget()</code></td>
+                        <td>HEAD/Head_Function.mod<br><code>MergeJgWith</code></td>
                         <td>외부축 통합, jointtarget.extax 사용</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">42</td>
                         <td>갠트리 및 로봇 로봇타겟/조인트 타겟 그룹 생성</td>
-                        <td>HEAD/Head_Function.mod<br><code>fnCreateRobTarget()</code></td>
+                        <td>HEAD/Head_Function.mod<br><code>MergePgWith</code></td>
                         <td>robtarget.extax 통합</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-n">
                         <td class="index-col">43</td>
                         <td>각도 범위를 -pi~pi로 변경</td>
-                        <td>HEAD/Head_Function.mod<br><code>fnNormalizeAngle()</code></td>
+                        <td>HEAD/Head_Function.mod<br><code>NormalizeAngle</code></td>
                         <td>수학 함수, 차용 가능</td>
                         <td><span class="badge badge-success">N</span></td>
                     </tr>
@@ -875,105 +871,105 @@
                     <tr class="class-a">
                         <td class="index-col">44</td>
                         <td>매크로 200 211 222 255 용접</td>
-                        <td>T_ROB1/Head_MoveControl.mod<br><code>rMacro200(), rMacro211() 등</code></td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>rWeld012</code></td>
                         <td>SyncMove 기반 신규 작성 (우선순위 낮음)</td>
                         <td><span class="badge badge-danger">A</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">45</td>
                         <td>매크로 244 용접</td>
-                        <td>T_ROB1/Head_MoveControl.mod<br><code>rMacro244()</code></td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>rWeld34</code></td>
                         <td><strong>최우선 개발</strong>, SyncMove 재작성</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-a">
                         <td class="index-col">46</td>
                         <td>매크로 200 211 222 255 용접 모션</td>
-                        <td>T_ROB1/Head_MoveControl.mod<br><code>rMacro200Motion() 등</code></td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>rNoWeld0123</code></td>
                         <td>SyncMove 기반 신규 작성</td>
                         <td><span class="badge badge-danger">A</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">47</td>
                         <td>매크로 244 용접 모션</td>
-                        <td>T_ROB1/Head_MoveControl.mod<br><code>rMacro244Motion()</code></td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>rNoWeld34</code></td>
                         <td><strong>최우선 개발</strong>, 모션만</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">48</td>
                         <td>터치 안전 범위 계산</td>
-                        <td>T_ROB1/Head_TouchSensing.mod<br><code>fnTouchSafetyZone()</code></td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>TouchLimit</code></td>
                         <td>외부축 포함 안전 영역 재정의</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">49</td>
                         <td>용접 좌표 계산</td>
-                        <td>T_ROB1/Head_MoveControl.mod<br><code>rDefineWeldPosR1()</code></td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>fCalcWeldingpos</code></td>
                         <td>robtarget.extax 통합</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">50</td>
                         <td>터치 보정 기능</td>
-                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rTouchCorrection()</code></td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rCorrSearchStartEnd</code></td>
                         <td>외부축 좌표 보정 로직 재작성</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">51</td>
                         <td>터치 보정을 위한 이동</td>
-                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rMoveToTouch()</code></td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rMoveCorrConnect</code></td>
                         <td>외부축 통합 이동</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">52</td>
                         <td>용접선 X 방향 터치 보정</td>
-                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rTouchX()</code></td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rCorrSearchWeldLineEdgeX</code></td>
                         <td>외부축 좌표 보정</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">53</td>
                         <td>용접선 Y 방향 터치 보정</td>
-                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rTouchY()</code></td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rCorrSearchWeldLineEdgeY</code></td>
                         <td>외부축 좌표 보정</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">54</td>
                         <td>용접선 Z 방향 터치 보정</td>
-                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rTouchZ()</code></td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rCorrSearchWeldLineEdgeZ</code></td>
                         <td>외부축 좌표 보정</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">55</td>
                         <td>터치 인식 기능</td>
-                        <td>T_ROB1/Head_TouchSensing.mod<br><code>fnTouchDetect()</code></td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rCorrSearchByWire</code></td>
                         <td>외부축 포함 재작성</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">56</td>
                         <td>진입 에러 처리</td>
-                        <td>T_ROB1/ErrorHandler.mod<br><code>prApproachError()</code></td>
+                        <td>T_ROB1/ErrorHandler.mod<br><code>rErrorDuringEntry</code></td>
                         <td>외부축 포함 에러 복구</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">57</td>
                         <td>용접 에러 처리</td>
-                        <td>T_ROB1/ErrorHandler.mod<br><code>prWeldingError()</code></td>
+                        <td>T_ROB1/ErrorHandler.mod<br><code>rArcError</code></td>
                         <td>ArcLink XT 에러 처리</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">58</td>
                         <td>터치 실패 에러 처리</td>
-                        <td>T_ROB1/ErrorHandler.mod<br><code>prTouchError()</code></td>
+                        <td>T_ROB1/ErrorHandler.mod<br><code>rTouchErrorHandling</code></td>
                         <td>외부축 포함 에러 복구</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
@@ -995,21 +991,21 @@
                     <tr class="class-1">
                         <td class="index-col">59</td>
                         <td>명령 입력 무결성 확인</td>
-                        <td>T_ROB1/MainModule.mod<br><code>fnValidateCommand()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>rCheckCmdMacth</code></td>
                         <td>UI 통신 (stReact{2}로 변경)</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">60</td>
                         <td>로봇 초기화</td>
-                        <td>T_ROB1/MainModule.mod<br><code>prInitialize()</code></td>
+                        <td>T_ROB1/MainModule.mod<br><code>rSettingInitialize</code></td>
                         <td>외부축 설정 포함</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
                     <tr class="class-1">
                         <td class="index-col">61</td>
                         <td>에러 처리용 Z홈</td>
-                        <td>T_ROB1/ErrorHandler.mod<br><code>prErrorZHome()</code></td>
+                        <td>T_ROB1/ErrorHandler.mod<br><code>rErrorMoveHome</code></td>
                         <td>외부축 포함 안전 복귀</td>
                         <td><span class="badge badge-warning">1</span></td>
                     </tr>
@@ -1234,7 +1230,7 @@
                         <ul>
                             <li>대안 A: 순차 용접으로 변경 (Two Torch 동시 사용 포기, 일정 영향 없음)</li>
                             <li>대안 B: 해당 매크로 제외 (우선순위 낮은 매크로만)</li>
-                            <li>대안 C: 추가 개발 시도 (비용 및 일정 재협의)</li>
+                            <li>대안 C: 추가 개발 시도 (일정 재협의)</li>
                         </ul>
                     </li>
                     <li><strong>협의 및 승인 (Day 4-5):</strong> 삼성중공업 + 에스피시스템스 + ABB 3자 협의</li>
