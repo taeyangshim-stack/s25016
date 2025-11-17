@@ -373,6 +373,7 @@
             <button class="nav-tab" onclick="showTab('hexagon')">📐 Hexagon</button>
             <button class="nav-tab" onclick="showTab('work-manage')">🏭 근무관리</button>
             <button class="nav-tab" onclick="showTab('documents')">📚 문서 자료</button>
+            <button class="nav-tab" onclick="showTab('planb-motion')">🤖 Plan B & 모션</button>
         </div>
 
         <!-- 전체 개요 탭 -->
@@ -1290,6 +1291,130 @@ python3 log_analyzer.py</pre>
                     • 일일 진행상황 업데이트<br>
                     • 긴급사항 즉시 공유
                 </p>
+            </div>
+        </div>
+
+        <!-- Plan B & 모션 뷰어 탭 -->
+        <div id="planb-motion" class="tab-content">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">🤖 Plan B 로봇 시스템 고도화 & XYZR 갠트리 모션</h2>
+
+            <div class="dashboard-grid">
+                <!-- XYZR 갠트리 모션 시스템 -->
+                <div class="card" style="border-left-color: #8b5cf6;">
+                    <h3>📐 XYZR 갠트리 + 듀얼 로봇 모션 시스템</h3>
+                    <a href="advanced_motion_viewer.html" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                        🎬 고급 용접 모션 뷰어 (XYZR 갠트리 + 듀얼 로봇)
+                    </a>
+                    <a href="motion_viewer_index.html" class="project-link" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);" target="_blank">
+                        📋 듀얼 토치 모션 뷰어 인덱스
+                    </a>
+                    <a href="motion_viewer.html" class="project-link" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);" target="_blank">
+                        📊 기본 모션 뷰어
+                    </a>
+                    <a href="punchlist/docs/251113_codex_갠트리XYZR시각화요구사항.md" class="project-link" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);" target="_blank">
+                        📝 갠트리 XYZR 시각화 상세 요구사항
+                    </a>
+                    <div style="margin-top: 15px; padding: 15px; background: #f3e8ff; border-radius: 8px; border-left: 3px solid #8b5cf6;">
+                        <p style="margin: 0; color: #6b21a8; font-size: 0.95em;">
+                            <strong>🎯 시스템:</strong> XYZ 선형축 + R축 회전 갠트리<br>
+                            <strong>🤖 구성:</strong> R축 바디에 2대 로봇 부착 (±488mm)<br>
+                            <strong>🔧 용도:</strong> T-bar 웹 양면 동시/교대 용접<br>
+                            <strong>📊 회전:</strong> ±100° 범위, 용접선 수직 유지
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Plan B 로봇 시스템 재구성 -->
+                <div class="card" style="border-left-color: #667eea;">
+                    <h3>📘 Plan B 로봇 시스템 재구성</h3>
+                    <a href="planb_specification.html" class="project-link" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" target="_blank">
+                        📋 Plan B 시스템 재구성 사양서 (메인)
+                    </a>
+                    <a href="setting_planb_comparison.html" class="project-link" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" target="_blank">
+                        ⚖️ Plan A vs Plan B 설정 비교
+                    </a>
+                    <a href="ppt_slides/index.html" class="project-link" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);" target="_blank">
+                        🎬 PPT 슬라이드 인덱스 (17개 슬라이드)
+                    </a>
+                    <a href="ppt_slides/Plan_B_Accurate.pptx" class="project-link" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" download>
+                        📥 PowerPoint 다운로드 (Plan_B_Accurate.pptx - 38슬라이드)
+                    </a>
+                    <a href="Plan_B_Robot_Reconfiguration_Spec.pptx" class="project-link" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);" download>
+                        📥 PowerPoint 다운로드 (Plan_B_Robot_Reconfiguration_Spec.pptx)
+                    </a>
+                    <div style="margin-top: 15px; padding: 15px; background: #e0e7ff; border-radius: 8px; border-left: 3px solid #667eea;">
+                        <p style="margin: 0; color: #3730a3; font-size: 0.95em;">
+                            <strong>🎯 목표:</strong> 3-Task → 2-Task 구조 단순화<br>
+                            <strong>⚡ 개선:</strong> 좌표 변환 함수 제거, 자동 동기화<br>
+                            <strong>📅 프로젝트:</strong> S25016 - 34bay 자동용접 A/B라인<br>
+                            <strong>👥 담당:</strong> ABB 코리아 (황동호, 유대영)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 관련 기술 문서 -->
+                <div class="card" style="border-left-color: #06b6d4;">
+                    <h3>📚 관련 기술 문서</h3>
+                    <a href="robot_system_review.html" class="project-link" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);" target="_blank">
+                        📊 로봇 시스템 리뷰 (현행 분석)
+                    </a>
+                    <a href="robot_system_review_ko.html" class="project-link" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);" target="_blank">
+                        📋 로봇 시스템 리뷰 (한글)
+                    </a>
+                    <a href="robot_backup_comparison.html" class="project-link" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);" target="_blank">
+                        🗂️ 로봇 백업 비교 분석
+                    </a>
+                    <a href="robot_backup_history.html" class="project-link" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" target="_blank">
+                        📚 ABB 로봇 백업 변경 이력
+                    </a>
+                    <a href="abb_robot_programming_specification.html" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                        📖 ABB 로봇 프로그래밍 사양서
+                    </a>
+                    <a href="abb_spec_detailed.html" class="project-link" style="background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);" target="_blank">
+                        📄 ABB 상세 사양
+                    </a>
+                    <div style="margin-top: 15px; padding: 15px; background: #cffafe; border-radius: 8px; border-left: 3px solid #06b6d4;">
+                        <p style="margin: 0; color: #155e75; font-size: 0.95em;">
+                            <strong>📌 참고:</strong> 시스템 전환 및 고도화를 위한 기술 문서<br>
+                            <strong>🔧 범위:</strong> 로봇 설정, 백업, 프로그래밍 가이드<br>
+                            <strong>✅ 활용:</strong> Plan B 구현 및 모션 시스템 개발
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 프로젝트 정보 카드 -->
+                <div class="card" style="border-left-color: #f59e0b; grid-column: 1 / -1;">
+                    <h3>📊 프로젝트 개요</h3>
+                    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                        <div class="info-box">
+                            <h4>🎯 Plan B 시스템 재구성</h4>
+                            <p>
+                                <strong>목적:</strong> 로봇 시스템 아키텍처 단순화<br>
+                                <strong>주요 변경:</strong> 3-Task → 2-Task 구조<br>
+                                <strong>효과:</strong> 유지보수 간소화, 안정성 향상<br>
+                                <strong>일정:</strong> Phase 1-4 (4주 계획)
+                            </p>
+                        </div>
+                        <div class="info-box">
+                            <h4>🎬 XYZR 갠트리 모션</h4>
+                            <p>
+                                <strong>목적:</strong> 용접 모션 시각화 및 시뮬레이션<br>
+                                <strong>구성:</strong> XYZ 선형축 + R축 회전 + 듀얼 로봇<br>
+                                <strong>기능:</strong> TCP 경로, 위빙, R축 회전 표현<br>
+                                <strong>대상:</strong> T-bar 웹 양면 동시 용접
+                            </p>
+                        </div>
+                        <div class="info-box">
+                            <h4>👥 프로젝트 담당자</h4>
+                            <p>
+                                <strong>총괄:</strong> 황동호 팀장 (ABB 코리아)<br>
+                                &nbsp;&nbsp;📞 010-6479-5340<br>
+                                <strong>프로그래밍:</strong> 유대영 차장 (ABB 코리아)<br>
+                                &nbsp;&nbsp;📞 010-3278-9779
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
