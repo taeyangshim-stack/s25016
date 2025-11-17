@@ -1131,11 +1131,20 @@ python3 log_analyzer.py</pre>
 
                 <div class="card">
                     <h3>🔌 DeviceNet 문서</h3>
+                    <a href="projects/devicenet/docs/251010_시운전현황보고.html" class="project-link" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);" target="_blank">
+                        📊 10/10 시운전 현황 및 10/11 계획 (최신)
+                    </a>
                     <a href="projects/devicenet/docs/251009_작업진행_세부내용.html" class="project-link" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%);" target="_blank">
-                        📋 10/9 작업 진행 세부내용 (최신)
+                        📋 10/9 작업 진행 세부내용
                     </a>
                     <a href="projects/devicenet/index.html" class="project-link" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);" target="_blank">
                         🔧 통신 문제 해결 진행 현황 보고
+                    </a>
+                    <a href="projects/devicenet/docs/251009_아크불량_체크리스트.html" class="project-link project-link-devicenet" target="_blank">
+                        ⚡ 아크 불량 체크리스트
+                    </a>
+                    <a href="projects/devicenet/docs/251009_예상원인점검_이더넷통신.html" class="project-link project-link-devicenet" target="_blank">
+                        🔍 예상 원인 점검 (이더넷 통신)
                     </a>
                     <a href="projects/devicenet/docs/ABB_Lincoln_DeviceNet_체크리스트.html" class="project-link project-link-devicenet" target="_blank">
                         ✅ ABB-Lincoln 연결 체크리스트
@@ -1160,8 +1169,17 @@ python3 log_analyzer.py</pre>
                     <a href="robot_system_review.html" class="project-link" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);" target="_blank">
                         📊 현행 시스템 검토 (Plan A)
                     </a>
+                    <a href="상하축이슈_대시보드.html" class="project-link project-link-robot" target="_blank">
+                        🎯 상하축 이슈 종합 대시보드
+                    </a>
+                    <a href="projects/robot-vertical-axis/dashboard.html" class="project-link project-link-robot" target="_blank">
+                        📋 상하축 프로젝트 대시보드
+                    </a>
                     <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
-                        📋 ROBOT↔UI 테스트 통합 결과 (10/3-10/4)
+                        🧪 ROBOT↔UI 테스트 통합 결과 (10/3-10/4)
+                    </a>
+                    <a href="robot_comparison_report.html" class="project-link project-link-robot" target="_blank">
+                        📊 로봇 비교 보고서
                     </a>
                     <div style="margin-top: 15px; padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 3px solid #dc2626;">
                         <p style="margin: 0; color: #991b1b; font-size: 0.95em;">
@@ -1169,9 +1187,81 @@ python3 log_analyzer.py</pre>
                             <strong>📅 다음 테스트:</strong> 2024.10.09 (에러핸들링 집중)
                         </p>
                     </div>
-                    <a href="projects/robot-ui-integration-test/test-results/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link" target="_blank" style="background: #f3f4f6; color: #6b7280; margin-top: 10px;">
-                        📄 1차 결과 백업 (10/3)
+                </div>
+
+                <div class="card" style="border-left-color: #ef4444;">
+                    <h3>🗂️ 로봇 백업 분석</h3>
+                    <a href="projects/robot-backup/robot_backup_detailed_report.html" class="project-link" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);" target="_blank">
+                        📄 로봇 백업 상세 분석 보고서
                     </a>
+                    <a href="projects/robot-backup/robot_backup_comparison_report.html" class="project-link" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);" target="_blank">
+                        📊 로봇 백업 비교 리포트
+                    </a>
+                    <a href="projects/robot-backup/report-20251015-9c3f7bd2.html" class="project-link" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" target="_blank">
+                        🗂️ 로봇 백업 업데이트 인덱스 (2025-10-15)
+                    </a>
+                    <a href="robot_backup_history.html" class="project-link" style="background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);" target="_blank">
+                        📚 ABB 로봇 백업 변경 이력 (Git 기반)
+                    </a>
+                    <a href="robot_backup_comparison.html" class="project-link" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);" target="_blank">
+                        📋 로봇 백업 비교 보고서 (실용적 분석)
+                    </a>
+                    <div style="margin-top: 15px; padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 3px solid #ef4444;">
+                        <p style="margin: 0; color: #991b1b; font-size: 0.95em;">
+                            <strong>📌 최신 업데이트:</strong> 2025-10-15<br>
+                            <strong>🔧 대상:</strong> 1호기, 2호기, 3호기 컨트롤러<br>
+                            <strong>📊 내용:</strong> 용접 파라미터 최적화, I/O 세팅 통일
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left-color: #dc2626;">
+                    <h3>📋 상하축 이슈 상세 문서</h3>
+                    <a href="250917_상하축이슈/05_문서자료/251013_Codex_리포지터리_리뷰.html" class="project-link" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);" target="_blank">
+                        📂 251013 Codex 리포지터리 리뷰
+                    </a>
+                    <a href="250917_상하축이슈/05_문서자료/251018_Codex_3호기_Arc에러_복구점검.html" class="project-link" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);" target="_blank">
+                        ⚡ 251018 3호기 Arc 에러 복구 점검
+                    </a>
+                    <a href="250917_상하축이슈/05_문서자료/251021_3호기_Arc재시작_멍때림_문제분석.html" class="project-link" style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);" target="_blank">
+                        🔍 251021 3호기 Arc 재시작 멍때림 분석
+                    </a>
+                    <a href="250917_상하축이슈/05_문서자료/251021_3호기_터치센싱_멍때림_문제분석.html" class="project-link" style="background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);" target="_blank">
+                        📊 251021 3호기 터치센싱 멍때림 분석
+                    </a>
+                    <a href="250917_상하축이슈/05_문서자료/251021_CrossStop신호_초기화_문제.html" class="project-link" style="background: linear-gradient(135deg, #fda4af 0%, #fb7185 100%);" target="_blank">
+                        🚨 251021 CrossStop 신호 초기화 문제
+                    </a>
+                    <a href="250917_상하축이슈/05_문서자료/251013_SP_로봇백업비교.html" class="project-link" style="background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);" target="_blank">
+                        📄 251013 로봇 백업 비교 보고서
+                    </a>
+                    <div style="margin-top: 15px; padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 3px solid #dc2626;">
+                        <p style="margin: 0; color: #991b1b; font-size: 0.95em;">
+                            <strong>🚨 중요:</strong> 3호기 관련 주요 이슈 문서<br>
+                            <strong>📅 기간:</strong> 2024.10.13 ~ 10.21<br>
+                            <strong>🔧 내용:</strong> Arc 에러, 터치센싱, CrossStop 신호 분석
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left-color: #0ea5e9;">
+                    <h3>📧 ABB 기술 지원</h3>
+                    <a href="email_to_abb_technical_support.html" class="project-link" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);" target="_blank">
+                        📧 ABB 기술 지원 이메일
+                    </a>
+                    <a href="robot_sync_issue_report.html" class="project-link" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);" target="_blank">
+                        🚨 로봇 동기화 이슈 보고서 (긴급)
+                    </a>
+                    <a href="setting_planb_comparison.html" class="project-link" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);" target="_blank">
+                        🧭 Setting Plan B 전·후 비교 (3호기)
+                    </a>
+                    <div style="margin-top: 15px; padding: 15px; background: #e0f2fe; border-radius: 8px; border-left: 3px solid #0ea5e9;">
+                        <p style="margin: 0; color: #075985; font-size: 0.95em;">
+                            <strong>📌 용도:</strong> ABB 기술팀 지원 요청 문서<br>
+                            <strong>🔧 내용:</strong> 동기화 이슈, Plan B 설정 비교<br>
+                            <strong>📊 상태:</strong> 진행 중
+                        </p>
+                    </div>
                 </div>
 
                 <div class="card">
