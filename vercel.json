@@ -37,6 +37,7 @@
     { "source": "/robot-review-ko", "destination": "/robot_system_review_ko.html" },
     { "source": "/robot-review-en", "destination": "/robot_system_review_en.html" },
     { "source": "/robot-review", "destination": "/robot_system_review.html" },
-    { "source": "/abb-spec", "destination": "/abb_robot_programming_specification.html" }
+    { "source": "/abb-spec", "destination": "/abb_robot_programming_specification.html" },
+    { "source": "/abb-spec-detailed", "destination": "/abb_spec_detailed.html" }
   ]
 }

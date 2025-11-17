@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABB 로봇 프로그래밍 발주 사양서 (상세) - 삼성중공업 34bay B라인</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+            line-height: 1.8;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 4px solid #007bff;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #007bff;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 10px;
+        }
+        .header .meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .header .meta-item {
+            background-color: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .meta-item strong {
+            color: #007bff;
+            margin-right: 5px;
+        }
+
+        /* 탭 스타일 */
+        .tab-container {
+            margin-bottom: 30px;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 3px solid #007bff;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .tab-button {
+            background-color: #f8f9fa;
+            border: none;
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #666;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            transition: all 0.3s;
+        }
+        .tab-button:hover {
+            background-color: #e9ecef;
+        }
+        .tab-button.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 30px 0;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            color: #007bff;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 6px solid #007bff;
+            padding-left: 15px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #28a745;
+            padding-left: 12px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #495057;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.95em;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #e9ecef; }
+
+        .category-row {
+            background-color: #e6f2ff !important;
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+        .index-col {
+            text-align: center;
+            width: 50px;
+            font-weight: bold;
+        }
+
+        .class-1 { border-left: 4px solid #ffc107; }
+        .class-a { border-left: 4px solid #dc3545; }
+        .class-n { border-left: 4px solid #28a745; }
+        .class-del { border-left: 4px solid #6c757d; background-color: #f8d7da !important; }
+
+        .highlight-box {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .highlight-box strong {
+            color: #856404;
+        }
+
+        .info-box {
+            background-color: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .info-box strong {
+            color: #0c5460;
+        }
+
+        .warning-box {
+            background-color: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .warning-box strong {
+            color: #721c24;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        li {
+            margin: 8px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+        .badge-primary { background-color: #007bff; color: white; }
+        .badge-success { background-color: #28a745; color: white; }
+        .badge-warning { background-color: #ffc107; color: #333; }
+        .badge-danger { background-color: #dc3545; color: white; }
+        .badge-info { background-color: #17a2b8; color: white; }
+        .badge-secondary { background-color: #6c757d; color: white; }
+
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .legend {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .legend h4 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .legend-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 4px solid #ccc;
+            background-color: white;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 3px solid #007bff;
+            text-align: center;
+            color: #666;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+            .tab-buttons { display: none; }
+            .tab-content { display: block !important; page-break-before: always; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 헤더 -->
+    <div class="header">
+        <h1>ABB 로봇 프로그래밍 발주 사양서 (상세)</h1>
+        <div class="subtitle">삼성중공업 34bay 자동용접 시스템 B라인 - Plan B 기준</div>
+        <div class="meta">
+            <div class="meta-item"><strong>프로젝트:</strong> S25016</div>
+            <div class="meta-item"><strong>시스템:</strong> Two Torch 용접 로봇</div>
+            <div class="meta-item"><strong>발주처:</strong> 에스피시스템스</div>
+            <div class="meta-item"><strong>작성일:</strong> 2025-11-17</div>
+            <div class="meta-item"><strong>버전:</strong> 2.0 (상세)</div>
+        </div>
+    </div>
+
+    <!-- 탭 메뉴 -->
+    <div class="tab-container">
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="showTab('overview')">📋 프로젝트 개요</button>
+            <button class="tab-button" onclick="showTab('scope')">📦 공급 범위 및 책임</button>
+            <button class="tab-button" onclick="showTab('functions')">⚙️ 61개 기능 상세</button>
+            <button class="tab-button" onclick="showTab('macros')">🔧 매크로 구현 계획</button>
+            <button class="tab-button" onclick="showTab('reference')">📚 기존 사양서 링크</button>
+        </div>
+
+        <!-- 탭1: 프로젝트 개요 -->
+        <div id="overview" class="tab-content active">
+            <h2>1. 프로젝트 개요 및 목적</h2>
+
+            <div class="highlight-box">
+                <strong>📌 유대영 차장님 핵심 요구사항 반영:</strong>
+                <p>본 문서는 2025년 11월 유대영 차장님께서 요청하신 <strong>6가지 명확화 항목</strong>을 기반으로 작성되었습니다.</p>
+                <ol>
+                    <li>ABB 공급 범위 명확화</li>
+                    <li>시운전 범위 수치화 (매크로 조합 기준)</li>
+                    <li>구현 기능 리스트 (61개 항목)</li>
+                    <li>용접 품질 개선 불가 시 대응 방안</li>
+                    <li>계약 후 우선순위 모델 진행 순서 (매크로 244 기본)</li>
+                    <li>예상 일정 (계약 후 완료 시점)</li>
+                </ol>
+            </div>
+
+            <h3>1.1 프로젝트 배경</h3>
+            <ul>
+                <li><strong>현재 시스템 (Plan A):</strong> 3-Task 준동기화 방식의 안정성 및 성능 이슈</li>
+                <li><strong>목표 시스템 (Plan B):</strong> 외부축 통합 기반 2-Task 하드웨어 동기화</li>
+                <li><strong>프로젝트 성격:</strong> 턴키 방식이 아닌 <strong>시운전 범위 프로젝트</strong></li>
+            </ul>
+
+            <h3>1.2 시스템 구성</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>구성요소</th>
+                        <th>사양</th>
+                        <th>비고</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>갠트리</strong></td>
+                        <td>X, Y, Z, R 4축</td>
+                        <td>ROB_1의 외부축으로 통합</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ROB_1</strong></td>
+                        <td>6축 (Torch 1)</td>
+                        <td>갠트리 위에 장착 (총 10축)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ROB_2</strong></td>
+                        <td>6축 (Torch 2)</td>
+                        <td>갠트리 R축 프레임에 설치 (제어상 독립)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>제어기</strong></td>
+                        <td>ABB IRC5</td>
+                        <td>MultiMove + SERVO TOOL CONTROL 옵션</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>1.3 핵심 기술 요구사항</h3>
+            <div class="warning-box">
+                <strong>⚠️ SERVO TOOL CONTROL 필수:</strong>
+                <p>ROB_2가 갠트리 R축 프레임에 물리적으로 설치되어 있으나, ROB_1이 갠트리(X, Y, Z, R)로 이동할 때 ROB_2는 ROB_1의 위치를 추적할 수 없습니다.</p>
+                <p><strong>해결책:</strong> ROB_2에 가상축(Virtual Axis) 옵션을 적용하여 ROB_1의 움직임을 실시간 트래킹</p>
+            </div>
+
+            <h3>1.4 적용 범위</h3>
+            <ul>
+                <li><strong>대상 시스템:</strong> 34bay B라인 Two Torch 용접 로봇</li>
+                <li><strong>작업 방식:</strong> 시운전 범위 (프로그래밍 + 테스트 + 교육)</li>
+                <li><strong>참조 시스템:</strong> GR자동화 코드 (선택적 참고)</li>
+            </ul>
+        </div>
+
+        <!-- 탭2: 공급 범위 및 책임 -->
+        <div id="scope" class="tab-content">
+            <h2>2. 공급 범위 및 책임 한계</h2>
+
+            <h3>2.1 ABB 공급 범위</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">항목</th>
+                        <th>상세 내용</th>
+                        <th style="width: 20%;">책임</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>RAPID 프로그래밍</strong></td>
+                        <td>61개 기능 구현 (본 문서 탭3 참조)<br>Plan B 구조 기반 2-Task 프로그램 작성</td>
+                        <td>ABB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>외부축 설정</strong></td>
+                        <td>갠트리 4축(X,Y,Z,R)을 ROB_1 외부축으로 통합<br>MOC.cfg, SIO.cfg, EIO.cfg 설정</td>
+                        <td>ABB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MultiMove 설정</strong></td>
+                        <td>ROB_1 + ROB_2 협조 동작 설정<br>SyncMove, SERVO TOOL CONTROL 구성</td>
+                        <td>ABB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ArcLink XT 통신</strong></td>
+                        <td>Lincoln Electric 용접기 통신 설정<br>용접 파라미터 매핑</td>
+                        <td>ABB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>시뮬레이션</strong></td>
+                        <td>RobotStudio 시뮬레이션 파일 제공<br>간섭 체크 및 검증</td>
+                        <td>ABB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>시운전 지원</strong></td>
+                        <td>현장 상주 지원 (기간: 협의)<br>시운전 디버깅 및 미세 조정</td>
+                        <td>ABB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>교육</strong></td>
+                        <td>운영자/유지보수/프로그래밍 교육</td>
+                        <td>ABB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>문서</strong></td>
+                        <td>소스 코드 (주석 포함), 매뉴얼, 트러블슈팅 가이드</td>
+                        <td>ABB</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2.2 에스피시스템스 제공 범위</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">항목</th>
+                        <th>상세 내용</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>GR자동화 코드 제공</strong></td>
+                        <td>백업 파일: <code>/robot)badkup/1200-526404_BACKUP_2025-11-05_2120_B2</code><br>
+                        참고용 제공 (분류 N 항목 차용 가능)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>매크로 정의</strong></td>
+                        <td>Two Torch Macro ABC 코드 체계<br>수평용접 25개, 수직용접 4개 매크로</td>
+                    </tr>
+                    <tr>
+                        <td><strong>시스템 레이아웃</strong></td>
+                        <td>34bay B라인 도면<br>좌표계 정의<br>안전 영역 정의</td>
+                    </tr>
+                    <tr>
+                        <td><strong>UI 통신 사양</strong></td>
+                        <td>PLC 인터페이스 정의<br>I/O 신호 매핑</td>
+                    </tr>
+                    <tr>
+                        <td><strong>프로젝트 관리</strong></td>
+                        <td>삼성중공업 협의 창구<br>일정 조율 및 검수 진행</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2.3 삼성중공업 제공 범위</h3>
+            <ul>
+                <li><strong>용접 데이터:</strong> welddata 40개 세트, weavedata 40개 세트 (Plan A에서 검증된 파라미터)</li>
+                <li>현장 접근 권한 및 안전 교육</li>
+                <li>전기/공압 인프라</li>
+                <li>실부재 테스트용 부재 제공</li>
+                <li>최종 검수 및 인수</li>
+            </ul>
+
+            <h3>2.4 책임 한계 및 면책 사항</h3>
+
+            <div class="warning-box">
+                <strong>⚠️ 매크로 200 동기 제어 이슈:</strong>
+                <p><strong>매크로 200 (Open - Two Torch - Open)</strong>의 경우, <strong>"동시 출발 동시 도착"이 아닌 조건</strong>에서 ROB_1, ROB_2 완전 동기 제어가 불가능할 수 있습니다.</p>
+                <ul>
+                    <li><strong>선행 검토 결과:</strong> ABB 유대영 차장님의 기술 검토 시 동기 제어 문제점 확인</li>
+                    <li><strong>공유 완료:</strong> 삼성중공업과 해당 이슈 공유 완료</li>
+                    <li><strong>대응 방안:</strong> 프로젝트 진행 과정에서 협의를 통해 다음 대안 중 선택
+                        <ol>
+                            <li>순차 용접 방식으로 변경 (Two Torch 동시 사용 포기)</li>
+                            <li>해당 매크로 제외 (우선순위 낮은 경우)</li>
+                            <li>추가 개발 시도 (비용 및 일정 재협의)</li>
+                        </ol>
+                    </li>
+                    <li><strong>협의 프로세스:</strong> 매크로 200 개발 착수 전 기술 검토 → 문제 확인 시 즉시 보고 → 3일 내 대안 제시 → 고객 승인 후 진행</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 기타 매크로:</strong>
+                <p>매크로 211, 222, 255 등 기타 매크로에서도 유사한 동기 제어 이슈가 발생할 경우, 동일한 협의 프로세스를 적용합니다.</p>
+            </div>
+
+            <h3>2.5 검수 기준</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>항목</th>
+                        <th>합격 기준</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>기능 구현</strong></td>
+                        <td>61개 기능 중 <strong>필수 기능 100% 구현</strong><br>
+                        (분류 1, A: 53개 / 분류 N: 선택적 / 분류 -: 제외)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>매크로 구현</strong></td>
+                        <td><strong>매크로 244 (우선순위)</strong> 100% 동작<br>
+                        매크로 200, 211, 222, 255: 협의 후 결정</td>
+                    </tr>
+                    <tr>
+                        <td><strong>동기화 정밀도</strong></td>
+                        <td>ROB_1, ROB_2 TCP 상대 위치 오차 <strong>±2mm 이내</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>안전 기능</strong></td>
+                        <td>비상 정지, 충돌 감지, 유동 리미트 100% 정상 동작</td>
+                    </tr>
+                    <tr>
+                        <td><strong>실부재 테스트</strong></td>
+                        <td>샘플 부재 용접 성공 (외관 검사 통과)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 탭3: 61개 기능 상세 -->
+        <div id="functions" class="tab-content">
+            <h2>3. 61개 기능 상세 리스트</h2>
+
+            <div class="legend">
+                <h4>📌 분류 기준 설명</h4>
+                <div class="legend-item class-1">
+                    <strong>분류 1 (참고 재작성):</strong> GR자동화 코드를 <u>참고는 가능</u>하나 그대로 사용할 수 없으며, Plan B 구조에 맞추어 <strong>참고하여 재작성이 필요한 기능</strong>. (총 25개)
+                </div>
+                <div class="legend-item class-a">
+                    <strong>분류 A (신규 개발):</strong> GR자동화 코드를 <u>참고할 수 없고</u>, Plan B에서 <strong>완전 신규로 작성이 필요한 기능</strong>. (총 28개)
+                </div>
+                <div class="legend-item class-n">
+                    <strong>분류 N (차용 가능):</strong> GR자동화에서 작성된 코드를 <u>차용 가능</u>한 기능으로, 필요 시 인터페이스 수준의 최소 수정만으로 사용 가능한 항목. (총 8개)
+                </div>
+                <div class="legend-item class-del">
+                    <strong>분류 - (삭제):</strong> Plan B 기준에서 <strong>삭제 대상</strong> 기능 (구현/적용 범위에서 제외 예정).
+                </div>
+            </div>
+
+            <h3>3.1 UI 명령 (32개)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="index-col">No.</th>
+                        <th style="width: 35%;">기능</th>
+                        <th style="width: 25%;">백업 파일 위치</th>
+                        <th style="width: 30%;">Plan B 고려사항</th>
+                        <th style="width: 10%;">분류</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="class-1">
+                        <td class="index-col">1</td>
+                        <td>(갠트리별) 글로벌 홈 이동</td>
+                        <td>HEAD/Head_Command.mod<br><code>prGlobalHome()</code></td>
+                        <td>갠트리를 외부축으로 통합, TASK7 삭제 필요</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">2</td>
+                        <td>계측용 Z홈 이동</td>
+                        <td>HEAD/Head_Command.mod<br><code>prMeasureHome()</code></td>
+                        <td>외부축 좌표 통합 (robtarget.extax)</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">3</td>
+                        <td>로봇 1 티칭 자세</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prTeachingPose()</code></td>
+                        <td>외부축 포함 티칭 자세 정의</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">4</td>
+                        <td>로봇 2 티칭 자세</td>
+                        <td>T_ROB2/MainModule.mod<br><code>prTeachingPose()</code></td>
+                        <td>SERVO TOOL CONTROL 고려 필요</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">5</td>
+                        <td>절대위치로 갠트리 이동</td>
+                        <td>HEAD/Head_Command.mod<br><code>MoveJgJ()</code></td>
+                        <td>외부축 MoveJ로 단순화, TASK7 제거</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">6</td>
+                        <td>상대 위치로 갠트리 이동</td>
+                        <td>HEAD/Head_Command.mod<br><code>MovePgJ()</code></td>
+                        <td>좌표 변환 함수 제거, 직접 계산</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">7</td>
+                        <td>일반 Z홈 자세 이동</td>
+                        <td>HEAD/Head_Command.mod<br><code>prZHome()</code></td>
+                        <td>외부축 통합 좌표로 재정의</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">8</td>
+                        <td>용접 수행</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWelding()</code></td>
+                        <td>SyncMove 기반 재작성</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">9</td>
+                        <td>용접 모션 수행</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWeldingMotion()</code></td>
+                        <td>아크 없이 모션만, 2-Task 동기화</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">10</td>
+                        <td>보정 기능을 사용한 용접 수행</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWeldingWithTouch()</code></td>
+                        <td>터치 보정 + 용접, 외부축 고려</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">11</td>
+                        <td>보정 기능을 사용한 용접 모션 수행</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWeldingMotionWithTouch()</code></td>
+                        <td>터치 보정 + 모션</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">12</td>
+                        <td>용접 수행(작업자 입력 정보 사용)</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWeldingUI()</code></td>
+                        <td>UI 통신 (stReact{2}로 변경)</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">13</td>
+                        <td>용접 모션 수행(작업자 입력 정보 사용)</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWeldingMotionUI()</code></td>
+                        <td>UI 통신</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">14</td>
+                        <td>보정 기능을 사용한 용접 수행(작업자 입력 정보 사용)</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWeldingWithTouchUI()</code></td>
+                        <td>UI 통신 + 터치 보정</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">15</td>
+                        <td>보정 기능을 사용한 용접 모션 수행(작업자 입력 정보 사용)</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWeldingMotionWithTouchUI()</code></td>
+                        <td>UI 통신 + 터치 보정</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">16</td>
+                        <td>카메라 커버 전부 열기</td>
+                        <td>HEAD/Head_Command.mod<br><code>prCameraOpenAll()</code></td>
+                        <td>I/O 제어만, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">17</td>
+                        <td>카메라 커버 전부 닫기</td>
+                        <td>HEAD/Head_Command.mod<br><code>prCameraCloseAll()</code></td>
+                        <td>I/O 제어만, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-del">
+                        <td class="index-col">18</td>
+                        <td>카메라 블로워 동작</td>
+                        <td>(주석 처리됨)</td>
+                        <td>Plan B에서 제외</td>
+                        <td><span class="badge badge-secondary">-</span></td>
+                    </tr>
+                    <tr class="class-del">
+                        <td class="index-col">19</td>
+                        <td>카메라 블로워 차단</td>
+                        <td>(주석 처리됨)</td>
+                        <td>Plan B에서 제외</td>
+                        <td><span class="badge badge-secondary">-</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">20</td>
+                        <td>1번 카메라 커버 열기</td>
+                        <td>HEAD/Head_Command.mod<br><code>prCameraOpen1()</code></td>
+                        <td>I/O 제어, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">21</td>
+                        <td>1번 카메라 커버 닫기</td>
+                        <td>HEAD/Head_Command.mod<br><code>prCameraClose1()</code></td>
+                        <td>I/O 제어, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">22</td>
+                        <td>2번 카메라 커버 열기</td>
+                        <td>HEAD/Head_Command.mod<br><code>prCameraOpen2()</code></td>
+                        <td>I/O 제어, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">23</td>
+                        <td>2번 카메라 커버 닫기</td>
+                        <td>HEAD/Head_Command.mod<br><code>prCameraClose2()</code></td>
+                        <td>I/O 제어, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">24</td>
+                        <td>모든 로봇 와이어 커팅</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWireCutAll()</code></td>
+                        <td>2-Task 동기화 필요</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-a">
+                        <td class="index-col">25</td>
+                        <td>와이어 클리닝(1/2 호기 구분)</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWireCleaning()</code></td>
+                        <td>신규 장비, 신규 개발 필요</td>
+                        <td><span class="badge badge-danger">A</span></td>
+                    </tr>
+                    <tr class="class-a">
+                        <td class="index-col">26</td>
+                        <td>토치 TCP 체크(BullsEye)</td>
+                        <td>(미구현)</td>
+                        <td>ABB BullsEye 시스템 신규 통합</td>
+                        <td><span class="badge badge-danger">A</span></td>
+                    </tr>
+                    <tr class="class-a">
+                        <td class="index-col">27</td>
+                        <td>토치 TCP 업데이트(BullsEye)</td>
+                        <td>(미구현)</td>
+                        <td>ABB BullsEye 시스템 신규 통합</td>
+                        <td><span class="badge badge-danger">A</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">28</td>
+                        <td>와이어 교체 모드 진입</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWireChangeMode()</code></td>
+                        <td>외부축 고려 재작성</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">29</td>
+                        <td>1번 로봇 와이어 커팅</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prWireCut1()</code></td>
+                        <td>외부축 고려</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">30</td>
+                        <td>2번 로봇 와이어 커팅</td>
+                        <td>T_ROB2/MainModule.mod<br><code>prWireCut2()</code></td>
+                        <td>ROB_2만 해당, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">31</td>
+                        <td>홀 카메라 기반 갠트리 X축 원점 계측</td>
+                        <td>HEAD/Head_Measure.mod<br><code>prMeasureHall()</code></td>
+                        <td>외부축 원점 설정 로직 재작성</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-a">
+                        <td class="index-col">32</td>
+                        <td>LDS 기반 갠트리 X/Y/Z축 원점 계측</td>
+                        <td>(미구현)</td>
+                        <td>LDS 센서 신규 통합</td>
+                        <td><span class="badge badge-danger">A</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.2 메인 동작 정의 함수 (11개)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="index-col">No.</th>
+                        <th style="width: 35%;">기능</th>
+                        <th style="width: 25%;">백업 파일 위치</th>
+                        <th style="width: 30%;">Plan B 고려사항</th>
+                        <th style="width: 10%;">분류</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="class-1">
+                        <td class="index-col">33</td>
+                        <td>글로벌 좌표 기반 각도 계산</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnCalcAngle()</code></td>
+                        <td>외부축 통합 좌표계 기준으로 재계산</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">34</td>
+                        <td>각 로봇 현 TCP를 글로벌 기준으로 계산</td>
+                        <td>HEAD/Head_Function.mod<br><code>CalcCurrentTcp()</code></td>
+                        <td><strong>삭제 대상</strong> - 제어기 자동 계산</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">35</td>
+                        <td>법선 벡터 계산</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnNormalVector()</code></td>
+                        <td>수학 함수, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">36</td>
+                        <td>선분 시작점으로부터 입력 거리만큼 끝점으로 이동한 위치 계산</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnPointOnLine()</code></td>
+                        <td>수학 함수, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">37</td>
+                        <td>조인트값 기준 갠트리 현 글로벌 좌표계 상 위치 계산</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnJointToCoord()</code></td>
+                        <td><strong>삭제 대상</strong> - 제어기 자동 계산</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">38</td>
+                        <td>글로벌 좌표계 위치 기준 갠트리 목표 조인트 계산</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnCoordToJoint()</code></td>
+                        <td><strong>삭제 대상</strong> - 제어기 자동 계산</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-a">
+                        <td class="index-col">39</td>
+                        <td>브레이크 포인트(용접 중 작업 각 변화) 위치 계산</td>
+                        <td>HEAD/Head_MoveControl.mod<br><code>fnBreakPoint()</code></td>
+                        <td>외부축 포함 재계산 로직 필요</td>
+                        <td><span class="badge badge-danger">A</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">40</td>
+                        <td>특정 범위 이내의 값의 경우에만 변수 업데이트</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnLimitUpdate()</code></td>
+                        <td>유틸리티 함수, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">41</td>
+                        <td>갠트리 및 로봇 조인트 타겟 그룹 생성</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnCreateJointTarget()</code></td>
+                        <td>외부축 통합, jointtarget.extax 사용</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">42</td>
+                        <td>갠트리 및 로봇 로봇타겟/조인트 타겟 그룹 생성</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnCreateRobTarget()</code></td>
+                        <td>robtarget.extax 통합</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-n">
+                        <td class="index-col">43</td>
+                        <td>각도 범위를 -pi~pi로 변경</td>
+                        <td>HEAD/Head_Function.mod<br><code>fnNormalizeAngle()</code></td>
+                        <td>수학 함수, 차용 가능</td>
+                        <td><span class="badge badge-success">N</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.3 로봇별 동작 정의 함수 (15개)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="index-col">No.</th>
+                        <th style="width: 35%;">기능</th>
+                        <th style="width: 25%;">백업 파일 위치</th>
+                        <th style="width: 30%;">Plan B 고려사항</th>
+                        <th style="width: 10%;">분류</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="class-a">
+                        <td class="index-col">44</td>
+                        <td>매크로 200 211 222 255 용접</td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>rMacro200(), rMacro211() 등</code></td>
+                        <td>SyncMove 기반 신규 작성 (우선순위 낮음)</td>
+                        <td><span class="badge badge-danger">A</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">45</td>
+                        <td>매크로 244 용접</td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>rMacro244()</code></td>
+                        <td><strong>최우선 개발</strong>, SyncMove 재작성</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-a">
+                        <td class="index-col">46</td>
+                        <td>매크로 200 211 222 255 용접 모션</td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>rMacro200Motion() 등</code></td>
+                        <td>SyncMove 기반 신규 작성</td>
+                        <td><span class="badge badge-danger">A</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">47</td>
+                        <td>매크로 244 용접 모션</td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>rMacro244Motion()</code></td>
+                        <td><strong>최우선 개발</strong>, 모션만</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">48</td>
+                        <td>터치 안전 범위 계산</td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>fnTouchSafetyZone()</code></td>
+                        <td>외부축 포함 안전 영역 재정의</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">49</td>
+                        <td>용접 좌표 계산</td>
+                        <td>T_ROB1/Head_MoveControl.mod<br><code>rDefineWeldPosR1()</code></td>
+                        <td>robtarget.extax 통합</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">50</td>
+                        <td>터치 보정 기능</td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rTouchCorrection()</code></td>
+                        <td>외부축 좌표 보정 로직 재작성</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">51</td>
+                        <td>터치 보정을 위한 이동</td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rMoveToTouch()</code></td>
+                        <td>외부축 통합 이동</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">52</td>
+                        <td>용접선 X 방향 터치 보정</td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rTouchX()</code></td>
+                        <td>외부축 좌표 보정</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">53</td>
+                        <td>용접선 Y 방향 터치 보정</td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rTouchY()</code></td>
+                        <td>외부축 좌표 보정</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">54</td>
+                        <td>용접선 Z 방향 터치 보정</td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>rTouchZ()</code></td>
+                        <td>외부축 좌표 보정</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">55</td>
+                        <td>터치 인식 기능</td>
+                        <td>T_ROB1/Head_TouchSensing.mod<br><code>fnTouchDetect()</code></td>
+                        <td>외부축 포함 재작성</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">56</td>
+                        <td>진입 에러 처리</td>
+                        <td>T_ROB1/ErrorHandler.mod<br><code>prApproachError()</code></td>
+                        <td>외부축 포함 에러 복구</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">57</td>
+                        <td>용접 에러 처리</td>
+                        <td>T_ROB1/ErrorHandler.mod<br><code>prWeldingError()</code></td>
+                        <td>ArcLink XT 에러 처리</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">58</td>
+                        <td>터치 실패 에러 처리</td>
+                        <td>T_ROB1/ErrorHandler.mod<br><code>prTouchError()</code></td>
+                        <td>외부축 포함 에러 복구</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.4 메인 테스크 함수 (3개)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="index-col">No.</th>
+                        <th style="width: 35%;">기능</th>
+                        <th style="width: 25%;">백업 파일 위치</th>
+                        <th style="width: 30%;">Plan B 고려사항</th>
+                        <th style="width: 10%;">분류</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="class-1">
+                        <td class="index-col">59</td>
+                        <td>명령 입력 무결성 확인</td>
+                        <td>T_ROB1/MainModule.mod<br><code>fnValidateCommand()</code></td>
+                        <td>UI 통신 (stReact{2}로 변경)</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">60</td>
+                        <td>로봇 초기화</td>
+                        <td>T_ROB1/MainModule.mod<br><code>prInitialize()</code></td>
+                        <td>외부축 설정 포함</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                    <tr class="class-1">
+                        <td class="index-col">61</td>
+                        <td>에러 처리용 Z홈</td>
+                        <td>T_ROB1/ErrorHandler.mod<br><code>prErrorZHome()</code></td>
+                        <td>외부축 포함 안전 복귀</td>
+                        <td><span class="badge badge-warning">1</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <h4>📊 개발 범위 통계</h4>
+                <ul>
+                    <li><strong>분류 1 (참고 재작성):</strong> 25개 (41%) - 외부축 통합, 좌표 변환 제거 필요</li>
+                    <li><strong>분류 A (신규 개발):</strong> 28개 (46%) - BullsEye, LDS, 매크로 200/211/222/255 등</li>
+                    <li><strong>분류 N (차용 가능):</strong> 8개 (13%) - 카메라 제어, 수학 함수 등</li>
+                    <li><strong>분류 - (삭제):</strong> 카메라 블로워 2개 (제외)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 탭4: 매크로 구현 계획 -->
+        <div id="macros" class="tab-content">
+            <h2>4. 매크로 구현 계획 및 우선순위</h2>
+
+            <h3>4.1 매크로 리스트</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="width: 15%;">용접 방식</th>
+                        <th colspan="5">매크로 코드</th>
+                    </tr>
+                    <tr>
+                        <th>1열</th>
+                        <th>2열</th>
+                        <th>3열</th>
+                        <th>4열</th>
+                        <th>5열</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="5"><strong>수평용접</strong><br>(총 25개)</td>
+                        <td>200</td>
+                        <td>210</td>
+                        <td>220</td>
+                        <td>240</td>
+                        <td>250</td>
+                    </tr>
+                    <tr>
+                        <td>201</td>
+                        <td>211</td>
+                        <td>221</td>
+                        <td>241</td>
+                        <td>251</td>
+                    </tr>
+                    <tr>
+                        <td>202</td>
+                        <td>212</td>
+                        <td>222</td>
+                        <td>242</td>
+                        <td>252</td>
+                    </tr>
+                    <tr>
+                        <td>204</td>
+                        <td>214</td>
+                        <td>224</td>
+                        <td><strong style="color: #dc3545; font-size: 1.1em;">244</strong></td>
+                        <td>254</td>
+                    </tr>
+                    <tr>
+                        <td>205</td>
+                        <td>215</td>
+                        <td>225</td>
+                        <td>245</td>
+                        <td>255</td>
+                    </tr>
+                    <tr>
+                        <td><strong>수직용접</strong><br>(총 4개)</td>
+                        <td colspan="5">622, 624, 642, 644</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.2 계약 후 우선순위 모델 진행 순서</h3>
+
+            <div class="highlight-box">
+                <strong>🎯 우선순위 전략: 매크로 244를 기본 바탕으로 진행</strong>
+                <p>유대영 차장님 요청사항을 반영하여, <strong>매크로 244</strong>를 최우선으로 개발하고 검증한 후 확장하는 전략을 수립합니다.</p>
+            </div>
+
+            <h4>Phase 1: 매크로 244 집중 개발 (Week 1-4)</h4>
+            <div class="info-box">
+                <strong>목표:</strong> 매크로 244 (Divided - Two Torch - Divided) 100% 완성
+                <ul>
+                    <li><strong>매크로 정의:</strong>
+                        <ul>
+                            <li>A=2: Two Torch 직선 부재</li>
+                            <li>B=4: Divided Type (시작점 분할 처리)</li>
+                            <li>C=4: Divided Type (끝점 분할 처리)</li>
+                        </ul>
+                    </li>
+                    <li><strong>핵심 기술:</strong>
+                        <ul>
+                            <li>외부축 통합 (갠트리 X,Y,Z,R → robtarget.extax)</li>
+                            <li>SyncMove 기반 ROB_1 + ROB_2 동기화</li>
+                            <li>SERVO TOOL CONTROL 적용 (ROB_2 가상축)</li>
+                            <li>ArcLink XT 용접 제어</li>
+                        </ul>
+                    </li>
+                    <li><strong>개발 기능:</strong> 기능 No. 45, 47, 49, 59, 60 우선 구현</li>
+                    <li><strong>검수 기준:</strong> 시뮬레이션 + 실부재 테스트 성공</li>
+                </ul>
+            </div>
+
+            <h4>Phase 2: 매크로 200, 211, 222, 255 확장 (Week 5-7)</h4>
+            <div class="info-box">
+                <strong>목표:</strong> 4개 주요 매크로 추가 개발
+                <ul>
+                    <li><strong>매크로 200:</strong> Open - Two Torch - Open (직선)</li>
+                    <li><strong>매크로 211:</strong> Snip - Two Torch - Snip (직선)</li>
+                    <li><strong>매크로 222:</strong> Closed - Two Torch - Closed (직선)</li>
+                    <li><strong>매크로 255:</strong> Closed-Open - Two Torch - Closed-Open (직선)</li>
+                    <li><strong>검토 사항:</strong> 유대영 차장님이 지적한 "동시 출발 동시 도착" 이슈 해결</li>
+                    <li><strong>대응 방안:</strong> 문제 발생 시 협의 후 대안 선택 (순차 용접 또는 제외)</li>
+                </ul>
+            </div>
+
+            <h4>Phase 3: 나머지 수평용접 매크로 (Week 8-10)</h4>
+            <div class="info-box">
+                <strong>목표:</strong> 수평용접 나머지 20개 매크로 개발
+                <ul>
+                    <li>201, 202, 204, 205 그룹</li>
+                    <li>210, 212, 214, 215 그룹</li>
+                    <li>220, 221, 224, 225 그룹</li>
+                    <li>240, 241, 242, 245 그룹</li>
+                    <li>250, 251, 252, 254 그룹</li>
+                    <li><strong>우선순위:</strong> 삼성중공업 사용 빈도 기준</li>
+                </ul>
+            </div>
+
+            <h4>Phase 4: 수직용접 매크로 및 최종 통합 (Week 11-12)</h4>
+            <div class="info-box">
+                <strong>목표:</strong> 수직용접 4개 매크로 + 전체 통합 테스트
+                <ul>
+                    <li>622, 624, 642, 644 매크로 개발</li>
+                    <li>전체 29개 매크로 통합 테스트</li>
+                    <li>실부재 종합 검증</li>
+                    <li>최종 문서화 및 인수</li>
+                </ul>
+            </div>
+
+            <h3>4.3 매크로별 예상 난이도 및 리스크</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>매크로</th>
+                        <th>난이도</th>
+                        <th>리스크</th>
+                        <th>대응 방안</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>244</strong></td>
+                        <td><span class="badge badge-warning">중</span></td>
+                        <td>외부축 통합 기본 검증</td>
+                        <td>최우선 개발, 충분한 테스트</td>
+                    </tr>
+                    <tr>
+                        <td><strong>200</strong></td>
+                        <td><span class="badge badge-danger">고</span></td>
+                        <td>동시 출발 동시 도착 이슈 (유대영 차장 지적)</td>
+                        <td>사전 시뮬레이션, 협의 후 대안</td>
+                    </tr>
+                    <tr>
+                        <td><strong>211</strong></td>
+                        <td><span class="badge badge-warning">중</span></td>
+                        <td>Snip 처리 복잡도</td>
+                        <td>244 기반 확장</td>
+                    </tr>
+                    <tr>
+                        <td><strong>222</strong></td>
+                        <td><span class="badge badge-warning">중</span></td>
+                        <td>Closed 처리 정밀도</td>
+                        <td>244 기반 확장</td>
+                    </tr>
+                    <tr>
+                        <td><strong>255</strong></td>
+                        <td><span class="badge badge-danger">고</span></td>
+                        <td>복합 처리 (Closed-Open)</td>
+                        <td>단계별 검증</td>
+                    </tr>
+                    <tr>
+                        <td><strong>622, 624, 642, 644</strong></td>
+                        <td><span class="badge badge-danger">고</span></td>
+                        <td>수직용접 특수 제어</td>
+                        <td>수평용접 완료 후 착수</td>
+                    </tr>
+                    <tr>
+                        <td><strong>나머지 20개</strong></td>
+                        <td><span class="badge badge-success">저~중</span></td>
+                        <td>검증된 패턴 적용</td>
+                        <td>244 패턴 재사용</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.4 동기 제어 불가 시 대응 프로세스</h3>
+
+            <div class="warning-box">
+                <strong>📋 동기 제어 이슈 대응 절차:</strong>
+                <p><strong>매크로 200</strong> 등에서 ROB_1, ROB_2 완전 동기 제어가 불가능할 경우 다음 절차를 따릅니다.</p>
+                <ol>
+                    <li><strong>문제 발견 (Day 0):</strong> 특정 매크로에서 ROB_1, ROB_2 동기 제어 불가 확인</li>
+                    <li><strong>원인 분석 (Day 1-2):</strong>
+                        <ul>
+                            <li>하드웨어 문제 (외부축, SERVO TOOL CONTROL)</li>
+                            <li>소프트웨어 문제 (SyncMove 타이밍)</li>
+                            <li>매크로 특성 (동시 출발 동시 도착 불가 조건)</li>
+                        </ul>
+                    </li>
+                    <li><strong>대안 제시 (Day 3):</strong>
+                        <ul>
+                            <li>대안 A: 순차 용접으로 변경 (Two Torch 동시 사용 포기, 일정 영향 없음)</li>
+                            <li>대안 B: 해당 매크로 제외 (우선순위 낮은 매크로만)</li>
+                            <li>대안 C: 추가 개발 시도 (비용 및 일정 재협의)</li>
+                        </ul>
+                    </li>
+                    <li><strong>협의 및 승인 (Day 4-5):</strong> 삼성중공업 + 에스피시스템스 + ABB 3자 협의</li>
+                    <li><strong>실행 (Day 6~):</strong> 승인된 대안 적용 및 재검증</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 사전 협의 원칙:</strong>
+                <p>매크로 200, 211, 222, 255 등 동기 제어 이슈가 예상되는 매크로는 개발 착수 전 기술 검토를 실시하고, 문제 발생 가능성이 높을 경우 사전에 협의하여 진행 방향을 결정합니다.</p>
+            </div>
+        </div>
+
+        <!-- 탭5: 기존 사양서 링크 -->
+        <div id="reference" class="tab-content">
+            <h2>5. 기존 사양서 및 참고 자료</h2>
+
+            <h3>5.1 기본 사양서</h3>
+            <div class="info-box">
+                <strong>📄 ABB 로봇 프로그래밍 발주 사양서 (기본)</strong>
+                <p>상세 기술 사양, 시스템 구성, 테스트 계획, 문서 및 교육, 일정 관리 등 기본 내용은 다음 파일을 참조하시기 바랍니다:</p>
+                <ul>
+                    <li><strong>파일:</strong> <code>abb_robot_programming_specification.html</code></li>
+                    <li><strong>URL:</strong> <a href="./abb_robot_programming_specification.html" target="_blank">기본 사양서 보기</a></li>
+                    <li><strong>포함 내용:</strong>
+                        <ul>
+                            <li>프로젝트 개요 및 적용 범위</li>
+                            <li>시스템 기본 정보 (외부축, 물리적 구성)</li>
+                            <li>Two Torch 용접 Macro ABC 정의</li>
+                            <li>통신 인터페이스 (ArcLink XT, PLC, UI)</li>
+                            <li>센서 및 주변 장치</li>
+                            <li>안전 및 보호 기능</li>
+                            <li>프로그램 구조 (Plan B vs Plan A)</li>
+                            <li>SERVO TOOL CONTROL 필요성</li>
+                            <li>테스팅 및 검증 (4단계)</li>
+                            <li>문서 및 교육 계획</li>
+                            <li>프로젝트 일정 및 담당자</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h3>5.2 Plan B 사양서</h3>
+            <div class="info-box">
+                <strong>📄 Plan B 상세 기술 사양서</strong>
+                <p>Plan B 구조의 상세 기술 내용은 다음 링크를 참조하시기 바랍니다:</p>
+                <ul>
+                    <li><strong>URL:</strong> <a href="https://s2501602.vercel.app/planb_specification.html" target="_blank">Plan B 사양서</a></li>
+                    <li><strong>핵심 내용:</strong>
+                        <ul>
+                            <li>Plan A vs Plan B 비교</li>
+                            <li>외부축 통합 개념</li>
+                            <li>하드웨어 동기화 vs 소프트웨어 동기화</li>
+                            <li>데이터 구조 변경 (robtarget.extax)</li>
+                            <li>좌표 변환 함수 삭제</li>
+                            <li>3-Task → 2-Task 마이그레이션</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h3>5.3 GR자동화 백업 자료</h3>
+            <div class="info-box">
+                <strong>📁 Plan A 백업 파일 (참고용)</strong>
+                <ul>
+                    <li><strong>경로:</strong> <code>/home/qwe/works/s25016/robot)badkup/1200-526404_BACKUP_2025-11-05_2120_B2</code></li>
+                    <li><strong>구조:</strong>
+                        <ul>
+                            <li>TASK1 (T_ROB1) - 로봇 1 메인</li>
+                            <li>TASK2 (T_ROB2) - 로봇 2 메인</li>
+                            <li>TASK7 (Gantry) - 갠트리 제어 (Plan B에서 삭제)</li>
+                            <li>TASK8 (Head) - UI 통신 및 공통 함수</li>
+                        </ul>
+                    </li>
+                    <li><strong>주요 모듈:</strong>
+                        <ul>
+                            <li><code>HEAD/Head_Command.mod</code> - UI 명령 처리</li>
+                            <li><code>HEAD/Head_Function.mod</code> - 좌표 변환 함수 (Plan B 삭제 대상)</li>
+                            <li><code>HEAD/Head_MoveControl.mod</code> - 매크로 용접 로직</li>
+                            <li><code>HEAD/Head_TouchSensing.mod</code> - 터치 보정</li>
+                            <li><code>T_ROB1/MainModule.mod</code> - ROB_1 메인</li>
+                            <li><code>T_ROB2/MainModule.mod</code> - ROB_2 메인</li>
+                            <li><code>Gantry_MainModule.mod</code> - 갠트리 (Plan B 삭제)</li>
+                        </ul>
+                    </li>
+                    <li><strong>활용 방법:</strong>
+                        <ul>
+                            <li>분류 N 기능: 그대로 차용 가능</li>
+                            <li>분류 1 기능: 참고하여 재작성</li>
+                            <li>분류 A 기능: 참고 불가, 신규 작성</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h3>5.4 DeviceNet 신호 테이블 (참고용)</h3>
+            <div class="info-box">
+                <strong>📊 Lincoln Electric DeviceNet 신호 (158개)</strong>
+                <p><strong>주의:</strong> 본 프로젝트는 DeviceNet이 아닌 <strong>ArcLink XT</strong>를 사용하므로, 아래 자료는 참고용입니다.</p>
+                <ul>
+                    <li><strong>파일:</strong> <a href="./251003_용접기_디바이스넷/DeviceNet_Signals_Table.html" target="_blank">DeviceNet 신호 테이블</a></li>
+                    <li><strong>원본 사양서:</strong> <code>251003_용접기_디바이스넷/Y50031_DeviceNetInterfaceSpecification-21.pdf</code> (76 pages)</li>
+                </ul>
+            </div>
+
+            <h3>5.5 관련 문서</h3>
+            <ul>
+                <li><strong>ROBOT↔UI 테스트 결과:</strong> <code>250917_상하축이슈/04_작업진행/</code>
+                    <ul>
+                        <li>통합 결과: <code>251004_에이전트_ROBOT-UI_테스트_통합결과.html</code></li>
+                        <li>고객 발송: <code>251004_고객발송_테스트결과.html</code></li>
+                    </ul>
+                </li>
+                <li><strong>Hexagon 측정 프로젝트:</strong> <code>hexagon/robot-accuracy.html</code></li>
+                <li><strong>프로젝트 통합 대시보드:</strong> <a href="./index.html">S25016 메인 대시보드</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p><strong>문서 버전:</strong> 2.0 (상세)</p>
+        <p><strong>최종 수정일:</strong> 2025-11-17</p>
+        <p><strong>작성:</strong> SP 심태양 | <strong>프로젝트:</strong> S25016</p>
+        <p><strong>배포:</strong> 유대영 차장 (ABB), 삼성중공업, 에스피시스템스</p>
+        <p style="margin-top: 20px; font-size: 0.9em; color: #999;">
+            이 문서는 ABB 로봇 프로그래밍 발주를 위한 상세 기술 사양서입니다.<br>
+            유대영 차장님의 6가지 명확화 요청사항을 반영하여 작성되었습니다.
+        </p>
+    </div>
+</div>
+
+<script>
+    function showTab(tabName) {
+        // 모든 탭 내용 숨기기
+        const allTabs = document.querySelectorAll('.tab-content');
+        allTabs.forEach(tab => tab.classList.remove('active'));
+
+        // 모든 탭 버튼 비활성화
+        const allButtons = document.querySelectorAll('.tab-button');
+        allButtons.forEach(btn => btn.classList.remove('active'));
+
+        // 선택한 탭 표시
+        document.getElementById(tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
