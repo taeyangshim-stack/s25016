@@ -1,0 +1,81 @@
+cp -r /home/qwe/works/s25016/RAPID/Samsung_Ins/ /mnt/c/Users/user/Documents/RobotStudio/Projects/Samsung_Ins/
+
+cp -r /mnt/c/Users/user/Documents/RobotStudio/Projects/Samsung_Ins/Backups /home/qwe/works/s25016/RAPID/Samsung_Ins/
+
+
+여기서
+C:\Users\user\Documents\RobotStudio\Projects\PlanB_ToolControl2\Backups
+
+여기로
+/home/qwe/works/s25016/RAPID
+
+cp -r /mnt/c/Users/user/Documents/RobotStudio/Projects/PlanB_ToolControl2/Backups /home/qwe/works/s25016/RAPID/PlanB_ToolControl2
+
+cp -r /home/qwe/works/s25016/RAPID/PlanB_ToolControl2 /mnt/c/Users/user/Documents/RobotStudio/Projects/PlanB_ToolControl2/Backups
+
+
+고급 용접 모션 뷰어 - XYZR 갠트리 + 듀얼 로봇 시스템
+Plan B 로봇 시스템 재구성 사양서
+
+
+
+# 1단계: 원격 저장소의 변경사항 확인 (병합하지 않음)
+git fetch origin
+
+# 2단계: 변경사항이 있는지 확인
+git status
+
+# 3단계: 원격 브랜치의 변경사항을 로컬에 병합
+git pull origin claude/review-main-index-01UotHVW9FxvdGwtwb1urP1U
+
+
+?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1
+
+링크는 확인 했습니다. 
+이제 백업파일(abb) 백업파일을 제가 계속 업데이트 하면서 
+rapid코드를 빌드해 나갈 예정입니다. 집중력 있게 
+
+백업파일 경로는 아래와 같습니다 
+s25016/RAPID/PlanB_ToolControl2/rcyjdrty_BACKUP_2025-11-14
+확인 하고 백업 파일이 확인이 안되면 알려주세요 
+
+advanced_motion_viewer.html 기능을 라피드에 넣고 싶은 것입니다. 
+작업을 하면서 작업내용을 문서화(시각화)하면서 진행하고 싶습니다. 
+
+궁금한것 있으면 물어봐 주세요 
+
+
+1️⃣ 통합 목표
+D: 기타 (설명 부탁드립니다)
+라피드를 수정하면 제가 로봇스튜디오에 리스토어해서 실행하고 확인하고 현상을 공유하여 다시 라피드를 업데이트 하는 과정으로 진행 할 예정입니다.
+
+2️⃣ 데이터 흐름
+E: 기타 (설명 부탁드립니다)
+우에서 설명을 잠시 했지만 백업파일을 활용하여 로봇스튜디오에 리스토어 하여 확인 할 예정입니다. 
+좋은 방법이 있으면 제안 부탁 합니다. 
+
+
+3️⃣ 시각화 내용
+지금 로봇 스튜디오를 사용하면 의미가 없는 것 아닌가요?
+
+
+4️⃣ 작업 문서화
+A: HTML 파일로 모션 경로 + 코드 설명 통합
+시각화 자료를 포함 하고 싶습니다. 
+
+
+5️⃣ 현재 RAPID 코드 분석
+현제 코드는 참고코드 입니다. 
+
+------------------------------------------
+
+Python 스크립트 실행 > 이것이 무슨 역활인지 모르겠습니다.
+Git으로 백업 파일 버전 관리
+테스트 결과를 어떻게 기록하시나요? (스크린샷)
+옵션 A: 프로토타입부터 시작
+
+
+
+
+
+
