@@ -127,8 +127,343 @@
             color: var(--color-gray-900);
         }
 
+        .table-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+        }
+
+        .view-toggle {
+            display: inline-flex;
+            padding: 4px;
+            background: var(--color-gray-50);
+            border-radius: var(--border-radius-full);
+            border: 1px solid var(--color-gray-200);
+        }
+
+        .view-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 14px;
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            border-radius: var(--border-radius-full);
+            cursor: pointer;
+            color: var(--color-gray-500);
+            transition: all 0.2s ease;
+        }
+
+        .view-btn.active {
+            background: var(--color-white);
+            color: var(--color-gray-900);
+            box-shadow: var(--shadow-sm);
+        }
+
         .table-wrapper {
             overflow-x: auto;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-4);
+            padding: var(--space-5);
+        }
+
+        .matrix-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: var(--space-4);
+            padding: var(--space-5);
+        }
+
+        .matrix-column {
+            background: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--color-gray-200);
+            padding: var(--space-4);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .matrix-column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--font-base);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
+        }
+
+        .matrix-column-header span {
+            font-size: var(--font-sm);
+            color: var(--color-gray-600);
+        }
+
+        .matrix-subgrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: var(--space-3);
+        }
+
+        .matrix-cell {
+            background: var(--color-gray-50);
+            border-radius: var(--border-radius-base);
+            border: 1px solid var(--color-gray-200);
+            padding: var(--space-3);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            min-height: 140px;
+        }
+
+        .matrix-cell-hmi {
+            border-color: #c084fc;
+            box-shadow: 0 0 0 1px #c084fc;
+            background: #faf5ff;
+        }
+
+        .matrix-cell-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--font-sm);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
+        }
+
+        .matrix-count {
+            font-size: var(--font-xs);
+            color: var(--color-gray-500);
+            background: var(--color-white);
+            border-radius: var(--border-radius-full);
+            padding: 2px 6px;
+            border: 1px solid var(--color-gray-300);
+        }
+
+        .matrix-issue-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .matrix-issue {
+            background: var(--color-white);
+            border-radius: var(--border-radius-base);
+            border: 1px solid var(--color-gray-200);
+            padding: var(--space-2);
+            font-size: var(--font-xs);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .matrix-issue:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .matrix-issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+            gap: var(--space-2);
+        }
+
+        .matrix-issue-id {
+            font-family: 'Consolas', monospace;
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+        }
+
+        .matrix-issue-title {
+            font-size: var(--font-xs);
+            color: var(--color-gray-800);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .matrix-issue-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+            color: var(--color-gray-500);
+        }
+
+        .matrix-priority {
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-700);
+        }
+
+        .matrix-empty {
+            font-size: var(--font-xs);
+            color: var(--color-gray-500);
+            text-align: center;
+            padding: var(--space-2);
+        }
+
+        .matrix-more {
+            font-size: var(--font-xs);
+            color: var(--color-gray-500);
+            text-align: right;
+        }
+
+        .issue-card {
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-4);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            box-shadow: var(--shadow-sm);
+            background: var(--color-white);
+            transition: var(--transition-base);
+            position: relative;
+        }
+
+        .issue-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .issue-card.priority-긴급 {
+            border-left: 4px solid #dc2626;
+        }
+
+        .issue-card.priority-높음 {
+            border-left: 4px solid #f97316;
+        }
+
+        .issue-card.priority-보통 {
+            border-left: 4px solid #2563eb;
+        }
+
+        .issue-card.priority-낮음 {
+            border-left: 4px solid #6b7280;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--space-3);
+        }
+
+        .card-priority {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-weight: var(--font-semibold);
+            font-size: var(--font-sm);
+        }
+
+        .card-priority::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .card-priority-긴급::before {
+            background: #dc2626;
+        }
+
+        .card-priority-높음::before {
+            background: #f97316;
+        }
+
+        .card-priority-보통::before {
+            background: #2563eb;
+        }
+
+        .card-priority-낮음::before {
+            background: #6b7280;
+        }
+
+        .card-title {
+            font-size: var(--font-base);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-900);
+            line-height: 1.5;
+        }
+
+        .card-id {
+            font-family: 'Consolas', monospace;
+            font-size: var(--font-xs);
+            color: var(--color-gray-500);
+        }
+
+        .card-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-3);
+            font-size: var(--font-xs);
+            color: var(--color-gray-600);
+        }
+
+        .card-meta strong {
+            display: block;
+            color: var(--color-gray-900);
+            margin-bottom: 2px;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+        }
+
+        .card-line {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--font-xs);
+            color: var(--color-gray-600);
+        }
+
+        .card-category {
+            font-size: var(--font-xs);
+            color: var(--color-gray-500);
+        }
+
+        .card-dates {
+            background: var(--color-gray-50);
+            border-radius: var(--border-radius-base);
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-xs);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-3);
+        }
+
+        .card-updated {
+            font-size: var(--font-xs);
+            color: var(--color-gray-500);
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
         }
 
         table {
@@ -692,12 +1027,23 @@
                 <div class="table-title">
                     <span id="resultCount">0</span>개의 이슈
                 </div>
-                <div>
+                <div class="table-actions">
+                    <div class="view-toggle" role="group" aria-label="보기 모드 선택">
+                        <button type="button" class="view-btn active" data-view="matrix" onclick="switchView('matrix')">매트릭스</button>
+                        <button type="button" class="view-btn" data-view="card" onclick="switchView('card')">카드형</button>
+                        <button type="button" class="view-btn" data-view="table" onclick="switchView('table')">테이블형</button>
+                    </div>
                     <button class="btn btn-outline btn-sm" onclick="exportToCSV()">📥 CSV 내보내기</button>
                 </div>
             </div>
 
-            <div class="table-wrapper">
+            <div id="matrixView" class="matrix-container" aria-live="polite">
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="empty-state-icon">⏳</div>
+                    <p>메트릭스를 준비 중입니다...</p>
+                </div>
+            </div>
+            <div class="table-wrapper hidden" id="tableView">
                 <table>
                     <thead>
                         <tr>
@@ -720,6 +1066,7 @@
                     </tbody>
                 </table>
             </div>
+            <div id="cardView" class="card-grid hidden" aria-live="polite"></div>
 
             <!-- 페이지네이션 -->
             <div class="pagination" id="pagination" style="display: none;">
@@ -741,15 +1088,104 @@
         let sortColumn = 'id';
         let sortDirection = 'desc';
         let categoryConfig = null;
+        let currentView = 'matrix';
+        const MATRIX_MAX_ITEMS = 4;
+        const DOMAIN_ORDER = ['기계', '전기', '제어'];
 
         // 페이지 로드
         document.addEventListener('DOMContentLoaded', async () => {
             await initFilters();
+            updateViewToggle();
             await loadIssues();
             
             document.getElementById('excludeSortColumn').addEventListener('change', applyFilters);
             document.getElementById('excludeSortValue').addEventListener('change', applyFilters);
         });
+
+        function updateViewToggle() {
+            const tableWrapper = document.getElementById('tableView');
+            const cardWrapper = document.getElementById('cardView');
+            const matrixWrapper = document.getElementById('matrixView');
+
+            if (tableWrapper) {
+                tableWrapper.classList.toggle('hidden', currentView !== 'table');
+            }
+
+            if (cardWrapper) {
+                cardWrapper.classList.toggle('hidden', currentView !== 'card');
+            }
+
+            if (matrixWrapper) {
+                matrixWrapper.classList.toggle('hidden', currentView !== 'matrix');
+            }
+
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                const view = btn.getAttribute('data-view');
+                btn.classList.toggle('active', view === currentView);
+            });
+        }
+
+        function switchView(view) {
+            if (currentView === view) return;
+            currentView = view;
+            renderTable();
+        }
+
+        function getSubcategoriesForDomain(domain) {
+            if (categoryConfig && Array.isArray(categoryConfig.categories)) {
+                const matched = categoryConfig.categories.find(cat => cat.name === domain);
+                if (matched && Array.isArray(matched.subcategories)) {
+                    return matched.subcategories.map(sub => sub.name);
+                }
+            }
+
+            const fallback = PunchListAPI.CATEGORIES && PunchListAPI.CATEGORIES[domain];
+            if (Array.isArray(fallback) && fallback.length > 0) {
+                return fallback;
+            }
+
+            return ['기타'];
+        }
+
+        function buildMatrixIssueList(issues) {
+            if (!issues || issues.length === 0) {
+                return '<div class="matrix-empty">등록된 이슈 없음</div>';
+            }
+
+            const displayed = issues.slice(0, MATRIX_MAX_ITEMS).map(issue => {
+                const statusBadge = `<span class="badge badge-status-${issue.status}">${issue.status}</span>`;
+                const priorityIcons = {
+                    '긴급': '🚨',
+                    '높음': '⚠️',
+                    '보통': '📌',
+                    '낮음': '📎'
+                };
+                const priorityIcon = priorityIcons[issue.priority] || '📌';
+
+                return `
+                    <div class="matrix-issue" onclick="window.location.href='detail.html?id=${issue.id}'">
+                        <div class="matrix-issue-header">
+                            <span class="matrix-issue-id">${issue.id}</span>
+                            ${statusBadge}
+                        </div>
+                        <div class="matrix-issue-title" title="${issue.title}">${issue.title}</div>
+                        <div class="matrix-issue-meta">
+                            <span>${issue.owner || '-'}</span>
+                            <span class="matrix-priority">${priorityIcon} ${issue.priority}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (issues.length > MATRIX_MAX_ITEMS) {
+                return `
+                    ${displayed}
+                    <div class="matrix-more">+${issues.length - MATRIX_MAX_ITEMS}건 더보기</div>
+                `;
+            }
+
+            return displayed;
+        }
 
         // 필터 초기화
         async function initFilters() {
@@ -1000,16 +1436,26 @@
             });
         }
 
-        // 테이블 렌더링
+        // 테이블/카드/매트릭스 렌더링
         function renderTable() {
             const tbody = document.getElementById('issueTableBody');
+            const cardWrapper = document.getElementById('cardView');
+            const matrixContainer = document.getElementById('matrixView');
             const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
             const pageIssues = filteredIssues.slice(start, end);
+            const matrixIssues = filteredIssues;
 
             document.getElementById('resultCount').textContent = filteredIssues.length;
 
             if (pageIssues.length === 0) {
+                const emptyState = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>검색 결과가 없습니다.</p>
+                    </div>
+                `;
+
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="8" class="empty-state">
@@ -1018,45 +1464,56 @@
                         </td>
                     </tr>
                 `;
+
+                if (cardWrapper) {
+                    cardWrapper.innerHTML = emptyState;
+                }
+
+                if (matrixContainer) {
+                    matrixContainer.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <div class="empty-state-icon">📭</div>
+                            <p>검색 결과가 없습니다.</p>
+                        </div>
+                    `;
+                }
+
+                updateViewToggle();
                 return;
             }
 
-            tbody.innerHTML = pageIssues.map(issue => {
+            const priorityIcons = {
+                '긴급': '🚨',
+                '높음': '⚠️',
+                '보통': '📌',
+                '낮음': '📎'
+            };
+
+            const renderedIssues = pageIssues.map(issue => {
                 const isOverdue = PunchListAPI.isOverdue(issue);
                 const isRecent = PunchListAPI.isRecentlyUpdated(issue);
 
-                // 가독성 개선: 우선순위 클래스 추가
                 const priorityClass = `priority-${issue.priority}`;
                 const rowClasses = [priorityClass];
                 if (isRecent) rowClasses.push('recent-update');
                 const rowClassAttr = ` class="${rowClasses.join(' ')}"`;
 
-                // 우선순위 아이콘
-                const priorityIcons = {
-                    '긴급': '🚨',
-                    '높음': '⚠️',
-                    '보통': '📌',
-                    '낮음': '📎'
-                };
                 const priorityIcon = priorityIcons[issue.priority] || '📌';
 
-                // 라인 뱃지
                 const lineCell = issue.line_classification
                     ? PunchListAPI.getLineBadge(issue.line_classification)
                     : '<span class="line-badge" style="background: #e5e7eb; color: #4b5563;">미지정</span>';
 
-                // 최근 변경 표시
                 const updatedLabel = PunchListAPI.formatDateTime(issue.updated_at);
                 const recentIndicator = isRecent
                     ? '<span class="recent-indicator" title="최근 72시간 내 업데이트">🆕</span>'
                     : '';
 
-                // 일정 표시 (요청일 → 목표일)
                 const requestDate = PunchListAPI.formatDate(issue.request_date);
                 const targetDate = PunchListAPI.formatDate(issue.target_date);
                 const scheduleClass = isOverdue ? 'schedule-overdue' : 'schedule-date';
 
-                return `
+                const tableRow = `
                     <tr${rowClassAttr}>
                         <td class="priority-cell">
                             <div class="priority-indicator">
@@ -1099,7 +1556,138 @@
                         </td>
                     </tr>
                 `;
+
+                const cardTags = [
+                    lineCell,
+                    issue.category ? `<span class="tag">${issue.category}</span>` : '',
+                    issue.subcategory ? `<span class="tag">${issue.subcategory}</span>` : ''
+                ].filter(Boolean).join('');
+
+                const card = `
+                    <article class="issue-card ${priorityClass}">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">${issue.id}</div>
+                                <div class="card-title">${issue.title}</div>
+                            </div>
+                            <div class="card-priority card-priority-${issue.priority}">
+                                <span>${priorityIcon}</span>
+                                <span>${issue.priority}</span>
+                            </div>
+                        </div>
+                        <div class="card-tags">
+                            ${cardTags || '<span class="tag">미분류</span>'}
+                        </div>
+                        <div class="card-meta">
+                            <div>
+                                <strong>상태</strong>
+                                <span class="badge badge-status-${issue.status}">${issue.status}</span>
+                            </div>
+                            <div>
+                                <strong>담당자</strong>
+                                <span>${issue.owner || '-'}</span>
+                            </div>
+                            <div>
+                                <strong>일정</strong>
+                                <div class="card-dates">
+                                    <span>${requestDate}</span>
+                                    <span class="schedule-arrow">→</span>
+                                    <span class="${scheduleClass}">${targetDate}${isOverdue ? ' ⚠️' : ''}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <span class="card-updated">
+                                최근 변경: ${updatedLabel} ${recentIndicator}
+                            </span>
+                            <div class="card-actions">
+                                <button class="action-btn" onclick="event.stopPropagation(); window.location.href='detail.html?id=${issue.id}'">
+                                    상세
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+
+                return { table: tableRow, card };
+            });
+
+            tbody.innerHTML = renderedIssues.map(item => item.table).join('');
+
+            if (cardWrapper) {
+                cardWrapper.innerHTML = renderedIssues.map(item => item.card).join('');
+            }
+
+            renderMatrixView(matrixIssues);
+            updateViewToggle();
+        }
+
+        function renderMatrixView(issues) {
+            const matrixContainer = document.getElementById('matrixView');
+            if (!matrixContainer) return;
+
+            const matrixData = {};
+            DOMAIN_ORDER.forEach(domain => {
+                matrixData[domain] = {};
+            });
+
+            (issues || []).forEach(issue => {
+                const domain = issue.category || '미지정';
+                const subcategory = issue.subcategory || '기타';
+
+                if (!matrixData[domain]) {
+                    matrixData[domain] = {};
+                }
+                if (!matrixData[domain][subcategory]) {
+                    matrixData[domain][subcategory] = [];
+                }
+                matrixData[domain][subcategory].push(issue);
+            });
+
+            const extraDomains = Object.keys(matrixData).filter(domain => !DOMAIN_ORDER.includes(domain));
+            const orderedDomains = [...DOMAIN_ORDER, ...extraDomains];
+
+            const matrixHtml = orderedDomains.map(domain => {
+                const domainData = matrixData[domain] || {};
+                const configuredSubs = getSubcategoriesForDomain(domain);
+                const existingSubs = Object.keys(domainData);
+                const mergedSubs = Array.from(new Set([...configuredSubs, ...existingSubs]));
+
+                const domainTotal = existingSubs.reduce((sum, key) => sum + (domainData[key]?.length || 0), 0);
+
+                const cells = mergedSubs.map(sub => {
+                    const issuesInSub = domainData[sub] || [];
+                    const highlightHMI = (sub || '').toUpperCase().includes('HMI');
+                    const cellClasses = ['matrix-cell'];
+                    if (highlightHMI) cellClasses.push('matrix-cell-hmi');
+
+                    return `
+                        <div class="${cellClasses.join(' ')}">
+                            <div class="matrix-cell-header">
+                                <span>${sub}</span>
+                                <span class="matrix-count">${issuesInSub.length}</span>
+                            </div>
+                            <div class="matrix-issue-list">
+                                ${buildMatrixIssueList(issuesInSub)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <section class="matrix-column">
+                        <div class="matrix-column-header">
+                            <span>${domain}</span>
+                            <span>${domainTotal}건</span>
+                        </div>
+                        <div class="matrix-subgrid">
+                            ${cells}
+                        </div>
+                    </section>
+                `;
             }).join('');
+
+            matrixContainer.innerHTML = matrixHtml;
         }
 
         // 통계 업데이트
