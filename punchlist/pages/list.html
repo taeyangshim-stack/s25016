@@ -59,6 +59,14 @@
             font-weight: var(--font-bold);
             color: var(--color-primary);
             margin-bottom: var(--space-1);
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .stat-total {
+            font-size: var(--font-sm);
+            color: var(--color-gray-500);
         }
 
         .stat-label {
@@ -905,23 +913,38 @@
             <!-- 통계 -->
             <div class="stats-grid" id="statsGrid">
                 <div class="stat-card">
-                    <div class="stat-number" id="totalCount">0</div>
-                    <div class="stat-label">전체 이슈</div>
+                    <div class="stat-number">
+                        <span id="totalCount">0</span>
+                        <span class="stat-total" id="totalCountTotal">/ 0</span>
+                    </div>
+                    <div class="stat-label">전체 이슈 (필터 / 전체)</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="progressCount">0</div>
+                    <div class="stat-number">
+                        <span id="progressCount">0</span>
+                        <span class="stat-total" id="progressCountTotal">/ 0</span>
+                    </div>
                     <div class="stat-label">진행중</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="pendingCount">0</div>
+                    <div class="stat-number">
+                        <span id="pendingCount">0</span>
+                        <span class="stat-total" id="pendingCountTotal">/ 0</span>
+                    </div>
                     <div class="stat-label">보류</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="completeCount">0</div>
+                    <div class="stat-number">
+                        <span id="completeCount">0</span>
+                        <span class="stat-total" id="completeCountTotal">/ 0</span>
+                    </div>
                     <div class="stat-label">완료</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="overdueCount">0</div>
+                    <div class="stat-number">
+                        <span id="overdueCount">0</span>
+                        <span class="stat-total" id="overdueCountTotal">/ 0</span>
+                    </div>
                     <div class="stat-label">지연</div>
                 </div>
             </div>
@@ -1091,6 +1114,7 @@
         let currentView = 'matrix';
         const MATRIX_MAX_ITEMS = 4;
         const DOMAIN_ORDER = ['기계', '전기', '제어'];
+        let globalStats = null;
 
         // 페이지 로드
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1272,6 +1296,7 @@
         async function loadIssues() {
             try {
                 allIssues = await PunchListAPI.loadAllIssues();
+                globalStats = PunchListAPI.calculateStats(allIssues);
                 refreshLineFilterOptions(allIssues);
                 applyFilters();
             } catch (error) {
@@ -1693,12 +1718,25 @@
         // 통계 업데이트
         function updateStats(targetIssues = allIssues) {
             const stats = PunchListAPI.calculateStats(targetIssues || []);
+            const global = globalStats || { total: 0, byStatus: {}, overdue: 0 };
+
+            const currentByStatus = stats.byStatus || {};
+            const globalByStatus = global.byStatus || {};
 
             document.getElementById('totalCount').textContent = stats.total;
-            document.getElementById('progressCount').textContent = stats.byStatus['진행중'] || 0;
-            document.getElementById('pendingCount').textContent = stats.byStatus['보류'] || 0;
-            document.getElementById('completeCount').textContent = stats.byStatus['완료'] || 0;
+            document.getElementById('totalCountTotal').textContent = `/ ${global.total || 0}`;
+
+            document.getElementById('progressCount').textContent = currentByStatus['진행중'] || 0;
+            document.getElementById('progressCountTotal').textContent = `/ ${globalByStatus['진행중'] || 0}`;
+
+            document.getElementById('pendingCount').textContent = currentByStatus['보류'] || 0;
+            document.getElementById('pendingCountTotal').textContent = `/ ${globalByStatus['보류'] || 0}`;
+
+            document.getElementById('completeCount').textContent = currentByStatus['완료'] || 0;
+            document.getElementById('completeCountTotal').textContent = `/ ${globalByStatus['완료'] || 0}`;
+
             document.getElementById('overdueCount').textContent = stats.overdue || 0;
+            document.getElementById('overdueCountTotal').textContent = `/ ${global.overdue || 0}`;
         }
 
         // 페이지네이션
