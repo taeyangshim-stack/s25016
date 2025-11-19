@@ -21,6 +21,12 @@ const path = require('path');
     timeout: 60000
   });
 
+  // 웹 폰트가 완전히 로드될 때까지 대기
+  await page.evaluateHandle('document.fonts.ready');
+
+  // 추가 대기 시간 (폰트 렌더링 완료)
+  await new Promise(resolve => setTimeout(resolve, 3000));
+
   // PDF 저장 경로
   const pdfPath = path.resolve(__dirname, 'abb_spec_detailed.pdf');
 
