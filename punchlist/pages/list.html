@@ -69,6 +69,13 @@
             color: var(--color-gray-500);
         }
 
+        .stat-note {
+            font-size: var(--font-xs);
+            color: var(--color-gray-500);
+            text-align: right;
+            margin-top: var(--space-2);
+        }
+
         .stat-label {
             font-size: var(--font-sm);
             color: var(--color-gray-600);
@@ -943,11 +950,12 @@
                 <div class="stat-card">
                     <div class="stat-number">
                         <span id="overdueCount">0</span>
-                        <span class="stat-total" id="overdueCountTotal">/ 0</span>
+                        <span class="stat-total" id="overduePercent">0%</span>
                     </div>
-                    <div class="stat-label">지연</div>
+                    <div class="stat-label">지연 (진행/보류 내)</div>
                 </div>
             </div>
+            <div class="stat-note">* 지연 이슈는 진행/보류 상태 건수 안에서 중복 집계됩니다.</div>
         </div>
 
         <!-- 필터 -->
@@ -1735,8 +1743,10 @@
             document.getElementById('completeCount').textContent = currentByStatus['완료'] || 0;
             document.getElementById('completeCountTotal').textContent = `/ ${globalByStatus['완료'] || 0}`;
 
-            document.getElementById('overdueCount').textContent = stats.overdue || 0;
-            document.getElementById('overdueCountTotal').textContent = `/ ${global.overdue || 0}`;
+            const overdueCount = stats.overdue || 0;
+            const overduePercent = stats.total ? Math.round((overdueCount / stats.total) * 100) : 0;
+            document.getElementById('overdueCount').textContent = overdueCount;
+            document.getElementById('overduePercent').textContent = `${overduePercent}%`;
         }
 
         // 페이지네이션
