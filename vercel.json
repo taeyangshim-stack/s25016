@@ -14,6 +14,7 @@
     { "source": "/abb-spec-detailed", "destination": "/abb_spec_detailed.html" },
     { "source": "/abb-spec", "destination": "/abb_robot_programming_specification.html" },
     { "source": "/", "destination": "/index.html" },
+    { "source": "/attendance", "destination": "/attendance.html" },
     { "source": "/hexagon", "destination": "/projects/hexagon/index.html" },
     { "source": "/hexagon/punchlist", "destination": "/projects/hexagon/punchlist.html" },
     { "source": "/hexagon/schedule", "destination": "/projects/hexagon/schedule.html" },
