@@ -52,6 +52,7 @@
             padding: var(--space-4);
             border-radius: var(--border-radius-base);
             text-align: center;
+            position: relative;
         }
 
         .stat-number {
@@ -65,6 +66,30 @@
             font-size: var(--font-sm);
             color: var(--color-gray-500);
             margin-left: 6px;
+        }
+
+        .stat-delta {
+            font-size: var(--font-xs);
+            font-weight: var(--font-semibold);
+            color: var(--color-gray-500);
+        }
+
+        .stat-delta.positive {
+            color: #16a34a;
+        }
+
+        .stat-delta.negative {
+            color: #dc2626;
+        }
+
+        .stat-card-clickable {
+            cursor: pointer;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .stat-card-clickable:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .stat-note {
@@ -195,24 +220,54 @@
             padding: var(--space-5);
         }
 
+        .matrix-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-2);
+            padding: 0 var(--space-5);
+            margin-bottom: -var(--space-3);
+        }
+
+        .matrix-controls button {
+            padding: 4px 10px;
+            border: 1px solid var(--color-gray-300);
+            background: var(--color-white);
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-xs);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .matrix-controls button:hover {
+            background: var(--color-gray-50);
+        }
+
         .matrix-column {
             background: var(--color-white);
             border-radius: var(--border-radius-lg);
             border: 1px solid var(--color-gray-200);
-            padding: var(--space-4);
+            padding: var(--space-2) var(--space-3);
             box-shadow: var(--shadow-sm);
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-3);
         }
 
-        .matrix-column-header {
+        .matrix-column[open] {
+            border-color: var(--color-primary-light, #bfdbfe);
+        }
+
+        .matrix-column summary {
+            list-style: none;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: var(--font-base);
             font-weight: var(--font-semibold);
             color: var(--color-gray-900);
+            cursor: pointer;
+            padding: var(--space-1) 0;
+        }
+
+        .matrix-column summary::-webkit-details-marker {
+            display: none;
         }
 
         .matrix-column-header span {
@@ -220,10 +275,15 @@
             color: var(--color-gray-600);
         }
 
+        .matrix-column:not([open]) .matrix-subgrid {
+            display: none;
+        }
+
         .matrix-subgrid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: var(--space-3);
+            margin-top: var(--space-3);
         }
 
         .matrix-cell {
@@ -919,33 +979,40 @@
             <div class="stats-grid" id="statsGrid">
                 <div class="stat-card">
                     <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-delta" id="totalDelta">-</div>
                     <div class="stat-label">전체 이슈</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="verifyingCount">0</div>
+                    <div class="stat-delta" id="verifyingDelta">-</div>
                     <div class="stat-label">검증중</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="pendingCount">0</div>
+                    <div class="stat-delta" id="pendingDelta">-</div>
                     <div class="stat-label">보류</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="newCount">0</div>
+                    <div class="stat-delta" id="newDelta">-</div>
                     <div class="stat-label">신규</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="completeCount">0</div>
+                    <div class="stat-delta" id="completeDelta">-</div>
                     <div class="stat-label">완료</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="progressCount">0</div>
+                    <div class="stat-delta" id="progressDelta">-</div>
                     <div class="stat-label">진행중</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card stat-card-clickable" role="button" tabindex="0" onclick="handleOverdueCardClick(event)" onkeydown="if(event.key==='Enter'||event.key===' '){handleOverdueCardClick(event);}">
                     <div class="stat-number">
                         <span id="overdueCount">0</span>
                         <span class="stat-total" id="overduePercent">0%</span>
                     </div>
+                    <div class="stat-delta" id="overdueDelta">-</div>
                     <div class="stat-label">지연 (진행/보류 내)</div>
                 </div>
             </div>
@@ -956,16 +1023,16 @@
         <div class="filters">
             <!-- 필터 프리셋 버튼 -->
             <div class="filter-presets">
-                <button class="preset-btn" onclick="applyPreset('urgent-b')">
+                <button class="preset-btn" data-preset="urgent-b" onclick="applyPreset('urgent-b', this)">
                     🚨 긴급 이슈 (B라인)
                 </button>
-                <button class="preset-btn" onclick="applyPreset('overdue')">
+                <button class="preset-btn" data-preset="overdue" onclick="applyPreset('overdue', this)">
                     ⚠️ 지연 중인 이슈
                 </button>
-                <button class="preset-btn" onclick="applyPreset('this-week')">
+                <button class="preset-btn" data-preset="this-week" onclick="applyPreset('this-week', this)">
                     📅 이번 주 마감
                 </button>
-                <button class="preset-btn" onclick="resetFilters()">
+                <button class="preset-btn" data-preset="all" onclick="resetFilters()">
                     🔄 전체 보기
                 </button>
             </div>
@@ -1062,6 +1129,10 @@
                 </div>
             </div>
 
+            <div class="matrix-controls">
+                <button type="button" onclick="toggleDomainSections(true)">모두 펼치기</button>
+                <button type="button" onclick="toggleDomainSections(false)">모두 접기</button>
+            </div>
             <div id="matrixView" class="matrix-container" aria-live="polite">
                 <div class="empty-state" style="grid-column: 1 / -1;">
                     <div class="empty-state-icon">⏳</div>
@@ -1116,6 +1187,8 @@
         let currentView = 'matrix';
         const MATRIX_MAX_ITEMS = 4;
         const DOMAIN_ORDER = ['기계', '전기', '제어'];
+        const STATS_STORAGE_KEY = 'punchlist_stats_snapshot';
+        let statsSnapshotCache = null;
 
         // 페이지 로드
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1131,6 +1204,7 @@
             const tableWrapper = document.getElementById('tableView');
             const cardWrapper = document.getElementById('cardView');
             const matrixWrapper = document.getElementById('matrixView');
+            const matrixControls = document.querySelector('.matrix-controls');
 
             if (tableWrapper) {
                 tableWrapper.classList.toggle('hidden', currentView !== 'table');
@@ -1143,6 +1217,9 @@
             if (matrixWrapper) {
                 matrixWrapper.classList.toggle('hidden', currentView !== 'matrix');
             }
+            if (matrixControls) {
+                matrixControls.classList.toggle('hidden', currentView !== 'matrix');
+            }
 
             document.querySelectorAll('.view-btn').forEach(btn => {
                 const view = btn.getAttribute('data-view');
@@ -1154,6 +1231,66 @@
             if (currentView === view) return;
             currentView = view;
             renderTable();
+        }
+
+        function handleOverdueCardClick(event) {
+            event?.preventDefault();
+            const overdueButton = document.querySelector('.preset-btn[data-preset="overdue"]');
+            applyPreset('overdue', overdueButton);
+            if (overdueButton) {
+                overdueButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function loadStatsSnapshot() {
+            if (statsSnapshotCache) return statsSnapshotCache;
+            if (typeof localStorage === 'undefined') return null;
+            try {
+                const raw = localStorage.getItem(STATS_STORAGE_KEY);
+                statsSnapshotCache = raw ? JSON.parse(raw) : null;
+                return statsSnapshotCache;
+            } catch (error) {
+                console.warn('이전 통계 스냅샷 로드 실패:', error);
+                return null;
+            }
+        }
+
+        function saveStatsSnapshot(snapshot) {
+            if (typeof localStorage === 'undefined') return;
+            try {
+                localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(snapshot));
+                statsSnapshotCache = snapshot;
+            } catch (error) {
+                console.warn('통계 스냅샷 저장 실패:', error);
+            }
+        }
+
+        function updateStatCard(valueId, deltaId, currentValue, previousValue) {
+            const valueEl = document.getElementById(valueId);
+            if (valueEl) {
+                valueEl.textContent = currentValue;
+            }
+            const deltaEl = document.getElementById(deltaId);
+            if (!deltaEl) return;
+
+            if (typeof previousValue !== 'number') {
+                deltaEl.textContent = '-';
+                deltaEl.classList.remove('positive', 'negative');
+                return;
+            }
+
+            const delta = currentValue - previousValue;
+            if (!delta) {
+                deltaEl.textContent = '변화 없음';
+                deltaEl.classList.remove('positive', 'negative');
+                return;
+            }
+
+            const directionClass = delta > 0 ? 'positive' : 'negative';
+            deltaEl.classList.remove('positive', 'negative');
+            deltaEl.classList.add(directionClass);
+            const symbol = delta > 0 ? '▲' : '▼';
+            deltaEl.textContent = `${symbol} ${Math.abs(delta)}`;
         }
 
         function getSubcategoriesForDomain(domain) {
@@ -1332,7 +1469,7 @@
             currentPage = 1;
             renderTable();
             updatePagination();
-            updateStats(filteredIssues);
+            updateStats(allIssues);
         }
 
         // 필터 초기화
@@ -1356,13 +1493,20 @@
         }
 
         // 필터 프리셋 적용
-        function applyPreset(presetType) {
+        function applyPreset(presetType, triggerElement = null) {
             // 먼저 모든 필터 초기화
             resetFilters();
 
             // 프리셋 버튼 활성화 표시
             document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            if (triggerElement) {
+                triggerElement.classList.add('active');
+            } else if (presetType === 'overdue' || presetType === 'urgent-b' || presetType === 'this-week') {
+                const presetButton = document.querySelector(`.preset-btn[data-preset="${presetType}"]`);
+                if (presetButton) {
+                    presetButton.classList.add('active');
+                }
+            }
 
             const today = new Date();
             const weekLater = new Date(today);
@@ -1385,6 +1529,7 @@
                     currentPage = 1;
                     renderTable();
                     updatePagination();
+                    updateStats(allIssues);
                     return;
 
                 case 'this-week':
@@ -1397,6 +1542,7 @@
                     currentPage = 1;
                     renderTable();
                     updatePagination();
+                    updateStats(allIssues);
                     return;
             }
 
@@ -1699,38 +1845,62 @@
                     `;
                 }).join('');
 
+                const openAttr = domainTotal > 0 ? ' open' : '';
+
                 return `
-                    <section class="matrix-column">
-                        <div class="matrix-column-header">
+                    <details class="matrix-column"${openAttr} data-domain="${domain}">
+                        <summary class="matrix-column-header">
                             <span>${domain}</span>
                             <span>${domainTotal}건</span>
-                        </div>
+                        </summary>
                         <div class="matrix-subgrid">
                             ${cells}
                         </div>
-                    </section>
+                    </details>
                 `;
             }).join('');
 
             matrixContainer.innerHTML = matrixHtml;
         }
 
+        function toggleDomainSections(expand = true) {
+            document.querySelectorAll('#matrixView .matrix-column').forEach(section => {
+                if (typeof section.open === 'boolean') {
+                    section.open = expand;
+                }
+            });
+        }
+
         // 통계 업데이트
         function updateStats(targetIssues = allIssues) {
             const stats = PunchListAPI.calculateStats(targetIssues || []);
             const byStatus = stats.byStatus || {};
+            const previous = loadStatsSnapshot() || {};
+            const previousByStatus = previous.byStatus || {};
 
-            document.getElementById('totalCount').textContent = stats.total || 0;
-            document.getElementById('verifyingCount').textContent = byStatus['검증중'] || 0;
-            document.getElementById('pendingCount').textContent = byStatus['보류'] || 0;
-            document.getElementById('newCount').textContent = byStatus['신규'] || 0;
-            document.getElementById('completeCount').textContent = byStatus['완료'] || 0;
-            document.getElementById('progressCount').textContent = byStatus['진행중'] || 0;
+            updateStatCard('totalCount', 'totalDelta', stats.total || 0, typeof previous.total === 'number' ? previous.total : undefined);
+            updateStatCard('verifyingCount', 'verifyingDelta', byStatus['검증중'] || 0, previousByStatus['검증중']);
+            updateStatCard('pendingCount', 'pendingDelta', byStatus['보류'] || 0, previousByStatus['보류']);
+            updateStatCard('newCount', 'newDelta', byStatus['신규'] || 0, previousByStatus['신규']);
+            updateStatCard('completeCount', 'completeDelta', byStatus['완료'] || 0, previousByStatus['완료']);
+            updateStatCard('progressCount', 'progressDelta', byStatus['진행중'] || 0, previousByStatus['진행중']);
 
             const overdueCount = stats.overdue || 0;
             const overduePercent = stats.total ? Math.round((overdueCount / stats.total) * 100) : 0;
-            document.getElementById('overdueCount').textContent = overdueCount;
+            updateStatCard('overdueCount', 'overdueDelta', overdueCount, typeof previous.overdue === 'number' ? previous.overdue : undefined);
             document.getElementById('overduePercent').textContent = `${overduePercent}%`;
+
+            saveStatsSnapshot({
+                total: stats.total || 0,
+                overdue: overdueCount,
+                byStatus: {
+                    '검증중': byStatus['검증중'] || 0,
+                    '보류': byStatus['보류'] || 0,
+                    '신규': byStatus['신규'] || 0,
+                    '완료': byStatus['완료'] || 0,
+                    '진행중': byStatus['진행중'] || 0
+                }
+            });
         }
 
         // 페이지네이션
