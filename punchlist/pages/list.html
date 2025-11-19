@@ -1274,7 +1274,6 @@
                 allIssues = await PunchListAPI.loadAllIssues();
                 refreshLineFilterOptions(allIssues);
                 applyFilters();
-                updateStats();
             } catch (error) {
                 console.error('이슈 로드 실패:', error);
                 document.getElementById('issueTableBody').innerHTML = `
@@ -1308,6 +1307,7 @@
             currentPage = 1;
             renderTable();
             updatePagination();
+            updateStats(filteredIssues);
         }
 
         // 필터 초기화
@@ -1691,8 +1691,8 @@
         }
 
         // 통계 업데이트
-        function updateStats() {
-            const stats = PunchListAPI.calculateStats(allIssues);
+        function updateStats(targetIssues = allIssues) {
+            const stats = PunchListAPI.calculateStats(targetIssues || []);
 
             document.getElementById('totalCount').textContent = stats.total;
             document.getElementById('progressCount').textContent = stats.byStatus['진행중'] || 0;
