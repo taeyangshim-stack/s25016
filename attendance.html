@@ -77,45 +77,135 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const sampleData = [
-                { name: '홍길동', base: 40, overtime: 10 },
-                { name: '김철수', base: 35, overtime: 5 },
-                { name: '이영희', base: 40, overtime: 15 },
-                { name: '박지성', base: 20, overtime: 2 },
-                { name: '최민호', base: 40, overtime: 11.5 },
-            ];
-
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygAg88Vk2cJwhkDUJQPn2OO18J9IhzvF0l85otx4khWGh8y4XxAJhpQlOZnVvATxQ/exec';
             const tableBody = document.querySelector('#attendance-table tbody');
-            const MAX_HOURS = 52;
-            const WARNING_HOURS = 50;
 
-            sampleData.forEach(employee => {
-                const totalHours = employee.base + employee.overtime;
-                const remainingHours = MAX_HOURS - totalHours;
-                
-                let status, statusClass;
-                if (totalHours > MAX_HOURS) {
-                    status = '초과';
-                    statusClass = 'status-exceeded';
-                } else if (totalHours >= WARNING_HOURS) {
-                    status = '경고';
-                    statusClass = 'status-warning';
-                } else {
-                    status = '정상';
-                    statusClass = 'status-normal';
+            function showLoading() {
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">데이터를 불러오는 중입니다...</td></tr>';
+            }
+
+            function showError(message) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: red; padding: 20px;">${message}</td></tr>`;
+            }
+
+            async function fetchAndProcessData() {
+                showLoading();
+                try {
+                    // Google Apps Script에서 모든 기록을 가져옵니다. 'action=getAllRecords'는 가정이며, 실제 Apps Script에 구현되어 있어야 합니다.
+                    const response = await fetch(`${SCRIPT_URL}?action=getAllRecords`);
+                    if (!response.ok) {
+                        throw new Error(`서버 응답 오류: ${response.status}`);
+                    }
+                    const records = await response.json();
+
+                    if (!Array.isArray(records)) {
+                         throw new Error('데이터 형식이 올바르지 않습니다. 배열이 아닙니다.');
+                    }
+
+                    processWeeklyHours(records);
+
+                } catch (error) {
+                    console.error('데이터 로드 실패:', error);
+                    showError(`데이터를 불러오는데 실패했습니다. Google Apps Script가 'getAllRecords' 액션을 지원하는지 확인하세요. (${error.message})`);
+                }
+            }
+
+            function getWeekNumber(d) {
+                d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+                d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+                var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+                var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+                return [d.getUTCFullYear(), weekNo];
+            }
+
+            function parseTime(timeStr) {
+                if (!timeStr || timeStr === '-') return null;
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                return hours * 60 + minutes; // 분 단위로 변환
+            }
+
+            function processWeeklyHours(records) {
+                const weeklyData = {};
+                const [currentYear, currentWeek] = getWeekNumber(new Date());
+
+                records.forEach(record => {
+                    const recordDate = new Date(record.date);
+                    const [recordYear, recordWeek] = getWeekNumber(recordDate);
+
+                    if (recordYear === currentYear && recordWeek === currentWeek) {
+                        if (!weeklyData[record.name]) {
+                            weeklyData[record.name] = { totalMinutes: 0 };
+                        }
+                        
+                        const checkInMinutes = parseTime(record.checkIn);
+                        const checkOutMinutes = parseTime(record.checkOut);
+
+                        if (checkInMinutes !== null && checkOutMinutes !== null && checkOutMinutes > checkInMinutes) {
+                            weeklyData[record.name].totalMinutes += checkOutMinutes - checkInMinutes;
+                        }
+                    }
+                });
+
+                const employeeStats = Object.keys(weeklyData).map(name => {
+                    const totalHours = weeklyData[name].totalMinutes / 60;
+                    // 기본 근무와 연장 근무를 구분하는 로직은 현재 데이터에 없으므로, 총 근무시간을 기반으로 계산합니다.
+                    // 여기서는 40시간을 기본, 초과분을 연장으로 가정합니다.
+                    const baseHours = Math.min(totalHours, 40);
+                    const overtimeHours = Math.max(0, totalHours - 40);
+                    
+                    return {
+                        name: name,
+                        total: totalHours,
+                        base: baseHours,
+                        overtime: overtimeHours
+                    };
+                });
+
+                renderTable(employeeStats);
+            }
+
+            function renderTable(employeeStats) {
+                if (employeeStats.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">이번 주 근무 기록이 없습니다.</td></tr>';
+                    return;
                 }
 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${employee.name}</td>
-                    <td>${totalHours.toFixed(1)}</td>
-                    <td>${employee.base.toFixed(1)}</td>
-                    <td>${employee.overtime.toFixed(1)}</td>
-                    <td>${remainingHours.toFixed(1)}</td>
-                    <td class="${statusClass}">${status}</td>
-                `;
-                tableBody.appendChild(row);
-            });
+                tableBody.innerHTML = ''; // 기존 내용 지우기
+
+                const MAX_HOURS = 52;
+                const WARNING_HOURS = 50;
+
+                employeeStats.sort((a, b) => b.total - a.total);
+
+                employeeStats.forEach(employee => {
+                    const remainingHours = MAX_HOURS - employee.total;
+                    
+                    let status, statusClass;
+                    if (employee.total > MAX_HOURS) {
+                        status = '초과';
+                        statusClass = 'status-exceeded';
+                    } else if (employee.total >= WARNING_HOURS) {
+                        status = '경고';
+                        statusClass = 'status-warning';
+                    } else {
+                        status = '정상';
+                        statusClass = 'status-normal';
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${employee.name}</td>
+                        <td>${employee.total.toFixed(1)}</td>
+                        <td>${employee.base.toFixed(1)}</td>
+                        <td>${employee.overtime.toFixed(1)}</td>
+                        <td>${remainingHours.toFixed(1)}</td>
+                        <td class="${statusClass}">${status}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            fetchAndProcessData();
         });
     </script>
 </body>
