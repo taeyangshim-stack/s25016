@@ -17,12 +17,56 @@
             text-align: center;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 20px auto;
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .filter-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .filter-group input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #searchButton {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            align-self: flex-end;
+        }
+        #searchButton:hover {
+            background-color: #2980b9;
+        }
+        .week-container {
+            margin-bottom: 30px;
+        }
+        .week-container h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
         }
         table {
             width: 100%;
@@ -41,81 +85,65 @@
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
-        .status-normal {
-            color: green;
-            font-weight: bold;
-        }
-        .status-warning {
-            color: orange;
-            font-weight: bold;
-        }
-        .status-exceeded {
-            color: red;
-            font-weight: bold;
-        }
+        .status-normal { color: green; font-weight: bold; }
+        .status-warning { color: orange; font-weight: bold; }
+        .status-exceeded { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>주 52시간 근무 현황</h1>
-        <table id="attendance-table">
-            <thead>
-                <tr>
-                    <th>사원</th>
-                    <th>주간 총 근무시간</th>
-                    <th>기본 근무</th>
-                    <th>연장 근무</th>
-                    <th>잔여 가능 시간</th>
-                    <th>상태</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data will be populated by JavaScript -->
-            </tbody>
-        </table>
+        
+        <div class="filter-container">
+            <div class="filter-group">
+                <label for="startDate">시작일</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="filter-group">
+                <label for="endDate">종료일</label>
+                <input type="date" id="endDate">
+            </div>
+            <button id="searchButton">검색</button>
+        </div>
+
+        <div id="results-container">
+            <!-- Weekly data will be rendered here -->
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const SCRIPT_URL = '/api/work-records';
-            const tableBody = document.querySelector('#attendance-table tbody');
+            const resultsContainer = document.getElementById('results-container');
+            const searchButton = document.getElementById('searchButton');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
 
-            function showLoading() {
-                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">데이터를 불러오는 중입니다...</td></tr>';
-            }
+            const holidays2025 = new Set([
+                '2025-01-01', // 신정
+                '2025-01-27', // 설날 연휴
+                '2025-01-28', // 설날
+                '2025-01-29', // 설날
+                '2025-01-30', // 설날 연휴
+                '2025-03-01', // 삼일절
+                '2025-03-03', // 삼일절 대체공휴일
+                '2025-05-01', // 근로자의 날
+                '2025-05-05', // 어린이날, 부처님오신날
+                '2025-05-06', // 대체공휴일
+                '2025-06-03', // 대통령 선거일
+                '2025-06-06', // 현충일
+                '2025-08-15', // 광복절
+                '2025-10-03', // 개천절
+                '2025-10-05', // 추석 연휴
+                '2025-10-06', // 추석
+                '2025-10-07', // 추석 연휴
+                '2025-10-08', // 추석 대체공휴일
+                '2025-10-09', // 한글날
+                '2025-12-25'  // 크리스마스
+            ]);
 
-            function showError(message) {
-                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: red; padding: 20px;">${message}</td></tr>`;
-            }
-
-            async function fetchAndProcessData() {
-                showLoading();
-                try {
-                    const response = await fetch(`${SCRIPT_URL}?action=getAllRecords`);
-                    if (!response.ok) {
-                        throw new Error(`서버 응답 오류: ${response.status}`);
-                    }
-                    const rawData = await response.json();
-
-                    if (!Array.isArray(rawData)) {
-                        throw new Error('데이터 형식이 올바르지 않습니다. (배열이 아님)');
-                    }
-                    
-                    // Google Sheets의 한글 컬럼명을 내부적으로 사용할 영문명으로 변환
-                    const records = rawData.map(row => ({
-                        timestamp: row['타임스탬프'] || new Date().toISOString(),
-                        date: row['날짜'] || null,
-                        name: row['인원'] || null,
-                        checkIn: row['입실시간'] || null,
-                        checkOut: row['퇴실시간'] || null,
-                    }));
-
-                    processWeeklyHours(records);
-
-                } catch (error) {
-                    console.error('데이터 로드 실패:', error);
-                    showError(`데이터를 불러오는데 실패했습니다. (${error.message})`);
-                }
+            function showMessage(message) {
+                resultsContainer.innerHTML = `<p style="text-align:center; padding: 20px;">${message}</p>`;
             }
 
             function getWeekNumber(d) {
@@ -123,120 +151,183 @@
                 d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
                 var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
                 var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-                return [d.getUTCFullYear(), weekNo];
+                return `${d.getUTCFullYear()}-${String(weekNo).padStart(2, '0')}`;
+            }
+            
+            function getWeekDateRange(year, week) {
+                const d = new Date(year, 0, 1);
+                const day = d.getDay() || 7;
+                d.setDate(d.getDate() + (week - 1) * 7 - day + 1);
+                const startDate = new Date(d);
+                const endDate = new Date(d);
+                endDate.setDate(endDate.getDate() + 6);
+                const formatDate = (dt) => `${dt.getMonth() + 1}/${dt.getDate()}`;
+                return `${formatDate(startDate)} ~ ${formatDate(endDate)}`;
             }
 
             function parseTime(timeStr) {
                 if (!timeStr || timeStr === '-' || typeof timeStr !== 'string') return null;
                 const [hours, minutes] = timeStr.split(':').map(Number);
                 if (isNaN(hours) || isNaN(minutes)) return null;
-                return hours * 60 + minutes; // 분 단위로 변환
+                return hours * 60 + minutes;
             }
-            
+
             function normalizeName(name) {
                 if (!name) return '알 수 없음';
                 return name.replace(/\s*\(.*\)\s*/, '').trim();
             }
 
-            function processWeeklyHours(records) {
-                const weeklyData = {};
-                const now = new Date();
-                const [currentYear, currentWeek] = getWeekNumber(now);
-                console.log(`[DEBUG] Current Year: ${currentYear}, Current Week: ${currentWeek}`);
-
-                records.forEach(record => {
-                    if (!record.date || !record.name) {
-                        console.log(`[DEBUG] Skipping record due to missing date or name:`, record);
-                        return;
-                    }
-
-                    const recordDate = new Date(record.date);
-                    if (isNaN(recordDate.getTime())) {
-                        console.log(`[DEBUG] Skipping record due to invalid date: ${record.date}`, record);
-                        return;
-                    }
-
-                    const [recordYear, recordWeek] = getWeekNumber(recordDate);
-                    console.log(`[DEBUG] Record Date: ${record.date}, Record Year: ${recordYear}, Record Week: ${recordWeek}, Matches Current Week: ${recordYear === currentYear && recordWeek === currentWeek}`);
-
-                    if (recordYear === currentYear && recordWeek === currentWeek) {
-                        const normalizedName = normalizeName(record.name);
-                        
-                        if (!weeklyData[normalizedName]) {
-                            weeklyData[normalizedName] = { totalMinutes: 0 };
-                        }
-                        
-                        const checkInMinutes = parseTime(record.checkIn);
-                        const checkOutMinutes = parseTime(record.checkOut);
-                        console.log(`[DEBUG] Name: ${normalizedName}, CheckIn: ${record.checkIn} (${checkInMinutes}min), CheckOut: ${record.checkOut} (${checkOutMinutes}min)`);
-
-                        if (checkInMinutes !== null && checkOutMinutes !== null && checkOutMinutes > checkInMinutes) {
-                            weeklyData[normalizedName].totalMinutes += checkOutMinutes - checkInMinutes;
-                        } else {
-                            console.log(`[DEBUG] Skipping time calculation for ${normalizedName} due to invalid times or checkOut <= checkIn. CheckIn: ${checkInMinutes}, CheckOut: ${checkOutMinutes}`);
-                        }
-                    }
-                });
-
-                const employeeStats = Object.keys(weeklyData).map(name => {
-                    const totalHours = weeklyData[name].totalMinutes / 60;
-                    const baseHours = Math.min(totalHours, 40);
-                    const overtimeHours = Math.max(0, totalHours - 40);
+            async function fetchAndProcessData() {
+                showMessage('데이터를 불러오는 중입니다...');
+                try {
+                    const response = await fetch(`${SCRIPT_URL}?action=getAllRecords`);
+                    if (!response.ok) throw new Error(`서버 응답 오류: ${response.status}`);
                     
-                    return {
-                        name: name,
-                        total: totalHours,
-                        base: baseHours,
-                        overtime: overtimeHours
-                    };
-                });
+                    const rawData = await response.json();
+                    if (!Array.isArray(rawData)) throw new Error('데이터 형식이 올바르지 않습니다.');
 
-                renderTable(employeeStats);
+                    const records = rawData.map(row => ({
+                        date: row['날짜'] || null,
+                        name: row['인원'] || null,
+                        checkIn: row['입실시간'] || null,
+                        checkOut: row['퇴실시간'] || null,
+                    }));
+
+                    processAndRender(records);
+                } catch (error) {
+                    console.error('데이터 로드 실패:', error);
+                    showMessage(`데이터를 불러오는데 실패했습니다. (${error.message})`);
+                }
             }
 
-            function renderTable(employeeStats) {
-                if (employeeStats.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">이번 주 근무 기록이 없습니다.</td></tr>';
+            function processAndRender(records) {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+
+                const weeklyData = {};
+
+                records.forEach(record => {
+                    if (!record.date || !record.name || !startDate || !endDate) return;
+                    if (record.date < startDate || record.date > endDate) return;
+
+                    const recordDate = new Date(record.date);
+                    if (isNaN(recordDate.getTime())) return;
+
+                    const weekKey = getWeekNumber(recordDate);
+                    if (!weeklyData[weekKey]) {
+                        weeklyData[weekKey] = {};
+                    }
+
+                    const normalizedName = normalizeName(record.name);
+                    if (!weeklyData[weekKey][normalizedName]) {
+                        weeklyData[weekKey][normalizedName] = { totalMinutes: 0, holidayMinutes: 0 };
+                    }
+
+                    const checkInMinutes = parseTime(record.checkIn);
+                    const checkOutMinutes = parseTime(record.checkOut);
+
+                    if (checkInMinutes !== null && checkOutMinutes !== null && checkOutMinutes > checkInMinutes) {
+                        const duration = checkOutMinutes - checkInMinutes;
+                        weeklyData[weekKey][normalizedName].totalMinutes += duration;
+
+                        const isHoliday = holidays2025.has(record.date) || recordDate.getDay() === 0 || recordDate.getDay() === 6;
+                        if (isHoliday) {
+                            weeklyData[weekKey][normalizedName].holidayMinutes += duration;
+                        }
+                    }
+                });
+
+                renderResults(weeklyData);
+            }
+
+            function renderResults(weeklyData) {
+                resultsContainer.innerHTML = '';
+                const sortedWeeks = Object.keys(weeklyData).sort().reverse();
+
+                if (sortedWeeks.length === 0) {
+                    showMessage('선택된 기간에 해당하는 근무 기록이 없습니다.');
                     return;
                 }
 
-                tableBody.innerHTML = '';
-
-                const MAX_HOURS = 52;
-                const WARNING_HOURS = 50;
-
-                employeeStats.sort((a, b) => b.total - a.total);
-
-                employeeStats.forEach(employee => {
-                    const remainingHours = MAX_HOURS - employee.total;
+                sortedWeeks.forEach(weekKey => {
+                    const [year, week] = weekKey.split('-');
+                    const weekContainer = document.createElement('div');
+                    weekContainer.className = 'week-container';
                     
-                    let status, statusClass;
-                    if (employee.total > MAX_HOURS) {
-                        status = '초과';
-                        statusClass = 'status-exceeded';
-                    } else if (employee.total >= WARNING_HOURS) {
-                        status = '경고';
-                        statusClass = 'status-warning';
-                    } else {
-                        status = '정상';
-                        statusClass = 'status-normal';
-                    }
+                    const title = document.createElement('h2');
+                    title.textContent = `${year}년 ${week}주차 (${getWeekDateRange(parseInt(year), parseInt(week))})`;
+                    weekContainer.appendChild(title);
 
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${employee.name}</td>
-                        <td>${employee.total.toFixed(1)}</td>
-                        <td>${employee.base.toFixed(1)}</td>
-                        <td>${employee.overtime.toFixed(1)}</td>
-                        <td>${remainingHours.toFixed(1)}</td>
-                        <td class="${statusClass}">${status}</td>
+                    const table = document.createElement('table');
+                    table.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>사원</th>
+                                <th>주간 총 근무시간</th>
+                                <th>기본 근무</th>
+                                <th>연장 근무</th>
+                                <th>휴일 근무</th>
+                                <th>잔여 가능 시간</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
                     `;
-                    tableBody.appendChild(row);
+                    const tableBody = table.querySelector('tbody');
+                    
+                    const employeeStats = Object.keys(weeklyData[weekKey]).map(name => {
+                        const totalHours = weeklyData[weekKey][name].totalMinutes / 60;
+                        const holidayHours = weeklyData[weekKey][name].holidayMinutes / 60;
+                        return { name, totalHours, holidayHours };
+                    }).sort((a, b) => b.totalHours - a.totalHours);
+
+                    employeeStats.forEach(emp => {
+                        const baseHours = Math.min(emp.totalHours, 40);
+                        const overtimeHours = Math.max(0, emp.totalHours - 40);
+                        const remainingHours = 52 - emp.totalHours;
+                        
+                        let status, statusClass;
+                        if (emp.totalHours > 52) {
+                            status = '초과'; statusClass = 'status-exceeded';
+                        } else if (emp.totalHours >= 50) {
+                            status = '경고'; statusClass = 'status-warning';
+                        } else {
+                            status = '정상'; statusClass = 'status-normal';
+                        }
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${emp.name}</td>
+                            <td>${emp.totalHours.toFixed(1)}</td>
+                            <td>${baseHours.toFixed(1)}</td>
+                            <td>${overtimeHours.toFixed(1)}</td>
+                            <td>${emp.holidayHours.toFixed(1)}</td>
+                            <td>${remainingHours.toFixed(1)}</td>
+                            <td class="${statusClass}">${status}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+
+                    weekContainer.appendChild(table);
+                    resultsContainer.appendChild(weekContainer);
                 });
             }
+            
+            function setDefaultDates() {
+                const today = new Date();
+                const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                
+                const toISODate = (d) => d.toISOString().split('T')[0];
 
-            fetchAndProcessData();
+                startDateInput.value = toISODate(firstDayOfMonth);
+                endDateInput.value = toISODate(lastDayOfMonth);
+            }
+
+            searchButton.addEventListener('click', fetchAndProcessData);
+            
+            setDefaultDates();
+            fetchAndProcessData(); // Initial load for the current month
         });
     </script>
-</body>
 </html>
