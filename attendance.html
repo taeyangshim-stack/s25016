@@ -15,6 +15,7 @@
         h1 {
             color: #2c3e50;
             text-align: center;
+            margin-bottom: 20px;
         }
         .container {
             max-width: 1200px;
@@ -23,50 +24,6 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .filter-container {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .filter-group label {
-            font-size: 14px;
-            margin-bottom: 5px;
-            color: #555;
-        }
-        .filter-group input {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        #searchButton {
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            align-self: flex-end;
-        }
-        #searchButton:hover {
-            background-color: #2980b9;
-        }
-        .week-container {
-            margin-bottom: 30px;
-        }
-        .week-container h2 {
-            color: #34495e;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
         }
         table {
             width: 100%;
@@ -92,89 +49,53 @@
 </head>
 <body>
     <div class="container">
-        <h1>주 52시간 근무 현황</h1>
+        <h1>근태 현황</h1>
         
-        <div class="filter-container">
-            <div class="filter-group">
-                <label for="startDate">시작일</label>
-                <input type="date" id="startDate">
-            </div>
-            <div class="filter-group">
-                <label for="endDate">종료일</label>
-                <input type="date" id="endDate">
-            </div>
-            <button id="searchButton">검색</button>
-        </div>
-
-        <div id="results-container">
-            <!-- Weekly data will be rendered here -->
-        </div>
+        <table id="attendance-table">
+            <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>인원</th>
+                    <th>입실시간</th>
+                    <th>퇴실시간</th>
+                    <th>일일 근무시간</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated by JavaScript -->
+            </tbody>
+        </table>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const SCRIPT_URL = '/api/work-records';
-            const resultsContainer = document.getElementById('results-container');
-            const searchButton = document.getElementById('searchButton');
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-
-            const holidays2025 = new Set([
-                '2025-01-01', // 신정
-                '2025-01-27', // 설날 연휴
-                '2025-01-28', // 설날
-                '2025-01-29', // 설날
-                '2025-01-30', // 설날 연휴
-                '2025-03-01', // 삼일절
-                '2025-03-03', // 삼일절 대체공휴일
-                '2025-05-01', // 근로자의 날
-                '2025-05-05', // 어린이날, 부처님오신날
-                '2025-05-06', // 대체공휴일
-                '2025-06-03', // 대통령 선거일
-                '2025-06-06', // 현충일
-                '2025-08-15', // 광복절
-                '2025-10-03', // 개천절
-                '2025-10-05', // 추석 연휴
-                '2025-10-06', // 추석
-                '2025-10-07', // 추석 연휴
-                '2025-10-08', // 추석 대체공휴일
-                '2025-10-09', // 한글날
-                '2025-12-25'  // 크리스마스
-            ]);
+            const tableBody = document.querySelector('#attendance-table tbody');
 
             function showMessage(message) {
-                resultsContainer.innerHTML = `<p style="text-align:center; padding: 20px;">${message}</p>`;
-            }
-
-            function getWeekNumber(d) {
-                d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-                d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-                var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-                var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-                return `${d.getUTCFullYear()}-${String(weekNo).padStart(2, '0')}`;
-            }
-            
-            function getWeekDateRange(year, week) {
-                const d = new Date(year, 0, 1);
-                const day = d.getDay() || 7;
-                d.setDate(d.getDate() + (week - 1) * 7 - day + 1);
-                const startDate = new Date(d);
-                const endDate = new Date(d);
-                endDate.setDate(endDate.getDate() + 6);
-                const formatDate = (dt) => `${dt.getMonth() + 1}/${dt.getDate()}`;
-                return `${formatDate(startDate)} ~ ${formatDate(endDate)}`;
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px;">${message}</td></tr>`;
             }
 
             function parseTime(timeStr) {
                 if (!timeStr || timeStr === '-' || typeof timeStr !== 'string') return null;
                 const [hours, minutes] = timeStr.split(':').map(Number);
                 if (isNaN(hours) || isNaN(minutes)) return null;
-                return hours * 60 + minutes;
+                return hours * 60 + minutes; // 분 단위로 변환
             }
-
+            
             function normalizeName(name) {
                 if (!name) return '알 수 없음';
                 return name.replace(/\s*\(.*\)\s*/, '').trim();
+            }
+
+            function calculateDailyWorkHours(checkIn, checkOut) {
+                const checkInMinutes = parseTime(checkIn);
+                const checkOutMinutes = parseTime(checkOut);
+
+                if (checkInMinutes !== null && checkOutMinutes !== null && checkOutMinutes > checkInMinutes) {
+                    return (checkOutMinutes - checkInMinutes) / 60; // 시간 단위로 반환
+                }
+                return 0;
             }
 
             async function fetchAndProcessData() {
@@ -186,148 +107,48 @@
                     const rawData = await response.json();
                     if (!Array.isArray(rawData)) throw new Error('데이터 형식이 올바르지 않습니다.');
 
-                    const records = rawData.map(row => ({
+                    const processedRecords = rawData.map(row => ({
+                        timestamp: row['타임스탬프'] || new Date().toISOString(),
                         date: row['날짜'] || null,
-                        name: row['인원'] || null,
-                        checkIn: row['입실시간'] || null,
-                        checkOut: row['퇴실시간'] || null,
+                        name: normalizeName(row['인원']),
+                        checkIn: row['입실시간'] || '-',
+                        checkOut: row['퇴실시간'] || '-',
+                        dailyHours: calculateDailyWorkHours(row['입실시간'], row['퇴실시간'])
                     }));
 
-                    processAndRender(records);
+                    renderTable(processedRecords);
+
                 } catch (error) {
                     console.error('데이터 로드 실패:', error);
                     showMessage(`데이터를 불러오는데 실패했습니다. (${error.message})`);
                 }
             }
 
-            function processAndRender(records) {
-                const startDate = startDateInput.value;
-                const endDate = endDateInput.value;
-
-                const weeklyData = {};
-
-                records.forEach(record => {
-                    if (!record.date || !record.name || !startDate || !endDate) return;
-                    if (record.date < startDate || record.date > endDate) return;
-
-                    const recordDate = new Date(record.date);
-                    if (isNaN(recordDate.getTime())) return;
-
-                    const weekKey = getWeekNumber(recordDate);
-                    if (!weeklyData[weekKey]) {
-                        weeklyData[weekKey] = {};
-                    }
-
-                    const normalizedName = normalizeName(record.name);
-                    if (!weeklyData[weekKey][normalizedName]) {
-                        weeklyData[weekKey][normalizedName] = { totalMinutes: 0, holidayMinutes: 0 };
-                    }
-
-                    const checkInMinutes = parseTime(record.checkIn);
-                    const checkOutMinutes = parseTime(record.checkOut);
-
-                    if (checkInMinutes !== null && checkOutMinutes !== null && checkOutMinutes > checkInMinutes) {
-                        const duration = checkOutMinutes - checkInMinutes;
-                        weeklyData[weekKey][normalizedName].totalMinutes += duration;
-
-                        const isHoliday = holidays2025.has(record.date) || recordDate.getDay() === 0 || recordDate.getDay() === 6;
-                        if (isHoliday) {
-                            weeklyData[weekKey][normalizedName].holidayMinutes += duration;
-                        }
-                    }
-                });
-
-                renderResults(weeklyData);
-            }
-
-            function renderResults(weeklyData) {
-                resultsContainer.innerHTML = '';
-                const sortedWeeks = Object.keys(weeklyData).sort().reverse();
-
-                if (sortedWeeks.length === 0) {
-                    showMessage('선택된 기간에 해당하는 근무 기록이 없습니다.');
+            function renderTable(records) {
+                if (records.length === 0) {
+                    showMessage('근무 기록이 없습니다.');
                     return;
                 }
 
-                sortedWeeks.forEach(weekKey => {
-                    const [year, week] = weekKey.split('-');
-                    const weekContainer = document.createElement('div');
-                    weekContainer.className = 'week-container';
-                    
-                    const title = document.createElement('h2');
-                    title.textContent = `${year}년 ${week}주차 (${getWeekDateRange(parseInt(year), parseInt(week))})`;
-                    weekContainer.appendChild(title);
+                tableBody.innerHTML = ''; // 기존 내용 지우기
 
-                    const table = document.createElement('table');
-                    table.innerHTML = `
-                        <thead>
-                            <tr>
-                                <th>사원</th>
-                                <th>주간 총 근무시간</th>
-                                <th>기본 근무</th>
-                                <th>연장 근무</th>
-                                <th>휴일 근무</th>
-                                <th>잔여 가능 시간</th>
-                                <th>상태</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
+                // 최신 데이터가 먼저 오도록 정렬
+                records.sort((a, b) => new Date(b.date + ' ' + b.checkIn) - new Date(a.date + ' ' + a.checkIn));
+
+                records.forEach(record => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${record.date}</td>
+                        <td>${record.name}</td>
+                        <td>${record.checkIn}</td>
+                        <td>${record.checkOut}</td>
+                        <td>${record.dailyHours.toFixed(1)}</td>
                     `;
-                    const tableBody = table.querySelector('tbody');
-                    
-                    const employeeStats = Object.keys(weeklyData[weekKey]).map(name => {
-                        const totalHours = weeklyData[weekKey][name].totalMinutes / 60;
-                        const holidayHours = weeklyData[weekKey][name].holidayMinutes / 60;
-                        return { name, totalHours, holidayHours };
-                    }).sort((a, b) => b.totalHours - a.totalHours);
-
-                    employeeStats.forEach(emp => {
-                        const baseHours = Math.min(emp.totalHours, 40);
-                        const overtimeHours = Math.max(0, emp.totalHours - 40);
-                        const remainingHours = 52 - emp.totalHours;
-                        
-                        let status, statusClass;
-                        if (emp.totalHours > 52) {
-                            status = '초과'; statusClass = 'status-exceeded';
-                        } else if (emp.totalHours >= 50) {
-                            status = '경고'; statusClass = 'status-warning';
-                        } else {
-                            status = '정상'; statusClass = 'status-normal';
-                        }
-
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${emp.name}</td>
-                            <td>${emp.totalHours.toFixed(1)}</td>
-                            <td>${baseHours.toFixed(1)}</td>
-                            <td>${overtimeHours.toFixed(1)}</td>
-                            <td>${emp.holidayHours.toFixed(1)}</td>
-                            <td>${remainingHours.toFixed(1)}</td>
-                            <td class="${statusClass}">${status}</td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-
-                    weekContainer.appendChild(table);
-                    resultsContainer.appendChild(weekContainer);
+                    tableBody.appendChild(row);
                 });
             }
-            
-            function setDefaultDates() {
-                const today = new Date();
-                const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-                const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                
-                const toISODate = (d) => d.toISOString().split('T')[0];
 
-                startDateInput.value = toISODate(firstDayOfMonth);
-                endDateInput.value = toISODate(lastDayOfMonth);
-            }
-
-            searchButton.addEventListener('click', fetchAndProcessData);
-            
-            setDefaultDates();
-            fetchAndProcessData(); // Initial load for the current month
+            fetchAndProcessData();
         });
     </script>
 </html>
