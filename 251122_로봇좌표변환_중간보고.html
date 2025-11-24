@@ -268,6 +268,86 @@
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
         }
 
+        .viz-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        }
+
+        .viz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .viz-title {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .viz-note {
+            color: #475569;
+            font-size: 0.95em;
+        }
+
+        .viz-metrics {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .viz-chip {
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.9em;
+            border: 1px solid rgba(0,0,0,0.05);
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .viz-canvas {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 10px;
+            background: white;
+            border: 1px dashed #e2e8f0;
+        }
+
+        .viz-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+            color: #475569;
+            font-size: 0.95em;
+        }
+
+        .viz-legend span {
+            position: relative;
+            padding-left: 18px;
+        }
+
+        .viz-legend span::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--c, #64748b);
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
+        }
+
         @media print {
             body {
                 background: white;
@@ -470,6 +550,29 @@ EXTCTL1 (R축 회전 적용)
 Robot2 Base Frame ([488, -374.57, 1400]mm, 180° Y축)
     ↓
 World (wobj0)</div>
+
+                <h3>좌표 변환 시각화</h3>
+                <div class="viz-card">
+                    <div class="viz-header">
+                        <div>
+                            <p class="viz-title">World 기준 Y축 배치</p>
+                            <p class="viz-note">Robot1: Y=+488mm · Robot2: Y=-488mm (목표 거리 976mm) / 실측 거리 982.21mm</p>
+                        </div>
+                        <div class="viz-metrics">
+                            <div class="viz-chip" style="background: #e0f2fe; color: #0369a1;">목표 976mm</div>
+                            <div class="viz-chip" style="background: #ecfeff; color: #0f172a;">실측 982.21mm</div>
+                            <div class="viz-chip" style="background: #fef3c7; color: #92400e;">편차 +6.21mm</div>
+                        </div>
+                    </div>
+                    <canvas id="transformViz" class="viz-canvas" height="280"></canvas>
+                    <div class="viz-legend">
+                        <span style="--c:#0ea5e9;">Robot1 (+Y) 목표</span>
+                        <span style="--c:#e11d48;">Robot2 (-Y) 목표</span>
+                        <span style="--c:#10b981;">목표 거리 라인</span>
+                        <span style="--c:#f97316;">실측 거리 라인</span>
+                        <span style="--c:#94a3b8;">World 원점 (wobj0)</span>
+                    </div>
+                </div>
             </div>
 
             <!-- 4. 현재 상태 -->
@@ -649,5 +752,100 @@ HOME:/robot2_world_origin_test.txt (예정)</div>
             <a href="index.html" class="back-link">← 통합 대시보드로 돌아가기</a>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('transformViz');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const data = {
+                robot1Target: 488,
+                robot2Target: -488,
+                targetDistance: 976,
+                measuredDistance: 982.21
+            };
+            data.error = data.measuredDistance - data.targetDistance;
+            data.robot1Measured = data.robot1Target + data.error / 2;
+            data.robot2Measured = data.robot2Target - data.error / 2;
+
+            function draw() {
+                const rect = canvas.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                const height = 280;
+
+                canvas.width = rect.width * dpr;
+                canvas.height = height * dpr;
+
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.scale(dpr, dpr);
+                ctx.clearRect(0, 0, rect.width, height);
+
+                const padding = 60;
+                const originX = rect.width / 2;
+                const originY = height / 2;
+                const maxAbsY = Math.max(Math.abs(data.robot1Target), Math.abs(data.robot2Target), data.measuredDistance / 2) + 40;
+                const scale = (height - padding * 2) / (2 * maxAbsY);
+
+                const yToCanvas = (y) => originY - y * scale;
+
+                // World 축
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.moveTo(originX, padding);
+                ctx.lineTo(originX, height - padding);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = '#475569';
+                ctx.font = '12px "Segoe UI", sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText('wobj0', originX - 12, originY + 4);
+
+                const drawDistanceLine = (y1, y2, color, label, offset) => {
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(originX + offset, yToCanvas(y1));
+                    ctx.lineTo(originX + offset, yToCanvas(y2));
+                    ctx.stroke();
+
+                    const midY = (y1 + y2) / 2;
+                    ctx.fillStyle = '#0f172a';
+                    ctx.font = '12px "Segoe UI", sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(label, originX + offset + 10, yToCanvas(midY) + 4);
+                };
+
+                const drawPoint = (y, color, label, alignLeft) => {
+                    const yPos = yToCanvas(y);
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(originX, yPos, 8, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#0f172a';
+                    ctx.font = '12px "Segoe UI", sans-serif';
+                    ctx.textAlign = alignLeft ? 'left' : 'right';
+                    const textX = alignLeft ? originX + 14 : originX - 14;
+                    ctx.fillText(label, textX, yPos + 4);
+                };
+
+                drawDistanceLine(data.robot1Target, data.robot2Target, '#10b981', `목표 ${data.targetDistance.toFixed(0)}mm`, 34);
+                drawDistanceLine(data.robot1Measured, data.robot2Measured, '#f97316', `실측 ${data.measuredDistance.toFixed(2)}mm (+${data.error.toFixed(2)}mm)`, 90);
+
+                drawPoint(data.robot1Target, '#0ea5e9', `Robot1 +${data.robot1Target}mm`, true);
+                drawPoint(data.robot2Target, '#e11d48', `Robot2 ${data.robot2Target}mm`, true);
+                drawPoint(data.robot1Measured, '#f97316', `실측 +${data.robot1Measured.toFixed(2)}mm`, false);
+                drawPoint(data.robot2Measured, '#f97316', `실측 ${data.robot2Measured.toFixed(2)}mm`, false);
+                drawPoint(0, '#94a3b8', 'World 0', false);
+            }
+
+            window.addEventListener('resize', draw);
+            draw();
+        });
+    </script>
 </body>
 </html>
