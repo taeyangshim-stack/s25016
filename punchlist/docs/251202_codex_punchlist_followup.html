@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <title>펀치리스트 진행 로그 백업 (251202)</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 24px; }
+      h1 { font-size: 20px; margin-bottom: 8px; }
+      p { margin: 4px 0 12px; }
+      table { border-collapse: collapse; width: 100%; }
+      th, td { border: 1px solid #ccc; padding: 6px 8px; font-size: 13px; }
+      th { background: #f3f3f3; text-align: left; }
+      tr:nth-child(even) td { background: #fafafa; }
+      .status { white-space: nowrap; }
+    </style>
+  </head>
+  <body>
+    <h1>펀치리스트 진행 로그 백업</h1>
+    <p>대화 단절 시 참조용 요약(작성: 251202). CSV 상태와 별도 메모를 함께 기록.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th class="status">CSV 상태</th>
+          <th>추가 메모 / 요청자</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>PL-2025-006</td><td class="status">검증중</td><td>이마룬 진행 상태 확인 필요.</td></tr>
+        <tr><td>PL-2025-008</td><td class="status">진행중</td><td>B라인 불스아이: 1호기만 설치, 2·3호기 미설치. 12/2 박기혁 방문 예정(위치 결정).</td></tr>
+        <tr><td>PL-2025-011</td><td class="status">신규</td><td>B라인 진행·UI 통계 탭 연동 협의 필요. 박주한 확인.</td></tr>
+        <tr><td>PL-2025-012</td><td class="status">검증중</td><td>“안전하지 않은 동기화” 메시지. 이마룬 진행 점검.</td></tr>
+        <tr><td>PL-2025-013</td><td class="status">신규</td><td>12/1 업데이트 사항 반영 요청. 이마룬 확인.</td></tr>
+        <tr><td>PL-2025-015</td><td class="status">완료</td><td>상태 재확인 요청(이마룬).</td></tr>
+        <tr><td>PL-2025-018</td><td class="status">검증중</td><td>완료 가능 여부 이마룬에게 문의.</td></tr>
+        <tr><td>PL-2025-020</td><td class="status">진행중</td><td>수직용접 지연. 지속 모니터링.</td></tr>
+        <tr><td>PL-2025-021</td><td class="status">진행중</td><td>박주한: 완료/진행중/예정 정리 요청 필요.</td></tr>
+        <tr><td>PL-2025-022</td><td class="status">완료</td><td>박주한에게 진행 재확인 필요(Access Denied 조치).</td></tr>
+        <tr><td>PL-2025-023</td><td class="status">보류</td><td>로봇 메이커 확인 불가 → 고객사 공유 후 컴펌 필요.</td></tr>
+        <tr><td>PL-2025-024</td><td class="status">신규</td><td>A라인 전장 잔여 작업 진행 상황 이상주 확인 요청.</td></tr>
+        <tr><td>PL-2025-025</td><td class="status">신규</td><td>B라인 전장 리스트처럼 A라인도 상세 정리 필요 여부 이상주 확인.</td></tr>
+        <tr><td>PL-2025-026</td><td class="status">진행중</td><td>컨트롤러 발판. 12/2 박기혁 현장 방문 시 진행 공유 요청.</td></tr>
+        <tr><td>PL-2025-027</td><td class="status">진행중</td><td>IN/OUT 차광막. 고객사 중간 확인 필요(정예희·박기혁).</td></tr>
+        <tr><td>PL-2025-028</td><td class="status">완료</td><td>릴/피더기 브라켓 변경 완료 내용 박기혁 공유 필요.</td></tr>
+        <tr><td>PL-2025-029</td><td class="status">완료</td><td>센서 설치 완료. PLC I/O 포설 및 PLC→UI→운영 연동 필요(잔량 알림).</td></tr>
+        <tr><td>PL-2025-030</td><td class="status">진행중</td><td>자율안전신고서. 박기혁 업데이트 점검 필요.</td></tr>
+        <tr><td>PL-2025-031</td><td class="status">완료</td><td>LDS 제어 작업 잔여. 이상주와 후속 정리 필요.</td></tr>
+        <tr><td>PL-2025-032</td><td class="status">진행중</td><td>토치 케이블 처짐 방지. 박기혁 진행 공유 필요.</td></tr>
+        <tr><td>PL-2025-033</td><td class="status">진행중</td><td>전원 케이블 타입 변경. 박기혁 진행 공유 필요.</td></tr>
+        <tr><td>PL-2025-034</td><td class="status">진행중</td><td>릴·피더기 위치 상향. 박기혁 진행 공유 필요.</td></tr>
+        <tr><td>PL-2025-035</td><td class="status">진행중</td><td>블스아이 설치/위치 확정. 박기혁 진행 공유 필요.</td></tr>
+        <tr><td>PL-2025-036</td><td class="status">신규</td><td>거더 상향 조정. 박기혁 진행 확인 필요.</td></tr>
+        <tr><td>PL-2025-038</td><td class="status">완료</td><td>쇼크 센서 무력화. 이상주에게 결과 공유 요청.</td></tr>
+        <tr><td>PL-2025-039</td><td class="status">진행중</td><td>스프레이 LOW 경고. 관제 전달 여부 이상주 확인.</td></tr>
+        <tr><td>PL-2025-042</td><td class="status">완료</td><td>홈 동작 간소화 Case1. 완료 여부 이상주·이마룬 재확인.</td></tr>
+        <tr><td>PL-2025-046</td><td class="status">진행중</td><td>전장품 보호 커버. 이상주 진행 확인 필요.</td></tr>
+        <tr><td>PL-2025-047</td><td class="status">완료</td><td>용접와이어 릴브라켓 변경. 완전 완료로 기록.</td></tr>
+        <tr><td>PL-2025-048</td><td class="status">진행중</td><td>Plan B 로봇 재구성. 에스피시스템스 본사 별도 진행, 직접 팔로업 필요.</td></tr>
+        <tr><td>PL-2025-049</td><td class="status">완료</td><td>캐노피+잔량 센서. 전기 배선 완료(이상주), 제어측 박주한이 PLC 인터페이스·운영 연동 준비 필요.</td></tr>
+        <tr><td>PL-2025-050</td><td class="status">완료</td><td>브레이크포인트 정보 미전달 이슈. 이마룬에게 적용/동작 리뷰 요청.</td></tr>
+        <tr><td>PL-2025-051</td><td class="status">진행중</td><td>아크웨어 초기화 관련. 유대영 차장 지속 팔로업 요청.</td></tr>
+        <tr><td>PL-2025-052</td><td class="status">보류</td><td>A라인 PLC BOX 경광등 방향 전환 시 재타공/홀막음 필요로 변경 취소(이상주). 최종 확정 여부 확인.</td></tr>
+        <tr><td>PL-2025-053</td><td class="status">신규</td><td>B라인 1호기 OP PC 전원 OFF. 절전모드 해제(12/1 적용) 후 관망 중. 이상주·임석호 확인 필요.</td></tr>
+        <tr><td>PL-2025-054</td><td class="status">완료</td><td>갠트리 충돌 검사 미작동 긴급 패치. 완료로 기록.</td></tr>
+        <tr><td>PL-2025-055</td><td class="status">진행중</td><td>B라인 드라이런 속도 배율 적용. 이마룬·최광년에게 RAPID 적용/검증 상태 확인 필요.</td></tr>
+        <tr><td>PL-2025-056</td><td class="status">완료</td><td>로봇 이동속도(0/25/50/75/100) UI+RAPID 완료.</td></tr>
+        <tr><td>PL-2025-057</td><td class="status">완료</td><td>로봇/갠트리 TCP 속도 설정 구현 완료.</td></tr>
+        <tr><td>PL-2025-058</td><td class="status">완료</td><td>와이어 커팅 속도 제어 UI+RAPID 완료.</td></tr>
+        <tr><td>PL-2025-059</td><td class="status">완료</td><td>수동조작 용어 표준화(UI 수정 완료). 보고 시 담당을 박주한으로 표기.</td></tr>
+        <tr><td>PL-2025-060</td><td class="status">진행중</td><td>시뮬 vs 실제 알람(컨트롤러 예외 협의 건). 박주한에게 현재 계획/필요사항 확인 필요(10월 초 이후 보류).</td></tr>
+        <tr><td>PL-2025-061</td><td class="status">완료</td><td>알람처리(팬던트→UI→관제). 완료로 표기되어 있으나 실제 적용 범위 확인 필요(박주한에게 진행 내용 문의).</td></tr>
+        <tr><td>PL-2025-062</td><td class="status">완료</td><td>수동조작 상대/절대 모드 가시성 개선(UI 반영). 적용은 미비, 향후 추가 이슈 발생 시 대응하기로 함.</td></tr>
+        <tr><td>PL-2025-064</td><td class="status">완료</td><td>매크로 일괄변경/임시저장 완료. A라인 조회·선/후행 완료. B라인도 적용됐는지 박주한에게 확인 필요.</td></tr>
+        <tr><td>PL-2025-065</td><td class="status">진행중</td><td>실시간 용접 조건 변경(전압/WFS). 이마룬에게 A라인 트리거 교체/동작, B라인 RAPID·IO 적용 상태 공유 요청.</td></tr>
+        <tr><td>PL-2025-066</td><td class="status">완료</td><td>토치 클리너 리머 전진 속도 조정 완료.</td></tr>
+        <tr><td>PL-2025-067</td><td class="status">신규</td><td>공압/CO2압/냉각수/가스유량 알람 UI. A라인: PLC–UI 인터페이스 정리, UI 화면·관제 연동 남음. B라인: 결선 완료, PLC–UI 인터페이스 및 관제 연동/화면 구성 남음. 임계값 기준(2단/3단) 결정 필요. 박주한 리뷰 요청.</td></tr>
+        <tr><td>PL-2025-068</td><td class="status">진행중</td><td>B라인 쇼크 센서 알람 무력화(OP 스위치). 이상주에게 적용/검증 여부 확인.</td></tr>
+        <tr><td>PL-2025-069</td><td class="status">신규</td><td>RAPID 자동 상태 확인 에러(sdk 통신 단절 시). 박주한 협의 중, 12/3 기준 차주 수요일 조치 예정.</td></tr>
+        <tr><td>PL-2025-070</td><td class="status">신규</td><td>B라인 와이어커팅+십자레이저 전장(설치/와이어링). DeviceNet 이슈 해소, 전장 작업 착수 필요. 심태양 완료 처리 예정.</td></tr>
+        <tr><td>PL-2025-071</td><td class="status">완료</td><td>속도파라미터 UI 설정(로봇/갠트리). 완료로 기록, 박주한에게 현장 테스트 결과 공유 요청.</td></tr>
+        <tr><td>PL-2025-072</td><td class="status">완료</td><td>3호기 웰드가이드 보드 교체/결선 확인 후 완료.</td></tr>
+        <tr><td>PL-2025-073</td><td class="status">완료</td><td>B라인 CT 절감용 3종 홈 자세 적용. 완료 상태 유지.</td></tr>
+        <tr><td>PL-2025-074</td><td class="status">신규</td><td>인셉션 에러 UI 세분화. 시그널/모션/용접별 세분화 개발 취합 중(27일 목표). 박주한 리뷰/진행 확인 필요.</td></tr>
+        <tr><td>PL-2025-076</td><td class="status">완료</td><td>알람 다중 발생 시 UI 프리징 방지 구현 완료. 구현 내용/방법을 박주한에게 확인 예정.</td></tr>
+        <tr><td>PL-2025-077</td><td class="status">완료</td><td>심데이터 Ign_Move_Delay / ScrapeStart 칼럼 추가 완료. DB/UI/RAPID 적용 경로와 배포 범위를 박주한에게 확인 필요.</td></tr>
+        <tr><td>PL-2025-078</td><td class="status">완료</td><td>엑셀 기반 토치·심데이터 제어 개선 완료. 실제 적용 절차/버튼 동작 분리 방식 확인 후, 박주한에게 메일로 공유 요청 예정.</td></tr>
+        <tr><td>PL-2025-079</td><td class="status">완료</td><td>DB 백업 파일명 중복 개선 완료. A/B 공통 적용 여부와 실제 진행/완료 경과를 박주한에게 확인 후 메일로 공유 예정.</td></tr>
+        <tr><td>PL-2025-080</td><td class="status">검증중</td><td>아크 에러 발생 시 운영SW에서 RAPID 제어 자동화(Stop→PP to Main→Run, 복구 표시·승인 단계). 검증 완료 예정 시점과 완료 처리 가능 여부를 박주한에게 요청.</td></tr>
+        <tr><td>PL-2025-081</td><td class="status">완료</td><td>계측 홈 / 기본 Z홈 분리 완료(Cmd 102/110, 관제 API, UI 버튼/상태 추가). PL-2025-042/073과 중복 여부를 이마룬에게 점검 요청.</td></tr>
+        <tr><td>PL-2025-082</td><td class="status">진행중</td><td>R축 +레이저 전원 투입/셋업(전원투입, 피치/시프트/로테이션 셋팅, 2·3호기 수평 전개). 진행 현황과 완료 예정일을 심태양에게 확인 필요.</td></tr>
+        <tr><td>PL-2025-083</td><td class="status">신규</td><td>B라인 X축 하드 리밋 무시 스위치가 동작하지 않음. 결선 문제로 추정되므로 이상주에게 원인 점검 및 일정 수립 요청.</td></tr>
+        <tr><td>PL-2025-084</td><td class="status">검증중</td><td>PLC 알람 체크(A라인): PLC 알람·압력센서·스프레이 로우레벨 값을 UI로 송신하는 PLC–UI 인터페이스는 구성 완료. UI–운영SW 협의는 끝났고 프로토타입 적용 대기 중. 박주한에게 적용 일정/완료 가능 여부 확인 필요. B라인은 센서 미장착으로 보류.</td></tr>
+        <tr><td>PL-2025-085</td><td class="status">완료</td><td>카메라 블로 개별 제어 완료(RAPID 개별 온오프 커맨드 + UI 개별 제어). 현재 UI에서만 검증, 관제SW 연동 검증 남음. 박주한/이마룬에게 관제 검증 일정 확인.</td></tr>
+        <tr><td>PL-2025-086</td><td class="status">검증중</td><td>트랙 데이터 레코드 추가(Max_Corr/track_bias). 운영SW 로컬 DB 칼럼 확장 및 TorchMotion RECORD 반영·동작 확인 완료, RAPID Gain Y/Z 기능은 11/27 삭제. 현황/완료 가능 시점을 박주한에게 확인 필요.</td></tr>
+        <tr><td>PL-2025-088</td><td class="status">신규</td><td>작업자/관리자 권한별 UI 구분 요구. 롤 정의·권한 매핑·전환 방식·UI 차이 범위 확정 및 적용 일정 수립을 박주한에게 문의 필요.</td></tr>
+        <tr><td>PL-2025-089</td><td class="status">신규</td><td>돌림 용접 구간 개별 옵셋 적용. A라인은 각 용접선별 갠트리 길이 오프셋 적용 완료 기록 있음. B라인 적용 여부 및 진행/계획을 박주한에게 공유 요청.</td></tr>
+        <tr><td>PL-2025-090</td><td class="status">신규</td><td>터치 센싱 Z/Y 이중 터치 시 에러 처리. 요구 스펙/진행 상황을 이마룬에게 업데이트 요청 후 일정 수립.</td></tr>
+        <tr><td>PL-2025-091</td><td class="status">신규</td><td>B라인 수동 용접 기능 추가(팬던트 프로그램 버튼 기반 티칭, 실시간 용접). 요구 범위/적용 계획을 박주한에게 확인 필요.</td></tr>
+        <tr><td>PL-2025-092</td><td class="status">신규</td><td>수직 용접 터치 센싱 옵셋 적용. A/B 공통 적용 대상. 스펙·적용 범위·일정을 박주한에게 확인 필요.</td></tr>
+        <tr><td>PL-2025-093</td><td class="status">신규</td><td>운영 S/W 최종 매뉴얼 제출(A/B 공통, 낮음). 제출 범위/버전·산출물 위치·마감 일정 확인 필요.</td></tr>
+        <tr><td>PL-2025-094</td><td class="status">신규</td><td>작업자 요청(B라인): ① 와이어 공급 릴 위치 한 피치 이동(완료) ② 측정 SMR 브라켓 제거(완료) ③ 로봇 수직축 부하는 PL-2025-113로 이관.</td></tr>
+        <tr><td>PL-2025-095</td><td class="status">신규</td><td>명판 오/미부착(A/B라인). X/Y/Z축 명판 미부착/오부착 건을 박기혁과 컨셉 공유·승인 준비 중. 제작/부착·위치 변경 일정은 오민환·심태양에게 확인 후 온라인 펀치리스트 반영 예정.</td></tr>
+        <tr><td>PL-2025-096</td><td class="status">신규</td><td>B라인 용접선 길이/두께 차이 크로스 시 용접 불가 반환. RAPID에서 차단 중이나 UI도 검출/리턴 로직 추가 필요. 박주한에게 준비/계획 공유 요청.</td></tr>
+        <tr><td>PL-2025-097</td><td class="status">신규</td><td>로봇 백그라이트/절연 볼트·핀·와셔 부착 필요(A/B라인). 플레이트 통전으로 아크에러 의심. 백그라이트 제작 후 과제 갠트리 적용 → 거제조선소 34bay A/B라인 적용 예정. 심태양이 일정/조치 계획 확인 필요.</td></tr>
+        <tr><td>PL-2025-098</td><td class="status">신규</td><td>B라인 유지보수 리스트 요청(윤활 팩, 와이어커터 날, 노즐 클리너 액, 캠팔로워 베어링 등). 요청 발송 상태. 정예희/박기혁에게 리스트 정리·전달 일정 확인 필요.</td></tr>
+        <tr><td>PL-2025-099</td><td class="status">신규</td><td>UI 조작 로깅(긴급, A/B라인). 로봇 오류 원인 분석을 위해 UI/DB 조작 기록 기능 부재. 로깅 범위·포맷·보관·알람 정책 및 진행 상황을 박주한에게 공유 요청.</td></tr>
+        <tr><td>PL-2025-100</td><td class="status">진행중</td><td>터치 모션 파라미터 X_init 변수화(A/B라인). Y/Z 보정 모션 X좌표를 매크로별 저장하도록 변경 중. 진행 상황을 최광년·이마룬에게 확인(이마룬에게 공유/업데이트 요청).</td></tr>
+        <tr><td>PL-2025-101</td><td class="status">검증중</td><td>A라인 UI 와이어 커팅 자세 티칭 추가. 커맨드 기반 접근/커팅 위치 이동·저장·피딩/커팅·탈출·안전장치 구현 적용 후 검증 중. 진행 상황을 최광년·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-102</td><td class="status">완료</td><td>와이어 교체 상황 해제 후 Z홈 기능 추가(A/B라인). 완료 상태로 기록됨—완료 확인을 박주한에게 요청.</td></tr>
+        <tr><td>PL-2025-103</td><td class="status">신규</td><td>겐트리 A/B LINE 호기 구분 명판 요청(낮음). 요청일 12/2, 목표 12/12, 담당 심태양. 진행/일정 확인 필요.</td></tr>
+        <tr><td>PL-2025-104</td><td class="status">진행중</td><td>작업자 사용 이력 로그 추가(A/B라인). 사용자 활동 로깅 기능 필요. PL-ID 100으로 확정. 설계/개발 진행 상황을 박주한·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-105</td><td class="status">신규</td><td>로봇/UI 통신 단절 시 UI 프리징 및 관제 상태 전송 문제(A/B라인). SDK 통신 단절 시 무한 자동 요청/프리징 방지 및 상태 전송 로직 필요. 박주한·이마룬에게 원인/조치 계획 확인 요청.</td></tr>
+        <tr><td>PL-2025-106</td><td class="status">진행중</td><td>UI–관제(디지털 트윈) 통신 주기 문제(A/B라인). 통신 속도 테스트 콘솔로 A/B라인 모니터링 데이터 지연 측정/비교 중, 필요 시 로봇 테스크 정지 후 재시도. 진행 상황을 박주한·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-107</td><td class="status">보류</td><td>[중복작성] 터치모션 파라미터 UI/RAPID 전달 준비. PL-2025-100/103과 중복, 삭제 예정. 박주한·이상주에게 정리 확인.</td></tr>
+        <tr><td>PL-2025-108</td><td class="status">완료</td><td>상부 추락 방지 도어/보수 데크 열림 감지(A라인). 센서 감지 시 상위 정지, 필요 시 UI→관제 전달. 완료 처리 상태 확인.</td></tr>
+        <tr><td>PL-2025-109</td><td class="status">신규</td><td>Weld↔Robot LAN 케이블 처리(A/B라인). 노이즈로 케이블을 덕트 밖에 풀어둔 상태 → 후렉시블 처리 및 Y축 빔 따라 전원 케이블과 분리 경로로 변경 예정. 이상주·이동혁에게 진행 확인.</td></tr>
+        <tr><td>PL-2025-110</td><td class="status">완료</td><td>타워램프/상부 경광등 부저 미동작(A/B라인). PLC 프로그램 누락 수정 완료(A4호기, B1~3호기).</td></tr>
+        <tr><td>PL-2025-111</td><td class="status">신규</td><td>A라인 형상 보간 실패(25-11-27 9:30, 4호기). 28일 18시 이후 재현/원인 분석 예정. 긴급 이슈, 진행 상황을 최광년·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-112</td><td class="status">신규</td><td>100 매크로 토치 회전 속도 완화(토치 진행각 0도 포인트 제거, 갠트리 오프셋 증가). 회전 속도 프로파일/오프셋 수치 등 적용 방법을 최광년·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-113</td><td class="status">신규</td><td>Z축 과부하 에러 긴급 대응(94번 부하 이슈 이관). 워밍업 루틴 작성, 필요 시 파라미터 25→30 적용 및 재현 모니터링. 최광년·이마룬에게 진행 상황 확인.</td></tr>
+        <tr><td>PL-2025-114</td><td class="status">신규</td><td>용접 조건 DB 저장 후 UI 리프레시 에러(긴급). 에러 재현 조건·로그·수정/배포 일정 확인을 박주한·이마룬에게 요청.</td></tr>
+        <tr><td>PL-2025-115</td><td class="status">신규</td><td>B라인 앵글 회피 거리 130→150mm 상향. 파라미터 변경 범위/호기 대상/일정을 최광년·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-116</td><td class="status">신규</td><td>노즐 클리닝 티칭 기능 추가(긴급 아님). 우선순위 낮게 두고, 다른 긴급/높음 이슈 우선 처리 후 진행. 구현/검증 계획을 최광년·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-117</td><td class="status">신규</td><td>스프레이 티칭 기능 추가(긴급 아님). 우선순위 낮게 두고, 긴급/높음 이슈 후 진행. 구현/검증 계획을 최광년·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-118</td><td class="status">신규</td><td>스프레이 시간 변수화 및 UI 제어. 긴급 아님 → 다른 높은 우선순위 후 진행. 준비 필요 사항을 이마룬에게, 요구/계획을 박주한에게 확인.</td></tr>
+        <tr><td>PL-2025-119</td><td class="status">완료</td><td>터치 보정 정밀도 확인(속도/자세 정·역/진행각 매크로). 별도 관리 예정. 진행 결과를 최광년·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-120</td><td class="status">신규</td><td>터치 모션 중 갠트리 Z 고정(최적화, A라인). 별도 관리 예정. 조치 계획을 이마룬에게 공유 요청.</td></tr>
+        <tr><td>PL-2025-121</td><td class="status">신규</td><td>터치 모션 중 이동 오프셋 적용. 별도 관리 예정. 오프셋 계산/적용 방식 조치 계획을 이마룬에게 공유 요청.</td></tr>
+        <tr><td>PL-2025-122</td><td class="status">완료</td><td>에어건 설치(거더 위). 12/2 부착 완료.</td></tr>
+        <tr><td>PL-2025-123</td><td class="status">신규</td><td>메인 에어 압력 게이지 조립 불량(A/B라인, 보통). 압력 센서 불능 상태. 조치 계획을 심태양에게 확인.</td></tr>
+        <tr><td>PL-2025-124</td><td class="status">신규</td><td>B라인 1호기 디바이스넷 통신 상실. 복구 계획을 최광년·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-125</td><td class="status">신규</td><td>B라인 1호기 2번 용접기 모드 상실(모드 5번 사라짐). 복구 계획을 최광년·이마룬에게 확인.</td></tr>
+        <tr><td>PL-2025-126</td><td class="status">신규</td><td>작업 취소/재개 시 속도 0%로 설정되는 경우 발생(UI). 재현/수정 계획을 박주한·이마룬에게 확인.</td></tr>
+      </tbody>
+    </table>
+  </body>
+</html>
