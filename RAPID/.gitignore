@@ -1,0 +1,25 @@
+# RAPID Version Control - .gitignore
+# S25016 SpGantry Project
+# Created: 2025-12-05
+
+# RobotStudio temporary files
+*.bak
+*.tmp
+*~
+
+# RobotWare system files (large, auto-generated)
+*.cfg.bak
+SYSPAR/
+
+# Log files
+*.log
+*.txt
+HOME/*.txt
+
+# Backup folders (managed separately)
+*_BACKUP_*/backup_*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
