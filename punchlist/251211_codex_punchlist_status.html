@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>ABB 라인 이슈 현황표 (거제 34bay)</title>
+  <style>
+    body {
+      font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      margin: 24px;
+      background: #f5f5f5;
+      color: #222;
+    }
+    h1 {
+      margin: 0 0 16px;
+    }
+    .desc {
+      margin: 0 0 16px;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+      vertical-align: top;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    th {
+      background: #f0f3f8;
+      text-align: left;
+      font-weight: 700;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      background: #d9534f;
+      color: #fff;
+      margin-right: 4px;
+    }
+    .tag.wait {
+      background: #f0ad4e;
+    }
+    .tag.info {
+      background: #5bc0de;
+    }
+  </style>
+</head>
+<body>
+  <h1>ABB 라인 이슈 현황표 (거제 34bay)</h1>
+  <p class="desc">
+    12/8 현장 미팅 이후 ABB 코리아 대응 요청 이슈 목록입니다. 각 항목별로 접수 일자, 전달 자료, 현상, 요청 사항을 정리했습니다.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 22%;">이슈</th>
+        <th style="width: 14%;">최초/최근 문의</th>
+        <th style="width: 24%;">전달 자료·로그</th>
+        <th style="width: 22%;">현상·영향</th>
+        <th style="width: 18%;">요청 사항</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tag wait">대기</span>용접기 통신/PP 리셋 불가</td>
+        <td>11/14, 11/17, 12/10</td>
+        <td>진단 파일 다수(용접기 에러/통신 회복 불가)</td>
+        <td>PP to Main 초기화 불가, 용접 제어 실패 반복</td>
+        <td>로그 분석 및 복구 절차, 재발 방지책 회신 시점</td>
+      </tr>
+      <tr>
+        <td><span class="tag wait">대기</span>형상보간 실패</td>
+        <td>12/10</td>
+        <td>진단 파일 전달</td>
+        <td>형상보간 오류로 모션 중단</td>
+        <td>원인 분석 및 패치/셋팅 가이드</td>
+      </tr>
+      <tr>
+        <td><span class="tag wait">대기</span>디바이스넷 통신 실패</td>
+        <td>12/03~12/04</td>
+        <td>진단 파일 전달</td>
+        <td>통신 실패로 장비 정지</td>
+        <td>근본 원인 및 재발 방지 대책</td>
+      </tr>
+      <tr>
+        <td><span class="tag wait">대기</span>용접 데이터 배열/For문 제한</td>
+        <td>11/17</td>
+        <td>현장 시험 결과(사용 불가 재확인)</td>
+        <td>Plan B 적용 불가, 로직 설계 제약</td>
+        <td>대체 명령/구현 방안 제시</td>
+      </tr>
+      <tr>
+        <td><span class="tag wait">대기</span>ArcWare 초기화/Stop Process</td>
+        <td>11/17</td>
+        <td>문의만 발송, 회신 미수</td>
+        <td>ArcWare 리셋/정지 동작 불확실</td>
+        <td>정상 절차 및 예외 처리 가이드</td>
+      </tr>
+      <tr>
+        <td><span class="tag wait">대기</span>불스아이 정밀도 문제</td>
+        <td>1/10 → 5/26 재문의</td>
+        <td>글로벌 회신 대기</td>
+        <td>정합 불량, 보정 신뢰도 저하</td>
+        <td>정밀도 개선 방안/현장 지원 일정</td>
+      </tr>
+      <tr>
+        <td><span class="tag wait">대기</span>저온 통신 이슈</td>
+        <td>12월 초</td>
+        <td>내부 보고</td>
+        <td>컨트롤러 내부 통신 불안정</td>
+        <td>원인 분석 및 환경 대책</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>라이트커튼·안전도어 운영 워크플로우 (정식/저속)</title>
+  <style>
+    body {
+      font-family: "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      margin: 24px;
+      line-height: 1.6;
+      color: #222;
+    }
+    h1, h2, h3 {
+      margin: 0 0 12px;
+    }
+    .section {
+      margin-bottom: 24px;
+      padding: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      margin-right: 6px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #fff;
+      background: #2f7ed6;
+    }
+    .tag.alt {
+      background: #d67e2f;
+    }
+    .inline-label {
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <h1>라이트커튼·안전도어 운영 워크플로우</h1>
+  <div class="section">
+    <h2>목적</h2>
+    <ul>
+      <li>공식 자동운전(도어 잠금, 라이트커튼 비상정지)과 생산성 확보용 저속/바이패스 운전(도어 개방, 라이트커튼 무력화)을 구분해 운영한다.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>전제</h2>
+    <ul>
+      <li>공식 조건: 자동운전에서 안전도어는 잠기며, 라이트커튼 검지 시 라인은 비상정지.</li>
+      <li>생산 요구: 저속 모드에서는 안전도어 개방 허용, 라이트커튼 무력화. 일부 비상정지 버튼은 항상 유효.</li>
+      <li>상태 표시는 박스 내 램프(라이트커튼 정상, 안전도어 상태), 조작은 스위치(기능 선택, Lock/UnLock)와 리셋/비상정지 버튼으로 수행.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>모드 정의</h2>
+    <ul>
+      <li><span class="tag">정지 모드</span>자동운전. 안전도어 Lock. 라이트커튼 검지 시 전 호기 로봇·자동화 비상정지. 안전도어 열림도 동일하게 비상정지.</li>
+      <li><span class="tag alt">저속/바이패스</span>생산 효율 목적. 안전도어 개방 허용, 라이트커튼 무력화(검지로 비상정지 미동작). 일부 비상정지 버튼은 모드와 무관하게 유효.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>A. 정식 안전 우선 플로우(정지)</h2>
+    <ul>
+      <li>기능 선택 스위치 <span class="inline-label">정지</span> 위치 설정, 라이트커튼 정상 램프 점등 확인.</li>
+      <li>라이트커튼/안전도어 검지 발생 → 전 겐트리·로봇 비상정지.</li>
+      <li>현장 안전 확인(작업자/장애물 완전 퇴출).</li>
+      <li>라이트커튼 정상 램프 OFF면 리셋 버튼으로 정상화. 안전도어는 닫힘·Lock 상태 확인 후 재가동.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>B. 생산 효율 플로우(저속/바이패스)</h2>
+    <ul>
+      <li>기능 선택 스위치 <span class="inline-label">저속/바이패스</span> 위치 설정. 도어 개방 가능, 라이트커튼 무력화 상태를 현장 안내에 표시.</li>
+      <li>라이트커튼 검지 시 비상정지 미동작. 안전도어는 Unlock 상태로 개방 가능.</li>
+      <li>일부 비상정지 버튼은 모드와 무관하게 즉시 전 설비 비상정지(대상 버튼 목록 명시).</li>
+      <li>위험 요소 제거 후 정지 모드 복귀: 도어 Lock, 라이트커튼 정상 램프 점등 확인, 리셋 수행.</li>
+      <li>저속/바이패스 사용 시간·구역을 작업허가/교대 인수인계에 기록하고 종료 시 확인 서명.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>체크포인트</h2>
+    <ul>
+      <li>저속/바이패스 사용 시 라이트커튼 무력화에 따른 추가 방호·감시 대책(거리 확보, 안내, 경광등, 감시자 배치)을 안전팀과 사전 합의.</li>
+      <li>모드 전환(저속↔정지) 책임자와 승인 절차를 SOP에 명시.</li>
+      <li>기능 선택 스위치 상태와 저속 사용 시간/구역을 교대 인수인계에 기록.</li>
+      <li>리셋·정지 복귀 전에는 항상 라인 내부 무인 상태를 눈으로 확인.</li>
+    </ul>
+  </div>
+</body>
+</html>
