@@ -1,0 +1,119 @@
+========================================
+RAPID Syntax Error Fix Report
+========================================
+Date: 2025-12-17
+Time: 12:13 PM KST
+
+========================================
+Errors Found (RobotStudio Check)
+========================================
+
+T_ROB2 Errors (3):
+1. TestRobot2Capabilities(59,3): Unexpected 'var'
+2. TestRobot2Capabilities(137,3): Unexpected 'var'
+3. TestRobot2Capabilities(191,3): Unexpected 'var'
+
+T_ROB1 Errors (3):
+1. Task1SharedVariables(23,41): Expected ':=' '<exp>'
+2. Task1SharedVariables(71,31): Expected identifier
+3. Task1SharedVariables(87,30): Expected identifier
+
+========================================
+Root Cause Analysis
+========================================
+
+RAPID Language Rules:
+1. All VAR declarations MUST be at the start of PROC
+2. Cannot declare VAR in the middle of code
+3. All PERS variables MUST be initialized
+
+Violations Found:
+- test_robot2_capabilities.mod: VAR iodev declared mid-PROC (3 times)
+- task1_shared_variables.mod: TASK PERS jointtarget not initialized
+
+========================================
+Fixes Applied
+========================================
+
+File: test_robot2_capabilities.mod
+-----------------------------------
+1. TestRobot2_ReadExternalAxes()
+   BEFORE (line 59 - mid-code):
+     ! Save to file
+     VAR iodev logfile;
+     Open "/HOME/", logfile \Write;
+
+   AFTER (line 27 - PROC start):
+     VAR jointtarget current_joint;
+     ...
+     VAR iodev logfile;
+
+2. TestRobot2_ReadSharedVariable()
+   BEFORE (line 137 - mid-code):
+     ! Save to file
+     VAR iodev logfile;
+     Open "/HOME/", logfile \Write;
+
+   AFTER (line 117 - PROC start):
+     VAR num test_value;
+     VAR iodev logfile;
+
+3. TestRobot2_TCPCoordinates()
+   BEFORE (line 191 - mid-code):
+     ! Save to file
+     VAR iodev logfile;
+     Open "/HOME/", logfile \Write;
+
+   AFTER (line 166 - PROC start):
+     VAR robtarget tcp_world;
+     VAR robtarget tcp_wobj0;
+     VAR robtarget tcp_base;
+     VAR iodev logfile;
+
+File: task1_shared_variables.mod
+-----------------------------------
+1. shared_gantry_pos initialization
+   BEFORE (line 23):
+     TASK PERS jointtarget shared_gantry_pos;
+
+   AFTER (line 23):
+     TASK PERS jointtarget shared_gantry_pos := [[0,0,0,0,0,0],[0,0,0,0,0,0]];
+
+========================================
+Verification
+========================================
+
+Git Status:
+- Commit: 6295db5
+- Message: "fix: Correct RAPID syntax errors in test modules"
+- Files changed: 2
+  - test_robot2_capabilities.mod
+  - task1_shared_variables.mod
+
+Expected Result:
+✓ No syntax errors in RobotStudio check
+✓ Modules load successfully
+✓ Ready for testing
+
+========================================
+Next Steps
+========================================
+
+1. Copy updated files to RobotStudio:
+   cp -r /home/qwe/works/s25016/RAPID/SpGantry_1200_526406_BACKUP_2025-11-21 \
+         /mnt/c/Users/user/Documents/RobotStudio/Projects/SpSystem_20251117/Backups/
+
+2. Reload modules in RobotStudio:
+   - TASK2: test_robot2_capabilities.mod
+   - TASK1: task1_shared_variables.mod
+
+3. Run RobotStudio "Check Program":
+   - Should show: "No errors"
+
+4. Execute test:
+   - Run: TestRobot2_ReadExternalAxes()
+   - Check: /HOME/robot2_external_axes_test.txt
+
+========================================
+End of Report
+========================================
