@@ -1314,8 +1314,9 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Verify TCP Orientation in All Coordinate Systems
 	! ========================================
-	! Version: v1.2.0
-	! Date: 2025-12-18
+	! Version: v1.2.1
+	! Date: 2025-12-19
+	! Changes: Fixed "Too intense frequency of Write" error by adding WaitTime
 	! Purpose: Compare TCP position and orientation in 4 coordinate systems:
 	!   1. World - Global coordinate system
 	!   2. wobj0 - Default work object (= World in current config)
@@ -1335,71 +1336,38 @@ MODULE Rob2_MainModule
 		tcp_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
 		tcp_rob_base := CRobT(\Tool:=tool0\WObj:=wobjRob2Base);
 
-		! Display on FlexPendant
-		TPWrite "========================================";
-		TPWrite "TASK2 - TCP Orientation Verification (v1.2.0)";
-		TPWrite "========================================";
-		TPWrite "";
-		TPWrite "1. World Coordinates:";
-		TPWrite "  Pos: [" + NumToStr(tcp_world.trans.x, 2) + ", " + NumToStr(tcp_world.trans.y, 2) + ", " + NumToStr(tcp_world.trans.z, 2) + "]";
-		TPWrite "  Rot: [" + NumToStr(tcp_world.rot.q1, 4) + ", " + NumToStr(tcp_world.rot.q2, 4) + ", " + NumToStr(tcp_world.rot.q3, 4) + ", " + NumToStr(tcp_world.rot.q4, 4) + "]";
-		TPWrite "";
-		TPWrite "2. wobj0 Coordinates:";
-		TPWrite "  Pos: [" + NumToStr(tcp_wobj0.trans.x, 2) + ", " + NumToStr(tcp_wobj0.trans.y, 2) + ", " + NumToStr(tcp_wobj0.trans.z, 2) + "]";
-		TPWrite "  Rot: [" + NumToStr(tcp_wobj0.rot.q1, 4) + ", " + NumToStr(tcp_wobj0.rot.q2, 4) + ", " + NumToStr(tcp_wobj0.rot.q3, 4) + ", " + NumToStr(tcp_wobj0.rot.q4, 4) + "]";
-		TPWrite "";
-		TPWrite "3. WobjFloor Coordinates:";
-		TPWrite "  Pos: [" + NumToStr(tcp_floor.trans.x, 2) + ", " + NumToStr(tcp_floor.trans.y, 2) + ", " + NumToStr(tcp_floor.trans.z, 2) + "]";
-		TPWrite "  Rot: [" + NumToStr(tcp_floor.rot.q1, 4) + ", " + NumToStr(tcp_floor.rot.q2, 4) + ", " + NumToStr(tcp_floor.rot.q3, 4) + ", " + NumToStr(tcp_floor.rot.q4, 4) + "]";
-		TPWrite "";
-		TPWrite "4. wobjRob2Base Coordinates:";
-		TPWrite "  Pos: [" + NumToStr(tcp_rob_base.trans.x, 2) + ", " + NumToStr(tcp_rob_base.trans.y, 2) + ", " + NumToStr(tcp_rob_base.trans.z, 2) + "]";
-		TPWrite "  Rot: [" + NumToStr(tcp_rob_base.rot.q1, 4) + ", " + NumToStr(tcp_rob_base.rot.q2, 4) + ", " + NumToStr(tcp_rob_base.rot.q3, 4) + ", " + NumToStr(tcp_rob_base.rot.q4, 4) + "]";
-		TPWrite "========================================";
+		! Display on FlexPendant (reduced output)
+		TPWrite "TASK2 - TCP Orientation (v1.2.1)";
+		TPWrite "World: [" + NumToStr(tcp_world.trans.x, 1) + "," + NumToStr(tcp_world.trans.y, 1) + "," + NumToStr(tcp_world.trans.z, 1) + "]";
+		TPWrite "Floor: [" + NumToStr(tcp_floor.trans.x, 1) + "," + NumToStr(tcp_floor.trans.y, 1) + "," + NumToStr(tcp_floor.trans.z, 1) + "]";
+		TPWrite "Rob2Base: [" + NumToStr(tcp_rob_base.trans.x, 1) + "," + NumToStr(tcp_rob_base.trans.y, 1) + "," + NumToStr(tcp_rob_base.trans.z, 1) + "]";
 
-		! Save to file
+		! Save to file (with WaitTime to prevent "Too intense frequency" error)
 		Open "/HOME/", logfile \Write;
 		Open "task2_tcp_orientation.txt", logfile \Append;
 
 		Write logfile, "========================================";
-		Write logfile, "TASK2 - TCP Orientation Verification (v1.2.0)";
+		Write logfile, "TASK2 - TCP Orientation Verification (v1.2.1)";
+		Write logfile, "Date: " + CDate() + " " + CTime();
 		Write logfile, "========================================";
-		Write logfile, "Date: " + CDate();
-		Write logfile, "Time: " + CTime();
-		Write logfile, "";
+		WaitTime 0.05;
 
-		Write logfile, "1. World Coordinate System:";
-		Write logfile, "  Position: [" + NumToStr(tcp_world.trans.x, 3) + ", " + NumToStr(tcp_world.trans.y, 3) + ", " + NumToStr(tcp_world.trans.z, 3) + "] mm";
-		Write logfile, "  Rotation: [" + NumToStr(tcp_world.rot.q1, 6) + ", " + NumToStr(tcp_world.rot.q2, 6) + ", " + NumToStr(tcp_world.rot.q3, 6) + ", " + NumToStr(tcp_world.rot.q4, 6) + "]";
-		Write logfile, "";
+		Write logfile, "1. World: Pos=[" + NumToStr(tcp_world.trans.x, 3) + "," + NumToStr(tcp_world.trans.y, 3) + "," + NumToStr(tcp_world.trans.z, 3) + "]";
+		Write logfile, "   Rot=[" + NumToStr(tcp_world.rot.q1, 6) + "," + NumToStr(tcp_world.rot.q2, 6) + "," + NumToStr(tcp_world.rot.q3, 6) + "," + NumToStr(tcp_world.rot.q4, 6) + "]";
+		WaitTime 0.05;
 
-		Write logfile, "2. wobj0 Coordinate System:";
-		Write logfile, "  Position: [" + NumToStr(tcp_wobj0.trans.x, 3) + ", " + NumToStr(tcp_wobj0.trans.y, 3) + ", " + NumToStr(tcp_wobj0.trans.z, 3) + "] mm";
-		Write logfile, "  Rotation: [" + NumToStr(tcp_wobj0.rot.q1, 6) + ", " + NumToStr(tcp_wobj0.rot.q2, 6) + ", " + NumToStr(tcp_wobj0.rot.q3, 6) + ", " + NumToStr(tcp_wobj0.rot.q4, 6) + "]";
-		Write logfile, "";
+		Write logfile, "2. wobj0: Pos=[" + NumToStr(tcp_wobj0.trans.x, 3) + "," + NumToStr(tcp_wobj0.trans.y, 3) + "," + NumToStr(tcp_wobj0.trans.z, 3) + "]";
+		Write logfile, "   Rot=[" + NumToStr(tcp_wobj0.rot.q1, 6) + "," + NumToStr(tcp_wobj0.rot.q2, 6) + "," + NumToStr(tcp_wobj0.rot.q3, 6) + "," + NumToStr(tcp_wobj0.rot.q4, 6) + "]";
+		WaitTime 0.05;
 
-		Write logfile, "3. WobjFloor Coordinate System (Floor at [-9500, 5300, 2100]):";
-		Write logfile, "  Position: [" + NumToStr(tcp_floor.trans.x, 3) + ", " + NumToStr(tcp_floor.trans.y, 3) + ", " + NumToStr(tcp_floor.trans.z, 3) + "] mm";
-		Write logfile, "  Rotation: [" + NumToStr(tcp_floor.rot.q1, 6) + ", " + NumToStr(tcp_floor.rot.q2, 6) + ", " + NumToStr(tcp_floor.rot.q3, 6) + ", " + NumToStr(tcp_floor.rot.q4, 6) + "]";
-		Write logfile, "";
+		Write logfile, "3. Floor: Pos=[" + NumToStr(tcp_floor.trans.x, 3) + "," + NumToStr(tcp_floor.trans.y, 3) + "," + NumToStr(tcp_floor.trans.z, 3) + "]";
+		Write logfile, "   Rot=[" + NumToStr(tcp_floor.rot.q1, 6) + "," + NumToStr(tcp_floor.rot.q2, 6) + "," + NumToStr(tcp_floor.rot.q3, 6) + "," + NumToStr(tcp_floor.rot.q4, 6) + "]";
+		WaitTime 0.05;
 
-		Write logfile, "4. wobjRob2Base (Robot2 45deg rotation):";
-		Write logfile, "  Position: [" + NumToStr(tcp_rob_base.trans.x, 3) + ", " + NumToStr(tcp_rob_base.trans.y, 3) + ", " + NumToStr(tcp_rob_base.trans.z, 3) + "] mm";
-		Write logfile, "  Rotation: [" + NumToStr(tcp_rob_base.rot.q1, 6) + ", " + NumToStr(tcp_rob_base.rot.q2, 6) + ", " + NumToStr(tcp_rob_base.rot.q3, 6) + ", " + NumToStr(tcp_rob_base.rot.q4, 6) + "]";
-		Write logfile, "";
+		Write logfile, "4. Rob2Base: Pos=[" + NumToStr(tcp_rob_base.trans.x, 3) + "," + NumToStr(tcp_rob_base.trans.y, 3) + "," + NumToStr(tcp_rob_base.trans.z, 3) + "]";
+		Write logfile, "   Rot=[" + NumToStr(tcp_rob_base.rot.q1, 6) + "," + NumToStr(tcp_rob_base.rot.q2, 6) + "," + NumToStr(tcp_rob_base.rot.q3, 6) + "," + NumToStr(tcp_rob_base.rot.q4, 6) + "]";
+		WaitTime 0.05;
 
-		Write logfile, "Coordinate System Definitions:";
-		Write logfile, "  - World: Global coordinate system (controller reference)";
-		Write logfile, "  - wobj0: Default work object (should match World if uframe=[0,0,0])";
-		Write logfile, "  - WobjFloor: Floor reference frame, origin at [-9500, 5300, 2100] from World";
-		Write logfile, "  - wobjRob2Base: Robot2 base frame with 45-degree rotation";
-		Write logfile, "    Rotation quaternion: [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17]";
-		Write logfile, "";
-
-		Write logfile, "Expected Observations:";
-		Write logfile, "  - World and wobj0 should be identical (both show same position/rotation)";
-		Write logfile, "  - WobjFloor position = World position - [-9500, 5300, 2100]";
-		Write logfile, "  - wobjRob2Base shows TCP in Robot2 base frame (45deg rotated)";
 		Write logfile, "========================================\0A";
 
 		Close logfile;
