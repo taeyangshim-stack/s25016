@@ -96,7 +96,14 @@ MODULE Rob2_MainModule
 
     PERS wobjdata wobjWeldLine2;
     PERS wobjdata wobjRotCtr2;
-    PERS wobjdata WobjFloor;
+
+    ! Work Object Definitions (v1.2.0 2025-12-18)
+    ! WobjFloor: Floor coordinate system at [-9500, 5300, 2100] from World
+    PERS wobjdata WobjFloor := [FALSE, TRUE, "", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+
+    ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
+    ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
+    PERS wobjdata wobjRob2Base := [FALSE, TRUE, "", [[0, 0, 0], [-0.0000000000000000432964, 0.707107, 0.707107, 0.0000000000000000432964]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     PERS num nMotionTotalStep{2};
     PERS num nMotionStepCount{2};
@@ -1300,6 +1307,106 @@ MODULE Rob2_MainModule
 
 	ERROR
 		TPWrite "ERROR in CompareWorldAndWobj0: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
+	ENDPROC
+
+	! ========================================
+	! Verify TCP Orientation in All Coordinate Systems
+	! ========================================
+	! Version: v1.2.0
+	! Date: 2025-12-18
+	! Purpose: Compare TCP position and orientation in 4 coordinate systems:
+	!   1. World - Global coordinate system
+	!   2. wobj0 - Default work object (= World in current config)
+	!   3. WobjFloor - Floor coordinate system at [-9500, 5300, 2100]
+	!   4. wobjRob2Base - Robot2 Base Frame (45° rotation per MOC.cfg)
+	! Output: FlexPendant display + /HOME/task2_tcp_orientation.txt
+	PROC VerifyTCPOrientation()
+		VAR robtarget tcp_world;
+		VAR robtarget tcp_wobj0;
+		VAR robtarget tcp_floor;
+		VAR robtarget tcp_rob_base;
+		VAR iodev logfile;
+
+		! Read TCP in all coordinate systems
+		tcp_world := CRobT(\Tool:=tool0);
+		tcp_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+		tcp_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+		tcp_rob_base := CRobT(\Tool:=tool0\WObj:=wobjRob2Base);
+
+		! Display on FlexPendant
+		TPWrite "========================================";
+		TPWrite "TASK2 - TCP Orientation Verification (v1.2.0)";
+		TPWrite "========================================";
+		TPWrite "";
+		TPWrite "1. World Coordinates:";
+		TPWrite "  Pos: [" + NumToStr(tcp_world.trans.x, 2) + ", " + NumToStr(tcp_world.trans.y, 2) + ", " + NumToStr(tcp_world.trans.z, 2) + "]";
+		TPWrite "  Rot: [" + NumToStr(tcp_world.rot.q1, 4) + ", " + NumToStr(tcp_world.rot.q2, 4) + ", " + NumToStr(tcp_world.rot.q3, 4) + ", " + NumToStr(tcp_world.rot.q4, 4) + "]";
+		TPWrite "";
+		TPWrite "2. wobj0 Coordinates:";
+		TPWrite "  Pos: [" + NumToStr(tcp_wobj0.trans.x, 2) + ", " + NumToStr(tcp_wobj0.trans.y, 2) + ", " + NumToStr(tcp_wobj0.trans.z, 2) + "]";
+		TPWrite "  Rot: [" + NumToStr(tcp_wobj0.rot.q1, 4) + ", " + NumToStr(tcp_wobj0.rot.q2, 4) + ", " + NumToStr(tcp_wobj0.rot.q3, 4) + ", " + NumToStr(tcp_wobj0.rot.q4, 4) + "]";
+		TPWrite "";
+		TPWrite "3. WobjFloor Coordinates:";
+		TPWrite "  Pos: [" + NumToStr(tcp_floor.trans.x, 2) + ", " + NumToStr(tcp_floor.trans.y, 2) + ", " + NumToStr(tcp_floor.trans.z, 2) + "]";
+		TPWrite "  Rot: [" + NumToStr(tcp_floor.rot.q1, 4) + ", " + NumToStr(tcp_floor.rot.q2, 4) + ", " + NumToStr(tcp_floor.rot.q3, 4) + ", " + NumToStr(tcp_floor.rot.q4, 4) + "]";
+		TPWrite "";
+		TPWrite "4. wobjRob2Base Coordinates:";
+		TPWrite "  Pos: [" + NumToStr(tcp_rob_base.trans.x, 2) + ", " + NumToStr(tcp_rob_base.trans.y, 2) + ", " + NumToStr(tcp_rob_base.trans.z, 2) + "]";
+		TPWrite "  Rot: [" + NumToStr(tcp_rob_base.rot.q1, 4) + ", " + NumToStr(tcp_rob_base.rot.q2, 4) + ", " + NumToStr(tcp_rob_base.rot.q3, 4) + ", " + NumToStr(tcp_rob_base.rot.q4, 4) + "]";
+		TPWrite "========================================";
+
+		! Save to file
+		Open "/HOME/", logfile \Write;
+		Open "task2_tcp_orientation.txt", logfile \Append;
+
+		Write logfile, "========================================";
+		Write logfile, "TASK2 - TCP Orientation Verification (v1.2.0)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+
+		Write logfile, "1. World Coordinate System:";
+		Write logfile, "  Position: [" + NumToStr(tcp_world.trans.x, 3) + ", " + NumToStr(tcp_world.trans.y, 3) + ", " + NumToStr(tcp_world.trans.z, 3) + "] mm";
+		Write logfile, "  Rotation: [" + NumToStr(tcp_world.rot.q1, 6) + ", " + NumToStr(tcp_world.rot.q2, 6) + ", " + NumToStr(tcp_world.rot.q3, 6) + ", " + NumToStr(tcp_world.rot.q4, 6) + "]";
+		Write logfile, "";
+
+		Write logfile, "2. wobj0 Coordinate System:";
+		Write logfile, "  Position: [" + NumToStr(tcp_wobj0.trans.x, 3) + ", " + NumToStr(tcp_wobj0.trans.y, 3) + ", " + NumToStr(tcp_wobj0.trans.z, 3) + "] mm";
+		Write logfile, "  Rotation: [" + NumToStr(tcp_wobj0.rot.q1, 6) + ", " + NumToStr(tcp_wobj0.rot.q2, 6) + ", " + NumToStr(tcp_wobj0.rot.q3, 6) + ", " + NumToStr(tcp_wobj0.rot.q4, 6) + "]";
+		Write logfile, "";
+
+		Write logfile, "3. WobjFloor Coordinate System (Floor at [-9500, 5300, 2100]):";
+		Write logfile, "  Position: [" + NumToStr(tcp_floor.trans.x, 3) + ", " + NumToStr(tcp_floor.trans.y, 3) + ", " + NumToStr(tcp_floor.trans.z, 3) + "] mm";
+		Write logfile, "  Rotation: [" + NumToStr(tcp_floor.rot.q1, 6) + ", " + NumToStr(tcp_floor.rot.q2, 6) + ", " + NumToStr(tcp_floor.rot.q3, 6) + ", " + NumToStr(tcp_floor.rot.q4, 6) + "]";
+		Write logfile, "";
+
+		Write logfile, "4. wobjRob2Base (Robot2 45deg rotation):";
+		Write logfile, "  Position: [" + NumToStr(tcp_rob_base.trans.x, 3) + ", " + NumToStr(tcp_rob_base.trans.y, 3) + ", " + NumToStr(tcp_rob_base.trans.z, 3) + "] mm";
+		Write logfile, "  Rotation: [" + NumToStr(tcp_rob_base.rot.q1, 6) + ", " + NumToStr(tcp_rob_base.rot.q2, 6) + ", " + NumToStr(tcp_rob_base.rot.q3, 6) + ", " + NumToStr(tcp_rob_base.rot.q4, 6) + "]";
+		Write logfile, "";
+
+		Write logfile, "Coordinate System Definitions:";
+		Write logfile, "  - World: Global coordinate system (controller reference)";
+		Write logfile, "  - wobj0: Default work object (should match World if uframe=[0,0,0])";
+		Write logfile, "  - WobjFloor: Floor reference frame, origin at [-9500, 5300, 2100] from World";
+		Write logfile, "  - wobjRob2Base: Robot2 base frame with 45-degree rotation";
+		Write logfile, "    Rotation quaternion: [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17]";
+		Write logfile, "";
+
+		Write logfile, "Expected Observations:";
+		Write logfile, "  - World and wobj0 should be identical (both show same position/rotation)";
+		Write logfile, "  - WobjFloor position = World position - [-9500, 5300, 2100]";
+		Write logfile, "  - wobjRob2Base shows TCP in Robot2 base frame (45deg rotated)";
+		Write logfile, "========================================\0A";
+
+		Close logfile;
+		TPWrite "Saved to: /HOME/task2_tcp_orientation.txt";
+
+	ERROR
+		TPWrite "ERROR in VerifyTCPOrientation: " + NumToStr(ERRNO, 0);
 		Close logfile;
 		TRYNEXT;
 	ENDPROC
