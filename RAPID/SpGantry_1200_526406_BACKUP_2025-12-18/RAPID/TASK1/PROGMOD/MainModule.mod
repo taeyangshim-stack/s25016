@@ -21,7 +21,17 @@ MODULE MainModule
     CONST robtarget Target_80:=[[1161.172382635,144.558432538,-14.87045264],[0.061622111,-0.06163207,0.704422579,-0.704409706],[0,-1,0,0],[129.957869649,168.339699507,103.588841856,0,0,7.446037445]];
 	TASK PERS jointtarget jTemp:=[[0,-2.51761,-12.1411,0,15.6587,0],[-500,500,300,15,0,-28.6479]];
 	PERS pos nCaledR1Pos:=[-28.6282,626.304,300];
-    
+
+	! Shared Variables for Gantry Position (v1.0.0 2025-12-17)
+	TASK PERS jointtarget shared_gantry_pos := [[0,0,0,0,0,0],[0,0,0,0,0,0]];
+	TASK PERS num shared_gantry_x := 0;
+	TASK PERS num shared_gantry_y := 0;
+	TASK PERS num shared_gantry_z := 0;
+	TASK PERS num shared_gantry_r := 0;
+	TASK PERS num shared_gantry_x2 := 0;
+	TASK PERS num shared_update_counter := 0;
+	TASK PERS num shared_test_value := 12345;
+
 	PROC main()
 		rUpdateR1Position;
 	ENDPROC
@@ -131,23 +141,6 @@ MODULE MainModule
     ENDPROC
 
 	!========================================
-	! Shared Variables for Gantry Position
-	!========================================
-	! Version: v1.0.0
-	! Date: 2025-12-17
-	! Purpose: Share gantry position info with TASK2
-
-	! Shared Variable Declarations
-	TASK PERS jointtarget shared_gantry_pos := [[0,0,0,0,0,0],[0,0,0,0,0,0]];
-	TASK PERS num shared_gantry_x := 0;   ! X1 axis
-	TASK PERS num shared_gantry_y := 0;   ! Y axis
-	TASK PERS num shared_gantry_z := 0;   ! Z axis
-	TASK PERS num shared_gantry_r := 0;   ! R axis
-	TASK PERS num shared_gantry_x2 := 0;  ! X2 axis
-	TASK PERS num shared_update_counter := 0;
-	TASK PERS num shared_test_value := 12345;
-
-	!========================================
 	! Update Gantry Position
 	!========================================
 	PROC UpdateSharedGantryPosition()
@@ -205,12 +198,27 @@ MODULE MainModule
 	! Date: 2025-12-17
 
 	PROC ShowWobj0Definition()
+		VAR string str_robhold;
+		VAR string str_ufprog;
+
 		TPWrite "========================================";
 		TPWrite "TASK1 - wobj0 Definition";
 		TPWrite "========================================";
 
-		TPWrite "wobj0.robhold: " + NumToStr(wobj0.robhold, 0);
-		TPWrite "wobj0.ufprog: " + NumToStr(wobj0.ufprog, 0);
+		IF wobj0.robhold = TRUE THEN
+			str_robhold := "TRUE";
+		ELSE
+			str_robhold := "FALSE";
+		ENDIF
+
+		IF wobj0.ufprog = TRUE THEN
+			str_ufprog := "TRUE";
+		ELSE
+			str_ufprog := "FALSE";
+		ENDIF
+
+		TPWrite "wobj0.robhold: " + str_robhold;
+		TPWrite "wobj0.ufprog: " + str_ufprog;
 		TPWrite "";
 		TPWrite "User Frame (uframe):";
 		TPWrite "  X = " + NumToStr(wobj0.uframe.trans.x, 2) + " mm";

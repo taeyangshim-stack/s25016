@@ -1161,12 +1161,27 @@ MODULE Rob2_MainModule
 	! Date: 2025-12-17
 
 	PROC ShowWobj0Definition()
+		VAR string str_robhold;
+		VAR string str_ufprog;
+
 		TPWrite "========================================";
 		TPWrite "TASK2 - wobj0 Definition";
 		TPWrite "========================================";
 
-		TPWrite "wobj0.robhold: " + NumToStr(wobj0.robhold, 0);
-		TPWrite "wobj0.ufprog: " + NumToStr(wobj0.ufprog, 0);
+		IF wobj0.robhold = TRUE THEN
+			str_robhold := "TRUE";
+		ELSE
+			str_robhold := "FALSE";
+		ENDIF
+
+		IF wobj0.ufprog = TRUE THEN
+			str_ufprog := "TRUE";
+		ELSE
+			str_ufprog := "FALSE";
+		ENDIF
+
+		TPWrite "wobj0.robhold: " + str_robhold;
+		TPWrite "wobj0.ufprog: " + str_ufprog;
 		TPWrite "";
 		TPWrite "User Frame (uframe):";
 		TPWrite "  X = " + NumToStr(wobj0.uframe.trans.x, 2) + " mm";
