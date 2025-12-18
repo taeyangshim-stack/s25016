@@ -1,0 +1,26 @@
+AWCPLC For IRC5 WG
+S1=5,30         ;Wait for specified delay time (10 msec increments).
+S2=52,25:9      ;Write REG[LSB] to Welding Parameter[MSB].
+S3=52,26:9      ;Write REG[LSB] to Welding Parameter[MSB].
+S4=14,255:1     ;Set Loop Counter to Value
+S5=14,2:2       ;Set Loop Counter to Value
+S6=2,49:1       ;Is Input (LSB) Off? No - Branch to (MSB) sequence.
+S7=17,30        ;Jump to subroutine (LSB).
+S8=13,6         ;Jump to sequence (LSB).
+S30=15,1         ;Decrement Loop Counter
+S31=24,39        ;Branch if Not Equal
+S32=14,255:1     ;Set Loop Counter to Value
+S33=15,2         ;Decrement Loop Counter
+S34=24,38        ;Branch if Not Equal
+S35=14,2:2       ;Set Loop Counter to Value
+S36=3,1          ;Set Relay (LSB).
+S37=18,0         ;Return from subroutine
+S38=4,1          ;Reset Relay (LSB)
+S39=18,0         ;Return from subroutine
+S49=3,1         ;Set Relay (LSB).
+S50=10,0        ;Start Weld sequence with schedule (LSB).
+S51=1,2:1       ;Is Input (LSB) On?  No - Branch to (MSB) sequence.
+S52=11,51:0     ;Is Arc Active?  No - Jump to sequence (MSB).
+S53=2,53:1      ;Is Input (LSB) Off? No - Branch to (MSB) sequence.
+S54=12,0:0      ;Is this end of the weld cycle?  No - Jump to (MSB) sequence
+S55=13,2        ;Jump to sequence (LSB).

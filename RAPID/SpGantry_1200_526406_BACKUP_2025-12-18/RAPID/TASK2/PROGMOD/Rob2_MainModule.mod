@@ -1,0 +1,1215 @@
+MODULE Rob2_MainModule
+    RECORD targetdata
+        robtarget position;
+        num cpm;
+        num schedule;
+        num voltage;
+        num wfs;
+        num Current;
+        num WeaveShape;
+        num WeaveType;
+        num WeaveLength;
+        num WeaveWidth;
+        num WeaveDwellLeft;
+        num WeaveDwellRight;
+        num TrackType;
+        num TrackGainY;
+        num TrackGainZ;
+    ENDRECORD
+
+    RECORD monRobs
+        extjoint monExt;
+        robjoint monJoint1;
+        robjoint monJoint2;
+        pose monPose1;
+        pose monPose2;
+    ENDRECORD
+
+    RECORD torchmotion
+        num No;
+        num LengthOffset;
+        num BreadthOffset;
+        num HeightOffset;
+        num WorkingAngle;
+        num TravelAngle;
+        num WeldingSpeed;
+        num Schedule;
+        num Voltage;
+        num FeedingSpeed;
+        num Current;
+        num WeaveShape;
+        num WeaveType;
+        num WeaveLength;
+        num WeaveWidth;
+        num WeaveDwellLeft;
+        num WeaveDwellRight;
+        num TrackType;
+        num TrackGainY;
+        num TrackGainZ;
+    ENDRECORD
+
+    RECORD corrorder
+        num X_StartOffset;
+        num X_Depth;
+        num X_ReturnLength;
+        num Y_StartOffset;
+        num Y_Depth;
+        num Y_ReturnLength;
+        num Z_StartOffset;
+        num Z_Depth;
+        num Z_ReturnLength;
+        num RY_Torch;
+    ENDRECORD
+
+    RECORD edgedata
+        pos EdgePos;
+        num Height;
+        num Breadth;
+        num HoleSize;
+        num Thickness;
+        num AngleHeight;
+        num AngleWidth;
+    ENDRECORD
+
+    PERS tasks taskGroup12{2};
+    PERS tasks taskGroup13{2};
+    PERS tasks taskGroup23{2};
+    PERS tasks taskGroup123{3};
+    PERS pos nCaledR2Pos;
+    TASK PERS jointtarget jTemp:=[[0,-2.51761,-12.1411,0,15.6587,0],[-500,500,300,15,0,-28.6479]];
+    PERS wobjdata wobjtest:=[FALSE,TRUE,"GantryRob",[[-971.372,373.696,300],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
+
+    ! Sync Data
+    TASK VAR syncident SynchronizeJGJon{9999};
+    TASK VAR syncident SynchronizePGJon{9999};
+    TASK VAR syncident SynchronizePGLon{9999};
+    TASK VAR syncident SynchronizeJGJoff{9999};
+    TASK VAR syncident SynchronizePGJoff{9999};
+    TASK VAR syncident SynchronizePGLoff{9999};
+    TASK VAR syncident Wait{100};
+
+    PERS string stCommand;
+    PERS string stReact{3};
+    PERS num idSync;
+    PERS speeddata vSync;
+    PERS zonedata zSync;
+
+    PERS wobjdata wobjWeldLine2;
+    PERS wobjdata wobjRotCtr2;
+    PERS wobjdata WobjFloor;
+
+    PERS num nMotionTotalStep{2};
+    PERS num nMotionStepCount{2};
+    PERS num nMotionStartStepLast{2};
+    PERS num nMotionEndStepLast{2};
+    PERS num nRunningStep{2};
+    PERS num nWeldSequence;
+
+    PERS jointtarget jRob2;
+    PERS robtarget pRob2;
+    PERS bool bRqMoveG_PosHold;
+
+    PERS robtarget pctWeldPosR1;
+    PERS robtarget pctWeldPosR2;
+
+    PERS targetdata Welds2{40};
+    TASK PERS speeddata vWeld{40}:=[[10,200,200,200],[10,200,200,200],[10,200,200,200],[10,200,200,200],[9.16667,200,200,200],[9.16667,200,200,200],[8.33333,200,200,200],[7.5,200,200,200],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[10,200,200,200]];
+    PERS seamdata smDefault_2;
+
+
+    PERS speeddata vTargetSpeed;
+    PERS zonedata zTargetZone;
+
+    TASK PERS welddata wdTrap:=[10,0,[5,0,38,240,0,400,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd1:=[10,0,[5,0,39.5,260,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd2:=[10,0,[5,0,39.5,260,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd3:=[10,0,[5,0,39.5,260,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd4:=[10,0,[5,0,39.5,260,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd5:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd6:=[9.16667,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd7:=[8.33333,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd8:=[7.5,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd9:=[7.5,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd10:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd11:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd12:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd13:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd14:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd15:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd16:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd17:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd18:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd19:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd20:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd21:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd22:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd23:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd24:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd25:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd26:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd27:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd28:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd29:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd30:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd31:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd32:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd33:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd34:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd35:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd36:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd37:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd38:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd39:=[0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata wd40:=[10,0,[5,0,39.5,260,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+
+    TASK PERS welddata Holdwd1:=[0.01,0,[5,0,39.5,260,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata Holdwd2:=[0.01,0,[5,0,39.5,260,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata Holdwd3:=[0.01,0,[5,0,39.5,260,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata Holdwd4:=[0.01,0,[5,0,39.5,260,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata Holdwd5:=[0.01,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata Holdwd6:=[0.01,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata Holdwd7:=[0.01,0,[5,0,39.5,255,0,420,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata Holdwd8:=[0.01,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata Holdwd9:=[0.01,0,[5,0,36,225,0,375,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS welddata Holdwd10:=[0.01,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
+
+    !!! weave data !!!
+    TASK PERS weavedata weaveTrap:=[1,2,3,3,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave1:=[1,2,2,3,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave2:=[1,2,2,3,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave3:=[1,2,2,3,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave4:=[1,2,2,3,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave5:=[1,2,2,3.5,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave6:=[1,2,2,3.5,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave7:=[1,2,2,3.5,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave8:=[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave9:=[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave10:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave11:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave12:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave13:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave14:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave15:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave16:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave17:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave18:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave19:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave20:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave21:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave22:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave23:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave24:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave25:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave26:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave27:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave28:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave29:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave30:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave31:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave32:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave33:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave34:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave35:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave36:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave37:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave38:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave39:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS weavedata weave40:=[1,2,2,3,0,0,0,0,0,0,0,0,0,0,0];
+
+    !!! Track Data !!!
+    TASK PERS trackdata trackTrap:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track0:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track1:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track2:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track3:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track4:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track5:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track6:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track7:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track8:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track9:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track10:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track11:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track12:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track13:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track14:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track15:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track16:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track17:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track18:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track19:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track20:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track21:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track22:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track23:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track24:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track25:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track26:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track27:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track28:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track29:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track30:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track31:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track32:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track33:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track34:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track35:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track36:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track37:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track38:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track39:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+    TASK PERS trackdata track40:=[0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
+
+    TASK VAR intnum inumMoveG_PosHold;
+
+    PERS bool bGanTry_Last_pos;
+    PERS bool bTouch_last_R1_Comp;
+    PERS bool bTouch_last_R2_Comp;
+    PERS bool bGanTry_First_pos;
+    PERS bool bTouch_First_R1_Comp;
+    PERS bool bTouch_First_R2_Comp;
+    PERS num nMacro010{2}:=[4,4];
+    PERS num nMacro001{2}:=[4,4];
+    PERS bool bEndSearchComplete;
+    PERS edgedata edgeStart{2}:=[[[18363.5,4423.9,4.92933],50,50,0,12,0,0],[[18363.9,4411.91,4.65171],50,50,0,12,0,0]];
+    PERS edgedata edgeEnd{2}:=[[[19008.1,4446.95,5.66316],50,50,0,12,0,0],[[19008.5,4434.96,5.38554],50,50,0,12,0,0]];
+    PERS corrorder corrStart{10}:=[[20,30,10,25,40,10,15,30,10,2],[20,30,10,25,40,10,15,30,10,0],[-15,-30,-10,25,40,10,15,30,10,2],[0,0,0,25,40,10,15,30,10,0],[0,0,0,25,40,20,15,30,20,0],[-15,-30,-10,25,40,10,15,30,10,0],[999,0,0,0,0,0,0,0,0,0],[999,0,0,0,0,0,0,0,0,0],[999,0,0,25,40,10,15,30,30,10],[999,0,0,0,0,0,0,0,0,0]];
+    PERS corrorder corrEnd{10}:=[[20,30,10,25,40,10,15,30,10,2],[20,30,10,25,40,10,15,30,10,0],[-15,-30,-10,25,40,10,15,30,10,2],[0,0,0,25,40,10,15,30,10,0],[0,0,0,25,40,20,15,40,20,0],[-15,-30,-10,25,40,10,15,30,10,0],[999,0,0,25,40,10,15,30,10,0],[999,0,0,0,0,0,0,0,0,0],[0,0,0,25,40,10,15,30,10,0],[0,0,0,0,0,0,0,0,0,0]];
+    PERS pos pCorredStartPos{2};
+    PERS pos pCorredEndPos{2};
+
+    PERS num nCorrX_Store_Start{2};
+    PERS num nCorrY_Store_Start{2};
+    PERS num nCorrZ_Store_Start{2};
+    PERS num nCorrX_Store_End{2};
+    PERS num nCorrY_Store_End{2};
+    PERS num nCorrZ_Store_End{2};
+
+    TASK PERS num nCorrFailOffs_Y:=0;
+    TASK PERS num nCorrFailOffs_Z:=0;
+    CONST bool bEnd:=FALSE;
+    CONST bool bStart:=TRUE;
+
+
+    PERS torchmotion macroStartBuffer2{10};
+    PERS torchmotion macroEndBuffer2{10};
+    PERS num nWeldLineLength:=400;
+    ! 264.966;
+    PERS num nWeldLineLength_R2;
+    ! 264.966;
+    PERS robtarget pSearchStart:=[[0,-37.0002,4.16317],[0.270598,-0.653282,-0.653282,-0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    PERS robtarget pSearchEnd:=[[0,15,4.16317],[0.270598,-0.653282,-0.653282,-0.270598],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    TASK PERS string TouchErrorDirSub:="Start_Y";
+    TASK PERS string TouchErrorDirMain:="Ready";
+    PERS num nTouchRetryCount{2};
+    PERS num n_Angle;
+    TASK PERS num RetryDepthData{3}:=[10,10,10];
+    PERS robtarget pWeldPosR2{40}:=[[[-3,7,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.31,9E+09,9E+09]],[[-3,7,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.31,9E+09,9E+09]],[[-3,-4.5,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.31,9E+09,9E+09]],[[15,-1,1],[0.307623,-0.549545,-0.742667,-0.227629],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.34,9E+09,9E+09]],[[200,-1,1],[0.270598,-0.653282,-0.653282,-0.270598],[-1,0,0,1],[-8704.03,-8704.03,294.161,1030.72,9E+09,9E+09]],[[1390,-1.00592,0.996463],[0.270597,-0.653283,-0.653281,-0.270597],[0,0,-1,1],[-8707.81,-8707.8,1477.15,1033.13,9E+09,9E+09]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0,0,0]],[[1390,-1,1],[0.270598,-0.653282,-0.653282,-0.270598],[-1,0,0,1],[-8707.8,-8707.8,1477.15,1033.12,9E+09,9E+09]]];
+    PERS num nRobCorrSpaceHeight;
+    PERS pos pCorredPosBuffer:=[-0.000742761,3.88479,5.49397];
+    PERS bool bWireTouch2;
+    CONST robtarget pNull:=[[0,0,0],[1,0,0,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+    PERS bool bRobSwap;
+    PERS jointtarget jCorrT_ROB2_Start;
+    PERS jointtarget jCorrT_ROB2_End;
+    PERS robtarget pCorrT_ROB2_Start;
+    PERS robtarget pCorrT_ROB2_End;
+
+    !!!!jWireCut
+    TASK PERS num nWireCutSpeed:=600;
+    PERS tooldata tWeld2:=[TRUE,[[319.938,-6.311,330],[0.92587,0.003729,0.377818,-0.009128]],[3.1,[-71.4,3.8,173.2],[1,0,0,0],0.055,0.049,0.005]];
+    PERS tooldata tWeld2copy:=[TRUE,[[320.377,0,330.247],[0.92587,0,0.37784,0]],[3.1,[-71.4,3.8,173.2],[1,0,0,0],0.055,0.049,0.005]];
+    PERS bool bEnableWeldSkip;
+    PERS num nTrapCheck_2:=0;
+    PERS seamdata smDefault_2Trap;
+    VAR num tool_rx_end{3};
+    VAR num tool_rx_start{3};
+    VAR num tool_rx_delta{3};
+    VAR robtarget pcalcWeldpos;
+    VAR robtarget pMoveWeldpos;
+    VAR robtarget pSaveWeldpos;
+    !Error
+    TASK VAR intnum iErrorDuringEntry;
+    PERS num nEntryRetryCount{2};
+    TASK VAR intnum iMoveHome_RBT2;
+    TASK PERS bool bTouchWorkCount{6}:=[FALSE,FALSE,FALSE,FALSE,FALSE,FALSE];
+    PERS monRobs MonitorweldErrorpostion;
+    PERS monRobs MonitorPosition;
+    PERS pos posStart;
+    PERS pos posEnd;
+    PERS bool bGantryInTrap{2};
+    TASK VAR intnum intOutGantryHold;
+    PERS edgedata edgestartBuffer2;
+    PERS edgedata edgeEndBuffer2;
+    PERS num nStartThick;
+    PERS num nEndThick;
+    PERS bool bBreakPoint{2};
+    PERS num nBreakPoint{2};
+    PERS bool btouchTimeOut{2};
+    PERS bool bWeldOutputDisable;
+    TASK PERS seamdata tsm2:=[0.5,0.5,[0,0,32,0,0,380,0,0,0],0,0,0,0,0,[0,0,0,0,0,0,0,0,0],0,1,[0,0,32,0,0,380,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
+    TASK PERS welddata twel2:=[0.01,0,[0,0,32,0,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    TASK PERS weavedata tweav2:=[1,2,2,2,0,0,0,0,0,0,0,0,0,0,0];
+    TASK PERS bool bInstalldir:=FALSE;
+    PERS num nMoveid;
+    PERS bool bExitCycle:=FALSE;
+
+    TRAP trapOutGantryHold
+        IDelete intOutGantryHold;
+        bGantryInTrap{2}:=FALSE;
+        Reset intReHoldGantry_2;
+        Holdwd1:=[Welds2{1}.cpm/6,0,[5,0,Welds2{1}.voltage,Welds2{1}.wfs,0,Welds2{1}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        Holdwd2:=[Welds2{2}.cpm/6,0,[5,0,Welds2{2}.voltage,Welds2{2}.wfs,0,Welds2{2}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        Holdwd3:=[Welds2{3}.cpm/6,0,[5,0,Welds2{3}.voltage,Welds2{3}.wfs,0,Welds2{3}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        Holdwd4:=[Welds2{4}.cpm/6,0,[5,0,Welds2{4}.voltage,Welds2{4}.wfs,0,Welds2{4}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        Holdwd5:=[Welds2{5}.cpm/6,0,[5,0,Welds2{5}.voltage,Welds2{5}.wfs,0,Welds2{5}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        Holdwd6:=[Welds2{6}.cpm/6,0,[5,0,Welds2{6}.voltage,Welds2{6}.wfs,0,Welds2{6}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        Holdwd7:=[Welds2{7}.cpm/6,0,[5,0,Welds2{7}.voltage,Welds2{7}.wfs,0,Welds2{7}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        Holdwd8:=[Welds2{8}.cpm/6,0,[5,0,Welds2{8}.voltage,Welds2{8}.wfs,0,Welds2{8}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        Holdwd9:=[Welds2{9}.cpm/6,0,[5,0,Welds2{9}.voltage,Welds2{9}.wfs,0,Welds2{9}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        Holdwd10:=[Welds2{10}.cpm/6,0,[5,0,Welds2{10}.voltage,Welds2{10}.wfs,0,Welds2{10}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+        ArcRefresh;
+    ENDTRAP
+
+    TRAP trapMoveG_PosHold
+        rTrapWeldMove;
+    ENDTRAP
+
+    TRAP trapErrorDuringEntry
+        Set po34_EntryR2Error;
+        IDelete iMoveHome_RBT2;
+        rErrorDuringEntry;
+    ENDTRAP
+
+    TRAP trapMoveHome_RBT2
+        VAR robtarget pTemp;
+        IDelete iMoveHome_RBT2;
+        StopMove;
+        ClearPath;
+        StartMove;
+        pTemp:=CRobT(\TaskName:="T_ROB2"\Tool:=tWeld2\WObj:=wobjWeldLine2);
+        MoveL RelTool(pTemp,0,0,-10),vTargetSpeed,z0,tWeld2\WObj:=wobjWeldLine2;
+        bWeldOutputDisable:=TRUE;
+        stReact{2}:="Error_Arc_Touch";
+        WaitSyncTask Wait{80},taskGroup123;
+        WaitUntil stReact=["Error_Arc_Touch","Error_Arc_Touch","Error_Arc_Touch"];
+        WaitSyncTask Wait{81},taskGroup123;
+        WaitUntil stCommand="Error_Arc_Touch";
+        stReact{2}:="";
+        WaitUntil stCommand="";
+        WaitSyncTask Wait{82},taskGroup123;
+        ExitCycle;
+
+    ENDTRAP
+
+    PROC main()
+        rUpdateR2Position;
+    ENDPROC
+
+    PROC rInit()
+        AccSet 30,30;
+
+        stReact{2}:="";
+        WaitUntil stCommand="";
+        stReact{2}:="Ready";
+        IDelete inumMoveG_PosHold;
+        IDelete iMoveHome_RBT2;
+        IDelete intOutGantryHold;
+        Reset intReHoldGantry_2;
+        Reset soLn2Touch;
+        bGantryInTrap{2}:=FALSE;
+        RETURN ;
+        MoveAbsJ [[0.0204923,-24.7246,-8.05237,0.0496605,-57.6256,1.6],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]]\NoEOffs,v1000,z50,tool0;
+        MoveJ [[168.50,0.00,1167.50],[0.999973,0.000344359,-0.00351527,0.00652012],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]],v1000,z50,tool0;
+        RETURN ;
+        ArcLStart [[-2.89,-0.02,1.95],[0.307559,-0.549626,-0.742627,-0.227649],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]],v10,smDefault_2,wd2,fine,tWeld2\WObj:=wobjWeldLine2;
+        ArcLEnd [[31.01,-0.07,1.91],[0.307527,-0.549634,-0.742645,-0.227613],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]],v10,smDefault_2,wd2,fine,tWeld2\WObj:=wobjWeldLine2;
+        RETURN ;
+        MoveL [[0,0,0],[0.264906,0.659459,-0.649912,0.269356],[0,0,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]],v10,z50,tWeld2\WObj:=wobjWeldLine2;
+    ENDPROC
+
+    !    PROC rTrapNoWeldMove()
+    !        VAR num i;
+    !        VAR targetdata WeldsTemp;
+    !        VAR robtarget pWeldTemp;
+
+    !        StopMove;
+    !        StorePath;
+
+    !        i:=nRunningStep{2};
+    !        WeldsTemp:=Welds2{i};
+    !        pWeldTemp:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobjWeldLine2);
+    !        WeldsTemp.position:=pWeldTemp;
+    !        ConfL\Off;
+    !        While (so_MoveG_PosHold=1) DO
+    !            nTrapCheck_2:=1;
+    !            MoveL RelTool(WeldsTemp.position,0,-0.1,0),vWeld{i},fine,tWeld2\WObj:=wobjWeldLine2;
+    !            MoveL RelTool(WeldsTemp.position,0,0.1,0),vWeld{i},fine,tWeld2\WObj:=wobjWeldLine2;
+    !        ENDWHILE
+    !        ConfL\On;
+    !        RestoPath;
+    !        StartMove;
+    !    ENDPROC
+
+    PROC rTrapWeldMove()
+        VAR num i;
+        VAR robtarget pWeldTemp;
+        VAR robtarget pTemp_pos;
+        VAR num nTempMmps;
+        VAR speeddata vWeldTemp;
+        IDelete inumMoveG_PosHold;
+        StopMove;
+        !        ClearPath;
+        !        StorePath;
+        i:=nRunningStep{2};
+        nTempMmps:=Welds2{i}.cpm/6;
+        vWeldTemp:=[nTempMmps,200,200,200];
+        pWeldTemp:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobjWeldLine2);
+        StartMove;
+        ConfL\Off;
+        WHILE (so_MoveG_PosHold=1) DO
+            nTrapCheck_2:=2;
+            MoveL Offs(pWeldTemp,0,0,0),vWeldTemp,fine,tWeld2\WObj:=wobjWeldLine2;
+            MoveL Offs(pWeldTemp,0,0,0),vWeldTemp,fine,tWeld2\WObj:=wobjWeldLine2;
+        ENDWHILE
+        ConfL\On;
+        !        RestoPath;
+
+    ENDPROC
+
+    PROC rMoveCorrConnect(num X,num Y,num Z,num Rx,num Ry,num Rz,num EAX_D,bool isStartPos,bool CCW,\switch LIN)
+        VAR robtarget pTempConnect;
+        VAR num nCorrX_Store;
+        VAR num nCorrY_Store;
+        VAR num nCorrZ_Store;
+
+        IF (isStartPos=bStart) THEN
+            nCorrX_Store:=nCorrX_Store_Start{2};
+            nCorrY_Store:=nCorrY_Store_Start{2};
+            nCorrZ_Store:=nCorrZ_Store_Start{2};
+        ELSE
+            nCorrX_Store:=nCorrX_Store_End{2};
+            nCorrY_Store:=nCorrY_Store_End{2};
+            nCorrZ_Store:=nCorrZ_Store_End{2};
+        ENDIF
+
+
+        pTempConnect:=pNull;
+        pTempConnect.robconf:=[0,0,0,1];
+
+        IF isStartPos=bStart THEN
+            !        pTempConnect:=ConvertTcpToGantryCoord(pWeldPosR2{2}.position);
+            IF CCW=FALSE THEN
+                pTempConnect.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+                pTempConnect.rot:=[0.5,-0.5,-0.5,-0.5];
+                pTempConnect:=RelTool(pTempConnect,0,0,0\Rx:=macroStartBuffer2{1}.TravelAngle\Ry:=-1*macroStartBuffer2{1}.WorkingAngle+nBreakPoint{2});
+            ELSE
+                pTempConnect.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y*(-1)),nCorrZ_Store+(Z)];
+                pTempConnect.rot:=[0.5,0.5,-0.5,0.5];
+                pTempConnect:=RelTool(pTempConnect,0,0,0\Rx:=-1*macroStartBuffer2{1}.TravelAngle\Ry:=-1*macroStartBuffer2{1}.WorkingAngle+nBreakPoint{2});
+            ENDIF
+        ELSEIF isStartPos=bEnd THEN
+            !        pTempConnect:=ConvertTcpToGantryCoord(pWeldPosR2{nMotionStepCount}.position);
+            IF CCW=FALSE THEN
+                pTempConnect.trans:=[nWeldLineLength_R2+nCorrX_Store+(X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+                pTempConnect.rot:=[0.5,-0.5,-0.5,-0.5];
+                pTempConnect:=RelTool(pTempConnect,0,0,0\Rx:=macroEndBuffer2{nMotionEndStepLast{2}}.TravelAngle\Ry:=-1*macroEndBuffer2{nMotionEndStepLast{2}}.WorkingAngle+nBreakPoint{2});
+            ELSE
+                pTempConnect.trans:=[nWeldLineLength_R2+nCorrX_Store+(X),nCorrY_Store+(Y*(-1)),nCorrZ_Store+(Z)];
+                pTempConnect.rot:=[0.5,0.5,-0.5,0.5];
+                pTempConnect:=RelTool(pTempConnect,0,0,0\Rx:=-1*macroEndBuffer2{nMotionEndStepLast{2}}.TravelAngle\Ry:=-1*macroEndBuffer2{nMotionEndStepLast{2}}.WorkingAngle+nBreakPoint{2});
+            ENDIF
+        ENDIF
+
+        IF Present(LIN)=FALSE THEN
+            MoveJ pTempConnect,v300,fine,tWeld2\WObj:=wobjWeldLine2;
+        ELSE
+            MoveL pTempConnect,v300,fine,tWeld2\WObj:=wobjWeldLine2;
+        ENDIF
+
+        RETURN ;
+    ENDPROC
+
+    PROC rCorrSearchWeldLineEdgeX(num X,num Y,num Z,num Depth,num RetX,bool isStartPos,bool CCW,string dirErrorCheck)
+        VAR num nCorrX_Store;
+        VAR num nCorrY_Store;
+        VAR num nCorrZ_Store;
+        WaitUntil bRobSwap=CCW;
+        IF (isStartPos=bStart) THEN
+            nCorrX_Store:=nCorrX_Store_Start{2};
+            nCorrY_Store:=nCorrY_Store_Start{2};
+            nCorrZ_Store:=nCorrZ_Store_Start{2};
+        ELSE
+            nCorrX_Store:=nCorrX_Store_End{2};
+            nCorrY_Store:=nCorrY_Store_End{2};
+            nCorrZ_Store:=nCorrZ_Store_End{2};
+        ENDIF
+
+        TouchErrorDirSub:=dirErrorCheck;
+        IF TouchErrorDirMain=dirErrorCheck AND nTouchRetryCount{2}>0 THEN
+            IF (isStartPos=bEnd AND (nMacro001{1}=2 OR nMacro001{1}=5)) OR (isStartPos=bStart AND (nMacro010{1}=2 OR nMacro010{1}=5)) THEN
+                Depth:=Depth+((RetryDepthData{1}*(-1))*nTouchRetryCount{2});
+            ELSE
+                Depth:=Depth+(RetryDepthData{1}*nTouchRetryCount{2});
+            ENDIF
+        ENDIF
+        !!! Search weld X edge !!!
+        WaitUntil bRobSwap=CCW;
+        IF (isStartPos=bStart) THEN
+            !        pSearchStart:=ConvertTcpToGantryCoord(pWeldPosR2{1}.position);
+            pSearchStart.rot:=Welds2{1}.position.rot;
+            IF (CCW=FALSE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+            IF (CCW=TRUE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y*(-1)),nCorrZ_Store+(Z)];
+        ELSEIF (isStartPos=bEnd) THEN
+            !        pSearchStart:=ConvertTcpToGantryCoord(pWeldPosR2{nMotionStepCount}.position);
+            !  pSearchStart.rot:=pWeldPosR2{nMotionStepCount{2}}.rot;
+            pSearchStart.rot:=Welds2{nMotionStepCount{2}}.position.rot;
+            IF (CCW=FALSE) pSearchStart.trans:=[nWeldLineLength_R2+nCorrX_Store+(X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+            IF (CCW=TRUE) pSearchStart.trans:=[nWeldLineLength_R2+nCorrX_Store+(X),nCorrY_Store+(Y*(-1)),nCorrZ_Store+(Z)];
+        ENDIF
+
+        pSearchStart.robconf.cfx:=1;
+        pSearchStart.extax:=[9e9,9e9,9e9,9e9,9e9,9e9];
+        !    pSearchStart.extax.eax_d:=wobjWeldLine1.uframe.trans.z-(nRobCorrSpaceHeight+wobjWeldLine1.oframe.trans.z);
+
+        pSearchEnd:=pSearchStart;
+        IF (isStartPos=bStart) pSearchEnd.trans.x:=pSearchStart.trans.x+Depth;
+        IF (isStartPos=bEnd) pSearchEnd.trans.x:=pSearchStart.trans.x-Depth;
+
+        rCorrSearchByWire pSearchStart,pSearchEnd\X;
+
+        IF (isStartPos=bStart) nCorrX_Store:=pCorredPosBuffer.x;
+        IF (isStartPos=bEnd) nCorrX_Store:=pCorredPosBuffer.x-nWeldLineLength_R2;
+
+        IF (isStartPos=bStart) THEN
+            nCorrX_Store_Start{2}:=nCorrX_Store;
+            nCorrY_Store_Start{2}:=nCorrY_Store;
+            nCorrZ_Store_Start{2}:=nCorrZ_Store;
+        ELSE
+            nCorrX_Store_End{2}:=nCorrX_Store;
+            nCorrY_Store_End{2}:=nCorrY_Store;
+            nCorrZ_Store_End{2}:=nCorrZ_Store;
+        ENDIF
+
+        rMoveCorrConnect RetX,Y,Z,0,0,0,pSearchStart.extax.eax_d,isStartPos,CCW;
+        nTouchRetryCount{2}:=0;
+        TouchErrorDirMain:="Ready";
+
+        RETURN ;
+    ENDPROC
+
+    PROC rCorrSearchWeldLineEdgeY(num X,num Y,num Z,num Depth,num RetY,bool isStartPos,bool CCW,string dirErrorCheck)
+        VAR num nCorrX_Store;
+        VAR num nCorrY_Store;
+        VAR num nCorrZ_Store;
+        WaitUntil bRobSwap=CCW;
+        IF (isStartPos=bStart) THEN
+            nCorrX_Store:=nCorrX_Store_Start{2};
+            nCorrY_Store:=nCorrY_Store_Start{2};
+            nCorrZ_Store:=nCorrZ_Store_Start{2};
+        ELSE
+            nCorrX_Store:=nCorrX_Store_End{2};
+            nCorrY_Store:=nCorrY_Store_End{2};
+            nCorrZ_Store:=nCorrZ_Store_End{2};
+        ENDIF
+
+        TouchErrorDirSub:=dirErrorCheck;
+        RetryDepthData{2}:=RetryDepthData{2}*(-1);
+        IF TouchErrorDirMain=dirErrorCheck AND nTouchRetryCount{2}>0 Depth:=Depth+(RetryDepthData{2}*nTouchRetryCount{2});
+        RetryDepthData{2}:=RetryDepthData{2}*(-1);
+
+        !!! Search weld Y edge !!!
+        WaitUntil bRobSwap=CCW;
+        IF (isStartPos=bStart) THEN
+            !        pSearchStart:=ConvertTcpToGantryCoord(pWeldPosR2{1}.position);
+            pSearchStart.rot:=Welds2{1}.position.rot;
+            IF (CCW=FALSE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+            IF (CCW=TRUE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y*(-1)),nCorrZ_Store+Z];
+        ELSEIF (isStartPos=bEnd) THEN
+            !        pSearchStart:=ConvertTcpToGantryCoord(pWeldPosR2{nMotionStepCount}.position);
+            !pSearchStart.rot:=pWeldPosR2{nMotionStepCount{2}}.rot;
+            pSearchStart.rot:=Welds2{nMotionStepCount{2}}.position.rot;
+            IF (CCW=FALSE) pSearchStart.trans:=[nWeldLineLength_R2+nCorrX_Store+(X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+            IF (CCW=TRUE) pSearchStart.trans:=[nWeldLineLength_R2+nCorrX_Store+(X),nCorrY_Store+(Y*(-1)),nCorrZ_Store+(Z)];
+        ENDIF
+
+        pSearchStart.robconf.cfx:=1;
+        !  pSearchStart.extax.eax_d:=wobjWeldLine1.uframe.trans.z-(nRobCorrSpaceHeight+wobjWeldLine1.oframe.trans.z);
+
+        pSearchEnd:=pSearchStart;
+        pSearchStart.extax:=[9e9,9e9,9e9,9e9,9e9,9e9];
+        IF (CCW=FALSE) pSearchEnd.trans.y:=pSearchStart.trans.y-Depth;
+        IF (CCW=TRUE) pSearchEnd.trans.y:=pSearchStart.trans.y+Depth;
+
+        rCorrSearchByWire pSearchStart,pSearchEnd\Y;
+
+        nCorrY_Store:=pCorredPosBuffer.y;
+
+        IF (isStartPos=bStart) THEN
+            nCorrX_Store_Start{2}:=nCorrX_Store;
+            nCorrY_Store_Start{2}:=nCorrY_Store;
+            nCorrZ_Store_Start{2}:=nCorrZ_Store;
+        ELSE
+            nCorrX_Store_End{2}:=nCorrX_Store;
+            nCorrY_Store_End{2}:=nCorrY_Store;
+            nCorrZ_Store_End{2}:=nCorrZ_Store;
+        ENDIF
+
+        rMoveCorrConnect X,RetY,Z,0,0,0,pSearchStart.extax.eax_d,isStartPos,CCW;
+        nTouchRetryCount{2}:=0;
+        TouchErrorDirMain:="Ready";
+
+        RETURN ;
+    ENDPROC
+
+    PROC rCorrSearchWeldLineEdgeZ(num X,num Y,num Z,num Depth,num RetZ,bool isStartPos,bool CCW,string dirErrorCheck)
+        VAR num nCorrX_Store;
+        VAR num nCorrY_Store;
+        VAR num nCorrZ_Store;
+        WaitUntil bRobSwap=CCW;
+        IF (isStartPos=bStart) THEN
+            nCorrX_Store:=nCorrX_Store_Start{2};
+            nCorrY_Store:=nCorrY_Store_Start{2};
+            nCorrZ_Store:=nCorrZ_Store_Start{2};
+        ELSE
+            nCorrX_Store:=nCorrX_Store_End{2};
+            nCorrY_Store:=nCorrY_Store_End{2};
+            nCorrZ_Store:=nCorrZ_Store_End{2};
+        ENDIF
+        TouchErrorDirSub:=dirErrorCheck;
+        IF TouchErrorDirMain=dirErrorCheck AND nTouchRetryCount{2}>0 Depth:=Depth+(RetryDepthData{3}*nTouchRetryCount{2});
+        !!! Search weld Z edge !!!
+        WaitUntil bRobSwap=CCW;
+        IF (isStartPos=bStart) THEN
+            !       pSearchStart:=ConvertTcpToGantryCoord(pWeldPosR2{1}.position);
+            pSearchStart.rot:=Welds2{1}.position.rot;
+            IF (CCW=FALSE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+            IF (CCW=TRUE) pSearchStart.trans:=[nCorrX_Store+(-1*X),nCorrY_Store+(Y*(-1)),nCorrZ_Store+(Z)];
+        ELSEIF (isStartPos=bEnd) THEN
+            !        pSearchStart:=ConvertTcpToGantryCoord(pWeldPosR2{nMotionStepCount}.position);
+            pSearchStart.rot:=Welds2{nMotionStepCount{2}}.position.rot;
+            ! pSearchStart.rot:=pWeldPosR2{nMotionStepCount{2}}.rot;
+            IF (CCW=FALSE) pSearchStart.trans:=[nWeldLineLength_R2+nCorrX_Store+(X),nCorrY_Store+(Y),nCorrZ_Store+(Z)];
+            IF (CCW=TRUE) pSearchStart.trans:=[nWeldLineLength_R2+nCorrX_Store+(X),nCorrY_Store+(Y*(-1)),nCorrZ_Store+(Z)];
+        ENDIF
+
+        pSearchStart.robconf.cfx:=1;
+        pSearchStart.extax:=[9e9,9e9,9e9,9e9,9e9,9e9];
+        !  pSearchStart.extax.eax_d:=wobjWeldLine1.uframe.trans.z-(nRobCorrSpaceHeight+wobjWeldLine1.oframe.trans.z);
+
+        pSearchEnd:=pSearchStart;
+        pSearchEnd.trans.z:=pSearchStart.trans.z-Depth;
+
+        rCorrSearchByWire pSearchStart,pSearchEnd\Z;
+
+        nCorrZ_Store:=pCorredPosBuffer.z;
+
+        IF (isStartPos=bStart) THEN
+            nCorrX_Store_Start{2}:=nCorrX_Store;
+            nCorrY_Store_Start{2}:=nCorrY_Store;
+            nCorrZ_Store_Start{2}:=nCorrZ_Store;
+        ELSE
+            nCorrX_Store_End{2}:=nCorrX_Store;
+            nCorrY_Store_End{2}:=nCorrY_Store;
+            nCorrZ_Store_End{2}:=nCorrZ_Store;
+        ENDIF
+
+        rMoveCorrConnect X,Y,RetZ,0,0,0,pSearchStart.extax.eax_d,isStartPos,CCW;
+        nTouchRetryCount{2}:=0;
+        TouchErrorDirMain:="Ready";
+
+        RETURN ;
+    ENDPROC
+
+    PROC rCorrSearchByWire(robtarget SearchStart,robtarget SearchEnd,\switch X\switch Y\switch Z)
+        VAR robtarget pTemp:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,9E+09,9E+09]];
+        MoveJ SearchStart,v100,fine,tWeld2\WObj:=wobjWeldLine2;
+        rCheckWelder;
+        SearchL\SStop,bWireTouch2,SearchStart,SearchEnd,v10,tWeld2\WObj:=wobjWeldLine2;
+
+        Reset soLn2Touch;
+        WaitTime 0;
+        WaitUntil(siLn2TouchActive=0);
+        pTemp:=CRobT(\taskname:="T_ROB2"\tool:=tWeld2\WObj:=wobjWeldLine2);
+        pCorredPosBuffer:=pTemp.trans;
+        !        stop;
+        RETURN ;
+    ERROR
+
+        TouchErrorDirMain:=TouchErrorDirSub;
+        IDelete iMoveHome_RBT2;
+        IF ERRNO=ERR_WHLSEARCH THEN
+            rTouchErrorHandling 2;
+        ELSEIF ERRNO=ERR_SIGSUPSEARCH THEN
+            WaitTime 999;
+            rTouchErrorHandling 3;
+        ELSE
+            rTouchErrorHandling 3;
+        ENDIF
+    ENDPROC
+
+    PROC rZero()
+        MoveAbsJ [[0,0,0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]]\NoEOffs,v1000,fine,tool0;
+    ENDPROC
+
+    PROC rErrorDuringEntry()
+        VAR robtarget pTemp;
+        Reset soLn2Touch;
+        StopMove;
+        ClearPath;
+        StartMove;
+        pTemp:=CRobT(\TaskName:="T_ROB2"\Tool:=tWeld2\WObj:=wobjWeldLine2);
+        MoveL RelTool(pTemp,0,0,-10),vTargetSpeed,fine,tWeld2\WObj:=wobjWeldLine2;
+        stReact{2}:="Error_Arc_Touch";
+        WaitSyncTask Wait{80},taskGroup123;
+        WaitUntil stReact=["Error_Arc_Touch","Error_Arc_Touch","Error_Arc_Touch"];
+        WaitSyncTask Wait{81},taskGroup123;
+        WaitUntil stCommand="Error_Arc_Touch";
+        stReact{2}:="";
+        WaitUntil stCommand="";
+        WaitSyncTask Wait{82},taskGroup123;
+
+        ExitCycle;
+    ENDPROC
+
+    PROC rArcError()
+        VAR robtarget pTemp;
+
+        IDelete iMoveHome_RBT2;
+        StopMove;
+        ClearPath;
+        StartMove;
+        IF bRobSwap=FALSE THEN
+            Set po37_ArcR2Error;
+            MonitorweldErrorpostion.monPose1:=MonitorPosition.monPose1;
+            MonitorweldErrorpostion.monPose2:=MonitorPosition.monPose2;
+        ELSE
+            Set po36_ArcR1Error;
+            MonitorweldErrorpostion.monPose1:=MonitorPosition.monPose1;
+            MonitorweldErrorpostion.monPose2:=MonitorPosition.monPose2;
+        ENDIF
+
+        pTemp:=CRobT(\TaskName:="T_ROB2"\Tool:=tWeld2\WObj:=wobjWeldLine2);
+        MoveL RelTool(pTemp,0,0,-10),vTargetSpeed,z0,tWeld2\WObj:=wobjWeldLine2;
+
+        stReact{2}:="Error_Arc_Touch";
+        WaitSyncTask Wait{80},taskGroup123;
+        WaitUntil stReact=["Error_Arc_Touch","Error_Arc_Touch","Error_Arc_Touch"];
+        WaitSyncTask Wait{81},taskGroup123;
+        WaitUntil stCommand="Error_Arc_Touch";
+        stReact{2}:="";
+        WaitUntil stCommand="";
+        WaitSyncTask Wait{82},taskGroup123;
+        ExitCycle;
+
+    ENDPROC
+
+    PROC rTouchErrorHandling(num Errorno)
+        VAR robtarget pTemp;
+        Reset soLn2Touch;
+        Set po35_TouchR2Error;
+        IDelete iMoveHome_RBT2;
+
+        pTemp:=CRobT(\TaskName:="T_ROB2"\tool:=tWeld2\WObj:=wobjWeldLine2);
+        MoveL RelTool(pTemp,0,0,-10),v200,z10,tWeld2\WObj:=wobjWeldLine2;
+        stReact{2}:="Error_Arc_Touch";
+        WaitSyncTask Wait{80},taskGroup123;
+        WaitUntil stReact=["Error_Arc_Touch","Error_Arc_Touch","Error_Arc_Touch"];
+        WaitSyncTask Wait{81},taskGroup123;
+        WaitUntil stCommand="Error_Arc_Touch";
+        stReact{2}:="";
+        WaitUntil stCommand="";
+        WaitSyncTask Wait{82},taskGroup123;
+        StartMove;
+        ExitCycle;
+
+
+    ENDPROC
+
+    PROC rT_ROB2check()
+        VAR robtarget pTemp;
+        pTemp:=CRobT(\TaskName:="T_ROB2"\Tool:=tWeld2\WObj:=wobjWeldLine2);
+        IF Abs(pTemp.trans.Y)<100 AND Abs(pTemp.trans.Z)<200 THEN
+            IF pTemp.trans.Y>0 then
+                pTemp.trans.y:=140;
+                MoveL pTemp,v100,z10,tWeld2\WObj:=wobjWeldLine2;
+            ENDIF
+            IF pTemp.trans.Y<0 THEN
+                pTemp.trans.y:=-140;
+                MoveL pTemp,v100,z10,tWeld2\WObj:=wobjWeldLine2;
+            ENDIF
+        ENDIF
+    ENDPROC
+
+    PROC rCheckWelder()
+        IF (soLn2Touch=1) THEN
+            Reset soLn2Touch;
+            WaitTime 0.5;
+        ENDIF
+        WaitTime 0.5;
+        WaitUntil(siLn2TouchActive=0 OR soLn2Touch=0);
+        Set soLn2Touch;
+        WaitUntil(siLn2TouchActive=1 AND soLn2Touch=1);
+    ENDPROC
+
+    PROC rWeldinit()
+        return1:
+        !!!===ArcWareReset===!!!
+        reset soAwDeleteSDB2;
+        WaitUntil soAwDeleteSDB2=0\MaxTime:=5;
+        reset soAwError2;
+        WaitUntil soAwError2=0\MaxTime:=5;
+        reset soAwGasOn2;
+        WaitUntil soAwGasOn2=0\MaxTime:=5;
+        reset soAwInitSDB2;
+        WaitUntil soAwInitSDB2=0\MaxTime:=5;
+        reset soAwManFeed15mm2;
+        WaitUntil soAwManFeed15mm2=0\MaxTime:=5;
+        reset soAwManFeedRev2;
+        WaitUntil soAwManFeedRev2=0\MaxTime:=5;
+        reset soAwManGasOn2;
+        WaitUntil soAwManGasOn2=0\MaxTime:=5;
+        reset soAwOnFlag2;
+        WaitUntil soAwOnFlag2=0\MaxTime:=5;
+        reset soAwRestart2;
+        WaitUntil soAwRestart2=0\MaxTime:=5;
+        reset soAwRunning2;
+        WaitUntil soAwRunning2=0\MaxTime:=5;
+        reset soAwWeldUpdate2;
+        WaitUntil soAwWeldUpdate2=0\MaxTime:=5;
+        set soAwTaskReady2;
+        WaitUntil soAwTaskReady2=1\MaxTime:=5;
+        set soAwStart2;
+        WaitUntil soAwStart2=1\MaxTime:=5;
+        set soAwEquipOK2;
+        WaitUntil soAwEquipOK2=1\MaxTime:=5;
+        !!!!!!!====Lincoln_Reset====!!!!
+        reset soLn2AdjWireStickOut;
+        WaitUntil soLn2AdjWireStickOut=0\MaxTime:=5;
+        reset soLn2ArcOkLatch;
+        WaitUntil soLn2ArcOkLatch=0\MaxTime:=5;
+        set soLn2BusAvailable;
+        WaitUntil soLn2BusAvailable=1\MaxTime:=5;
+        reset soLn2EvalWeldDataLog;
+        WaitUntil soLn2EvalWeldDataLog=0\MaxTime:=5;
+        reset soLn2FeedOn;
+        WaitUntil soLn2FeedOn=0\MaxTime:=5;
+        reset soLn2Gas;
+        WaitUntil soLn2Gas=0\MaxTime:=5;
+        reset soLn2GasError;
+        WaitUntil soLn2GasError=0\MaxTime:=5;
+        set soLn2Installed;
+        WaitUntil soLn2Installed=1\MaxTime:=5;
+        set soLn2Listen;
+        WaitUntil soLn2Listen=1\MaxTime:=5;
+        reset soLn2LoadWeldModes;
+        WaitUntil soLn2LoadWeldModes=0\MaxTime:=5;
+        reset soLn2ManWireFeed;
+        WaitUntil soLn2ManWireFeed=0\MaxTime:=5;
+        set soLn2NOP_Enable;
+        WaitUntil soLn2NOP_Enable=1\MaxTime:=5;
+        reset soLn2NOPDisable;
+        WaitUntil soLn2NOPDisable=0\MaxTime:=5;
+        reset soLn2SaveCapLog;
+        WaitUntil soLn2SaveCapLog=0\MaxTime:=5;
+        reset soLn2ShowRecMessage;
+        WaitUntil soLn2ShowRecMessage=0\MaxTime:=5;
+        reset soLn2StartPart;
+        WaitUntil soLn2StartPart=0\MaxTime:=5;
+        set soLn2StartupComplete;
+        WaitUntil soLn2StartupComplete=1\MaxTime:=5;
+        reset soLn2StopProc;
+        WaitUntil soLn2StopProc=0\MaxTime:=5;
+        set soLn2T1Exec;
+        WaitUntil soLn2T1Exec=1\MaxTime:=5;
+        set soLn2T2Exec;
+        WaitUntil soLn2T2Exec=1\MaxTime:=5;
+        reset soLn2Touch;
+        WaitUntil soLn2Touch=0\MaxTime:=5;
+        reset soLn2TouchActive;
+        WaitUntil soLn2TouchActive=0\MaxTime:=5;
+        set soLn2ValidSchedule;
+        WaitUntil soLn2ValidSchedule=1\MaxTime:=5;
+        reset soLn2VoltError;
+        WaitUntil soLn2VoltError=0\MaxTime:=5;
+        reset soLn2WaterError;
+        WaitUntil soLn2WaterError=0\MaxTime:=5;
+        reset soLn2Weld;
+        WaitUntil soLn2Weld=0\MaxTime:=5;
+        reset soLn2WeldDataLogOn;
+        WaitUntil soLn2WeldDataLogOn=0\MaxTime:=5;
+        set soLn2WelderRdyDO;
+        WaitUntil soLn2WelderRdyDO=1\MaxTime:=5;
+        reset soLn2WeldError;
+        WaitUntil soLn2WeldError=0\MaxTime:=5;
+        reset soLn2WireBurnOff;
+        WaitUntil soLn2WireBurnOff=0\MaxTime:=5;
+        reset soLn2WireFeedError;
+        WaitUntil soLn2WireFeedError=0\MaxTime:=5;
+        set soLn2WireFeedRdyDO;
+        WaitUntil soLn2WireFeedRdyDO=1\MaxTime:=5;
+        reset soLn2WireStickDO;
+        WaitUntil soLn2WireStickDO=0\MaxTime:=5;
+        RETURN ;
+        GOTO return1;
+    ENDPROC
+
+    PROC Routine2()
+        MoveJ [[-0.00,981.00,441.10],[0.5,-0.5,0.5,0.5],[1,0,0,2],[9E+9,9E+9,9E+9,9E+9,9E+9,9E+9]],v1000,z50,tool0;
+    ENDPROC
+
+    PROC rUpdateR2Position()
+        VAR num X;
+        VAR num Y;
+        VAR num Z;
+        VAR num R;
+        VAR num X2;
+        VAR num Y2;
+        VAR num Z2;
+        !        jTemp:=[[0,0,0,0,0,0],[0,0,0,30,0,0]];
+        jTemp := CJointT(\TaskName:="T_ROB1");
+
+        X:=jtemp.extax.eax_a;
+        Y:=jtemp.extax.eax_b;
+        Z:=jtemp.extax.eax_c;
+        R:=jtemp.extax.eax_d;
+
+        X2:=X-(488*cos(R));
+        !X2:=X-(976*cos(R));
+        Y2:=Y-(488*sin(R));
+        !Y2:=Y-(976*sin(R));
+
+        nCaledR2Pos:=[X2,Y2,Z];
+        wobjtest:=[FALSE,TRUE,"GantryRob",[[X2,Y2,Z],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
+    ENDPROC
+
+	!========================================
+	! Robot2 Capability Tests
+	!========================================
+	! Version: v1.0.0
+	! Date: 2025-12-17
+	! Purpose: Verify Robot2 gantry external axis access
+
+	!========================================
+	! Test 1: Read External Axes via CJointT()
+	!========================================
+	PROC TestRobot2_ReadExternalAxes()
+		VAR jointtarget current_joint;
+		VAR num gantry_x;
+		VAR num gantry_y;
+		VAR num gantry_z;
+		VAR num gantry_r;
+		VAR num gantry_x2;
+		VAR iodev logfile;
+
+		TPWrite "========================================";
+		TPWrite "Test 1: Robot2 - Read External Axes";
+		TPWrite "========================================";
+
+		current_joint := CJointT();
+
+		TPWrite "Robot Joints:";
+		TPWrite "  J1 = " + NumToStr(current_joint.robax.rax_1, 2) + " deg";
+		TPWrite "  J2 = " + NumToStr(current_joint.robax.rax_2, 2) + " deg";
+		TPWrite "  J3 = " + NumToStr(current_joint.robax.rax_3, 2) + " deg";
+		TPWrite "  J4 = " + NumToStr(current_joint.robax.rax_4, 2) + " deg";
+		TPWrite "  J5 = " + NumToStr(current_joint.robax.rax_5, 2) + " deg";
+		TPWrite "  J6 = " + NumToStr(current_joint.robax.rax_6, 2) + " deg";
+
+		gantry_x := current_joint.extax.eax_a;
+		gantry_y := current_joint.extax.eax_b;
+		gantry_z := current_joint.extax.eax_c;
+		gantry_r := current_joint.extax.eax_d;
+		gantry_x2 := current_joint.extax.eax_f;
+
+		TPWrite "Gantry External Axes:";
+		TPWrite "  X1 = " + NumToStr(gantry_x, 4) + " m";
+		TPWrite "  Y  = " + NumToStr(gantry_y, 4) + " m";
+		TPWrite "  Z  = " + NumToStr(gantry_z, 4) + " m";
+		TPWrite "  R  = " + NumToStr(gantry_r, 4) + " rad";
+		TPWrite "  X2 = " + NumToStr(gantry_x2, 4) + " m";
+
+		Open "/HOME/", logfile \Write;
+		Open "robot2_external_axes_test.txt", logfile \Append;
+
+		Write logfile, "========================================";
+		Write logfile, "Robot2 - External Axes Reading Test";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "Robot Joints: ["
+			+ NumToStr(current_joint.robax.rax_1, 2) + ", "
+			+ NumToStr(current_joint.robax.rax_2, 2) + ", "
+			+ NumToStr(current_joint.robax.rax_3, 2) + ", "
+			+ NumToStr(current_joint.robax.rax_4, 2) + ", "
+			+ NumToStr(current_joint.robax.rax_5, 2) + ", "
+			+ NumToStr(current_joint.robax.rax_6, 2) + "]";
+		Write logfile, "";
+		Write logfile, "Gantry External Axes:";
+		Write logfile, "  X1 = " + NumToStr(gantry_x, 4) + " m";
+		Write logfile, "  Y  = " + NumToStr(gantry_y, 4) + " m";
+		Write logfile, "  Z  = " + NumToStr(gantry_z, 4) + " m";
+		Write logfile, "  R  = " + NumToStr(gantry_r, 4) + " rad";
+		Write logfile, "  X2 = " + NumToStr(gantry_x2, 4) + " m";
+		Write logfile, "";
+		Write logfile, "Result: ";
+
+		IF gantry_x <> 9E9 OR gantry_y <> 9E9 OR gantry_z <> 9E9 THEN
+			Write logfile, "SUCCESS - Robot2 can read gantry external axes!";
+			TPWrite "Result: SUCCESS";
+		ELSE
+			Write logfile, "FAIL - Robot2 cannot read gantry external axes";
+			TPWrite "Result: FAIL";
+		ENDIF
+
+		Write logfile, "========================================\0A";
+		Close logfile;
+
+		TPWrite "========================================";
+		TPWrite "Test 1 Complete. Check robot2_external_axes_test.txt";
+
+	ERROR
+		TPWrite "ERROR in TestRobot2_ReadExternalAxes: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
+	ENDPROC
+
+	!========================================
+	! Test 2: Robot2 TCP Coordinates
+	!========================================
+	PROC TestRobot2_TCPCoordinates()
+		VAR robtarget tcp_world;
+		VAR robtarget tcp_wobj0;
+		VAR robtarget tcp_base;
+		VAR iodev logfile;
+
+		TPWrite "========================================";
+		TPWrite "Test 2: Robot2 - TCP Coordinates";
+		TPWrite "========================================";
+
+		tcp_world := CRobT(\Tool:=tool0);
+		tcp_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+		tcp_base := tcp_wobj0;
+
+		TPWrite "World Coordinates:";
+		TPWrite "  X = " + NumToStr(tcp_world.trans.x, 3) + " mm";
+		TPWrite "  Y = " + NumToStr(tcp_world.trans.y, 3) + " mm";
+		TPWrite "  Z = " + NumToStr(tcp_world.trans.z, 3) + " mm";
+
+		TPWrite "wobj0 Coordinates:";
+		TPWrite "  X = " + NumToStr(tcp_wobj0.trans.x, 3) + " mm";
+		TPWrite "  Y = " + NumToStr(tcp_wobj0.trans.y, 3) + " mm";
+		TPWrite "  Z = " + NumToStr(tcp_wobj0.trans.z, 3) + " mm";
+
+		Open "/HOME/", logfile \Write;
+		Open "robot2_tcp_coordinates.txt", logfile \Append;
+
+		Write logfile, "========================================";
+		Write logfile, "Robot2 - TCP Coordinates Test";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "1. World Coordinates:";
+		Write logfile, "   X = " + NumToStr(tcp_world.trans.x, 3) + " mm";
+		Write logfile, "   Y = " + NumToStr(tcp_world.trans.y, 3) + " mm";
+		Write logfile, "   Z = " + NumToStr(tcp_world.trans.z, 3) + " mm";
+		Write logfile, "";
+		Write logfile, "2. wobj0 Coordinates:";
+		Write logfile, "   X = " + NumToStr(tcp_wobj0.trans.x, 3) + " mm";
+		Write logfile, "   Y = " + NumToStr(tcp_wobj0.trans.y, 3) + " mm";
+		Write logfile, "   Z = " + NumToStr(tcp_wobj0.trans.z, 3) + " mm";
+		Write logfile, "";
+		Write logfile, "Note: Robot2 wobj0 should be at Robot2 Base";
+		Write logfile, "========================================\0A";
+
+		Close logfile;
+
+		TPWrite "========================================";
+		TPWrite "Test 2 Complete. Check robot2_tcp_coordinates.txt";
+
+	ERROR
+		TPWrite "ERROR in TestRobot2_TCPCoordinates: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
+	ENDPROC
+
+	!========================================
+	! Test Runner
+	!========================================
+	PROC RunAllTests()
+		TPWrite "Starting Robot2 Capabilities Test Suite...";
+		TPWrite "";
+
+		TestRobot2_ReadExternalAxes;
+		WaitTime 2;
+
+		TestRobot2_TCPCoordinates;
+		WaitTime 2;
+
+		TPWrite "";
+		TPWrite "All tests complete!";
+		TPWrite "Check /HOME folder for result files.";
+	ENDPROC
+
+	!========================================
+	! Check wobj0 Definition
+	!========================================
+	! Version: v1.0.0
+	! Date: 2025-12-17
+
+	PROC ShowWobj0Definition()
+		TPWrite "========================================";
+		TPWrite "TASK2 - wobj0 Definition";
+		TPWrite "========================================";
+
+		TPWrite "wobj0.robhold: " + NumToStr(wobj0.robhold, 0);
+		TPWrite "wobj0.ufprog: " + NumToStr(wobj0.ufprog, 0);
+		TPWrite "";
+		TPWrite "User Frame (uframe):";
+		TPWrite "  X = " + NumToStr(wobj0.uframe.trans.x, 2) + " mm";
+		TPWrite "  Y = " + NumToStr(wobj0.uframe.trans.y, 2) + " mm";
+		TPWrite "  Z = " + NumToStr(wobj0.uframe.trans.z, 2) + " mm";
+		TPWrite "  q1 = " + NumToStr(wobj0.uframe.rot.q1, 4);
+		TPWrite "  q2 = " + NumToStr(wobj0.uframe.rot.q2, 4);
+		TPWrite "  q3 = " + NumToStr(wobj0.uframe.rot.q3, 4);
+		TPWrite "  q4 = " + NumToStr(wobj0.uframe.rot.q4, 4);
+		TPWrite "";
+		TPWrite "Object Frame (oframe):";
+		TPWrite "  X = " + NumToStr(wobj0.oframe.trans.x, 2) + " mm";
+		TPWrite "  Y = " + NumToStr(wobj0.oframe.trans.y, 2) + " mm";
+		TPWrite "  Z = " + NumToStr(wobj0.oframe.trans.z, 2) + " mm";
+		TPWrite "========================================";
+	ENDPROC
+
+	PROC CompareWorldAndWobj0()
+		VAR robtarget pos_world;
+		VAR robtarget pos_wobj0;
+
+		TPWrite "========================================";
+		TPWrite "Compare World vs wobj0 Coordinates";
+		TPWrite "========================================";
+
+		pos_world := CRobT(\Tool:=tool0);
+		pos_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+
+		TPWrite "World Coordinates:";
+		TPWrite "  X = " + NumToStr(pos_world.trans.x, 2) + " mm";
+		TPWrite "  Y = " + NumToStr(pos_world.trans.y, 2) + " mm";
+		TPWrite "  Z = " + NumToStr(pos_world.trans.z, 2) + " mm";
+		TPWrite "";
+		TPWrite "wobj0 Coordinates:";
+		TPWrite "  X = " + NumToStr(pos_wobj0.trans.x, 2) + " mm";
+		TPWrite "  Y = " + NumToStr(pos_wobj0.trans.y, 2) + " mm";
+		TPWrite "  Z = " + NumToStr(pos_wobj0.trans.z, 2) + " mm";
+		TPWrite "";
+		TPWrite "Difference (World - wobj0):";
+		TPWrite "  dX = " + NumToStr(pos_world.trans.x - pos_wobj0.trans.x, 2) + " mm";
+		TPWrite "  dY = " + NumToStr(pos_world.trans.y - pos_wobj0.trans.y, 2) + " mm";
+		TPWrite "  dZ = " + NumToStr(pos_world.trans.z - pos_wobj0.trans.z, 2) + " mm";
+		TPWrite "========================================";
+	ENDPROC
+
+ENDMODULE

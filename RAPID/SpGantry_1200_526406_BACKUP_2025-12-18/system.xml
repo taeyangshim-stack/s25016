@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SystemProperties>
+  <SystemName>SpGantry_1200_526406</SystemName>
+  <SerialNo>1200-526406</SerialNo>
+  <UsedMedia>
+    <Media path="C:\Users\user\AppData\Local\ABB\RobotWare\RobotWare_6.16.1028" name="RobotWare" version="6.16.1028">
+    </Media>
+    <Media path="C:\Users\user\AppData\Local\ABB\RobotWare\LincolnArcLink-XT_1.06.5.0" name="LincolnArcLink-XT" version="1.06.5.0">
+    </Media>
+  </UsedMedia>
+  <ControlModule>
+    <Option descr="UDPUC Driver">
+    </Option>
+    <Option descr="652-1 BullsEye">
+    </Option>
+    <Option descr="653-3 ABB TSC 2013">
+    </Option>
+    <Option descr="Korean">
+    </Option>
+    <Option descr="687-1 Advanced Robot Motion">
+    </Option>
+    <Option descr="613-1 Collision Detection">
+    </Option>
+    <Option descr="709-1 DeviceNet Master/Slave">
+    </Option>
+    <Option descr="617-1 FlexPendant Interface">
+    </Option>
+    <Option descr="614-1 FTP SFTP and NFS client">
+    </Option>
+    <Option descr="623-1 Multitasking">
+    </Option>
+    <Option descr="612-1 Path Offset">
+    </Option>
+    <Option descr="611-1 Path Recovery">
+    </Option>
+    <Option descr="616-1 PC Interface">
+    </Option>
+    <Option descr="688-1 RobotStudio App Connect">
+    </Option>
+    <Option descr="628-1 Sensor Interface">
+    </Option>
+    <Option descr="1180-1 Tool Control">
+    </Option>
+    <Option descr="1553-1 Tracking Interface">
+    </Option>
+    <Option descr="608-1 World Zones">
+    </Option>
+    <Option descr="RobotWare Base">
+    </Option>
+    <Option descr="637-1 Production Screen">
+    </Option>
+    <Option descr="604-1 MultiMove Coordinated">
+    </Option>
+    <Option descr="634-1 MultiProcess">
+    </Option>
+  </ControlModule>
+  <DriveModule>
+    <Name>Robot1</Name>
+    <Option descr="Axis Calibration">
+    </Option>
+    <Option descr="Pendelum Calibration">
+    </Option>
+    <Option descr="Motor Commutation">
+    </Option>
+    <Option descr="Service Info System">
+    </Option>
+    <Option descr="657-1 SmarTac IO version">
+    </Option>
+    <Option descr="633-4 Arc with MultiProcess">
+    </Option>
+    <Option descr="Drive System IRB 120/140/260/360/910SC/1200/1400/1520/1600/1660ID">
+    </Option>
+    <Option descr="ADU-790A in position X3">
+    </Option>
+    <Option descr="ADU-790A in position Y3">
+    </Option>
+    <Option descr="ADU-790A in position Z3">
+    </Option>
+    <Option descr="IRB 1200-5/0.9 Type B">
+    </Option>
+    <Option descr="RW Add-In loaded Welder">
+    </Option>
+    <Option descr="815-2 WeldGuide MultiPass">
+    </Option>
+    <Option descr="Ethernet">
+    </Option>
+  </DriveModule>
+  <DriveModule>
+    <Name>Robot2</Name>
+    <Option descr="Axis Calibration">
+    </Option>
+    <Option descr="657-1 SmarTac IO version">
+    </Option>
+    <Option descr="633-4 Arc with MultiProcess">
+    </Option>
+    <Option descr="Drive System IRB 120/140/260/360/910SC/1200/1400/1520/1600/1660ID">
+    </Option>
+    <Option descr="ADU-790A in position X3">
+    </Option>
+    <Option descr="ADU-790A in position Y3">
+    </Option>
+    <Option descr="ADU-790A in position Z3">
+    </Option>
+    <Option descr="IRB 1200-5/0.9 Type B">
+    </Option>
+    <Option descr="RW Add-In loaded Welder">
+    </Option>
+    <Option descr="815-2 WeldGuide MultiPass">
+    </Option>
+    <Option descr="Ethernet">
+    </Option>
+  </DriveModule>
+  <DriveModule>
+    <Name>Robot3</Name>
+    <Option descr="Drive System IRB 460/640/660/760/4600/66xx/6700">
+    </Option>
+    <Option descr="ADU-790A in position X3">
+    </Option>
+    <Option descr="ADU-790A in position Y3">
+    </Option>
+    <Option descr="ADU-790A in position Z3">
+    </Option>
+  </DriveModule>
+  <AdditionalOption>
+    <Name>LincolnArcLink-XT</Name>
+    <Option descr="LincolnArcLink-XT">
+    </Option>
+    <Option descr="LincolnArcLink-XT">
+    </Option>
+    <Option descr="IncludeSmtConfig">
+    </Option>
+    <Option descr="IncludeSmtConfig">
+    </Option>
+  </AdditionalOption>
+</SystemProperties>

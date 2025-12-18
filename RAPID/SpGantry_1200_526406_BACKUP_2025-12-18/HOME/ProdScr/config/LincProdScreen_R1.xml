@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProjectSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Grid="false" Separator="true">
+  <Apps>
+    <App>
+      <Name>Lincoln R1</Name>
+      <SystemApp>false</SystemApp>
+      <Index>8</Index>
+      <Assembly>TpsViewLincolnDataEditor.dll</Assembly>
+      <Type>ABB.Robotics.Processes.Arc.TpsViewLincolnDataEditor</Type>
+      <Image>LincolnLogo64x64.jpg</Image>
+      <AlertSignal />
+      <ErrorSignal />
+      <InData>T_ROB1</InData>
+    </App>
+    <App>
+      <Name>WvTr R1</Name>
+      <SystemApp>false</SystemApp>
+      <Index>9</Index>
+      <Assembly>TpsViewWeaveTrackDataEditor.dll</Assembly>
+      <Type>ABB.Robotics.Processes.Arc.TpsViewWeaveTrackDataEditor</Type>
+      <Image>WeaveIcon_64_64.jpg</Image>
+      <AlertSignal />
+      <ErrorSignal />
+      <InData>T_ROB1</InData>
+    </App>
+    <App>
+      <Name>ManOp R1</Name>
+      <SystemApp>false</SystemApp>
+      <Index>10</Index>
+      <Assembly>TpsViewArcManualOperation.dll</Assembly>
+      <Type>ABB.Robotics.Processes.Arc.TpsViewArcManualOperation</Type>
+      <Image>ArcManOp_64_64.jpg</Image>
+      <AlertSignal />
+      <ErrorSignal />
+      <InData>T_ROB1</InData>
+    </App>
+    <App>
+      <Name>Monitor R1</Name>
+      <SystemApp>false</SystemApp>
+      <Index>11</Index>
+      <Assembly>TpsLincolnMonitor.dll</Assembly>
+      <Type>ABB.Robotics.Processes.Arc.TpsLincolnMonitor</Type>
+      <Image>LincolnMeter64x64.jpg</Image>
+      <AlertSignal />
+      <ErrorSignal />
+      <InData>T_ROB1</InData>
+    </App>
+  </Apps>
+  <Widgets>
+     <Widget>
+      <Name>GenArcStatus R1</Name>
+      <Page>1</Page>
+      <Assembly>TpsViewGenArcStatus.dll</Assembly>
+      <Type>ABB.Robotics.Processes.Arc.TpsViewGenArcStatus</Type>
+      <Position>
+        <X>4</X>
+        <Y>1</Y>
+      </Position>
+      <Bindings />
+      <ZIndex>0</ZIndex>
+      <InData>T_ROB1:siLn1Arc_Est</InData>
+    </Widget>
+    <Widget>
+      <Name>ProcessStopR1</Name>
+      <Page>1</Page>
+      <Assembly>TpsViewProcessStop.dll</Assembly>
+      <Type>ABB.Robotics.Processes.Arc.TpsViewProcessStop</Type>
+      <Position>
+        <X>8</X>
+        <Y>2</Y>
+      </Position>
+      <Bindings />
+      <ZIndex>1</ZIndex>
+      <InData>T_ROB1:soLn1StopProc:siLn1StopProc:Stop Process</InData>
+    </Widget>
+  	<Widget Locked="true">
+      <Name>LincolnWeldInfo</Name>
+      <Page>2</Page>
+      <Assembly>TpsViewWeldInfo.dll</Assembly>
+      <Type>ABB.Robotics.Processes.Arc.TpsViewWeldInfo</Type>
+      <Position>
+        <X>1</X>
+        <Y>1</Y>
+      </Position>
+      <ZIndex>1</ZIndex>
+      <InData>T_ROB1</InData>
+      <Bindings />
+    </Widget>
+  </Widgets>
+</ProjectSettings>
