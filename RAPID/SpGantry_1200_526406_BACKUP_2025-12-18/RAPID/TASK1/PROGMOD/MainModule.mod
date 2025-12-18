@@ -194,15 +194,17 @@ MODULE MainModule
 	!========================================
 	! Check wobj0 Definition
 	!========================================
-	! Version: v1.0.0
-	! Date: 2025-12-17
+	! Version: v1.1.0
+	! Date: 2025-12-18
+	! Changes: Added file output to /HOME/task1_wobj0_definition.txt
 
 	PROC ShowWobj0Definition()
 		VAR string str_robhold;
 		VAR string str_ufprog;
+		VAR iodev logfile;
 
 		TPWrite "========================================";
-		TPWrite "TASK1 - wobj0 Definition";
+		TPWrite "TASK1 - wobj0 Definition (v1.1.0)";
 		TPWrite "========================================";
 
 		IF wobj0.robhold = TRUE THEN
@@ -234,14 +236,55 @@ MODULE MainModule
 		TPWrite "  Y = " + NumToStr(wobj0.oframe.trans.y, 2) + " mm";
 		TPWrite "  Z = " + NumToStr(wobj0.oframe.trans.z, 2) + " mm";
 		TPWrite "========================================";
+
+		! Save to file
+		Open "/HOME/", logfile \Write;
+		Open "task1_wobj0_definition.txt", logfile \Append;
+
+		Write logfile, "========================================";
+		Write logfile, "TASK1 - wobj0 Definition (v1.1.0)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "wobj0.robhold: " + str_robhold;
+		Write logfile, "wobj0.ufprog: " + str_ufprog;
+		Write logfile, "";
+		Write logfile, "User Frame (uframe):";
+		Write logfile, "  X = " + NumToStr(wobj0.uframe.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(wobj0.uframe.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(wobj0.uframe.trans.z, 2) + " mm";
+		Write logfile, "  q1 = " + NumToStr(wobj0.uframe.rot.q1, 4);
+		Write logfile, "  q2 = " + NumToStr(wobj0.uframe.rot.q2, 4);
+		Write logfile, "  q3 = " + NumToStr(wobj0.uframe.rot.q3, 4);
+		Write logfile, "  q4 = " + NumToStr(wobj0.uframe.rot.q4, 4);
+		Write logfile, "";
+		Write logfile, "Object Frame (oframe):";
+		Write logfile, "  X = " + NumToStr(wobj0.oframe.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(wobj0.oframe.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(wobj0.oframe.trans.z, 2) + " mm";
+		Write logfile, "========================================\0A";
+
+		Close logfile;
+		TPWrite "Saved to: /HOME/task1_wobj0_definition.txt";
+
+	ERROR
+		TPWrite "ERROR in ShowWobj0Definition: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
 	ENDPROC
+
+	! Version: v1.1.0
+	! Date: 2025-12-18
+	! Changes: Added file output to /HOME/task1_world_vs_wobj0.txt
 
 	PROC CompareWorldAndWobj0()
 		VAR robtarget pos_world;
 		VAR robtarget pos_wobj0;
+		VAR iodev logfile;
 
 		TPWrite "========================================";
-		TPWrite "Compare World vs wobj0 Coordinates";
+		TPWrite "TASK1 - Compare World vs wobj0 (v1.1.0)";
 		TPWrite "========================================";
 
 		pos_world := CRobT(\Tool:=tool0);
@@ -262,6 +305,40 @@ MODULE MainModule
 		TPWrite "  dY = " + NumToStr(pos_world.trans.y - pos_wobj0.trans.y, 2) + " mm";
 		TPWrite "  dZ = " + NumToStr(pos_world.trans.z - pos_wobj0.trans.z, 2) + " mm";
 		TPWrite "========================================";
+
+		! Save to file
+		Open "/HOME/", logfile \Write;
+		Open "task1_world_vs_wobj0.txt", logfile \Append;
+
+		Write logfile, "========================================";
+		Write logfile, "TASK1 - Compare World vs wobj0 (v1.1.0)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "World Coordinates:";
+		Write logfile, "  X = " + NumToStr(pos_world.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(pos_world.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(pos_world.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "wobj0 Coordinates:";
+		Write logfile, "  X = " + NumToStr(pos_wobj0.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(pos_wobj0.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(pos_wobj0.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "Difference (World - wobj0):";
+		Write logfile, "  dX = " + NumToStr(pos_world.trans.x - pos_wobj0.trans.x, 2) + " mm";
+		Write logfile, "  dY = " + NumToStr(pos_world.trans.y - pos_wobj0.trans.y, 2) + " mm";
+		Write logfile, "  dZ = " + NumToStr(pos_world.trans.z - pos_wobj0.trans.z, 2) + " mm";
+		Write logfile, "========================================\0A";
+
+		Close logfile;
+		TPWrite "Saved to: /HOME/task1_world_vs_wobj0.txt";
+
+	ERROR
+		TPWrite "ERROR in CompareWorldAndWobj0: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
 	ENDPROC
 
 ENDMODULE
