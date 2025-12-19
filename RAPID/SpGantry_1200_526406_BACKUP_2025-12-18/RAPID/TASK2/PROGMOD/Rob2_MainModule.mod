@@ -1343,8 +1343,7 @@ MODULE Rob2_MainModule
 		TPWrite "Rob2Base: [" + NumToStr(tcp_rob_base.trans.x, 1) + "," + NumToStr(tcp_rob_base.trans.y, 1) + "," + NumToStr(tcp_rob_base.trans.z, 1) + "]";
 
 		! Save to file (with WaitTime to prevent "Too intense frequency" error)
-		Open "/HOME/", logfile \Write;
-		Open "task2_tcp_orientation.txt", logfile \Append;
+		Open "HOME:/task2_tcp_orientation.txt", logfile \Append;
 
 		Write logfile, "========================================";
 		Write logfile, "TASK2 - TCP Orientation Verification (v1.2.1)";
