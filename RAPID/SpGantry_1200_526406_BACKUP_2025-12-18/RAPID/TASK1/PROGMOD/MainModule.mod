@@ -516,4 +516,34 @@ MODULE MainModule
 		TRYNEXT;
 	ENDPROC
 
+	! ========================================
+	! Quick Test - X Axis Movement
+	! ========================================
+	! Version: v1.3.0
+	! Date: 2025-12-23
+	! Purpose: Quick test without parameters - Move X+500mm
+	PROC TestXAxis()
+		TPWrite "TASK1 - Testing X axis +500mm";
+		TestCoordinateMovement 500, 0, 0;
+		TPWrite "Test complete!";
+	ENDPROC
+
+	! ========================================
+	! Quick Test - Y Axis Movement
+	! ========================================
+	PROC TestYAxis()
+		TPWrite "TASK1 - Testing Y axis +300mm";
+		TestCoordinateMovement 0, 300, 0;
+		TPWrite "Test complete!";
+	ENDPROC
+
+	! ========================================
+	! Quick Test - Z Axis Movement
+	! ========================================
+	PROC TestZAxis()
+		TPWrite "TASK1 - Testing Z axis +200mm";
+		TestCoordinateMovement 0, 0, 200;
+		TPWrite "Test complete!";
+	ENDPROC
+
 ENDMODULE
