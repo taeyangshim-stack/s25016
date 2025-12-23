@@ -416,4 +416,104 @@ MODULE MainModule
 		TRYNEXT;
 	ENDPROC
 
+	! ========================================
+	! Test Coordinate System Movement
+	! ========================================
+	! Version: v1.3.0
+	! Date: 2025-12-23
+	! Purpose: Verify coordinate system alignment by moving robot and comparing coordinates
+	!   - Move robot in wobj0 coordinate system
+	!   - Check if Floor coordinate system shows same movement
+	!   - Validates coordinate system direction and position relationship
+	! Parameters:
+	!   delta_x, delta_y, delta_z: Movement distance in wobj0 coordinates (mm)
+	! Output: /HOME/task1_coordinate_test.txt
+	PROC TestCoordinateMovement(num delta_x, num delta_y, num delta_z)
+		VAR robtarget pos_start_wobj0;
+		VAR robtarget pos_start_floor;
+		VAR robtarget pos_target;
+		VAR robtarget pos_end_wobj0;
+		VAR robtarget pos_end_floor;
+		VAR num diff_wobj0_x;
+		VAR num diff_wobj0_y;
+		VAR num diff_wobj0_z;
+		VAR num diff_floor_x;
+		VAR num diff_floor_y;
+		VAR num diff_floor_z;
+		VAR iodev logfile;
+
+		! Read starting position in both coordinate systems
+		pos_start_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+		pos_start_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+
+		TPWrite "Start wobj0: [" + NumToStr(pos_start_wobj0.trans.x, 1) + "," + NumToStr(pos_start_wobj0.trans.y, 1) + "," + NumToStr(pos_start_wobj0.trans.z, 1) + "]";
+		TPWrite "Start Floor: [" + NumToStr(pos_start_floor.trans.x, 1) + "," + NumToStr(pos_start_floor.trans.y, 1) + "," + NumToStr(pos_start_floor.trans.z, 1) + "]";
+
+		! Calculate target position (wobj0 + delta)
+		pos_target := pos_start_wobj0;
+		pos_target.trans.x := pos_target.trans.x + delta_x;
+		pos_target.trans.y := pos_target.trans.y + delta_y;
+		pos_target.trans.z := pos_target.trans.z + delta_z;
+
+		TPWrite "Moving wobj0: [" + NumToStr(delta_x, 1) + "," + NumToStr(delta_y, 1) + "," + NumToStr(delta_z, 1) + "]";
+
+		! Move to target position
+		MoveL pos_target, v100, fine, tool0\WObj:=wobj0;
+
+		! Read ending position in both coordinate systems
+		pos_end_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+		pos_end_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+
+		TPWrite "End wobj0: [" + NumToStr(pos_end_wobj0.trans.x, 1) + "," + NumToStr(pos_end_wobj0.trans.y, 1) + "," + NumToStr(pos_end_wobj0.trans.z, 1) + "]";
+		TPWrite "End Floor: [" + NumToStr(pos_end_floor.trans.x, 1) + "," + NumToStr(pos_end_floor.trans.y, 1) + "," + NumToStr(pos_end_floor.trans.z, 1) + "]";
+
+		! Calculate differences
+		diff_wobj0_x := pos_end_wobj0.trans.x - pos_start_wobj0.trans.x;
+		diff_wobj0_y := pos_end_wobj0.trans.y - pos_start_wobj0.trans.y;
+		diff_wobj0_z := pos_end_wobj0.trans.z - pos_start_wobj0.trans.z;
+
+		diff_floor_x := pos_end_floor.trans.x - pos_start_floor.trans.x;
+		diff_floor_y := pos_end_floor.trans.y - pos_start_floor.trans.y;
+		diff_floor_z := pos_end_floor.trans.z - pos_start_floor.trans.z;
+
+		TPWrite "wobj0 moved: [" + NumToStr(diff_wobj0_x, 1) + "," + NumToStr(diff_wobj0_y, 1) + "," + NumToStr(diff_wobj0_z, 1) + "]";
+		TPWrite "Floor moved: [" + NumToStr(diff_floor_x, 1) + "," + NumToStr(diff_floor_y, 1) + "," + NumToStr(diff_floor_z, 1) + "]";
+
+		! Save to file
+		Open "HOME:/task1_coordinate_test.txt", logfile \Append;
+
+		Write logfile, "========================================";
+		Write logfile, "TASK1 - Coordinate System Movement Test (v1.3.0)";
+		Write logfile, "Date: " + CDate() + " " + CTime();
+		Write logfile, "========================================";
+		WaitTime 0.05;
+
+		Write logfile, "Command: Move wobj0 [" + NumToStr(delta_x, 3) + "," + NumToStr(delta_y, 3) + "," + NumToStr(delta_z, 3) + "]";
+		WaitTime 0.05;
+
+		Write logfile, "Start wobj0: [" + NumToStr(pos_start_wobj0.trans.x, 3) + "," + NumToStr(pos_start_wobj0.trans.y, 3) + "," + NumToStr(pos_start_wobj0.trans.z, 3) + "]";
+		Write logfile, "Start Floor: [" + NumToStr(pos_start_floor.trans.x, 3) + "," + NumToStr(pos_start_floor.trans.y, 3) + "," + NumToStr(pos_start_floor.trans.z, 3) + "]";
+		WaitTime 0.05;
+
+		Write logfile, "End wobj0: [" + NumToStr(pos_end_wobj0.trans.x, 3) + "," + NumToStr(pos_end_wobj0.trans.y, 3) + "," + NumToStr(pos_end_wobj0.trans.z, 3) + "]";
+		Write logfile, "End Floor: [" + NumToStr(pos_end_floor.trans.x, 3) + "," + NumToStr(pos_end_floor.trans.y, 3) + "," + NumToStr(pos_end_floor.trans.z, 3) + "]";
+		WaitTime 0.05;
+
+		Write logfile, "wobj0 moved: [" + NumToStr(diff_wobj0_x, 3) + "," + NumToStr(diff_wobj0_y, 3) + "," + NumToStr(diff_wobj0_z, 3) + "]";
+		Write logfile, "Floor moved: [" + NumToStr(diff_floor_x, 3) + "," + NumToStr(diff_floor_y, 3) + "," + NumToStr(diff_floor_z, 3) + "]";
+		WaitTime 0.05;
+
+		Write logfile, "Verification: If wobj0 and Floor have same direction,";
+		Write logfile, "  movement should be identical in both coordinate systems.";
+		Write logfile, "========================================\0A";
+
+		Close logfile;
+		TPWrite "Saved to: /HOME/task1_coordinate_test.txt";
+
+	ERROR
+		TPWrite "ERROR in TestCoordinateMovement: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
+	ENDPROC
+
 ENDMODULE
