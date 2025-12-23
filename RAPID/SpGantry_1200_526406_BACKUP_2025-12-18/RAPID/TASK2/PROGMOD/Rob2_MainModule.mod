@@ -1610,4 +1610,37 @@ MODULE Rob2_MainModule
 		TPWrite "Test complete!";
 	ENDPROC
 
+	! ========================================
+	! Robot2 TCP Coordinate Test - X Axis
+	! ========================================
+	! Version: v1.4.2
+	! Date: 2025-12-23
+	! Purpose: Move Robot2 TCP in wobj0 X direction and verify Floor coordinate alignment
+	PROC TestRobot2X()
+		TPWrite "TASK2 - Robot2 TCP X Axis Test";
+		TPWrite "Moving Robot2 TCP: wobj0 X +500mm";
+		TestCoordinateMovement 500, 0, 0;
+		TPWrite "Test complete!";
+	ENDPROC
+
+	! ========================================
+	! Robot2 TCP Coordinate Test - Y Axis
+	! ========================================
+	PROC TestRobot2Y()
+		TPWrite "TASK2 - Robot2 TCP Y Axis Test";
+		TPWrite "Moving Robot2 TCP: wobj0 Y +300mm";
+		TestCoordinateMovement 0, 300, 0;
+		TPWrite "Test complete!";
+	ENDPROC
+
+	! ========================================
+	! Robot2 TCP Coordinate Test - Z Axis
+	! ========================================
+	PROC TestRobot2Z()
+		TPWrite "TASK2 - Robot2 TCP Z Axis Test";
+		TPWrite "Moving Robot2 TCP: wobj0 Z +200mm";
+		TestCoordinateMovement 0, 0, 200;
+		TPWrite "Test complete!";
+	ENDPROC
+
 ENDMODULE
