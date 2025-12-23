@@ -517,32 +517,137 @@ MODULE MainModule
 	ENDPROC
 
 	! ========================================
-	! Quick Test - X Axis Movement
+	! Move to Safe Middle Position
 	! ========================================
-	! Version: v1.3.0
+	! Version: v1.4.0
 	! Date: 2025-12-23
-	! Purpose: Quick test without parameters - Move X+500mm
-	PROC TestXAxis()
-		TPWrite "TASK1 - Testing X axis +500mm";
-		TestCoordinateMovement 500, 0, 0;
+	! Purpose: Move gantry to middle of stroke range for safe testing
+	! Middle positions: M1=1.4m, M2=2.65m, M3=0.5m
+	PROC MoveToMiddlePosition()
+		VAR jointtarget middle_pos;
+
+		TPWrite "Moving to middle position...";
+
+		middle_pos := CJointT();
+
+		! Set gantry axes to middle positions (safe testing position)
+		middle_pos.extax.eax_a := 1400;     ! M1DM3 middle: (-9.51+12.31)/2 = 1.4m = 1400mm
+		middle_pos.extax.eax_b := 2650;     ! M2DM3 middle: (-0.05+5.35)/2 = 2.65m = 2650mm
+		middle_pos.extax.eax_c := 500;      ! M3DM3 middle: (-0.05+1.05)/2 = 0.5m = 500mm
+
+		MoveAbsJ middle_pos, v100, fine, tool0\WObj:=wobj0;
+
+		TPWrite "Reached middle position";
+	ENDPROC
+
+	! ========================================
+	! Test Gantry Axis Movement
+	! ========================================
+	! Version: v1.4.0
+	! Date: 2025-12-23
+	! Purpose: Move gantry joint axes and compare wobj0 vs Floor coordinate changes
+	! Parameters:
+	!   delta_m1 - M1DM3 (X axis) movement in mm
+	!   delta_m2 - M2DM3 (Y axis) movement in mm
+	!   delta_m3 - M3DM3 (Z axis) movement in mm
+	PROC TestGantryAxisMovement(num delta_m1, num delta_m2, num delta_m3)
+		VAR jointtarget joints_start;
+		VAR jointtarget joints_end;
+		VAR robtarget tcp_start_wobj0;
+		VAR robtarget tcp_end_wobj0;
+		VAR robtarget tcp_start_floor;
+		VAR robtarget tcp_end_floor;
+		VAR num wobj0_dx;
+		VAR num wobj0_dy;
+		VAR num wobj0_dz;
+		VAR num floor_dx;
+		VAR num floor_dy;
+		VAR num floor_dz;
+		VAR iodev logfile;
+
+		! Read starting positions
+		joints_start := CJointT();
+		tcp_start_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+		tcp_start_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+
+		TPWrite "Start - Gantry: M1=" + NumToStr(joints_start.extax.eax_a, 1) + " M2=" + NumToStr(joints_start.extax.eax_b, 1) + " M3=" + NumToStr(joints_start.extax.eax_c, 1);
+
+		! Calculate target joint position
+		joints_end := joints_start;
+		joints_end.extax.eax_a := joints_end.extax.eax_a + delta_m1;
+		joints_end.extax.eax_b := joints_end.extax.eax_b + delta_m2;
+		joints_end.extax.eax_c := joints_end.extax.eax_c + delta_m3;
+
+		! Move gantry
+		MoveAbsJ joints_end, v100, fine, tool0\WObj:=wobj0;
+
+		! Read ending positions
+		tcp_end_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+		tcp_end_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+
+		TPWrite "End - Gantry: M1=" + NumToStr(joints_end.extax.eax_a, 1) + " M2=" + NumToStr(joints_end.extax.eax_b, 1) + " M3=" + NumToStr(joints_end.extax.eax_c, 1);
+
+		! Calculate TCP changes
+		wobj0_dx := tcp_end_wobj0.trans.x - tcp_start_wobj0.trans.x;
+		wobj0_dy := tcp_end_wobj0.trans.y - tcp_start_wobj0.trans.y;
+		wobj0_dz := tcp_end_wobj0.trans.z - tcp_start_wobj0.trans.z;
+
+		floor_dx := tcp_end_floor.trans.x - tcp_start_floor.trans.x;
+		floor_dy := tcp_end_floor.trans.y - tcp_start_floor.trans.y;
+		floor_dz := tcp_end_floor.trans.z - tcp_start_floor.trans.z;
+
+		! Save to file
+		Open "HOME:/task1_gantry_test.txt", logfile \Append;
+		Write logfile, "========================================";
+		Write logfile, "TASK1 - Gantry Axis Movement Test (v1.4.0)";
+		Write logfile, "Date: " + CDate() + " " + CTime();
+		Write logfile, "========================================";
+		WaitTime 0.05;
+		Write logfile, "Gantry Joint Movement: M1=" + NumToStr(delta_m1, 1) + "mm, M2=" + NumToStr(delta_m2, 1) + "mm, M3=" + NumToStr(delta_m3, 1) + "mm";
+		WaitTime 0.05;
+		Write logfile, "wobj0 TCP moved: [" + NumToStr(wobj0_dx, 3) + ", " + NumToStr(wobj0_dy, 3) + ", " + NumToStr(wobj0_dz, 3) + "] mm";
+		WaitTime 0.05;
+		Write logfile, "Floor TCP moved: [" + NumToStr(floor_dx, 3) + ", " + NumToStr(floor_dy, 3) + ", " + NumToStr(floor_dz, 3) + "] mm";
+		WaitTime 0.05;
+		Write logfile, "========================================";
+		Close logfile;
+
+		TPWrite "Saved to: task1_gantry_test.txt";
+	ENDPROC
+
+	! ========================================
+	! Quick Test - Gantry X Axis Movement
+	! ========================================
+	! Version: v1.4.0
+	! Date: 2025-12-23
+	! Purpose: Test M1DM3 (Gantry X) +1000mm movement
+	PROC TestGantryX()
+		TPWrite "TASK1 - Gantry X Axis Test";
+		MoveToMiddlePosition;
+		TPWrite "Testing M1DM3 (X axis) +1000mm";
+		TestGantryAxisMovement 1000, 0, 0;
 		TPWrite "Test complete!";
 	ENDPROC
 
 	! ========================================
-	! Quick Test - Y Axis Movement
+	! Quick Test - Gantry Y Axis Movement
 	! ========================================
-	PROC TestYAxis()
-		TPWrite "TASK1 - Testing Y axis +300mm";
-		TestCoordinateMovement 0, 300, 0;
+	PROC TestGantryY()
+		TPWrite "TASK1 - Gantry Y Axis Test";
+		MoveToMiddlePosition;
+		TPWrite "Testing M2DM3 (Y axis) +500mm";
+		TestGantryAxisMovement 0, 500, 0;
 		TPWrite "Test complete!";
 	ENDPROC
 
 	! ========================================
-	! Quick Test - Z Axis Movement
+	! Quick Test - Gantry Z Axis Movement
 	! ========================================
-	PROC TestZAxis()
-		TPWrite "TASK1 - Testing Z axis +200mm";
-		TestCoordinateMovement 0, 0, 200;
+	PROC TestGantryZ()
+		TPWrite "TASK1 - Gantry Z Axis Test";
+		MoveToMiddlePosition;
+		TPWrite "Testing M3DM3 (Z axis) +200mm";
+		TestGantryAxisMovement 0, 0, 200;
 		TPWrite "Test complete!";
 	ENDPROC
 
