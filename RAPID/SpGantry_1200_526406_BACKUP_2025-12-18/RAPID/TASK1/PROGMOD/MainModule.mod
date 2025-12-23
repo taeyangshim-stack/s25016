@@ -649,36 +649,21 @@ MODULE MainModule
 	ENDPROC
 
 	! ========================================
-	! Robot1 TCP Coordinate Test - X Axis
+	! Robot1 TCP Coordinate Test - XYZ Combined
 	! ========================================
-	! Version: v1.4.2
+	! Version: v1.4.3
 	! Date: 2025-12-23
-	! Purpose: Move Robot1 TCP in wobj0 X direction and verify Floor coordinate alignment
-	PROC TestRobot1X()
-		TPWrite "TASK1 - Robot1 TCP X Axis Test";
-		TPWrite "Moving Robot1 TCP: wobj0 X +500mm";
-		TestCoordinateMovement 500, 0, 0;
-		TPWrite "Test complete!";
-	ENDPROC
-
-	! ========================================
-	! Robot1 TCP Coordinate Test - Y Axis
-	! ========================================
-	PROC TestRobot1Y()
-		TPWrite "TASK1 - Robot1 TCP Y Axis Test";
-		TPWrite "Moving Robot1 TCP: wobj0 Y +300mm";
-		TestCoordinateMovement 0, 300, 0;
-		TPWrite "Test complete!";
-	ENDPROC
-
-	! ========================================
-	! Robot1 TCP Coordinate Test - Z Axis
-	! ========================================
-	PROC TestRobot1Z()
-		TPWrite "TASK1 - Robot1 TCP Z Axis Test";
-		TPWrite "Moving Robot1 TCP: wobj0 Z +200mm";
-		TestCoordinateMovement 0, 0, 200;
-		TPWrite "Test complete!";
+	! Purpose: Move Robot1 TCP in wobj0 [X+300, Y+200, Z+100] and verify Floor alignment
+	! Expected Result:
+	!   Robot1 wobj0 = World coordinate system
+	!   Floor = World + offset [-9500, 5300, 2100] + RX 180deg rotation
+	!   RX 180deg inverts Y and Z axes
+	!   Therefore: wobj0 [+300, +200, +100] -> Floor [+300, -200, -100]
+	PROC TestRobot1_XYZ()
+		TPWrite "TASK1 - Robot1 wobj0 vs Floor Test";
+		TPWrite "Moving wobj0: [+300, +200, +100]";
+		TestCoordinateMovement 300, 200, 100;
+		TPWrite "Test complete! Check txt file";
 	ENDPROC
 
 ENDMODULE
