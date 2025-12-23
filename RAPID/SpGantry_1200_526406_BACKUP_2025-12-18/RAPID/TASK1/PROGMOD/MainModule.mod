@@ -535,7 +535,7 @@ MODULE MainModule
 		middle_pos.extax.eax_b := 2650;     ! M2DM3 middle: (-0.05+5.35)/2 = 2.65m = 2650mm
 		middle_pos.extax.eax_c := 500;      ! M3DM3 middle: (-0.05+1.05)/2 = 0.5m = 500mm
 
-		MoveAbsJ middle_pos, v100, fine, tool0\WObj:=wobj0;
+		MoveAbsJ middle_pos, v100, fine, tool0;
 
 		TPWrite "Reached middle position";
 	ENDPROC
@@ -579,7 +579,7 @@ MODULE MainModule
 		joints_end.extax.eax_c := joints_end.extax.eax_c + delta_m3;
 
 		! Move gantry
-		MoveAbsJ joints_end, v100, fine, tool0\WObj:=wobj0;
+		MoveAbsJ joints_end, v100, fine, tool0;
 
 		! Read ending positions
 		tcp_end_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
@@ -618,12 +618,11 @@ MODULE MainModule
 	! ========================================
 	! Quick Test - Gantry X Axis Movement
 	! ========================================
-	! Version: v1.4.0
+	! Version: v1.4.1
 	! Date: 2025-12-23
-	! Purpose: Test M1DM3 (Gantry X) +1000mm movement
+	! Purpose: Test M1DM3 (Gantry X) +1000mm movement from current position
 	PROC TestGantryX()
 		TPWrite "TASK1 - Gantry X Axis Test";
-		MoveToMiddlePosition;
 		TPWrite "Testing M1DM3 (X axis) +1000mm";
 		TestGantryAxisMovement 1000, 0, 0;
 		TPWrite "Test complete!";
@@ -634,7 +633,6 @@ MODULE MainModule
 	! ========================================
 	PROC TestGantryY()
 		TPWrite "TASK1 - Gantry Y Axis Test";
-		MoveToMiddlePosition;
 		TPWrite "Testing M2DM3 (Y axis) +500mm";
 		TestGantryAxisMovement 0, 500, 0;
 		TPWrite "Test complete!";
@@ -645,7 +643,6 @@ MODULE MainModule
 	! ========================================
 	PROC TestGantryZ()
 		TPWrite "TASK1 - Gantry Z Axis Test";
-		MoveToMiddlePosition;
 		TPWrite "Testing M3DM3 (Z axis) +200mm";
 		TestGantryAxisMovement 0, 0, 200;
 		TPWrite "Test complete!";
