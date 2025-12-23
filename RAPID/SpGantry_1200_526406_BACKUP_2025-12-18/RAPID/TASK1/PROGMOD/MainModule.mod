@@ -651,18 +651,18 @@ MODULE MainModule
 	! ========================================
 	! Robot1 TCP Coordinate Test - XYZ Combined
 	! ========================================
-	! Version: v1.4.3
-	! Date: 2025-12-23
-	! Purpose: Move Robot1 TCP in wobj0 [X+300, Y+200, Z+100] and verify Floor alignment
+	! Version: v1.4.4
+	! Date: 2025-12-24
+	! Purpose: Move Robot1 TCP in wobj0 [X+30, Y+20, Z+10] and verify Floor alignment
 	! Expected Result:
 	!   Robot1 wobj0 = World coordinate system
 	!   Floor = World + offset [-9500, 5300, 2100] + RX 180deg rotation
 	!   RX 180deg inverts Y and Z axes
-	!   Therefore: wobj0 [+300, +200, +100] -> Floor [+300, -200, -100]
+	!   Therefore: wobj0 [+30, +20, +10] -> Floor [+30, -20, -10]
 	PROC TestRobot1_XYZ()
 		TPWrite "TASK1 - Robot1 wobj0 vs Floor Test";
-		TPWrite "Moving wobj0: [+300, +200, +100]";
-		TestCoordinateMovement 300, 200, 100;
+		TPWrite "Moving wobj0: [+30, +20, +10]";
+		TestCoordinateMovement 30, 20, 10;
 		TPWrite "Test complete! Check txt file";
 	ENDPROC
 

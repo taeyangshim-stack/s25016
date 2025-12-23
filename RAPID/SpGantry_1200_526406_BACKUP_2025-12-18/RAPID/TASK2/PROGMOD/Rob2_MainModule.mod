@@ -1613,17 +1613,17 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Robot2 TCP Coordinate Test - XYZ Combined
 	! ========================================
-	! Version: v1.4.3
-	! Date: 2025-12-23
-	! Purpose: Move Robot2 TCP in wobj0 [X+300, Y+200, Z+100] and verify Floor alignment
+	! Version: v1.4.4
+	! Date: 2025-12-24
+	! Purpose: Move Robot2 TCP in wobj0 [X+30, Y+20, Z+10] and verify Floor alignment
 	! Expected Result:
 	!   Robot2 wobj0 may already be Y,Z inverted (based on jog test observation)
 	!   If Robot2 wobj0 = Floor direction (hypothesis):
-	!   Then: wobj0 [+300, +200, +100] -> Floor [+300, +200, +100] (same direction)
+	!   Then: wobj0 [+30, +20, +10] -> Floor [+30, +20, +10] (same direction)
 	PROC TestRobot2_XYZ()
 		TPWrite "TASK2 - Robot2 wobj0 vs Floor Test";
-		TPWrite "Moving wobj0: [+300, +200, +100]";
-		TestCoordinateMovement 300, 200, 100;
+		TPWrite "Moving wobj0: [+30, +20, +10]";
+		TestCoordinateMovement 30, 20, 10;
 		TPWrite "Test complete! Check txt file";
 	ENDPROC
 
