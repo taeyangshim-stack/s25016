@@ -182,6 +182,10 @@ MODULE Rob2_MainModule
     ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
     PERS wobjdata wobjRob2Base := [FALSE, TRUE, "", [[0, 0, 0], [-0.0000000000000000432964, 0.707107, 0.707107, 0.0000000000000000432964]], [[0, 0, 0], [1, 0, 0, 0]]];
 
+    ! Robot Position Monitoring (v1.5.1 2025-12-25)
+    ! Robot2 TCP position in Floor coordinate system (for distance measurement)
+    TASK PERS robtarget robot2_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+
     PERS num nMotionTotalStep{2};
     PERS num nMotionStepCount{2};
     PERS num nMotionStartStepLast{2};
@@ -1802,6 +1806,103 @@ MODULE Rob2_MainModule
 		TPWrite "Returned to original position";
 
 		TPWrite "Test complete! Check txt file";
+	ENDPROC
+
+	! ========================================
+	! Update Robot2 Floor Position
+	! ========================================
+	! Version: v1.5.1
+	! Date: 2025-12-25
+	! Purpose: Update Robot2 TCP position in Floor coordinate system
+	! Used for distance measurement between robots
+	PROC UpdateRobot2FloorPosition()
+		robot2_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+	ENDPROC
+
+	! ========================================
+	! Calculate Robot Distance
+	! ========================================
+	! Version: v1.5.1
+	! Date: 2025-12-25
+	! Purpose: Calculate 3D distance between Robot1 and Robot2 in Floor coordinate
+	! Returns: Distance in mm
+	FUNC num CalculateRobotDistance()
+		VAR num dx;
+		VAR num dy;
+		VAR num dz;
+
+		dx := robot2_floor_pos.trans.x - robot1_floor_pos.trans.x;
+		dy := robot2_floor_pos.trans.y - robot1_floor_pos.trans.y;
+		dz := robot2_floor_pos.trans.z - robot1_floor_pos.trans.z;
+
+		RETURN Sqrt(Pow(dx, 2) + Pow(dy, 2) + Pow(dz, 2));
+	ENDFUNC
+
+	! ========================================
+	! Measure Robot Distance
+	! ========================================
+	! Version: v1.5.1
+	! Date: 2025-12-25
+	! Purpose: Measure and log distance between Robot1 and Robot2
+	! Output: TP display + /HOME/robot_distance_log.txt
+	PROC MeasureRobotDistance()
+		VAR num distance;
+		VAR iodev logfile;
+
+		TPWrite "========================================";
+		TPWrite "Robot Distance Measurement (v1.5.1)";
+		TPWrite "========================================";
+
+		! Update both robot positions
+		UpdateRobot1FloorPosition;
+		UpdateRobot2FloorPosition;
+
+		! Calculate distance
+		distance := CalculateRobotDistance();
+
+		! Display on TP
+		TPWrite "Robot1 Floor Position:";
+		TPWrite "  X = " + NumToStr(robot1_floor_pos.trans.x, 2) + " mm";
+		TPWrite "  Y = " + NumToStr(robot1_floor_pos.trans.y, 2) + " mm";
+		TPWrite "  Z = " + NumToStr(robot1_floor_pos.trans.z, 2) + " mm";
+		TPWrite "";
+		TPWrite "Robot2 Floor Position:";
+		TPWrite "  X = " + NumToStr(robot2_floor_pos.trans.x, 2) + " mm";
+		TPWrite "  Y = " + NumToStr(robot2_floor_pos.trans.y, 2) + " mm";
+		TPWrite "  Z = " + NumToStr(robot2_floor_pos.trans.z, 2) + " mm";
+		TPWrite "";
+		TPWrite "Distance between robots: " + NumToStr(distance, 2) + " mm";
+		TPWrite "========================================";
+
+		! Save to log file
+		Open "HOME:/robot_distance_log.txt", logfile \Write;
+
+		Write logfile, "========================================";
+		Write logfile, "Robot Distance Measurement (v1.5.1)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "Robot1 Floor Position (tool0):";
+		Write logfile, "  X = " + NumToStr(robot1_floor_pos.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(robot1_floor_pos.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(robot1_floor_pos.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "Robot2 Floor Position (tool0):";
+		Write logfile, "  X = " + NumToStr(robot2_floor_pos.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(robot2_floor_pos.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(robot2_floor_pos.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "Distance: " + NumToStr(distance, 2) + " mm";
+		Write logfile, "========================================\0A";
+
+		Close logfile;
+		TPWrite "Saved to: /HOME/robot_distance_log.txt";
+
+	ERROR
+		TPWrite "ERROR in MeasureRobotDistance: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
 	ENDPROC
 
 ENDMODULE
