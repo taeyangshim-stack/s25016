@@ -1831,9 +1831,9 @@ MODULE Rob2_MainModule
 		VAR num dy;
 		VAR num dz;
 
-		dx := robot2_floor_pos.trans.x - robot1_floor_pos.trans.x;
-		dy := robot2_floor_pos.trans.y - robot1_floor_pos.trans.y;
-		dz := robot2_floor_pos.trans.z - robot1_floor_pos.trans.z;
+		dx := robot2_floor_pos.trans.x - T_ROB1:robot1_floor_pos.trans.x;
+		dy := robot2_floor_pos.trans.y - T_ROB1:robot1_floor_pos.trans.y;
+		dz := robot2_floor_pos.trans.z - T_ROB1:robot1_floor_pos.trans.z;
 
 		RETURN Sqrt(Pow(dx, 2) + Pow(dy, 2) + Pow(dz, 2));
 	ENDFUNC
@@ -1854,7 +1854,7 @@ MODULE Rob2_MainModule
 		TPWrite "========================================";
 
 		! Update both robot positions
-		UpdateRobot1FloorPosition;
+		%"T_ROB1:UpdateRobot1FloorPosition"%;
 		UpdateRobot2FloorPosition;
 
 		! Calculate distance
@@ -1862,9 +1862,9 @@ MODULE Rob2_MainModule
 
 		! Display on TP
 		TPWrite "Robot1 Floor Position:";
-		TPWrite "  X = " + NumToStr(robot1_floor_pos.trans.x, 2) + " mm";
-		TPWrite "  Y = " + NumToStr(robot1_floor_pos.trans.y, 2) + " mm";
-		TPWrite "  Z = " + NumToStr(robot1_floor_pos.trans.z, 2) + " mm";
+		TPWrite "  X = " + NumToStr(T_ROB1:robot1_floor_pos.trans.x, 2) + " mm";
+		TPWrite "  Y = " + NumToStr(T_ROB1:robot1_floor_pos.trans.y, 2) + " mm";
+		TPWrite "  Z = " + NumToStr(T_ROB1:robot1_floor_pos.trans.z, 2) + " mm";
 		TPWrite "";
 		TPWrite "Robot2 Floor Position:";
 		TPWrite "  X = " + NumToStr(robot2_floor_pos.trans.x, 2) + " mm";
@@ -1884,9 +1884,9 @@ MODULE Rob2_MainModule
 		Write logfile, "Time: " + CTime();
 		Write logfile, "";
 		Write logfile, "Robot1 Floor Position (tool0):";
-		Write logfile, "  X = " + NumToStr(robot1_floor_pos.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(robot1_floor_pos.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(robot1_floor_pos.trans.z, 2) + " mm";
+		Write logfile, "  X = " + NumToStr(T_ROB1:robot1_floor_pos.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(T_ROB1:robot1_floor_pos.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(T_ROB1:robot1_floor_pos.trans.z, 2) + " mm";
 		Write logfile, "";
 		Write logfile, "Robot2 Floor Position (tool0):";
 		Write logfile, "  X = " + NumToStr(robot2_floor_pos.trans.x, 2) + " mm";
