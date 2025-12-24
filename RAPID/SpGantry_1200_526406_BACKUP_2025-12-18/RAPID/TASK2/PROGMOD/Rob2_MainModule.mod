@@ -1379,18 +1379,61 @@ MODULE Rob2_MainModule
 	ENDPROC
 
 	! ========================================
+	! Read Config Mode from /HOME/config.txt
+	! ========================================
+	! Version: v1.5.0
+	! Date: 2025-12-24
+	! Returns: 0 or 1 (default: 0 if file not found or error)
+	FUNC num ReadConfigMode()
+		VAR iodev configfile;
+		VAR string line;
+		VAR num mode_value;
+		VAR bool found;
+
+		mode_value := 0;  ! Default
+		found := FALSE;
+
+		! Try to open config.txt
+		Open "HOME:/config.txt", configfile \Read;
+
+		! Read lines until MODE= found
+		WHILE found = FALSE DO
+			line := ReadStr(configfile);
+
+			! Check if line starts with "MODE="
+			IF StrFind(line, 1, "MODE=") = 1 THEN
+				! Extract number after "MODE="
+				mode_value := StrToVal(StrPart(line, 6, 1), mode_value);
+				found := TRUE;
+			ENDIF
+		ENDWHILE
+
+		Close configfile;
+		RETURN mode_value;
+
+	ERROR
+		! File not found or read error - return default 0
+		IF ERRNO = ERR_FILEOPEN THEN
+			TPWrite "config.txt not found - using MODE=0";
+		ENDIF
+		Close configfile;
+		RETURN 0;
+	ENDFUNC
+
+	! ========================================
 	! Test Coordinate System Movement
 	! ========================================
-	! Version: v1.3.0
-	! Date: 2025-12-23
+	! Version: v1.5.0
+	! Date: 2025-12-24
 	! Purpose: Verify coordinate system alignment by moving robot and comparing coordinates
-	!   - Move robot in wobj0 coordinate system
-	!   - Check if Floor coordinate system shows same movement
+	!   - Move robot in specified coordinate system
+	!   - Check if Floor coordinate system shows expected movement
 	!   - Validates coordinate system direction and position relationship
 	! Parameters:
-	!   delta_x, delta_y, delta_z: Movement distance in wobj0 coordinates (mm)
+	!   delta_x, delta_y, delta_z: Movement distance (mm)
+	!   base_wobj: Base coordinate system for movement (wobj0 or WobjFloor)
 	! Output: /HOME/task2_coordinate_test.txt
-	PROC TestCoordinateMovement(num delta_x, num delta_y, num delta_z)
+	PROC TestCoordinateMovement(num delta_x, num delta_y, num delta_z, wobjdata base_wobj)
 		VAR robtarget pos_start_wobj0;
 		VAR robtarget pos_start_floor;
 		VAR robtarget pos_target;
@@ -1411,16 +1454,16 @@ MODULE Rob2_MainModule
 		TPWrite "Start wobj0: [" + NumToStr(pos_start_wobj0.trans.x, 1) + "," + NumToStr(pos_start_wobj0.trans.y, 1) + "," + NumToStr(pos_start_wobj0.trans.z, 1) + "]";
 		TPWrite "Start Floor: [" + NumToStr(pos_start_floor.trans.x, 1) + "," + NumToStr(pos_start_floor.trans.y, 1) + "," + NumToStr(pos_start_floor.trans.z, 1) + "]";
 
-		! Calculate target position (wobj0 + delta)
-		pos_target := pos_start_wobj0;
+		! Calculate target position (base_wobj + delta)
+		pos_target := CRobT(\Tool:=tool0\WObj:=base_wobj);
 		pos_target.trans.x := pos_target.trans.x + delta_x;
 		pos_target.trans.y := pos_target.trans.y + delta_y;
 		pos_target.trans.z := pos_target.trans.z + delta_z;
 
-		TPWrite "Moving wobj0: [" + NumToStr(delta_x, 1) + "," + NumToStr(delta_y, 1) + "," + NumToStr(delta_z, 1) + "]";
+		TPWrite "Moving in base coordinate: [" + NumToStr(delta_x, 1) + "," + NumToStr(delta_y, 1) + "," + NumToStr(delta_z, 1) + "]";
 
 		! Move to target position
-		MoveL pos_target, v100, fine, tool0\WObj:=wobj0;
+		MoveL pos_target, v100, fine, tool0\WObj:=base_wobj;
 
 		! Read ending position in both coordinate systems
 		pos_end_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
@@ -1613,22 +1656,30 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Robot2 TCP Coordinate Test - XYZ Combined with Return
 	! ========================================
-	! Version: v1.4.6
+	! Version: v1.5.0
 	! Date: 2025-12-24
-	! Purpose: Move Robot2 TCP in wobj0 [X+50, Y+30, Z+20] from home position and return
-	! Expected Result:
-	!   Robot2 wobj0 may already be Y,Z inverted (based on jog test observation)
-	!   If Robot2 wobj0 = Floor direction (hypothesis):
-	!   Then: wobj0 [+50, +30, +20] -> Floor [+50, +30, +20] (same direction)
-	! Changes from v1.4.5:
-	!   - Start from home position (all 6 robot axes = 0 degrees)
-	!   - Keep gantry position unchanged
-	!   - Return to original joint position after test
+	! Purpose: Move Robot2 TCP in [X+50, Y+30, Z+20] from home position and return
+	! MODE Selection (from /HOME/config.txt):
+	!   MODE=0 (User's coordinate system):
+	!     - Base: WobjFloor
+	!     - Floor [+50, +30, +20] -> wobj0 [+50, +30, +20], Floor [+50, +30, +20]
+	!   MODE=1 (Claude's coordinate system):
+	!     - Base: wobj0
+	!     - wobj0 [+50, +30, +20] -> Floor [+50, -30, -20]
+	! Changes from v1.4.7:
+	!   - Added config.txt MODE support
+	!   - MODE=0: Use WobjFloor as base coordinate
+	!   - MODE=1: Use wobj0 as base coordinate (default behavior)
 	PROC TestRobot2_XYZ()
 		VAR jointtarget original_pos;
 		VAR jointtarget home_pos;
+		VAR num config_mode;
 
-		TPWrite "TASK2 - Robot2 wobj0 vs Floor Test (v1.4.6)";
+		TPWrite "TASK2 - Robot2 Coordinate Test (v1.5.0)";
+
+		! Read config mode
+		config_mode := ReadConfigMode();
+		TPWrite "Config MODE=" + NumToStr(config_mode, 0);
 
 		! Save original joint position
 		original_pos := CJointT();
@@ -1648,9 +1699,16 @@ MODULE Rob2_MainModule
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "At home position";
 
-		! Perform coordinate test
-		TPWrite "Moving wobj0: [+50, +30, +20]";
-		TestCoordinateMovement 50, 30, 20;
+		! Perform coordinate test based on MODE
+		IF config_mode = 0 THEN
+			! MODE=0: User's coordinate - use WobjFloor as base
+			TPWrite "MODE=0: Moving Floor: [+50, +30, +20]";
+			TestCoordinateMovement 50, 30, 20, WobjFloor;
+		ELSE
+			! MODE=1: Claude's coordinate - use wobj0 as base
+			TPWrite "MODE=1: Moving wobj0: [+50, +30, +20]";
+			TestCoordinateMovement 50, 30, 20, wobj0;
+		ENDIF
 
 		! Return to original joint position
 		TPWrite "Returning to original position...";

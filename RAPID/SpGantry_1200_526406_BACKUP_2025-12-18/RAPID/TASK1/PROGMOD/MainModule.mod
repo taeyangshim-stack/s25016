@@ -417,13 +417,55 @@ MODULE MainModule
 	ENDPROC
 
 	! ========================================
+	! Read Config Mode from /HOME/config.txt
+	! ========================================
+	! Version: v1.5.0
+	! Date: 2025-12-24
+	! Returns: 0 or 1 (default: 0 if file not found or error)
+	FUNC num ReadConfigMode()
+		VAR iodev configfile;
+		VAR string line;
+		VAR num mode_value;
+		VAR bool found;
+
+		mode_value := 0;  ! Default
+		found := FALSE;
+
+		! Try to open config.txt
+		Open "HOME:/config.txt", configfile \Read;
+
+		! Read lines until MODE= found
+		WHILE found = FALSE DO
+			line := ReadStr(configfile);
+
+			! Check if line starts with "MODE="
+			IF StrFind(line, 1, "MODE=") = 1 THEN
+				! Extract number after "MODE="
+				mode_value := StrToVal(StrPart(line, 6, 1), mode_value);
+				found := TRUE;
+			ENDIF
+		ENDWHILE
+
+		Close configfile;
+		RETURN mode_value;
+
+	ERROR
+		! File not found or read error - return default 0
+		IF ERRNO = ERR_FILEOPEN THEN
+			TPWrite "config.txt not found - using MODE=0";
+		ENDIF
+		Close configfile;
+		RETURN 0;
+	ENDFUNC
+
+	! ========================================
 	! Test Coordinate System Movement
 	! ========================================
-	! Version: v1.3.0
-	! Date: 2025-12-23
+	! Version: v1.5.0
+	! Date: 2025-12-24
 	! Purpose: Verify coordinate system alignment by moving robot and comparing coordinates
-	!   - Move robot in wobj0 coordinate system
-	!   - Check if Floor coordinate system shows same movement
+	!   - Move robot in wobj0 coordinate system (Robot1 always uses wobj0)
+	!   - Check if Floor coordinate system shows expected movement
 	!   - Validates coordinate system direction and position relationship
 	! Parameters:
 	!   delta_x, delta_y, delta_z: Movement distance in wobj0 coordinates (mm)
@@ -651,23 +693,27 @@ MODULE MainModule
 	! ========================================
 	! Robot1 TCP Coordinate Test - XYZ Combined with Return
 	! ========================================
-	! Version: v1.4.6
+	! Version: v1.5.0
 	! Date: 2025-12-24
 	! Purpose: Move Robot1 TCP in wobj0 [X+50, Y+30, Z+20] from home position and return
-	! Expected Result:
+	! Expected Result (MODE independent - Robot1 always uses wobj0):
 	!   Robot1 wobj0 = World coordinate system
 	!   Floor = World + offset [-9500, 5300, 2100] + RX 180deg rotation
 	!   RX 180deg inverts Y and Z axes
 	!   Therefore: wobj0 [+50, +30, +20] -> Floor [+50, -30, -20]
-	! Changes from v1.4.5:
-	!   - Start from home position (all 6 robot axes = 0 degrees)
-	!   - Keep gantry position unchanged
-	!   - Return to original joint position after test
+	! Changes from v1.4.7:
+	!   - Added config.txt MODE display (Robot1 behavior unchanged)
+	!   - Robot1 always uses wobj0 regardless of MODE
 	PROC TestRobot1_XYZ()
 		VAR jointtarget original_pos;
 		VAR jointtarget home_pos;
+		VAR num config_mode;
 
-		TPWrite "TASK1 - Robot1 wobj0 vs Floor Test (v1.4.6)";
+		TPWrite "TASK1 - Robot1 Coordinate Test (v1.5.0)";
+
+		! Read config mode (for display only - Robot1 always uses wobj0)
+		config_mode := ReadConfigMode();
+		TPWrite "Config MODE=" + NumToStr(config_mode, 0) + " (Robot1 always uses wobj0)";
 
 		! Save original joint position
 		original_pos := CJointT();
