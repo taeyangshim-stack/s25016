@@ -1,4 +1,81 @@
 MODULE Rob2_MainModule
+	!========================================
+	! TASK2 (Robot2) - Rob2_MainModule
+	! Version History
+	!========================================
+	! v1.0.0 (2025-12-17)
+	!   - Initial gantry position sharing system
+	!   - Added shared_gantry_pos and related variables
+	!   - Created UpdateSharedGantryPosition procedure
+	!
+	! v1.1.0 (2025-12-18)
+	!   - Added wobj0 definition verification
+	!   - Verified Robot2's wobj0 is READ-ONLY (equals World)
+	!   - Documented wobj0 vs WobjFloor relationship
+	!
+	! v1.2.0 (2025-12-18)
+	!   - Added WobjFloor coordinate system
+	!   - Frame: [-9500, 5300, 2100] with quaternion [0, 1, 0, 0]
+	!   - Quaternion [0,1,0,0] = 180° rotation around X-axis (Y,Z inverted)
+	!   - Added comprehensive coordinate system documentation
+	!
+	! v1.3.0 (2025-12-18)
+	!   - Added coordinate verification procedures
+	!   - TestRobot2_TCP: TCP position verification in wobj0 and WobjFloor
+	!   - TestRobot2_XYZ: X/Y/Z axis movement tests
+	!   - TestCoordinateMovement: Core movement and logging procedure
+	!   - WritePosToFile: File logging with overwrite mode
+	!
+	! v1.4.0 (2025-12-18)
+	!   - Added World coordinate comparison
+	!   - CompareRobot2Coordinates: Compare wobj0, WobjFloor, World
+	!   - Verified relationship: wobj0 = World (for Robot2)
+	!   - Verified WobjFloor transforms coordinates correctly
+	!
+	! v1.4.1 (2025-12-23)
+	!   - Removed MoveToMiddlePosition calls to prevent Reference Error
+	!   - Simplified procedure calls in TestRobot2_TCP
+	!
+	! v1.4.2 (2025-12-24)
+	!   - Added Robot2 TCP coordinate movement tests
+	!   - TestCoordinateMovement: Move and log TCP positions
+	!
+	! v1.4.3 (2025-12-24)
+	!   - Combined X/Y/Z tests into single TestRobot2_XYZ procedure
+	!   - Streamlined coordinate testing workflow
+	!
+	! v1.4.4 (2025-12-24)
+	!   - Reduced movement distance to avoid joint limits
+	!   - Changed test distances: 50mm X, 30mm Y, 20mm Z
+	!
+	! v1.4.5 (2025-12-24)
+	!   - Increased movement back to 50/30/20 mm
+	!   - Added return to start position after test
+	!
+	! v1.4.6 (2025-12-24)
+	!   - Added home position test capability
+	!   - Save original joint position with CJointT()
+	!   - Move to home position [0,0,0,0,0,0] before test
+	!   - Return to original position after test
+	!
+	! v1.4.7 (2025-12-24)
+	!   - Fixed singularity error in home position
+	!   - Changed Robot2 home position to [+90,0,0,0,30,0]
+	!   - J1=+90° for Robot2 mounting orientation
+	!   - J5=30° to avoid wrist singularity (not 0°)
+	!
+	! v1.5.0 (2025-12-24) - DUAL COORDINATE SYSTEM
+	!   - Added config.txt MODE support for dual coordinate systems
+	!   - ReadConfigMode() function reads /HOME/config.txt
+	!   - MODE=0 (Default - User's system):
+	!     * Robot2 uses WobjFloor as base coordinate
+	!     * wobj0 [+50,+30,+20] -> Floor [+50,+30,+20] (NO Y,Z inversion)
+	!   - MODE=1 (Claude's system):
+	!     * Robot2 uses wobj0 as base coordinate
+	!     * wobj0 [+50,+30,+20] -> Floor [+50,-30,-20] (Y,Z inverted)
+	!   - Modified TestCoordinateMovement to accept wobjdata parameter
+	!   - TestRobot2_XYZ now switches coordinate system based on MODE
+	!========================================
     RECORD targetdata
         robtarget position;
         num cpm;

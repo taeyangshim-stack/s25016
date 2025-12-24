@@ -1,4 +1,79 @@
 MODULE MainModule
+	!========================================
+	! TASK1 (Robot1) - MainModule
+	! Version History
+	!========================================
+	! v1.0.0 (2025-12-17)
+	!   - Initial gantry position sharing system
+	!   - Added shared_gantry_pos and related variables
+	!   - Created UpdateSharedGantryPosition procedure
+	!
+	! v1.1.0 (2025-12-18)
+	!   - Added wobj0 definition verification
+	!   - ShowWobj0Definition procedure with file output
+	!   - CompareWorldAndWobj0 procedure
+	!   - Output to /HOME/task1_wobj0_definition.txt
+	!
+	! v1.2.0 (2025-12-18)
+	!   - Added Work Object definitions
+	!   - WobjFloor: Floor coordinate at [-9500, 5300, 2100] with RX 180° rotation
+	!   - wobjRob1Base: GantryRob coordinate with Y-axis 90° rotation
+	!
+	! v1.2.1 (2025-12-19)
+	!   - Fixed "Too intense frequency of Write" error (41617)
+	!   - Added WaitTime 0.05 between Write operations
+	!   - VerifyTCPOrientation procedure for 4 coordinate systems
+	!
+	! v1.3.0 (2025-12-23)
+	!   - Added TestCoordinateMovement procedure
+	!   - Move TCP and verify wobj0 vs Floor coordinate changes
+	!   - Output to /HOME/task1_coordinate_test.txt
+	!
+	! v1.4.0 (2025-12-23)
+	!   - Added MoveToMiddlePosition procedure
+	!   - Added TestGantryAxisMovement procedure
+	!   - Added TestGantryX/Y/Z quick test procedures
+	!
+	! v1.4.1 (2025-12-23)
+	!   - Fixed Reference Error 50366
+	!   - Removed MoveToMiddlePosition calls
+	!   - Changed to relative movement only
+	!
+	! v1.4.2 (2025-12-24)
+	!   - Added Robot TCP coordinate movement tests
+	!   - TestRobot1_X, TestRobot1_Y, TestRobot1_Z procedures
+	!
+	! v1.4.3 (2025-12-24)
+	!   - Combined X/Y/Z tests into single procedure
+	!   - TestRobot1_XYZ replaces separate axis tests
+	!   - Movement: [30, 20, 10] mm
+	!
+	! v1.4.4 (2025-12-24)
+	!   - Reduced movement to avoid joint limits
+	!   - Changed from [300, 200, 100] to [30, 20, 10]
+	!   - Prevents 50050 "Position outside reach" error
+	!
+	! v1.4.5 (2025-12-24)
+	!   - Added return to start position
+	!   - Increased movement back to [50, 30, 20]
+	!   - Save start position and return after test
+	!
+	! v1.4.6 (2025-12-24)
+	!   - Start from home position (all 6 axes = 0°)
+	!   - Keep gantry position unchanged
+	!   - Return to original joint position after test
+	!
+	! v1.4.7 (2025-12-24)
+	!   - Avoid wrist singularity
+	!   - Home position: [-90, 0, 0, 0, 30, 0] (J5 = 30°)
+	!
+	! v1.5.0 (2025-12-24)
+	!   - Added config.txt MODE support
+	!   - ReadConfigMode() function reads /HOME/config.txt
+	!   - Robot1 always uses wobj0 (MODE independent)
+	!   - Display MODE for consistency with Robot2
+	!========================================
+
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
