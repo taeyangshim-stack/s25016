@@ -673,9 +673,9 @@ MODULE MainModule
 		original_pos := CJointT();
 		TPWrite "Original joint position saved";
 
-		! Create home position (all 6 robot axes = 0, keep gantry position)
+		! Create home position (Robot1: J1=-90, others=0, keep gantry position)
 		home_pos := original_pos;
-		home_pos.robax.rax_1 := 0;
+		home_pos.robax.rax_1 := -90;
 		home_pos.robax.rax_2 := 0;
 		home_pos.robax.rax_3 := 0;
 		home_pos.robax.rax_4 := 0;
@@ -683,7 +683,7 @@ MODULE MainModule
 		home_pos.robax.rax_6 := 0;
 
 		! Move to home position
-		TPWrite "Moving to home position (all axes = 0)...";
+		TPWrite "Moving to home position [-90,0,0,0,0,0]...";
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "At home position";
 
