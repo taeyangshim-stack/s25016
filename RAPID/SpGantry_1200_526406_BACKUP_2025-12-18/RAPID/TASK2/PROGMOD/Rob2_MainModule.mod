@@ -1634,17 +1634,17 @@ MODULE Rob2_MainModule
 		original_pos := CJointT();
 		TPWrite "Original joint position saved";
 
-		! Create home position (Robot2: J1=+90, others=0, keep gantry position)
+		! Create home position (Robot2: [+90,0,0,0,30,0], keep gantry position)
 		home_pos := original_pos;
 		home_pos.robax.rax_1 := 90;
 		home_pos.robax.rax_2 := 0;
 		home_pos.robax.rax_3 := 0;
 		home_pos.robax.rax_4 := 0;
-		home_pos.robax.rax_5 := 0;
+		home_pos.robax.rax_5 := 30;
 		home_pos.robax.rax_6 := 0;
 
 		! Move to home position
-		TPWrite "Moving to home position [+90,0,0,0,0,0]...";
+		TPWrite "Moving to home position [+90,0,0,0,30,0]...";
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "At home position";
 
