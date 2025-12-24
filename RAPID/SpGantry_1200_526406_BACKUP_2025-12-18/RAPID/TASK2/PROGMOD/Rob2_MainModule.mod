@@ -1466,6 +1466,7 @@ MODULE Rob2_MainModule
 		VAR string line;
 		VAR num mode_value;
 		VAR bool found;
+		VAR bool ok;
 
 		mode_value := 0;  ! Default
 		found := FALSE;
@@ -1479,8 +1480,8 @@ MODULE Rob2_MainModule
 
 			! Check if line starts with "MODE="
 			IF StrFind(line, 1, "MODE=") = 1 THEN
-				! Extract number after "MODE="
-				mode_value := StrToVal(StrPart(line, 6, 1), mode_value);
+				! Extract number after "MODE=" (StrToVal returns bool, stores result in mode_value)
+				ok := StrToVal(StrPart(line, 6, 1), mode_value);
 				found := TRUE;
 			ENDIF
 		ENDWHILE
@@ -1508,9 +1509,9 @@ MODULE Rob2_MainModule
 	!   - Validates coordinate system direction and position relationship
 	! Parameters:
 	!   delta_x, delta_y, delta_z: Movement distance (mm)
-	!   base_wobj: Base coordinate system for movement (wobj0 or WobjFloor)
+	!   mode: 0=WobjFloor base, 1=wobj0 base
 	! Output: /HOME/task2_coordinate_test.txt
-	PROC TestCoordinateMovement(num delta_x, num delta_y, num delta_z, wobjdata base_wobj)
+	PROC TestCoordinateMovement(num delta_x, num delta_y, num delta_z, num mode)
 		VAR robtarget pos_start_wobj0;
 		VAR robtarget pos_start_floor;
 		VAR robtarget pos_target;
@@ -1531,16 +1532,24 @@ MODULE Rob2_MainModule
 		TPWrite "Start wobj0: [" + NumToStr(pos_start_wobj0.trans.x, 1) + "," + NumToStr(pos_start_wobj0.trans.y, 1) + "," + NumToStr(pos_start_wobj0.trans.z, 1) + "]";
 		TPWrite "Start Floor: [" + NumToStr(pos_start_floor.trans.x, 1) + "," + NumToStr(pos_start_floor.trans.y, 1) + "," + NumToStr(pos_start_floor.trans.z, 1) + "]";
 
-		! Calculate target position (base_wobj + delta)
-		pos_target := CRobT(\Tool:=tool0\WObj:=base_wobj);
-		pos_target.trans.x := pos_target.trans.x + delta_x;
-		pos_target.trans.y := pos_target.trans.y + delta_y;
-		pos_target.trans.z := pos_target.trans.z + delta_z;
-
-		TPWrite "Moving in base coordinate: [" + NumToStr(delta_x, 1) + "," + NumToStr(delta_y, 1) + "," + NumToStr(delta_z, 1) + "]";
-
-		! Move to target position
-		MoveL pos_target, v100, fine, tool0\WObj:=base_wobj;
+		! Calculate target position based on mode
+		IF mode = 0 THEN
+			! MODE=0: Use WobjFloor as base
+			pos_target := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+			pos_target.trans.x := pos_target.trans.x + delta_x;
+			pos_target.trans.y := pos_target.trans.y + delta_y;
+			pos_target.trans.z := pos_target.trans.z + delta_z;
+			TPWrite "Moving in Floor coordinate: [" + NumToStr(delta_x, 1) + "," + NumToStr(delta_y, 1) + "," + NumToStr(delta_z, 1) + "]";
+			MoveL pos_target, v100, fine, tool0\WObj:=WobjFloor;
+		ELSE
+			! MODE=1: Use wobj0 as base
+			pos_target := CRobT(\Tool:=tool0\WObj:=wobj0);
+			pos_target.trans.x := pos_target.trans.x + delta_x;
+			pos_target.trans.y := pos_target.trans.y + delta_y;
+			pos_target.trans.z := pos_target.trans.z + delta_z;
+			TPWrite "Moving in wobj0 coordinate: [" + NumToStr(delta_x, 1) + "," + NumToStr(delta_y, 1) + "," + NumToStr(delta_z, 1) + "]";
+			MoveL pos_target, v100, fine, tool0\WObj:=wobj0;
+		ENDIF
 
 		! Read ending position in both coordinate systems
 		pos_end_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
@@ -1780,11 +1789,11 @@ MODULE Rob2_MainModule
 		IF config_mode = 0 THEN
 			! MODE=0: User's coordinate - use WobjFloor as base
 			TPWrite "MODE=0: Moving Floor: [+50, +30, +20]";
-			TestCoordinateMovement 50, 30, 20, WobjFloor;
+			TestCoordinateMovement 50, 30, 20, 0;
 		ELSE
 			! MODE=1: Claude's coordinate - use wobj0 as base
 			TPWrite "MODE=1: Moving wobj0: [+50, +30, +20]";
-			TestCoordinateMovement 50, 30, 20, wobj0;
+			TestCoordinateMovement 50, 30, 20, 1;
 		ENDIF
 
 		! Return to original joint position

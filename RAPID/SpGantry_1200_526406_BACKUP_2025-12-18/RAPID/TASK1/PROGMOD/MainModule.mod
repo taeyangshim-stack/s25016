@@ -502,6 +502,7 @@ MODULE MainModule
 		VAR string line;
 		VAR num mode_value;
 		VAR bool found;
+		VAR bool ok;
 
 		mode_value := 0;  ! Default
 		found := FALSE;
@@ -515,8 +516,8 @@ MODULE MainModule
 
 			! Check if line starts with "MODE="
 			IF StrFind(line, 1, "MODE=") = 1 THEN
-				! Extract number after "MODE="
-				mode_value := StrToVal(StrPart(line, 6, 1), mode_value);
+				! Extract number after "MODE=" (StrToVal returns bool, stores result in mode_value)
+				ok := StrToVal(StrPart(line, 6, 1), mode_value);
 				found := TRUE;
 			ENDIF
 		ENDWHILE
