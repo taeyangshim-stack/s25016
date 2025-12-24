@@ -1613,30 +1613,49 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Robot2 TCP Coordinate Test - XYZ Combined with Return
 	! ========================================
-	! Version: v1.4.5
+	! Version: v1.4.6
 	! Date: 2025-12-24
-	! Purpose: Move Robot2 TCP in wobj0 [X+50, Y+30, Z+20] and return to start
+	! Purpose: Move Robot2 TCP in wobj0 [X+50, Y+30, Z+20] from home position and return
 	! Expected Result:
 	!   Robot2 wobj0 may already be Y,Z inverted (based on jog test observation)
 	!   If Robot2 wobj0 = Floor direction (hypothesis):
 	!   Then: wobj0 [+50, +30, +20] -> Floor [+50, +30, +20] (same direction)
+	! Changes from v1.4.5:
+	!   - Start from home position (all 6 robot axes = 0 degrees)
+	!   - Keep gantry position unchanged
+	!   - Return to original joint position after test
 	PROC TestRobot2_XYZ()
-		VAR robtarget start_pos;
+		VAR jointtarget original_pos;
+		VAR jointtarget home_pos;
 
-		TPWrite "TASK2 - Robot2 wobj0 vs Floor Test";
+		TPWrite "TASK2 - Robot2 wobj0 vs Floor Test (v1.4.6)";
 
-		! Save start position
-		start_pos := CRobT(\Tool:=tool0\WObj:=wobj0);
-		TPWrite "Start position saved";
+		! Save original joint position
+		original_pos := CJointT();
+		TPWrite "Original joint position saved";
 
-		! Move and test
+		! Create home position (all 6 robot axes = 0, keep gantry position)
+		home_pos := original_pos;
+		home_pos.robax.rax_1 := 0;
+		home_pos.robax.rax_2 := 0;
+		home_pos.robax.rax_3 := 0;
+		home_pos.robax.rax_4 := 0;
+		home_pos.robax.rax_5 := 0;
+		home_pos.robax.rax_6 := 0;
+
+		! Move to home position
+		TPWrite "Moving to home position (all axes = 0)...";
+		MoveAbsJ home_pos, v100, fine, tool0;
+		TPWrite "At home position";
+
+		! Perform coordinate test
 		TPWrite "Moving wobj0: [+50, +30, +20]";
 		TestCoordinateMovement 50, 30, 20;
 
-		! Return to start
-		TPWrite "Returning to start position...";
-		MoveL start_pos, v100, fine, tool0\WObj:=wobj0;
-		TPWrite "Returned to start position";
+		! Return to original joint position
+		TPWrite "Returning to original position...";
+		MoveAbsJ original_pos, v100, fine, tool0;
+		TPWrite "Returned to original position";
 
 		TPWrite "Test complete! Check txt file";
 	ENDPROC
