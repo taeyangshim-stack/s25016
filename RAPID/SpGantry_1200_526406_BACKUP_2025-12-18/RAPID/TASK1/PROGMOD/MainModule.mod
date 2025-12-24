@@ -649,20 +649,34 @@ MODULE MainModule
 	ENDPROC
 
 	! ========================================
-	! Robot1 TCP Coordinate Test - XYZ Combined
+	! Robot1 TCP Coordinate Test - XYZ Combined with Return
 	! ========================================
-	! Version: v1.4.4
+	! Version: v1.4.5
 	! Date: 2025-12-24
-	! Purpose: Move Robot1 TCP in wobj0 [X+30, Y+20, Z+10] and verify Floor alignment
+	! Purpose: Move Robot1 TCP in wobj0 [X+50, Y+30, Z+20] and return to start
 	! Expected Result:
 	!   Robot1 wobj0 = World coordinate system
 	!   Floor = World + offset [-9500, 5300, 2100] + RX 180deg rotation
 	!   RX 180deg inverts Y and Z axes
-	!   Therefore: wobj0 [+30, +20, +10] -> Floor [+30, -20, -10]
+	!   Therefore: wobj0 [+50, +30, +20] -> Floor [+50, -30, -20]
 	PROC TestRobot1_XYZ()
+		VAR robtarget start_pos;
+
 		TPWrite "TASK1 - Robot1 wobj0 vs Floor Test";
-		TPWrite "Moving wobj0: [+30, +20, +10]";
-		TestCoordinateMovement 30, 20, 10;
+
+		! Save start position
+		start_pos := CRobT(\Tool:=tool0\WObj:=wobj0);
+		TPWrite "Start position saved";
+
+		! Move and test
+		TPWrite "Moving wobj0: [+50, +30, +20]";
+		TestCoordinateMovement 50, 30, 20;
+
+		! Return to start
+		TPWrite "Returning to start position...";
+		MoveL start_pos, v100, fine, tool0\WObj:=wobj0;
+		TPWrite "Returned to start position";
+
 		TPWrite "Test complete! Check txt file";
 	ENDPROC
 
