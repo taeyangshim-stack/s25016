@@ -109,7 +109,8 @@ MODULE MainModule
 
 	! Robot Position Monitoring (v1.5.1 2025-12-25)
 	! Robot1 TCP position in Floor coordinate system (for distance measurement)
-	TASK PERS robtarget robot1_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+	! Shared across tasks - use PERS (not TASK PERS) for cross-task access
+	PERS robtarget robot1_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 
 	! Work Object Definitions (v1.2.0 2025-12-18)
 	! WobjFloor: Floor coordinate system at [-9500, 5300, 2100] from World

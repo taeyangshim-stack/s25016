@@ -183,8 +183,12 @@ MODULE Rob2_MainModule
     PERS wobjdata wobjRob2Base := [FALSE, TRUE, "", [[0, 0, 0], [-0.0000000000000000432964, 0.707107, 0.707107, 0.0000000000000000432964]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! Robot Position Monitoring (v1.5.1 2025-12-25)
+    ! Robot1 TCP position from TASK1 (external reference)
+    PERS robtarget robot1_floor_pos;
+
     ! Robot2 TCP position in Floor coordinate system (for distance measurement)
-    TASK PERS robtarget robot2_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    ! Shared across tasks - use PERS (not TASK PERS) for cross-task access
+    PERS robtarget robot2_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 
     PERS num nMotionTotalStep{2};
     PERS num nMotionStepCount{2};
@@ -1831,9 +1835,9 @@ MODULE Rob2_MainModule
 		VAR num dy;
 		VAR num dz;
 
-		dx := robot2_floor_pos.trans.x - T_ROB1:robot1_floor_pos.trans.x;
-		dy := robot2_floor_pos.trans.y - T_ROB1:robot1_floor_pos.trans.y;
-		dz := robot2_floor_pos.trans.z - T_ROB1:robot1_floor_pos.trans.z;
+		dx := robot2_floor_pos.trans.x - robot1_floor_pos.trans.x;
+		dy := robot2_floor_pos.trans.y - robot1_floor_pos.trans.y;
+		dz := robot2_floor_pos.trans.z - robot1_floor_pos.trans.z;
 
 		RETURN Sqrt(Pow(dx, 2) + Pow(dy, 2) + Pow(dz, 2));
 	ENDFUNC
@@ -1862,9 +1866,9 @@ MODULE Rob2_MainModule
 
 		! Display on TP
 		TPWrite "Robot1 Floor Position:";
-		TPWrite "  X = " + NumToStr(T_ROB1:robot1_floor_pos.trans.x, 2) + " mm";
-		TPWrite "  Y = " + NumToStr(T_ROB1:robot1_floor_pos.trans.y, 2) + " mm";
-		TPWrite "  Z = " + NumToStr(T_ROB1:robot1_floor_pos.trans.z, 2) + " mm";
+		TPWrite "  X = " + NumToStr(robot1_floor_pos.trans.x, 2) + " mm";
+		TPWrite "  Y = " + NumToStr(robot1_floor_pos.trans.y, 2) + " mm";
+		TPWrite "  Z = " + NumToStr(robot1_floor_pos.trans.z, 2) + " mm";
 		TPWrite "";
 		TPWrite "Robot2 Floor Position:";
 		TPWrite "  X = " + NumToStr(robot2_floor_pos.trans.x, 2) + " mm";
@@ -1884,9 +1888,9 @@ MODULE Rob2_MainModule
 		Write logfile, "Time: " + CTime();
 		Write logfile, "";
 		Write logfile, "Robot1 Floor Position (tool0):";
-		Write logfile, "  X = " + NumToStr(T_ROB1:robot1_floor_pos.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(T_ROB1:robot1_floor_pos.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(T_ROB1:robot1_floor_pos.trans.z, 2) + " mm";
+		Write logfile, "  X = " + NumToStr(robot1_floor_pos.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(robot1_floor_pos.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(robot1_floor_pos.trans.z, 2) + " mm";
 		Write logfile, "";
 		Write logfile, "Robot2 Floor Position (tool0):";
 		Write logfile, "  X = " + NumToStr(robot2_floor_pos.trans.x, 2) + " mm";
