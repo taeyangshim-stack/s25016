@@ -185,6 +185,8 @@ MODULE Rob2_MainModule
     ! Robot Position Monitoring (v1.5.1 2025-12-25)
     ! Robot1 TCP position from TASK1 (external reference)
     PERS robtarget robot1_floor_pos;
+    ! Robot1 wobj0 snapshot from TASK1 (external reference)
+    PERS wobjdata robot1_wobj0_snapshot;
 
     ! Robot2 TCP position in Floor coordinate system (for distance measurement)
     ! Shared across tasks - use PERS (not TASK PERS) for cross-task access
@@ -1247,6 +1249,151 @@ MODULE Rob2_MainModule
 	ENDPROC
 
 	!========================================
+	! Compare Robot1/Robot2 wobj0 (Snapshot)
+	!========================================
+	! Version: v1.6.0
+	! Date: 2025-12-25
+	! Purpose: Print Robot1/Robot2 wobj0 values and differences in one output
+	PROC CompareWobj0Snapshots()
+		VAR iodev logfile;
+		VAR num dux;
+		VAR num duy;
+		VAR num duz;
+		VAR num dox;
+		VAR num doy;
+		VAR num doz;
+		VAR num duq1;
+		VAR num duq2;
+		VAR num duq3;
+		VAR num duq4;
+		VAR num doq1;
+		VAR num doq2;
+		VAR num doq3;
+		VAR num doq4;
+
+		TPWrite "========================================";
+		TPWrite "Compare Robot1/Robot2 wobj0 (v1.6.0)";
+		TPWrite "========================================";
+
+		! Refresh Robot1 snapshot from TASK1
+		%"T_ROB1:UpdateRobot1Wobj0Snapshot"%;
+
+		TPWrite "Robot1 wobj0 (T_ROB1):";
+		TPWrite "  UFrame X = " + NumToStr(robot1_wobj0_snapshot.uframe.trans.x, 2);
+		TPWrite "  UFrame Y = " + NumToStr(robot1_wobj0_snapshot.uframe.trans.y, 2);
+		TPWrite "  UFrame Z = " + NumToStr(robot1_wobj0_snapshot.uframe.trans.z, 2);
+		TPWrite "  UFrame q1 = " + NumToStr(robot1_wobj0_snapshot.uframe.rot.q1, 4);
+		TPWrite "  UFrame q2 = " + NumToStr(robot1_wobj0_snapshot.uframe.rot.q2, 4);
+		TPWrite "  UFrame q3 = " + NumToStr(robot1_wobj0_snapshot.uframe.rot.q3, 4);
+		TPWrite "  UFrame q4 = " + NumToStr(robot1_wobj0_snapshot.uframe.rot.q4, 4);
+		TPWrite "  OFrame X = " + NumToStr(robot1_wobj0_snapshot.oframe.trans.x, 2);
+		TPWrite "  OFrame Y = " + NumToStr(robot1_wobj0_snapshot.oframe.trans.y, 2);
+		TPWrite "  OFrame Z = " + NumToStr(robot1_wobj0_snapshot.oframe.trans.z, 2);
+
+		TPWrite "";
+		TPWrite "Robot2 wobj0 (T_ROB2):";
+		TPWrite "  UFrame X = " + NumToStr(wobj0.uframe.trans.x, 2);
+		TPWrite "  UFrame Y = " + NumToStr(wobj0.uframe.trans.y, 2);
+		TPWrite "  UFrame Z = " + NumToStr(wobj0.uframe.trans.z, 2);
+		TPWrite "  UFrame q1 = " + NumToStr(wobj0.uframe.rot.q1, 4);
+		TPWrite "  UFrame q2 = " + NumToStr(wobj0.uframe.rot.q2, 4);
+		TPWrite "  UFrame q3 = " + NumToStr(wobj0.uframe.rot.q3, 4);
+		TPWrite "  UFrame q4 = " + NumToStr(wobj0.uframe.rot.q4, 4);
+		TPWrite "  OFrame X = " + NumToStr(wobj0.oframe.trans.x, 2);
+		TPWrite "  OFrame Y = " + NumToStr(wobj0.oframe.trans.y, 2);
+		TPWrite "  OFrame Z = " + NumToStr(wobj0.oframe.trans.z, 2);
+
+		dux := wobj0.uframe.trans.x - robot1_wobj0_snapshot.uframe.trans.x;
+		duy := wobj0.uframe.trans.y - robot1_wobj0_snapshot.uframe.trans.y;
+		duz := wobj0.uframe.trans.z - robot1_wobj0_snapshot.uframe.trans.z;
+		dox := wobj0.oframe.trans.x - robot1_wobj0_snapshot.oframe.trans.x;
+		doy := wobj0.oframe.trans.y - robot1_wobj0_snapshot.oframe.trans.y;
+		doz := wobj0.oframe.trans.z - robot1_wobj0_snapshot.oframe.trans.z;
+		duq1 := wobj0.uframe.rot.q1 - robot1_wobj0_snapshot.uframe.rot.q1;
+		duq2 := wobj0.uframe.rot.q2 - robot1_wobj0_snapshot.uframe.rot.q2;
+		duq3 := wobj0.uframe.rot.q3 - robot1_wobj0_snapshot.uframe.rot.q3;
+		duq4 := wobj0.uframe.rot.q4 - robot1_wobj0_snapshot.uframe.rot.q4;
+		doq1 := wobj0.oframe.rot.q1 - robot1_wobj0_snapshot.oframe.rot.q1;
+		doq2 := wobj0.oframe.rot.q2 - robot1_wobj0_snapshot.oframe.rot.q2;
+		doq3 := wobj0.oframe.rot.q3 - robot1_wobj0_snapshot.oframe.rot.q3;
+		doq4 := wobj0.oframe.rot.q4 - robot1_wobj0_snapshot.oframe.rot.q4;
+
+		TPWrite "";
+		TPWrite "Difference (R2 - R1):";
+		TPWrite "  UFrame dX = " + NumToStr(dux, 2);
+		TPWrite "  UFrame dY = " + NumToStr(duy, 2);
+		TPWrite "  UFrame dZ = " + NumToStr(duz, 2);
+		TPWrite "  UFrame dq1 = " + NumToStr(duq1, 4);
+		TPWrite "  UFrame dq2 = " + NumToStr(duq2, 4);
+		TPWrite "  UFrame dq3 = " + NumToStr(duq3, 4);
+		TPWrite "  UFrame dq4 = " + NumToStr(duq4, 4);
+		TPWrite "  OFrame dX = " + NumToStr(dox, 2);
+		TPWrite "  OFrame dY = " + NumToStr(doy, 2);
+		TPWrite "  OFrame dZ = " + NumToStr(doz, 2);
+		TPWrite "  OFrame dq1 = " + NumToStr(doq1, 4);
+		TPWrite "  OFrame dq2 = " + NumToStr(doq2, 4);
+		TPWrite "  OFrame dq3 = " + NumToStr(doq3, 4);
+		TPWrite "  OFrame dq4 = " + NumToStr(doq4, 4);
+		TPWrite "========================================";
+
+		Open "HOME:/wobj0_compare.txt", logfile \Write;
+		Write logfile, "========================================";
+		Write logfile, "Compare Robot1/Robot2 wobj0 (v1.6.0)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "Robot1 wobj0 (T_ROB1):";
+		Write logfile, "  UFrame X = " + NumToStr(robot1_wobj0_snapshot.uframe.trans.x, 2);
+		Write logfile, "  UFrame Y = " + NumToStr(robot1_wobj0_snapshot.uframe.trans.y, 2);
+		Write logfile, "  UFrame Z = " + NumToStr(robot1_wobj0_snapshot.uframe.trans.z, 2);
+		Write logfile, "  UFrame q1 = " + NumToStr(robot1_wobj0_snapshot.uframe.rot.q1, 4);
+		Write logfile, "  UFrame q2 = " + NumToStr(robot1_wobj0_snapshot.uframe.rot.q2, 4);
+		Write logfile, "  UFrame q3 = " + NumToStr(robot1_wobj0_snapshot.uframe.rot.q3, 4);
+		Write logfile, "  UFrame q4 = " + NumToStr(robot1_wobj0_snapshot.uframe.rot.q4, 4);
+		Write logfile, "  OFrame X = " + NumToStr(robot1_wobj0_snapshot.oframe.trans.x, 2);
+		Write logfile, "  OFrame Y = " + NumToStr(robot1_wobj0_snapshot.oframe.trans.y, 2);
+		Write logfile, "  OFrame Z = " + NumToStr(robot1_wobj0_snapshot.oframe.trans.z, 2);
+		Write logfile, "";
+		Write logfile, "Robot2 wobj0 (T_ROB2):";
+		Write logfile, "  UFrame X = " + NumToStr(wobj0.uframe.trans.x, 2);
+		Write logfile, "  UFrame Y = " + NumToStr(wobj0.uframe.trans.y, 2);
+		Write logfile, "  UFrame Z = " + NumToStr(wobj0.uframe.trans.z, 2);
+		Write logfile, "  UFrame q1 = " + NumToStr(wobj0.uframe.rot.q1, 4);
+		Write logfile, "  UFrame q2 = " + NumToStr(wobj0.uframe.rot.q2, 4);
+		Write logfile, "  UFrame q3 = " + NumToStr(wobj0.uframe.rot.q3, 4);
+		Write logfile, "  UFrame q4 = " + NumToStr(wobj0.uframe.rot.q4, 4);
+		Write logfile, "  OFrame X = " + NumToStr(wobj0.oframe.trans.x, 2);
+		Write logfile, "  OFrame Y = " + NumToStr(wobj0.oframe.trans.y, 2);
+		Write logfile, "  OFrame Z = " + NumToStr(wobj0.oframe.trans.z, 2);
+		Write logfile, "";
+		Write logfile, "Difference (R2 - R1):";
+		Write logfile, "  UFrame dX = " + NumToStr(dux, 2);
+		Write logfile, "  UFrame dY = " + NumToStr(duy, 2);
+		Write logfile, "  UFrame dZ = " + NumToStr(duz, 2);
+		Write logfile, "  UFrame dq1 = " + NumToStr(duq1, 4);
+		Write logfile, "  UFrame dq2 = " + NumToStr(duq2, 4);
+		Write logfile, "  UFrame dq3 = " + NumToStr(duq3, 4);
+		Write logfile, "  UFrame dq4 = " + NumToStr(duq4, 4);
+		Write logfile, "  OFrame dX = " + NumToStr(dox, 2);
+		Write logfile, "  OFrame dY = " + NumToStr(doy, 2);
+		Write logfile, "  OFrame dZ = " + NumToStr(doz, 2);
+		Write logfile, "  OFrame dq1 = " + NumToStr(doq1, 4);
+		Write logfile, "  OFrame dq2 = " + NumToStr(doq2, 4);
+		Write logfile, "  OFrame dq3 = " + NumToStr(doq3, 4);
+		Write logfile, "  OFrame dq4 = " + NumToStr(doq4, 4);
+		Write logfile, "========================================\0A";
+		Close logfile;
+
+		TPWrite "Saved to: /HOME/wobj0_compare.txt";
+
+	ERROR
+		TPWrite "ERROR in CompareWobj0Snapshots: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
+	ENDPROC
+
+	!========================================
 	! Check wobj0 Definition
 	!========================================
 	! Version: v1.1.0
@@ -1813,6 +1960,16 @@ MODULE Rob2_MainModule
 	ENDPROC
 
 	! ========================================
+	! Update Robot1 Floor Position (local)
+	! ========================================
+	! Version: v1.5.2
+	! Date: 2025-12-25
+	! Purpose: Read Robot1 TCP from T_ROB1 without cross-task procedure call
+	PROC UpdateRobot1FloorPositionLocal()
+		robot1_floor_pos := CRobT(\TaskName:="T_ROB1"\Tool:=tool0\WObj:=WobjFloor);
+	ENDPROC
+
+	! ========================================
 	! Update Robot2 Floor Position
 	! ========================================
 	! Version: v1.5.1
@@ -1858,7 +2015,7 @@ MODULE Rob2_MainModule
 		TPWrite "========================================";
 
 		! Update both robot positions
-		%"T_ROB1:UpdateRobot1FloorPosition"%;
+		UpdateRobot1FloorPositionLocal;
 		UpdateRobot2FloorPosition;
 
 		! Calculate distance

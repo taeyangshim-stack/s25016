@@ -111,6 +111,8 @@ MODULE MainModule
 	! Robot1 TCP position in Floor coordinate system (for distance measurement)
 	! Shared across tasks - use PERS (not TASK PERS) for cross-task access
 	PERS robtarget robot1_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+	! Robot1 wobj0 snapshot for cross-task comparison
+	PERS wobjdata robot1_wobj0_snapshot;
 
 	! Work Object Definitions (v1.2.0 2025-12-18)
 	! WobjFloor: Floor coordinate system at [-9500, 5300, 2100] from World
@@ -277,6 +279,16 @@ MODULE MainModule
 
 	ERROR
 		TPWrite "ERROR in TestPrintSharedGantryPosition: " + NumToStr(ERRNO, 0);
+	ENDPROC
+
+	!========================================
+	! Update Robot1 wobj0 Snapshot
+	!========================================
+	! Version: v1.6.0
+	! Date: 2025-12-25
+	! Purpose: Share Robot1 wobj0 data with other tasks
+	PROC UpdateRobot1Wobj0Snapshot()
+		robot1_wobj0_snapshot := wobj0;
 	ENDPROC
 
 	!========================================
