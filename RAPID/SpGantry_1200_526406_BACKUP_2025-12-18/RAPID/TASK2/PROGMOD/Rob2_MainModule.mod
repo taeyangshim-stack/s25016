@@ -2175,6 +2175,7 @@ MODULE Rob2_MainModule
 		VAR string line;
 		VAR bool found_value;
 		VAR num found_count;
+		VAR num eq_pos;
 		VAR num gantry_x_offset;
 		VAR num gantry_y_offset;
 		VAR num gantry_z_offset;
@@ -2194,23 +2195,27 @@ MODULE Rob2_MainModule
 		Open "HOME:/config.txt", configfile \Read;
 		WHILE found_count < 4 DO
 			line := ReadStr(configfile \RemoveCR);
-			IF StrFind(line, 1, "GANTRY_X=") <> 0 THEN
-				found_value := StrToVal(StrPart(line, 10, StrLen(line) - 9), gantry_x_offset);
+			IF StrFind(line, 1, "GANTRY_X=") = 1 THEN
+				eq_pos := StrFind(line, 1, "=");
+				found_value := StrToVal(StrPart(line, eq_pos + 1, StrLen(line) - eq_pos), gantry_x_offset);
 				IF found_value THEN
 					found_count := found_count + 1;
 				ENDIF
-			ELSEIF StrFind(line, 1, "GANTRY_Y=") <> 0 THEN
-				found_value := StrToVal(StrPart(line, 10, StrLen(line) - 9), gantry_y_offset);
+			ELSEIF StrFind(line, 1, "GANTRY_Y=") = 1 THEN
+				eq_pos := StrFind(line, 1, "=");
+				found_value := StrToVal(StrPart(line, eq_pos + 1, StrLen(line) - eq_pos), gantry_y_offset);
 				IF found_value THEN
 					found_count := found_count + 1;
 				ENDIF
-			ELSEIF StrFind(line, 1, "GANTRY_Z=") <> 0 THEN
-				found_value := StrToVal(StrPart(line, 10, StrLen(line) - 9), gantry_z_offset);
+			ELSEIF StrFind(line, 1, "GANTRY_Z=") = 1 THEN
+				eq_pos := StrFind(line, 1, "=");
+				found_value := StrToVal(StrPart(line, eq_pos + 1, StrLen(line) - eq_pos), gantry_z_offset);
 				IF found_value THEN
 					found_count := found_count + 1;
 				ENDIF
-			ELSEIF StrFind(line, 1, "GANTRY_R=") <> 0 THEN
-				found_value := StrToVal(StrPart(line, 10, StrLen(line) - 9), gantry_r_offset);
+			ELSEIF StrFind(line, 1, "GANTRY_R=") = 1 THEN
+				eq_pos := StrFind(line, 1, "=");
+				found_value := StrToVal(StrPart(line, eq_pos + 1, StrLen(line) - eq_pos), gantry_r_offset);
 				IF found_value THEN
 					found_count := found_count + 1;
 				ENDIF
