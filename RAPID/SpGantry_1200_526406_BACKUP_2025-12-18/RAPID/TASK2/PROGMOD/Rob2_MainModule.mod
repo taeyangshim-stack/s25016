@@ -2158,13 +2158,13 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.16
+	! Version: v1.7.17
 	! Date: 2025-12-28
 	! Purpose: Test if Floor coordinates change when gantry moves
-	! Reads gantry movement from config.txt
+	! Reads gantry movement from config.txt (X, Y, Z, R)
 	! Output: /HOME/gantry_floor_test.txt
 	PROC TestGantryFloorCoordinates()
-		VAR jointtarget initial_pos;
+		VAR jointtarget home_pos;
 		VAR jointtarget moved_pos;
 		VAR robtarget rob1_floor_before;
 		VAR robtarget rob2_floor_before;
@@ -2174,28 +2174,58 @@ MODULE Rob2_MainModule
 		VAR iodev configfile;
 		VAR string line;
 		VAR bool found_gantry_x;
+		VAR bool found_gantry_y;
+		VAR bool found_gantry_z;
+		VAR bool found_gantry_r;
 		VAR num gantry_x_offset;
+		VAR num gantry_y_offset;
+		VAR num gantry_z_offset;
+		VAR num gantry_r_offset;
 
 		TPWrite "========================================";
-		TPWrite "Gantry Floor Test (v1.7.16)";
+		TPWrite "Gantry Floor Test (v1.7.17)";
 
 		! Initialize
 		found_gantry_x := FALSE;
+		found_gantry_y := FALSE;
+		found_gantry_z := FALSE;
+		found_gantry_r := FALSE;
 		gantry_x_offset := 0;
+		gantry_y_offset := 0;
+		gantry_z_offset := 0;
+		gantry_r_offset := 0;
 
-		! Read gantry offset from config.txt
+		! Read gantry offsets from config.txt
 		Open "HOME:/config.txt", configfile \Read;
-		WHILE NOT found_gantry_x DO
+		WHILE (NOT found_gantry_x OR NOT found_gantry_y OR NOT found_gantry_z OR NOT found_gantry_r) DO
 			line := ReadStr(configfile \RemoveCR);
-			IF StrFind(line, 1, "GANTRY_X") <> 0 THEN
-				! Parse GANTRY_X=1000 format
+			IF StrFind(line, 1, "GANTRY_X=") <> 0 THEN
 				gantry_x_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_gantry_x);
-				found_gantry_x := TRUE;
+			ELSEIF StrFind(line, 1, "GANTRY_Y=") <> 0 THEN
+				gantry_y_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_gantry_y);
+			ELSEIF StrFind(line, 1, "GANTRY_Z=") <> 0 THEN
+				gantry_z_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_gantry_z);
+			ELSEIF StrFind(line, 1, "GANTRY_R=") <> 0 THEN
+				gantry_r_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_gantry_r);
 			ENDIF
 		ENDWHILE
 		Close configfile;
 
-		TPWrite "Gantry X offset: " + NumToStr(gantry_x_offset, 0);
+		TPWrite "Gantry offsets:";
+		TPWrite "  X=" + NumToStr(gantry_x_offset, 0) + " mm";
+		TPWrite "  Y=" + NumToStr(gantry_y_offset, 0) + " mm";
+		TPWrite "  Z=" + NumToStr(gantry_z_offset, 0) + " mm";
+		TPWrite "  R=" + NumToStr(gantry_r_offset, 1) + " deg";
+
+		! Move to HOME position (all gantry axes = 0)
+		TPWrite "Moving to HOME position...";
+		home_pos := CJointT();
+		home_pos.extax.eax_a := 0;  ! X axis
+		home_pos.extax.eax_b := 0;  ! Y axis
+		home_pos.extax.eax_c := 0;  ! Z axis
+		home_pos.extax.eax_d := 0;  ! R axis
+		MoveAbsJ home_pos, v100, fine, tool0;
+		WaitTime 1.0;
 
 		! Measure BEFORE gantry movement
 		TPWrite "Measuring before gantry move...";
@@ -2204,13 +2234,13 @@ MODULE Rob2_MainModule
 		rob1_floor_before := robot1_floor_pos;
 		rob2_floor_before := robot2_floor_pos;
 
-		! Save initial gantry position
-		initial_pos := CJointT();
-
-		! Move gantry X axis
-		TPWrite "Moving gantry X by " + NumToStr(gantry_x_offset, 0) + " mm...";
-		moved_pos := initial_pos;
-		moved_pos.extax.eax_a := initial_pos.extax.eax_a + gantry_x_offset;
+		! Move gantry axes (only non-zero offsets)
+		TPWrite "Moving gantry...";
+		moved_pos := home_pos;
+		moved_pos.extax.eax_a := gantry_x_offset;  ! X axis (mm)
+		moved_pos.extax.eax_b := gantry_y_offset;  ! Y axis (mm)
+		moved_pos.extax.eax_c := gantry_z_offset;  ! Z axis (mm)
+		moved_pos.extax.eax_d := gantry_r_offset;  ! R axis (degrees)
 		MoveAbsJ moved_pos, v100, fine, tool0;
 		WaitTime 1.0;
 
@@ -2221,20 +2251,24 @@ MODULE Rob2_MainModule
 		rob1_floor_after := robot1_floor_pos;
 		rob2_floor_after := robot2_floor_pos;
 
-		! Return to initial position
-		TPWrite "Returning to initial position...";
-		MoveAbsJ initial_pos, v100, fine, tool0;
+		! Return to HOME position
+		TPWrite "Returning to HOME position...";
+		MoveAbsJ home_pos, v100, fine, tool0;
 
 		! Save results
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.16)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.17)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
 		Write logfile, "";
-		Write logfile, "Gantry X movement: " + NumToStr(gantry_x_offset, 2) + " mm";
+		Write logfile, "Gantry Movement:";
+		Write logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(gantry_y_offset, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(gantry_z_offset, 2) + " mm";
+		Write logfile, "  R = " + NumToStr(gantry_r_offset, 2) + " deg";
 		Write logfile, "";
 		Write logfile, "BEFORE Gantry Movement:";
 		Write logfile, "------------------------";
