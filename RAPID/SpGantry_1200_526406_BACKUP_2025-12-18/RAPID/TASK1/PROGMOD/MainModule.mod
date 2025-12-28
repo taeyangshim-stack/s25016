@@ -852,12 +852,12 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.26
+	! Version: v1.7.27
 	! Date: 2025-12-29
 	! Purpose: Move Robot1 to initial test position
 	! Position: Robot1 [-90,0,0,0,0,0], Gantry X=Y=Z=R=0
-	! Note: Moves robot first, then gantry slowly to avoid linked motor error
-	! Note: Only modifies eax_a~d, keeps eax_e~f from CJointT()
+	! Note: Sets eax_f := eax_a for Master-Follower synchronization
+	! Note: Based on 12-18 backup HOME movement code (v100 speed)
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_pos;
 		VAR jointtarget home_pos;
@@ -875,20 +875,17 @@ MODULE MainModule
 		MoveAbsJ initial_pos, v100, fine, tool0;
 		TPWrite "Robot1 joints at initial position";
 
-		! Now move gantry to HOME slowly if needed
+		! Now move gantry to HOME position
+		TPWrite "Moving gantry to HOME position...";
 		home_pos := initial_pos;
-		IF home_pos.extax.eax_a <> 0 OR home_pos.extax.eax_b <> 0 OR home_pos.extax.eax_c <> 0 OR home_pos.extax.eax_d <> 0 THEN
-			TPWrite "Moving gantry to HOME position...";
-			home_pos.extax.eax_a := 0;  ! X1
-			home_pos.extax.eax_b := 0;  ! Y
-			home_pos.extax.eax_c := 0;  ! Z
-			home_pos.extax.eax_d := 0;  ! R
-			! eax_e, eax_f: keep values from CJointT() (DO NOT modify)
-			MoveAbsJ home_pos, v50, fine, tool0;  ! Slower speed for linked axes
-			TPWrite "Gantry at HOME position";
-		ELSE
-			TPWrite "Gantry already at HOME position";
-		ENDIF
+		home_pos.extax.eax_a := 0;  ! X1
+		home_pos.extax.eax_b := 0;  ! Y
+		home_pos.extax.eax_c := 0;  ! Z
+		home_pos.extax.eax_d := 0;  ! R
+		! eax_e: keep from CJointT() (not used)
+		home_pos.extax.eax_f := 0;  ! X2 = X1 (Master-Follower sync!)
+		MoveAbsJ home_pos, v100, fine, tool0;
+		TPWrite "Gantry at HOME position";
 		TPWrite "Robot1 ready: [-90,0,0,0,0,0], Gantry: [X,Y,Z,R]=0";
 	ENDPROC
 
