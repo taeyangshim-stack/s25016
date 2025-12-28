@@ -2195,22 +2195,22 @@ MODULE Rob2_MainModule
 		WHILE found_count < 4 DO
 			line := ReadStr(configfile \RemoveCR);
 			IF StrFind(line, 1, "GANTRY_X=") <> 0 THEN
-				found_value := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), gantry_x_offset);
+				found_value := StrToVal(StrPart(line, 10, StrLen(line) - 9), gantry_x_offset);
 				IF found_value THEN
 					found_count := found_count + 1;
 				ENDIF
 			ELSEIF StrFind(line, 1, "GANTRY_Y=") <> 0 THEN
-				found_value := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), gantry_y_offset);
+				found_value := StrToVal(StrPart(line, 10, StrLen(line) - 9), gantry_y_offset);
 				IF found_value THEN
 					found_count := found_count + 1;
 				ENDIF
 			ELSEIF StrFind(line, 1, "GANTRY_Z=") <> 0 THEN
-				found_value := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), gantry_z_offset);
+				found_value := StrToVal(StrPart(line, 10, StrLen(line) - 9), gantry_z_offset);
 				IF found_value THEN
 					found_count := found_count + 1;
 				ENDIF
 			ELSEIF StrFind(line, 1, "GANTRY_R=") <> 0 THEN
-				found_value := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), gantry_r_offset);
+				found_value := StrToVal(StrPart(line, 10, StrLen(line) - 9), gantry_r_offset);
 				IF found_value THEN
 					found_count := found_count + 1;
 				ENDIF
