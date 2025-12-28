@@ -174,13 +174,12 @@ MODULE Rob2_MainModule
     PERS wobjdata wobjWeldLine2;
     PERS wobjdata wobjRotCtr2;
 
-    ! Work Object Definitions (v1.7.9 2025-12-28)
+    ! Work Object Definitions (v1.7.10 2025-12-28)
     ! WobjFloor: Floor coordinate system from TASK1 (external reference)
     PERS wobjdata WobjFloor;
 
     ! WobjFloor_Rob2: Floor coordinate system for Robot2
-    ! Case 1: Offset from Robot2 wobj0 (Z-axis pointing up)
-    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, -4812, -2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 4812, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
     ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
@@ -2074,10 +2073,10 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Robot2 Base Height
 	! ========================================
-	! Version: v1.7.3
+	! Version: v1.7.10
 	! Date: 2025-12-28
 	! Purpose: Check tool0 TCP height from base at specific joint angles
-	! Uses WobjFloor_Rob2 (no rotation, adjusted Y offset)
+	! Uses WobjFloor_Rob2
 	! Output: TP display + /HOME/robot2_base_height.txt
 	PROC TestRobot2BaseHeight()
 		VAR jointtarget test_pos;
@@ -2086,7 +2085,7 @@ MODULE Rob2_MainModule
 		VAR iodev logfile;
 
 		TPWrite "========================================";
-		TPWrite "Robot2 Base Height Test (v1.7.3)";
+		TPWrite "Robot2 Base Height Test (v1.7.10)";
 
 		! Get current position
 		test_pos := CJointT();
@@ -2127,7 +2126,7 @@ MODULE Rob2_MainModule
 		Open "HOME:/robot2_base_height.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Robot2 Base Height Test (v1.7.3)";
+		Write logfile, "Robot2 Base Height Test (v1.7.10)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
