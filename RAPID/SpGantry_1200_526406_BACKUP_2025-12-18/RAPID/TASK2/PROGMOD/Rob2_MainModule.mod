@@ -2210,21 +2210,35 @@ MODULE Rob2_MainModule
 		ENDIF
 		TPWrite "Robot1 position OK (J1=-90)";
 
-		! Move Robot2 to initial test position
+		! Move Robot2 to initial test position (keep current gantry position)
 		TPWrite "Moving Robot2 to initial position...";
 		rob2_init := CJointT();
+		! Set robot joints only
 		rob2_init.robax.rax_1 := 90;
 		rob2_init.robax.rax_2 := 0;
 		rob2_init.robax.rax_3 := 0;
 		rob2_init.robax.rax_4 := 0;
 		rob2_init.robax.rax_5 := 0;
 		rob2_init.robax.rax_6 := 0;
-		rob2_init.extax.eax_a := 0;
-		rob2_init.extax.eax_b := 0;
-		rob2_init.extax.eax_c := 0;
-		rob2_init.extax.eax_d := 0;
+		! Keep current gantry position (DO NOT force to 0)
+		! extax values already set by CJointT()
 		MoveAbsJ rob2_init, v100, fine, tool0;
 		TPWrite "Robot2 initial position reached!";
+
+		! Now move gantry to HOME slowly if needed
+		home_pos := rob2_init;
+		IF home_pos.extax.eax_a <> 0 OR home_pos.extax.eax_b <> 0 OR home_pos.extax.eax_c <> 0 OR home_pos.extax.eax_d <> 0 THEN
+			TPWrite "Moving gantry to HOME position...";
+			home_pos.extax.eax_a := 0;
+			home_pos.extax.eax_b := 0;
+			home_pos.extax.eax_c := 0;
+			home_pos.extax.eax_d := 0;
+			MoveAbsJ home_pos, v50, fine, tool0;  ! Slower speed for gantry
+			TPWrite "Gantry at HOME position";
+		ELSE
+			TPWrite "Gantry already at HOME position";
+			home_pos := rob2_init;
+		ENDIF
 		TPWrite "Both robots ready!";
 
 		! Read gantry offsets from config.txt (simple approach)
