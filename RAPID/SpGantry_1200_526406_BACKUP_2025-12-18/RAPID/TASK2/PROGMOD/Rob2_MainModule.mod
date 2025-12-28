@@ -174,12 +174,12 @@ MODULE Rob2_MainModule
     PERS wobjdata wobjWeldLine2;
     PERS wobjdata wobjRotCtr2;
 
-    ! Work Object Definitions (v1.7.7 2025-12-28)
+    ! Work Object Definitions (v1.7.8 2025-12-28)
     ! WobjFloor: Floor coordinate system from TASK1 (external reference)
     PERS wobjdata WobjFloor;
 
     ! WobjFloor_Rob2: Floor coordinate system for Robot2
-    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 4812, -2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, -4812, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
     ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
