@@ -2173,10 +2173,8 @@ MODULE Rob2_MainModule
 		VAR iodev logfile;
 		VAR iodev configfile;
 		VAR string line;
-		VAR bool found_gantry_x;
-		VAR bool found_gantry_y;
-		VAR bool found_gantry_z;
-		VAR bool found_gantry_r;
+		VAR bool found_value;
+		VAR num found_count;
 		VAR num gantry_x_offset;
 		VAR num gantry_y_offset;
 		VAR num gantry_z_offset;
@@ -2186,10 +2184,7 @@ MODULE Rob2_MainModule
 		TPWrite "Gantry Floor Test (v1.7.17)";
 
 		! Initialize
-		found_gantry_x := FALSE;
-		found_gantry_y := FALSE;
-		found_gantry_z := FALSE;
-		found_gantry_r := FALSE;
+		found_count := 0;
 		gantry_x_offset := 0;
 		gantry_y_offset := 0;
 		gantry_z_offset := 0;
@@ -2197,16 +2192,28 @@ MODULE Rob2_MainModule
 
 		! Read gantry offsets from config.txt
 		Open "HOME:/config.txt", configfile \Read;
-		WHILE (NOT found_gantry_x OR NOT found_gantry_y OR NOT found_gantry_z OR NOT found_gantry_r) DO
+		WHILE found_count < 4 DO
 			line := ReadStr(configfile \RemoveCR);
 			IF StrFind(line, 1, "GANTRY_X=") <> 0 THEN
-				gantry_x_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_gantry_x);
+				gantry_x_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_value);
+				IF found_value THEN
+					found_count := found_count + 1;
+				ENDIF
 			ELSEIF StrFind(line, 1, "GANTRY_Y=") <> 0 THEN
-				gantry_y_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_gantry_y);
+				gantry_y_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_value);
+				IF found_value THEN
+					found_count := found_count + 1;
+				ENDIF
 			ELSEIF StrFind(line, 1, "GANTRY_Z=") <> 0 THEN
-				gantry_z_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_gantry_z);
+				gantry_z_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_value);
+				IF found_value THEN
+					found_count := found_count + 1;
+				ENDIF
 			ELSEIF StrFind(line, 1, "GANTRY_R=") <> 0 THEN
-				gantry_r_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_gantry_r);
+				gantry_r_offset := StrToVal(StrPart(line, StrFind(line, 1, "=") + 1, StrLen(line)), found_value);
+				IF found_value THEN
+					found_count := found_count + 1;
+				ENDIF
 			ENDIF
 		ENDWHILE
 		Close configfile;
