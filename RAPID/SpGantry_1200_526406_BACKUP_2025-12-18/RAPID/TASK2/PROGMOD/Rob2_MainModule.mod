@@ -2068,4 +2068,54 @@ MODULE Rob2_MainModule
 		TRYNEXT;
 	ENDPROC
 
+	! ========================================
+	! Test Robot2 Base Height
+	! ========================================
+	! Version: v1.7.1
+	! Date: 2025-12-28
+	! Purpose: Check tool0 TCP height from base at specific joint angles
+	PROC TestRobot2BaseHeight()
+		VAR jointtarget test_pos;
+		VAR robtarget tcp_wobj0;
+		VAR robtarget tcp_floor;
+
+		TPWrite "========================================";
+		TPWrite "Robot2 Base Height Test (v1.7.1)";
+
+		! Get current position
+		test_pos := CJointT();
+
+		! Set robot joints to [+90, 0, 0, 0, 0, 0]
+		test_pos.robax.rax_1 := 90;
+		test_pos.robax.rax_2 := 0;
+		test_pos.robax.rax_3 := 0;
+		test_pos.robax.rax_4 := 0;
+		test_pos.robax.rax_5 := 0;
+		test_pos.robax.rax_6 := 0;
+
+		! Move to test position
+		TPWrite "Moving to test position [+90,0,0,0,0,0]...";
+		MoveAbsJ test_pos, v100, fine, tool0;
+		WaitTime 0.5;
+
+		! Read TCP position in wobj0
+		tcp_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+
+		! Read TCP position in Floor coordinate
+		tcp_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+
+		! Display results
+		TPWrite "Robot2 wobj0:";
+		TPWrite "  X = " + NumToStr(tcp_wobj0.trans.x, 2);
+		TPWrite "  Y = " + NumToStr(tcp_wobj0.trans.y, 2);
+		TPWrite "  Z = " + NumToStr(tcp_wobj0.trans.z, 2);
+
+		TPWrite "Robot2 Floor:";
+		TPWrite "  X = " + NumToStr(tcp_floor.trans.x, 2);
+		TPWrite "  Y = " + NumToStr(tcp_floor.trans.y, 2);
+		TPWrite "  Z = " + NumToStr(tcp_floor.trans.z, 2);
+
+		TPWrite "========================================";
+	ENDPROC
+
 ENDMODULE
