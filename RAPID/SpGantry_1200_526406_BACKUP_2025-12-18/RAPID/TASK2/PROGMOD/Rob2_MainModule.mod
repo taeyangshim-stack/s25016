@@ -2158,14 +2158,14 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.24
+	! Version: v1.7.25
 	! Date: 2025-12-29
 	! Purpose: Test if Floor coordinates change when gantry moves
 	! Reads gantry movement from config.txt (X, Y, Z, R)
 	! Initial position: Robot1 [-90,0,0,0,0,0], Robot2 [+90,0,0,0,0,0], Gantry X1=Y=Z=R=X2=0
 	! Note: This procedure controls BOTH robots automatically
 	! Note: X1 and X2 axes move together (Master-Follower synchronization)
-	! Note: eax_e is not modified (reserved or unused axis)
+	! Note: eax_e set to 9E9 (ABB standard for unused external axis)
 	! Output: /HOME/gantry_floor_test.txt
 	PROC TestGantryFloorCoordinates()
 		VAR jointtarget rob1_init;
@@ -2191,7 +2191,7 @@ MODULE Rob2_MainModule
 		VAR num gantry_r_offset;
 
 		TPWrite "========================================";
-		TPWrite "Gantry Floor Test (v1.7.24)";
+		TPWrite "Gantry Floor Test (v1.7.25)";
 
 		! Initialize variables
 		gantry_x_offset := 0;
@@ -2235,7 +2235,7 @@ MODULE Rob2_MainModule
 			home_pos.extax.eax_b := 0;  ! Y
 			home_pos.extax.eax_c := 0;  ! Z
 			home_pos.extax.eax_d := 0;  ! R
-			! eax_e: keep current value (not used or reserved)
+			home_pos.extax.eax_e := 9E9;  ! Not used (ABB standard for unused axis)
 			home_pos.extax.eax_f := 0;  ! X2 (Master-Follower with X1)
 			MoveAbsJ home_pos, v50, fine, tool0;  ! Slower speed for gantry
 			TPWrite "Gantry at HOME position";
@@ -2339,7 +2339,7 @@ MODULE Rob2_MainModule
 		moved_pos.extax.eax_b := gantry_y_offset;  ! Y axis (mm)
 		moved_pos.extax.eax_c := gantry_z_offset;  ! Z axis (mm)
 		moved_pos.extax.eax_d := gantry_r_offset;  ! R axis (degrees)
-		! eax_e: keep current value (not used or reserved)
+		moved_pos.extax.eax_e := 9E9;  ! Not used (ABB standard for unused axis)
 		moved_pos.extax.eax_f := gantry_x_offset;  ! X2 axis (mm) - same as X1 for Master-Follower sync
 		MoveAbsJ moved_pos, v100, fine, tool0;
 		WaitTime 1.0;
@@ -2359,7 +2359,7 @@ MODULE Rob2_MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.24)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.25)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
@@ -2367,7 +2367,7 @@ MODULE Rob2_MainModule
 		Write logfile, "Initial Position:";
 		Write logfile, "  Robot1: [-90,0,0,0,0,0]";
 		Write logfile, "  Robot2: [+90,0,0,0,0,0]";
-		Write logfile, "  Gantry: X1=0, Y=0, Z=0, R=0, X2=0 (eax_e reserved)";
+		Write logfile, "  Gantry: X1=0, Y=0, Z=0, R=0, X2=0 (eax_e=9E9 unused)";
 		Write logfile, "";
 		Write logfile, "Gantry Movement:";
 		Write logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm (X1 and X2 synchronized)";

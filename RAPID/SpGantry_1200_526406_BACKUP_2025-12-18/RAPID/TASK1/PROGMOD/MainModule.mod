@@ -852,12 +852,12 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.24
+	! Version: v1.7.25
 	! Date: 2025-12-29
 	! Purpose: Move Robot1 to initial test position
 	! Position: Robot1 [-90,0,0,0,0,0], Gantry X1=Y=Z=R=X2=0
 	! Note: Moves robot first, then gantry slowly to avoid linked motor error
-	! Note: eax_e is not modified (reserved or unused axis)
+	! Note: eax_e set to 9E9 (ABB standard for unused external axis)
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_pos;
 		VAR jointtarget home_pos;
@@ -883,7 +883,7 @@ MODULE MainModule
 			home_pos.extax.eax_b := 0;  ! Y
 			home_pos.extax.eax_c := 0;  ! Z
 			home_pos.extax.eax_d := 0;  ! R
-			! eax_e: keep current value (not used or reserved)
+			home_pos.extax.eax_e := 9E9;  ! Not used (ABB standard for unused axis)
 			home_pos.extax.eax_f := 0;  ! X2 (Master-Follower with X1)
 			MoveAbsJ home_pos, v50, fine, tool0;  ! Slower speed for linked axes
 			TPWrite "Gantry at HOME position";
