@@ -2203,38 +2203,45 @@ MODULE Rob2_MainModule
 		gantry_r_offset := 0;
 
 		! Read gantry offsets from config.txt
+		TPWrite "Opening config.txt...";
 		Open "HOME:/config.txt", configfile \Read;
+		TPWrite "Reading config values...";
+
 		WHILE all_found = FALSE DO
 			line := ReadStr(configfile);
+
 			IF StrFind(line, 1, "GANTRY_X=") = 1 THEN
 				eq_pos := StrFind(line, 1, "=");
-				IF eq_pos > 0 AND StrLen(line) > eq_pos THEN
-					value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
-					found_value := StrToVal(value_str, gantry_x_offset);
-					found_x := TRUE;
-				ENDIF
-			ELSEIF StrFind(line, 1, "GANTRY_Y=") = 1 THEN
-				eq_pos := StrFind(line, 1, "=");
-				IF eq_pos > 0 AND StrLen(line) > eq_pos THEN
-					value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
-					found_value := StrToVal(value_str, gantry_y_offset);
-					found_y := TRUE;
-				ENDIF
-			ELSEIF StrFind(line, 1, "GANTRY_Z=") = 1 THEN
-				eq_pos := StrFind(line, 1, "=");
-				IF eq_pos > 0 AND StrLen(line) > eq_pos THEN
-					value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
-					found_value := StrToVal(value_str, gantry_z_offset);
-					found_z := TRUE;
-				ENDIF
-			ELSEIF StrFind(line, 1, "GANTRY_R=") = 1 THEN
-				eq_pos := StrFind(line, 1, "=");
-				IF eq_pos > 0 AND StrLen(line) > eq_pos THEN
-					value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
-					found_value := StrToVal(value_str, gantry_r_offset);
-					found_r := TRUE;
-				ENDIF
+				value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
+				found_value := StrToVal(value_str, gantry_x_offset);
+				found_x := TRUE;
+				TPWrite "Found GANTRY_X=" + NumToStr(gantry_x_offset, 0);
 			ENDIF
+
+			IF StrFind(line, 1, "GANTRY_Y=") = 1 THEN
+				eq_pos := StrFind(line, 1, "=");
+				value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
+				found_value := StrToVal(value_str, gantry_y_offset);
+				found_y := TRUE;
+				TPWrite "Found GANTRY_Y=" + NumToStr(gantry_y_offset, 0);
+			ENDIF
+
+			IF StrFind(line, 1, "GANTRY_Z=") = 1 THEN
+				eq_pos := StrFind(line, 1, "=");
+				value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
+				found_value := StrToVal(value_str, gantry_z_offset);
+				found_z := TRUE;
+				TPWrite "Found GANTRY_Z=" + NumToStr(gantry_z_offset, 0);
+			ENDIF
+
+			IF StrFind(line, 1, "GANTRY_R=") = 1 THEN
+				eq_pos := StrFind(line, 1, "=");
+				value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
+				found_value := StrToVal(value_str, gantry_r_offset);
+				found_r := TRUE;
+				TPWrite "Found GANTRY_R=" + NumToStr(gantry_r_offset, 1);
+			ENDIF
+
 			! Check if all parameters found
 			IF found_x = TRUE THEN
 				IF found_y = TRUE THEN
@@ -2245,12 +2252,14 @@ MODULE Rob2_MainModule
 					ENDIF
 				ENDIF
 			ENDIF
+
 			! Check EOF
 			IF eof_reached = TRUE THEN
 				all_found := TRUE;
 			ENDIF
 		ENDWHILE
 		Close configfile;
+		TPWrite "Config reading complete!";
 
 		TPWrite "Gantry offsets:";
 		TPWrite "  X=" + NumToStr(gantry_x_offset, 0) + " mm";
@@ -2355,13 +2364,18 @@ MODULE Rob2_MainModule
 	ERROR
 		! Handle EOF when reading config file
 		IF ERRNO = ERR_FILEACC THEN
+			TPWrite "EOF reached in config.txt";
 			eof_reached := TRUE;
 			TRYNEXT;
+		ELSEIF ERRNO = ERR_FILEOPEN THEN
+			TPWrite "ERROR: Cannot open config.txt";
+			STOP;
 		ELSE
-			TPWrite "ERROR in TestGantryFloorCoordinates: " + NumToStr(ERRNO, 0);
+			TPWrite "ERROR in TestGantryFloorCoordinates";
+			TPWrite "ERRNO: " + NumToStr(ERRNO, 0);
 			Close logfile;
 			Close configfile;
-			TRYNEXT;
+			STOP;
 		ENDIF
 	ENDPROC
 
