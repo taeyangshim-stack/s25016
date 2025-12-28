@@ -853,16 +853,18 @@ MODULE MainModule
 	! ========================================
 	! Test Robot1 Base Height
 	! ========================================
-	! Version: v1.7.1
+	! Version: v1.7.2
 	! Date: 2025-12-28
 	! Purpose: Check tool0 TCP height from base at specific joint angles
+	! Output: TP display + /HOME/robot1_base_height.txt
 	PROC TestRobot1BaseHeight()
 		VAR jointtarget test_pos;
 		VAR robtarget tcp_wobj0;
 		VAR robtarget tcp_floor;
+		VAR iodev logfile;
 
 		TPWrite "========================================";
-		TPWrite "Robot1 Base Height Test (v1.7.1)";
+		TPWrite "Robot1 Base Height Test (v1.7.2)";
 
 		! Get current gantry position
 		test_pos := CJointT();
@@ -886,7 +888,7 @@ MODULE MainModule
 		! Read TCP position in Floor coordinate
 		tcp_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
 
-		! Display results
+		! Display on TP
 		TPWrite "Robot1 wobj0:";
 		TPWrite "  X = " + NumToStr(tcp_wobj0.trans.x, 2);
 		TPWrite "  Y = " + NumToStr(tcp_wobj0.trans.y, 2);
@@ -898,6 +900,36 @@ MODULE MainModule
 		TPWrite "  Z = " + NumToStr(tcp_floor.trans.z, 2);
 
 		TPWrite "========================================";
+
+		! Save to log file
+		Open "HOME:/robot1_base_height.txt", logfile \Write;
+
+		Write logfile, "========================================";
+		Write logfile, "Robot1 Base Height Test (v1.7.2)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "Joint Angles: [-90, 0, 0, 0, 0, 0]";
+		Write logfile, "";
+		Write logfile, "Robot1 wobj0 (tool0):";
+		Write logfile, "  X = " + NumToStr(tcp_wobj0.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(tcp_wobj0.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(tcp_wobj0.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "Robot1 Floor (tool0):";
+		Write logfile, "  X = " + NumToStr(tcp_floor.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(tcp_floor.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(tcp_floor.trans.z, 2) + " mm";
+		Write logfile, "========================================\0A";
+
+		Close logfile;
+		TPWrite "Saved to: /HOME/robot1_base_height.txt";
+
+	ERROR
+		TPWrite "ERROR in TestRobot1BaseHeight: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
 	ENDPROC
 
 ENDMODULE
