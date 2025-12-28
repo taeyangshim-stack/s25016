@@ -174,10 +174,16 @@ MODULE Rob2_MainModule
     PERS wobjdata wobjWeldLine2;
     PERS wobjdata wobjRotCtr2;
 
-    ! Work Object Definitions (v1.7.0 2025-12-28)
+    ! Work Object Definitions (v1.7.3 2025-12-28)
     ! WobjFloor: Floor coordinate system from TASK1 (external reference)
-    ! Defined with ufmec="ROB_1" so all tasks use same physical coordinate
     PERS wobjdata WobjFloor;
+
+    ! WobjFloor_Rob2: Floor coordinate system for Robot2 (v1.7.3)
+    ! Robot2 is also upside-down mounted, 488mm offset from Robot1 in +Y direction
+    ! Robot2 wobj0 is already rotated 180deg vs Robot1, so NO rotation needed
+    ! Y offset: 5300 - 488 = 4812 (to align with same physical Floor coordinate)
+    ! Z offset: Same as Robot1 (2100) because both robots at same height on R-axis
+    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 4812, 2100], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
     ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
@@ -1973,13 +1979,13 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Update Robot2 Floor Position
 	! ========================================
-	! Version: v1.7.0
+	! Version: v1.7.3
 	! Date: 2025-12-28
 	! Purpose: Update Robot2 TCP position in Floor coordinate system
-	! WobjFloor is defined with ufmec="ROB_1" so both robots use same physical coordinate
+	! Uses WobjFloor_Rob2 which has no rotation (Robot2 wobj0 already rotated)
 	! Used for distance measurement between robots
 	PROC UpdateRobot2FloorPosition()
-		robot2_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+		robot2_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjFloor_Rob2);
 	ENDPROC
 
 	! ========================================
@@ -2071,9 +2077,10 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Robot2 Base Height
 	! ========================================
-	! Version: v1.7.2
+	! Version: v1.7.3
 	! Date: 2025-12-28
 	! Purpose: Check tool0 TCP height from base at specific joint angles
+	! Uses WobjFloor_Rob2 (no rotation, adjusted Y offset)
 	! Output: TP display + /HOME/robot2_base_height.txt
 	PROC TestRobot2BaseHeight()
 		VAR jointtarget test_pos;
@@ -2082,7 +2089,7 @@ MODULE Rob2_MainModule
 		VAR iodev logfile;
 
 		TPWrite "========================================";
-		TPWrite "Robot2 Base Height Test (v1.7.2)";
+		TPWrite "Robot2 Base Height Test (v1.7.3)";
 
 		! Get current position
 		test_pos := CJointT();
@@ -2103,8 +2110,8 @@ MODULE Rob2_MainModule
 		! Read TCP position in wobj0
 		tcp_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
 
-		! Read TCP position in Floor coordinate
-		tcp_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+		! Read TCP position in Floor coordinate (using Robot2-specific Floor)
+		tcp_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor_Rob2);
 
 		! Display on TP
 		TPWrite "Robot2 wobj0:";
@@ -2112,7 +2119,7 @@ MODULE Rob2_MainModule
 		TPWrite "  Y = " + NumToStr(tcp_wobj0.trans.y, 2);
 		TPWrite "  Z = " + NumToStr(tcp_wobj0.trans.z, 2);
 
-		TPWrite "Robot2 Floor:";
+		TPWrite "Robot2 Floor (WobjFloor_Rob2):";
 		TPWrite "  X = " + NumToStr(tcp_floor.trans.x, 2);
 		TPWrite "  Y = " + NumToStr(tcp_floor.trans.y, 2);
 		TPWrite "  Z = " + NumToStr(tcp_floor.trans.z, 2);
@@ -2123,7 +2130,7 @@ MODULE Rob2_MainModule
 		Open "HOME:/robot2_base_height.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Robot2 Base Height Test (v1.7.2)";
+		Write logfile, "Robot2 Base Height Test (v1.7.3)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
@@ -2135,7 +2142,7 @@ MODULE Rob2_MainModule
 		Write logfile, "  Y = " + NumToStr(tcp_wobj0.trans.y, 2) + " mm";
 		Write logfile, "  Z = " + NumToStr(tcp_wobj0.trans.z, 2) + " mm";
 		Write logfile, "";
-		Write logfile, "Robot2 Floor (tool0):";
+		Write logfile, "Robot2 Floor (tool0) - using WobjFloor_Rob2:";
 		Write logfile, "  X = " + NumToStr(tcp_floor.trans.x, 2) + " mm";
 		Write logfile, "  Y = " + NumToStr(tcp_floor.trans.y, 2) + " mm";
 		Write logfile, "  Z = " + NumToStr(tcp_floor.trans.z, 2) + " mm";
