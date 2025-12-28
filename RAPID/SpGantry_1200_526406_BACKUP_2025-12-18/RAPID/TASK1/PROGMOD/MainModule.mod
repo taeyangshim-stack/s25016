@@ -114,9 +114,10 @@ MODULE MainModule
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
-	! Work Object Definitions (v1.2.0 2025-12-18)
-	! WobjFloor: Floor coordinate system at [-9500, 5300, 2100] from World
-	PERS wobjdata WobjFloor := [FALSE, TRUE, "", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+	! Work Object Definitions (v1.7.0 2025-12-28)
+	! WobjFloor: Floor coordinate system at [-9500, 5300, 2100] from ROB_1 base
+	! ufmec="ROB_1" ensures all tasks use same physical coordinate system
+	PERS wobjdata WobjFloor := [FALSE, TRUE, "ROB_1", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
 	! wobjRob1Base: Robot1 Base Frame = GantryRob coordinate system (Y-axis 90° rotation)
 	! Quaternion [0, 0.707107, 0, 0.707107] = Y-axis 90° rotation

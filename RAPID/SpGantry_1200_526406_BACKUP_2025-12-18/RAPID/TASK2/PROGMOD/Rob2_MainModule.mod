@@ -174,16 +174,10 @@ MODULE Rob2_MainModule
     PERS wobjdata wobjWeldLine2;
     PERS wobjdata wobjRotCtr2;
 
-    ! Work Object Definitions (v1.2.0 2025-12-18)
-    ! WobjFloor: Floor coordinate system from Robot1 (external reference)
-    ! Robot1 wobj0 -> Floor: X-axis 180deg rotation + offset
+    ! Work Object Definitions (v1.7.0 2025-12-28)
+    ! WobjFloor: Floor coordinate system from TASK1 (external reference)
+    ! Defined with ufmec="ROB_1" so all tasks use same physical coordinate
     PERS wobjdata WobjFloor;
-
-    ! WobjFloor_Rob2: Floor coordinate system for Robot2 (v1.6.1 2025-12-28)
-    ! Robot2 wobj0 is +488mm in Robot1's +Y direction
-    ! Robot2 wobj0 is already rotated 180deg vs Robot1, so no rotation needed
-    ! Y offset: 5300 - 488 = 4812
-    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 4812, 2100], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
     ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
@@ -1979,13 +1973,13 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Update Robot2 Floor Position
 	! ========================================
-	! Version: v1.6.1
+	! Version: v1.7.0
 	! Date: 2025-12-28
-	! Purpose: Update Robot2 TCP position in Robot2-specific Floor coordinate system
-	! Uses WobjFloor_Rob2 which accounts for Robot2's 180deg rotated wobj0
+	! Purpose: Update Robot2 TCP position in Floor coordinate system
+	! WobjFloor is defined with ufmec="ROB_1" so both robots use same physical coordinate
 	! Used for distance measurement between robots
 	PROC UpdateRobot2FloorPosition()
-		robot2_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjFloor_Rob2);
+		robot2_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjFloor);
 	ENDPROC
 
 	! ========================================
