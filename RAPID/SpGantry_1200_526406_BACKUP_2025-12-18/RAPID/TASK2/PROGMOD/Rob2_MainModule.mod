@@ -178,14 +178,12 @@ MODULE Rob2_MainModule
     ! WobjFloor: Floor coordinate system from TASK1 (external reference)
     PERS wobjdata WobjFloor;
 
-    ! WobjFloor_Rob2: Floor coordinate system for Robot2 (v1.7.5)
+    ! WobjFloor_Rob2: Floor coordinate system for Robot2 (v1.7.6)
     ! Robot2 is also upside-down mounted, 488mm offset from Robot1 in +Y direction
     ! Robot2 needs SAME 180deg rotation as Robot1 to align wobj0 -> Floor
     ! Y offset: 5300 - 488 = 4812 (to align with same physical Floor coordinate)
-    ! Z offset: 321.80 (adjusted for Robot2 wobj0 Z being opposite sign vs Robot1)
-    !   Robot1 wobj0 Z = +889.10 → Floor Z = 1210.90
-    !   Robot2 wobj0 Z = -889.10 → (180deg) → +889.10 → offset 321.80 → Floor Z = 1210.90
-    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 4812, 321.80], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+    ! Z offset: -2100 (opposite sign from Robot1 due to Robot2 base orientation)
+    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 4812, -2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
     ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
