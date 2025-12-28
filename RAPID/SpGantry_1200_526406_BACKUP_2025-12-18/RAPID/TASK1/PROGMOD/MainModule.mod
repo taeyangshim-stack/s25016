@@ -114,10 +114,8 @@ MODULE MainModule
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
-	! Work Object Definitions (v1.7.3 2025-12-28)
+	! Work Object Definitions (v1.7.7 2025-12-28)
 	! WobjFloor: Floor coordinate system for Robot1
-	! Offset from Robot1 base: [-9500, 5300, 2100]
-	! X-axis 180deg rotation [0,1,0,0] to align with upside-down mounting
 	PERS wobjdata WobjFloor := [FALSE, TRUE, "", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
 	! wobjRob1Base: Robot1 Base Frame = GantryRob coordinate system (Y-axis 90° rotation)
