@@ -186,7 +186,7 @@ MODULE Rob2_MainModule
     ! Robot1 TCP position from TASK1 (external reference)
     PERS robtarget robot1_floor_pos;
     ! Robot1 wobj0 snapshot from TASK1 (external reference)
-    PERS wobjdata robot1_wobj0_snapshot;
+    PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
     ! Robot2 TCP position in Floor coordinate system (for distance measurement)
     ! Shared across tasks - use PERS (not TASK PERS) for cross-task access
