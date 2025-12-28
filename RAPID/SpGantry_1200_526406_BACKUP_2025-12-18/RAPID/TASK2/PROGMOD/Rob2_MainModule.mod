@@ -2158,7 +2158,7 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.20
+	! Version: v1.7.21
 	! Date: 2025-12-29
 	! Purpose: Test if Floor coordinates change when gantry moves
 	! Reads gantry movement from config.txt (X, Y, Z, R)
@@ -2187,7 +2187,7 @@ MODULE Rob2_MainModule
 		VAR num gantry_r_offset;
 
 		TPWrite "========================================";
-		TPWrite "Gantry Floor Test (v1.7.20)";
+		TPWrite "Gantry Floor Test (v1.7.21)";
 
 		! Initialize variables
 		gantry_x_offset := 0;
@@ -2222,48 +2222,56 @@ MODULE Rob2_MainModule
 		! Read GANTRY_X
 		found_x := FALSE;
 		WHILE found_x = FALSE DO
-			line := ReadStr(configfile);
+			line := ReadStr(configfile \RemoveCR);
 			IF StrFind(line, 1, "GANTRY_X=") = 1 THEN
-				value_str := StrPart(line, 10, StrLen(line) - 9);
-				found_value := StrToVal(value_str, gantry_x_offset);
-				found_x := TRUE;
-				TPWrite "Found GANTRY_X=" + NumToStr(gantry_x_offset, 0);
+				IF StrLen(line) >= 10 THEN
+					value_str := StrPart(line, 10, StrLen(line) - 9);
+					found_value := StrToVal(value_str, gantry_x_offset);
+					found_x := TRUE;
+					TPWrite "Found GANTRY_X=" + NumToStr(gantry_x_offset, 0);
+				ENDIF
 			ENDIF
 		ENDWHILE
 
 		! Read GANTRY_Y
 		found_y := FALSE;
 		WHILE found_y = FALSE DO
-			line := ReadStr(configfile);
+			line := ReadStr(configfile \RemoveCR);
 			IF StrFind(line, 1, "GANTRY_Y=") = 1 THEN
-				value_str := StrPart(line, 10, StrLen(line) - 9);
-				found_value := StrToVal(value_str, gantry_y_offset);
-				found_y := TRUE;
-				TPWrite "Found GANTRY_Y=" + NumToStr(gantry_y_offset, 0);
+				IF StrLen(line) >= 10 THEN
+					value_str := StrPart(line, 10, StrLen(line) - 9);
+					found_value := StrToVal(value_str, gantry_y_offset);
+					found_y := TRUE;
+					TPWrite "Found GANTRY_Y=" + NumToStr(gantry_y_offset, 0);
+				ENDIF
 			ENDIF
 		ENDWHILE
 
 		! Read GANTRY_Z
 		found_z := FALSE;
 		WHILE found_z = FALSE DO
-			line := ReadStr(configfile);
+			line := ReadStr(configfile \RemoveCR);
 			IF StrFind(line, 1, "GANTRY_Z=") = 1 THEN
-				value_str := StrPart(line, 10, StrLen(line) - 9);
-				found_value := StrToVal(value_str, gantry_z_offset);
-				found_z := TRUE;
-				TPWrite "Found GANTRY_Z=" + NumToStr(gantry_z_offset, 0);
+				IF StrLen(line) >= 10 THEN
+					value_str := StrPart(line, 10, StrLen(line) - 9);
+					found_value := StrToVal(value_str, gantry_z_offset);
+					found_z := TRUE;
+					TPWrite "Found GANTRY_Z=" + NumToStr(gantry_z_offset, 0);
+				ENDIF
 			ENDIF
 		ENDWHILE
 
 		! Read GANTRY_R
 		found_r := FALSE;
 		WHILE found_r = FALSE DO
-			line := ReadStr(configfile);
+			line := ReadStr(configfile \RemoveCR);
 			IF StrFind(line, 1, "GANTRY_R=") = 1 THEN
-				value_str := StrPart(line, 10, StrLen(line) - 9);
-				found_value := StrToVal(value_str, gantry_r_offset);
-				found_r := TRUE;
-				TPWrite "Found GANTRY_R=" + NumToStr(gantry_r_offset, 1);
+				IF StrLen(line) >= 10 THEN
+					value_str := StrPart(line, 10, StrLen(line) - 9);
+					found_value := StrToVal(value_str, gantry_r_offset);
+					found_r := TRUE;
+					TPWrite "Found GANTRY_R=" + NumToStr(gantry_r_offset, 1);
+				ENDIF
 			ENDIF
 		ENDWHILE
 
@@ -2318,7 +2326,7 @@ MODULE Rob2_MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.20)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.21)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
