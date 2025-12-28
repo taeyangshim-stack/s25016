@@ -2158,12 +2158,13 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.22
+	! Version: v1.7.23
 	! Date: 2025-12-29
 	! Purpose: Test if Floor coordinates change when gantry moves
 	! Reads gantry movement from config.txt (X, Y, Z, R)
-	! Initial position: Robot1 [-90,0,0,0,0,0], Robot2 [+90,0,0,0,0,0], Gantry [0,0,0,0]
+	! Initial position: Robot1 [-90,0,0,0,0,0], Robot2 [+90,0,0,0,0,0], Gantry [0,0,0,0,0,0]
 	! Note: This procedure controls BOTH robots automatically
+	! Note: X1 and X2 axes move together (Master-Follower synchronization)
 	! Output: /HOME/gantry_floor_test.txt
 	PROC TestGantryFloorCoordinates()
 		VAR jointtarget rob1_init;
@@ -2189,7 +2190,7 @@ MODULE Rob2_MainModule
 		VAR num gantry_r_offset;
 
 		TPWrite "========================================";
-		TPWrite "Gantry Floor Test (v1.7.22)";
+		TPWrite "Gantry Floor Test (v1.7.23)";
 
 		! Initialize variables
 		gantry_x_offset := 0;
@@ -2210,21 +2211,37 @@ MODULE Rob2_MainModule
 		ENDIF
 		TPWrite "Robot1 position OK (J1=-90)";
 
-		! Move Robot2 to initial test position
+		! Move Robot2 to initial test position (keep current gantry position)
 		TPWrite "Moving Robot2 to initial position...";
 		rob2_init := CJointT();
+		! Set robot joints only
 		rob2_init.robax.rax_1 := 90;
 		rob2_init.robax.rax_2 := 0;
 		rob2_init.robax.rax_3 := 0;
 		rob2_init.robax.rax_4 := 0;
 		rob2_init.robax.rax_5 := 0;
 		rob2_init.robax.rax_6 := 0;
-		rob2_init.extax.eax_a := 0;
-		rob2_init.extax.eax_b := 0;
-		rob2_init.extax.eax_c := 0;
-		rob2_init.extax.eax_d := 0;
+		! Keep current gantry position (DO NOT force to 0)
+		! extax values already set by CJointT()
 		MoveAbsJ rob2_init, v100, fine, tool0;
 		TPWrite "Robot2 initial position reached!";
+
+		! Now move gantry to HOME slowly if needed
+		home_pos := rob2_init;
+		IF home_pos.extax.eax_a <> 0 OR home_pos.extax.eax_b <> 0 OR home_pos.extax.eax_c <> 0 OR home_pos.extax.eax_d <> 0 OR home_pos.extax.eax_e <> 0 OR home_pos.extax.eax_f <> 0 THEN
+			TPWrite "Moving gantry to HOME position...";
+			home_pos.extax.eax_a := 0;  ! X1
+			home_pos.extax.eax_b := 0;  ! Y
+			home_pos.extax.eax_c := 0;  ! Z
+			home_pos.extax.eax_d := 0;  ! R
+			home_pos.extax.eax_e := 0;  ! num
+			home_pos.extax.eax_f := 0;  ! X2 (Master-Follower with X1)
+			MoveAbsJ home_pos, v50, fine, tool0;  ! Slower speed for gantry
+			TPWrite "Gantry at HOME position";
+		ELSE
+			TPWrite "Gantry already at HOME position";
+			home_pos := rob2_init;
+		ENDIF
 		TPWrite "Both robots ready!";
 
 		! Read gantry offsets from config.txt (simple approach)
@@ -2317,10 +2334,12 @@ MODULE Rob2_MainModule
 		! Move gantry axes (only non-zero offsets)
 		TPWrite "Moving gantry...";
 		moved_pos := home_pos;
-		moved_pos.extax.eax_a := gantry_x_offset;  ! X axis (mm)
+		moved_pos.extax.eax_a := gantry_x_offset;  ! X1 axis (mm)
 		moved_pos.extax.eax_b := gantry_y_offset;  ! Y axis (mm)
 		moved_pos.extax.eax_c := gantry_z_offset;  ! Z axis (mm)
 		moved_pos.extax.eax_d := gantry_r_offset;  ! R axis (degrees)
+		moved_pos.extax.eax_e := 0;  ! num (keep at 0)
+		moved_pos.extax.eax_f := gantry_x_offset;  ! X2 axis (mm) - same as X1 for Master-Follower sync
 		MoveAbsJ moved_pos, v100, fine, tool0;
 		WaitTime 1.0;
 
@@ -2339,7 +2358,7 @@ MODULE Rob2_MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.22)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.23)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
@@ -2347,10 +2366,10 @@ MODULE Rob2_MainModule
 		Write logfile, "Initial Position:";
 		Write logfile, "  Robot1: [-90,0,0,0,0,0]";
 		Write logfile, "  Robot2: [+90,0,0,0,0,0]";
-		Write logfile, "  Gantry: [0,0,0,0]";
+		Write logfile, "  Gantry: [0,0,0,0,0,0] (X1,Y,Z,R,num,X2)";
 		Write logfile, "";
 		Write logfile, "Gantry Movement:";
-		Write logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm";
+		Write logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm (X1 and X2 synchronized)";
 		Write logfile, "  Y = " + NumToStr(gantry_y_offset, 2) + " mm";
 		Write logfile, "  Z = " + NumToStr(gantry_z_offset, 2) + " mm";
 		Write logfile, "  R = " + NumToStr(gantry_r_offset, 2) + " deg";
