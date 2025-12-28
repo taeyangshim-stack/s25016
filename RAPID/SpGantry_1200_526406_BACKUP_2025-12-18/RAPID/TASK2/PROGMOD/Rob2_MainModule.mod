@@ -2158,12 +2158,14 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.17
-	! Date: 2025-12-28
+	! Version: v1.7.18
+	! Date: 2025-12-29
 	! Purpose: Test if Floor coordinates change when gantry moves
 	! Reads gantry movement from config.txt (X, Y, Z, R)
+	! Initial position: Robot1 [-90,0,0,0,0,0], Robot2 [+90,0,0,0,0,0], Gantry [0,0,0,0]
 	! Output: /HOME/gantry_floor_test.txt
 	PROC TestGantryFloorCoordinates()
+		VAR jointtarget initial_pos;
 		VAR jointtarget home_pos;
 		VAR jointtarget moved_pos;
 		VAR robtarget rob1_floor_before;
@@ -2188,9 +2190,9 @@ MODULE Rob2_MainModule
 		VAR num gantry_r_offset;
 
 		TPWrite "========================================";
-		TPWrite "Gantry Floor Test (v1.7.17)";
+		TPWrite "Gantry Floor Test (v1.7.18)";
 
-		! Initialize
+		! Initialize variables
 		found_x := FALSE;
 		found_y := FALSE;
 		found_z := FALSE;
@@ -2201,6 +2203,25 @@ MODULE Rob2_MainModule
 		gantry_y_offset := 0;
 		gantry_z_offset := 0;
 		gantry_r_offset := 0;
+
+		! Move to initial test position
+		TPWrite "Moving to initial position...";
+		initial_pos := CJointT();
+		! Robot2 joint angles: [+90, 0, 0, 0, 0, 0]
+		initial_pos.robax.rax_1 := 90;
+		initial_pos.robax.rax_2 := 0;
+		initial_pos.robax.rax_3 := 0;
+		initial_pos.robax.rax_4 := 0;
+		initial_pos.robax.rax_5 := 0;
+		initial_pos.robax.rax_6 := 0;
+		! Gantry axes: [0, 0, 0, 0]
+		initial_pos.extax.eax_a := 0;
+		initial_pos.extax.eax_b := 0;
+		initial_pos.extax.eax_c := 0;
+		initial_pos.extax.eax_d := 0;
+		MoveAbsJ initial_pos, v100, fine, tool0;
+		TPWrite "Initial position reached!";
+		TPWrite "Robot2: [+90,0,0,0,0,0], Gantry: [0,0,0,0]";
 
 		! Read gantry offsets from config.txt
 		TPWrite "Opening config.txt...";
@@ -2325,10 +2346,15 @@ MODULE Rob2_MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.17)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.18)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "Initial Position:";
+		Write logfile, "  Robot1: [-90,0,0,0,0,0]";
+		Write logfile, "  Robot2: [+90,0,0,0,0,0]";
+		Write logfile, "  Gantry: [0,0,0,0]";
 		Write logfile, "";
 		Write logfile, "Gantry Movement:";
 		Write logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm";

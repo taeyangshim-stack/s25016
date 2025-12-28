@@ -850,6 +850,35 @@ MODULE MainModule
 	ENDPROC
 
 	! ========================================
+	! Set Robot1 Initial Position for Gantry Test
+	! ========================================
+	! Version: v1.7.18
+	! Date: 2025-12-29
+	! Purpose: Move Robot1 to initial test position
+	! Position: Robot1 [-90,0,0,0,0,0], Gantry [0,0,0,0]
+	PROC SetRobot1InitialPosition()
+		VAR jointtarget initial_pos;
+
+		TPWrite "Moving Robot1 to initial position...";
+		initial_pos := CJointT();
+		! Robot1 joint angles: [-90, 0, 0, 0, 0, 0]
+		initial_pos.robax.rax_1 := -90;
+		initial_pos.robax.rax_2 := 0;
+		initial_pos.robax.rax_3 := 0;
+		initial_pos.robax.rax_4 := 0;
+		initial_pos.robax.rax_5 := 0;
+		initial_pos.robax.rax_6 := 0;
+		! Gantry axes: [0, 0, 0, 0]
+		initial_pos.extax.eax_a := 0;
+		initial_pos.extax.eax_b := 0;
+		initial_pos.extax.eax_c := 0;
+		initial_pos.extax.eax_d := 0;
+		MoveAbsJ initial_pos, v100, fine, tool0;
+		TPWrite "Robot1 initial position reached!";
+		TPWrite "Robot1: [-90,0,0,0,0,0], Gantry: [0,0,0,0]";
+	ENDPROC
+
+	! ========================================
 	! Test Robot1 Base Height
 	! ========================================
 	! Version: v1.7.14
