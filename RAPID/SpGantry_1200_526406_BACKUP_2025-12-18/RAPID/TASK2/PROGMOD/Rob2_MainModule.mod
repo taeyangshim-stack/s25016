@@ -2158,14 +2158,16 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.21
+	! Version: v1.7.22
 	! Date: 2025-12-29
 	! Purpose: Test if Floor coordinates change when gantry moves
 	! Reads gantry movement from config.txt (X, Y, Z, R)
 	! Initial position: Robot1 [-90,0,0,0,0,0], Robot2 [+90,0,0,0,0,0], Gantry [0,0,0,0]
+	! Note: This procedure controls BOTH robots automatically
 	! Output: /HOME/gantry_floor_test.txt
 	PROC TestGantryFloorCoordinates()
-		VAR jointtarget initial_pos;
+		VAR jointtarget rob1_init;
+		VAR jointtarget rob2_init;
 		VAR jointtarget home_pos;
 		VAR jointtarget moved_pos;
 		VAR robtarget rob1_floor_before;
@@ -2187,7 +2189,7 @@ MODULE Rob2_MainModule
 		VAR num gantry_r_offset;
 
 		TPWrite "========================================";
-		TPWrite "Gantry Floor Test (v1.7.21)";
+		TPWrite "Gantry Floor Test (v1.7.22)";
 
 		! Initialize variables
 		gantry_x_offset := 0;
@@ -2195,24 +2197,43 @@ MODULE Rob2_MainModule
 		gantry_z_offset := 0;
 		gantry_r_offset := 0;
 
-		! Move to initial test position
-		TPWrite "Moving to initial position...";
-		initial_pos := CJointT();
-		! Robot2 joint angles: [+90, 0, 0, 0, 0, 0]
-		initial_pos.robax.rax_1 := 90;
-		initial_pos.robax.rax_2 := 0;
-		initial_pos.robax.rax_3 := 0;
-		initial_pos.robax.rax_4 := 0;
-		initial_pos.robax.rax_5 := 0;
-		initial_pos.robax.rax_6 := 0;
-		! Gantry axes: [0, 0, 0, 0]
-		initial_pos.extax.eax_a := 0;
-		initial_pos.extax.eax_b := 0;
-		initial_pos.extax.eax_c := 0;
-		initial_pos.extax.eax_d := 0;
-		MoveAbsJ initial_pos, v100, fine, tool0;
-		TPWrite "Initial position reached!";
-		TPWrite "Robot2: [+90,0,0,0,0,0], Gantry: [0,0,0,0]";
+		! Move BOTH robots to initial test position
+		TPWrite "Moving Robot1 and Robot2 to initial positions...";
+
+		! Setup Robot1 initial position: [-90, 0, 0, 0, 0, 0], Gantry [0,0,0,0]
+		rob1_init := CJointT(\TaskName:="T_ROB1");
+		rob1_init.robax.rax_1 := -90;
+		rob1_init.robax.rax_2 := 0;
+		rob1_init.robax.rax_3 := 0;
+		rob1_init.robax.rax_4 := 0;
+		rob1_init.robax.rax_5 := 0;
+		rob1_init.robax.rax_6 := 0;
+		rob1_init.extax.eax_a := 0;
+		rob1_init.extax.eax_b := 0;
+		rob1_init.extax.eax_c := 0;
+		rob1_init.extax.eax_d := 0;
+
+		! Setup Robot2 initial position: [+90, 0, 0, 0, 0, 0], Gantry [0,0,0,0]
+		rob2_init := CJointT();
+		rob2_init.robax.rax_1 := 90;
+		rob2_init.robax.rax_2 := 0;
+		rob2_init.robax.rax_3 := 0;
+		rob2_init.robax.rax_4 := 0;
+		rob2_init.robax.rax_5 := 0;
+		rob2_init.robax.rax_6 := 0;
+		rob2_init.extax.eax_a := 0;
+		rob2_init.extax.eax_b := 0;
+		rob2_init.extax.eax_c := 0;
+		rob2_init.extax.eax_d := 0;
+
+		! Move Robot1 first (controls gantry)
+		MoveExtJ rob1_init, v100, fine, tool0 \ID:=1;
+		TPWrite "Robot1 moved to initial position";
+
+		! Move Robot2
+		MoveAbsJ rob2_init, v100, fine, tool0;
+		TPWrite "Robot2 moved to initial position";
+		TPWrite "Both robots ready!";
 
 		! Read gantry offsets from config.txt (simple approach)
 		TPWrite "Opening config.txt...";
@@ -2326,7 +2347,7 @@ MODULE Rob2_MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.21)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.22)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
