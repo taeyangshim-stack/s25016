@@ -2092,8 +2092,8 @@ MODULE Rob2_MainModule
 		! Get current position
 		test_pos := CJointT();
 
-		! Set robot joints to [+90, 0, 0, 0, 0, 0]
-		test_pos.robax.rax_1 := 90;
+		! Set robot joints to [-90, 0, 0, 0, 0, 0]
+		test_pos.robax.rax_1 := -90;
 		test_pos.robax.rax_2 := 0;
 		test_pos.robax.rax_3 := 0;
 		test_pos.robax.rax_4 := 0;
@@ -2101,7 +2101,7 @@ MODULE Rob2_MainModule
 		test_pos.robax.rax_6 := 0;
 
 		! Move to test position
-		TPWrite "Moving to test position [+90,0,0,0,0,0]...";
+		TPWrite "Moving to test position [-90,0,0,0,0,0]...";
 		MoveAbsJ test_pos, v100, fine, tool0;
 		WaitTime 0.5;
 
@@ -2133,7 +2133,7 @@ MODULE Rob2_MainModule
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
 		Write logfile, "";
-		Write logfile, "Joint Angles: [+90, 0, 0, 0, 0, 0]";
+		Write logfile, "Joint Angles: [-90, 0, 0, 0, 0, 0]";
 		Write logfile, "";
 		Write logfile, "Robot2 wobj0 (tool0):";
 		Write logfile, "  X = " + NumToStr(tcp_wobj0.trans.x, 2) + " mm";
