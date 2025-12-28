@@ -2075,7 +2075,7 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Robot2 Base Height
 	! ========================================
-	! Version: v1.7.13
+	! Version: v1.7.14
 	! Date: 2025-12-28
 	! Purpose: Check tool0 TCP height from base at specific joint angles
 	! Uses WobjFloor_Rob2
@@ -2087,7 +2087,7 @@ MODULE Rob2_MainModule
 		VAR iodev logfile;
 
 		TPWrite "========================================";
-		TPWrite "Robot2 Base Height Test (v1.7.13)";
+		TPWrite "Robot2 Base Height Test (v1.7.14)";
 
 		! Get current position
 		test_pos := CJointT();
@@ -2128,7 +2128,7 @@ MODULE Rob2_MainModule
 		Open "HOME:/robot2_base_height.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Robot2 Base Height Test (v1.7.13)";
+		Write logfile, "Robot2 Base Height Test (v1.7.14)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();

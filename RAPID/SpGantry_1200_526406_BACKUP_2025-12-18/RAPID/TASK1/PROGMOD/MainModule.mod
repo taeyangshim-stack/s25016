@@ -852,7 +852,7 @@ MODULE MainModule
 	! ========================================
 	! Test Robot1 Base Height
 	! ========================================
-	! Version: v1.7.2
+	! Version: v1.7.14
 	! Date: 2025-12-28
 	! Purpose: Check tool0 TCP height from base at specific joint angles
 	! Output: TP display + /HOME/robot1_base_height.txt
@@ -863,7 +863,7 @@ MODULE MainModule
 		VAR iodev logfile;
 
 		TPWrite "========================================";
-		TPWrite "Robot1 Base Height Test (v1.7.2)";
+		TPWrite "Robot1 Base Height Test (v1.7.14)";
 
 		! Get current gantry position
 		test_pos := CJointT();
@@ -904,7 +904,7 @@ MODULE MainModule
 		Open "HOME:/robot1_base_height.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Robot1 Base Height Test (v1.7.2)";
+		Write logfile, "Robot1 Base Height Test (v1.7.14)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
