@@ -2197,23 +2197,21 @@ MODULE Rob2_MainModule
 		gantry_z_offset := 0;
 		gantry_r_offset := 0;
 
-		! Move BOTH robots to initial test position
-		TPWrite "Moving Robot1 and Robot2 to initial positions...";
-
-		! Setup Robot1 initial position: [-90, 0, 0, 0, 0, 0], Gantry [0,0,0,0]
+		! Check Robot1 position
+		TPWrite "Checking Robot1 position...";
 		rob1_init := CJointT(\TaskName:="T_ROB1");
-		rob1_init.robax.rax_1 := -90;
-		rob1_init.robax.rax_2 := 0;
-		rob1_init.robax.rax_3 := 0;
-		rob1_init.robax.rax_4 := 0;
-		rob1_init.robax.rax_5 := 0;
-		rob1_init.robax.rax_6 := 0;
-		rob1_init.extax.eax_a := 0;
-		rob1_init.extax.eax_b := 0;
-		rob1_init.extax.eax_c := 0;
-		rob1_init.extax.eax_d := 0;
+		IF Abs(rob1_init.robax.rax_1 + 90) > 5 THEN
+			TPWrite "WARNING: Robot1 is NOT at initial position!";
+			TPWrite "Current Robot1 J1: " + NumToStr(rob1_init.robax.rax_1, 1);
+			TPWrite "Expected: -90 degrees";
+			TPWrite "Please run TASK1->SetRobot1InitialPosition first";
+			TPWrite "Then re-run this test";
+			STOP;
+		ENDIF
+		TPWrite "Robot1 position OK (J1=-90)";
 
-		! Setup Robot2 initial position: [+90, 0, 0, 0, 0, 0], Gantry [0,0,0,0]
+		! Move Robot2 to initial test position
+		TPWrite "Moving Robot2 to initial position...";
 		rob2_init := CJointT();
 		rob2_init.robax.rax_1 := 90;
 		rob2_init.robax.rax_2 := 0;
@@ -2225,14 +2223,8 @@ MODULE Rob2_MainModule
 		rob2_init.extax.eax_b := 0;
 		rob2_init.extax.eax_c := 0;
 		rob2_init.extax.eax_d := 0;
-
-		! Move Robot1 first (controls gantry)
-		MoveExtJ rob1_init, v100, fine, tool0 \ID:=1;
-		TPWrite "Robot1 moved to initial position";
-
-		! Move Robot2
 		MoveAbsJ rob2_init, v100, fine, tool0;
-		TPWrite "Robot2 moved to initial position";
+		TPWrite "Robot2 initial position reached!";
 		TPWrite "Both robots ready!";
 
 		! Read gantry offsets from config.txt (simple approach)
