@@ -2158,7 +2158,7 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.18
+	! Version: v1.7.19
 	! Date: 2025-12-29
 	! Purpose: Test if Floor coordinates change when gantry moves
 	! Reads gantry movement from config.txt (X, Y, Z, R)
@@ -2190,7 +2190,7 @@ MODULE Rob2_MainModule
 		VAR num gantry_r_offset;
 
 		TPWrite "========================================";
-		TPWrite "Gantry Floor Test (v1.7.18)";
+		TPWrite "Gantry Floor Test (v1.7.19)";
 
 		! Initialize variables
 		found_x := FALSE;
@@ -2241,9 +2241,7 @@ MODULE Rob2_MainModule
 						TPWrite "Found GANTRY_X=" + NumToStr(gantry_x_offset, 0);
 					ENDIF
 				ENDIF
-			ENDIF
-
-			IF StrFind(line, 1, "GANTRY_Y=") = 1 THEN
+			ELSEIF StrFind(line, 1, "GANTRY_Y=") = 1 THEN
 				eq_pos := StrFind(line, 1, "=");
 				IF eq_pos > 0 THEN
 					IF StrLen(line) > eq_pos THEN
@@ -2253,9 +2251,7 @@ MODULE Rob2_MainModule
 						TPWrite "Found GANTRY_Y=" + NumToStr(gantry_y_offset, 0);
 					ENDIF
 				ENDIF
-			ENDIF
-
-			IF StrFind(line, 1, "GANTRY_Z=") = 1 THEN
+			ELSEIF StrFind(line, 1, "GANTRY_Z=") = 1 THEN
 				eq_pos := StrFind(line, 1, "=");
 				IF eq_pos > 0 THEN
 					IF StrLen(line) > eq_pos THEN
@@ -2265,9 +2261,7 @@ MODULE Rob2_MainModule
 						TPWrite "Found GANTRY_Z=" + NumToStr(gantry_z_offset, 0);
 					ENDIF
 				ENDIF
-			ENDIF
-
-			IF StrFind(line, 1, "GANTRY_R=") = 1 THEN
+			ELSEIF StrFind(line, 1, "GANTRY_R=") = 1 THEN
 				eq_pos := StrFind(line, 1, "=");
 				IF eq_pos > 0 THEN
 					IF StrLen(line) > eq_pos THEN
@@ -2346,7 +2340,7 @@ MODULE Rob2_MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.18)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.19)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
