@@ -2212,34 +2212,50 @@ MODULE Rob2_MainModule
 
 			IF StrFind(line, 1, "GANTRY_X=") = 1 THEN
 				eq_pos := StrFind(line, 1, "=");
-				value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
-				found_value := StrToVal(value_str, gantry_x_offset);
-				found_x := TRUE;
-				TPWrite "Found GANTRY_X=" + NumToStr(gantry_x_offset, 0);
+				IF eq_pos > 0 THEN
+					IF StrLen(line) > eq_pos THEN
+						value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
+						found_value := StrToVal(value_str, gantry_x_offset);
+						found_x := TRUE;
+						TPWrite "Found GANTRY_X=" + NumToStr(gantry_x_offset, 0);
+					ENDIF
+				ENDIF
 			ENDIF
 
 			IF StrFind(line, 1, "GANTRY_Y=") = 1 THEN
 				eq_pos := StrFind(line, 1, "=");
-				value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
-				found_value := StrToVal(value_str, gantry_y_offset);
-				found_y := TRUE;
-				TPWrite "Found GANTRY_Y=" + NumToStr(gantry_y_offset, 0);
+				IF eq_pos > 0 THEN
+					IF StrLen(line) > eq_pos THEN
+						value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
+						found_value := StrToVal(value_str, gantry_y_offset);
+						found_y := TRUE;
+						TPWrite "Found GANTRY_Y=" + NumToStr(gantry_y_offset, 0);
+					ENDIF
+				ENDIF
 			ENDIF
 
 			IF StrFind(line, 1, "GANTRY_Z=") = 1 THEN
 				eq_pos := StrFind(line, 1, "=");
-				value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
-				found_value := StrToVal(value_str, gantry_z_offset);
-				found_z := TRUE;
-				TPWrite "Found GANTRY_Z=" + NumToStr(gantry_z_offset, 0);
+				IF eq_pos > 0 THEN
+					IF StrLen(line) > eq_pos THEN
+						value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
+						found_value := StrToVal(value_str, gantry_z_offset);
+						found_z := TRUE;
+						TPWrite "Found GANTRY_Z=" + NumToStr(gantry_z_offset, 0);
+					ENDIF
+				ENDIF
 			ENDIF
 
 			IF StrFind(line, 1, "GANTRY_R=") = 1 THEN
 				eq_pos := StrFind(line, 1, "=");
-				value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
-				found_value := StrToVal(value_str, gantry_r_offset);
-				found_r := TRUE;
-				TPWrite "Found GANTRY_R=" + NumToStr(gantry_r_offset, 1);
+				IF eq_pos > 0 THEN
+					IF StrLen(line) > eq_pos THEN
+						value_str := StrPart(line, eq_pos + 1, StrLen(line) - eq_pos);
+						found_value := StrToVal(value_str, gantry_r_offset);
+						found_r := TRUE;
+						TPWrite "Found GANTRY_R=" + NumToStr(gantry_r_offset, 1);
+					ENDIF
+				ENDIF
 			ENDIF
 
 			! Check if all parameters found
