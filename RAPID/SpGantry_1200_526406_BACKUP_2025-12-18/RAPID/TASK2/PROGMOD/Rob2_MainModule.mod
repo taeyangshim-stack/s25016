@@ -2158,12 +2158,12 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.28
+	! Version: v1.7.29
 	! Date: 2025-12-29
 	! Purpose: Test if Floor coordinates change when gantry moves
 	! Reads gantry movement from config.txt (X, Y, Z, R)
 	! Initial position: Robot1 [-90,0,0,0,0,0], Robot2 [+90,0,0,0,0,0]
-	! Gantry HOME: [-9500, 5300, 2100, 0] (WobjFloor uframe origin)
+	! Gantry HOME: [-9500, 5300, 700, 0] (safe Z position, max=1000mm)
 	! Gantry moved: HOME + config offset
 	! Note: Based on 12-23 backup fnCoordToJoint function
 	! Output: /HOME/gantry_floor_test.txt
@@ -2232,7 +2232,7 @@ MODULE Rob2_MainModule
 		home_pos := rob2_init;
 		home_pos.extax.eax_a := -9500;  ! X1 = WobjFloor origin X
 		home_pos.extax.eax_b := 5300;   ! Y = WobjFloor origin Y
-		home_pos.extax.eax_c := 2100;   ! Z = WobjFloor origin Z
+		home_pos.extax.eax_c := 700;    ! Z = Safe mid-height (max=1000, ref: 12-23 backup)
 		home_pos.extax.eax_d := 0;      ! R = 0
 		! eax_e: keep from CJointT() (not used)
 		home_pos.extax.eax_f := -9500;  ! X2 = X1 (Master-Follower sync!)
@@ -2332,7 +2332,7 @@ MODULE Rob2_MainModule
 		moved_pos := home_pos;
 		moved_pos.extax.eax_a := -9500 + gantry_x_offset;  ! X1 = HOME + offset
 		moved_pos.extax.eax_b := 5300 + gantry_y_offset;   ! Y = HOME + offset
-		moved_pos.extax.eax_c := 2100 + gantry_z_offset;   ! Z = HOME + offset
+		moved_pos.extax.eax_c := 700 + gantry_z_offset;    ! Z = HOME + offset (max=1000)
 		moved_pos.extax.eax_d := 0 + gantry_r_offset;      ! R = HOME + offset
 		! eax_e: keep from home_pos/CJointT() (not used)
 		moved_pos.extax.eax_f := -9500 + gantry_x_offset;  ! X2 = X1 (Master-Follower sync!)

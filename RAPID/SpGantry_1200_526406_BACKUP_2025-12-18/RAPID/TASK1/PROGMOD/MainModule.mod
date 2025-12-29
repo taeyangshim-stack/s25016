@@ -880,7 +880,7 @@ MODULE MainModule
 		home_pos := initial_pos;
 		home_pos.extax.eax_a := -9500;  ! X1 = WobjFloor origin X
 		home_pos.extax.eax_b := 5300;   ! Y = WobjFloor origin Y
-		home_pos.extax.eax_c := 2100;   ! Z = WobjFloor origin Z
+		home_pos.extax.eax_c := 700;    ! Z = Safe mid-height (max=1000, ref: 12-23 backup)
 		home_pos.extax.eax_d := 0;      ! R = 0
 		! eax_e: keep from CJointT() (not used)
 		home_pos.extax.eax_f := -9500;  ! X2 = X1 (Master-Follower sync!)
