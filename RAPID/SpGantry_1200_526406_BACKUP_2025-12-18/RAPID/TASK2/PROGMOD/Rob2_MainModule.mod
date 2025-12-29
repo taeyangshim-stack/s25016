@@ -1975,6 +1975,33 @@ MODULE Rob2_MainModule
 	ENDPROC
 
 	! ========================================
+	! Set Robot2 Initial Position
+	! ========================================
+	! Version: v1.7.30
+	! Date: 2025-12-30
+	! Purpose: Move Robot2 to initial test position (+90,0,0,0,0,0)
+	! NOTE: This procedure does NOT control gantry (only TASK1 can control gantry)
+	! Gantry should already be at HOME [0,0,0,0] by TASK1->SetRobot1InitialPosition
+	PROC SetRobot2InitialPosition()
+		VAR jointtarget initial_pos;
+
+		TPWrite "Moving Robot2 to initial position...";
+		initial_pos := CJointT();
+		! Robot2 joint angles: [+90, 0, 0, 0, 0, 0]
+		initial_pos.robax.rax_1 := 90;
+		initial_pos.robax.rax_2 := 0;
+		initial_pos.robax.rax_3 := 0;
+		initial_pos.robax.rax_4 := 0;
+		initial_pos.robax.rax_5 := 0;
+		initial_pos.robax.rax_6 := 0;
+		! Keep current gantry position (DO NOT modify extax!)
+		! extax values already set by CJointT()
+		MoveAbsJ initial_pos, v100, fine, tool0;
+		TPWrite "Robot2 at initial position: [+90,0,0,0,0,0]";
+		TPWrite "Gantry position unchanged (controlled by TASK1)";
+	ENDPROC
+
+	! ========================================
 	! Update Robot2 Floor Position
 	! ========================================
 	! Version: v1.7.3

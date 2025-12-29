@@ -875,18 +875,18 @@ MODULE MainModule
 		MoveAbsJ initial_pos, v100, fine, tool0;
 		TPWrite "Robot1 joints at initial position";
 
-		! Now move gantry to HOME position
+		! Now move gantry to HOME position (physical origin)
 		TPWrite "Moving gantry to HOME position...";
 		home_pos := initial_pos;
-		home_pos.extax.eax_a := -9500;  ! X1 = WobjFloor origin X
-		home_pos.extax.eax_b := 5300;   ! Y = WobjFloor origin Y
-		home_pos.extax.eax_c := 700;    ! Z = Safe mid-height (max=1000, ref: 12-23 backup)
-		home_pos.extax.eax_d := 0;      ! R = 0
+		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
+		home_pos.extax.eax_b := 0;      ! Y = Physical origin
+		home_pos.extax.eax_c := 0;      ! Z = Physical origin
+		home_pos.extax.eax_d := 0;      ! R = Physical origin
 		! eax_e: keep from CJointT() (not used)
-		home_pos.extax.eax_f := -9500;  ! X2 = X1 (Master-Follower sync!)
+		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
 		MoveAbsJ home_pos, v100, fine, tool0;
-		TPWrite "Gantry at HOME position (WobjFloor origin)";
-		TPWrite "Robot1 ready: [-90,0,0,0,0,0], Gantry: [X,Y,Z,R]=0";
+		TPWrite "Gantry at HOME position [0,0,0,0]";
+		TPWrite "Robot1 ready: [-90,0,0,0,0,0], Gantry HOME";
 	ENDPROC
 
 	! ========================================
@@ -969,6 +969,255 @@ MODULE MainModule
 		TPWrite "ERROR in TestRobot1BaseHeight: " + NumToStr(ERRNO, 0);
 		Close logfile;
 		TRYNEXT;
+	ENDPROC
+
+	! ========================================
+	! Test Gantry Movement Effect on Floor Coordinates
+	! ========================================
+	! Version: v1.7.30
+	! Date: 2025-12-30
+	! Purpose: Test if Floor coordinates change when gantry moves
+	! Reads gantry movement from config.txt (X, Y, Z, R offsets)
+	! Initial position: Robot1 [-90,0,0,0,0,0], Robot2 [+90,0,0,0,0,0]
+	! Gantry HOME: [0, 0, 0, 0] (physical origin)
+	! Coordinate transformation: eax_a = 0+X, eax_b = 0-Y, eax_c = 0-Z, eax_d = 0-R
+	! Output: /HOME/gantry_floor_test.txt
+	PROC TestGantryFloorCoordinates()
+		VAR jointtarget rob1_current;
+		VAR jointtarget rob2_current;
+		VAR jointtarget home_pos;
+		VAR jointtarget moved_pos;
+		VAR robtarget rob1_floor_before;
+		VAR robtarget rob2_floor_before;
+		VAR robtarget rob1_floor_after;
+		VAR robtarget rob2_floor_after;
+		VAR iodev logfile;
+		VAR iodev configfile;
+		VAR string line;
+		VAR string value_str;
+		VAR bool found_value;
+		VAR bool found_x;
+		VAR bool found_y;
+		VAR bool found_z;
+		VAR bool found_r;
+		VAR num gantry_x_offset;
+		VAR num gantry_y_offset;
+		VAR num gantry_z_offset;
+		VAR num gantry_r_offset;
+
+		TPWrite "========================================";
+		TPWrite "Gantry Floor Test (v1.7.30)";
+
+		! Initialize variables
+		gantry_x_offset := 0;
+		gantry_y_offset := 0;
+		gantry_z_offset := 0;
+		gantry_r_offset := 0;
+
+		! Check if both robots are at initial position
+		TPWrite "Checking robot positions...";
+		rob1_current := CJointT();
+		rob2_current := CJointT(\TaskName:="T_ROB2");
+
+		IF Abs(rob1_current.robax.rax_1 + 90) > 5 THEN
+			TPWrite "WARNING: Robot1 NOT at initial position!";
+			TPWrite "Current Robot1 J1: " + NumToStr(rob1_current.robax.rax_1, 1);
+			TPWrite "Expected: -90 degrees";
+			TPWrite "Please run SetRobot1InitialPosition first";
+			STOP;
+		ENDIF
+
+		IF Abs(rob2_current.robax.rax_1 - 90) > 5 THEN
+			TPWrite "WARNING: Robot2 NOT at initial position!";
+			TPWrite "Current Robot2 J1: " + NumToStr(rob2_current.robax.rax_1, 1);
+			TPWrite "Expected: +90 degrees";
+			TPWrite "Please run TASK2->SetRobot2InitialPosition first";
+			STOP;
+		ENDIF
+		TPWrite "Both robots at initial positions OK";
+
+		! Read gantry offsets from config.txt
+		TPWrite "Reading config.txt...";
+		Open "HOME:/config.txt", configfile \Read;
+
+		! Read GANTRY_X
+		found_x := FALSE;
+		WHILE found_x = FALSE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "GANTRY_X=") = 1 THEN
+				IF StrLen(line) >= 10 THEN
+					value_str := StrPart(line, 10, StrLen(line) - 9);
+					found_value := StrToVal(value_str, gantry_x_offset);
+					found_x := TRUE;
+					TPWrite "GANTRY_X=" + NumToStr(gantry_x_offset, 0);
+				ENDIF
+			ENDIF
+		ENDWHILE
+
+		! Read GANTRY_Y
+		found_y := FALSE;
+		WHILE found_y = FALSE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "GANTRY_Y=") = 1 THEN
+				IF StrLen(line) >= 10 THEN
+					value_str := StrPart(line, 10, StrLen(line) - 9);
+					found_value := StrToVal(value_str, gantry_y_offset);
+					found_y := TRUE;
+					TPWrite "GANTRY_Y=" + NumToStr(gantry_y_offset, 0);
+				ENDIF
+			ENDIF
+		ENDWHILE
+
+		! Read GANTRY_Z
+		found_z := FALSE;
+		WHILE found_z = FALSE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "GANTRY_Z=") = 1 THEN
+				IF StrLen(line) >= 10 THEN
+					value_str := StrPart(line, 10, StrLen(line) - 9);
+					found_value := StrToVal(value_str, gantry_z_offset);
+					found_z := TRUE;
+					TPWrite "GANTRY_Z=" + NumToStr(gantry_z_offset, 0);
+				ENDIF
+			ENDIF
+		ENDWHILE
+
+		! Read GANTRY_R
+		found_r := FALSE;
+		WHILE found_r = FALSE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "GANTRY_R=") = 1 THEN
+				IF StrLen(line) >= 10 THEN
+					value_str := StrPart(line, 10, StrLen(line) - 9);
+					found_value := StrToVal(value_str, gantry_r_offset);
+					found_r := TRUE;
+					TPWrite "GANTRY_R=" + NumToStr(gantry_r_offset, 1);
+				ENDIF
+			ENDIF
+		ENDWHILE
+
+		Close configfile;
+		TPWrite "Config reading complete!";
+
+		! Move to HOME position [0, 0, 0, 0]
+		TPWrite "Moving gantry to HOME [0,0,0,0]...";
+		home_pos := CJointT();
+		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
+		home_pos.extax.eax_b := 0;      ! Y = Physical origin
+		home_pos.extax.eax_c := 0;      ! Z = Physical origin
+		home_pos.extax.eax_d := 0;      ! R = Physical origin
+		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
+		MoveAbsJ home_pos, v100, fine, tool0;
+		WaitTime 1.0;
+
+		! Measure BEFORE gantry movement
+		TPWrite "Measuring BEFORE gantry move...";
+		UpdateRobot1FloorPosition;
+		UpdateRobot2FloorPositionLocal;
+		rob1_floor_before := robot1_floor_pos;
+		rob2_floor_before := robot2_floor_pos;
+
+		! Move gantry with coordinate transformation (Y, Z use minus)
+		TPWrite "Moving gantry with offsets...";
+		moved_pos := home_pos;
+		moved_pos.extax.eax_a := 0 + gantry_x_offset;   ! X: HOME + offset
+		moved_pos.extax.eax_b := 0 - gantry_y_offset;   ! Y: HOME - offset
+		moved_pos.extax.eax_c := 0 - gantry_z_offset;   ! Z: HOME - offset
+		moved_pos.extax.eax_d := 0 - gantry_r_offset;   ! R: HOME - offset
+		moved_pos.extax.eax_f := 0 + gantry_x_offset;   ! X2 = X1 (synchronized!)
+		MoveAbsJ moved_pos, v100, fine, tool0;
+		WaitTime 1.0;
+
+		! Measure AFTER gantry movement
+		TPWrite "Measuring AFTER gantry move...";
+		UpdateRobot1FloorPosition;
+		UpdateRobot2FloorPositionLocal;
+		rob1_floor_after := robot1_floor_pos;
+		rob2_floor_after := robot2_floor_pos;
+
+		! Return to HOME position
+		TPWrite "Returning to HOME...";
+		MoveAbsJ home_pos, v100, fine, tool0;
+
+		! Save results
+		TPWrite "Saving results...";
+		Open "HOME:/gantry_floor_test.txt", logfile \Write;
+
+		Write logfile, "========================================";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.30)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "Gantry HOME: [0, 0, 0, 0] (physical origin)";
+		Write logfile, "Coordinate Transformation:";
+		Write logfile, "  Physical X = 0 + User_X";
+		Write logfile, "  Physical Y = 0 - User_Y";
+		Write logfile, "  Physical Z = 0 - User_Z";
+		Write logfile, "  Physical R = 0 - User_R";
+		Write logfile, "";
+		Write logfile, "Initial Position:";
+		Write logfile, "  Robot1: [-90,0,0,0,0,0]";
+		Write logfile, "  Robot2: [+90,0,0,0,0,0]";
+		Write logfile, "  Gantry: [0,0,0,0]";
+		Write logfile, "";
+		Write logfile, "Gantry Movement (User coordinates):";
+		Write logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(gantry_y_offset, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(gantry_z_offset, 2) + " mm";
+		Write logfile, "  R = " + NumToStr(gantry_r_offset, 2) + " deg";
+		Write logfile, "";
+		Write logfile, "BEFORE Gantry Movement:";
+		Write logfile, "------------------------";
+		Write logfile, "Robot1 Floor (tool0):";
+		Write logfile, "  X = " + NumToStr(rob1_floor_before.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(rob1_floor_before.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(rob1_floor_before.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "Robot2 Floor (tool0):";
+		Write logfile, "  X = " + NumToStr(rob2_floor_before.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(rob2_floor_before.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(rob2_floor_before.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "AFTER Gantry Movement:";
+		Write logfile, "----------------------";
+		Write logfile, "Robot1 Floor (tool0):";
+		Write logfile, "  X = " + NumToStr(rob1_floor_after.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(rob1_floor_after.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(rob1_floor_after.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "Robot2 Floor (tool0):";
+		Write logfile, "  X = " + NumToStr(rob2_floor_after.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(rob2_floor_after.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(rob2_floor_after.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "DIFFERENCE:";
+		Write logfile, "-----------";
+		Write logfile, "Robot1 Floor Delta:";
+		Write logfile, "  dX = " + NumToStr(rob1_floor_after.trans.x - rob1_floor_before.trans.x, 2) + " mm";
+		Write logfile, "  dY = " + NumToStr(rob1_floor_after.trans.y - rob1_floor_before.trans.y, 2) + " mm";
+		Write logfile, "  dZ = " + NumToStr(rob1_floor_after.trans.z - rob1_floor_before.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "Robot2 Floor Delta:";
+		Write logfile, "  dX = " + NumToStr(rob2_floor_after.trans.x - rob2_floor_before.trans.x, 2) + " mm";
+		Write logfile, "  dY = " + NumToStr(rob2_floor_after.trans.y - rob2_floor_before.trans.y, 2) + " mm";
+		Write logfile, "  dZ = " + NumToStr(rob2_floor_after.trans.z - rob2_floor_before.trans.z, 2) + " mm";
+		Write logfile, "========================================\0A";
+
+		Close logfile;
+		TPWrite "Saved to: /HOME/gantry_floor_test.txt";
+		TPWrite "Test complete!";
+		TPWrite "========================================";
+
+	ERROR
+		IF ERRNO = ERR_FILEOPEN THEN
+			TPWrite "ERROR: Cannot open config.txt or log file";
+		ELSE
+			TPWrite "ERROR in TestGantryFloorCoordinates: " + NumToStr(ERRNO, 0);
+		ENDIF
+		Close configfile;
+		Close logfile;
+		STOP;
 	ENDPROC
 
 ENDMODULE
