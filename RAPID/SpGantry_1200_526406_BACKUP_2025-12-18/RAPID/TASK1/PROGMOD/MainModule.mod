@@ -179,8 +179,10 @@ MODULE MainModule
 	PERS wobjdata wobjRob1Base := [FALSE, TRUE, "", [[0, 0, 0], [0, 0.707107, 0, 0.707107]], [[0, 0, 0], [1, 0, 0, 0]]];
 
 	PROC main()
-		! Temporary: Call SetRobot1InitialPosition for testing
+		! Test sequence: Initialize robots and run gantry floor coordinate test
 		SetRobot1InitialPosition;
+		WaitTime 1.0;
+		TestGantryFloorCoordinates;
 		! Original: rUpdateR1Position;
 	ENDPROC
     
