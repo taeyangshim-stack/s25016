@@ -866,12 +866,12 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.28
-	! Date: 2025-12-29
+	! Version: v1.7.35
+	! Date: 2025-12-30
 	! Purpose: Move Robot1 to initial test position
-	! Position: Robot1 [-90,0,0,0,0,0], Gantry HOME=WobjFloor origin
-	! HOME: [-9500, 5300, 2100, 0] (WobjFloor uframe)
-	! Note: Based on 12-23 backup fnCoordToJoint function
+	! Position: Robot1 [-90,0,0,0,0,0], Gantry HOME=[0,0,0,0] (Physical origin)
+	! HOME Physical: [0,0,0,0] = Floor [9500,5300,2100,0]
+	! Note: 2-step move to prevent linked motor error (sync X1-X2 first, then HOME)
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_pos;
 		VAR jointtarget home_pos;
@@ -893,9 +893,16 @@ MODULE MainModule
 
 		! Now move gantry to HOME position (physical origin)
 		TPWrite "Moving gantry to HOME position...";
-		home_pos := CJointT();  ! Read CURRENT position (after robot movement)
-		! Synchronize X2 with X1 from current position
-		home_pos.extax.eax_f := home_pos.extax.eax_a;
+
+		! Step 1: Synchronize X1 and X2 first (physical sync)
+		TPWrite "Step 1: Synchronizing X1 and X2...";
+		home_pos := CJointT();  ! Read CURRENT position
+		home_pos.extax.eax_f := home_pos.extax.eax_a;  ! X2 = X1
+		MoveAbsJ home_pos, v100, fine, tool0;  ! Physical sync
+		TPWrite "X1 and X2 synchronized";
+
+		! Step 2: Move all axes to HOME [0,0,0,0]
+		TPWrite "Step 2: Moving to HOME [0,0,0,0]...";
 		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
 		home_pos.extax.eax_b := 0;      ! Y = Physical origin
 		home_pos.extax.eax_c := 0;      ! Z = Physical origin
