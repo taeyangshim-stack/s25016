@@ -912,7 +912,7 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.45
+	! Version: v1.7.46
 	! Date: 2025-12-31
 	! Purpose: Move Robot1 to initial test position
 	! Position: Robot1 TCP [0, 0, 1000] in wobj0, Gantry HOME=[0,0,0,0]
@@ -974,8 +974,9 @@ MODULE MainModule
 		! TCP position: [0, 0, 1000] in wobj0 (R-axis center)
 		! Robot1 wobj0 origin is already at R-axis center (+488mm from Robot1 base)
 		! Quaternion: [0.49996, -0.50004, 0.50004, 0.49996]
+		! Use MoveJ (not MoveL) to avoid external axis value requirement
 		home_tcp := [[0, 0, 1000], [0.49996, -0.50004, 0.50004, 0.49996], [0, 0, 0, 0], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]];
-		MoveL home_tcp, v100, fine, tool0\WObj:=wobj0;
+		MoveJ home_tcp, v100, fine, tool0\WObj:=wobj0;
 		TPWrite "Robot1 TCP at HOME [0, 0, 1000]";
 
 		! Step 3: Move gantry to HOME position (physical origin)
