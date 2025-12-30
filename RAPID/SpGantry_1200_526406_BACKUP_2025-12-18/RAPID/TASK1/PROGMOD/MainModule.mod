@@ -912,7 +912,7 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.40
+	! Version: v1.7.42
 	! Date: 2025-12-30
 	! Purpose: Move Robot1 to initial test position
 	! Position: Robot1 [-90,0,0,0,0,0], Gantry HOME=[0,0,0,0] (Physical origin)
@@ -923,12 +923,34 @@ MODULE MainModule
 		VAR jointtarget sync_pos;
 		VAR jointtarget home_pos;
 
-		! Step 0: Synchronize X1-X2 at current position (safe from any position)
+		! Step 0: Synchronize X1-X2 at current position (progressive approach)
+		! Progressive sync prevents linked motor error when X1-X2 distance is large
+		VAR num x1_target;
+		VAR num x2_current;
+		VAR num distance;
+
 		TPWrite "Step 0: Synchronizing gantry X1-X2 at current position...";
 		sync_pos := CJointT();
 		TPWrite "Current gantry: X1=" + NumToStr(sync_pos.extax.eax_a,0) + ", X2=" + NumToStr(sync_pos.extax.eax_f,0);
-		sync_pos.extax.eax_f := sync_pos.extax.eax_a;  ! X2 = X1
-		MoveAbsJ sync_pos, v10, fine, tool0;  ! Slow speed for large X1-X2 differences
+
+		x1_target := sync_pos.extax.eax_a;
+		x2_current := sync_pos.extax.eax_f;
+		distance := x1_target - x2_current;
+
+		! If distance > 100mm, use progressive approach (25%, 50%, 75%, 100%)
+		IF Abs(distance) > 100 THEN
+			TPWrite "Large X1-X2 difference (" + NumToStr(Abs(distance),0) + "mm) - progressive sync";
+			sync_pos.extax.eax_f := x2_current + distance * 0.25;
+			MoveAbsJ sync_pos, v10, fine, tool0;
+			sync_pos.extax.eax_f := x2_current + distance * 0.50;
+			MoveAbsJ sync_pos, v10, fine, tool0;
+			sync_pos.extax.eax_f := x2_current + distance * 0.75;
+			MoveAbsJ sync_pos, v10, fine, tool0;
+		ENDIF
+
+		! Final synchronization
+		sync_pos.extax.eax_f := x1_target;  ! X2 = X1
+		MoveAbsJ sync_pos, v10, fine, tool0;
 		TPWrite "Gantry X1-X2 synchronized";
 
 		! Step 1: Move Robot1 joints to initial position
