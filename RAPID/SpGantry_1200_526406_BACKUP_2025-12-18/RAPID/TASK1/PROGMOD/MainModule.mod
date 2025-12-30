@@ -1123,7 +1123,7 @@ MODULE MainModule
 		gantry_r_offset := 0;
 
 		! Check if both robots are at initial position (v1.7.48)
-		! HOME position changed to TCP [0, 0/488, ±1000] with J1≈0°
+		! HOME position changed to TCP [0, 0/488, +/-1000] with J1~0 deg
 		TPWrite "Checking robot positions...";
 		rob1_current := CJointT();
 		rob2_current := CJointT(\TaskName:="T_ROB2");
