@@ -179,9 +179,10 @@ MODULE Rob2_MainModule
     PERS wobjdata WobjFloor;
 
     ! WobjFloor_Rob2: Floor coordinate system for Robot2
-    ! Y offset: 4812 (Robot2 is 488mm offset from center wobj0)
-    ! Z offset: 321.80 (adjusted for Robot2 wobj0 Z direction)
-    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 4812, 321.80], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+    ! MUST be identical to TASK1's WobjFloor (absolute world coordinate)
+    ! uframe: [-9500, 5300, 2100] = Gantry HOME in Floor coordinate
+    ! rot: [0, 1, 0, 0] = 180° around Y-axis
+    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
     ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
