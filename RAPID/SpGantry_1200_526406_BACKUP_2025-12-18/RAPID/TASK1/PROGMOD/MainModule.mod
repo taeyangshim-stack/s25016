@@ -113,6 +113,11 @@ MODULE MainModule
 	!   - SetRobot1InitialPosition: Re-read position in Step 2
 	!   - Added home_pos := CJointT() after Step 1 movement
 	!   - Ensures X1-X2 synchronization with actual current position
+	!
+	! v1.7.37 (2025-12-30)
+	!   - SetRobot1InitialPosition: Added debug TPWrite messages
+	!   - Display X1, X2 values before/after Step 1 synchronization
+	!   - Display current position before Step 2 HOME movement
 	!========================================
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
@@ -907,12 +912,12 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.36
+	! Version: v1.7.37
 	! Date: 2025-12-30
 	! Purpose: Move Robot1 to initial test position
 	! Position: Robot1 [-90,0,0,0,0,0], Gantry HOME=[0,0,0,0] (Physical origin)
 	! HOME Physical: [0,0,0,0] = Floor [9500,5300,2100,0]
-	! Note: 2-step move with CJointT() re-read to prevent linked motor error
+	! Note: Added debug TPWrite messages to track X1-X2 synchronization
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_pos;
 		VAR jointtarget home_pos;
@@ -938,19 +943,26 @@ MODULE MainModule
 		! Step 1: Synchronize X1 and X2 first (physical sync)
 		TPWrite "Step 1: Synchronizing X1 and X2...";
 		home_pos := CJointT();  ! Read CURRENT position
+		TPWrite "Before sync: X1=" + NumToStr(home_pos.extax.eax_a,0) + ", X2=" + NumToStr(home_pos.extax.eax_f,0);
 		home_pos.extax.eax_f := home_pos.extax.eax_a;  ! X2 = X1
 		MoveAbsJ home_pos, v100, fine, tool0;  ! Physical sync
 		TPWrite "X1 and X2 synchronized";
 
+		! Verify synchronization
+		home_pos := CJointT();
+		TPWrite "After sync: X1=" + NumToStr(home_pos.extax.eax_a,0) + ", X2=" + NumToStr(home_pos.extax.eax_f,0);
+
 		! Step 2: Move all axes to HOME [0,0,0,0]
 		TPWrite "Step 2: Moving to HOME [0,0,0,0]...";
 		home_pos := CJointT();  ! Re-read position after Step 1 movement
+		TPWrite "Current pos: X=" + NumToStr(home_pos.extax.eax_a,0) + ", Y=" + NumToStr(home_pos.extax.eax_b,0) + ", Z=" + NumToStr(home_pos.extax.eax_c,0);
 		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
 		home_pos.extax.eax_b := 0;      ! Y = Physical origin
 		home_pos.extax.eax_c := 0;      ! Z = Physical origin
 		home_pos.extax.eax_d := 0;      ! R = Physical origin
 		! eax_e: keep from CJointT() (not used)
 		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
+		TPWrite "Target: [0,0,0,0], X1=X2=0";
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "Gantry at HOME position [0,0,0,0]";
 		TPWrite "Robot1 ready: [-90,0,0,0,0,0], Gantry HOME";
