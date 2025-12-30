@@ -912,16 +912,17 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.42
-	! Date: 2025-12-30
+	! Version: v1.7.44
+	! Date: 2025-12-31
 	! Purpose: Move Robot1 to initial test position
-	! Position: Robot1 [-90,0,0,0,0,0], Gantry HOME=[0,0,0,0] (Physical origin)
-	! HOME Physical: [0,0,0,0] = Floor [9500,5300,2100,0]
+	! Position: Robot1 TCP [0, -488, 1000] in wobj0, Gantry HOME=[0,0,0,0]
+	! TCP at R-axis center for easy calculation and verification
 	! Note: Safe from any starting position - synchronizes X1-X2 first
 	PROC SetRobot1InitialPosition()
-		VAR jointtarget initial_pos;
+		VAR jointtarget initial_joint;
 		VAR jointtarget sync_pos;
 		VAR jointtarget home_pos;
+		VAR robtarget home_tcp;
 
 		! Step 0: Synchronize X1-X2 at current position (progressive approach)
 		! Progressive sync prevents linked motor error when X1-X2 distance is large
@@ -953,23 +954,31 @@ MODULE MainModule
 		MoveAbsJ sync_pos, v10, fine, tool0;
 		TPWrite "Gantry X1-X2 synchronized";
 
-		! Step 1: Move Robot1 joints to initial position
-		TPWrite "Step 1: Moving Robot1 to initial position...";
-		initial_pos := CJointT();
+		! Step 1: Move Robot1 joints to intermediate position (avoid configuration issue)
+		TPWrite "Step 1: Moving Robot1 to intermediate joint position...";
+		initial_joint := CJointT();
 		! Keep synchronized gantry position
-		initial_pos.extax.eax_f := initial_pos.extax.eax_a;
-		! Robot1 joint angles: [-90, 0, 0, 0, 0, 0]
-		initial_pos.robax.rax_1 := -90;
-		initial_pos.robax.rax_2 := 0;
-		initial_pos.robax.rax_3 := 0;
-		initial_pos.robax.rax_4 := 0;
-		initial_pos.robax.rax_5 := 0;
-		initial_pos.robax.rax_6 := 0;
-		MoveAbsJ initial_pos, v100, fine, tool0;
-		TPWrite "Robot1 joints at initial position";
+		initial_joint.extax.eax_f := initial_joint.extax.eax_a;
+		! Robot1 joint angles: [0, -2.58, -11.88, 0, 14.47, 0]
+		initial_joint.robax.rax_1 := 0;
+		initial_joint.robax.rax_2 := -2.58;
+		initial_joint.robax.rax_3 := -11.88;
+		initial_joint.robax.rax_4 := 0;
+		initial_joint.robax.rax_5 := 14.47;
+		initial_joint.robax.rax_6 := 0;
+		MoveAbsJ initial_joint, v100, fine, tool0;
+		TPWrite "Robot1 at intermediate joint position";
 
-		! Step 2: Move gantry to HOME position (physical origin)
-		TPWrite "Step 2: Moving gantry to HOME [0,0,0,0]...";
+		! Step 2: Move Robot1 TCP to HOME position at R-axis center
+		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, -488, 1000] in wobj0...";
+		! TCP position: [0, -488, 1000] in wobj0 (R-axis center)
+		! This position puts both Robot1 and Robot2 TCP at R-axis center
+		home_tcp := [[0, -488, 1000], [1, 0, 0, 0], [0, 0, 0, 0], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]];
+		MoveL home_tcp, v100, fine, tool0\WObj:=wobj0;
+		TPWrite "Robot1 TCP at HOME [0, -488, 1000]";
+
+		! Step 3: Move gantry to HOME position (physical origin)
+		TPWrite "Step 3: Moving gantry to HOME [0,0,0,0]...";
 		home_pos := CJointT();  ! Read current position
 		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
 		home_pos.extax.eax_b := 0;      ! Y = Physical origin
@@ -979,7 +988,7 @@ MODULE MainModule
 		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "Gantry at HOME position [0,0,0,0]";
-		TPWrite "Robot1 ready: [-90,0,0,0,0,0], Gantry HOME";
+		TPWrite "Robot1 ready: TCP [0,-488,1000], Gantry HOME";
 	ENDPROC
 
 	! ========================================

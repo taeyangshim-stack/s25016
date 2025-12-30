@@ -1999,29 +1999,41 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Set Robot2 Initial Position
 	! ========================================
-	! Version: v1.7.40
-	! Date: 2025-12-30
-	! Purpose: Move Robot2 to initial test position (+90,0,0,0,0,0)
+	! Version: v1.7.44
+	! Date: 2025-12-31
+	! Purpose: Move Robot2 to initial test position TCP [0, 488, -1000]
+	! Position at R-axis center for easy calculation and verification
 	! NOTE: This procedure does NOT control gantry (only TASK1 can control gantry)
 	! Gantry should already be at HOME [0,0,0,0] by TASK1->SetRobot1InitialPosition
 	PROC SetRobot2InitialPosition()
-		VAR jointtarget initial_pos;
+		VAR jointtarget initial_joint;
+		VAR robtarget home_tcp;
 
-		TPWrite "Moving Robot2 to initial position...";
-		initial_pos := CJointT();
-		! Robot2 joint angles: [+90, 0, 0, 0, 0, 0]
-		initial_pos.robax.rax_1 := 90;
-		initial_pos.robax.rax_2 := 0;
-		initial_pos.robax.rax_3 := 0;
-		initial_pos.robax.rax_4 := 0;
-		initial_pos.robax.rax_5 := 0;
-		initial_pos.robax.rax_6 := 0;
+		! Step 1: Move Robot2 joints to intermediate position (avoid configuration issue)
+		TPWrite "Step 1: Moving Robot2 to intermediate joint position...";
+		initial_joint := CJointT();
+		! Robot2 joint angles: [0, -2.58, -11.88, 0, 14.47, 0]
+		initial_joint.robax.rax_1 := 0;
+		initial_joint.robax.rax_2 := -2.58;
+		initial_joint.robax.rax_3 := -11.88;
+		initial_joint.robax.rax_4 := 0;
+		initial_joint.robax.rax_5 := 14.47;
+		initial_joint.robax.rax_6 := 0;
 		! Keep current gantry position (DO NOT modify extax!)
 		! extax values already set by CJointT()
-		MoveAbsJ initial_pos, v100, fine, tool0;
-		TPWrite "Robot2 at initial position: [+90,0,0,0,0,0]";
+		MoveAbsJ initial_joint, v100, fine, tool0;
+		TPWrite "Robot2 at intermediate joint position";
+
+		! Step 2: Move Robot2 TCP to HOME position at R-axis center
+		TPWrite "Step 2: Moving Robot2 TCP to HOME [0, 488, -1000] in wobj0...";
+		! TCP position: [0, 488, -1000] in wobj0 (R-axis center, opposite side of Robot1)
+		! This position puts both Robot1 and Robot2 TCP at R-axis center
+		home_tcp := [[0, 488, -1000], [1, 0, 0, 0], [0, 0, 0, 0], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]];
+		MoveL home_tcp, v100, fine, tool0\WObj:=wobj0;
+		TPWrite "Robot2 TCP at HOME [0, 488, -1000]";
 		TPWrite "Gantry position unchanged (controlled by TASK1)";
-		! Initialize robot2_floor_pos for cross-task measurement (v1.7.40)
+
+		! Initialize robot2_floor_pos for cross-task measurement (v1.7.43)
 		UpdateRobot2FloorPosition;
 	ENDPROC
 
