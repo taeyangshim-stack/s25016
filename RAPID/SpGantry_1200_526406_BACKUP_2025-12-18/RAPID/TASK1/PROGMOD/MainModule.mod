@@ -866,12 +866,12 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.35
+	! Version: v1.7.36
 	! Date: 2025-12-30
 	! Purpose: Move Robot1 to initial test position
 	! Position: Robot1 [-90,0,0,0,0,0], Gantry HOME=[0,0,0,0] (Physical origin)
 	! HOME Physical: [0,0,0,0] = Floor [9500,5300,2100,0]
-	! Note: 2-step move to prevent linked motor error (sync X1-X2 first, then HOME)
+	! Note: 2-step move with CJointT() re-read to prevent linked motor error
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_pos;
 		VAR jointtarget home_pos;
@@ -903,6 +903,7 @@ MODULE MainModule
 
 		! Step 2: Move all axes to HOME [0,0,0,0]
 		TPWrite "Step 2: Moving to HOME [0,0,0,0]...";
+		home_pos := CJointT();  ! Re-read position after Step 1 movement
 		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
 		home_pos.extax.eax_b := 0;      ! Y = Physical origin
 		home_pos.extax.eax_c := 0;      ! Z = Physical origin
