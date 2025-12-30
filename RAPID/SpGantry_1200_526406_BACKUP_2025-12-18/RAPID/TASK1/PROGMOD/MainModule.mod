@@ -990,7 +990,7 @@ MODULE MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.32
+	! Version: v1.7.33
 	! Date: 2025-12-30
 	! Purpose: Test if Floor coordinates change when gantry moves
 	! Reads gantry movement from config.txt (Floor absolute coordinates)
@@ -999,6 +999,7 @@ MODULE MainModule
 	! Coordinate transformation: Physical = Floor - HOME_offset
 	!   eax_a = Floor_X - 9500, eax_b = 5300 - Floor_Y
 	!   eax_c = 2100 - Floor_Z, eax_d = 0 - Floor_R
+	! Note: X1-X2 synchronization added to prevent linked motor error
 	! Output: /HOME/gantry_floor_test.txt
 	PROC TestGantryFloorCoordinates()
 		VAR jointtarget rob1_current;
@@ -1164,7 +1165,7 @@ MODULE MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.32)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.33)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
