@@ -2028,13 +2028,54 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Update Robot2 Floor Position
 	! ========================================
-	! Version: v1.7.3
-	! Date: 2025-12-28
-	! Purpose: Update Robot2 TCP position in Floor coordinate system
-	! Uses WobjFloor_Rob2 which has no rotation (Robot2 wobj0 already rotated)
+	! Version: v1.7.43
+	! Date: 2025-12-31
+	! Purpose: Calculate Robot2 TCP position in Floor coordinate system
+	! NOTE: Robot2 cannot sense gantry movement (passive on R-axis)
+	!       Must calculate Floor position using gantry data from TASK1
 	! Used for distance measurement between robots
 	PROC UpdateRobot2FloorPosition()
-		robot2_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjFloor_Rob2);
+		VAR jointtarget gantry_joint;
+		VAR robtarget robot2_tcp_base;
+		VAR num gantry_x;
+		VAR num gantry_y;
+		VAR num gantry_z;
+		VAR num gantry_r;
+		VAR num r_rad;
+		VAR num robot2_base_floor_x;
+		VAR num robot2_base_floor_y;
+		VAR num robot2_base_floor_z;
+
+		! Read gantry position from TASK1 (Robot2 cannot sense this directly)
+		gantry_joint := CJointT(\TaskName:="T_ROB1");
+		gantry_x := gantry_joint.extax.eax_a;
+		gantry_y := gantry_joint.extax.eax_b;
+		gantry_z := gantry_joint.extax.eax_c;
+		gantry_r := gantry_joint.extax.eax_d;  ! degrees
+		r_rad := gantry_r * pi / 180;  ! convert to radians
+
+		! Read Robot2 TCP in Robot2 base coordinate
+		robot2_tcp_base := CRobT(\Tool:=tool0\WObj:=wobj0);
+
+		! Calculate Robot2 base position in Floor coordinate
+		! Robot2 is -488mm offset from gantry center on R-axis
+		robot2_base_floor_x := gantry_x + (-488 * Cos(r_rad));
+		robot2_base_floor_y := gantry_y + (-488 * Sin(r_rad));
+		robot2_base_floor_z := gantry_z;
+
+		! Calculate Robot2 TCP in Floor coordinate
+		! Apply R-axis rotation to TCP offset
+		robot2_floor_pos.trans.x := robot2_base_floor_x + robot2_tcp_base.trans.x * Cos(r_rad) - robot2_tcp_base.trans.y * Sin(r_rad);
+		robot2_floor_pos.trans.y := robot2_base_floor_y + robot2_tcp_base.trans.x * Sin(r_rad) + robot2_tcp_base.trans.y * Cos(r_rad);
+		robot2_floor_pos.trans.z := robot2_base_floor_z + robot2_tcp_base.trans.z;
+
+		! Transform to Floor coordinate system (HOME offset)
+		robot2_floor_pos.trans.x := robot2_floor_pos.trans.x + 9500;  ! Physical -> Floor
+		robot2_floor_pos.trans.y := 5300 - robot2_floor_pos.trans.y;  ! Invert Y
+		robot2_floor_pos.trans.z := 2100 - robot2_floor_pos.trans.z;  ! Invert Z
+
+		! Keep rotation from base coordinate
+		robot2_floor_pos.rot := robot2_tcp_base.rot;
 	ENDPROC
 
 	! ========================================
