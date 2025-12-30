@@ -1998,7 +1998,7 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Set Robot2 Initial Position
 	! ========================================
-	! Version: v1.7.30
+	! Version: v1.7.40
 	! Date: 2025-12-30
 	! Purpose: Move Robot2 to initial test position (+90,0,0,0,0,0)
 	! NOTE: This procedure does NOT control gantry (only TASK1 can control gantry)
@@ -2020,6 +2020,8 @@ MODULE Rob2_MainModule
 		MoveAbsJ initial_pos, v100, fine, tool0;
 		TPWrite "Robot2 at initial position: [+90,0,0,0,0,0]";
 		TPWrite "Gantry position unchanged (controlled by TASK1)";
+		! Initialize robot2_floor_pos for cross-task measurement (v1.7.40)
+		UpdateRobot2FloorPosition;
 	ENDPROC
 
 	! ========================================

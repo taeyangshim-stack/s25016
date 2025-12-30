@@ -912,7 +912,7 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.39
+	! Version: v1.7.40
 	! Date: 2025-12-30
 	! Purpose: Move Robot1 to initial test position
 	! Position: Robot1 [-90,0,0,0,0,0], Gantry HOME=[0,0,0,0] (Physical origin)
@@ -928,7 +928,7 @@ MODULE MainModule
 		sync_pos := CJointT();
 		TPWrite "Current gantry: X1=" + NumToStr(sync_pos.extax.eax_a,0) + ", X2=" + NumToStr(sync_pos.extax.eax_f,0);
 		sync_pos.extax.eax_f := sync_pos.extax.eax_a;  ! X2 = X1
-		MoveAbsJ sync_pos, v100, fine, tool0;  ! Gantry sync only
+		MoveAbsJ sync_pos, v10, fine, tool0;  ! Slow speed for large X1-X2 differences
 		TPWrite "Gantry X1-X2 synchronized";
 
 		! Step 1: Move Robot1 joints to initial position
