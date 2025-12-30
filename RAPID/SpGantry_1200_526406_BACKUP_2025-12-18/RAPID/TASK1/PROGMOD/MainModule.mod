@@ -893,7 +893,9 @@ MODULE MainModule
 
 		! Now move gantry to HOME position (physical origin)
 		TPWrite "Moving gantry to HOME position...";
-		home_pos := initial_pos;
+		home_pos := CJointT();  ! Read CURRENT position (after robot movement)
+		! Synchronize X2 with X1 from current position
+		home_pos.extax.eax_f := home_pos.extax.eax_a;
 		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
 		home_pos.extax.eax_b := 0;      ! Y = Physical origin
 		home_pos.extax.eax_c := 0;      ! Z = Physical origin
