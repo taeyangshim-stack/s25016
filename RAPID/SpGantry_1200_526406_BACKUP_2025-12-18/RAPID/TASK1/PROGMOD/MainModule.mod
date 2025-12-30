@@ -988,13 +988,15 @@ MODULE MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.30
+	! Version: v1.7.32
 	! Date: 2025-12-30
 	! Purpose: Test if Floor coordinates change when gantry moves
-	! Reads gantry movement from config.txt (X, Y, Z, R offsets)
+	! Reads gantry movement from config.txt (Floor absolute coordinates)
 	! Initial position: Robot1 [-90,0,0,0,0,0], Robot2 [+90,0,0,0,0,0]
-	! Gantry HOME: [0, 0, 0, 0] (physical origin)
-	! Coordinate transformation: eax_a = 0+X, eax_b = 0-Y, eax_c = 0-Z, eax_d = 0-R
+	! Gantry HOME Physical: [0, 0, 0, 0], Floor: [9500, 5300, 2100, 0]
+	! Coordinate transformation: Physical = Floor - HOME_offset
+	!   eax_a = Floor_X - 9500, eax_b = 5300 - Floor_Y
+	!   eax_c = 2100 - Floor_Z, eax_d = 0 - Floor_R
 	! Output: /HOME/gantry_floor_test.txt
 	PROC TestGantryFloorCoordinates()
 		VAR jointtarget rob1_current;
@@ -1131,14 +1133,14 @@ MODULE MainModule
 		rob1_floor_before := robot1_floor_pos;
 		rob2_floor_before := robot2_floor_pos;
 
-		! Move gantry with coordinate transformation (Y, Z use minus)
+		! Move gantry with Floor→Physical coordinate transformation
 		TPWrite "Moving gantry with offsets...";
 		moved_pos := home_pos;
-		moved_pos.extax.eax_a := 0 + gantry_x_offset;   ! X: HOME + offset
-		moved_pos.extax.eax_b := 0 - gantry_y_offset;   ! Y: HOME - offset
-		moved_pos.extax.eax_c := 0 - gantry_z_offset;   ! Z: HOME - offset
-		moved_pos.extax.eax_d := 0 - gantry_r_offset;   ! R: HOME - offset
-		moved_pos.extax.eax_f := 0 + gantry_x_offset;   ! X2 = X1 (synchronized!)
+		moved_pos.extax.eax_a := gantry_x_offset - 9500;   ! Physical X = Floor_X - 9500
+		moved_pos.extax.eax_b := 5300 - gantry_y_offset;   ! Physical Y = 5300 - Floor_Y
+		moved_pos.extax.eax_c := 2100 - gantry_z_offset;   ! Physical Z = 2100 - Floor_Z
+		moved_pos.extax.eax_d := 0 - gantry_r_offset;      ! Physical R = 0 - Floor_R
+		moved_pos.extax.eax_f := gantry_x_offset - 9500;   ! X2 = X1 (synchronized!)
 		MoveAbsJ moved_pos, v100, fine, tool0;
 		WaitTime 1.0;
 
@@ -1158,24 +1160,28 @@ MODULE MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.30)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.32)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
 		Write logfile, "";
-		Write logfile, "Gantry HOME: [0, 0, 0, 0] (physical origin)";
-		Write logfile, "Coordinate Transformation:";
-		Write logfile, "  Physical X = 0 + User_X";
-		Write logfile, "  Physical Y = 0 - User_Y";
-		Write logfile, "  Physical Z = 0 - User_Z";
-		Write logfile, "  Physical R = 0 - User_R";
+		Write logfile, "Gantry HOME:";
+		Write logfile, "  Physical (wobj0): [0, 0, 0, 0]";
+		Write logfile, "  Floor: [9500, 5300, 2100, 0]";
+		Write logfile, "";
+		Write logfile, "Coordinate Transformation (Floor -> Physical):";
+		Write logfile, "  Physical X = Floor_X - 9500";
+		Write logfile, "  Physical Y = 5300 - Floor_Y";
+		Write logfile, "  Physical Z = 2100 - Floor_Z";
+		Write logfile, "  Physical R = 0 - Floor_R";
 		Write logfile, "";
 		Write logfile, "Initial Position:";
 		Write logfile, "  Robot1: [-90,0,0,0,0,0]";
 		Write logfile, "  Robot2: [+90,0,0,0,0,0]";
-		Write logfile, "  Gantry: [0,0,0,0]";
+		Write logfile, "  Gantry Physical: [0,0,0,0]";
+		Write logfile, "  Gantry Floor: [9500,5300,2100,0]";
 		Write logfile, "";
-		Write logfile, "Gantry Movement (User coordinates):";
+		Write logfile, "Gantry Movement (Floor coordinates):";
 		Write logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm";
 		Write logfile, "  Y = " + NumToStr(gantry_y_offset, 2) + " mm";
 		Write logfile, "  Z = " + NumToStr(gantry_z_offset, 2) + " mm";
