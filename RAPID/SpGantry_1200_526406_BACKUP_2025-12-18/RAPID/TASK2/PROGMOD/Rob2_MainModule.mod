@@ -503,7 +503,15 @@ MODULE Rob2_MainModule
     ENDTRAP
 
     PROC main()
-        rUpdateR2Position;
+        ! Initialize Robot2 position
+        SetRobot2InitialPosition;
+        WaitTime 1.0;
+
+        ! Continuously update robot2_floor_pos for cross-task measurement
+        WHILE TRUE DO
+            rUpdateR2Position;
+            WaitTime 0.1;  ! Update every 100ms
+        ENDWHILE
     ENDPROC
 
     PROC rInit()
