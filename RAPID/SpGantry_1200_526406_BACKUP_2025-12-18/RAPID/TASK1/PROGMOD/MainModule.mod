@@ -111,12 +111,16 @@ MODULE MainModule
 	! Robot1 TCP position in Floor coordinate system (for distance measurement)
 	! Shared across tasks - use PERS (not TASK PERS) for cross-task access
 	PERS robtarget robot1_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+	! Robot2 TCP position in Floor coordinate system (for cross-task measurement)
+	PERS robtarget robot2_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
 	! Work Object Definitions (v1.7.7 2025-12-28)
 	! WobjFloor: Floor coordinate system for Robot1
 	PERS wobjdata WobjFloor := [FALSE, TRUE, "", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+	! WobjFloor_Rob2: Floor coordinate system for Robot2 (for cross-task measurement)
+	PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 4812, 321.80], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
 	! wobjRob1Base: Robot1 Base Frame = GantryRob coordinate system (Y-axis 90° rotation)
 	! Quaternion [0, 0.707107, 0, 0.707107] = Y-axis 90° rotation
@@ -847,6 +851,16 @@ MODULE MainModule
 	! Used for distance measurement between robots
 	PROC UpdateRobot1FloorPosition()
 		robot1_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+	ENDPROC
+
+	! ========================================
+	! Update Robot2 Floor Position (Cross-Task)
+	! ========================================
+	! Version: v1.7.31
+	! Date: 2025-12-30
+	! Purpose: Read Robot2 TCP from T_ROB2 for cross-task measurement
+	PROC UpdateRobot2FloorPositionLocal()
+		robot2_floor_pos := CRobT(\TaskName:="T_ROB2"\Tool:=tool0\WObj:=WobjFloor_Rob2);
 	ENDPROC
 
 	! ========================================
