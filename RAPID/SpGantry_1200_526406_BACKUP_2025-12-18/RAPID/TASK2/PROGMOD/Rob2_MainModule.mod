@@ -503,13 +503,23 @@ MODULE Rob2_MainModule
     ENDTRAP
 
     PROC main()
+        VAR num update_counter := 0;
+
         ! Initialize Robot2 position
         SetRobot2InitialPosition;
         WaitTime 1.0;
 
         ! Continuously update robot2_floor_pos for cross-task measurement
+        TPWrite "TASK2: Starting position update loop...";
         WHILE TRUE DO
             rUpdateR2Position;
+            update_counter := update_counter + 1;
+
+            ! Log every 100 updates (10 seconds)
+            IF update_counter MOD 100 = 0 THEN
+                TPWrite "TASK2: Update loop running (" + NumToStr(update_counter, 0) + " updates)";
+            ENDIF
+
             WaitTime 0.1;  ! Update every 100ms
         ENDWHILE
     ENDPROC
