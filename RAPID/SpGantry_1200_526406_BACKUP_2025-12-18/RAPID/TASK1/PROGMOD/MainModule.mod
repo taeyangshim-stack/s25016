@@ -147,7 +147,7 @@ MODULE MainModule
 	VAR syncident sync3;
     CONST robtarget Target_70:=[[1161.172779454,144.559329246,-14.871009752],[0.061622373,-0.061632152,0.704422634,-0.704409621],[0,-1,0,0],[50.497416407,99.641412497,66.590927541,0,0,2.893288836]];
     CONST robtarget Target_80:=[[1161.172382635,144.558432538,-14.87045264],[0.061622111,-0.06163207,0.704422579,-0.704409706],[0,-1,0,0],[129.957869649,168.339699507,103.588841856,0,0,7.446037445]];
-	TASK PERS jointtarget jTemp:=[[0,-2.51761,-12.1411,0,15.6587,0],[-500,500,300,15,0,-28.6479]];
+	TASK PERS jointtarget jTemp_rob1:=[[0,-2.51761,-12.1411,0,15.6587,0],[-500,500,300,15,0,-28.6479]];
 	PERS pos nCaledR1Pos:=[-28.6282,626.304,300];
 
 	! Shared Variables for Gantry Position (v1.0.0 2025-12-17)
@@ -192,13 +192,13 @@ MODULE MainModule
         VAR num X1;
         VAR num Y1;
         VAR num Z1;
-        !        jTemp:=[[0,0,0,0,0,0],[0,0,0,30,0,0]];
-        jTemp := CJointT(\TaskName:="T_ROB1");
+        !        jTemp_rob1:=[[0,0,0,0,0,0],[0,0,0,30,0,0]];
+        jTemp_rob1 := CJointT(\TaskName:="T_ROB1");
 
-        X:=jtemp.extax.eax_a;
-        Y:=jtemp.extax.eax_b;
-        Z:=jtemp.extax.eax_c;
-        R:=jtemp.extax.eax_d;
+        X:=jTemp_rob1.extax.eax_a;
+        Y:=jTemp_rob1.extax.eax_b;
+        Z:=jTemp_rob1.extax.eax_c;
+        R:=jTemp_rob1.extax.eax_d;
 
         X1:=X+(488*cos(R));
         !X2:=X-(976*cos(R));
