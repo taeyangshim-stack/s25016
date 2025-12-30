@@ -179,7 +179,9 @@ MODULE MainModule
 	PERS wobjdata wobjRob1Base := [FALSE, TRUE, "", [[0, 0, 0], [0, 0.707107, 0, 0.707107]], [[0, 0, 0], [1, 0, 0, 0]]];
 
 	PROC main()
-		rUpdateR1Position;
+		! Temporary: Call SetRobot1InitialPosition for testing
+		SetRobot1InitialPosition;
+		! Original: rUpdateR1Position;
 	ENDPROC
     
     PROC rUpdateR1Position()
