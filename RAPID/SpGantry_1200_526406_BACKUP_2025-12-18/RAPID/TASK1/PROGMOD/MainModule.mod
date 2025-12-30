@@ -878,6 +878,8 @@ MODULE MainModule
 
 		TPWrite "Moving Robot1 to initial position...";
 		initial_pos := CJointT();
+		! Synchronize X2 with X1 first (prevent linked motor error)
+		initial_pos.extax.eax_f := initial_pos.extax.eax_a;
 		! Robot1 joint angles: [-90, 0, 0, 0, 0, 0]
 		initial_pos.robax.rax_1 := -90;
 		initial_pos.robax.rax_2 := 0;
@@ -1118,6 +1120,8 @@ MODULE MainModule
 		! Move to HOME position [0, 0, 0, 0]
 		TPWrite "Moving gantry to HOME [0,0,0,0]...";
 		home_pos := CJointT();
+		! Synchronize X2 with X1 first (prevent linked motor error)
+		home_pos.extax.eax_f := home_pos.extax.eax_a;
 		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
 		home_pos.extax.eax_b := 0;      ! Y = Physical origin
 		home_pos.extax.eax_c := 0;      ! Z = Physical origin
