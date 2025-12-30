@@ -1133,7 +1133,7 @@ MODULE MainModule
 		rob1_floor_before := robot1_floor_pos;
 		rob2_floor_before := robot2_floor_pos;
 
-		! Move gantry with Floor→Physical coordinate transformation
+		! Move gantry with Floor->Physical coordinate transformation
 		TPWrite "Moving gantry with offsets...";
 		moved_pos := home_pos;
 		moved_pos.extax.eax_a := gantry_x_offset - 9500;   ! Physical X = Floor_X - 9500
