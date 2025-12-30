@@ -1122,23 +1122,24 @@ MODULE MainModule
 		gantry_z_offset := 0;
 		gantry_r_offset := 0;
 
-		! Check if both robots are at initial position
+		! Check if both robots are at initial position (v1.7.48)
+		! HOME position changed to TCP [0, 0/488, ±1000] with J1≈0°
 		TPWrite "Checking robot positions...";
 		rob1_current := CJointT();
 		rob2_current := CJointT(\TaskName:="T_ROB2");
 
-		IF Abs(rob1_current.robax.rax_1 + 90) > 5 THEN
+		IF Abs(rob1_current.robax.rax_1 - 0) > 15 THEN
 			TPWrite "WARNING: Robot1 NOT at initial position!";
 			TPWrite "Current Robot1 J1: " + NumToStr(rob1_current.robax.rax_1, 1);
-			TPWrite "Expected: -90 degrees";
+			TPWrite "Expected: ~0 degrees (HOME TCP [0,0,1000])";
 			TPWrite "Please run SetRobot1InitialPosition first";
 			STOP;
 		ENDIF
 
-		IF Abs(rob2_current.robax.rax_1 - 90) > 5 THEN
+		IF Abs(rob2_current.robax.rax_1 - 0) > 15 THEN
 			TPWrite "WARNING: Robot2 NOT at initial position!";
 			TPWrite "Current Robot2 J1: " + NumToStr(rob2_current.robax.rax_1, 1);
-			TPWrite "Expected: +90 degrees";
+			TPWrite "Expected: ~0 degrees (HOME TCP [0,488,-1000])";
 			TPWrite "Please run TASK2->SetRobot2InitialPosition first";
 			STOP;
 		ENDIF
@@ -1254,7 +1255,7 @@ MODULE MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.33)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.48)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
