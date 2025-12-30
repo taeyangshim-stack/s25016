@@ -165,8 +165,8 @@ MODULE MainModule
 	! Shared across tasks - use PERS (not TASK PERS) for cross-task access
 	PERS robtarget robot1_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 	! Robot2 TCP position in Floor coordinate system (from TASK2)
-	! Reference TASK2's robot2_floor_pos variable (updated by TASK2)
-	PERS robtarget robot2_floor_pos \Task:='T_ROB2';
+	! External reference - initialized and updated by TASK2
+	PERS robtarget robot2_floor_pos;
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
