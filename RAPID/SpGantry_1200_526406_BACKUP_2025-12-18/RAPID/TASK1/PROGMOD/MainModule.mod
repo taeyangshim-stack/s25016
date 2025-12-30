@@ -72,6 +72,47 @@ MODULE MainModule
 	!   - ReadConfigMode() function reads /HOME/config.txt
 	!   - Robot1 always uses wobj0 (MODE independent)
 	!   - Display MODE for consistency with Robot2
+	!
+	! v1.7.28 (2025-12-29)
+	!   - Added SetRobot1InitialPosition procedure
+	!   - Robot1: [-90,0,0,0,0,0], Gantry: HOME position
+	!
+	! v1.7.29 (2025-12-29)
+	!   - Fixed Z-axis out of range error (50027)
+	!   - Changed HOME Z from 2100 to 700 (within physical limit)
+	!
+	! v1.7.30 (2025-12-29)
+	!   - Moved TestGantryFloorCoordinates from TASK2 to TASK1
+	!   - Changed HOME to physical origin [0,0,0,0]
+	!   - HOME Physical [0,0,0,0] = Floor [9500,5300,2100,0]
+	!
+	! v1.7.31 (2025-12-30)
+	!   - Added UpdateRobot2FloorPositionLocal to TASK1
+	!   - Added WobjFloor_Rob2 and robot2_floor_pos
+	!   - Support cross-task Robot2 measurement from TASK1
+	!
+	! v1.7.32 (2025-12-30)
+	!   - Fixed Floor->Physical coordinate transformation
+	!   - Physical = Floor_offset - HOME_offset
+	!   - Y, Z, R use subtraction due to Rx 180° rotation
+	!
+	! v1.7.33 (2025-12-30)
+	!   - Added X1-X2 synchronization in TestGantryFloorCoordinates
+	!   - Prevent linked motor error 50246
+	!
+	! v1.7.34 (2025-12-30)
+	!   - SetRobot1InitialPosition: Read position after robot movement
+	!   - Changed home_pos := initial_pos -> home_pos := CJointT()
+	!
+	! v1.7.35 (2025-12-30)
+	!   - SetRobot1InitialPosition: 2-step move to prevent error 50246
+	!   - Step 1: Synchronize X1-X2 at current position
+	!   - Step 2: Move all axes to HOME [0,0,0,0]
+	!
+	! v1.7.36 (2025-12-30)
+	!   - SetRobot1InitialPosition: Re-read position in Step 2
+	!   - Added home_pos := CJointT() after Step 1 movement
+	!   - Ensures X1-X2 synchronization with actual current position
 	!========================================
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
