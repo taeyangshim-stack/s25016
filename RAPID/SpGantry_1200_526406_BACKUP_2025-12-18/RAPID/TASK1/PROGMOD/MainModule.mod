@@ -118,6 +118,13 @@ MODULE MainModule
 	!   - SetRobot1InitialPosition: Added debug TPWrite messages
 	!   - Display X1, X2 values before/after Step 1 synchronization
 	!   - Display current position before Step 2 HOME movement
+	!
+	! v1.7.38 (2025-12-30)
+	!   - Fixed Robot2 Floor measurement in TestGantryFloorCoordinates
+	!   - Changed robot2_floor_pos to alias referencing TASK2's variable
+	!   - Removed incorrect UpdateRobot2FloorPositionLocal (used wrong WObj)
+	!   - Removed WobjFloor_Rob2 from TASK1 (only in TASK2)
+	!   - TASK2 now updates robot2_floor_pos automatically via rUpdateR2Position
 	!========================================
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
@@ -157,16 +164,15 @@ MODULE MainModule
 	! Robot1 TCP position in Floor coordinate system (for distance measurement)
 	! Shared across tasks - use PERS (not TASK PERS) for cross-task access
 	PERS robtarget robot1_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-	! Robot2 TCP position in Floor coordinate system (for cross-task measurement)
-	PERS robtarget robot2_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+	! Robot2 TCP position in Floor coordinate system (from TASK2)
+	! Reference TASK2's robot2_floor_pos variable (updated by TASK2)
+	PERS robtarget robot2_floor_pos \Task:='T_ROB2';
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
 	! Work Object Definitions (v1.7.7 2025-12-28)
 	! WobjFloor: Floor coordinate system for Robot1
 	PERS wobjdata WobjFloor := [FALSE, TRUE, "", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
-	! WobjFloor_Rob2: Floor coordinate system for Robot2 (for cross-task measurement)
-	PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 4812, 321.80], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
 	! wobjRob1Base: Robot1 Base Frame = GantryRob coordinate system (Y-axis 90° rotation)
 	! Quaternion [0, 0.707107, 0, 0.707107] = Y-axis 90° rotation
@@ -900,16 +906,6 @@ MODULE MainModule
 	ENDPROC
 
 	! ========================================
-	! Update Robot2 Floor Position (Cross-Task)
-	! ========================================
-	! Version: v1.7.31
-	! Date: 2025-12-30
-	! Purpose: Read Robot2 TCP from T_ROB2 for cross-task measurement
-	PROC UpdateRobot2FloorPositionLocal()
-		robot2_floor_pos := CRobT(\TaskName:="T_ROB2"\Tool:=tool0\WObj:=WobjFloor_Rob2);
-	ENDPROC
-
-	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
 	! Version: v1.7.37
@@ -1197,7 +1193,7 @@ MODULE MainModule
 		! Measure BEFORE gantry movement
 		TPWrite "Measuring BEFORE gantry move...";
 		UpdateRobot1FloorPosition;
-		UpdateRobot2FloorPositionLocal;
+		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
 		rob1_floor_before := robot1_floor_pos;
 		rob2_floor_before := robot2_floor_pos;
 
@@ -1215,7 +1211,7 @@ MODULE MainModule
 		! Measure AFTER gantry movement
 		TPWrite "Measuring AFTER gantry move...";
 		UpdateRobot1FloorPosition;
-		UpdateRobot2FloorPositionLocal;
+		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
 		rob1_floor_after := robot1_floor_pos;
 		rob2_floor_after := robot2_floor_pos;
 

@@ -1081,6 +1081,9 @@ MODULE Rob2_MainModule
 
         nCaledR2Pos:=[X2,Y2,Z];
         wobjtest:=[FALSE,TRUE,"GantryRob",[[X2,Y2,Z],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
+
+        ! Update Robot2 Floor position for cross-task measurement (v1.7.38)
+        UpdateRobot2FloorPosition;
     ENDPROC
 
 	!========================================
