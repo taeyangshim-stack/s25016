@@ -1999,7 +1999,7 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Set Robot2 Initial Position
 	! ========================================
-	! Version: v1.7.44
+	! Version: v1.7.45
 	! Date: 2025-12-31
 	! Purpose: Move Robot2 to initial test position TCP [0, 488, -1000]
 	! Position at R-axis center for easy calculation and verification
@@ -2026,9 +2026,10 @@ MODULE Rob2_MainModule
 
 		! Step 2: Move Robot2 TCP to HOME position at R-axis center
 		TPWrite "Step 2: Moving Robot2 TCP to HOME [0, 488, -1000] in wobj0...";
-		! TCP position: [0, 488, -1000] in wobj0 (R-axis center, opposite side of Robot1)
-		! This position puts both Robot1 and Robot2 TCP at R-axis center
-		home_tcp := [[0, 488, -1000], [1, 0, 0, 0], [0, 0, 0, 0], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]];
+		! TCP position: [0, 488, -1000] in wobj0 (R-axis center)
+		! Robot2 needs to move +488mm from base to reach R-axis center
+		! Quaternion: [0.50000, -0.50000, -0.50000, -0.50000]
+		home_tcp := [[0, 488, -1000], [0.50000, -0.50000, -0.50000, -0.50000], [0, 0, 0, 0], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]];
 		MoveL home_tcp, v100, fine, tool0\WObj:=wobj0;
 		TPWrite "Robot2 TCP at HOME [0, 488, -1000]";
 		TPWrite "Gantry position unchanged (controlled by TASK1)";

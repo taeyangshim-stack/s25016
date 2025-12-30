@@ -912,11 +912,11 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.44
+	! Version: v1.7.45
 	! Date: 2025-12-31
 	! Purpose: Move Robot1 to initial test position
-	! Position: Robot1 TCP [0, -488, 1000] in wobj0, Gantry HOME=[0,0,0,0]
-	! TCP at R-axis center for easy calculation and verification
+	! Position: Robot1 TCP [0, 0, 1000] in wobj0, Gantry HOME=[0,0,0,0]
+	! Robot1 wobj0 is at R-axis center, so Y=0 puts TCP at R-axis center
 	! Note: Safe from any starting position - synchronizes X1-X2 first
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_joint;
@@ -970,12 +970,13 @@ MODULE MainModule
 		TPWrite "Robot1 at intermediate joint position";
 
 		! Step 2: Move Robot1 TCP to HOME position at R-axis center
-		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, -488, 1000] in wobj0...";
-		! TCP position: [0, -488, 1000] in wobj0 (R-axis center)
-		! This position puts both Robot1 and Robot2 TCP at R-axis center
-		home_tcp := [[0, -488, 1000], [1, 0, 0, 0], [0, 0, 0, 0], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]];
+		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] in wobj0...";
+		! TCP position: [0, 0, 1000] in wobj0 (R-axis center)
+		! Robot1 wobj0 origin is already at R-axis center (+488mm from Robot1 base)
+		! Quaternion: [0.49996, -0.50004, 0.50004, 0.49996]
+		home_tcp := [[0, 0, 1000], [0.49996, -0.50004, 0.50004, 0.49996], [0, 0, 0, 0], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]];
 		MoveL home_tcp, v100, fine, tool0\WObj:=wobj0;
-		TPWrite "Robot1 TCP at HOME [0, -488, 1000]";
+		TPWrite "Robot1 TCP at HOME [0, 0, 1000]";
 
 		! Step 3: Move gantry to HOME position (physical origin)
 		TPWrite "Step 3: Moving gantry to HOME [0,0,0,0]...";
