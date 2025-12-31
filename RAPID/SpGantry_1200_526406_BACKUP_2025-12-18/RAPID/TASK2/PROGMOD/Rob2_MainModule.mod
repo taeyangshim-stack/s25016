@@ -75,6 +75,19 @@ MODULE Rob2_MainModule
 	!     * wobj0 [+50,+30,+20] -> Floor [+50,-30,-20] (Y,Z inverted)
 	!   - Modified TestCoordinateMovement to accept wobjdata parameter
 	!   - TestRobot2_XYZ now switches coordinate system based on MODE
+	!
+	! v1.7.45 - v1.7.47 (2025-12-31)
+	!   - Updated SetRobot2InitialPosition to match Robot1 HOME position
+	!   - Robot2 HOME: TCP [0, 488, -1000] with quaternion [0.50000, -0.50000, -0.50000, -0.50000]
+	!   - Fixed 40512 error using actual extax values from CJointT()
+	!
+	! v1.7.50 (2025-12-31)
+	!   - Added WobjGantry_Rob2 dynamic work object for Robot2 TCP control
+	!   - Implemented UpdateGantryWobj_Rob2() to read gantry position from TASK1
+	!   - Robot2 cannot control gantry - must use CJointT(\TaskName:="T_ROB1")
+	!   - R-axis rotation with 90deg base offset (R=0: gantry parallel to Y-axis)
+	!   - Enables Robot2 TCP control in Floor coordinates regardless of gantry position
+	!   - SetRobot2InitialPosition now uses WobjGantry_Rob2 instead of wobj0
 	!========================================
     RECORD targetdata
         robtarget position;
@@ -183,6 +196,12 @@ MODULE Rob2_MainModule
     ! uframe: [-9500, 5300, 2100] = Gantry HOME in Floor coordinate
     ! rot: [0, 1, 0, 0] = 180° around Y-axis
     PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+
+    ! WobjGantry_Rob2: Dynamic work object for Robot2 TCP control (v1.7.50)
+    ! Updated by UpdateGantryWobj_Rob2() to track gantry position from TASK1
+    ! Allows Robot2 TCP control in Floor coordinates regardless of gantry position
+    ! Robot2 cannot control gantry, must read position from TASK1
+    PERS wobjdata WobjGantry_Rob2 := [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
     ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
@@ -1999,10 +2018,11 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Set Robot2 Initial Position
 	! ========================================
-	! Version: v1.7.47
+	! Version: v1.7.50
 	! Date: 2025-12-31
 	! Purpose: Move Robot2 to initial test position TCP [0, 488, -1000]
 	! Position at R-axis center for easy calculation and verification
+	! Uses WobjGantry_Rob2 which tracks current gantry position from TASK1
 	! NOTE: This procedure does NOT control gantry (only TASK1 can control gantry)
 	! Gantry should already be at HOME [0,0,0,0] by TASK1->SetRobot1InitialPosition
 	PROC SetRobot2InitialPosition()
@@ -2025,15 +2045,17 @@ MODULE Rob2_MainModule
 		TPWrite "Robot2 at intermediate joint position";
 
 		! Step 2: Move Robot2 TCP to HOME position at R-axis center
-		TPWrite "Step 2: Moving Robot2 TCP to HOME [0, 488, -1000] in wobj0...";
-		! TCP position: [0, 488, -1000] in wobj0 (R-axis center)
+		TPWrite "Step 2: Moving Robot2 TCP to HOME [0, 488, -1000] using WobjGantry_Rob2...";
+		! Update WobjGantry_Rob2 to reflect current gantry position from TASK1
+		UpdateGantryWobj_Rob2;
+		! TCP position: [0, 488, -1000] in WobjGantry_Rob2 (tracks gantry position)
 		! Robot2 needs to move +488mm from base to reach R-axis center
 		! Quaternion: [0.50000, -0.50000, -0.50000, -0.50000]
 		! Read current gantry position and preserve it in extax
 		initial_joint := CJointT();
 		home_tcp := [[0, 488, -1000], [0.50000, -0.50000, -0.50000, -0.50000], [0, 0, 0, 0], initial_joint.extax];
-		MoveJ home_tcp, v100, fine, tool0\WObj:=wobj0;
-		TPWrite "Robot2 TCP at HOME [0, 488, -1000]";
+		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;  ! Using WobjGantry_Rob2 instead of wobj0!
+		TPWrite "Robot2 TCP at HOME [0, 488, -1000] (WobjGantry_Rob2)";
 		TPWrite "Gantry position unchanged (controlled by TASK1)";
 
 		! Initialize robot2_floor_pos for cross-task measurement (v1.7.43)
@@ -2091,6 +2113,54 @@ MODULE Rob2_MainModule
 
 		! Keep rotation from base coordinate
 		robot2_floor_pos.rot := robot2_tcp_base.rot;
+	ENDPROC
+
+	! ========================================
+	! Update Gantry Work Object for Robot2
+	! ========================================
+	! Version: v1.7.50
+	! Date: 2025-12-31
+	! Purpose: Update WobjGantry_Rob2 to reflect current gantry position and rotation
+	! Robot2 cannot control gantry - must read position from TASK1
+	! This allows Robot2 TCP control in Floor coordinates regardless of gantry position
+	! R-axis orientation: R=0 means gantry parallel to Y-axis (Floor coordinate)
+	! Must be called before using WobjGantry_Rob2 for TCP movements
+	PROC UpdateGantryWobj_Rob2()
+		VAR jointtarget current_gantry;
+		VAR num r_deg;
+		VAR num r_rad;
+		VAR num half_angle;
+		VAR num total_deg;
+		VAR num total_rad;
+
+		! Read current gantry position from TASK1 (Robot2 cannot sense this directly)
+		current_gantry := CJointT(\TaskName:="T_ROB1");
+
+		! Update WobjGantry_Rob2 position to current gantry location
+		WobjGantry_Rob2.uframe.trans.x := current_gantry.extax.eax_a;
+		WobjGantry_Rob2.uframe.trans.y := current_gantry.extax.eax_b;
+		WobjGantry_Rob2.uframe.trans.z := current_gantry.extax.eax_c;
+
+		! Calculate R-axis rotation and convert to quaternion
+		! R-axis is Z-axis rotation in Floor coordinate system
+		! R=0: Gantry parallel to Y-axis (perpendicular to X-axis)
+		! Base rotation: 90 deg (Y-axis direction)
+		! Total rotation: 90 + R
+		r_deg := current_gantry.extax.eax_d;
+		total_deg := 90 + r_deg;  ! Base 90deg + R-axis angle
+		total_rad := total_deg * pi / 180;
+		half_angle := total_rad / 2;
+
+		! Z-axis rotation quaternion: [cos(theta/2), 0, 0, sin(theta/2)]
+		WobjGantry_Rob2.uframe.rot.q1 := Cos(half_angle);
+		WobjGantry_Rob2.uframe.rot.q2 := 0;
+		WobjGantry_Rob2.uframe.rot.q3 := 0;
+		WobjGantry_Rob2.uframe.rot.q4 := Sin(half_angle);
+
+		TPWrite "WobjGantry_Rob2 updated: [" + NumToStr(current_gantry.extax.eax_a,0) + ", "
+		                                    + NumToStr(current_gantry.extax.eax_b,0) + ", "
+		                                    + NumToStr(current_gantry.extax.eax_c,0) + ", R="
+		                                    + NumToStr(r_deg,1) + "]";
 	ENDPROC
 
 	! ========================================
