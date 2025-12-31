@@ -1024,10 +1024,18 @@ MODULE MainModule
 		current_gantry := CJointT();
 		r_deg := current_gantry.extax.eax_d;
 
+		! DEBUG: Show gantry position read by UpdateRobot2BaseDynamicWobj (v1.7.50)
+		TPWrite "  [DEBUG] Gantry read in UpdateRobot2BaseDynamicWobj:";
+		TPWrite "    Physical: [" + NumToStr(current_gantry.extax.eax_a,1) + ", "
+		                          + NumToStr(current_gantry.extax.eax_b,1) + ", "
+		                          + NumToStr(current_gantry.extax.eax_c,1) + ", "
+		                          + NumToStr(current_gantry.extax.eax_d,1) + "]";
+
 		! Calculate total R-axis rotation (90deg base + R)
 		! R=0: Gantry parallel to Y-axis
 		total_r_deg := 90 + r_deg;
 		total_r_rad := total_r_deg * pi / 180;
+		TPWrite "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_rad),3) + ", Sin=" + NumToStr(Sin(total_r_rad),3);
 
 		! Calculate Robot2 base position in Physical coordinates
 		! Robot2 Floor Y = 4812 (5300-488) -> Physical Y = +488
@@ -1035,6 +1043,11 @@ MODULE MainModule
 		WobjRobot2Base_Dynamic.uframe.trans.x := current_gantry.extax.eax_a + (488 * Cos(total_r_rad));
 		WobjRobot2Base_Dynamic.uframe.trans.y := current_gantry.extax.eax_b + (488 * Sin(total_r_rad));
 		WobjRobot2Base_Dynamic.uframe.trans.z := current_gantry.extax.eax_c;
+
+		! DEBUG: Show Physical calculation
+		TPWrite "    Robot2 Base Physical: [" + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.x,1) + ", "
+		                                      + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.y,1) + ", "
+		                                      + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.z,1) + "]";
 
 		! Transform Physical -> Floor coordinates for Robot2 base
 		base_floor_x := WobjRobot2Base_Dynamic.uframe.trans.x + 9500;
