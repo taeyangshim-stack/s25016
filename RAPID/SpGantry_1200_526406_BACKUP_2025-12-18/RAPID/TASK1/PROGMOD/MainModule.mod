@@ -966,11 +966,6 @@ MODULE MainModule
 	! Must be called before using WobjGantry for TCP movements
 	PROC UpdateGantryWobj()
 		VAR jointtarget current_gantry;
-		VAR num r_deg;
-		VAR num r_rad;
-		VAR num half_angle_deg;
-		VAR num total_deg;
-		VAR num total_rad;
 
 		! Read current gantry position
 		current_gantry := CJointT();
@@ -980,28 +975,19 @@ MODULE MainModule
 		WobjGantry.uframe.trans.y := current_gantry.extax.eax_b;
 		WobjGantry.uframe.trans.z := current_gantry.extax.eax_c;
 
-		! Calculate R-axis rotation and convert to quaternion
-		! R-axis is Z-axis rotation in Floor coordinate system
-		! R=0: Gantry parallel to Y-axis (perpendicular to X-axis)
-		! Base rotation: 90 deg (Y-axis direction)
-		! Total rotation: 90 + R
-		! IMPORTANT: RAPID Cos/Sin functions take DEGREES, not radians!
-		r_deg := current_gantry.extax.eax_d;
-		total_deg := 90 + r_deg;  ! Base 90deg + R-axis angle
-		total_rad := total_deg * pi / 180;  ! For reference only
-		half_angle_deg := total_deg / 2;  ! Half angle in DEGREES for Cos/Sin
-
-		! Z-axis rotation quaternion: [cos(theta/2), 0, 0, sin(theta/2)]
-		! RAPID Cos/Sin use DEGREES!
-		WobjGantry.uframe.rot.q1 := Cos(half_angle_deg);
+		! WobjGantry orientation
+		! IMPORTANT: WobjGantry coordinate system is always aligned with World/Floor
+		! R-axis rotation affects robot base, NOT work object orientation
+		! Keep quaternion as identity (no rotation)
+		WobjGantry.uframe.rot.q1 := 1;
 		WobjGantry.uframe.rot.q2 := 0;
 		WobjGantry.uframe.rot.q3 := 0;
-		WobjGantry.uframe.rot.q4 := Sin(half_angle_deg);
+		WobjGantry.uframe.rot.q4 := 0;
 
 		TPWrite "WobjGantry updated: [" + NumToStr(current_gantry.extax.eax_a,0) + ", "
 		                              + NumToStr(current_gantry.extax.eax_b,0) + ", "
 		                              + NumToStr(current_gantry.extax.eax_c,0) + ", R="
-		                              + NumToStr(r_deg,1) + "]";
+		                              + NumToStr(current_gantry.extax.eax_d,1) + "]";
 	ENDPROC
 
 	! ========================================
