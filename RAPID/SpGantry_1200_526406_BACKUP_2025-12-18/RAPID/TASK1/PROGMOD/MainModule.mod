@@ -985,16 +985,18 @@ MODULE MainModule
 		! R=0: Gantry parallel to Y-axis (perpendicular to X-axis)
 		! Base rotation: 90 deg (Y-axis direction)
 		! Total rotation: 90 + R
+		! IMPORTANT: RAPID Cos/Sin functions take DEGREES, not radians!
 		r_deg := current_gantry.extax.eax_d;
 		total_deg := 90 + r_deg;  ! Base 90deg + R-axis angle
-		total_rad := total_deg * pi / 180;
-		half_angle := total_rad / 2;
+		total_rad := total_deg * pi / 180;  ! For reference only
+		half_angle_deg := total_deg / 2;  ! Half angle in DEGREES for Cos/Sin
 
 		! Z-axis rotation quaternion: [cos(theta/2), 0, 0, sin(theta/2)]
-		WobjGantry.uframe.rot.q1 := Cos(half_angle);
+		! RAPID Cos/Sin use DEGREES!
+		WobjGantry.uframe.rot.q1 := Cos(half_angle_deg);
 		WobjGantry.uframe.rot.q2 := 0;
 		WobjGantry.uframe.rot.q3 := 0;
-		WobjGantry.uframe.rot.q4 := Sin(half_angle);
+		WobjGantry.uframe.rot.q4 := Sin(half_angle_deg);
 
 		TPWrite "WobjGantry updated: [" + NumToStr(current_gantry.extax.eax_a,0) + ", "
 		                              + NumToStr(current_gantry.extax.eax_b,0) + ", "
@@ -1046,16 +1048,18 @@ MODULE MainModule
 
 		! Calculate total R-axis rotation (90deg base + R)
 		! R=0: Gantry parallel to Y-axis
+		! IMPORTANT: RAPID Cos/Sin functions take DEGREES, not radians!
 		total_r_deg := 90 + r_deg;
-		total_r_rad := total_r_deg * pi / 180;
-		TPWrite "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_rad),3) + ", Sin=" + NumToStr(Sin(total_r_rad),3);
-		IF enable_debug_logging Write debug_logfile, "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_rad),3) + ", Sin=" + NumToStr(Sin(total_r_rad),3);
+		total_r_rad := total_r_deg * pi / 180;  ! For reference only
+		TPWrite "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_deg),3) + ", Sin=" + NumToStr(Sin(total_r_deg),3);
+		IF enable_debug_logging Write debug_logfile, "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_deg),3) + ", Sin=" + NumToStr(Sin(total_r_deg),3);
 
 		! Calculate Robot2 base position in Physical coordinates
 		! Robot2 Floor Y = 4812 (5300-488) -> Physical Y = +488
 		! Robot2 is +488mm offset from R-axis center in Physical coordinates
-		WobjRobot2Base_Dynamic.uframe.trans.x := current_gantry.extax.eax_a + (488 * Cos(total_r_rad));
-		WobjRobot2Base_Dynamic.uframe.trans.y := current_gantry.extax.eax_b + (488 * Sin(total_r_rad));
+		! RAPID Cos/Sin use DEGREES!
+		WobjRobot2Base_Dynamic.uframe.trans.x := current_gantry.extax.eax_a + (488 * Cos(total_r_deg));
+		WobjRobot2Base_Dynamic.uframe.trans.y := current_gantry.extax.eax_b + (488 * Sin(total_r_deg));
 		WobjRobot2Base_Dynamic.uframe.trans.z := current_gantry.extax.eax_c;
 
 		! DEBUG: Show Physical calculation
