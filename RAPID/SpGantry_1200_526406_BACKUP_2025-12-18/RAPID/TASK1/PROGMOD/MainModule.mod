@@ -171,8 +171,13 @@ MODULE MainModule
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
 	! Work Object Definitions (v1.7.7 2025-12-28)
-	! WobjFloor: Floor coordinate system for Robot1
+	! WobjFloor: Floor coordinate system for Robot1 (fixed, for measurement)
 	PERS wobjdata WobjFloor := [FALSE, TRUE, "", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+
+	! WobjGantry: Dynamic work object that tracks gantry position (v1.7.49)
+	! Updated by UpdateGantryWobj() before TCP movements
+	! Allows TCP control regardless of gantry position
+	PERS wobjdata WobjGantry := [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
 	! wobjRob1Base: Robot1 Base Frame = GantryRob coordinate system (Y-axis 90° rotation)
 	! Quaternion [0, 0.707107, 0, 0.707107] = Y-axis 90° rotation
@@ -910,13 +915,53 @@ MODULE MainModule
 	ENDPROC
 
 	! ========================================
+	! Update Gantry Work Object
+	! ========================================
+	! Version: v1.7.49
+	! Date: 2025-12-31
+	! Purpose: Update WobjGantry to reflect current gantry position
+	! This allows TCP control regardless of gantry position
+	! Must be called before using WobjGantry for TCP movements
+	PROC UpdateGantryWobj()
+		VAR jointtarget current_gantry;
+		VAR num r_deg;
+		VAR num r_rad;
+		VAR num half_angle;
+
+		! Read current gantry position
+		current_gantry := CJointT();
+
+		! Update WobjGantry position to current gantry location
+		WobjGantry.uframe.trans.x := current_gantry.extax.eax_a;
+		WobjGantry.uframe.trans.y := current_gantry.extax.eax_b;
+		WobjGantry.uframe.trans.z := current_gantry.extax.eax_c;
+
+		! Calculate R-axis rotation and convert to quaternion
+		! R-axis is Z-axis rotation in Floor coordinate system
+		r_deg := current_gantry.extax.eax_d;
+		r_rad := r_deg * pi / 180;
+		half_angle := r_rad / 2;
+
+		! Z-axis rotation quaternion: [cos(theta/2), 0, 0, sin(theta/2)]
+		WobjGantry.uframe.rot.q1 := Cos(half_angle);
+		WobjGantry.uframe.rot.q2 := 0;
+		WobjGantry.uframe.rot.q3 := 0;
+		WobjGantry.uframe.rot.q4 := Sin(half_angle);
+
+		TPWrite "WobjGantry updated: [" + NumToStr(current_gantry.extax.eax_a,0) + ", "
+		                              + NumToStr(current_gantry.extax.eax_b,0) + ", "
+		                              + NumToStr(current_gantry.extax.eax_c,0) + ", R="
+		                              + NumToStr(r_deg,1) + "]";
+	ENDPROC
+
+	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.47
+	! Version: v1.7.49
 	! Date: 2025-12-31
 	! Purpose: Move Robot1 to initial test position
-	! Position: Robot1 TCP [0, 0, 1000] in wobj0, Gantry HOME=[0,0,0,0]
-	! Robot1 wobj0 is at R-axis center, so Y=0 puts TCP at R-axis center
+	! Position: Robot1 TCP [0, 0, 1000] in WobjGantry (dynamic), Gantry HOME=[0,0,0,0]
+	! Uses WobjGantry which tracks current gantry position - safe from any gantry position
 	! Note: Safe from any starting position - synchronizes X1-X2 first
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_joint;
@@ -970,15 +1015,16 @@ MODULE MainModule
 		TPWrite "Robot1 at intermediate joint position";
 
 		! Step 2: Move Robot1 TCP to HOME position at R-axis center
-		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] in wobj0...";
-		! TCP position: [0, 0, 1000] in wobj0 (R-axis center)
-		! Robot1 wobj0 origin is already at R-axis center (+488mm from Robot1 base)
+		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] using WobjGantry...";
+		! Update WobjGantry to reflect current gantry position
+		UpdateGantryWobj;
+		! TCP position: [0, 0, 1000] in WobjGantry (tracks gantry position)
 		! Quaternion: [0.49996, -0.50004, 0.50004, 0.49996]
-		! Read current gantry position and preserve it in extax
+		! extax preserves current gantry position
 		sync_pos := CJointT();
 		home_tcp := [[0, 0, 1000], [0.49996, -0.50004, 0.50004, 0.49996], [0, 0, 0, 0], sync_pos.extax];
-		MoveJ home_tcp, v100, fine, tool0\WObj:=wobj0;
-		TPWrite "Robot1 TCP at HOME [0, 0, 1000]";
+		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry;
+		TPWrite "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry)";
 
 		! Step 3: Move gantry to HOME position (physical origin)
 		TPWrite "Step 3: Moving gantry to HOME [0,0,0,0]...";
@@ -991,7 +1037,7 @@ MODULE MainModule
 		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "Gantry at HOME position [0,0,0,0]";
-		TPWrite "Robot1 ready: TCP [0,-488,1000], Gantry HOME";
+		TPWrite "Robot1 ready: TCP [0,0,1000], Gantry HOME";
 	ENDPROC
 
 	! ========================================
