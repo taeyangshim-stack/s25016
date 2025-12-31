@@ -125,6 +125,36 @@ MODULE MainModule
 	!   - Removed incorrect UpdateRobot2FloorPositionLocal (used wrong WObj)
 	!   - Removed WobjFloor_Rob2 from TASK1 (only in TASK2)
 	!   - TASK2 now updates robot2_floor_pos automatically via rUpdateR2Position
+	!
+	! v1.7.42 - v1.7.44 (2025-12-31)
+	!   - Progressive X1-X2 synchronization in SetRobot1InitialPosition
+	!   - Updated HOME position to TCP-based: [0, 0, 1000] in wobj0
+	!
+	! v1.7.45 (2025-12-31)
+	!   - Added precise quaternions for HOME positions
+	!   - Robot1: [0.49996, -0.50004, 0.50004, 0.49996]
+	!   - Added intermediate joint [0, -2.58, -11.88, 0, 14.47, 0] to avoid config issues
+	!
+	! v1.7.46 - v1.7.47 (2025-12-31)
+	!   - Fixed 40512 "Missing External Axis Value" error
+	!   - Changed from extax=[9E9,...] to actual gantry position from CJointT()
+	!   - Changed MoveL to MoveJ for HOME positioning
+	!
+	! v1.7.48 (2025-12-31)
+	!   - Updated TestGantryFloorCoordinates position check
+	!   - Changed from J1=-90/+90 check to J1~0 deg check (TCP-based HOME)
+	!   - Fixed unicode symbols in comments (replaced +/-, ~ for ASCII)
+	!
+	! v1.7.49 (2025-12-31)
+	!   - Added WobjGantry dynamic work object for TCP control
+	!   - Implemented UpdateGantryWobj() to track gantry position
+	!   - Enables TCP control from any gantry position
+	!   - SetRobot1InitialPosition now uses WobjGantry instead of wobj0
+	!
+	! v1.7.50 (2025-12-31)
+	!   - Corrected R-axis rotation orientation in UpdateGantryWobj()
+	!   - R=0: Gantry parallel to Y-axis (perpendicular to X-axis) in Floor coordinate
+	!   - Added base 90 deg rotation offset to quaternion calculation
 	!========================================
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
@@ -917,16 +947,19 @@ MODULE MainModule
 	! ========================================
 	! Update Gantry Work Object
 	! ========================================
-	! Version: v1.7.49
+	! Version: v1.7.50
 	! Date: 2025-12-31
-	! Purpose: Update WobjGantry to reflect current gantry position
+	! Purpose: Update WobjGantry to reflect current gantry position and rotation
 	! This allows TCP control regardless of gantry position
+	! R-axis orientation: R=0 means gantry parallel to Y-axis (Floor coordinate)
 	! Must be called before using WobjGantry for TCP movements
 	PROC UpdateGantryWobj()
 		VAR jointtarget current_gantry;
 		VAR num r_deg;
 		VAR num r_rad;
 		VAR num half_angle;
+		VAR num total_deg;
+		VAR num total_rad;
 
 		! Read current gantry position
 		current_gantry := CJointT();
@@ -938,9 +971,13 @@ MODULE MainModule
 
 		! Calculate R-axis rotation and convert to quaternion
 		! R-axis is Z-axis rotation in Floor coordinate system
+		! R=0: Gantry parallel to Y-axis (perpendicular to X-axis)
+		! Base rotation: 90 deg (Y-axis direction)
+		! Total rotation: 90 + R
 		r_deg := current_gantry.extax.eax_d;
-		r_rad := r_deg * pi / 180;
-		half_angle := r_rad / 2;
+		total_deg := 90 + r_deg;  ! Base 90deg + R-axis angle
+		total_rad := total_deg * pi / 180;
+		half_angle := total_rad / 2;
 
 		! Z-axis rotation quaternion: [cos(theta/2), 0, 0, sin(theta/2)]
 		WobjGantry.uframe.rot.q1 := Cos(half_angle);
