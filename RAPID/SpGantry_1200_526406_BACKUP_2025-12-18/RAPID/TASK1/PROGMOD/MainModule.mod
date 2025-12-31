@@ -1419,4 +1419,138 @@ MODULE MainModule
 		STOP;
 	ENDPROC
 
+	! ========================================
+	! Test Gantry with Multiple R-axis Rotations
+	! ========================================
+	! Version: v1.7.50
+	! Date: 2025-12-31
+	! Purpose: Test Robot1 and Robot2 TCP positions at various R-axis angles
+	! Tests multiple R values to verify WobjGantry rotation handling
+	! Initial position: Robot1 and Robot2 at HOME
+	! Gantry moves to [X, Y, Z] with different R angles: 0, 30, 45, 60, 90, -30, -45 degrees
+	! Output: /HOME/gantry_rotation_test.txt
+	PROC TestGantryMultipleRotations()
+		VAR jointtarget home_pos;
+		VAR jointtarget test_pos;
+		VAR robtarget rob1_floor;
+		VAR robtarget rob2_floor;
+		VAR iodev logfile;
+		VAR num test_x;
+		VAR num test_y;
+		VAR num test_z;
+		VAR num r_angles{7};
+		VAR num i;
+		VAR string r_str;
+
+		! Test configuration: Gantry position
+		test_x := 1000;   ! Physical X = 1000mm (Floor X = 10500)
+		test_y := 500;    ! Physical Y = 500mm (Floor Y = 5800)
+		test_z := 300;    ! Physical Z = 300mm (Floor Z = 2400)
+
+		! Test R-axis angles (degrees)
+		r_angles := [0, 30, 45, 60, 90, -30, -45];
+
+		TPWrite "========================================";
+		TPWrite "Starting Multiple R-axis Rotation Test";
+		TPWrite "========================================";
+
+		! Verify initial position
+		TPWrite "Verifying robots at HOME position...";
+		home_pos := CJointT();
+		IF Abs(home_pos.extax.eax_a) > 10 OR Abs(home_pos.extax.eax_b) > 10 OR Abs(home_pos.extax.eax_c) > 10 OR Abs(home_pos.extax.eax_d) > 2 THEN
+			TPWrite "WARNING: Gantry not at HOME!";
+			TPWrite "Current: [" + NumToStr(home_pos.extax.eax_a,0) + ", " + NumToStr(home_pos.extax.eax_b,0) + ", " + NumToStr(home_pos.extax.eax_c,0) + ", " + NumToStr(home_pos.extax.eax_d,1) + "]";
+			TPWrite "Please run SetRobot1InitialPosition first";
+			RETURN;
+		ENDIF
+
+		! Open log file
+		Open "HOME:/gantry_rotation_test.txt", logfile \Write;
+		Write logfile, "========================================";
+		Write logfile, "Gantry R-axis Rotation Test (v1.7.50)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "Test Configuration:";
+		Write logfile, "  Gantry Position (Physical): [" + NumToStr(test_x,0) + ", " + NumToStr(test_y,0) + ", " + NumToStr(test_z,0) + "]";
+		Write logfile, "  Gantry Position (Floor): [" + NumToStr(test_x + 9500,0) + ", " + NumToStr(5300 - test_y,0) + ", " + NumToStr(2100 - test_z,0) + "]";
+		Write logfile, "  R-axis angles tested: 0, 30, 45, 60, 90, -30, -45 degrees";
+		Write logfile, "";
+		Write logfile, "Floor Coordinate System:";
+		Write logfile, "  X+ = right (material flow direction)";
+		Write logfile, "  Y+ = up";
+		Write logfile, "  Z+ = vertical up";
+		Write logfile, "  R=0: Gantry parallel to Y-axis (perpendicular to X-axis)";
+		Write logfile, "  Robot1 at Y+, Robot2 at Y-";
+		Write logfile, "";
+
+		! Test each R angle
+		FOR i FROM 1 TO 7 DO
+			r_str := NumToStr(r_angles{i}, 1);
+			TPWrite "----------------------------------------";
+			TPWrite "Test " + NumToStr(i,0) + "/7: R = " + r_str + " degrees";
+			TPWrite "----------------------------------------";
+
+			! Move gantry to test position with current R angle
+			test_pos := CJointT();
+			test_pos.extax.eax_a := test_x;
+			test_pos.extax.eax_b := test_y;
+			test_pos.extax.eax_c := test_z;
+			test_pos.extax.eax_d := r_angles{i};
+			test_pos.extax.eax_f := test_x;  ! X2 = X1 (synchronized)
+			MoveAbsJ test_pos, v100, fine, tool0;
+			WaitTime 0.5;
+
+			! Measure Floor positions
+			UpdateRobot1FloorPosition;
+			rob1_floor := robot1_floor_pos;
+			rob2_floor := robot2_floor_pos;  ! Updated by TASK2
+
+			! Write results to file
+			Write logfile, "Test " + NumToStr(i,0) + ": R = " + r_str + " deg";
+			Write logfile, "--------------------";
+			Write logfile, "Gantry (Physical): [" + NumToStr(test_pos.extax.eax_a,0) + ", " + NumToStr(test_pos.extax.eax_b,0) + ", " + NumToStr(test_pos.extax.eax_c,0) + ", " + r_str + "]";
+			Write logfile, "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a + 9500,0) + ", " + NumToStr(5300 - test_pos.extax.eax_b,0) + ", " + NumToStr(2100 - test_pos.extax.eax_c,0) + ", " + r_str + "]";
+			Write logfile, "";
+			Write logfile, "Robot1 Floor TCP:";
+			Write logfile, "  X = " + NumToStr(rob1_floor.trans.x, 2) + " mm";
+			Write logfile, "  Y = " + NumToStr(rob1_floor.trans.y, 2) + " mm";
+			Write logfile, "  Z = " + NumToStr(rob1_floor.trans.z, 2) + " mm";
+			Write logfile, "";
+			Write logfile, "Robot2 Floor TCP:";
+			Write logfile, "  X = " + NumToStr(rob2_floor.trans.x, 2) + " mm";
+			Write logfile, "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm";
+			Write logfile, "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
+			Write logfile, "";
+
+			! Display on teach pendant
+			TPWrite "Robot1 Floor: [" + NumToStr(rob1_floor.trans.x,1) + ", " + NumToStr(rob1_floor.trans.y,1) + ", " + NumToStr(rob1_floor.trans.z,1) + "]";
+			TPWrite "Robot2 Floor: [" + NumToStr(rob2_floor.trans.x,1) + ", " + NumToStr(rob2_floor.trans.y,1) + ", " + NumToStr(rob2_floor.trans.z,1) + "]";
+		ENDFOR
+
+		! Return to HOME
+		TPWrite "Returning to HOME...";
+		MoveAbsJ home_pos, v100, fine, tool0;
+
+		Write logfile, "========================================";
+		Write logfile, "Test completed - Returned to HOME";
+		Write logfile, "========================================";
+		Close logfile;
+
+		TPWrite "========================================";
+		TPWrite "Multiple R-axis Rotation Test Complete!";
+		TPWrite "Results saved to gantry_rotation_test.txt";
+		TPWrite "========================================";
+
+	ERROR
+		IF ERRNO = ERR_FILEOPEN THEN
+			TPWrite "ERROR: Cannot open log file";
+		ELSE
+			TPWrite "ERROR in TestGantryMultipleRotations: " + NumToStr(ERRNO, 0);
+		ENDIF
+		Close logfile;
+		STOP;
+	ENDPROC
+
 ENDMODULE
