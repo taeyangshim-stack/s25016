@@ -1313,19 +1313,6 @@ MODULE MainModule
 		ENDIF
 		TPWrite "Both robots at initial positions OK";
 
-		! Measure HOME TCP positions (v1.7.50)
-		TPWrite "Measuring HOME TCP positions...";
-		UpdateRobot1FloorPosition;
-		UpdateRobot2BaseDynamicWobj;  ! This also updates robot2_floor_pos
-		rob1_floor_home := robot1_floor_pos;
-		rob2_floor_home := robot2_floor_pos;
-		TPWrite "Robot1 HOME TCP Floor: [" + NumToStr(rob1_floor_home.trans.x,0) + ", "
-		                                    + NumToStr(rob1_floor_home.trans.y,0) + ", "
-		                                    + NumToStr(rob1_floor_home.trans.z,0) + "]";
-		TPWrite "Robot2 HOME TCP Floor: [" + NumToStr(rob2_floor_home.trans.x,0) + ", "
-		                                    + NumToStr(rob2_floor_home.trans.y,0) + ", "
-		                                    + NumToStr(rob2_floor_home.trans.z,0) + "]";
-
 		! Read gantry offsets from config.txt
 		TPWrite "Reading config.txt...";
 		Open "HOME:/config.txt", configfile \Read;
@@ -1401,6 +1388,19 @@ MODULE MainModule
 		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
 		MoveAbsJ home_pos, v100, fine, tool0;
 		WaitTime 1.0;
+
+		! Measure HOME TCP positions (v1.7.50)
+		TPWrite "Measuring HOME TCP positions...";
+		UpdateRobot1FloorPosition;
+		UpdateRobot2BaseDynamicWobj;  ! This also updates robot2_floor_pos
+		rob1_floor_home := robot1_floor_pos;
+		rob2_floor_home := robot2_floor_pos;
+		TPWrite "Robot1 HOME TCP Floor: [" + NumToStr(rob1_floor_home.trans.x,0) + ", "
+		                                    + NumToStr(rob1_floor_home.trans.y,0) + ", "
+		                                    + NumToStr(rob1_floor_home.trans.z,0) + "]";
+		TPWrite "Robot2 HOME TCP Floor: [" + NumToStr(rob2_floor_home.trans.x,0) + ", "
+		                                    + NumToStr(rob2_floor_home.trans.y,0) + ", "
+		                                    + NumToStr(rob2_floor_home.trans.z,0) + "]";
 
 		! Measure BEFORE gantry movement
 		TPWrite "Measuring BEFORE gantry move...";
