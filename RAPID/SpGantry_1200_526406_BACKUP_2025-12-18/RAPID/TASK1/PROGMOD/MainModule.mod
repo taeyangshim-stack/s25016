@@ -968,7 +968,7 @@ MODULE MainModule
 		VAR jointtarget current_gantry;
 		VAR num r_deg;
 		VAR num r_rad;
-		VAR num half_angle;
+		VAR num half_angle_deg;
 		VAR num total_deg;
 		VAR num total_rad;
 
