@@ -1023,9 +1023,10 @@ MODULE MainModule
 		total_r_rad := total_r_deg * pi / 180;
 
 		! Calculate Robot2 base position in Physical coordinates
-		! Robot2 is -488mm offset from R-axis center
-		WobjRobot2Base_Dynamic.uframe.trans.x := current_gantry.extax.eax_a + (-488 * Cos(total_r_rad));
-		WobjRobot2Base_Dynamic.uframe.trans.y := current_gantry.extax.eax_b + (-488 * Sin(total_r_rad));
+		! Robot2 Floor Y = 4812 (5300-488) -> Physical Y = +488
+		! Robot2 is +488mm offset from R-axis center in Physical coordinates
+		WobjRobot2Base_Dynamic.uframe.trans.x := current_gantry.extax.eax_a + (488 * Cos(total_r_rad));
+		WobjRobot2Base_Dynamic.uframe.trans.y := current_gantry.extax.eax_b + (488 * Sin(total_r_rad));
 		WobjRobot2Base_Dynamic.uframe.trans.z := current_gantry.extax.eax_c;
 
 		! Transform Physical -> Floor coordinates
