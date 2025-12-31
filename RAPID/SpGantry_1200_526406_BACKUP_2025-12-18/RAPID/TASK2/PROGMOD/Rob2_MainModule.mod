@@ -2073,19 +2073,18 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Version: v1.7.50
 	! Date: 2025-12-31
-	! Purpose: Read Robot2 TCP position in Floor coordinate system
-	! Uses WobjRobot2Base_Dynamic (updated by TASK1) to track gantry movement
-	! WobjRobot2Base_Dynamic contains:
-	!   - Robot2 base position in Floor coordinates (calculated by TASK1)
-	!   - Robot2 base rotation = Floor direction (quaternion [1,0,0,0])
-	!   - Updated by TASK1's UpdateRobot2BaseDynamicWobj() procedure
-	! Robot2 reads its TCP offset from this dynamic base coordinate
-	! This approach overcomes TASK2's inability to sense gantry movement
-	! Used for distance measurement between robots
+	! Purpose: Placeholder - TASK1 calculates Robot2 Floor position
+	! TASK1's UpdateRobot2BaseDynamicWobj() calculates robot2_floor_pos directly
+	! TASK2 cannot sense gantry movement, so TASK1 does the calculation:
+	!   1. TASK1 reads current gantry position
+	!   2. TASK1 calculates Robot2 base Floor position
+	!   3. TASK1 reads Robot2 TCP wobj0 using CRobT(\TaskName:="T_ROB2")
+	!   4. TASK1 combines: robot2_floor_pos = base Floor + TCP wobj0
+	! This procedure does nothing - robot2_floor_pos already updated by TASK1
 	PROC UpdateRobot2FloorPosition()
-		! Read Robot2 TCP relative to its base (tracked by TASK1 in Floor coords)
-		! WobjRobot2Base_Dynamic is updated by TASK1 to track Robot2 base position
-		robot2_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjRobot2Base_Dynamic);
+		! Do nothing - TASK1's UpdateRobot2BaseDynamicWobj() already updated robot2_floor_pos
+		! This procedure kept for backward compatibility
+		RETURN;
 	ENDPROC
 
 	! ========================================

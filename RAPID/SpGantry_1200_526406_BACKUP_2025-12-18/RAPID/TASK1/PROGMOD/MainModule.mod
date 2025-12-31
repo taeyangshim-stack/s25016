@@ -999,19 +999,26 @@ MODULE MainModule
 	ENDPROC
 
 	! ========================================
-	! Update Robot2 Base Dynamic Work Object
+	! Update Robot2 Floor Position (from TASK1)
 	! ========================================
 	! Version: v1.7.50
 	! Date: 2025-12-31
-	! Purpose: Update WobjRobot2Base_Dynamic to track Robot2 base position in Floor coordinates
-	! Robot2 base moves with gantry, offset -488mm from R-axis center
-	! Robot2 base direction = Floor direction (no rotation)
-	! Must be called by TASK1 so Robot2 (TASK2) can read correct Floor position
+	! Purpose: Calculate Robot2 TCP position in Floor coordinates
+	! TASK1 calculates this because TASK2 cannot sense gantry movement
+	! Approach:
+	!   1. Calculate Robot2 base position in Floor coordinates
+	!   2. Read Robot2 TCP position in wobj0 (from TASK2)
+	!   3. Combine: Robot2 TCP Floor = Robot2 base Floor + Robot2 TCP wobj0
+	!   4. Store in robot2_floor_pos (shared variable)
 	PROC UpdateRobot2BaseDynamicWobj()
 		VAR jointtarget current_gantry;
 		VAR num r_deg;
 		VAR num total_r_deg;
 		VAR num total_r_rad;
+		VAR robtarget robot2_tcp_wobj0;
+		VAR num base_floor_x;
+		VAR num base_floor_y;
+		VAR num base_floor_z;
 
 		! Read current gantry position
 		current_gantry := CJointT();
@@ -1029,10 +1036,15 @@ MODULE MainModule
 		WobjRobot2Base_Dynamic.uframe.trans.y := current_gantry.extax.eax_b + (488 * Sin(total_r_rad));
 		WobjRobot2Base_Dynamic.uframe.trans.z := current_gantry.extax.eax_c;
 
-		! Transform Physical -> Floor coordinates
-		WobjRobot2Base_Dynamic.uframe.trans.x := WobjRobot2Base_Dynamic.uframe.trans.x + 9500;
-		WobjRobot2Base_Dynamic.uframe.trans.y := 5300 - WobjRobot2Base_Dynamic.uframe.trans.y;
-		WobjRobot2Base_Dynamic.uframe.trans.z := 2100 - WobjRobot2Base_Dynamic.uframe.trans.z;
+		! Transform Physical -> Floor coordinates for Robot2 base
+		base_floor_x := WobjRobot2Base_Dynamic.uframe.trans.x + 9500;
+		base_floor_y := 5300 - WobjRobot2Base_Dynamic.uframe.trans.y;
+		base_floor_z := 2100 - WobjRobot2Base_Dynamic.uframe.trans.z;
+
+		! Store in WobjRobot2Base_Dynamic for reference
+		WobjRobot2Base_Dynamic.uframe.trans.x := base_floor_x;
+		WobjRobot2Base_Dynamic.uframe.trans.y := base_floor_y;
+		WobjRobot2Base_Dynamic.uframe.trans.z := base_floor_z;
 
 		! Robot2 base direction = Floor direction (no rotation!)
 		! Robot2 wobj0 is aligned with Floor coordinate system
@@ -1041,9 +1053,24 @@ MODULE MainModule
 		WobjRobot2Base_Dynamic.uframe.rot.q3 := 0;
 		WobjRobot2Base_Dynamic.uframe.rot.q4 := 0;
 
-		TPWrite "WobjRobot2Base_Dynamic updated: [" + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.x,0) + ", "
-		                                           + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.y,0) + ", "
-		                                           + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.z,0) + "]";
+		! Read Robot2 TCP position in wobj0 (from TASK2)
+		robot2_tcp_wobj0 := CRobT(\TaskName:="T_ROB2"\Tool:=tool0\WObj:=wobj0);
+
+		! Calculate Robot2 TCP Floor position
+		! Robot2 wobj0 is aligned with Floor direction, so simple addition
+		robot2_floor_pos.trans.x := base_floor_x + robot2_tcp_wobj0.trans.x;
+		robot2_floor_pos.trans.y := base_floor_y + robot2_tcp_wobj0.trans.y;
+		robot2_floor_pos.trans.z := base_floor_z + robot2_tcp_wobj0.trans.z;
+
+		TPWrite "Robot2 Base Floor: [" + NumToStr(base_floor_x,0) + ", "
+		                                + NumToStr(base_floor_y,0) + ", "
+		                                + NumToStr(base_floor_z,0) + "]";
+		TPWrite "Robot2 TCP wobj0: [" + NumToStr(robot2_tcp_wobj0.trans.x,0) + ", "
+		                               + NumToStr(robot2_tcp_wobj0.trans.y,0) + ", "
+		                               + NumToStr(robot2_tcp_wobj0.trans.z,0) + "]";
+		TPWrite "Robot2 TCP Floor: [" + NumToStr(robot2_floor_pos.trans.x,0) + ", "
+		                               + NumToStr(robot2_floor_pos.trans.y,0) + ", "
+		                               + NumToStr(robot2_floor_pos.trans.z,0) + "]";
 	ENDPROC
 
 	! ========================================
@@ -1238,6 +1265,8 @@ MODULE MainModule
 		VAR robtarget rob2_floor_before;
 		VAR robtarget rob1_floor_after;
 		VAR robtarget rob2_floor_after;
+		VAR robtarget rob1_floor_home;
+		VAR robtarget rob2_floor_home;
 		VAR iodev logfile;
 		VAR iodev configfile;
 		VAR string line;
@@ -1283,6 +1312,19 @@ MODULE MainModule
 			STOP;
 		ENDIF
 		TPWrite "Both robots at initial positions OK";
+
+		! Measure HOME TCP positions (v1.7.50)
+		TPWrite "Measuring HOME TCP positions...";
+		UpdateRobot1FloorPosition;
+		UpdateRobot2BaseDynamicWobj;  ! This also updates robot2_floor_pos
+		rob1_floor_home := robot1_floor_pos;
+		rob2_floor_home := robot2_floor_pos;
+		TPWrite "Robot1 HOME TCP Floor: [" + NumToStr(rob1_floor_home.trans.x,0) + ", "
+		                                    + NumToStr(rob1_floor_home.trans.y,0) + ", "
+		                                    + NumToStr(rob1_floor_home.trans.z,0) + "]";
+		TPWrite "Robot2 HOME TCP Floor: [" + NumToStr(rob2_floor_home.trans.x,0) + ", "
+		                                    + NumToStr(rob2_floor_home.trans.y,0) + ", "
+		                                    + NumToStr(rob2_floor_home.trans.z,0) + "]";
 
 		! Read gantry offsets from config.txt
 		TPWrite "Reading config.txt...";
@@ -1416,6 +1458,14 @@ MODULE MainModule
 		Write logfile, "  Robot2: TCP [0, 488, -1000] in wobj0, J1~0 deg";
 		Write logfile, "  Gantry Physical: [0,0,0,0]";
 		Write logfile, "  Gantry Floor: [9500,5300,2100,0]";
+		Write logfile, "";
+		Write logfile, "HOME TCP Measured (Floor coordinates):";
+		Write logfile, "  Robot1 Floor: [" + NumToStr(rob1_floor_home.trans.x, 2) + ", "
+		                                   + NumToStr(rob1_floor_home.trans.y, 2) + ", "
+		                                   + NumToStr(rob1_floor_home.trans.z, 2) + "]";
+		Write logfile, "  Robot2 Floor: [" + NumToStr(rob2_floor_home.trans.x, 2) + ", "
+		                                   + NumToStr(rob2_floor_home.trans.y, 2) + ", "
+		                                   + NumToStr(rob2_floor_home.trans.z, 2) + "]";
 		Write logfile, "";
 		Write logfile, "Gantry Movement (Floor coordinates):";
 		Write logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm";
