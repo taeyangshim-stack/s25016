@@ -1162,16 +1162,17 @@ MODULE MainModule
 	! ========================================
 	! Test Gantry Movement Effect on Floor Coordinates
 	! ========================================
-	! Version: v1.7.33
-	! Date: 2025-12-30
+	! Version: v1.7.50
+	! Date: 2025-12-31
 	! Purpose: Test if Floor coordinates change when gantry moves
 	! Reads gantry movement from config.txt (Floor absolute coordinates)
-	! Initial position: Robot1 [-90,0,0,0,0,0], Robot2 [+90,0,0,0,0,0]
+	! Initial position: Robot1 TCP [0, 0, 1000] wobj0, Robot2 TCP [0, 488, -1000] wobj0
+	!   Both robots at J1~0 deg (HOME position)
 	! Gantry HOME Physical: [0, 0, 0, 0], Floor: [9500, 5300, 2100, 0]
 	! Coordinate transformation: Physical = Floor - HOME_offset
 	!   eax_a = Floor_X - 9500, eax_b = 5300 - Floor_Y
 	!   eax_c = 2100 - Floor_Z, eax_d = 0 - Floor_R
-	! Note: X1-X2 synchronization added to prevent linked motor error
+	! Note: Uses WobjGantry for TCP control from any gantry position
 	! Output: /HOME/gantry_floor_test.txt
 	PROC TestGantryFloorCoordinates()
 		VAR jointtarget rob1_current;
@@ -1338,7 +1339,7 @@ MODULE MainModule
 		Open "HOME:/gantry_floor_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.48)";
+		Write logfile, "Gantry Floor Coordinate Test (v1.7.50)";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
@@ -1353,9 +1354,9 @@ MODULE MainModule
 		Write logfile, "  Physical Z = 2100 - Floor_Z";
 		Write logfile, "  Physical R = 0 - Floor_R";
 		Write logfile, "";
-		Write logfile, "Initial Position:";
-		Write logfile, "  Robot1: [-90,0,0,0,0,0]";
-		Write logfile, "  Robot2: [+90,0,0,0,0,0]";
+		Write logfile, "Initial Position (HOME):";
+		Write logfile, "  Robot1: TCP [0, 0, 1000] in wobj0, J1~0 deg";
+		Write logfile, "  Robot2: TCP [0, 488, -1000] in wobj0, J1~0 deg";
 		Write logfile, "  Gantry Physical: [0,0,0,0]";
 		Write logfile, "  Gantry Floor: [9500,5300,2100,0]";
 		Write logfile, "";
