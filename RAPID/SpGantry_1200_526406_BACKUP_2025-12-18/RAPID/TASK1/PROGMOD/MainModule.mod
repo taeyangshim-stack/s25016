@@ -187,6 +187,10 @@ MODULE MainModule
 	TASK PERS num shared_gantry_z := 0;
 	TASK PERS num shared_gantry_r := 0;
 	TASK PERS num shared_gantry_x2 := 0;
+
+	! Debug logging control (v1.7.50)
+	VAR bool enable_debug_logging := FALSE;
+	VAR iodev debug_logfile;
 	TASK PERS num shared_update_counter := 0;
 	TASK PERS num shared_test_value := 12345;
 
@@ -443,36 +447,36 @@ MODULE MainModule
 		Open "/HOME/", logfile \Write;
 		Open "task1_wobj0_definition.txt", logfile \Append;
 
-		Write logfile, "========================================";
-		Write logfile, "TASK1 - wobj0 Definition (v1.1.0)";
-		Write logfile, "========================================";
-		Write logfile, "Date: " + CDate();
-		Write logfile, "Time: " + CTime();
-		Write logfile, "";
-		Write logfile, "wobj0.robhold: " + str_robhold;
-		Write logfile, "wobj0.ufprog: " + str_ufprog;
-		Write logfile, "";
-		Write logfile, "User Frame (uframe):";
-		Write logfile, "  X = " + NumToStr(wobj0.uframe.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(wobj0.uframe.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(wobj0.uframe.trans.z, 2) + " mm";
-		Write logfile, "  q1 = " + NumToStr(wobj0.uframe.rot.q1, 4);
-		Write logfile, "  q2 = " + NumToStr(wobj0.uframe.rot.q2, 4);
-		Write logfile, "  q3 = " + NumToStr(wobj0.uframe.rot.q3, 4);
-		Write logfile, "  q4 = " + NumToStr(wobj0.uframe.rot.q4, 4);
-		Write logfile, "";
-		Write logfile, "Object Frame (oframe):";
-		Write logfile, "  X = " + NumToStr(wobj0.oframe.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(wobj0.oframe.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(wobj0.oframe.trans.z, 2) + " mm";
-		Write logfile, "========================================\0A";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "TASK1 - wobj0 Definition (v1.1.0)";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Date: " + CDate();
+		Write debug_logfile, "Time: " + CTime();
+		Write debug_logfile, "";
+		Write debug_logfile, "wobj0.robhold: " + str_robhold;
+		Write debug_logfile, "wobj0.ufprog: " + str_ufprog;
+		Write debug_logfile, "";
+		Write debug_logfile, "User Frame (uframe):";
+		Write debug_logfile, "  X = " + NumToStr(wobj0.uframe.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(wobj0.uframe.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(wobj0.uframe.trans.z, 2) + " mm";
+		Write debug_logfile, "  q1 = " + NumToStr(wobj0.uframe.rot.q1, 4);
+		Write debug_logfile, "  q2 = " + NumToStr(wobj0.uframe.rot.q2, 4);
+		Write debug_logfile, "  q3 = " + NumToStr(wobj0.uframe.rot.q3, 4);
+		Write debug_logfile, "  q4 = " + NumToStr(wobj0.uframe.rot.q4, 4);
+		Write debug_logfile, "";
+		Write debug_logfile, "Object Frame (oframe):";
+		Write debug_logfile, "  X = " + NumToStr(wobj0.oframe.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(wobj0.oframe.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(wobj0.oframe.trans.z, 2) + " mm";
+		Write debug_logfile, "========================================\0A";
 
-		Close logfile;
+		Close debug_logfile;
 		TPWrite "Saved to: /HOME/task1_wobj0_definition.txt";
 
 	ERROR
 		TPWrite "ERROR in ShowWobj0Definition: " + NumToStr(ERRNO, 0);
-		Close logfile;
+		Close debug_logfile;
 		TRYNEXT;
 	ENDPROC
 
@@ -512,34 +516,34 @@ MODULE MainModule
 		Open "/HOME/", logfile \Write;
 		Open "task1_world_vs_wobj0.txt", logfile \Append;
 
-		Write logfile, "========================================";
-		Write logfile, "TASK1 - Compare World vs wobj0 (v1.1.0)";
-		Write logfile, "========================================";
-		Write logfile, "Date: " + CDate();
-		Write logfile, "Time: " + CTime();
-		Write logfile, "";
-		Write logfile, "World Coordinates:";
-		Write logfile, "  X = " + NumToStr(pos_world.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(pos_world.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(pos_world.trans.z, 2) + " mm";
-		Write logfile, "";
-		Write logfile, "wobj0 Coordinates:";
-		Write logfile, "  X = " + NumToStr(pos_wobj0.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(pos_wobj0.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(pos_wobj0.trans.z, 2) + " mm";
-		Write logfile, "";
-		Write logfile, "Difference (World - wobj0):";
-		Write logfile, "  dX = " + NumToStr(pos_world.trans.x - pos_wobj0.trans.x, 2) + " mm";
-		Write logfile, "  dY = " + NumToStr(pos_world.trans.y - pos_wobj0.trans.y, 2) + " mm";
-		Write logfile, "  dZ = " + NumToStr(pos_world.trans.z - pos_wobj0.trans.z, 2) + " mm";
-		Write logfile, "========================================\0A";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "TASK1 - Compare World vs wobj0 (v1.1.0)";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Date: " + CDate();
+		Write debug_logfile, "Time: " + CTime();
+		Write debug_logfile, "";
+		Write debug_logfile, "World Coordinates:";
+		Write debug_logfile, "  X = " + NumToStr(pos_world.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(pos_world.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(pos_world.trans.z, 2) + " mm";
+		Write debug_logfile, "";
+		Write debug_logfile, "wobj0 Coordinates:";
+		Write debug_logfile, "  X = " + NumToStr(pos_wobj0.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(pos_wobj0.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(pos_wobj0.trans.z, 2) + " mm";
+		Write debug_logfile, "";
+		Write debug_logfile, "Difference (World - wobj0):";
+		Write debug_logfile, "  dX = " + NumToStr(pos_world.trans.x - pos_wobj0.trans.x, 2) + " mm";
+		Write debug_logfile, "  dY = " + NumToStr(pos_world.trans.y - pos_wobj0.trans.y, 2) + " mm";
+		Write debug_logfile, "  dZ = " + NumToStr(pos_world.trans.z - pos_wobj0.trans.z, 2) + " mm";
+		Write debug_logfile, "========================================\0A";
 
-		Close logfile;
+		Close debug_logfile;
 		TPWrite "Saved to: /HOME/task1_world_vs_wobj0.txt";
 
 	ERROR
 		TPWrite "ERROR in CompareWorldAndWobj0: " + NumToStr(ERRNO, 0);
-		Close logfile;
+		Close debug_logfile;
 		TRYNEXT;
 	ENDPROC
 
@@ -577,36 +581,36 @@ MODULE MainModule
 		! Save to file (with WaitTime to prevent "Too intense frequency" error)
 		Open "HOME:/task1_tcp_orientation.txt", logfile \Append;
 
-		Write logfile, "========================================";
-		Write logfile, "TASK1 - TCP Orientation Verification (v1.2.1)";
-		Write logfile, "Date: " + CDate() + " " + CTime();
-		Write logfile, "========================================";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "TASK1 - TCP Orientation Verification (v1.2.1)";
+		Write debug_logfile, "Date: " + CDate() + " " + CTime();
+		Write debug_logfile, "========================================";
 		WaitTime 0.05;
 
-		Write logfile, "1. World: Pos=[" + NumToStr(tcp_world.trans.x, 3) + "," + NumToStr(tcp_world.trans.y, 3) + "," + NumToStr(tcp_world.trans.z, 3) + "]";
-		Write logfile, "   Rot=[" + NumToStr(tcp_world.rot.q1, 6) + "," + NumToStr(tcp_world.rot.q2, 6) + "," + NumToStr(tcp_world.rot.q3, 6) + "," + NumToStr(tcp_world.rot.q4, 6) + "]";
+		Write debug_logfile, "1. World: Pos=[" + NumToStr(tcp_world.trans.x, 3) + "," + NumToStr(tcp_world.trans.y, 3) + "," + NumToStr(tcp_world.trans.z, 3) + "]";
+		Write debug_logfile, "   Rot=[" + NumToStr(tcp_world.rot.q1, 6) + "," + NumToStr(tcp_world.rot.q2, 6) + "," + NumToStr(tcp_world.rot.q3, 6) + "," + NumToStr(tcp_world.rot.q4, 6) + "]";
 		WaitTime 0.05;
 
-		Write logfile, "2. wobj0: Pos=[" + NumToStr(tcp_wobj0.trans.x, 3) + "," + NumToStr(tcp_wobj0.trans.y, 3) + "," + NumToStr(tcp_wobj0.trans.z, 3) + "]";
-		Write logfile, "   Rot=[" + NumToStr(tcp_wobj0.rot.q1, 6) + "," + NumToStr(tcp_wobj0.rot.q2, 6) + "," + NumToStr(tcp_wobj0.rot.q3, 6) + "," + NumToStr(tcp_wobj0.rot.q4, 6) + "]";
+		Write debug_logfile, "2. wobj0: Pos=[" + NumToStr(tcp_wobj0.trans.x, 3) + "," + NumToStr(tcp_wobj0.trans.y, 3) + "," + NumToStr(tcp_wobj0.trans.z, 3) + "]";
+		Write debug_logfile, "   Rot=[" + NumToStr(tcp_wobj0.rot.q1, 6) + "," + NumToStr(tcp_wobj0.rot.q2, 6) + "," + NumToStr(tcp_wobj0.rot.q3, 6) + "," + NumToStr(tcp_wobj0.rot.q4, 6) + "]";
 		WaitTime 0.05;
 
-		Write logfile, "3. Floor: Pos=[" + NumToStr(tcp_floor.trans.x, 3) + "," + NumToStr(tcp_floor.trans.y, 3) + "," + NumToStr(tcp_floor.trans.z, 3) + "]";
-		Write logfile, "   Rot=[" + NumToStr(tcp_floor.rot.q1, 6) + "," + NumToStr(tcp_floor.rot.q2, 6) + "," + NumToStr(tcp_floor.rot.q3, 6) + "," + NumToStr(tcp_floor.rot.q4, 6) + "]";
+		Write debug_logfile, "3. Floor: Pos=[" + NumToStr(tcp_floor.trans.x, 3) + "," + NumToStr(tcp_floor.trans.y, 3) + "," + NumToStr(tcp_floor.trans.z, 3) + "]";
+		Write debug_logfile, "   Rot=[" + NumToStr(tcp_floor.rot.q1, 6) + "," + NumToStr(tcp_floor.rot.q2, 6) + "," + NumToStr(tcp_floor.rot.q3, 6) + "," + NumToStr(tcp_floor.rot.q4, 6) + "]";
 		WaitTime 0.05;
 
-		Write logfile, "4. Rob1Base: Pos=[" + NumToStr(tcp_rob_base.trans.x, 3) + "," + NumToStr(tcp_rob_base.trans.y, 3) + "," + NumToStr(tcp_rob_base.trans.z, 3) + "]";
-		Write logfile, "   Rot=[" + NumToStr(tcp_rob_base.rot.q1, 6) + "," + NumToStr(tcp_rob_base.rot.q2, 6) + "," + NumToStr(tcp_rob_base.rot.q3, 6) + "," + NumToStr(tcp_rob_base.rot.q4, 6) + "]";
+		Write debug_logfile, "4. Rob1Base: Pos=[" + NumToStr(tcp_rob_base.trans.x, 3) + "," + NumToStr(tcp_rob_base.trans.y, 3) + "," + NumToStr(tcp_rob_base.trans.z, 3) + "]";
+		Write debug_logfile, "   Rot=[" + NumToStr(tcp_rob_base.rot.q1, 6) + "," + NumToStr(tcp_rob_base.rot.q2, 6) + "," + NumToStr(tcp_rob_base.rot.q3, 6) + "," + NumToStr(tcp_rob_base.rot.q4, 6) + "]";
 		WaitTime 0.05;
 
-		Write logfile, "========================================\0A";
+		Write debug_logfile, "========================================\0A";
 
-		Close logfile;
+		Close debug_logfile;
 		TPWrite "Saved to: /HOME/task1_tcp_orientation.txt";
 
 	ERROR
 		TPWrite "ERROR in VerifyTCPOrientation: " + NumToStr(ERRNO, 0);
-		Close logfile;
+		Close debug_logfile;
 		TRYNEXT;
 	ENDPROC
 
@@ -719,37 +723,37 @@ MODULE MainModule
 		! Save to file
 		Open "HOME:/task1_coordinate_test.txt", logfile \Append;
 
-		Write logfile, "========================================";
-		Write logfile, "TASK1 - Coordinate System Movement Test (v1.3.0)";
-		Write logfile, "Date: " + CDate() + " " + CTime();
-		Write logfile, "========================================";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "TASK1 - Coordinate System Movement Test (v1.3.0)";
+		Write debug_logfile, "Date: " + CDate() + " " + CTime();
+		Write debug_logfile, "========================================";
 		WaitTime 0.05;
 
-		Write logfile, "Command: Move wobj0 [" + NumToStr(delta_x, 3) + "," + NumToStr(delta_y, 3) + "," + NumToStr(delta_z, 3) + "]";
+		Write debug_logfile, "Command: Move wobj0 [" + NumToStr(delta_x, 3) + "," + NumToStr(delta_y, 3) + "," + NumToStr(delta_z, 3) + "]";
 		WaitTime 0.05;
 
-		Write logfile, "Start wobj0: [" + NumToStr(pos_start_wobj0.trans.x, 3) + "," + NumToStr(pos_start_wobj0.trans.y, 3) + "," + NumToStr(pos_start_wobj0.trans.z, 3) + "]";
-		Write logfile, "Start Floor: [" + NumToStr(pos_start_floor.trans.x, 3) + "," + NumToStr(pos_start_floor.trans.y, 3) + "," + NumToStr(pos_start_floor.trans.z, 3) + "]";
+		Write debug_logfile, "Start wobj0: [" + NumToStr(pos_start_wobj0.trans.x, 3) + "," + NumToStr(pos_start_wobj0.trans.y, 3) + "," + NumToStr(pos_start_wobj0.trans.z, 3) + "]";
+		Write debug_logfile, "Start Floor: [" + NumToStr(pos_start_floor.trans.x, 3) + "," + NumToStr(pos_start_floor.trans.y, 3) + "," + NumToStr(pos_start_floor.trans.z, 3) + "]";
 		WaitTime 0.05;
 
-		Write logfile, "End wobj0: [" + NumToStr(pos_end_wobj0.trans.x, 3) + "," + NumToStr(pos_end_wobj0.trans.y, 3) + "," + NumToStr(pos_end_wobj0.trans.z, 3) + "]";
-		Write logfile, "End Floor: [" + NumToStr(pos_end_floor.trans.x, 3) + "," + NumToStr(pos_end_floor.trans.y, 3) + "," + NumToStr(pos_end_floor.trans.z, 3) + "]";
+		Write debug_logfile, "End wobj0: [" + NumToStr(pos_end_wobj0.trans.x, 3) + "," + NumToStr(pos_end_wobj0.trans.y, 3) + "," + NumToStr(pos_end_wobj0.trans.z, 3) + "]";
+		Write debug_logfile, "End Floor: [" + NumToStr(pos_end_floor.trans.x, 3) + "," + NumToStr(pos_end_floor.trans.y, 3) + "," + NumToStr(pos_end_floor.trans.z, 3) + "]";
 		WaitTime 0.05;
 
-		Write logfile, "wobj0 moved: [" + NumToStr(diff_wobj0_x, 3) + "," + NumToStr(diff_wobj0_y, 3) + "," + NumToStr(diff_wobj0_z, 3) + "]";
-		Write logfile, "Floor moved: [" + NumToStr(diff_floor_x, 3) + "," + NumToStr(diff_floor_y, 3) + "," + NumToStr(diff_floor_z, 3) + "]";
+		Write debug_logfile, "wobj0 moved: [" + NumToStr(diff_wobj0_x, 3) + "," + NumToStr(diff_wobj0_y, 3) + "," + NumToStr(diff_wobj0_z, 3) + "]";
+		Write debug_logfile, "Floor moved: [" + NumToStr(diff_floor_x, 3) + "," + NumToStr(diff_floor_y, 3) + "," + NumToStr(diff_floor_z, 3) + "]";
 		WaitTime 0.05;
 
-		Write logfile, "Verification: If wobj0 and Floor have same direction,";
-		Write logfile, "  movement should be identical in both coordinate systems.";
-		Write logfile, "========================================\0A";
+		Write debug_logfile, "Verification: If wobj0 and Floor have same direction,";
+		Write debug_logfile, "  movement should be identical in both coordinate systems.";
+		Write debug_logfile, "========================================\0A";
 
-		Close logfile;
+		Close debug_logfile;
 		TPWrite "Saved to: /HOME/task1_coordinate_test.txt";
 
 	ERROR
 		TPWrite "ERROR in TestCoordinateMovement: " + NumToStr(ERRNO, 0);
-		Close logfile;
+		Close debug_logfile;
 		TRYNEXT;
 	ENDPROC
 
@@ -835,19 +839,19 @@ MODULE MainModule
 
 		! Save to file
 		Open "HOME:/task1_gantry_test.txt", logfile \Append;
-		Write logfile, "========================================";
-		Write logfile, "TASK1 - Gantry Axis Movement Test (v1.4.0)";
-		Write logfile, "Date: " + CDate() + " " + CTime();
-		Write logfile, "========================================";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "TASK1 - Gantry Axis Movement Test (v1.4.0)";
+		Write debug_logfile, "Date: " + CDate() + " " + CTime();
+		Write debug_logfile, "========================================";
 		WaitTime 0.05;
-		Write logfile, "Gantry Joint Movement: M1=" + NumToStr(delta_m1, 1) + "mm, M2=" + NumToStr(delta_m2, 1) + "mm, M3=" + NumToStr(delta_m3, 1) + "mm";
+		Write debug_logfile, "Gantry Joint Movement: M1=" + NumToStr(delta_m1, 1) + "mm, M2=" + NumToStr(delta_m2, 1) + "mm, M3=" + NumToStr(delta_m3, 1) + "mm";
 		WaitTime 0.05;
-		Write logfile, "wobj0 TCP moved: [" + NumToStr(wobj0_dx, 3) + ", " + NumToStr(wobj0_dy, 3) + ", " + NumToStr(wobj0_dz, 3) + "] mm";
+		Write debug_logfile, "wobj0 TCP moved: [" + NumToStr(wobj0_dx, 3) + ", " + NumToStr(wobj0_dy, 3) + ", " + NumToStr(wobj0_dz, 3) + "] mm";
 		WaitTime 0.05;
-		Write logfile, "Floor TCP moved: [" + NumToStr(floor_dx, 3) + ", " + NumToStr(floor_dy, 3) + ", " + NumToStr(floor_dz, 3) + "] mm";
+		Write debug_logfile, "Floor TCP moved: [" + NumToStr(floor_dx, 3) + ", " + NumToStr(floor_dy, 3) + ", " + NumToStr(floor_dz, 3) + "] mm";
 		WaitTime 0.05;
-		Write logfile, "========================================";
-		Close logfile;
+		Write debug_logfile, "========================================";
+		Close debug_logfile;
 
 		TPWrite "Saved to: task1_gantry_test.txt";
 	ENDPROC
@@ -1010,9 +1014,10 @@ MODULE MainModule
 	!   2. Read Robot2 TCP position in wobj0 (from TASK2)
 	!   3. Combine: Robot2 TCP Floor = Robot2 base Floor + Robot2 TCP wobj0
 	!   4. Store in robot2_floor_pos (shared variable)
-	! Parameters:
-	!   \Logfile - Optional log file handle for debug output
-	PROC UpdateRobot2BaseDynamicWobj(\iodev Logfile)
+	! Uses global variables for logging:
+	!   enable_debug_logging - Set to TRUE to enable file logging
+	!   debug_logfile - File handle for debug output
+	PROC UpdateRobot2BaseDynamicWobj()
 		VAR jointtarget current_gantry;
 		VAR num r_deg;
 		VAR num total_r_deg;
@@ -1028,23 +1033,23 @@ MODULE MainModule
 
 		! DEBUG: Show gantry position read by UpdateRobot2BaseDynamicWobj (v1.7.50)
 		TPWrite "  [DEBUG] Gantry read in UpdateRobot2BaseDynamicWobj:";
-		IF Present(Logfile) Write Logfile, "  [DEBUG] Gantry read in UpdateRobot2BaseDynamicWobj:";
+		IF enable_debug_logging Write debug_logfile, "  [DEBUG] Gantry read in UpdateRobot2BaseDynamicWobj:";
 
 		TPWrite "    Physical: [" + NumToStr(current_gantry.extax.eax_a,1) + ", "
 		                          + NumToStr(current_gantry.extax.eax_b,1) + ", "
 		                          + NumToStr(current_gantry.extax.eax_c,1) + ", "
 		                          + NumToStr(current_gantry.extax.eax_d,1) + "]";
-		IF Present(Logfile) Write Logfile, "    Physical: [" + NumToStr(current_gantry.extax.eax_a,1) + ", "
-		                                                     + NumToStr(current_gantry.extax.eax_b,1) + ", "
-		                                                     + NumToStr(current_gantry.extax.eax_c,1) + ", "
-		                                                     + NumToStr(current_gantry.extax.eax_d,1) + "]";
+		IF enable_debug_logging Write debug_logfile, "    Physical: [" + NumToStr(current_gantry.extax.eax_a,1) + ", "
+		                                                                + NumToStr(current_gantry.extax.eax_b,1) + ", "
+		                                                                + NumToStr(current_gantry.extax.eax_c,1) + ", "
+		                                                                + NumToStr(current_gantry.extax.eax_d,1) + "]";
 
 		! Calculate total R-axis rotation (90deg base + R)
 		! R=0: Gantry parallel to Y-axis
 		total_r_deg := 90 + r_deg;
 		total_r_rad := total_r_deg * pi / 180;
 		TPWrite "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_rad),3) + ", Sin=" + NumToStr(Sin(total_r_rad),3);
-		IF Present(Logfile) Write Logfile, "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_rad),3) + ", Sin=" + NumToStr(Sin(total_r_rad),3);
+		IF enable_debug_logging Write debug_logfile, "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_rad),3) + ", Sin=" + NumToStr(Sin(total_r_rad),3);
 
 		! Calculate Robot2 base position in Physical coordinates
 		! Robot2 Floor Y = 4812 (5300-488) -> Physical Y = +488
@@ -1057,7 +1062,7 @@ MODULE MainModule
 		TPWrite "    Robot2 Base Physical: [" + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.x,1) + ", "
 		                                      + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.y,1) + ", "
 		                                      + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.z,1) + "]";
-		IF Present(Logfile) Write Logfile, "    Robot2 Base Physical: [" + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.x,1) + ", "
+		IF enable_debug_logging Write debug_logfile, "    Robot2 Base Physical: [" + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.x,1) + ", "
 		                                                                  + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.y,1) + ", "
 		                                                                  + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.z,1) + "]";
 
@@ -1090,21 +1095,21 @@ MODULE MainModule
 		TPWrite "Robot2 Base Floor: [" + NumToStr(base_floor_x,0) + ", "
 		                                + NumToStr(base_floor_y,0) + ", "
 		                                + NumToStr(base_floor_z,0) + "]";
-		IF Present(Logfile) Write Logfile, "Robot2 Base Floor: [" + NumToStr(base_floor_x,0) + ", "
+		IF enable_debug_logging Write debug_logfile, "Robot2 Base Floor: [" + NumToStr(base_floor_x,0) + ", "
 		                                                          + NumToStr(base_floor_y,0) + ", "
 		                                                          + NumToStr(base_floor_z,0) + "]";
 
 		TPWrite "Robot2 TCP wobj0: [" + NumToStr(robot2_tcp_wobj0.trans.x,0) + ", "
 		                               + NumToStr(robot2_tcp_wobj0.trans.y,0) + ", "
 		                               + NumToStr(robot2_tcp_wobj0.trans.z,0) + "]";
-		IF Present(Logfile) Write Logfile, "Robot2 TCP wobj0: [" + NumToStr(robot2_tcp_wobj0.trans.x,0) + ", "
+		IF enable_debug_logging Write debug_logfile, "Robot2 TCP wobj0: [" + NumToStr(robot2_tcp_wobj0.trans.x,0) + ", "
 		                                                         + NumToStr(robot2_tcp_wobj0.trans.y,0) + ", "
 		                                                         + NumToStr(robot2_tcp_wobj0.trans.z,0) + "]";
 
 		TPWrite "Robot2 TCP Floor: [" + NumToStr(robot2_floor_pos.trans.x,0) + ", "
 		                               + NumToStr(robot2_floor_pos.trans.y,0) + ", "
 		                               + NumToStr(robot2_floor_pos.trans.z,0) + "]";
-		IF Present(Logfile) Write Logfile, "Robot2 TCP Floor: [" + NumToStr(robot2_floor_pos.trans.x,0) + ", "
+		IF enable_debug_logging Write debug_logfile, "Robot2 TCP Floor: [" + NumToStr(robot2_floor_pos.trans.x,0) + ", "
 		                                                         + NumToStr(robot2_floor_pos.trans.y,0) + ", "
 		                                                         + NumToStr(robot2_floor_pos.trans.z,0) + "]";
 	ENDPROC
@@ -1249,31 +1254,31 @@ MODULE MainModule
 		! Save to log file
 		Open "HOME:/robot1_base_height.txt", logfile \Write;
 
-		Write logfile, "========================================";
-		Write logfile, "Robot1 Base Height Test (v1.7.14)";
-		Write logfile, "========================================";
-		Write logfile, "Date: " + CDate();
-		Write logfile, "Time: " + CTime();
-		Write logfile, "";
-		Write logfile, "Joint Angles: [-90, 0, 0, 0, 0, 0]";
-		Write logfile, "";
-		Write logfile, "Robot1 wobj0 (tool0):";
-		Write logfile, "  X = " + NumToStr(tcp_wobj0.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(tcp_wobj0.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(tcp_wobj0.trans.z, 2) + " mm";
-		Write logfile, "";
-		Write logfile, "Robot1 Floor (tool0):";
-		Write logfile, "  X = " + NumToStr(tcp_floor.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(tcp_floor.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(tcp_floor.trans.z, 2) + " mm";
-		Write logfile, "========================================\0A";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Robot1 Base Height Test (v1.7.14)";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Date: " + CDate();
+		Write debug_logfile, "Time: " + CTime();
+		Write debug_logfile, "";
+		Write debug_logfile, "Joint Angles: [-90, 0, 0, 0, 0, 0]";
+		Write debug_logfile, "";
+		Write debug_logfile, "Robot1 wobj0 (tool0):";
+		Write debug_logfile, "  X = " + NumToStr(tcp_wobj0.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(tcp_wobj0.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(tcp_wobj0.trans.z, 2) + " mm";
+		Write debug_logfile, "";
+		Write debug_logfile, "Robot1 Floor (tool0):";
+		Write debug_logfile, "  X = " + NumToStr(tcp_floor.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(tcp_floor.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(tcp_floor.trans.z, 2) + " mm";
+		Write debug_logfile, "========================================\0A";
 
-		Close logfile;
+		Close debug_logfile;
 		TPWrite "Saved to: /HOME/robot1_base_height.txt";
 
 	ERROR
 		TPWrite "ERROR in TestRobot1BaseHeight: " + NumToStr(ERRNO, 0);
-		Close logfile;
+		Close debug_logfile;
 		TRYNEXT;
 	ENDPROC
 
@@ -1321,13 +1326,14 @@ MODULE MainModule
 		TPWrite "Gantry Floor Test (v1.7.50)";
 
 		! Open log file first for debug output (v1.7.50)
-		Open "HOME:/gantry_floor_test.txt", logfile \Write;
-		Write logfile, "========================================";
-		Write logfile, "Gantry Floor Coordinate Test (v1.7.50)";
-		Write logfile, "========================================";
-		Write logfile, "Date: " + CDate();
-		Write logfile, "Time: " + CTime();
-		Write logfile, "";
+		Open "HOME:/gantry_floor_test.txt", debug_logfile \Write;
+		enable_debug_logging := TRUE;
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Gantry Floor Coordinate Test (v1.7.50)";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Date: " + CDate();
+		Write debug_logfile, "Time: " + CTime();
+		Write debug_logfile, "";
 
 		! Initialize variables
 		gantry_x_offset := 0;
@@ -1437,13 +1443,13 @@ MODULE MainModule
 		! Verify gantry is at HOME (v1.7.50)
 		moved_pos := CJointT();  ! Reuse moved_pos variable to check actual position
 		TPWrite "Gantry actual position after HOME move:";
-		Write logfile, "";
-		Write logfile, "Gantry actual position after HOME move:";
+		Write debug_logfile, "";
+		Write debug_logfile, "Gantry actual position after HOME move:";
 		TPWrite "  Physical: [" + NumToStr(moved_pos.extax.eax_a,1) + ", "
 		                        + NumToStr(moved_pos.extax.eax_b,1) + ", "
 		                        + NumToStr(moved_pos.extax.eax_c,1) + ", "
 		                        + NumToStr(moved_pos.extax.eax_d,1) + "]";
-		Write logfile, "  Physical: [" + NumToStr(moved_pos.extax.eax_a,1) + ", "
+		Write debug_logfile, "  Physical: [" + NumToStr(moved_pos.extax.eax_a,1) + ", "
 		                              + NumToStr(moved_pos.extax.eax_b,1) + ", "
 		                              + NumToStr(moved_pos.extax.eax_c,1) + ", "
 		                              + NumToStr(moved_pos.extax.eax_d,1) + "]";
@@ -1451,40 +1457,40 @@ MODULE MainModule
 		                     + NumToStr(5300 - moved_pos.extax.eax_b,1) + ", "
 		                     + NumToStr(2100 - moved_pos.extax.eax_c,1) + ", "
 		                     + NumToStr(0 - moved_pos.extax.eax_d,1) + "]";
-		Write logfile, "  Floor: [" + NumToStr(moved_pos.extax.eax_a + 9500,1) + ", "
+		Write debug_logfile, "  Floor: [" + NumToStr(moved_pos.extax.eax_a + 9500,1) + ", "
 		                           + NumToStr(5300 - moved_pos.extax.eax_b,1) + ", "
 		                           + NumToStr(2100 - moved_pos.extax.eax_c,1) + ", "
 		                           + NumToStr(0 - moved_pos.extax.eax_d,1) + "]";
 
 		! Measure HOME TCP positions (v1.7.50)
 		TPWrite "Measuring HOME TCP positions...";
-		Write logfile, "";
-		Write logfile, "Measuring HOME TCP positions...";
+		Write debug_logfile, "";
+		Write debug_logfile, "Measuring HOME TCP positions...";
 		UpdateRobot1FloorPosition;
-		UpdateRobot2BaseDynamicWobj \Logfile:=logfile;  ! This also updates robot2_floor_pos
+		UpdateRobot2BaseDynamicWobj;  ! This also updates robot2_floor_pos
 		rob1_floor_home := robot1_floor_pos;
 		rob2_floor_home := robot2_floor_pos;
 		TPWrite "Robot1 HOME TCP Floor: [" + NumToStr(rob1_floor_home.trans.x,0) + ", "
 		                                    + NumToStr(rob1_floor_home.trans.y,0) + ", "
 		                                    + NumToStr(rob1_floor_home.trans.z,0) + "]";
-		Write logfile, "Robot1 HOME TCP Floor: [" + NumToStr(rob1_floor_home.trans.x,0) + ", "
+		Write debug_logfile, "Robot1 HOME TCP Floor: [" + NumToStr(rob1_floor_home.trans.x,0) + ", "
 		                                          + NumToStr(rob1_floor_home.trans.y,0) + ", "
 		                                          + NumToStr(rob1_floor_home.trans.z,0) + "]";
 		TPWrite "Robot2 HOME TCP Floor: [" + NumToStr(rob2_floor_home.trans.x,0) + ", "
 		                                    + NumToStr(rob2_floor_home.trans.y,0) + ", "
 		                                    + NumToStr(rob2_floor_home.trans.z,0) + "]";
-		Write logfile, "Robot2 HOME TCP Floor: [" + NumToStr(rob2_floor_home.trans.x,0) + ", "
+		Write debug_logfile, "Robot2 HOME TCP Floor: [" + NumToStr(rob2_floor_home.trans.x,0) + ", "
 		                                          + NumToStr(rob2_floor_home.trans.y,0) + ", "
 		                                          + NumToStr(rob2_floor_home.trans.z,0) + "]";
 
 		! Measure BEFORE gantry movement
 		TPWrite "Measuring BEFORE gantry move...";
-		Write logfile, "";
-		Write logfile, "========================================";
-		Write logfile, "BEFORE Gantry Movement Test";
-		Write logfile, "========================================";
+		Write debug_logfile, "";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "BEFORE Gantry Movement Test";
+		Write debug_logfile, "========================================";
 		UpdateRobot1FloorPosition;
-		UpdateRobot2BaseDynamicWobj \Logfile:=logfile;  ! Update Robot2 base coordinate for TASK2
+		UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
 		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
 		rob1_floor_before := robot1_floor_pos;
 		rob2_floor_before := robot2_floor_pos;
@@ -1502,12 +1508,12 @@ MODULE MainModule
 
 		! Measure AFTER gantry movement
 		TPWrite "Measuring AFTER gantry move...";
-		Write logfile, "";
-		Write logfile, "========================================";
-		Write logfile, "AFTER Gantry Movement Test";
-		Write logfile, "========================================";
+		Write debug_logfile, "";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "AFTER Gantry Movement Test";
+		Write debug_logfile, "========================================";
 		UpdateRobot1FloorPosition;
-		UpdateRobot2BaseDynamicWobj \Logfile:=logfile;  ! Update Robot2 base coordinate for TASK2
+		UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
 		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
 		rob1_floor_after := robot1_floor_pos;
 		rob2_floor_after := robot2_floor_pos;
@@ -1518,54 +1524,54 @@ MODULE MainModule
 
 		! Save final results summary
 		TPWrite "Saving results...";
-		Write logfile, "";
-		Write logfile, "========================================";
-		Write logfile, "RESULTS SUMMARY";
-		Write logfile, "========================================";
-		Write logfile, "Gantry Movement Target (Floor coordinates):";
-		Write logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(gantry_y_offset, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(gantry_z_offset, 2) + " mm";
-		Write logfile, "  R = " + NumToStr(gantry_r_offset, 2) + " deg";
-		Write logfile, "";
-		Write logfile, "BEFORE Gantry Movement (HOME):";
-		Write logfile, "------------------------";
-		Write logfile, "Robot1 Floor (tool0):";
-		Write logfile, "  X = " + NumToStr(rob1_floor_before.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(rob1_floor_before.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(rob1_floor_before.trans.z, 2) + " mm";
-		Write logfile, "";
-		Write logfile, "Robot2 Floor (tool0):";
-		Write logfile, "  X = " + NumToStr(rob2_floor_before.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(rob2_floor_before.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(rob2_floor_before.trans.z, 2) + " mm";
-		Write logfile, "";
-		Write logfile, "AFTER Gantry Movement:";
-		Write logfile, "----------------------";
-		Write logfile, "Robot1 Floor (tool0):";
-		Write logfile, "  X = " + NumToStr(rob1_floor_after.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(rob1_floor_after.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(rob1_floor_after.trans.z, 2) + " mm";
-		Write logfile, "";
-		Write logfile, "Robot2 Floor (tool0):";
-		Write logfile, "  X = " + NumToStr(rob2_floor_after.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(rob2_floor_after.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(rob2_floor_after.trans.z, 2) + " mm";
-		Write logfile, "";
-		Write logfile, "DIFFERENCE:";
-		Write logfile, "-----------";
-		Write logfile, "Robot1 Floor Delta:";
-		Write logfile, "  dX = " + NumToStr(rob1_floor_after.trans.x - rob1_floor_before.trans.x, 2) + " mm";
-		Write logfile, "  dY = " + NumToStr(rob1_floor_after.trans.y - rob1_floor_before.trans.y, 2) + " mm";
-		Write logfile, "  dZ = " + NumToStr(rob1_floor_after.trans.z - rob1_floor_before.trans.z, 2) + " mm";
-		Write logfile, "";
-		Write logfile, "Robot2 Floor Delta:";
-		Write logfile, "  dX = " + NumToStr(rob2_floor_after.trans.x - rob2_floor_before.trans.x, 2) + " mm";
-		Write logfile, "  dY = " + NumToStr(rob2_floor_after.trans.y - rob2_floor_before.trans.y, 2) + " mm";
-		Write logfile, "  dZ = " + NumToStr(rob2_floor_after.trans.z - rob2_floor_before.trans.z, 2) + " mm";
-		Write logfile, "========================================\0A";
+		Write debug_logfile, "";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "RESULTS SUMMARY";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Gantry Movement Target (Floor coordinates):";
+		Write debug_logfile, "  X = " + NumToStr(gantry_x_offset, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(gantry_y_offset, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(gantry_z_offset, 2) + " mm";
+		Write debug_logfile, "  R = " + NumToStr(gantry_r_offset, 2) + " deg";
+		Write debug_logfile, "";
+		Write debug_logfile, "BEFORE Gantry Movement (HOME):";
+		Write debug_logfile, "------------------------";
+		Write debug_logfile, "Robot1 Floor (tool0):";
+		Write debug_logfile, "  X = " + NumToStr(rob1_floor_before.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(rob1_floor_before.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(rob1_floor_before.trans.z, 2) + " mm";
+		Write debug_logfile, "";
+		Write debug_logfile, "Robot2 Floor (tool0):";
+		Write debug_logfile, "  X = " + NumToStr(rob2_floor_before.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(rob2_floor_before.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(rob2_floor_before.trans.z, 2) + " mm";
+		Write debug_logfile, "";
+		Write debug_logfile, "AFTER Gantry Movement:";
+		Write debug_logfile, "----------------------";
+		Write debug_logfile, "Robot1 Floor (tool0):";
+		Write debug_logfile, "  X = " + NumToStr(rob1_floor_after.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(rob1_floor_after.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(rob1_floor_after.trans.z, 2) + " mm";
+		Write debug_logfile, "";
+		Write debug_logfile, "Robot2 Floor (tool0):";
+		Write debug_logfile, "  X = " + NumToStr(rob2_floor_after.trans.x, 2) + " mm";
+		Write debug_logfile, "  Y = " + NumToStr(rob2_floor_after.trans.y, 2) + " mm";
+		Write debug_logfile, "  Z = " + NumToStr(rob2_floor_after.trans.z, 2) + " mm";
+		Write debug_logfile, "";
+		Write debug_logfile, "DIFFERENCE:";
+		Write debug_logfile, "-----------";
+		Write debug_logfile, "Robot1 Floor Delta:";
+		Write debug_logfile, "  dX = " + NumToStr(rob1_floor_after.trans.x - rob1_floor_before.trans.x, 2) + " mm";
+		Write debug_logfile, "  dY = " + NumToStr(rob1_floor_after.trans.y - rob1_floor_before.trans.y, 2) + " mm";
+		Write debug_logfile, "  dZ = " + NumToStr(rob1_floor_after.trans.z - rob1_floor_before.trans.z, 2) + " mm";
+		Write debug_logfile, "";
+		Write debug_logfile, "Robot2 Floor Delta:";
+		Write debug_logfile, "  dX = " + NumToStr(rob2_floor_after.trans.x - rob2_floor_before.trans.x, 2) + " mm";
+		Write debug_logfile, "  dY = " + NumToStr(rob2_floor_after.trans.y - rob2_floor_before.trans.y, 2) + " mm";
+		Write debug_logfile, "  dZ = " + NumToStr(rob2_floor_after.trans.z - rob2_floor_before.trans.z, 2) + " mm";
+		Write debug_logfile, "========================================\0A";
 
-		Close logfile;
+		Close debug_logfile;
 		TPWrite "Saved to: /HOME/gantry_floor_test.txt";
 		TPWrite "Test complete!";
 		TPWrite "========================================";
@@ -1577,7 +1583,7 @@ MODULE MainModule
 			TPWrite "ERROR in TestGantryFloorCoordinates: " + NumToStr(ERRNO, 0);
 		ENDIF
 		Close configfile;
-		Close logfile;
+		Close debug_logfile;
 		STOP;
 	ENDPROC
 
@@ -1628,24 +1634,24 @@ MODULE MainModule
 
 		! Open log file
 		Open "HOME:/gantry_rotation_test.txt", logfile \Write;
-		Write logfile, "========================================";
-		Write logfile, "Gantry R-axis Rotation Test (v1.7.50)";
-		Write logfile, "========================================";
-		Write logfile, "Date: " + CDate();
-		Write logfile, "Time: " + CTime();
-		Write logfile, "";
-		Write logfile, "Test Configuration:";
-		Write logfile, "  Gantry Position (Physical): [" + NumToStr(test_x,0) + ", " + NumToStr(test_y,0) + ", " + NumToStr(test_z,0) + "]";
-		Write logfile, "  Gantry Position (Floor): [" + NumToStr(test_x + 9500,0) + ", " + NumToStr(5300 - test_y,0) + ", " + NumToStr(2100 - test_z,0) + "]";
-		Write logfile, "  R-axis angles tested: 0, 30, 45, 60, 90, -30, -45 degrees";
-		Write logfile, "";
-		Write logfile, "Floor Coordinate System:";
-		Write logfile, "  X+ = right (material flow direction)";
-		Write logfile, "  Y+ = up";
-		Write logfile, "  Z+ = vertical up";
-		Write logfile, "  R=0: Gantry parallel to Y-axis (perpendicular to X-axis)";
-		Write logfile, "  Robot1 at Y+, Robot2 at Y-";
-		Write logfile, "";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Gantry R-axis Rotation Test (v1.7.50)";
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Date: " + CDate();
+		Write debug_logfile, "Time: " + CTime();
+		Write debug_logfile, "";
+		Write debug_logfile, "Test Configuration:";
+		Write debug_logfile, "  Gantry Position (Physical): [" + NumToStr(test_x,0) + ", " + NumToStr(test_y,0) + ", " + NumToStr(test_z,0) + "]";
+		Write debug_logfile, "  Gantry Position (Floor): [" + NumToStr(test_x + 9500,0) + ", " + NumToStr(5300 - test_y,0) + ", " + NumToStr(2100 - test_z,0) + "]";
+		Write debug_logfile, "  R-axis angles tested: 0, 30, 45, 60, 90, -30, -45 degrees";
+		Write debug_logfile, "";
+		Write debug_logfile, "Floor Coordinate System:";
+		Write debug_logfile, "  X+ = right (material flow direction)";
+		Write debug_logfile, "  Y+ = up";
+		Write debug_logfile, "  Z+ = vertical up";
+		Write debug_logfile, "  R=0: Gantry parallel to Y-axis (perpendicular to X-axis)";
+		Write debug_logfile, "  Robot1 at Y+, Robot2 at Y-";
+		Write debug_logfile, "";
 
 		! Test each R angle
 		FOR i FROM 1 TO 7 DO
@@ -1670,21 +1676,21 @@ MODULE MainModule
 			rob2_floor := robot2_floor_pos;  ! Updated by TASK2
 
 			! Write results to file
-			Write logfile, "Test " + NumToStr(i,0) + ": R = " + r_str + " deg";
-			Write logfile, "--------------------";
-			Write logfile, "Gantry (Physical): [" + NumToStr(test_pos.extax.eax_a,0) + ", " + NumToStr(test_pos.extax.eax_b,0) + ", " + NumToStr(test_pos.extax.eax_c,0) + ", " + r_str + "]";
-			Write logfile, "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a + 9500,0) + ", " + NumToStr(5300 - test_pos.extax.eax_b,0) + ", " + NumToStr(2100 - test_pos.extax.eax_c,0) + ", " + r_str + "]";
-			Write logfile, "";
-			Write logfile, "Robot1 Floor TCP:";
-			Write logfile, "  X = " + NumToStr(rob1_floor.trans.x, 2) + " mm";
-			Write logfile, "  Y = " + NumToStr(rob1_floor.trans.y, 2) + " mm";
-			Write logfile, "  Z = " + NumToStr(rob1_floor.trans.z, 2) + " mm";
-			Write logfile, "";
-			Write logfile, "Robot2 Floor TCP:";
-			Write logfile, "  X = " + NumToStr(rob2_floor.trans.x, 2) + " mm";
-			Write logfile, "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm";
-			Write logfile, "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
-			Write logfile, "";
+			Write debug_logfile, "Test " + NumToStr(i,0) + ": R = " + r_str + " deg";
+			Write debug_logfile, "--------------------";
+			Write debug_logfile, "Gantry (Physical): [" + NumToStr(test_pos.extax.eax_a,0) + ", " + NumToStr(test_pos.extax.eax_b,0) + ", " + NumToStr(test_pos.extax.eax_c,0) + ", " + r_str + "]";
+			Write debug_logfile, "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a + 9500,0) + ", " + NumToStr(5300 - test_pos.extax.eax_b,0) + ", " + NumToStr(2100 - test_pos.extax.eax_c,0) + ", " + r_str + "]";
+			Write debug_logfile, "";
+			Write debug_logfile, "Robot1 Floor TCP:";
+			Write debug_logfile, "  X = " + NumToStr(rob1_floor.trans.x, 2) + " mm";
+			Write debug_logfile, "  Y = " + NumToStr(rob1_floor.trans.y, 2) + " mm";
+			Write debug_logfile, "  Z = " + NumToStr(rob1_floor.trans.z, 2) + " mm";
+			Write debug_logfile, "";
+			Write debug_logfile, "Robot2 Floor TCP:";
+			Write debug_logfile, "  X = " + NumToStr(rob2_floor.trans.x, 2) + " mm";
+			Write debug_logfile, "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm";
+			Write debug_logfile, "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
+			Write debug_logfile, "";
 
 			! Display on teach pendant
 			TPWrite "Robot1 Floor: [" + NumToStr(rob1_floor.trans.x,1) + ", " + NumToStr(rob1_floor.trans.y,1) + ", " + NumToStr(rob1_floor.trans.z,1) + "]";
@@ -1695,10 +1701,10 @@ MODULE MainModule
 		TPWrite "Returning to HOME...";
 		MoveAbsJ home_pos, v100, fine, tool0;
 
-		Write logfile, "========================================";
-		Write logfile, "Test completed - Returned to HOME";
-		Write logfile, "========================================";
-		Close logfile;
+		Write debug_logfile, "========================================";
+		Write debug_logfile, "Test completed - Returned to HOME";
+		Write debug_logfile, "========================================";
+		Close debug_logfile;
 
 		TPWrite "========================================";
 		TPWrite "Multiple R-axis Rotation Test Complete!";
@@ -1711,7 +1717,7 @@ MODULE MainModule
 		ELSE
 			TPWrite "ERROR in TestGantryMultipleRotations: " + NumToStr(ERRNO, 0);
 		ENDIF
-		Close logfile;
+		Close debug_logfile;
 		STOP;
 	ENDPROC
 
