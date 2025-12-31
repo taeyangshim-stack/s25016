@@ -209,6 +209,13 @@ MODULE MainModule
 	! Allows TCP control regardless of gantry position
 	PERS wobjdata WobjGantry := [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
+	! WobjRobot2Base_Dynamic: Robot2 base coordinate in Floor system (v1.7.50)
+	! Updated by UpdateRobot2BaseDynamicWobj() in TASK1
+	! Tracks Robot2 base position as gantry moves
+	! Robot2 base direction = Floor direction (no rotation, quaternion [1,0,0,0])
+	! Robot2 offset from R-axis center: -488mm on Y-axis
+	PERS wobjdata WobjRobot2Base_Dynamic := [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+
 	! wobjRob1Base: Robot1 Base Frame = GantryRob coordinate system (Y-axis 90° rotation)
 	! Quaternion [0, 0.707107, 0, 0.707107] = Y-axis 90° rotation
 	PERS wobjdata wobjRob1Base := [FALSE, TRUE, "", [[0, 0, 0], [0, 0.707107, 0, 0.707107]], [[0, 0, 0], [1, 0, 0, 0]]];
@@ -992,6 +999,53 @@ MODULE MainModule
 	ENDPROC
 
 	! ========================================
+	! Update Robot2 Base Dynamic Work Object
+	! ========================================
+	! Version: v1.7.50
+	! Date: 2025-12-31
+	! Purpose: Update WobjRobot2Base_Dynamic to track Robot2 base position in Floor coordinates
+	! Robot2 base moves with gantry, offset -488mm from R-axis center
+	! Robot2 base direction = Floor direction (no rotation)
+	! Must be called by TASK1 so Robot2 (TASK2) can read correct Floor position
+	PROC UpdateRobot2BaseDynamicWobj()
+		VAR jointtarget current_gantry;
+		VAR num r_deg;
+		VAR num total_r_deg;
+		VAR num total_r_rad;
+
+		! Read current gantry position
+		current_gantry := CJointT();
+		r_deg := current_gantry.extax.eax_d;
+
+		! Calculate total R-axis rotation (90deg base + R)
+		! R=0: Gantry parallel to Y-axis
+		total_r_deg := 90 + r_deg;
+		total_r_rad := total_r_deg * pi / 180;
+
+		! Calculate Robot2 base position in Physical coordinates
+		! Robot2 is -488mm offset from R-axis center
+		WobjRobot2Base_Dynamic.uframe.trans.x := current_gantry.extax.eax_a + (-488 * Cos(total_r_rad));
+		WobjRobot2Base_Dynamic.uframe.trans.y := current_gantry.extax.eax_b + (-488 * Sin(total_r_rad));
+		WobjRobot2Base_Dynamic.uframe.trans.z := current_gantry.extax.eax_c;
+
+		! Transform Physical -> Floor coordinates
+		WobjRobot2Base_Dynamic.uframe.trans.x := WobjRobot2Base_Dynamic.uframe.trans.x + 9500;
+		WobjRobot2Base_Dynamic.uframe.trans.y := 5300 - WobjRobot2Base_Dynamic.uframe.trans.y;
+		WobjRobot2Base_Dynamic.uframe.trans.z := 2100 - WobjRobot2Base_Dynamic.uframe.trans.z;
+
+		! Robot2 base direction = Floor direction (no rotation!)
+		! Robot2 wobj0 is aligned with Floor coordinate system
+		WobjRobot2Base_Dynamic.uframe.rot.q1 := 1;
+		WobjRobot2Base_Dynamic.uframe.rot.q2 := 0;
+		WobjRobot2Base_Dynamic.uframe.rot.q3 := 0;
+		WobjRobot2Base_Dynamic.uframe.rot.q4 := 0;
+
+		TPWrite "WobjRobot2Base_Dynamic updated: [" + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.x,0) + ", "
+		                                           + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.y,0) + ", "
+		                                           + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.z,0) + "]";
+	ENDPROC
+
+	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
 	! Version: v1.7.49
@@ -1308,6 +1362,7 @@ MODULE MainModule
 		! Measure BEFORE gantry movement
 		TPWrite "Measuring BEFORE gantry move...";
 		UpdateRobot1FloorPosition;
+		UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
 		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
 		rob1_floor_before := robot1_floor_pos;
 		rob2_floor_before := robot2_floor_pos;
@@ -1326,6 +1381,7 @@ MODULE MainModule
 		! Measure AFTER gantry movement
 		TPWrite "Measuring AFTER gantry move...";
 		UpdateRobot1FloorPosition;
+		UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
 		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
 		rob1_floor_after := robot1_floor_pos;
 		rob2_floor_after := robot2_floor_pos;

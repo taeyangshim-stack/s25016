@@ -194,14 +194,20 @@ MODULE Rob2_MainModule
     ! WobjFloor_Rob2: Floor coordinate system for Robot2
     ! MUST be identical to TASK1's WobjFloor (absolute world coordinate)
     ! uframe: [-9500, 5300, 2100] = Gantry HOME in Floor coordinate
-    ! rot: [0, 1, 0, 0] = 180° around Y-axis
-    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 5300, 2100], [0, 1, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+    ! rot: [1, 0, 0, 0] = No rotation (Robot2 wobj0 aligned with Floor!)
+    PERS wobjdata WobjFloor_Rob2 := [FALSE, TRUE, "", [[-9500, 5300, 2100], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! WobjGantry_Rob2: Dynamic work object for Robot2 TCP control (v1.7.50)
     ! Updated by UpdateGantryWobj_Rob2() to track gantry position from TASK1
     ! Allows Robot2 TCP control in Floor coordinates regardless of gantry position
     ! Robot2 cannot control gantry, must read position from TASK1
     PERS wobjdata WobjGantry_Rob2 := [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+
+    ! WobjRobot2Base_Dynamic: Robot2 base coordinate from TASK1 (external reference) (v1.7.50)
+    ! TASK1 updates this to track Robot2 base position as gantry moves
+    ! Robot2 uses this to calculate its Floor TCP position
+    ! Direction = Floor direction (no rotation, quaternion [1,0,0,0])
+    PERS wobjdata WobjRobot2Base_Dynamic;
 
     ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
     ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
@@ -2068,16 +2074,18 @@ MODULE Rob2_MainModule
 	! Version: v1.7.50
 	! Date: 2025-12-31
 	! Purpose: Read Robot2 TCP position in Floor coordinate system
-	! Uses WobjFloor_Rob2 to directly read Floor coordinates
-	! WobjFloor_Rob2 automatically handles:
-	!   - Robot2 base 45deg rotation
-	!   - R-axis rotation (via gantry tracking)
-	!   - Floor coordinate transformation
+	! Uses WobjRobot2Base_Dynamic (updated by TASK1) to track gantry movement
+	! WobjRobot2Base_Dynamic contains:
+	!   - Robot2 base position in Floor coordinates (calculated by TASK1)
+	!   - Robot2 base rotation = Floor direction (quaternion [1,0,0,0])
+	!   - Updated by TASK1's UpdateRobot2BaseDynamicWobj() procedure
+	! Robot2 reads its TCP offset from this dynamic base coordinate
+	! This approach overcomes TASK2's inability to sense gantry movement
 	! Used for distance measurement between robots
 	PROC UpdateRobot2FloorPosition()
-		! Read Robot2 TCP directly in Floor coordinate system
-		! WobjFloor_Rob2 is identical to TASK1's WobjFloor
-		robot2_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjFloor_Rob2);
+		! Read Robot2 TCP relative to its base (tracked by TASK1 in Floor coords)
+		! WobjRobot2Base_Dynamic is updated by TASK1 to track Robot2 base position
+		robot2_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjRobot2Base_Dynamic);
 	ENDPROC
 
 	! ========================================
