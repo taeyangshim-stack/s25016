@@ -1012,7 +1012,7 @@ MODULE MainModule
 	!   4. Store in robot2_floor_pos (shared variable)
 	! Parameters:
 	!   \Logfile - Optional log file handle for debug output
-	PROC UpdateRobot2BaseDynamicWobj(\switch iodev Logfile)
+	PROC UpdateRobot2BaseDynamicWobj(\iodev Logfile)
 		VAR jointtarget current_gantry;
 		VAR num r_deg;
 		VAR num total_r_deg;
