@@ -1389,6 +1389,18 @@ MODULE MainModule
 		MoveAbsJ home_pos, v100, fine, tool0;
 		WaitTime 1.0;
 
+		! Verify gantry is at HOME (v1.7.50)
+		moved_pos := CJointT();  ! Reuse moved_pos variable to check actual position
+		TPWrite "Gantry actual position after HOME move:";
+		TPWrite "  Physical: [" + NumToStr(moved_pos.extax.eax_a,1) + ", "
+		                        + NumToStr(moved_pos.extax.eax_b,1) + ", "
+		                        + NumToStr(moved_pos.extax.eax_c,1) + ", "
+		                        + NumToStr(moved_pos.extax.eax_d,1) + "]";
+		TPWrite "  Floor: [" + NumToStr(moved_pos.extax.eax_a + 9500,1) + ", "
+		                     + NumToStr(5300 - moved_pos.extax.eax_b,1) + ", "
+		                     + NumToStr(2100 - moved_pos.extax.eax_c,1) + ", "
+		                     + NumToStr(0 - moved_pos.extax.eax_d,1) + "]";
+
 		! Measure HOME TCP positions (v1.7.50)
 		TPWrite "Measuring HOME TCP positions...";
 		UpdateRobot1FloorPosition;
