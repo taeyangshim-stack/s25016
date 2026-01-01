@@ -132,7 +132,7 @@ MODULE MainModule
 	!
 	! v1.7.45 (2025-12-31)
 	!   - Added precise quaternions for HOME positions
-	!   - Robot1: [0.49996, -0.50004, 0.50004, 0.49996]
+	!   - Robot1: [0.5, -0.5, 0.5, 0.5]
 	!   - Added intermediate joint [0, -2.58, -11.88, 0, 14.47, 0] to avoid config issues
 	!
 	! v1.7.46 - v1.7.47 (2025-12-31)
@@ -1169,10 +1169,10 @@ MODULE MainModule
 		! Update WobjGantry to reflect current gantry position
 		UpdateGantryWobj;
 		! TCP position: [0, 0, 1000] in WobjGantry (tracks gantry position)
-		! Quaternion: [0.49996, -0.50004, 0.50004, 0.49996]
+		! Quaternion: [0.5, -0.5, 0.5, 0.5] (R-axis center orientation)
 		! extax preserves current gantry position
 		sync_pos := CJointT();
-		home_tcp := [[0, 0, 1000], [0.49996, -0.50004, 0.50004, 0.49996], [0, 0, 0, 0], sync_pos.extax];
+		home_tcp := [[0, 0, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
 		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry;
 		TPWrite "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry)";
 
