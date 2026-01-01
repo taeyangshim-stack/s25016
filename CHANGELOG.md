@@ -80,6 +80,12 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
   - **원인**: RAPID BREAK 문이 WHILE 루프를 빠져나가지 못하고 프로그램 종료
   - **해결**: BREAK 대신 `iteration := max_iterations` 사용하여 자연스러운 루프 종료
   - **개선**: correction 코드를 ELSE 블록으로 이동 (수렴 후 불필요한 이동 방지)
+- **UpdateGantryWobj_Rob2() 라디안/도 버그**: Robot2 X 좌표 -13.38mm 오프셋
+  - **증상**: Robot2 Floor X = 9486.62mm (예상: 9500.00mm)
+  - **원인**: `half_angle := total_rad / 2; Cos(half_angle)` - 라디안을 도로 사용
+  - **영향**: WobjGantry_Rob2 쿼터니언 [0.99991, 0, 0, 0.01371] (정상: [0.7071, 0, 0, 0.7071])
+  - **해결**: `half_angle_deg := total_deg / 2; Cos(half_angle_deg)` - 도 사용
+  - **참고**: UpdateRobot2BaseDynamicWobj()와 UpdateGantryWobj()는 이미 수정됨 (ad9ac5d)
 - **WobjGantry 쿼터니언**: identity [1,0,0,0] 유지 (회전 없음)
   - R-axis 회전은 로봇 base 회전이지 work object 회전이 아님
 - **Robot1 TCP 방향**: [0.5, -0.5, 0.5, 0.5] (이전: 근사값)
@@ -125,11 +131,12 @@ After (22:07):  DEBUG: Setting iteration to force loop exit → DEBUG: Exited re
 - gantry_floor_test.txt: 90줄 (적절한 양)
 
 ### Known Issues
-- **Robot2 X 좌표 -13.38mm 오프셋**:
-  - R-axis 중심에서 Robot2가 약 13mm 뒤에 위치
-  - Y, Z 좌표는 정확 (±0.2mm 이내)
-  - 반복적 보정에도 불구하고 오프셋 유지
-  - 원인 조사 필요
+- **해결됨**: Robot2 X 좌표 -13.38mm 오프셋
+  - **원인**: UpdateGantryWobj_Rob2()에서 라디안을 도(degree)로 사용하는 버그
+  - **증상**: WobjGantry_Rob2 쿼터니언이 [0.99991, 0, 0, 0.01371] (잘못됨)
+  - **정상값**: [0.7071, 0, 0, 0.7071] (90° Z-axis rotation)
+  - **수정**: half_angle_deg := total_deg / 2 (도 사용)
+  - **예상 결과**: Robot2 Floor X = 9500.00mm (Robot1과 동일)
 
 ### Technical Details
 **반복적 보정 알고리즘** (v1.7.50):
@@ -160,8 +167,9 @@ MODULE ModuleName
 ENDMODULE
 ```
 
-**Git Commits** (총 19개):
+**Git Commits** (총 20개):
 ```
+feb73cf - fix: Fix UpdateGantryWobj_Rob2 to use degrees (Robot2 X offset fix)
 1c4db24 - fix: Replace BREAK with iteration control for loop exit
 2893b58 - debug: Add debug message before BREAK
 72eda19 - docs: Update CHANGELOG with RECORD/CONST order fix
