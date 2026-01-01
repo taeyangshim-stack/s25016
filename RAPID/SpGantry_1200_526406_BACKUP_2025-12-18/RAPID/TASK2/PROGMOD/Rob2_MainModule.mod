@@ -2199,10 +2199,8 @@ MODULE Rob2_MainModule
 	PROC UpdateGantryWobj_Rob2()
 		VAR jointtarget current_gantry;
 		VAR num r_deg;
-		VAR num r_rad;
-		VAR num half_angle;
 		VAR num total_deg;
-		VAR num total_rad;
+		VAR num half_angle_deg;
 
 		! Read current gantry position from TASK1 (Robot2 cannot sense this directly)
 		current_gantry := CJointT(\TaskName:="T_ROB1");
@@ -2219,14 +2217,14 @@ MODULE Rob2_MainModule
 		! Total rotation: 90 + R
 		r_deg := current_gantry.extax.eax_d;
 		total_deg := 90 + r_deg;  ! Base 90deg + R-axis angle
-		total_rad := total_deg * pi / 180;
-		half_angle := total_rad / 2;
+		half_angle_deg := total_deg / 2;  ! Half angle in DEGREES (RAPID Cos/Sin use degrees!)
 
 		! Z-axis rotation quaternion: [cos(theta/2), 0, 0, sin(theta/2)]
-		WobjGantry_Rob2.uframe.rot.q1 := Cos(half_angle);
+		! IMPORTANT: RAPID Cos/Sin functions use DEGREES, not radians!
+		WobjGantry_Rob2.uframe.rot.q1 := Cos(half_angle_deg);
 		WobjGantry_Rob2.uframe.rot.q2 := 0;
 		WobjGantry_Rob2.uframe.rot.q3 := 0;
-		WobjGantry_Rob2.uframe.rot.q4 := Sin(half_angle);
+		WobjGantry_Rob2.uframe.rot.q4 := Sin(half_angle_deg);
 
 		TPWrite "WobjGantry_Rob2 updated: [" + NumToStr(current_gantry.extax.eax_a,0) + ", "
 		                                    + NumToStr(current_gantry.extax.eax_b,0) + ", "
