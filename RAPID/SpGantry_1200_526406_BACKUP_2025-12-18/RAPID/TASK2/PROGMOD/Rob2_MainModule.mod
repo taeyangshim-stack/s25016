@@ -530,24 +530,50 @@ MODULE Rob2_MainModule
 
     PROC main()
         VAR num update_counter := 0;
+        VAR iodev main_logfile;
+
+        ! Open main process log
+        Open "HOME:/task2_main_process.txt", main_logfile \Write;
+        Write main_logfile, "========================================";
+        Write main_logfile, "TASK2 Main Process Log (v1.7.50)";
+        Write main_logfile, "========================================";
+        Write main_logfile, "Date: " + CDate();
+        Write main_logfile, "Time: " + CTime();
+        Write main_logfile, "";
 
         ! Initialize Robot2 position
+        TPWrite "========================================";
+        TPWrite "TASK2: Starting Robot2 initialization...";
+        TPWrite "========================================";
+        Write main_logfile, "Step 1: Initializing Robot2...";
         SetRobot2InitialPosition;
+        TPWrite "TASK2: Robot2 initialization completed";
+        Write main_logfile, "Step 1: Robot2 initialization completed";
+        Write main_logfile, "";
+
         WaitTime 1.0;
 
-        ! Continuously update robot2_floor_pos for cross-task measurement
-        TPWrite "TASK2: Starting position update loop...";
-        WHILE TRUE DO
-            rUpdateR2Position;
-            update_counter := update_counter + 1;
+        ! Position update ready
+        TPWrite "TASK2: Ready for cross-task measurement";
+        Write main_logfile, "TASK2 ready for cross-task measurement";
+        Write main_logfile, "Robot2 will respond to TASK1 position queries";
+        Write main_logfile, "";
 
-            ! Log every 100 updates (10 seconds)
-            IF update_counter MOD 100 = 0 THEN
-                TPWrite "TASK2: Update loop running (" + NumToStr(update_counter, 0) + " updates)";
-            ENDIF
+        ! Close main log
+        Write main_logfile, "========================================";
+        Write main_logfile, "TASK2 Main Process completed at " + CTime();
+        Write main_logfile, "========================================";
+        Close main_logfile;
 
-            WaitTime 0.1;  ! Update every 100ms
-        ENDWHILE
+        TPWrite "========================================";
+        TPWrite "TASK2: Initialization completed!";
+        TPWrite "Check log files:";
+        TPWrite "  - task2_main_process.txt";
+        TPWrite "  - robot2_init_position.txt";
+        TPWrite "========================================";
+
+        ! Note: Position updates now handled by TASK1's UpdateRobot2BaseDynamicWobj
+        ! No continuous loop needed - TASK1 reads Robot2 position on-demand
     ENDPROC
 
     PROC rInit()
