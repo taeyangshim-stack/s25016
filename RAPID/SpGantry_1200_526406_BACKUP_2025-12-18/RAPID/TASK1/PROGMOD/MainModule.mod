@@ -1118,6 +1118,7 @@ MODULE MainModule
 		VAR jointtarget sync_pos;
 		VAR jointtarget home_pos;
 		VAR robtarget home_tcp;
+		VAR iodev logfile;
 
 		! Step 0: Synchronize X1-X2 at current position (progressive approach)
 		! Progressive sync prevents linked motor error when X1-X2 distance is large
@@ -1125,9 +1126,20 @@ MODULE MainModule
 		VAR num x2_current;
 		VAR num distance;
 
+		! Open log file for detailed logging
+		Open "HOME:/robot1_init_position.txt", logfile \Write;
+		Write logfile, "========================================";
+		Write logfile, "Robot1 Initial Position Setup (v1.7.50)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+
 		TPWrite "Step 0: Synchronizing gantry X1-X2 at current position...";
+		Write logfile, "Step 0: Synchronizing gantry X1-X2 at current position...";
 		sync_pos := CJointT();
 		TPWrite "Current gantry: X1=" + NumToStr(sync_pos.extax.eax_a,0) + ", X2=" + NumToStr(sync_pos.extax.eax_f,0);
+		Write logfile, "Current gantry: X1=" + NumToStr(sync_pos.extax.eax_a,0) + ", X2=" + NumToStr(sync_pos.extax.eax_f,0);
 
 		x1_target := sync_pos.extax.eax_a;
 		x2_current := sync_pos.extax.eax_f;
@@ -1136,6 +1148,7 @@ MODULE MainModule
 		! If distance > 100mm, use progressive approach (25%, 50%, 75%, 100%)
 		IF Abs(distance) > 100 THEN
 			TPWrite "Large X1-X2 difference (" + NumToStr(Abs(distance),0) + "mm) - progressive sync";
+			Write logfile, "Large X1-X2 difference (" + NumToStr(Abs(distance),0) + "mm) - progressive sync";
 			sync_pos.extax.eax_f := x2_current + distance * 0.25;
 			MoveAbsJ sync_pos, v10, fine, tool0;
 			sync_pos.extax.eax_f := x2_current + distance * 0.50;
@@ -1148,9 +1161,12 @@ MODULE MainModule
 		sync_pos.extax.eax_f := x1_target;  ! X2 = X1
 		MoveAbsJ sync_pos, v10, fine, tool0;
 		TPWrite "Gantry X1-X2 synchronized";
+		Write logfile, "Gantry X1-X2 synchronized";
+		Write logfile, "";
 
 		! Step 1: Move Robot1 joints to intermediate position (avoid configuration issue)
 		TPWrite "Step 1: Moving Robot1 to intermediate joint position...";
+		Write logfile, "Step 1: Moving Robot1 to intermediate joint position...";
 		initial_joint := CJointT();
 		! Keep synchronized gantry position
 		initial_joint.extax.eax_f := initial_joint.extax.eax_a;
@@ -1163,6 +1179,8 @@ MODULE MainModule
 		initial_joint.robax.rax_6 := 0;
 		MoveAbsJ initial_joint, v100, fine, tool0;
 		TPWrite "Robot1 at intermediate joint position";
+		Write logfile, "Robot1 at intermediate joint position";
+		Write logfile, "";
 
 		! Step 2: Move Robot1 TCP to HOME position at R-axis center with iterative refinement
 		VAR robtarget current_wobj0;
@@ -1173,6 +1191,7 @@ MODULE MainModule
 		VAR num tolerance := 0.5;  ! mm
 
 		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] using WobjGantry...";
+		Write logfile, "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] using WobjGantry...";
 		! Update WobjGantry to reflect current gantry position
 		UpdateGantryWobj;
 		! TCP position: [0, 0, 1000] in WobjGantry (tracks gantry position)
@@ -1181,8 +1200,10 @@ MODULE MainModule
 		sync_pos := CJointT();
 		home_tcp := [[0, 0, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
 		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry;
+		Write logfile, "Initial move to HOME completed";
 
 		! Iterative refinement to reach precise R-axis center (max 3 iterations)
+		Write logfile, "Starting iterative refinement (tolerance=" + NumToStr(tolerance, 1) + "mm)...";
 		WHILE iteration < max_iterations DO
 			iteration := iteration + 1;
 			! Read current position in wobj0
@@ -1191,10 +1212,12 @@ MODULE MainModule
 			error_y := 0 - current_wobj0.trans.y;  ! Target Y=0
 
 			TPWrite "Iteration " + NumToStr(iteration, 0) + ": Error X=" + NumToStr(error_x, 2) + ", Y=" + NumToStr(error_y, 2);
+			Write logfile, "Iteration " + NumToStr(iteration, 0) + ": Error X=" + NumToStr(error_x, 2) + ", Y=" + NumToStr(error_y, 2);
 
 			! Check if within tolerance
 			IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
 				TPWrite "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
+				Write logfile, "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
 				BREAK;
 			ENDIF
 
@@ -1203,12 +1226,16 @@ MODULE MainModule
 			sync_pos := CJointT();
 			home_tcp := [[error_x, error_y, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
 			MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry;
+			Write logfile, "  Correction applied";
 		ENDWHILE
 
 		TPWrite "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry) - Refined";
+		Write logfile, "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry) - Refined";
+		Write logfile, "";
 
 		! Step 3: Move gantry to HOME position (physical origin)
 		TPWrite "Step 3: Moving gantry to HOME [0,0,0,0]...";
+		Write logfile, "Step 3: Moving gantry to HOME [0,0,0,0]...";
 		home_pos := CJointT();  ! Read current position
 		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
 		home_pos.extax.eax_b := 0;      ! Y = Physical origin
@@ -1218,7 +1245,14 @@ MODULE MainModule
 		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "Gantry at HOME position [0,0,0,0]";
+		Write logfile, "Gantry at HOME position [0,0,0,0]";
 		TPWrite "Robot1 ready: TCP [0,0,1000], Gantry HOME";
+		Write logfile, "Robot1 ready: TCP [0,0,1000], Gantry HOME";
+		Write logfile, "";
+		Write logfile, "========================================";
+		Write logfile, "Setup completed at " + CTime();
+		Write logfile, "========================================";
+		Close logfile;
 	ENDPROC
 
 	! ========================================
