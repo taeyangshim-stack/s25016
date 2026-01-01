@@ -1164,7 +1164,14 @@ MODULE MainModule
 		MoveAbsJ initial_joint, v100, fine, tool0;
 		TPWrite "Robot1 at intermediate joint position";
 
-		! Step 2: Move Robot1 TCP to HOME position at R-axis center
+		! Step 2: Move Robot1 TCP to HOME position at R-axis center with iterative refinement
+		VAR robtarget current_wobj0;
+		VAR num error_x;
+		VAR num error_y;
+		VAR num iteration := 0;
+		VAR num max_iterations := 3;
+		VAR num tolerance := 0.5;  ! mm
+
 		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] using WobjGantry...";
 		! Update WobjGantry to reflect current gantry position
 		UpdateGantryWobj;
@@ -1174,7 +1181,31 @@ MODULE MainModule
 		sync_pos := CJointT();
 		home_tcp := [[0, 0, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
 		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry;
-		TPWrite "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry)";
+
+		! Iterative refinement to reach precise R-axis center (max 3 iterations)
+		WHILE iteration < max_iterations DO
+			iteration := iteration + 1;
+			! Read current position in wobj0
+			current_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+			error_x := 0 - current_wobj0.trans.x;  ! Target X=0
+			error_y := 0 - current_wobj0.trans.y;  ! Target Y=0
+
+			TPWrite "Iteration " + NumToStr(iteration, 0) + ": Error X=" + NumToStr(error_x, 2) + ", Y=" + NumToStr(error_y, 2);
+
+			! Check if within tolerance
+			IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
+				TPWrite "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
+				BREAK;
+			ENDIF
+
+			! Apply correction in WobjGantry coordinates
+			UpdateGantryWobj;
+			sync_pos := CJointT();
+			home_tcp := [[error_x, error_y, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
+			MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry;
+		ENDWHILE
+
+		TPWrite "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry) - Refined";
 
 		! Step 3: Move gantry to HOME position (physical origin)
 		TPWrite "Step 3: Moving gantry to HOME [0,0,0,0]...";
