@@ -1270,6 +1270,8 @@ MODULE MainModule
 			IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
 				TPWrite "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
 				Write logfile, "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
+				TPWrite "DEBUG: About to BREAK from WHILE loop";
+				Write logfile, "DEBUG: About to BREAK from WHILE loop";
 				BREAK;
 			ENDIF
 
