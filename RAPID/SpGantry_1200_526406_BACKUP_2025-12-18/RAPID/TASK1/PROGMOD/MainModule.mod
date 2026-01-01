@@ -1126,6 +1126,14 @@ MODULE MainModule
 		VAR num x2_current;
 		VAR num distance;
 
+		! Step 2: Iterative refinement variables
+		VAR robtarget current_wobj0;
+		VAR num error_x;
+		VAR num error_y;
+		VAR num iteration;
+		VAR num max_iterations;
+		VAR num tolerance;
+
 		! Open log file for detailed logging
 		Open "HOME:/robot1_init_position.txt", logfile \Write;
 		Write logfile, "========================================";
@@ -1183,12 +1191,9 @@ MODULE MainModule
 		Write logfile, "";
 
 		! Step 2: Move Robot1 TCP to HOME position at R-axis center with iterative refinement
-		VAR robtarget current_wobj0;
-		VAR num error_x;
-		VAR num error_y;
-		VAR num iteration := 0;
-		VAR num max_iterations := 3;
-		VAR num tolerance := 0.5;  ! mm
+		iteration := 0;
+		max_iterations := 3;
+		tolerance := 0.5;  ! mm
 
 		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] using WobjGantry...";
 		Write logfile, "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] using WobjGantry...";
