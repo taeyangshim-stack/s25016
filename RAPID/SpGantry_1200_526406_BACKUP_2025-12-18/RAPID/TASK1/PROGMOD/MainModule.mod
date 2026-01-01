@@ -157,6 +157,9 @@ MODULE MainModule
 	!   - Added base 90 deg rotation offset to quaternion calculation
 	!========================================
 
+	! Version constant for logging (v1.7.50+)
+	CONST string TASK1_VERSION := "v1.7.50";
+
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -230,7 +233,7 @@ MODULE MainModule
 		! Open main process log
 		Open "HOME:/main_process.txt", main_logfile \Write;
 		Write main_logfile, "========================================";
-		Write main_logfile, "Main Process Log (v1.7.50)";
+		Write main_logfile, "Main Process Log (" + TASK1_VERSION + ")";
 		Write main_logfile, "========================================";
 		Write main_logfile, "Date: " + CDate();
 		Write main_logfile, "Time: " + CTime();
@@ -1181,7 +1184,7 @@ MODULE MainModule
 		! Open log file for detailed logging
 		Open "HOME:/robot1_init_position.txt", logfile \Write;
 		Write logfile, "========================================";
-		Write logfile, "Robot1 Initial Position Setup (v1.7.50)";
+		Write logfile, "Robot1 Initial Position Setup (" + TASK1_VERSION + ")";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
@@ -1431,13 +1434,13 @@ MODULE MainModule
 		VAR num gantry_r_offset;
 
 		TPWrite "========================================";
-		TPWrite "Gantry Floor Test (v1.7.50)";
+		TPWrite "Gantry Floor Test (" + TASK1_VERSION + ")";
 
 		! Open log file first for debug output (v1.7.50)
 		Open "HOME:/gantry_floor_test.txt", debug_logfile \Write;
 		enable_debug_logging := TRUE;
 		Write debug_logfile, "========================================";
-		Write debug_logfile, "Gantry Floor Coordinate Test (v1.7.50)";
+		Write debug_logfile, "Gantry Floor Coordinate Test (" + TASK1_VERSION + ")";
 		Write debug_logfile, "========================================";
 		Write debug_logfile, "Date: " + CDate();
 		Write debug_logfile, "Time: " + CTime();
@@ -1743,7 +1746,7 @@ MODULE MainModule
 		! Open log file
 		Open "HOME:/gantry_rotation_test.txt", logfile \Write;
 		Write debug_logfile, "========================================";
-		Write debug_logfile, "Gantry R-axis Rotation Test (v1.7.50)";
+		Write debug_logfile, "Gantry R-axis Rotation Test (" + TASK1_VERSION + ")";
 		Write debug_logfile, "========================================";
 		Write debug_logfile, "Date: " + CDate();
 		Write debug_logfile, "Time: " + CTime();

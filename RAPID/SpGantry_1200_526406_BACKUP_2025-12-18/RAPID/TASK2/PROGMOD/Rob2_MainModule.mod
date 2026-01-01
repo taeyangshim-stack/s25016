@@ -89,6 +89,10 @@ MODULE Rob2_MainModule
 	!   - Enables Robot2 TCP control in Floor coordinates regardless of gantry position
 	!   - SetRobot2InitialPosition now uses WobjGantry_Rob2 instead of wobj0
 	!========================================
+
+	! Version constant for logging (v1.7.50+)
+	CONST string TASK2_VERSION := "v1.7.50";
+
     RECORD targetdata
         robtarget position;
         num cpm;
@@ -535,7 +539,7 @@ MODULE Rob2_MainModule
         ! Open main process log
         Open "HOME:/task2_main_process.txt", main_logfile \Write;
         Write main_logfile, "========================================";
-        Write main_logfile, "TASK2 Main Process Log (v1.7.50)";
+        Write main_logfile, "TASK2 Main Process Log (" + TASK2_VERSION + ")";
         Write main_logfile, "========================================";
         Write main_logfile, "Date: " + CDate();
         Write main_logfile, "Time: " + CTime();
@@ -2073,7 +2077,7 @@ MODULE Rob2_MainModule
 		! Open log file for detailed logging
 		Open "HOME:/robot2_init_position.txt", logfile \Write;
 		Write logfile, "========================================";
-		Write logfile, "Robot2 Initial Position Setup (v1.7.50)";
+		Write logfile, "Robot2 Initial Position Setup (" + TASK2_VERSION + ")";
 		Write logfile, "========================================";
 		Write logfile, "Date: " + CDate();
 		Write logfile, "Time: " + CTime();
