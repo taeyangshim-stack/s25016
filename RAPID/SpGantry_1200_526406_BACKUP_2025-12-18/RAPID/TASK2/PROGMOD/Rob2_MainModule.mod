@@ -90,9 +90,6 @@ MODULE Rob2_MainModule
 	!   - SetRobot2InitialPosition now uses WobjGantry_Rob2 instead of wobj0
 	!========================================
 
-	! Version constant for logging (v1.7.50+)
-	CONST string TASK2_VERSION := "v1.7.50";
-
     RECORD targetdata
         robtarget position;
         num cpm;
@@ -164,6 +161,9 @@ MODULE Rob2_MainModule
         num AngleHeight;
         num AngleWidth;
     ENDRECORD
+
+	! Version constant for logging (v1.7.50+)
+	CONST string TASK2_VERSION := "v1.7.50";
 
     PERS tasks taskGroup12{2};
     PERS tasks taskGroup13{2};
