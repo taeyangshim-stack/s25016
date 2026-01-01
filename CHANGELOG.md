@@ -63,6 +63,10 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
   - `task2_main_process.txt`: TASK2 전체 프로세스 로그
   - `robot2_init_position.txt`: Robot2 초기화 상세 (Step 1~2)
   - `gantry_floor_test.txt`: Floor 좌표 테스트 결과
+- **버전 상수 관리**:
+  - `TASK1_VERSION` 및 `TASK2_VERSION` 상수 추가
+  - 모든 로그에서 버전 상수 참조 (하드코딩 제거)
+  - 단일 지점에서 버전 관리, 업데이트 용이
 - **디버그 로깅**: WHILE 루프 종료 후 "DEBUG: Exited refinement loop"
 - **main() 개선**: 진행 상황 TP 출력, 로그 파일 목록 표시
 
@@ -101,8 +105,10 @@ ENDWHILE
 - Robot1: wobj0 ≈ WobjGantry (R-axis 중심)
 - Robot2: WobjGantry_Rob2 (R-axis 중심 + 488mm offset)
 
-**Git Commits** (총 12개):
+**Git Commits** (총 14개):
 ```
+8f5fcc0 - refactor: Use version constants for logging
+cacee83 - docs: Update CHANGELOG.md for v1.7.50 release
 b0e9c20 - debug: Add debug logging after WHILE loop exit
 3016535 - fix: Remove infinite loop from TASK2 main()
 f404454 - feat: Enhanced main() with logging
