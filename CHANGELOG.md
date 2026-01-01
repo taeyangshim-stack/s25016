@@ -75,6 +75,11 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
   - VAR 선언을 프로시저 시작 부분으로 이동
   - `half_angle_deg` 변수 선언 추가
   - TASK2: CONST 선언을 RECORD 정의 후로 이동 (RAPID 모듈 구조 순서 준수)
+- **BREAK 문 프로그램 종료 문제**: BREAK 실행 후 프로그램이 계속되지 않음
+  - **증상**: "DEBUG: About to BREAK" 출력됨, 하지만 ENDWHILE 이후 코드 미실행
+  - **원인**: RAPID BREAK 문이 WHILE 루프를 빠져나가지 못하고 프로그램 종료
+  - **해결**: BREAK 대신 `iteration := max_iterations` 사용하여 자연스러운 루프 종료
+  - **개선**: correction 코드를 ELSE 블록으로 이동 (수렴 후 불필요한 이동 방지)
 - **WobjGantry 쿼터니언**: identity [1,0,0,0] 유지 (회전 없음)
   - R-axis 회전은 로봇 base 회전이지 work object 회전이 아님
 - **Robot1 TCP 방향**: [0.5, -0.5, 0.5, 0.5] (이전: 근사값)
@@ -86,25 +91,22 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 - **TASK2 main()**: 무한루프 제거, 로깅 추가
 
 ### Known Issues
-- **프로그램 조기 종료**: 로그 파일이 WHILE 루프 후 중단
-  - **테스트 결과 (2026-01-01 13:10)**:
-    - ✅ "Position refined: within +/-0.5mm tolerance" 출력됨
-    - ❌ "DEBUG: Exited refinement loop" **출력 안됨**
-    - ❌ SetRobot1InitialPosition() **정상 리턴 안됨**
-    - ❌ main() "Step 1: Robot1 initialization completed" **출력 안됨**
-  - **추가 디버그**: BREAK 직전에 "DEBUG: About to BREAK" 추가
-  - 목적: BREAK가 실행되는지, 아니면 그 전에 중단되는지 확인
-  - Step 3 (Gantry HOME 이동) 미실행
-  - TestGantryFloorCoordinates 미실행
+- **해결됨**: 프로그램 조기 종료 문제 (BREAK 문 관련)
+  - 2026-01-01 13:17 테스트로 BREAK 문제 확인 및 수정
+  - `iteration := max_iterations` 방식으로 대체하여 해결
 
 ### Technical Details
-**반복적 보정 알고리즘**:
+**반복적 보정 알고리즘** (v1.7.50):
 ```rapid
 WHILE iteration < 3 DO
+    iteration := iteration + 1;
     pos := CRobT(\WObj:=wobj0);
     error := target - pos;
-    IF Abs(error) < 0.5mm THEN BREAK; ENDIF
-    MoveL correction, \WObj:=WobjGantry;
+    IF Abs(error) < 0.5mm THEN
+        iteration := max_iterations;  ! Force loop exit (BREAK has issues)
+    ELSE
+        MoveL correction, \WObj:=WobjGantry;  ! Apply correction
+    ENDIF
 ENDWHILE
 ```
 
@@ -122,8 +124,9 @@ MODULE ModuleName
 ENDMODULE
 ```
 
-**Git Commits** (총 18개):
+**Git Commits** (총 19개):
 ```
+1c4db24 - fix: Replace BREAK with iteration control for loop exit
 2893b58 - debug: Add debug message before BREAK
 72eda19 - docs: Update CHANGELOG with RECORD/CONST order fix
 c776ce5 - fix: Move TASK2_VERSION constant after RECORD definitions
