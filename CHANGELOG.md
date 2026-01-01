@@ -71,9 +71,10 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 - **main() 개선**: 진행 상황 TP 출력, 로그 파일 목록 표시
 
 ### Fixed
-- **RAPID 문법 오류**: 12개 syntax error 수정
+- **RAPID 문법 오류**: 42개 syntax error 수정
   - VAR 선언을 프로시저 시작 부분으로 이동
   - `half_angle_deg` 변수 선언 추가
+  - TASK2: CONST 선언을 RECORD 정의 후로 이동 (RAPID 모듈 구조 순서 준수)
 - **WobjGantry 쿼터니언**: identity [1,0,0,0] 유지 (회전 없음)
   - R-axis 회전은 로봇 base 회전이지 work object 회전이 아님
 - **Robot1 TCP 방향**: [0.5, -0.5, 0.5, 0.5] (이전: 근사값)
@@ -105,8 +106,20 @@ ENDWHILE
 - Robot1: wobj0 ≈ WobjGantry (R-axis 중심)
 - Robot2: WobjGantry_Rob2 (R-axis 중심 + 488mm offset)
 
-**Git Commits** (총 14개):
+**RAPID 모듈 구조 순서**:
+```rapid
+MODULE ModuleName
+    RECORD definitions      ! 1. RECORD 먼저
+    CONST declarations      ! 2. CONST 다음
+    PERS/VAR declarations   ! 3. PERS/VAR 다음
+    PROC/FUNC definitions   ! 4. PROC/FUNC 마지막
+ENDMODULE
 ```
+
+**Git Commits** (총 16개):
+```
+c776ce5 - fix: Move TASK2_VERSION constant after RECORD definitions
+5977db7 - docs: Add version constant management to CHANGELOG.md
 8f5fcc0 - refactor: Use version constants for logging
 cacee83 - docs: Update CHANGELOG.md for v1.7.50 release
 b0e9c20 - debug: Add debug logging after WHILE loop exit
