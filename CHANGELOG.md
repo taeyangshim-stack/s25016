@@ -16,6 +16,109 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 
 ---
 
+## [v1.7.50_260101] - 2026-01-01
+
+### 주요 개선사항
+
+#### Cos/Sin 라디안→도(degree) 수정
+- **문제**: RAPID Cos/Sin 함수는 도(degree)를 사용하는데 라디안 값을 전달
+- **영향**: Robot2 Base Physical 위치 계산 오류 (13mm 오차)
+- **수정**:
+  - `UpdateRobot2BaseDynamicWobj()`: Cos/Sin 함수에 degree 사용
+  - `UpdateGantryWobj()`: 쿼터니언 계산에 degree 사용
+- **결과**: Cos(90°) = 0.000, Sin(90°) = 1.000 (이전: 1.000, 0.027)
+- **커밋**: `ad9ac5d`
+
+#### 반복적 보정 (Iterative Refinement) 구현
+- **목적**: R-axis 중심 위치를 ±0.5mm 이내로 정밀 조정
+- **알고리즘**:
+  1. 목표 위치로 초기 이동 (WobjGantry)
+  2. 현재 wobj0 위치 읽기
+  3. 오차 계산 (목표 - 실제)
+  4. 보정 이동 실행
+  5. ±0.5mm tolerance 내 또는 최대 3회 반복
+- **결과**:
+  - Robot1: 1 iteration (Error: 0.00mm)
+  - Robot2: 2 iterations (Error: 0.13mm)
+- **커밋**: `b1b7663`
+
+#### Robot2 좌표계 불일치 수정
+- **문제**: Robot2 반복적 보정 발산 (12.72 → 0.85 → 12.35mm)
+- **원인**: wobj0에서 읽고 WobjGantry_Rob2로 이동 (서로 다른 좌표계)
+- **수정**: 읽기와 이동 모두 WobjGantry_Rob2 사용
+- **결과**: 정상 수렴 (-0.66 → -0.13mm)
+- **커밋**: `1110373`
+
+#### TASK2 무한루프 제거
+- **문제**: `WHILE TRUE DO` 무한루프로 프로그램 절대 종료 안 됨
+- **원인**: 불필요한 연속 위치 업데이트 로직
+- **수정**: 무한루프 제거, 초기화 후 정상 종료
+- **근거**: TASK1이 `CRobT(\TaskName:="T_ROB2")` 로 on-demand 읽기
+- **커밋**: `3016535`
+
+### Added
+- **포괄적 로깅 시스템**:
+  - `main_process.txt`: TASK1 전체 프로세스 로그
+  - `robot1_init_position.txt`: Robot1 초기화 상세 (Step 0~3)
+  - `task2_main_process.txt`: TASK2 전체 프로세스 로그
+  - `robot2_init_position.txt`: Robot2 초기화 상세 (Step 1~2)
+  - `gantry_floor_test.txt`: Floor 좌표 테스트 결과
+- **디버그 로깅**: WHILE 루프 종료 후 "DEBUG: Exited refinement loop"
+- **main() 개선**: 진행 상황 TP 출력, 로그 파일 목록 표시
+
+### Fixed
+- **RAPID 문법 오류**: 12개 syntax error 수정
+  - VAR 선언을 프로시저 시작 부분으로 이동
+  - `half_angle_deg` 변수 선언 추가
+- **WobjGantry 쿼터니언**: identity [1,0,0,0] 유지 (회전 없음)
+  - R-axis 회전은 로봇 base 회전이지 work object 회전이 아님
+- **Robot1 TCP 방향**: [0.5, -0.5, 0.5, 0.5] (이전: 근사값)
+
+### Changed
+- **SetRobot1InitialPosition**: 반복적 보정 + 로깅 추가
+- **SetRobot2InitialPosition**: 반복적 보정 + 로깅 추가
+- **TASK1 main()**: 로깅 및 진행 상황 추적 개선
+- **TASK2 main()**: 무한루프 제거, 로깅 추가
+
+### Known Issues
+- **프로그램 조기 종료**: 로그 파일이 WHILE 루프 후 중단
+  - 현재 디버그 로깅으로 원인 추적 중
+  - Step 3 (Gantry HOME 이동) 미실행
+  - TestGantryFloorCoordinates 미실행
+
+### Technical Details
+**반복적 보정 알고리즘**:
+```rapid
+WHILE iteration < 3 DO
+    pos := CRobT(\WObj:=wobj0);
+    error := target - pos;
+    IF Abs(error) < 0.5mm THEN BREAK; ENDIF
+    MoveL correction, \WObj:=WobjGantry;
+ENDWHILE
+```
+
+**좌표계 일치**:
+- Robot1: wobj0 ≈ WobjGantry (R-axis 중심)
+- Robot2: WobjGantry_Rob2 (R-axis 중심 + 488mm offset)
+
+**Git Commits** (총 12개):
+```
+b0e9c20 - debug: Add debug logging after WHILE loop exit
+3016535 - fix: Remove infinite loop from TASK2 main()
+f404454 - feat: Enhanced main() with logging
+04a01ad - fix: Move VAR declarations to procedure start
+dc30784 - feat: Add comprehensive logging to init procedures
+b1b7663 - feat: Add iterative refinement
+1110373 - fix: Fix Robot2 coordinate system mismatch
+bccce81 - fix: Correct Robot1 TCP quaternion
+c458a6d - fix: Keep WobjGantry orientation as identity
+aa1eb3d - fix: Declare half_angle_deg variable
+ad9ac5d - fix: Fix Cos/Sin to use degrees
+271a625 - fix: Use global variables for debug logging
+```
+
+---
+
 ## [v1.0_251205] - 2025-12-05
 
 ### Added
