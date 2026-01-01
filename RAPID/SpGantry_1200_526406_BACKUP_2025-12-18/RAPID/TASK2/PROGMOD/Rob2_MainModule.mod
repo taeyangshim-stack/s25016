@@ -2142,6 +2142,10 @@ MODULE Rob2_MainModule
 			Write logfile, "  Correction applied";
 		ENDWHILE
 
+		! Debug: Confirm WHILE loop completed
+		TPWrite "DEBUG: Exited refinement loop";
+		Write logfile, "DEBUG: Exited refinement loop";
+
 		TPWrite "Robot2 TCP at HOME [0, 488, -1000] (WobjGantry_Rob2) - Refined";
 		Write logfile, "Robot2 TCP at HOME [0, 488, -1000] (WobjGantry_Rob2) - Refined";
 		TPWrite "Gantry position unchanged (controlled by TASK1)";

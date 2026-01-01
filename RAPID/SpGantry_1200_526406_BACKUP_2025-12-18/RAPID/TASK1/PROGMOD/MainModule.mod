@@ -1278,6 +1278,10 @@ MODULE MainModule
 			Write logfile, "  Correction applied";
 		ENDWHILE
 
+		! Debug: Confirm WHILE loop completed
+		TPWrite "DEBUG: Exited refinement loop";
+		Write logfile, "DEBUG: Exited refinement loop";
+
 		TPWrite "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry) - Refined";
 		Write logfile, "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry) - Refined";
 		Write logfile, "";
