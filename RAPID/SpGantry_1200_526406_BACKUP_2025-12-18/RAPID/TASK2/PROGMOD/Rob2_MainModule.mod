@@ -2135,17 +2135,18 @@ MODULE Rob2_MainModule
 			IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
 				TPWrite "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
 				Write logfile, "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
-				TPWrite "DEBUG: About to BREAK from WHILE loop";
-				Write logfile, "DEBUG: About to BREAK from WHILE loop";
-				BREAK;
+				TPWrite "DEBUG: Setting iteration to force loop exit";
+				Write logfile, "DEBUG: Setting iteration to force loop exit";
+				! Force loop exit by setting iteration >= max_iterations (BREAK has issues)
+				iteration := max_iterations;
+			ELSE
+				! Apply correction: move to target position [0, 488, -1000] in WobjGantry_Rob2
+				UpdateGantryWobj_Rob2;
+				initial_joint := CJointT();
+				home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], initial_joint.extax];
+				MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry_Rob2;
+				Write logfile, "  Correction applied";
 			ENDIF
-
-			! Apply correction: move to target position [0, 488, -1000] in WobjGantry_Rob2
-			UpdateGantryWobj_Rob2;
-			initial_joint := CJointT();
-			home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], initial_joint.extax];
-			MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry_Rob2;
-			Write logfile, "  Correction applied";
 		ENDWHILE
 
 		! Debug: Confirm WHILE loop completed
