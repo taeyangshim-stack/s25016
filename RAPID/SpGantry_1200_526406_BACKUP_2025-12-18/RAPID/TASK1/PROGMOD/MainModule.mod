@@ -225,10 +225,54 @@ MODULE MainModule
 	PERS wobjdata wobjRob1Base := [FALSE, TRUE, "", [[0, 0, 0], [0, 0.707107, 0, 0.707107]], [[0, 0, 0], [1, 0, 0, 0]]];
 
 	PROC main()
-		! Test sequence: Initialize robots and run gantry floor coordinate test
+		VAR iodev main_logfile;
+
+		! Open main process log
+		Open "HOME:/main_process.txt", main_logfile \Write;
+		Write main_logfile, "========================================";
+		Write main_logfile, "Main Process Log (v1.7.50)";
+		Write main_logfile, "========================================";
+		Write main_logfile, "Date: " + CDate();
+		Write main_logfile, "Time: " + CTime();
+		Write main_logfile, "";
+
+		! Step 1: Initialize Robot1 and Gantry
+		TPWrite "========================================";
+		TPWrite "MAIN: Starting Robot1 initialization...";
+		TPWrite "========================================";
+		Write main_logfile, "Step 1: Initializing Robot1 and Gantry...";
 		SetRobot1InitialPosition;
+		TPWrite "MAIN: Robot1 initialization completed";
+		Write main_logfile, "Step 1: Robot1 initialization completed";
+		Write main_logfile, "";
+
 		WaitTime 1.0;
+
+		! Step 2: Run Gantry Floor Coordinate Test
+		TPWrite "========================================";
+		TPWrite "MAIN: Starting Gantry Floor Test...";
+		TPWrite "========================================";
+		Write main_logfile, "Step 2: Running Gantry Floor Coordinate Test...";
 		TestGantryFloorCoordinates;
+		TPWrite "MAIN: Gantry Floor Test completed";
+		Write main_logfile, "Step 2: Gantry Floor Test completed";
+		Write main_logfile, "";
+
+		! Close main log
+		Write main_logfile, "========================================";
+		Write main_logfile, "Main Process completed at " + CTime();
+		Write main_logfile, "========================================";
+		Close main_logfile;
+
+		TPWrite "========================================";
+		TPWrite "MAIN: All tests completed!";
+		TPWrite "Check log files:";
+		TPWrite "  - main_process.txt";
+		TPWrite "  - robot1_init_position.txt";
+		TPWrite "  - robot2_init_position.txt";
+		TPWrite "  - gantry_floor_test.txt";
+		TPWrite "========================================";
+
 		! Original: rUpdateR1Position;
 	ENDPROC
     
