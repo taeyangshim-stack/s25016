@@ -87,7 +87,13 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 
 ### Known Issues
 - **프로그램 조기 종료**: 로그 파일이 WHILE 루프 후 중단
-  - 현재 디버그 로깅으로 원인 추적 중
+  - **테스트 결과 (2026-01-01 13:10)**:
+    - ✅ "Position refined: within +/-0.5mm tolerance" 출력됨
+    - ❌ "DEBUG: Exited refinement loop" **출력 안됨**
+    - ❌ SetRobot1InitialPosition() **정상 리턴 안됨**
+    - ❌ main() "Step 1: Robot1 initialization completed" **출력 안됨**
+  - **추가 디버그**: BREAK 직전에 "DEBUG: About to BREAK" 추가
+  - 목적: BREAK가 실행되는지, 아니면 그 전에 중단되는지 확인
   - Step 3 (Gantry HOME 이동) 미실행
   - TestGantryFloorCoordinates 미실행
 
@@ -116,8 +122,10 @@ MODULE ModuleName
 ENDMODULE
 ```
 
-**Git Commits** (총 16개):
+**Git Commits** (총 18개):
 ```
+2893b58 - debug: Add debug message before BREAK
+72eda19 - docs: Update CHANGELOG with RECORD/CONST order fix
 c776ce5 - fix: Move TASK2_VERSION constant after RECORD definitions
 5977db7 - docs: Add version constant management to CHANGELOG.md
 8f5fcc0 - refactor: Use version constants for logging
