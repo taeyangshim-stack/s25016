@@ -249,7 +249,14 @@ MODULE MainModule
 		Write main_logfile, "Step 1: Robot1 initialization completed";
 		Write main_logfile, "";
 
-		WaitTime 1.0;
+		! Wait for TASK2 (Robot2) initialization to complete
+		! Robot2 initialization takes approximately 6-7 seconds
+		TPWrite "MAIN: Waiting for Robot2 initialization...";
+		Write main_logfile, "Waiting for Robot2 initialization (10 seconds)...";
+		WaitTime 10.0;
+		TPWrite "MAIN: Robot2 initialization should be completed";
+		Write main_logfile, "Robot2 initialization wait completed";
+		Write main_logfile, "";
 
 		! Step 2: Run Gantry Floor Coordinate Test
 		TPWrite "========================================";
