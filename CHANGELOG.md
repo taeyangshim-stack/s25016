@@ -80,6 +80,15 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
   - **원인**: RAPID BREAK 문이 WHILE 루프를 빠져나가지 못하고 프로그램 종료
   - **해결**: BREAK 대신 `iteration := max_iterations` 사용하여 자연스러운 루프 종료
   - **개선**: correction 코드를 ELSE 블록으로 이동 (수렴 후 불필요한 이동 방지)
+- **TASK1/TASK2 동기화 문제**: TestGantryFloorCoordinates가 Robot2 초기화 전에 실행
+  - **증상**: Robot2 TCP wobj0 = [-69, 298, -875] (예상: [0, 488, -1000])
+  - **타이밍 분석**:
+    - 22:43:36 - TASK2 SetRobot2InitialPosition 시작
+    - 22:43:37 - TASK1 TestGantryFloorCoordinates 시작 (WaitTime 1초 후)
+    - 22:43:42 - TASK2 SetRobot2InitialPosition 완료 (6초 소요)
+  - **원인**: WaitTime 1.0초 → Robot2 초기화 시간 6초 (불충분!)
+  - **영향**: Robot2 Floor 좌표 및 Delta 완전히 잘못됨
+  - **해결 (9d2f9f4)**: WaitTime 1.0 → 10.0초, 로깅 메시지 추가
 - **WobjGantry_Rob2 쿼터니언 오류**: Work object orientation 잘못 설정
   - **원인**: WobjGantry와 WobjGantry_Rob2의 역할 오해
   - **잘못된 접근 (feb73cf)**: Robot2 base가 90° 회전되어 있으므로 WobjGantry_Rob2도 회전시킴 [0.7071, 0, 0, 0.7071]
@@ -170,8 +179,9 @@ MODULE ModuleName
 ENDMODULE
 ```
 
-**Git Commits** (총 21개):
+**Git Commits** (총 22개):
 ```
+9d2f9f4 - fix: Increase WaitTime to 10 seconds for TASK2 initialization
 f1232d9 - fix: Revert WobjGantry_Rob2 quaternion to identity (corrects feb73cf)
 feb73cf - fix: Fix UpdateGantryWobj_Rob2 to use degrees (INCORRECT - caused worse offset)
 1c4db24 - fix: Replace BREAK with iteration control for loop exit
