@@ -2093,8 +2093,8 @@ MODULE Rob2_MainModule
 		Write logfile, "Starting iterative refinement (tolerance=" + NumToStr(tolerance, 1) + "mm)...";
 		WHILE iteration < max_iterations DO
 			iteration := iteration + 1;
-			! Read current position in wobj0
-			current_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+			! Read current position in WobjGantry_Rob2 (same coordinate system as move target!)
+			current_wobj0 := CRobT(\Tool:=tool0\WObj:=WobjGantry_Rob2);
 			error_x := 0 - current_wobj0.trans.x;  ! Target X=0
 			error_y := 488 - current_wobj0.trans.y;  ! Target Y=488
 
@@ -2108,10 +2108,10 @@ MODULE Rob2_MainModule
 				BREAK;
 			ENDIF
 
-			! Apply correction in WobjGantry_Rob2 coordinates
+			! Apply correction: move to target position [0, 488, -1000] in WobjGantry_Rob2
 			UpdateGantryWobj_Rob2;
 			initial_joint := CJointT();
-			home_tcp := [[error_x, 488 + error_y, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], initial_joint.extax];
+			home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], initial_joint.extax];
 			MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry_Rob2;
 			Write logfile, "  Correction applied";
 		ENDWHILE
