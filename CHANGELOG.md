@@ -90,10 +90,46 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 - **TASK1 main()**: 로깅 및 진행 상황 추적 개선
 - **TASK2 main()**: 무한루프 제거, 로깅 추가
 
+### Test Results (2026-01-01 22:07)
+
+**✅ 프로그램 정상 완료**:
+- TASK1 main(): Step 1 완료, Step 2 완료
+- TASK2 main(): 초기화 완료
+- 총 실행 시간: 31초 (22:07:29 - 22:08:00)
+
+**✅ BREAK 문제 해결 검증**:
+```
+Before (13:17): DEBUG: About to BREAK → (프로그램 종료)
+After (22:07):  DEBUG: Setting iteration to force loop exit → DEBUG: Exited refinement loop ✅
+```
+
+**✅ Gantry Floor 좌표 추적 정확도**:
+- Target: Floor [+1000, -300, -600]
+- Robot1 Delta: [1000.00, -300.00, -600.00] mm ✅
+- Robot2 Delta: [1000.00, -300.00, -600.00] mm ✅
+- 결과: 두 로봇 모두 동일한 Floor 좌표 변화
+
+**✅ 반복적 보정 성능**:
+- Robot1: 1 iteration, Error [0.00, -0.01] mm
+- Robot2: 2 iterations, Error [-0.13, -0.00] mm
+
+**⚠️ Robot2 X 좌표 오프셋**:
+- Robot1 HOME Floor X: 9500.00 mm
+- Robot2 HOME Floor X: 9486.62 mm
+- 차이: -13.38 mm (Y, Z는 ±0.2mm 이내)
+- 원인: 추가 조사 필요 (Cos/Sin 수정에도 불구하고 잔존)
+
+**⚠️ 41617 경고** (심각하지 않음):
+- "Too intense frequency of Write Instructions"
+- 프로그램은 정상 완료됨
+- gantry_floor_test.txt: 90줄 (적절한 양)
+
 ### Known Issues
-- **해결됨**: 프로그램 조기 종료 문제 (BREAK 문 관련)
-  - 2026-01-01 13:17 테스트로 BREAK 문제 확인 및 수정
-  - `iteration := max_iterations` 방식으로 대체하여 해결
+- **Robot2 X 좌표 -13.38mm 오프셋**:
+  - R-axis 중심에서 Robot2가 약 13mm 뒤에 위치
+  - Y, Z 좌표는 정확 (±0.2mm 이내)
+  - 반복적 보정에도 불구하고 오프셋 유지
+  - 원인 조사 필요
 
 ### Technical Details
 **반복적 보정 알고리즘** (v1.7.50):
