@@ -239,6 +239,8 @@ MODULE MainModule
 
 	PROC main()
 		VAR iodev main_logfile;
+		VAR num wait_counter;
+		VAR num max_wait_cycles;
 
 		! Open main process log
 		Open "HOME:/main_process.txt", main_logfile \Write;
@@ -263,8 +265,8 @@ MODULE MainModule
 		! This replaces the previous fixed WaitTime 10.0 approach
 		TPWrite "MAIN: Waiting for Robot2 initialization (checking flag)...";
 		Write main_logfile, "Waiting for Robot2 initialization (sync flag method)...";
-		VAR num wait_counter := 0;
-		VAR num max_wait_cycles := 200;  ! 20 seconds max (200 * 0.1s)
+		wait_counter := 0;
+		max_wait_cycles := 200;  ! 20 seconds max (200 * 0.1s)
 		WHILE robot2_init_complete = FALSE AND wait_counter < max_wait_cycles DO
 			WaitTime 0.1;  ! Check every 100ms
 			wait_counter := wait_counter + 1;
