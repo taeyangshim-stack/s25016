@@ -16,6 +16,51 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 
 ---
 
+## [v1.7.51_260103] - 2026-01-03
+
+### 주요 개선사항
+
+#### Flag-based Synchronization (TASK1/TASK2)
+- **배경**: v1.7.50에서 WaitTime 10초로 동기화 문제 해결했으나, 고정 딜레이는 비효율적
+- **개선**: Flag-based event synchronization 구현
+  - **PERS bool robot2_init_complete**: TASK2가 초기화 완료 시 TRUE로 설정
+  - **TASK1 polling loop**: 100ms 간격으로 flag 확인, 최대 20초 timeout
+  - **실제 대기 시간 로깅**: Robot2 초기화에 걸린 정확한 시간 기록
+  - **Timeout 감지**: 20초 내에 완료되지 않으면 WARNING 출력
+- **장점**:
+  - ✅ **효율성**: Robot2 초기화 완료 즉시 다음 단계 진행 (불필요한 대기 제거)
+  - ✅ **정확성**: 고정 딜레이 대신 실제 완료 확인
+  - ✅ **진단성**: 실제 대기 시간 로깅으로 성능 모니터링 가능
+  - ✅ **안정성**: Timeout 메커니즘으로 무한 대기 방지
+- **성능 향상 예상**:
+  - 이전: 항상 10초 대기 (Robot2 초기화가 2초만 걸려도 10초 대기)
+  - 개선: Robot2 초기화 시간만큼만 대기 (2초면 2초, 6초면 6초)
+  - 최대 8초 시간 절약 가능
+
+### Changed
+- **TASK1 MainModule.mod**:
+  - WaitTime 10.0 → Flag polling loop (100ms interval, 20s timeout)
+  - Added PERS bool robot2_init_complete declaration (external reference from TASK2)
+  - Added actual wait time logging
+  - Version: v1.7.50 → v1.7.51
+- **TASK2 Rob2_MainModule.mod**:
+  - Added PERS bool robot2_init_complete flag initialization (FALSE → TRUE)
+  - Sets flag after SetRobot2InitialPosition completes
+  - Added synchronization logging
+  - Version: v1.7.50 → v1.7.51
+
+### Technical Details
+- **Cross-task variable access**: PERS 변수는 TASK 간 공유 가능 (같은 이름으로 선언)
+- **Polling strategy**:
+  - Check interval: 100ms (WaitTime 0.1)
+  - Max cycles: 200 (20초 = 200 × 0.1초)
+  - Early exit: robot2_init_complete = TRUE 시 즉시 종료
+- **Log format**:
+  - Success: "Robot2 initialization confirmed after X.XX seconds"
+  - Timeout: "WARNING: Robot2 initialization timeout after 20.0 seconds"
+
+---
+
 ## [v1.7.50_260101] - 2026-01-01
 
 ### 주요 개선사항

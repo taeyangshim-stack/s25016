@@ -155,10 +155,17 @@ MODULE MainModule
 	!   - Corrected R-axis rotation orientation in UpdateGantryWobj()
 	!   - R=0: Gantry parallel to Y-axis (perpendicular to X-axis) in Floor coordinate
 	!   - Added base 90 deg rotation offset to quaternion calculation
+	!
+	! v1.7.51 (2026-01-03)
+	!   - Replaced fixed WaitTime synchronization with flag-based mechanism
+	!   - TASK1 now waits for robot2_init_complete flag from TASK2
+	!   - Polls every 100ms with 20 second timeout
+	!   - Logs actual wait time and detects timeout conditions
+	!   - More robust and efficient than fixed 10 second delay
 	!========================================
 
-	! Version constant for logging (v1.7.50+)
-	CONST string TASK1_VERSION := "v1.7.50";
+	! Version constant for logging (v1.7.51+)
+	CONST string TASK1_VERSION := "v1.7.51";
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
@@ -204,6 +211,9 @@ MODULE MainModule
 	! Robot2 TCP position in Floor coordinate system (from TASK2)
 	! External reference - initialized and updated by TASK2
 	PERS robtarget robot2_floor_pos;
+	! Robot2 initialization complete flag (from TASK2)
+	! External reference - set to TRUE by TASK2 when SetRobot2InitialPosition completes
+	PERS bool robot2_init_complete;
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
@@ -249,13 +259,24 @@ MODULE MainModule
 		Write main_logfile, "Step 1: Robot1 initialization completed";
 		Write main_logfile, "";
 
-		! Wait for TASK2 (Robot2) initialization to complete
-		! Robot2 initialization takes approximately 6-7 seconds
-		TPWrite "MAIN: Waiting for Robot2 initialization...";
-		Write main_logfile, "Waiting for Robot2 initialization (10 seconds)...";
-		WaitTime 10.0;
-		TPWrite "MAIN: Robot2 initialization should be completed";
-		Write main_logfile, "Robot2 initialization wait completed";
+		! Wait for TASK2 (Robot2) initialization to complete using synchronization flag
+		! This replaces the previous fixed WaitTime 10.0 approach
+		TPWrite "MAIN: Waiting for Robot2 initialization (checking flag)...";
+		Write main_logfile, "Waiting for Robot2 initialization (sync flag method)...";
+		VAR num wait_counter := 0;
+		VAR num max_wait_cycles := 200;  ! 20 seconds max (200 * 0.1s)
+		WHILE robot2_init_complete = FALSE AND wait_counter < max_wait_cycles DO
+			WaitTime 0.1;  ! Check every 100ms
+			wait_counter := wait_counter + 1;
+		ENDWHILE
+
+		IF robot2_init_complete = TRUE THEN
+			TPWrite "MAIN: Robot2 initialization confirmed (flag = TRUE)";
+			Write main_logfile, "Robot2 initialization confirmed after " + NumToStr(wait_counter * 0.1, 2) + " seconds";
+		ELSE
+			TPWrite "MAIN: WARNING - Robot2 initialization timeout!";
+			Write main_logfile, "WARNING: Robot2 initialization timeout after " + NumToStr(max_wait_cycles * 0.1, 1) + " seconds";
+		ENDIF
 		Write main_logfile, "";
 
 		! Step 2: Run Gantry Floor Coordinate Test

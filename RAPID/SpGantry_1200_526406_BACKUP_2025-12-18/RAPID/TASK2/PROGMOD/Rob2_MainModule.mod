@@ -162,8 +162,19 @@ MODULE Rob2_MainModule
         num AngleWidth;
     ENDRECORD
 
-	! Version constant for logging (v1.7.50+)
-	CONST string TASK2_VERSION := "v1.7.50";
+	! v1.7.51 (2026-01-03)
+	!   - Added robot2_init_complete synchronization flag
+	!   - TASK2 sets flag to TRUE after SetRobot2InitialPosition completes
+	!   - Enables precise TASK1/TASK2 synchronization without fixed delays
+	!   - Replaces crude WaitTime 10.0 approach with event-based signaling
+	!
+	! Version constant for logging (v1.7.51+)
+	CONST string TASK2_VERSION := "v1.7.51";
+
+	! Synchronization flag for TASK1/TASK2 initialization
+	! TASK2 sets this to TRUE when Robot2 initialization is complete
+	! TASK1 waits for this flag before starting gantry floor tests
+	PERS bool robot2_init_complete := FALSE;
 
     PERS tasks taskGroup12{2};
     PERS tasks taskGroup13{2};
@@ -545,6 +556,9 @@ MODULE Rob2_MainModule
         Write main_logfile, "Time: " + CTime();
         Write main_logfile, "";
 
+        ! Initialize synchronization flag
+        robot2_init_complete := FALSE;
+
         ! Initialize Robot2 position
         TPWrite "========================================";
         TPWrite "TASK2: Starting Robot2 initialization...";
@@ -553,6 +567,12 @@ MODULE Rob2_MainModule
         SetRobot2InitialPosition;
         TPWrite "TASK2: Robot2 initialization completed";
         Write main_logfile, "Step 1: Robot2 initialization completed";
+        Write main_logfile, "";
+
+        ! Set synchronization flag to signal TASK1
+        robot2_init_complete := TRUE;
+        TPWrite "TASK2: Synchronization flag set (robot2_init_complete = TRUE)";
+        Write main_logfile, "Robot2 initialization complete - synchronization flag set";
         Write main_logfile, "";
 
         WaitTime 1.0;
