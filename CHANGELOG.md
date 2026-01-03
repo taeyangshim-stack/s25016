@@ -7,6 +7,37 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 
 ---
 
+## [v1.8.2_260103] - 2026-01-03
+
+### Fixed
+- **CRITICAL FIX**: Robot2 TCP coordinate calculation during R-axis rotation
+  - **문제**: v1.8.1 테스트에서 Robot2 TCP가 R축 회전 시 잘못된 좌표 출력
+    - R=0°: Robot1 [9500, 5300], Robot2 [9500, 5300] ✅ 정확
+    - R=90°: Robot1 [9500, 5300], Robot2 [9012, 5788] ❌ 976mm 오프셋!
+  - **원인**: Robot2 wobj0 좌표를 단순 덧셈으로 처리
+    - Robot2 wobj0가 R축과 함께 회전하는데 회전 변환 누락
+  - **수정**: 회전 변환 행렬 적용 (MainModule.mod:1230-1232)
+    - Rotation matrix: `[cos(θ) -sin(θ); sin(θ) cos(θ)]`
+    - floor_x_offset = wobj0.x × cos(θ) - wobj0.y × sin(θ)
+    - floor_y_offset = wobj0.x × sin(θ) + wobj0.y × cos(θ)
+  - **결과**: 모든 R각도에서 Robot1/Robot2 TCP가 R-센터에서 일치 예상
+
+### Changed
+- **TASK1 MainModule.mod**:
+  - Version: v1.8.1 → v1.8.2
+  - UpdateRobot2BaseDynamicWobj() 프로시저 수정
+  - 변수 추가: floor_x_offset, floor_y_offset, floor_z_offset
+  - 디버그 로깅 추가: "Robot2 TCP Floor offset (rotated)"
+
+### Test Results (v1.8.2)
+- **Status**: 🧪 테스트 준비 완료 (재실행 필요)
+- **Expected**: Robot1과 Robot2 TCP가 모든 R각도에서 동일한 좌표
+  - R=0°: 두 TCP 모두 [9500, 5300, 1100]
+  - R=±45°: 두 TCP 모두 [9500, 5300, 1100]
+  - R=±90°: 두 TCP 모두 [9500, 5300, 1100]
+
+---
+
 ## [v1.8.1_260103] - 2026-01-03
 
 ### Fixed

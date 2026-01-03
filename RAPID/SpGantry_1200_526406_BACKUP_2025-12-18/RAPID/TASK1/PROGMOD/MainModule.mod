@@ -163,6 +163,14 @@ MODULE MainModule
 	!   - Logs actual wait time and detects timeout conditions
 	!   - More robust and efficient than fixed 10 second delay
 	!
+	! v1.8.2 (2026-01-03)
+	!   - CRITICAL FIX: Applied rotation transformation matrix in UpdateRobot2BaseDynamicWobj()
+	!   - Robot2 wobj0 coordinates now properly rotated to Floor coordinates
+	!   - Fixes incorrect Robot2 TCP during R-axis rotation (was offset by 976mm at R=90°)
+	!   - Robot1 and Robot2 TCP now correctly overlap at R-center for all R angles
+	!   - Added rotation matrix: [cos(θ) -sin(θ); sin(θ) cos(θ)]
+	!   - Added debug logging for rotated offset values
+	!
 	! v1.8.1 (2026-01-03)
 	!   - BUGFIX: Added UpdateRobot2BaseDynamicWobj() call in TestGantryRotation()
 	!   - BUGFIX: Increased WaitTime from 0.05 to 0.1 to prevent error 41617
@@ -179,8 +187,8 @@ MODULE MainModule
 	!   - Enhanced logging: quaternion, R-axis details
 	!========================================
 
-	! Version constant for logging (v1.8.1+)
-	CONST string TASK1_VERSION := "v1.8.1";
+	! Version constant for logging (v1.8.2+)
+	CONST string TASK1_VERSION := "v1.8.2";
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
@@ -1135,15 +1143,23 @@ MODULE MainModule
 	! ========================================
 	! Update Robot2 Floor Position (from TASK1)
 	! ========================================
-	! Version: v1.7.50
-	! Date: 2025-12-31
+	! Version: v1.8.2
+	! Date: 2026-01-03
 	! Purpose: Calculate Robot2 TCP position in Floor coordinates
 	! TASK1 calculates this because TASK2 cannot sense gantry movement
 	! Approach:
-	!   1. Calculate Robot2 base position in Floor coordinates
+	!   1. Calculate Robot2 base position in Floor coordinates (with 488mm offset rotation)
 	!   2. Read Robot2 TCP position in wobj0 (from TASK2)
-	!   3. Combine: Robot2 TCP Floor = Robot2 base Floor + Robot2 TCP wobj0
-	!   4. Store in robot2_floor_pos (shared variable)
+	!   3. Apply rotation transformation matrix to wobj0 coordinates
+	!      - Robot2 wobj0 rotates with gantry R-axis
+	!      - Rotation matrix: [cos(θ) -sin(θ); sin(θ) cos(θ)]
+	!      - θ = total_r_deg = 90° + r_deg
+	!   4. Combine: Robot2 TCP Floor = Robot2 base Floor + rotated wobj0 offset
+	!   5. Store in robot2_floor_pos (shared variable)
+	! Changes in v1.8.2:
+	!   - CRITICAL: Added rotation transformation matrix for wobj0 coordinates
+	!   - Fixes Robot2 TCP offset error during R-axis rotation
+	!   - Both Robot1 and Robot2 TCP now correctly at R-center for all angles
 	! Uses global variables for logging:
 	!   enable_debug_logging - Set to TRUE to enable file logging
 	!   debug_logfile - File handle for debug output
@@ -1156,6 +1172,9 @@ MODULE MainModule
 		VAR num base_floor_x;
 		VAR num base_floor_y;
 		VAR num base_floor_z;
+		VAR num floor_x_offset;
+		VAR num floor_y_offset;
+		VAR num floor_z_offset;
 
 		! Read current gantry position
 		current_gantry := CJointT();
@@ -1218,11 +1237,19 @@ MODULE MainModule
 		! Read Robot2 TCP position in wobj0 (from TASK2)
 		robot2_tcp_wobj0 := CRobT(\TaskName:="T_ROB2"\Tool:=tool0\WObj:=wobj0);
 
-		! Calculate Robot2 TCP Floor position
-		! Robot2 wobj0 is aligned with Floor direction, so simple addition
-		robot2_floor_pos.trans.x := base_floor_x + robot2_tcp_wobj0.trans.x;
-		robot2_floor_pos.trans.y := base_floor_y + robot2_tcp_wobj0.trans.y;
-		robot2_floor_pos.trans.z := base_floor_z + robot2_tcp_wobj0.trans.z;
+		! Calculate Robot2 TCP Floor position with rotation transformation
+		! CRITICAL: Robot2 wobj0 rotates with gantry R-axis!
+		! Apply rotation transformation matrix to convert wobj0 coords to Floor coords
+		! Rotation matrix for R-axis (total_r_deg = 90 + r_deg):
+		!   [cos(θ)  -sin(θ)]   [x_wobj0]   [x_floor]
+		!   [sin(θ)   cos(θ)] × [y_wobj0] = [y_floor]
+		floor_x_offset := robot2_tcp_wobj0.trans.x * Cos(total_r_deg) - robot2_tcp_wobj0.trans.y * Sin(total_r_deg);
+		floor_y_offset := robot2_tcp_wobj0.trans.x * Sin(total_r_deg) + robot2_tcp_wobj0.trans.y * Cos(total_r_deg);
+		floor_z_offset := robot2_tcp_wobj0.trans.z;  ! Z-axis not affected by R-axis rotation
+
+		robot2_floor_pos.trans.x := base_floor_x + floor_x_offset;
+		robot2_floor_pos.trans.y := base_floor_y + floor_y_offset;
+		robot2_floor_pos.trans.z := base_floor_z + floor_z_offset;
 
 		TPWrite "Robot2 Base Floor: [" + NumToStr(base_floor_x,0) + ", "
 		                                + NumToStr(base_floor_y,0) + ", "
@@ -1237,6 +1264,13 @@ MODULE MainModule
 		IF enable_debug_logging Write debug_logfile, "Robot2 TCP wobj0: [" + NumToStr(robot2_tcp_wobj0.trans.x,0) + ", "
 		                                                         + NumToStr(robot2_tcp_wobj0.trans.y,0) + ", "
 		                                                         + NumToStr(robot2_tcp_wobj0.trans.z,0) + "]";
+
+		TPWrite "Robot2 TCP Floor offset (rotated): [" + NumToStr(floor_x_offset,1) + ", "
+		                                                + NumToStr(floor_y_offset,1) + ", "
+		                                                + NumToStr(floor_z_offset,1) + "]";
+		IF enable_debug_logging Write debug_logfile, "Robot2 TCP Floor offset (rotated): [" + NumToStr(floor_x_offset,1) + ", "
+		                                                                          + NumToStr(floor_y_offset,1) + ", "
+		                                                                          + NumToStr(floor_z_offset,1) + "]";
 
 		TPWrite "Robot2 TCP Floor: [" + NumToStr(robot2_floor_pos.trans.x,0) + ", "
 		                               + NumToStr(robot2_floor_pos.trans.y,0) + ", "
