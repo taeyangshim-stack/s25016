@@ -1241,8 +1241,8 @@ MODULE MainModule
 		! CRITICAL: Robot2 wobj0 rotates with gantry R-axis!
 		! Apply rotation transformation matrix to convert wobj0 coords to Floor coords
 		! Rotation matrix for R-axis (total_r_deg = 90 + r_deg):
-		!   [cos(θ)  -sin(θ)]   [x_wobj0]   [x_floor]
-		!   [sin(θ)   cos(θ)] × [y_wobj0] = [y_floor]
+		!   [cos(T)  -sin(T)]   [x_wobj0]   [x_floor]
+		!   [sin(T)   cos(T)] x [y_wobj0] = [y_floor]
 		floor_x_offset := robot2_tcp_wobj0.trans.x * Cos(total_r_deg) - robot2_tcp_wobj0.trans.y * Sin(total_r_deg);
 		floor_y_offset := robot2_tcp_wobj0.trans.x * Sin(total_r_deg) + robot2_tcp_wobj0.trans.y * Cos(total_r_deg);
 		floor_z_offset := robot2_tcp_wobj0.trans.z;  ! Z-axis not affected by R-axis rotation
