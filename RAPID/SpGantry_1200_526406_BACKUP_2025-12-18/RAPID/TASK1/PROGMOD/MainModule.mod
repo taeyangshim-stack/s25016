@@ -16,8 +16,8 @@ MODULE MainModule
 	!
 	! v1.2.0 (2025-12-18)
 	!   - Added Work Object definitions
-	!   - WobjFloor: Floor coordinate at [-9500, 5300, 2100] with RX 180° rotation
-	!   - wobjRob1Base: GantryRob coordinate with Y-axis 90° rotation
+	!   - WobjFloor: Floor coordinate at [-9500, 5300, 2100] with RX 180deg rotation
+	!   - wobjRob1Base: GantryRob coordinate with Y-axis 90deg rotation
 	!
 	! v1.2.1 (2025-12-19)
 	!   - Fixed "Too intense frequency of Write" error (41617)
@@ -59,13 +59,13 @@ MODULE MainModule
 	!   - Save start position and return after test
 	!
 	! v1.4.6 (2025-12-24)
-	!   - Start from home position (all 6 axes = 0°)
+	!   - Start from home position (all 6 axes = 0deg)
 	!   - Keep gantry position unchanged
 	!   - Return to original joint position after test
 	!
 	! v1.4.7 (2025-12-24)
 	!   - Avoid wrist singularity
-	!   - Home position: [-90, 0, 0, 0, 30, 0] (J5 = 30°)
+	!   - Home position: [-90, 0, 0, 0, 30, 0] (J5 = 30deg)
 	!
 	! v1.5.0 (2025-12-24)
 	!   - Added config.txt MODE support
@@ -94,7 +94,7 @@ MODULE MainModule
 	! v1.7.32 (2025-12-30)
 	!   - Fixed Floor->Physical coordinate transformation
 	!   - Physical = Floor_offset - HOME_offset
-	!   - Y, Z, R use subtraction due to Rx 180° rotation
+	!   - Y, Z, R use subtraction due to Rx 180deg rotation
 	!
 	! v1.7.33 (2025-12-30)
 	!   - Added X1-X2 synchronization in TestGantryFloorCoordinates
@@ -166,9 +166,9 @@ MODULE MainModule
 	! v1.8.2 (2026-01-03)
 	!   - CRITICAL FIX: Applied rotation transformation matrix in UpdateRobot2BaseDynamicWobj()
 	!   - Robot2 wobj0 coordinates now properly rotated to Floor coordinates
-	!   - Fixes incorrect Robot2 TCP during R-axis rotation (was offset by 976mm at R=90°)
+	!   - Fixes incorrect Robot2 TCP during R-axis rotation (was offset by 976mm at R=90deg)
 	!   - Robot1 and Robot2 TCP now correctly overlap at R-center for all R angles
-	!   - Added rotation matrix: [cos(θ) -sin(θ); sin(θ) cos(θ)]
+	!   - Added rotation matrix: [cos(theta) -sin(theta); sin(theta) cos(theta)]
 	!   - Added debug logging for rotated offset values
 	!
 	! v1.8.1 (2026-01-03)
@@ -256,8 +256,8 @@ MODULE MainModule
 	! Robot2 offset from R-axis center: -488mm on Y-axis
 	PERS wobjdata WobjRobot2Base_Dynamic := [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
-	! wobjRob1Base: Robot1 Base Frame = GantryRob coordinate system (Y-axis 90° rotation)
-	! Quaternion [0, 0.707107, 0, 0.707107] = Y-axis 90° rotation
+	! wobjRob1Base: Robot1 Base Frame = GantryRob coordinate system (Y-axis 90deg rotation)
+	! Quaternion [0, 0.707107, 0, 0.707107] = Y-axis 90deg rotation
 	PERS wobjdata wobjRob1Base := [FALSE, TRUE, "", [[0, 0, 0], [0, 0.707107, 0, 0.707107]], [[0, 0, 0], [1, 0, 0, 0]]];
 
 	PROC main()
@@ -707,7 +707,7 @@ MODULE MainModule
 	!   1. World - Global coordinate system
 	!   2. wobj0 - Default work object (= World in current config)
 	!   3. WobjFloor - Floor coordinate system at [-9500, 5300, 2100]
-	!   4. wobjRob1Base - Robot1 Base Frame (GantryRob with Y-axis 90° rotation)
+	!   4. wobjRob1Base - Robot1 Base Frame (GantryRob with Y-axis 90deg rotation)
 	! Output: FlexPendant display + /HOME/task1_tcp_orientation.txt
 	PROC VerifyTCPOrientation()
 		VAR robtarget tcp_world;
@@ -1152,8 +1152,8 @@ MODULE MainModule
 	!   2. Read Robot2 TCP position in wobj0 (from TASK2)
 	!   3. Apply rotation transformation matrix to wobj0 coordinates
 	!      - Robot2 wobj0 rotates with gantry R-axis
-	!      - Rotation matrix: [cos(θ) -sin(θ); sin(θ) cos(θ)]
-	!      - θ = total_r_deg = 90° + r_deg
+	!      - Rotation matrix: [cos(theta) -sin(theta); sin(theta) cos(theta)]
+	!      - theta = total_r_deg = 90deg + r_deg
 	!   4. Combine: Robot2 TCP Floor = Robot2 base Floor + rotated wobj0 offset
 	!   5. Store in robot2_floor_pos (shared variable)
 	! Changes in v1.8.2:
