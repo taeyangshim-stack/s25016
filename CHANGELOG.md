@@ -59,6 +59,62 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
   - Success: "Robot2 initialization confirmed after X.XX seconds"
   - Timeout: "WARNING: Robot2 initialization timeout after 20.0 seconds"
 
+### Fixed
+- **RAPID Syntax Error (Line 256-257)**:
+  - **문제**: VAR 선언을 실행 코드 중간에 위치시킴
+  - **증상**: "Syntax error(136): Unexpected 'var'"
+  - **원인**: RAPID 문법 규칙 위반 (VAR는 PROC 시작 부분에 선언 필수)
+  - **해결**: VAR 선언을 main() PROC 시작 부분으로 이동
+  - **커밋**: `2a60952`
+
+### Test Results
+
+#### Test 1: 정위치 시작 (2026-01-03 09:10)
+**초기 조건**:
+- 모든 축이 HOME 위치에서 시작
+- Gantry X=0, Y=0, Z=0, R=0
+- Robot1 joints: HOME position
+- Robot2 joints: HOME position
+
+**결과**:
+```
+✅ Synchronization: 0.00 seconds
+   - TASK1 시작: 09:10:06
+   - TASK2 완료: 09:10:07 (1초 이내)
+   - Robot2 확인: "after 0.00 seconds" (이미 완료됨)
+
+✅ Coordinate Accuracy:
+   - Robot2 TCP wobj0: [0, 488, -1000] (Perfect!)
+   - Robot1 Floor: [9500.00, 5299.96, 1100.04]
+   - Robot2 Floor: [9500.00, 5300.00, 1100.00]
+   - Difference: 0.04mm (sub-millimeter)
+
+✅ Gantry Movement Delta:
+   - Robot1: [1000.00, -300.00, -600.00]
+   - Robot2: [1000.00, -300.00, -600.00]
+   - Perfect match!
+
+⏱️ Time Savings: 10 seconds
+   - Previous (WaitTime 10.0): Always 10s
+   - Current (Flag-based): 0s (immediate)
+```
+
+**분석**:
+- 정위치 시작으로 Robot2 초기화가 1초 이내 완료
+- 동기화 시간 0초는 TASK1이 확인할 때 이미 TASK2가 완료된 상태
+- 실제 Robot2 초기화 시간을 측정하려면 랜덤 위치 테스트 필요
+
+#### Test 2: 랜덤 위치 시작 (예정)
+**초기 조건**:
+- Gantry X=0 (고정)
+- 로봇 축 및 다른 갠트리 축: 랜덤 위치
+- Robot2 초기화 시간을 정확히 측정하기 위함
+
+**목적**:
+- Robot2가 멀리 떨어진 위치에서 HOME으로 이동하는 실제 시간 측정
+- Flag-based synchronization의 진정한 효율성 검증
+- WaitTime 10.0 대비 실제 시간 절약량 확인
+
 ---
 
 ## [v1.7.50_260101] - 2026-01-01
