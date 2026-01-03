@@ -1,0 +1,130 @@
+! =====================================
+! S25016 SpGantry Test Configuration (v1.8.0)
+! =====================================
+
+! Coordinate Test Mode Configuration
+! =====================================
+! MODE=0 : User's coordinate system
+!   - Robot1: wobj0 -> Floor [X, -Y, -Z]
+!   - Robot2: wobj0 -> Floor [X, Y, Z] (same direction)
+!
+! MODE=1 : Claude's coordinate system
+!   - Robot1: wobj0 -> Floor [X, -Y, -Z]
+!   - Robot2: wobj0 -> Floor [X, -Y, -Z]
+!
+! Default: MODE=0
+! =====================================
+MODE=0
+
+! =====================================
+! Test Case Selection (v1.8.0)
+! =====================================
+! TEST_MODE : Test execution mode
+!   0 = Single position test (use GANTRY_X/Y/Z/R below)
+!   1 = R-axis rotation test (multiple R angles, X/Y/Z=0)
+!   2 = Complex motion test (translation + rotation)
+!   3 = Custom multi-position test (read from POS1~POS5)
+!
+! Default: TEST_MODE=0
+! =====================================
+TEST_MODE=0
+
+! =====================================
+! Single Position Test (TEST_MODE=0)
+! =====================================
+! GANTRY_X, Y, Z : Linear axis movement offset (mm)
+! GANTRY_R : Rotational axis movement offset (degrees)
+! Used by TestGantryFloorCoordinates procedure
+! Range: X=±9500, Y=±5300, Z=0~1000, R=±90 (safe range)
+! =====================================
+GANTRY_X=0
+GANTRY_Y=0
+GANTRY_Z=0
+GANTRY_R=0
+
+! =====================================
+! R-axis Rotation Test (TEST_MODE=1)
+! =====================================
+! NUM_R_ANGLES : Number of R angles to test (1-10)
+! R_ANGLE_1 ~ R_ANGLE_10 : R-axis angles in degrees
+! X/Y/Z axes are fixed at 0
+! =====================================
+NUM_R_ANGLES=5
+R_ANGLE_1=-90
+R_ANGLE_2=-45
+R_ANGLE_3=0
+R_ANGLE_4=45
+R_ANGLE_5=90
+R_ANGLE_6=0
+R_ANGLE_7=0
+R_ANGLE_8=0
+R_ANGLE_9=0
+R_ANGLE_10=0
+
+! =====================================
+! Complex Motion Test (TEST_MODE=2)
+! =====================================
+! Combined translation + rotation
+! NUM_COMPLEX_POS : Number of positions (1-10)
+! Format: X, Y, Z, R for each position
+! =====================================
+NUM_COMPLEX_POS=3
+! Position 1: X=1000, Y=-300, Z=-600, R=45
+COMPLEX_POS_1_X=1000
+COMPLEX_POS_1_Y=-300
+COMPLEX_POS_1_Z=-600
+COMPLEX_POS_1_R=45
+! Position 2: X=2000, Y=-600, Z=-1200, R=90
+COMPLEX_POS_2_X=2000
+COMPLEX_POS_2_Y=-600
+COMPLEX_POS_2_Z=-1200
+COMPLEX_POS_2_R=90
+! Position 3: X=1500, Y=-450, Z=-900, R=-45
+COMPLEX_POS_3_X=1500
+COMPLEX_POS_3_Y=-450
+COMPLEX_POS_3_Z=-900
+COMPLEX_POS_3_R=-45
+
+! =====================================
+! Custom Multi-Position Test (TEST_MODE=3)
+! =====================================
+! NUM_POSITIONS : Number of custom positions (1-10)
+! Format: X, Y, Z, R for each position
+! =====================================
+NUM_POSITIONS=5
+! Position 1: HOME
+POS_1_X=0
+POS_1_Y=0
+POS_1_Z=0
+POS_1_R=0
+! Position 2: X moved
+POS_2_X=1000
+POS_2_Y=0
+POS_2_Z=0
+POS_2_R=0
+! Position 3: Y moved
+POS_3_X=0
+POS_3_Y=-300
+POS_3_Z=0
+POS_3_R=0
+! Position 4: Z moved
+POS_4_X=0
+POS_4_Y=0
+POS_4_Z=-600
+POS_4_R=0
+! Position 5: All moved
+POS_5_X=1000
+POS_5_Y=-300
+POS_5_Z=-600
+POS_5_R=45
+
+! =====================================
+! Logging Configuration
+! =====================================
+! LOG_QUATERNION : Log WobjGantry quaternion (0=off, 1=on)
+! LOG_R_DETAIL : Log R-axis detailed calculation (0=off, 1=on)
+! LOG_ROBOT2_BASE : Log Robot2 base position (0=off, 1=on)
+! =====================================
+LOG_QUATERNION=1
+LOG_R_DETAIL=1
+LOG_ROBOT2_BASE=1

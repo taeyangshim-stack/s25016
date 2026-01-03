@@ -162,10 +162,20 @@ MODULE MainModule
 	!   - Polls every 100ms with 20 second timeout
 	!   - Logs actual wait time and detects timeout conditions
 	!   - More robust and efficient than fixed 10 second delay
+	!
+	! v1.8.0 (2026-01-03)
+	!   - Added R-axis rotation testing capability
+	!   - Extended config.txt with TEST_MODE (0~3)
+	!   - TEST_MODE=0: Single position (backward compatible)
+	!   - TEST_MODE=1: R-axis rotation test (multiple angles)
+	!   - TEST_MODE=2: Complex motion (translation + rotation)
+	!   - TEST_MODE=3: Custom multi-position test
+	!   - Added TestGantryRotation() procedure
+	!   - Enhanced logging: quaternion, R-axis details
 	!========================================
 
-	! Version constant for logging (v1.7.51+)
-	CONST string TASK1_VERSION := "v1.7.51";
+	! Version constant for logging (v1.8.0+)
+	CONST string TASK1_VERSION := "v1.8.0";
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
@@ -239,8 +249,30 @@ MODULE MainModule
 
 	PROC main()
 		VAR iodev main_logfile;
+		VAR iodev configfile;
 		VAR num wait_counter;
 		VAR num max_wait_cycles;
+		VAR num test_mode;
+		VAR string line;
+		VAR string value_str;
+		VAR bool found_value;
+
+		! Read TEST_MODE from config.txt
+		test_mode := 0;  ! Default: backward compatible
+		Open "HOME:/config.txt", configfile \Read;
+		WHILE test_mode = 0 DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "TEST_MODE=") = 1 THEN
+				IF StrLen(line) >= 11 THEN
+					value_str := StrPart(line, 11, StrLen(line) - 10);
+					found_value := StrToVal(value_str, test_mode);
+					TPWrite "TEST_MODE=" + NumToStr(test_mode, 0);
+					GOTO test_mode_found;
+				ENDIF
+			ENDIF
+		ENDWHILE
+		test_mode_found:
+		Close configfile;
 
 		! Open main process log
 		Open "HOME:/main_process.txt", main_logfile \Write;
@@ -281,14 +313,42 @@ MODULE MainModule
 		ENDIF
 		Write main_logfile, "";
 
-		! Step 2: Run Gantry Floor Coordinate Test
+		! Step 2: Run Test based on TEST_MODE
 		TPWrite "========================================";
-		TPWrite "MAIN: Starting Gantry Floor Test...";
+		TPWrite "MAIN: Starting Test (MODE=" + NumToStr(test_mode,0) + ")...";
 		TPWrite "========================================";
-		Write main_logfile, "Step 2: Running Gantry Floor Coordinate Test...";
-		TestGantryFloorCoordinates;
-		TPWrite "MAIN: Gantry Floor Test completed";
-		Write main_logfile, "Step 2: Gantry Floor Test completed";
+		Write main_logfile, "Step 2: Running Test (MODE=" + NumToStr(test_mode,0) + ")...";
+
+		IF test_mode = 0 THEN
+			! Single position test (backward compatible)
+			TPWrite "MAIN: Single Position Test";
+			Write main_logfile, "Test Type: Single Position (GANTRY_X/Y/Z/R)";
+			TestGantryFloorCoordinates;
+		ELSEIF test_mode = 1 THEN
+			! R-axis rotation test
+			TPWrite "MAIN: R-axis Rotation Test";
+			Write main_logfile, "Test Type: R-axis Rotation (multiple angles)";
+			TestGantryRotation;
+		ELSEIF test_mode = 2 THEN
+			! Complex motion test (Phase 2)
+			TPWrite "MAIN: Complex Motion Test - Not implemented yet";
+			Write main_logfile, "Test Type: Complex Motion - Not implemented yet";
+			TPWrite "ERROR: TEST_MODE=2 not implemented";
+			TPWrite "Please use TEST_MODE=0 or 1";
+		ELSEIF test_mode = 3 THEN
+			! Custom multi-position test (Phase 3)
+			TPWrite "MAIN: Custom Multi-Position Test - Not implemented yet";
+			Write main_logfile, "Test Type: Custom Multi-Position - Not implemented yet";
+			TPWrite "ERROR: TEST_MODE=3 not implemented";
+			TPWrite "Please use TEST_MODE=0 or 1";
+		ELSE
+			TPWrite "ERROR: Invalid TEST_MODE=" + NumToStr(test_mode,0);
+			Write main_logfile, "ERROR: Invalid TEST_MODE=" + NumToStr(test_mode,0);
+			TPWrite "Valid values: 0 (Single), 1 (R-axis)";
+		ENDIF
+
+		TPWrite "MAIN: Test completed";
+		Write main_logfile, "Step 2: Test completed";
 		Write main_logfile, "";
 
 		! Close main log
@@ -1741,26 +1801,61 @@ MODULE MainModule
 	! Initial position: Robot1 and Robot2 at HOME
 	! Gantry moves to [X, Y, Z] with different R angles: 0, 30, 45, 60, 90, -30, -45 degrees
 	! Output: /HOME/gantry_rotation_test.txt
-	PROC TestGantryMultipleRotations()
+	PROC TestGantryRotation()
 		VAR jointtarget home_pos;
 		VAR jointtarget test_pos;
 		VAR robtarget rob1_floor;
 		VAR robtarget rob2_floor;
 		VAR iodev logfile;
+		VAR iodev configfile;
 		VAR num test_x;
 		VAR num test_y;
 		VAR num test_z;
-		VAR num r_angles{7};
+		VAR num r_angles{10};
+		VAR num num_r_angles;
 		VAR num i;
 		VAR string r_str;
+		VAR string line;
+		VAR string value_str;
+		VAR bool found_value;
 
-		! Test configuration: Gantry position
-		test_x := 1000;   ! Physical X = 1000mm (Floor X = 10500)
-		test_y := 500;    ! Physical Y = 500mm (Floor Y = 5800)
-		test_z := 300;    ! Physical Z = 300mm (Floor Z = 2400)
+		! Initialize
+		test_x := 0;  ! Fixed at 0 for R-axis rotation test
+		test_y := 0;
+		test_z := 0;
+		num_r_angles := 0;
 
-		! Test R-axis angles (degrees)
-		r_angles := [0, 30, 45, 60, 90, -30, -45];
+		! Read config.txt for R angles
+		TPWrite "Reading config.txt for R angles...";
+		Open "HOME:/config.txt", configfile \Read;
+
+		! Read NUM_R_ANGLES
+		WHILE num_r_angles = 0 DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "NUM_R_ANGLES=") = 1 THEN
+				IF StrLen(line) >= 14 THEN
+					value_str := StrPart(line, 14, StrLen(line) - 13);
+					found_value := StrToVal(value_str, num_r_angles);
+					TPWrite "NUM_R_ANGLES=" + NumToStr(num_r_angles, 0);
+				ENDIF
+			ENDIF
+		ENDWHILE
+
+		! Read R_ANGLE_1 to R_ANGLE_10
+		FOR i FROM 1 TO num_r_angles DO
+			WHILE TRUE DO
+				line := ReadStr(configfile \RemoveCR);
+				IF StrFind(line, 1, "R_ANGLE_" + NumToStr(i,0) + "=") = 1 THEN
+					value_str := StrPart(line, StrLen("R_ANGLE_" + NumToStr(i,0) + "=") + 1, StrLen(line) - StrLen("R_ANGLE_" + NumToStr(i,0) + "="));
+					found_value := StrToVal(value_str, r_angles{i});
+					TPWrite "R_ANGLE_" + NumToStr(i,0) + "=" + NumToStr(r_angles{i}, 1);
+					GOTO next_angle;
+				ENDIF
+			ENDWHILE
+			next_angle:
+		ENDFOR
+
+		Close configfile;
 
 		TPWrite "========================================";
 		TPWrite "Starting Multiple R-axis Rotation Test";
@@ -1778,30 +1873,34 @@ MODULE MainModule
 
 		! Open log file
 		Open "HOME:/gantry_rotation_test.txt", logfile \Write;
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "Gantry R-axis Rotation Test (" + TASK1_VERSION + ")";
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "Date: " + CDate();
-		Write debug_logfile, "Time: " + CTime();
-		Write debug_logfile, "";
-		Write debug_logfile, "Test Configuration:";
-		Write debug_logfile, "  Gantry Position (Physical): [" + NumToStr(test_x,0) + ", " + NumToStr(test_y,0) + ", " + NumToStr(test_z,0) + "]";
-		Write debug_logfile, "  Gantry Position (Floor): [" + NumToStr(test_x + 9500,0) + ", " + NumToStr(5300 - test_y,0) + ", " + NumToStr(2100 - test_z,0) + "]";
-		Write debug_logfile, "  R-axis angles tested: 0, 30, 45, 60, 90, -30, -45 degrees";
-		Write debug_logfile, "";
-		Write debug_logfile, "Floor Coordinate System:";
-		Write debug_logfile, "  X+ = right (material flow direction)";
-		Write debug_logfile, "  Y+ = up";
-		Write debug_logfile, "  Z+ = vertical up";
-		Write debug_logfile, "  R=0: Gantry parallel to Y-axis (perpendicular to X-axis)";
-		Write debug_logfile, "  Robot1 at Y+, Robot2 at Y-";
-		Write debug_logfile, "";
+		Write logfile, "========================================";
+		Write logfile, "Gantry R-axis Rotation Test (" + TASK1_VERSION + ")";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "Test Configuration:";
+		Write logfile, "  Gantry Position (Physical): [" + NumToStr(test_x,0) + ", " + NumToStr(test_y,0) + ", " + NumToStr(test_z,0) + "]";
+		Write logfile, "  Gantry Position (Floor): [" + NumToStr(test_x - 9500,0) + ", " + NumToStr(test_y + 5300,0) + ", " + NumToStr(test_z + 2100,0) + "]";
+		Write logfile, "  Number of R angles: " + NumToStr(num_r_angles,0);
+		Write logfile, "  R angles (degrees): ";
+		FOR i FROM 1 TO num_r_angles DO
+			Write logfile, "    R_ANGLE_" + NumToStr(i,0) + " = " + NumToStr(r_angles{i}, 1);
+		ENDFOR
+		Write logfile, "";
+		Write logfile, "Floor Coordinate System:";
+		Write logfile, "  X+ = right (material flow direction)";
+		Write logfile, "  Y+ = up";
+		Write logfile, "  Z+ = vertical up";
+		Write logfile, "  R=0: Gantry parallel to Y-axis (perpendicular to X-axis)";
+		Write logfile, "  Robot1 at Y+, Robot2 at Y-";
+		Write logfile, "";
 
 		! Test each R angle
-		FOR i FROM 1 TO 7 DO
+		FOR i FROM 1 TO num_r_angles DO
 			r_str := NumToStr(r_angles{i}, 1);
 			TPWrite "----------------------------------------";
-			TPWrite "Test " + NumToStr(i,0) + "/7: R = " + r_str + " degrees";
+			TPWrite "Test " + NumToStr(i,0) + "/" + NumToStr(num_r_angles,0) + ": R = " + r_str + " degrees";
 			TPWrite "----------------------------------------";
 
 			! Move gantry to test position with current R angle
@@ -1820,21 +1919,22 @@ MODULE MainModule
 			rob2_floor := robot2_floor_pos;  ! Updated by TASK2
 
 			! Write results to file
-			Write debug_logfile, "Test " + NumToStr(i,0) + ": R = " + r_str + " deg";
-			Write debug_logfile, "--------------------";
-			Write debug_logfile, "Gantry (Physical): [" + NumToStr(test_pos.extax.eax_a,0) + ", " + NumToStr(test_pos.extax.eax_b,0) + ", " + NumToStr(test_pos.extax.eax_c,0) + ", " + r_str + "]";
-			Write debug_logfile, "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a + 9500,0) + ", " + NumToStr(5300 - test_pos.extax.eax_b,0) + ", " + NumToStr(2100 - test_pos.extax.eax_c,0) + ", " + r_str + "]";
-			Write debug_logfile, "";
-			Write debug_logfile, "Robot1 Floor TCP:";
-			Write debug_logfile, "  X = " + NumToStr(rob1_floor.trans.x, 2) + " mm";
-			Write debug_logfile, "  Y = " + NumToStr(rob1_floor.trans.y, 2) + " mm";
-			Write debug_logfile, "  Z = " + NumToStr(rob1_floor.trans.z, 2) + " mm";
-			Write debug_logfile, "";
-			Write debug_logfile, "Robot2 Floor TCP:";
-			Write debug_logfile, "  X = " + NumToStr(rob2_floor.trans.x, 2) + " mm";
-			Write debug_logfile, "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm";
-			Write debug_logfile, "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
-			Write debug_logfile, "";
+			Write logfile, "Test " + NumToStr(i,0) + ": R = " + r_str + " deg";
+			Write logfile, "--------------------";
+			Write logfile, "Gantry (Physical): [" + NumToStr(test_pos.extax.eax_a,0) + ", " + NumToStr(test_pos.extax.eax_b,0) + ", " + NumToStr(test_pos.extax.eax_c,0) + ", " + r_str + "]";
+			Write logfile, "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a - 9500,0) + ", " + NumToStr(test_pos.extax.eax_b + 5300,0) + ", " + NumToStr(test_pos.extax.eax_c + 2100,0) + ", " + r_str + "]";
+			Write logfile, "";
+			Write logfile, "Robot1 Floor TCP:";
+			Write logfile, "  X = " + NumToStr(rob1_floor.trans.x, 2) + " mm";
+			Write logfile, "  Y = " + NumToStr(rob1_floor.trans.y, 2) + " mm";
+			Write logfile, "  Z = " + NumToStr(rob1_floor.trans.z, 2) + " mm";
+			Write logfile, "";
+			Write logfile, "Robot2 Floor TCP:";
+			Write logfile, "  X = " + NumToStr(rob2_floor.trans.x, 2) + " mm";
+			Write logfile, "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm";
+			Write logfile, "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
+			Write logfile, "";
+			WaitTime 0.05;  ! Prevent Write frequency error
 
 			! Display on teach pendant
 			TPWrite "Robot1 Floor: [" + NumToStr(rob1_floor.trans.x,1) + ", " + NumToStr(rob1_floor.trans.y,1) + ", " + NumToStr(rob1_floor.trans.z,1) + "]";
@@ -1845,13 +1945,13 @@ MODULE MainModule
 		TPWrite "Returning to HOME...";
 		MoveAbsJ home_pos, v100, fine, tool0;
 
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "Test completed - Returned to HOME";
-		Write debug_logfile, "========================================";
-		Close debug_logfile;
+		Write logfile, "========================================";
+		Write logfile, "Test completed - Returned to HOME";
+		Write logfile, "========================================";
+		Close logfile;
 
 		TPWrite "========================================";
-		TPWrite "Multiple R-axis Rotation Test Complete!";
+		TPWrite "R-axis Rotation Test Complete!";
 		TPWrite "Results saved to gantry_rotation_test.txt";
 		TPWrite "========================================";
 
@@ -1859,9 +1959,9 @@ MODULE MainModule
 		IF ERRNO = ERR_FILEOPEN THEN
 			TPWrite "ERROR: Cannot open log file";
 		ELSE
-			TPWrite "ERROR in TestGantryMultipleRotations: " + NumToStr(ERRNO, 0);
+			TPWrite "ERROR in TestGantryRotation: " + NumToStr(ERRNO, 0);
 		ENDIF
-		Close debug_logfile;
+		Close logfile;
 		STOP;
 	ENDPROC
 

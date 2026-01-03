@@ -168,8 +168,13 @@ MODULE Rob2_MainModule
 	!   - Enables precise TASK1/TASK2 synchronization without fixed delays
 	!   - Replaces crude WaitTime 10.0 approach with event-based signaling
 	!
-	! Version constant for logging (v1.7.51+)
-	CONST string TASK2_VERSION := "v1.7.51";
+	! v1.8.0 (2026-01-03)
+	!   - Version sync with TASK1 for R-axis rotation testing
+	!   - No functional changes in TASK2 (changes in TASK1 only)
+	!   - Ready for Phase 2: Complex motion testing
+	!
+	! Version constant for logging (v1.8.0+)
+	CONST string TASK2_VERSION := "v1.8.0";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
