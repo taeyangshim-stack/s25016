@@ -104,16 +104,68 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 - 동기화 시간 0초는 TASK1이 확인할 때 이미 TASK2가 완료된 상태
 - 실제 Robot2 초기화 시간을 측정하려면 랜덤 위치 테스트 필요
 
-#### Test 2: 랜덤 위치 시작 (예정)
+#### Test 2: 랜덤 위치 시작 (2026-01-03 10:15)
 **초기 조건**:
 - Gantry X=0 (고정)
 - 로봇 축 및 다른 갠트리 축: 랜덤 위치
-- Robot2 초기화 시간을 정확히 측정하기 위함
+- 초기 위치에서 HOME으로 이동 테스트
 
-**목적**:
-- Robot2가 멀리 떨어진 위치에서 HOME으로 이동하는 실제 시간 측정
-- Flag-based synchronization의 진정한 효율성 검증
-- WaitTime 10.0 대비 실제 시간 절약량 확인
+**결과**:
+```
+✅ Synchronization: 0.00 seconds
+   - TASK1 시작: 10:15:39
+   - TASK2 시작: 10:15:39 (동시)
+   - TASK2 완료: 10:15:39 (<1초, TASK1보다 빠름!)
+   - TASK1 완료: 10:15:40 (1초, Step 0 X1-X2 sync 포함)
+   - Robot2 확인: "after 0.00 seconds" (이미 완료)
+
+✅ Initialization Details:
+   Robot1 (4 steps):
+   - Step 0: X1-X2 synchronization
+   - Step 1: Intermediate joint position
+   - Step 2: TCP HOME with refinement (Error Y=-0.16mm, 1 iteration)
+   - Step 3: Gantry HOME [0,0,0,0]
+
+   Robot2 (2 steps):
+   - Step 1: Intermediate joint position
+   - Step 2: TCP HOME with refinement (Error Y=-0.06mm, 1 iteration)
+   - TASK1보다 먼저 완료! (Step 0 없음)
+
+✅ Coordinate Accuracy:
+   HOME Position:
+   - Robot1 Floor: [9500.00, 5299.97, 1100.05]
+   - Robot2 Floor: [9500.00, 5300.00, 1100.00]
+   - Difference: 0.03mm (sub-millimeter)
+
+   X=0 Position (Gantry moved):
+   - Robot1 Floor: [-0.02, -0.03, 600.05]
+   - Robot2 Floor: [0.00, 0.00, 600.00]
+   - Difference: 0.05mm (sub-millimeter)
+
+✅ Gantry Movement Delta:
+   - Robot1: [-9500.02, -5300.00, -500.00]
+   - Robot2: [-9500.00, -5300.00, -500.00]
+   - dX error: 0.02mm (Perfect!)
+
+⏱️ Time Savings: 10 seconds
+   - Previous (WaitTime 10.0): Always 10s
+   - Current (Flag-based): 0s (immediate)
+   - Total cycle time: Reduced from 11s to 1s
+```
+
+**분석**:
+- **TASK2가 TASK1보다 빠름**: Robot2는 Step 0 (X1-X2 sync) 없이 2단계만 실행
+- **병렬 실행 효과**: TASK1과 TASK2가 동시에 초기화 진행, TASK2가 먼저 완료
+- **효율적인 Refinement**: 1회 반복으로 ±0.5mm tolerance 달성 (매우 정확한 초기 이동)
+- **동기화 시간 0초**: TASK1이 확인할 때 TASK2는 이미 완료된 상태
+- **랜덤 위치에서도 빠른 초기화**: Robot2가 1초 이내 완료
+- **좌표 정확도 유지**: 0.02-0.05mm (sub-millimeter precision)
+
+**결론**:
+- Flag-based synchronization은 랜덤 위치 시작에서도 완벽히 작동
+- WaitTime 10초 → 0초로 **10초 절약** (사이클 타임 91% 단축)
+- Robot2가 TASK1보다 빠르게 완료되므로 대기 시간 없음
+- 정확도 손실 없이 효율성 극대화
 
 ---
 
