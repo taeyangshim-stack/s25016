@@ -962,7 +962,9 @@ function normalizeCommentsData(comments) {
 function sendEmailNotification(action, data) {
   // 담당자 이메일 설정 (실제 이메일로 변경 필요)
   const emails = {
-    '심태양': 'simsun@kakao.com'
+    '심태양': 'simsun@kakao.com',
+    '이마룬': 'maroon@spsystems.co.kr',
+    '이상주': 'sangju@spsystems.co.kr'
   };
 
   const ownerEmail = emails[data.owner];
