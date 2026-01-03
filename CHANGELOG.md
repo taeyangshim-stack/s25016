@@ -7,6 +7,75 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 
 ---
 
+## [v1.8.1_260103] - 2026-01-03
+
+### Fixed
+- **CRITICAL BUG**: Robot2 Floor TCP reporting [0, 0, 0] in TestGantryRotation()
+  - **원인**: UpdateRobot2BaseDynamicWobj() 호출 누락
+  - **수정**: Line 1918에 UpdateRobot2BaseDynamicWobj() 호출 추가
+  - **영향**: v1.8.0 TEST_MODE=1에서 Robot2 좌표가 정상 출력되지 않던 문제 해결
+- **Error 41617**: Write frequency error 완화
+  - WaitTime 0.05s → 0.1s 증가
+  - 연속 Write 명령어 사이 간격 확대
+
+### Changed
+- **TASK1 MainModule.mod**:
+  - Version: v1.8.0 → v1.8.1
+  - TestGantryRotation() 프로시저 버그 수정
+  - Write frequency error 완화
+
+### Test Results (v1.8.1)
+- **Status**: 🧪 테스트 준비 완료 (재실행 필요)
+- **Expected**: Robot2 Floor TCP 정상 출력 예상
+
+---
+
+## [v1.8.0_260103] - 2026-01-03
+
+### Added
+- **TEST_MODE System**: Config-based test case selection
+  - TEST_MODE=0: Single position test (backward compatible with v1.7.51)
+  - TEST_MODE=1: R-axis rotation test (NEW)
+  - TEST_MODE=2: Complex motion (planned for Phase 2)
+  - TEST_MODE=3: Custom multi-position (planned for Phase 3)
+- **R-axis Rotation Testing** (TEST_MODE=1):
+  - Dynamic angle configuration via config.txt
+  - NUM_R_ANGLES: 1-10 angles per test
+  - R_ANGLE_1~10: Individual angle values (-100° to +100°)
+  - Default test angles: -90°, -45°, 0°, 45°, 90°
+- **TestGantryRotation()** procedure:
+  - Config-based R-axis angle reading
+  - Automatic gantry position logging
+  - Robot1/Robot2 Floor TCP coordinate measurement
+  - Log file: gantry_rotation_test.txt
+- **Enhanced Logging Configuration**:
+  - LOG_QUATERNION: WobjGantry quaternion details
+  - LOG_R_DETAIL: R-axis calculation logging
+  - LOG_ROBOT2_BASE: Robot2 base position logging
+- **Documentation**:
+  - v1.8.0_Phase1_TestGuide.md: Comprehensive testing guide
+  - HOME_config.txt: Reference config file in repository
+
+### Changed
+- **TASK1 MainModule.mod**:
+  - Version: v1.7.51 → v1.8.0
+  - main() procedure: Added TEST_MODE branching logic
+  - Added TestGantryRotation() procedure
+- **TASK2 Rob2_MainModule.mod**:
+  - Version: v1.7.51 → v1.8.0 (sync only, no functional changes)
+- **config.txt**:
+  - Extended with TEST_MODE section
+  - Added R-axis rotation test parameters
+  - Added logging configuration flags
+
+### Test Results (v1.8.0)
+- **Status**: ⚠️ **FAILED** - Robot2 좌표 버그 발견
+- **Issue**: Robot2 Floor TCP reported as [0, 0, 0] for all R angles
+- **Robot1**: ✅ 정상 작동 (모든 각도에서 좌표 정상 출력)
+- **프로그램 완료**: ✅ (에러 41617 발생했으나 프로그램은 완료됨)
+
+---
+
 ## [Unreleased]
 
 ### 계획 중

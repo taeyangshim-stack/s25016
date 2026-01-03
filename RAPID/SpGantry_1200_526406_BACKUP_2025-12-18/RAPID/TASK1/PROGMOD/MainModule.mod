@@ -163,6 +163,11 @@ MODULE MainModule
 	!   - Logs actual wait time and detects timeout conditions
 	!   - More robust and efficient than fixed 10 second delay
 	!
+	! v1.8.1 (2026-01-03)
+	!   - BUGFIX: Added UpdateRobot2BaseDynamicWobj() call in TestGantryRotation()
+	!   - BUGFIX: Increased WaitTime from 0.05 to 0.1 to prevent error 41617
+	!   - Fixed Robot2 Floor TCP reporting [0,0,0] in R-axis rotation tests
+	!
 	! v1.8.0 (2026-01-03)
 	!   - Added R-axis rotation testing capability
 	!   - Extended config.txt with TEST_MODE (0~3)
@@ -174,8 +179,8 @@ MODULE MainModule
 	!   - Enhanced logging: quaternion, R-axis details
 	!========================================
 
-	! Version constant for logging (v1.8.0+)
-	CONST string TASK1_VERSION := "v1.8.0";
+	! Version constant for logging (v1.8.1+)
+	CONST string TASK1_VERSION := "v1.8.1";
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
@@ -1915,6 +1920,8 @@ MODULE MainModule
 
 			! Measure Floor positions
 			UpdateRobot1FloorPosition;
+			UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
+			! Note: robot2_floor_pos is updated by UpdateRobot2BaseDynamicWobj
 			rob1_floor := robot1_floor_pos;
 			rob2_floor := robot2_floor_pos;  ! Updated by TASK2
 
@@ -1934,7 +1941,7 @@ MODULE MainModule
 			Write logfile, "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm";
 			Write logfile, "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
 			Write logfile, "";
-			WaitTime 0.05;  ! Prevent Write frequency error
+			WaitTime 0.1;  ! Prevent Write frequency error (increased from 0.05)
 
 			! Display on teach pendant
 			TPWrite "Robot1 Floor: [" + NumToStr(rob1_floor.trans.x,1) + ", " + NumToStr(rob1_floor.trans.y,1) + ", " + NumToStr(rob1_floor.trans.z,1) + "]";
