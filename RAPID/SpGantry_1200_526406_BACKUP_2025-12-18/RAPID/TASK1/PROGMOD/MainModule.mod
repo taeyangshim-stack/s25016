@@ -1799,12 +1799,22 @@ MODULE MainModule
 	! ========================================
 	! Test Gantry with Multiple R-axis Rotations
 	! ========================================
-	! Version: v1.7.50
-	! Date: 2025-12-31
+	! Version: v1.8.1
+	! Date: 2026-01-03
 	! Purpose: Test Robot1 and Robot2 TCP positions at various R-axis angles
-	! Tests multiple R values to verify WobjGantry rotation handling
+	! Features:
+	!   - Config-based angle configuration (NUM_R_ANGLES, R_ANGLE_1~10)
+	!   - Robot1 and Robot2 Floor TCP coordinate measurement
+	!   - Automatic gantry position logging
+	! Changes in v1.8.1:
+	!   - BUGFIX: Added UpdateRobot2BaseDynamicWobj() call (Line 1918)
+	!   - Fixed Robot2 Floor TCP reporting [0,0,0]
+	! Changes in v1.8.0:
+	!   - Config-based R-axis angle reading from config.txt
+	!   - Replaces hardcoded angles with NUM_R_ANGLES and R_ANGLE_1~10
+	!   - Enhanced logging with gantry position details
 	! Initial position: Robot1 and Robot2 at HOME
-	! Gantry moves to [X, Y, Z] with different R angles: 0, 30, 45, 60, 90, -30, -45 degrees
+	! Gantry position: X=0, Y=0, Z=0 (fixed), R varies according to config
 	! Output: /HOME/gantry_rotation_test.txt
 	PROC TestGantryRotation()
 		VAR jointtarget home_pos;
