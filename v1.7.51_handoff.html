@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S25016 v1.7.51 Handoff Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        header .meta {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        header .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #667eea;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 60px;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        .warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .info {
+            border-left-color: #17a2b8;
+            background: #d1ecf1;
+        }
+
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #667eea;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -35px;
+            top: 5px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .stat-card .number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .collapsible::before {
+            content: '▼';
+            transition: transform 0.3s;
+        }
+
+        .collapsible.collapsed::before {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.hidden {
+            max-height: 0;
+        }
+
+        footer {
+            background: #282c34;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 S25016 SpGantry v1.7.51</h1>
+            <div class="subtitle">ABB Dual-Robot Gantry System - Technical Handoff Document</div>
+            <div class="meta">
+                <div class="meta-item">
+                    <strong>📅 Period:</strong> 2025-12-17 ~ 2026-01-03
+                </div>
+                <div class="meta-item">
+                    <strong>🏷️ Version:</strong> v1.7.51
+                </div>
+                <div class="meta-item">
+                    <strong>✅ Status:</strong> Production Ready
+                </div>
+                <div class="meta-item">
+                    <strong>👥 Team:</strong> SP 심태양 + Claude Code
+                </div>
+            </div>
+        </header>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="#summary">Executive Summary</a></li>
+                <li><a href="#timeline">Project Timeline</a></li>
+                <li><a href="#achievements">Technical Achievements</a></li>
+                <li><a href="#test-results">Test Results</a></li>
+                <li><a href="#config">Configuration</a></li>
+                <li><a href="#issues">Known Issues</a></li>
+                <li><a href="#next-steps">Next Steps</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- Executive Summary -->
+            <section id="summary">
+                <h2>📊 Executive Summary</h2>
+
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="number">51</div>
+                        <div class="label">Version Iterations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">10s</div>
+                        <div class="label">Cycle Time Saved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">0.02mm</div>
+                        <div class="label">Coordinate Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">100%</div>
+                        <div class="label">Test Pass Rate</div>
+                    </div>
+                </div>
+
+                <div class="card success">
+                    <h3>✅ Mission Accomplished</h3>
+                    <p><strong>목표:</strong> ABB 듀얼 로봇 갠트리 시스템의 좌표계 정확도 검증 및 TASK1/TASK2 동기화 최적화</p>
+                    <p><strong>결과:</strong> Sub-millimeter 정확도 달성 (0.02-0.05mm), Flag-based synchronization으로 사이클 타임 91% 단축 (11s → 1s)</p>
+                </div>
+
+                <h3>핵심 성과</h3>
+                <ul>
+                    <li><strong>Flag-based Synchronization:</strong> WaitTime 10초 고정 딜레이 제거, 실시간 완료 확인으로 10초 절약</li>
+                    <li><strong>좌표계 통합:</strong> WobjGantry, WobjFloor, Robot2 Base Dynamic Wobj 구현 완료</li>
+                    <li><strong>정확도 검증:</strong> 병진 이동 (X, Y, Z) sub-millimeter 정확도 달성</li>
+                    <li><strong>Iterative Refinement:</strong> TCP 위치 ±0.5mm tolerance 내 자동 보정</li>
+                    <li><strong>Cross-task Communication:</strong> TASK1 ↔ TASK2 실시간 데이터 공유</li>
+                </ul>
+            </section>
+
+            <!-- Project Timeline -->
+            <section id="timeline">
+                <h2>📅 Project Timeline</h2>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>v1.0.0 - v1.2.0 (2025-12-17~18)</h4>
+                        <p><span class="badge badge-primary">초기 설계</span></p>
+                        <ul>
+                            <li>Gantry position sharing system 구축</li>
+                            <li>wobj0 definition 검증</li>
+                            <li>WobjFloor 좌표계 정의</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4>v1.3.0 - v1.4.0 (2025-12-23~24)</h4>
+                        <p><span class="badge badge-primary">좌표 검증</span></p>
+                        <ul>
+                            <li>TestCoordinateMovement 구현</li>
+                            <li>Gantry X/Y/Z axis 이동 테스트</li>
+                            <li>Robot1/Robot2 TCP 좌표 검증</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4>v1.5.0 - v1.6.0 (2025-12-25~27)</h4>
+                        <p><span class="badge badge-primary">Robot2 통합</span></p>
+                        <ul>
+                            <li>Robot2 Floor position tracking</li>
+                            <li>Cross-task position measurement</li>
+                            <li>Robot1-Robot2 거리 측정 (976mm)</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4>v1.7.0 - v1.7.29 (2025-12-28~30)</h4>
+                        <p><span class="badge badge-primary">WobjGantry 구현</span></p>
+                        <ul>
+                            <li>Dynamic work object 시스템</li>
+                            <li>UpdateGantryWobj() 구현</li>
+                            <li>Gantry Floor coordinate test</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4>v1.7.30 - v1.7.49 (2025-12-30~31)</h4>
+                        <p><span class="badge badge-warning">문제 해결</span></p>
+                        <ul>
+                            <li>BREAK statement 문제 해결</li>
+                            <li>Cos/Sin degree/radian 버그 수정</li>
+                            <li>Iterative refinement 구현</li>
+                            <li>WobjGantry_Rob2 quaternion 수정</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4>v1.7.50 (2026-01-01)</h4>
+                        <p><span class="badge badge-warning">동기화 문제</span></p>
+                        <ul>
+                            <li>TASK1/TASK2 타이밍 이슈 발견</li>
+                            <li>WaitTime 1s → 10s 수정</li>
+                            <li>Robot2 X 좌표 -13.38mm 오프셋 해결</li>
+                        </ul>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h4>v1.7.51 (2026-01-03) ✨</h4>
+                        <p><span class="badge badge-success">Production Ready</span></p>
+                        <ul>
+                            <li>Flag-based synchronization 구현</li>
+                            <li>WaitTime 10s → 0s (10초 절약)</li>
+                            <li>사이클 타임 91% 단축 (11s → 1s)</li>
+                            <li>정위치/랜덤 위치 테스트 완료</li>
+                            <li>Sub-millimeter 정확도 검증</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Technical Achievements -->
+            <section id="achievements">
+                <h2>🏆 Technical Achievements</h2>
+
+                <h3 class="collapsible" onclick="toggleCollapse(this)">1. Flag-based Synchronization</h3>
+                <div class="collapsible-content">
+                    <div class="card info">
+                        <h4>문제 상황 (v1.7.50)</h4>
+                        <p>TASK1이 Robot2 초기화 완료를 기다리기 위해 고정 <code>WaitTime 10.0</code> 사용</p>
+                        <ul>
+                            <li>Robot2 초기화가 2초 걸려도 10초 대기 → 8초 낭비</li>
+                            <li>Robot2 초기화가 6초 걸려도 10초 대기 → 4초 낭비</li>
+                            <li>실제 완료 시간에 관계없이 항상 10초 고정</li>
+                        </ul>
+                    </div>
+
+                    <div class="card success">
+                        <h4>해결 방법 (v1.7.51)</h4>
+                        <p><strong>PERS bool robot2_init_complete</strong> flag 사용</p>
+                        <pre><code>! TASK2 (Rob2_MainModule.mod)
+PERS bool robot2_init_complete := FALSE;
+
+PROC main()
+    robot2_init_complete := FALSE;  ! 초기화
+    SetRobot2InitialPosition;       ! Robot2 초기화
+    robot2_init_complete := TRUE;   ! 완료 신호
+ENDPROC
+
+! TASK1 (MainModule.mod)
+PERS bool robot2_init_complete;  ! External reference
+
+PROC main()
+    SetRobot1InitialPosition;
+
+    ! Polling loop (100ms interval, 20s timeout)
+    wait_counter := 0;
+    max_wait_cycles := 200;
+    WHILE robot2_init_complete = FALSE AND wait_counter < max_wait_cycles DO
+        WaitTime 0.1;
+        wait_counter := wait_counter + 1;
+    ENDWHILE
+
+    IF robot2_init_complete = TRUE THEN
+        TPWrite "Robot2 confirmed after " + NumToStr(wait_counter * 0.1, 2) + " seconds";
+    ELSE
+        TPWrite "WARNING - Robot2 initialization timeout!";
+    ENDIF
+ENDPROC</code></pre>
+                    </div>
+
+                    <h4>성능 비교</h4>
+                    <table>
+                        <tr>
+                            <th>항목</th>
+                            <th>v1.7.50 (WaitTime)</th>
+                            <th>v1.7.51 (Flag-based)</th>
+                            <th>개선</th>
+                        </tr>
+                        <tr>
+                            <td>대기 시간</td>
+                            <td>항상 10초</td>
+                            <td>0초 (즉시)</td>
+                            <td><strong>10초 절약</strong></td>
+                        </tr>
+                        <tr>
+                            <td>효율성</td>
+                            <td>Robot2 완료와 무관</td>
+                            <td>완료 즉시 진행</td>
+                            <td><strong>✅</strong></td>
+                        </tr>
+                        <tr>
+                            <td>진단</td>
+                            <td>실제 시간 알 수 없음</td>
+                            <td>실제 대기 시간 로깅</td>
+                            <td><strong>✅</strong></td>
+                        </tr>
+                        <tr>
+                            <td>안정성</td>
+                            <td>Timeout 없음</td>
+                            <td>20초 timeout</td>
+                            <td><strong>✅</strong></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3 class="collapsible" onclick="toggleCollapse(this)">2. 좌표계 시스템</h3>
+                <div class="collapsible-content">
+                    <h4>WobjFloor - 절대 기준 좌표계</h4>
+                    <pre><code>PERS wobjdata WobjFloor := [
+    FALSE, TRUE, "",
+    [[-9500, 5300, 2100], [0, 1, 0, 0]],  ! Gantry HOME = Floor origin
+    [[0, 0, 0], [1, 0, 0, 0]]
+];</code></pre>
+                    <ul>
+                        <li>Origin: Gantry HOME 위치 [-9500, 5300, 2100]</li>
+                        <li>Orientation: X축 180° 회전 [0, 1, 0, 0]</li>
+                        <li>용도: Robot1/Robot2 절대 좌표 측정</li>
+                    </ul>
+
+                    <h4>WobjGantry - 동적 추적 좌표계</h4>
+                    <pre><code>PROC UpdateGantryWobj()
+    VAR jointtarget current_gantry;
+    VAR num r_deg;
+    VAR num total_deg;
+    VAR num half_angle_deg;
+
+    current_gantry := CJointT();
+
+    ! Physical position
+    WobjGantry.uframe.trans.x := current_gantry.extax.eax_a;
+    WobjGantry.uframe.trans.y := current_gantry.extax.eax_b;
+    WobjGantry.uframe.trans.z := current_gantry.extax.eax_c;
+
+    ! R-axis rotation (Z-axis rotation quaternion)
+    r_deg := current_gantry.extax.eax_d;
+    total_deg := 90 + r_deg;  ! Base rotation offset
+    half_angle_deg := total_deg / 2;
+
+    WobjGantry.uframe.rot.q1 := Cos(half_angle_deg);
+    WobjGantry.uframe.rot.q2 := 0;
+    WobjGantry.uframe.rot.q3 := 0;
+    WobjGantry.uframe.rot.q4 := Sin(half_angle_deg);
+ENDPROC</code></pre>
+                    <ul>
+                        <li>Gantry 물리 위치를 실시간 추적</li>
+                        <li>R축 회전을 quaternion으로 반영</li>
+                        <li>TCP 제어를 Gantry 위치와 무관하게 수행</li>
+                    </ul>
+
+                    <h4>Robot2 Base Dynamic Wobj</h4>
+                    <pre><code>PROC UpdateRobot2BaseDynamicWobj()
+    VAR jointtarget current_gantry;
+    VAR num r_physical;
+    VAR num r_total;
+    VAR num x_offset;
+    VAR num y_offset;
+
+    current_gantry := CJointT();
+    r_physical := current_gantry.extax.eax_d;
+    r_total := 90 + r_physical;  ! Robot2 base 90° rotation
+
+    ! Robot2 base offset from R-axis center (-488mm on local Y)
+    x_offset := -488 * Sin(r_total);
+    y_offset := 488 * Cos(r_total);
+
+    WobjRobot2Base_Dynamic.uframe.trans.x := current_gantry.extax.eax_a + x_offset;
+    WobjRobot2Base_Dynamic.uframe.trans.y := current_gantry.extax.eax_b + y_offset;
+    WobjRobot2Base_Dynamic.uframe.trans.z := current_gantry.extax.eax_c;
+ENDPROC</code></pre>
+                </div>
+
+                <h3 class="collapsible" onclick="toggleCollapse(this)">3. Iterative Refinement</h3>
+                <div class="collapsible-content">
+                    <p>TCP 위치를 ±0.5mm tolerance 내로 자동 보정하는 알고리즘</p>
+                    <pre><code>! Step 2-1: Initial move to HOME
+target_pos := [[0, 0, 1000], [0.5, -0.5, 0.5, 0.5], ...];
+MoveL target_pos, v100, fine, tool0 \WObj:=WobjGantry;
+
+! Step 2-2: Iterative refinement
+iteration := 1;
+max_iterations := 3;
+tolerance := 0.5;  ! mm
+
+WHILE iteration <= max_iterations DO
+    current_pos := CRobT(\Tool:=tool0 \WObj:=WobjGantry);
+
+    error_x := 0 - current_pos.trans.x;
+    error_y := 0 - current_pos.trans.y;
+
+    IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
+        ! Within tolerance
+        iteration := max_iterations;  ! Force exit
+    ELSE
+        ! Correction move
+        correction_pos := current_pos;
+        correction_pos.trans.x := correction_pos.trans.x + error_x;
+        correction_pos.trans.y := correction_pos.trans.y + error_y;
+        MoveL correction_pos, v20, fine, tool0 \WObj:=WobjGantry;
+        iteration := iteration + 1;
+    ENDIF
+ENDWHILE</code></pre>
+
+                    <h4>테스트 결과</h4>
+                    <table>
+                        <tr>
+                            <th>Robot</th>
+                            <th>반복 횟수</th>
+                            <th>최종 오차</th>
+                            <th>결과</th>
+                        </tr>
+                        <tr>
+                            <td>Robot1</td>
+                            <td>1회</td>
+                            <td>Y: -0.16mm</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>Robot2</td>
+                            <td>1회</td>
+                            <td>Y: -0.06mm</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3 class="collapsible" onclick="toggleCollapse(this)">4. Cross-task Communication</h3>
+                <div class="collapsible-content">
+                    <p>TASK1과 TASK2 간 실시간 데이터 공유</p>
+
+                    <h4>PERS 변수를 통한 공유</h4>
+                    <pre><code>! TASK1에서 선언 (external reference)
+PERS robtarget robot2_floor_pos;
+PERS bool robot2_init_complete;
+
+! TASK2에서 선언 (ownership)
+PERS robtarget robot2_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+PERS bool robot2_init_complete := FALSE;</code></pre>
+
+                    <h4>CRobT()를 통한 Robot2 위치 읽기</h4>
+                    <pre><code>! TASK1에서 Robot2 TCP 위치 읽기
+robot2_tcp_wobj0 := CRobT(\TaskName:="T_ROB2", \Tool:=tool0, \WObj:=wobj0);
+robot2_tcp_floor := CRobT(\TaskName:="T_ROB2", \Tool:=tool0, \WObj:=WobjFloor_Rob2);</code></pre>
+                </div>
+            </section>
+
+            <!-- Test Results -->
+            <section id="test-results">
+                <h2>🧪 Test Results</h2>
+
+                <h3>Test 1: 정위치 시작 (2026-01-03 09:10)</h3>
+                <div class="card">
+                    <h4>초기 조건</h4>
+                    <ul>
+                        <li>모든 축 HOME 위치</li>
+                        <li>Gantry: X=0, Y=0, Z=0, R=0°</li>
+                        <li>Robot1/Robot2: Joint HOME</li>
+                    </ul>
+
+                    <h4>결과</h4>
+                    <table>
+                        <tr>
+                            <th>항목</th>
+                            <th>측정값</th>
+                            <th>기준</th>
+                            <th>결과</th>
+                        </tr>
+                        <tr>
+                            <td>동기화 시간</td>
+                            <td>0.00초</td>
+                            <td>&lt; 10초</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>Robot2 TCP wobj0</td>
+                            <td>[0, 488, -1000]</td>
+                            <td>[0, 488, -1000]</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>Robot1 Floor</td>
+                            <td>[9500.00, 5299.96, 1100.04]</td>
+                            <td>[9500, 5300, 1100]</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>Robot2 Floor</td>
+                            <td>[9500.00, 5300.00, 1100.00]</td>
+                            <td>[9500, 5300, 1100]</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>좌표 차이</td>
+                            <td>0.04mm</td>
+                            <td>&lt; 0.5mm</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>Gantry Delta</td>
+                            <td>[1000.00, -300.00, -600.00]</td>
+                            <td>[1000, -300, -600]</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3>Test 2: 랜덤 위치 시작 (2026-01-03 10:15)</h3>
+                <div class="card">
+                    <h4>초기 조건</h4>
+                    <ul>
+                        <li>Gantry X=0 (고정)</li>
+                        <li>로봇 축 및 다른 갠트리 축: 랜덤 위치</li>
+                        <li>목적: 실제 초기화 시간 측정</li>
+                    </ul>
+
+                    <h4>결과</h4>
+                    <table>
+                        <tr>
+                            <th>항목</th>
+                            <th>측정값</th>
+                            <th>기준</th>
+                            <th>결과</th>
+                        </tr>
+                        <tr>
+                            <td>TASK1 초기화</td>
+                            <td>1초 (4단계)</td>
+                            <td>&lt; 10초</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>TASK2 초기화</td>
+                            <td>&lt;1초 (2단계)</td>
+                            <td>&lt; 10초</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>동기화 시간</td>
+                            <td>0.00초</td>
+                            <td>&lt; 10초</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>HOME 좌표 차이</td>
+                            <td>0.03mm</td>
+                            <td>&lt; 0.5mm</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>X=0 좌표 차이</td>
+                            <td>0.05mm</td>
+                            <td>&lt; 0.5mm</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                        <tr>
+                            <td>Delta dX 오차</td>
+                            <td>0.02mm</td>
+                            <td>&lt; 0.5mm</td>
+                            <td><span class="badge badge-success">PASS</span></td>
+                        </tr>
+                    </table>
+
+                    <h4>핵심 발견사항</h4>
+                    <div class="card info">
+                        <ul>
+                            <li><strong>TASK2가 TASK1보다 빠름:</strong> Robot2는 Step 0 (X1-X2 sync) 없이 2단계만 실행</li>
+                            <li><strong>병렬 실행 효과:</strong> TASK1과 TASK2 동시 시작, TASK2가 먼저 완료</li>
+                            <li><strong>Refinement 효율:</strong> 1회 반복으로 ±0.5mm tolerance 달성</li>
+                            <li><strong>랜덤 위치에서도 빠른 초기화:</strong> Robot2가 1초 이내 완료</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>종합 평가</h3>
+                <div class="card success">
+                    <h4>✅ 모든 테스트 통과</h4>
+                    <ul>
+                        <li>정위치 시작: 0.04mm 정확도</li>
+                        <li>랜덤 위치 시작: 0.02-0.05mm 정확도</li>
+                        <li>동기화 시간: 0초 (10초 절약)</li>
+                        <li>사이클 타임: 11초 → 1초 (91% 단축)</li>
+                        <li>정확도 손실 없이 효율성 극대화</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Configuration -->
+            <section id="config">
+                <h2>⚙️ Configuration Files</h2>
+
+                <h3>MOC.cfg - R축 회전 리미트</h3>
+                <div class="card warning">
+                    <h4>⚠️ 현재 설정 확인 필요</h4>
+                    <p><strong>파일 위치:</strong> <code>SYSPAR/MOC.cfg</code></p>
+                    <p><strong>Line 346-347:</strong></p>
+                    <pre><code>-name "M4DM3" -use_arm_type "M4DM3" -use_acc_data "M4DM3"\
+-upper_joint_bound 1.74533 -lower_joint_bound -1.74533</code></pre>
+
+                    <table>
+                        <tr>
+                            <th>항목</th>
+                            <th>현재 설정</th>
+                            <th>필요한 설정</th>
+                            <th>비고</th>
+                        </tr>
+                        <tr>
+                            <td>상한</td>
+                            <td>1.74533 rad (100°)</td>
+                            <td>1.5708 rad (90°)</td>
+                            <td rowspan="2">v1.8.0 테스트 전 수정 필요</td>
+                        </tr>
+                        <tr>
+                            <td>하한</td>
+                            <td>-1.74533 rad (-100°)</td>
+                            <td>-1.5708 rad (-90°)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3>config.txt - 테스트 파라미터</h3>
+                <div class="card">
+                    <p><strong>파일 위치:</strong> <code>HOME/config.txt</code></p>
+                    <p><strong>현재 설정:</strong></p>
+                    <pre><code>MODE=0
+
+GANTRY_X=0
+GANTRY_Y=0
+GANTRY_Z=1600
+GANTRY_R=0</code></pre>
+
+                    <h4>v1.8.0 확장 제안</h4>
+                    <pre><code># Test Case Selection
+TEST_CASE=1
+
+# Test Case 1: R-axis rotation test
+GANTRY_X=0
+GANTRY_Y=0
+GANTRY_Z=0
+GANTRY_R=45
+
+# Multiple test positions
+TEST_POSITIONS=5
+POS1_X=0, POS1_Y=0, POS1_Z=0, POS1_R=-90
+POS2_X=0, POS2_Y=0, POS2_Z=0, POS2_R=-45
+POS3_X=0, POS3_Y=0, POS3_Z=0, POS3_R=0
+POS4_X=0, POS4_Y=0, POS4_Z=0, POS4_R=45
+POS5_X=0, POS5_Y=0, POS5_Z=0, POS5_R=90</code></pre>
+                </div>
+
+                <h3>버전 상수</h3>
+                <div class="card">
+                    <h4>TASK1 (MainModule.mod)</h4>
+                    <pre><code>CONST string TASK1_VERSION := "v1.7.51";</code></pre>
+
+                    <h4>TASK2 (Rob2_MainModule.mod)</h4>
+                    <pre><code>CONST string TASK2_VERSION := "v1.7.51";</code></pre>
+                </div>
+            </section>
+
+            <!-- Known Issues -->
+            <section id="issues">
+                <h2>⚠️ Known Issues & Workarounds</h2>
+
+                <div class="card warning">
+                    <h3>1. Error 41617 - Too intense frequency of Write Instructions</h3>
+                    <p><strong>증상:</strong> Write 명령이 너무 빈번하게 실행됨</p>
+                    <p><strong>영향:</strong> 경고 메시지만 발생, 프로그램은 정상 완료</p>
+                    <p><strong>해결:</strong> v1.2.1에서 WaitTime 0.05 추가했으나 일부 구간에서 여전히 발생</p>
+                    <p><strong>Workaround:</strong> 무시 가능 (프로그램 동작에 영향 없음)</p>
+                </div>
+
+                <div class="card info">
+                    <h3>2. RAPID BREAK Statement</h3>
+                    <p><strong>문제:</strong> BREAK 실행 시 WHILE 루프를 빠져나가지 못하고 프로그램 종료</p>
+                    <p><strong>해결:</strong> v1.7.50에서 BREAK 대신 <code>iteration := max_iterations</code> 사용</p>
+                </div>
+
+                <div class="card info">
+                    <h3>3. Cos/Sin Degree vs Radian</h3>
+                    <p><strong>문제:</strong> RAPID Cos/Sin 함수는 degree를 사용하는데 radian 값을 전달</p>
+                    <p><strong>영향:</strong> Robot2 Base Physical 위치 계산 오류 (13mm 오차)</p>
+                    <p><strong>해결:</strong> v1.7.50에서 모든 Cos/Sin 함수 호출을 degree로 수정</p>
+                </div>
+
+                <div class="card success">
+                    <h3>4. 검증 완료된 범위</h3>
+                    <ul>
+                        <li>✅ 병진 이동: X, Y, Z 축 (R=0° 고정)</li>
+                        <li>✅ 좌표 정확도: 0.02-0.05mm (sub-millimeter)</li>
+                        <li>✅ 동기화: Flag-based (0초 대기)</li>
+                        <li>⏳ <strong>미검증:</strong> R축 회전 (-90° ~ +90°)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Next Steps -->
+            <section id="next-steps">
+                <h2>🚀 Next Steps - v1.8.0 R-axis Rotation</h2>
+
+                <div class="card">
+                    <h3>목표</h3>
+                    <p>갠트리 R축 회전을 포함한 복합 운동 검증</p>
+
+                    <h3>테스트 계획</h3>
+                    <h4>Test Case 1: R축 단독 회전</h4>
+                    <ul>
+                        <li>초기 위치: X=0, Y=0, Z=0, R=0°</li>
+                        <li>테스트 각도: -90°, -45°, 0°, 45°, 90°</li>
+                        <li>검증: WobjGantry quaternion, Robot1/Robot2 Floor 좌표</li>
+                    </ul>
+
+                    <h4>Test Case 2: 복합 운동 (병진 + 회전)</h4>
+                    <ul>
+                        <li>위치 1: X=1000, Y=-300, Z=-600, R=45°</li>
+                        <li>위치 2: X=2000, Y=-600, Z=-1200, R=90°</li>
+                        <li>위치 3: X=3000, Y=-900, Z=-1800, R=-45°</li>
+                    </ul>
+
+                    <h3>사전 작업</h3>
+                    <div class="card warning">
+                        <ol>
+                            <li><strong>MOC.cfg 수정:</strong> R축 리미트 ±100° → ±90°</li>
+                            <li><strong>config.txt 확장:</strong> 다중 테스트 포지션 지원</li>
+                            <li><strong>TestGantryRotation() 추가:</strong> R축 회전 테스트 프로시저</li>
+                            <li><strong>로깅 강화:</strong> quaternion, R축 각도 상세 로그</li>
+                        </ol>
+                    </div>
+
+                    <h3>예상 검증 항목</h3>
+                    <table>
+                        <tr>
+                            <th>검증 항목</th>
+                            <th>기준</th>
+                            <th>방법</th>
+                        </tr>
+                        <tr>
+                            <td>WobjGantry quaternion</td>
+                            <td>정확도 ±0.001</td>
+                            <td>이론값과 실측값 비교</td>
+                        </tr>
+                        <tr>
+                            <td>Robot1 TCP Floor</td>
+                            <td>±0.5mm</td>
+                            <td>회전 전후 좌표 비교</td>
+                        </tr>
+                        <tr>
+                            <td>Robot2 TCP Floor</td>
+                            <td>±0.5mm</td>
+                            <td>회전 전후 좌표 비교</td>
+                        </tr>
+                        <tr>
+                            <td>Robot1-Robot2 거리</td>
+                            <td>976mm ±1mm</td>
+                            <td>회전 중 거리 불변성</td>
+                        </tr>
+                        <tr>
+                            <td>회전 중심</td>
+                            <td>[9500, 5300, 2100]</td>
+                            <td>역산 계산</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p><strong>S25016 SpGantry v1.7.51 Handoff Document</strong></p>
+            <p>Generated: 2026-01-03 | Team: SP 심태양 + Claude Code</p>
+            <p>Next Version: <a href="#next-steps">v1.8.0 R-axis Rotation Testing</a></p>
+            <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+                🤖 Generated with <a href="https://claude.com/claude-code">Claude Code</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleCollapse(element) {
+            element.classList.toggle('collapsed');
+            const content = element.nextElementSibling;
+            content.classList.toggle('hidden');
+        }
+
+        // Initialize all collapsible sections as expanded
+        document.addEventListener('DOMContentLoaded', function() {
+            // All sections start expanded, no action needed
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('.nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>
