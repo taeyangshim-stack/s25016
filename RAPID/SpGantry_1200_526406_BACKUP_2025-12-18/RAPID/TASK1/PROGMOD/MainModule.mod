@@ -1951,6 +1951,7 @@ MODULE MainModule
 			Write logfile, "    R_ANGLE_" + NumToStr(i,0) + " = " + NumToStr(r_angles{i}, 1);
 		ENDFOR
 		Write logfile, "";
+		WaitTime 0.1;
 		Write logfile, "Floor Coordinate System:";
 		Write logfile, "  X+ = right (material flow direction)";
 		Write logfile, "  Y+ = up";
@@ -1958,6 +1959,7 @@ MODULE MainModule
 		Write logfile, "  R=0: Gantry parallel to Y-axis (perpendicular to X-axis)";
 		Write logfile, "  Robot1 at Y+, Robot2 at Y-";
 		Write logfile, "";
+		WaitTime 0.1;
 
 		! Test each R angle
 		FOR i FROM 1 TO num_r_angles DO
@@ -1983,23 +1985,22 @@ MODULE MainModule
 			rob1_floor := robot1_floor_pos;
 			rob2_floor := robot2_floor_pos;  ! Updated by TASK2
 
-			! Write results to file
-			Write logfile, "Test " + NumToStr(i,0) + ": R = " + r_str + " deg";
-			Write logfile, "--------------------";
-			Write logfile, "Gantry (Physical): [" + NumToStr(test_pos.extax.eax_a,0) + ", " + NumToStr(test_pos.extax.eax_b,0) + ", " + NumToStr(test_pos.extax.eax_c,0) + ", " + r_str + "]";
-			Write logfile, "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a - 9500,0) + ", " + NumToStr(test_pos.extax.eax_b + 5300,0) + ", " + NumToStr(test_pos.extax.eax_c + 2100,0) + ", " + r_str + "]";
-			Write logfile, "";
-			Write logfile, "Robot1 Floor TCP:";
-			Write logfile, "  X = " + NumToStr(rob1_floor.trans.x, 2) + " mm";
-			Write logfile, "  Y = " + NumToStr(rob1_floor.trans.y, 2) + " mm";
-			Write logfile, "  Z = " + NumToStr(rob1_floor.trans.z, 2) + " mm";
-			Write logfile, "";
-			Write logfile, "Robot2 Floor TCP:";
-			Write logfile, "  X = " + NumToStr(rob2_floor.trans.x, 2) + " mm";
-			Write logfile, "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm";
-			Write logfile, "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
+			! Write results to file (consolidated)
+			Write logfile, "Test " + NumToStr(i,0) + ": R = " + r_str + " deg" + "\0A"
+                   + "--------------------" + "\0A"
+                   + "Gantry (Physical): [" + NumToStr(test_pos.extax.eax_a,0) + ", " + NumToStr(test_pos.extax.eax_b,0) + ", " + NumToStr(test_pos.extax.eax_c,0) + ", " + r_str + "]" + "\0A"
+                   + "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a - 9500,0) + ", " + NumToStr(test_pos.extax.eax_b + 5300,0) + ", " + NumToStr(test_pos.extax.eax_c + 2100,0) + ", " + r_str + "]" + "\0A"
+                   + "" + "\0A"
+                   + "Robot1 Floor TCP:" + "\0A"
+                   + "  X = " + NumToStr(rob1_floor.trans.x, 2) + " mm" + "\0A"
+                   + "  Y = " + NumToStr(rob1_floor.trans.y, 2) + " mm" + "\0A"
+                   + "  Z = " + NumToStr(rob1_floor.trans.z, 2) + " mm" + "\0A"
+                   + "" + "\0A"
+                   + "Robot2 Floor TCP:" + "\0A"
+                   + "  X = " + NumToStr(rob2_floor.trans.x, 2) + " mm" + "\0A"
+                   + "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm" + "\0A"
+                   + "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
             WaitTime 0.1;
-			Write logfile, "";
 			WaitTime 0.1;  ! Prevent Write frequency error (increased from 0.05)
 
 			! Display on teach pendant
