@@ -173,6 +173,10 @@ MODULE Rob2_MainModule
 	!   - No functional changes in TASK2 (changes in TASK1 only)
 	!   - Ready for Phase 2: Complex motion testing
 	!
+	! v1.8.5 (2026-01-04)
+	!   - Version synchronized with TASK1 (Robot2 angle correction in TASK1).
+	!   - No functional changes in TASK2.
+	!
 	! v1.8.3 (2026-01-04)
 	!   - STABILITY: Added ERROR handlers to main and SetRobot2InitialPosition
 	!   - STABILITY: Corrected file handle usage in 4 procedures (single Open statement)
@@ -180,8 +184,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.3+)
-	CONST string TASK2_VERSION := "v1.8.3";
+	! Version constant for logging (v1.8.5+)
+	CONST string TASK2_VERSION := "v1.8.5";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete

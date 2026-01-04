@@ -171,9 +171,14 @@ MODULE MainModule
 	!   - Added rotation matrix: [cos(theta) -sin(theta); sin(theta) cos(theta)]
 	!   - Added debug logging for rotated offset values
 	!
+	! v1.8.5 (2026-01-04)
+	!   - FIX: Align Robot2 base and TCP rotation to Floor using r_deg (no 90deg offset).
+	!   - FIX: Compute Robot2 base from gantry Floor coordinates with rotated offset.
+	!   - EXPECTED: Robot2 Floor TCP stays at R-center for all R angles.
+	!
 	! v1.8.4 (2026-01-04)
 	!   - STABILITY: Reverted previous logging change that caused Value Error.
-	!   - STABILITY: Implemented chunked logging with multiple WaitTime 0.1s in TestGantryRotation 
+	!   - STABILITY: Implemented chunked logging with multiple WaitTime 0.1s in TestGantryRotation
 	!     to fix persistent "Too intense frequency of Write" error (41617).
 	!
 	! v1.8.3 (2026-01-04)
@@ -198,8 +203,8 @@ MODULE MainModule
 	!   - Enhanced logging: quaternion, R-axis details
 	!========================================
 
-	! Version constant for logging (v1.8.4+)
-	CONST string TASK1_VERSION := "v1.8.4";
+	! Version constant for logging (v1.8.5+)
+	CONST string TASK1_VERSION := "v1.8.5";
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
@@ -1157,19 +1162,22 @@ MODULE MainModule
 	! ========================================
 	! Update Robot2 Floor Position (from TASK1)
 	! ========================================
-	! Version: v1.8.2
-	! Date: 2026-01-03
+	! Version: v1.8.5
+	! Date: 2026-01-04
 	! Purpose: Calculate Robot2 TCP position in Floor coordinates
 	! TASK1 calculates this because TASK2 cannot sense gantry movement
 	! Approach:
-	!   1. Calculate Robot2 base position in Floor coordinates (with 488mm offset rotation)
+	!   1. Calculate Robot2 base position in Floor coordinates (rotate offset with R)
 	!   2. Read Robot2 TCP position in wobj0 (from TASK2)
 	!   3. Apply rotation transformation matrix to wobj0 coordinates
 	!      - Robot2 wobj0 rotates with gantry R-axis
 	!      - Rotation matrix: [cos(theta) -sin(theta); sin(theta) cos(theta)]
-	!      - theta = total_r_deg = 90deg + r_deg
+	!      - theta = total_r_deg = r_deg
 	!   4. Combine: Robot2 TCP Floor = Robot2 base Floor + rotated wobj0 offset
 	!   5. Store in robot2_floor_pos (shared variable)
+	! Changes in v1.8.5:
+	!   - Align total_r_deg to r_deg (no 90deg offset)
+	!   - Compute Robot2 base from gantry Floor + rotated offset
 	! Changes in v1.8.2:
 	!   - CRITICAL: Added rotation transformation matrix for wobj0 coordinates
 	!   - Fixes Robot2 TCP offset error during R-axis rotation
@@ -1186,6 +1194,9 @@ MODULE MainModule
 		VAR num base_floor_x;
 		VAR num base_floor_y;
 		VAR num base_floor_z;
+		VAR num gantry_floor_x;
+		VAR num gantry_floor_y;
+		VAR num gantry_floor_z;
 		VAR num floor_x_offset;
 		VAR num floor_y_offset;
 		VAR num floor_z_offset;
@@ -1207,34 +1218,25 @@ MODULE MainModule
 		                                                                + NumToStr(current_gantry.extax.eax_c,1) + ", "
 		                                                                + NumToStr(current_gantry.extax.eax_d,1) + "]";
 
-		! Calculate total R-axis rotation (90deg base + R)
-		! R=0: Gantry parallel to Y-axis
+		! Calculate total R-axis rotation
+		! R=0: Gantry parallel to Y-axis (wobj0 aligned with Floor)
 		! IMPORTANT: RAPID Cos/Sin functions take DEGREES, not radians!
-		total_r_deg := 90 + r_deg;
+		total_r_deg := r_deg;
 		total_r_rad := total_r_deg * pi / 180;  ! For reference only
 		TPWrite "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_deg),3) + ", Sin=" + NumToStr(Sin(total_r_deg),3);
 		IF enable_debug_logging Write debug_logfile, "    R total: " + NumToStr(total_r_deg,1) + " deg, Cos=" + NumToStr(Cos(total_r_deg),3) + ", Sin=" + NumToStr(Sin(total_r_deg),3);
 
-		! Calculate Robot2 base position in Physical coordinates
-		! Robot2 Floor Y = 4812 (5300-488) -> Physical Y = +488
-		! Robot2 is +488mm offset from R-axis center in Physical coordinates
-		! RAPID Cos/Sin use DEGREES!
-		WobjRobot2Base_Dynamic.uframe.trans.x := current_gantry.extax.eax_a + (488 * Cos(total_r_deg));
-		WobjRobot2Base_Dynamic.uframe.trans.y := current_gantry.extax.eax_b + (488 * Sin(total_r_deg));
-		WobjRobot2Base_Dynamic.uframe.trans.z := current_gantry.extax.eax_c;
+		! Convert gantry position to Floor coordinates
+		gantry_floor_x := current_gantry.extax.eax_a + 9500;
+		gantry_floor_y := 5300 - current_gantry.extax.eax_b;
+		gantry_floor_z := 2100 - current_gantry.extax.eax_c;
 
-		! DEBUG: Show Physical calculation
-		TPWrite "    Robot2 Base Physical: [" + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.x,1) + ", "
-		                                      + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.y,1) + ", "
-		                                      + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.z,1) + "]";
-		IF enable_debug_logging Write debug_logfile, "    Robot2 Base Physical: [" + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.x,1) + ", "
-		                                                                  + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.y,1) + ", "
-		                                                                  + NumToStr(WobjRobot2Base_Dynamic.uframe.trans.z,1) + "]";
-
-		! Transform Physical -> Floor coordinates for Robot2 base
-		base_floor_x := WobjRobot2Base_Dynamic.uframe.trans.x + 9500;
-		base_floor_y := 5300 - WobjRobot2Base_Dynamic.uframe.trans.y;
-		base_floor_z := 2100 - WobjRobot2Base_Dynamic.uframe.trans.z;
+		! Calculate Robot2 base position in Floor coordinates
+		! Robot2 base offset at R=0: [0, -488] from R-center in Floor coordinates
+		! Rotate base offset with current R-axis angle
+		base_floor_x := gantry_floor_x + (488 * Sin(total_r_deg));
+		base_floor_y := gantry_floor_y - (488 * Cos(total_r_deg));
+		base_floor_z := gantry_floor_z;
 
 		! Store in WobjRobot2Base_Dynamic for reference
 		WobjRobot2Base_Dynamic.uframe.trans.x := base_floor_x;
@@ -1254,7 +1256,7 @@ MODULE MainModule
 		! Calculate Robot2 TCP Floor position with rotation transformation
 		! CRITICAL: Robot2 wobj0 rotates with gantry R-axis!
 		! Apply rotation transformation matrix to convert wobj0 coords to Floor coords
-		! Rotation matrix for R-axis (total_r_deg = 90 + r_deg):
+		! Rotation matrix for R-axis (total_r_deg = r_deg):
 		!   [cos(T)  -sin(T)]   [x_wobj0]   [x_floor]
 		!   [sin(T)   cos(T)] x [y_wobj0] = [y_floor]
 		floor_x_offset := robot2_tcp_wobj0.trans.x * Cos(total_r_deg) - robot2_tcp_wobj0.trans.y * Sin(total_r_deg);
@@ -1852,13 +1854,17 @@ MODULE MainModule
 	! ========================================
 	! Test Gantry with Multiple R-axis Rotations
 	! ========================================
-	! Version: v1.8.1
-	! Date: 2026-01-03
+	! Version: v1.8.5
+	! Date: 2026-01-04
 	! Purpose: Test Robot1 and Robot2 TCP positions at various R-axis angles
 	! Features:
 	!   - Config-based angle configuration (NUM_R_ANGLES, R_ANGLE_1~10)
 	!   - Robot1 and Robot2 Floor TCP coordinate measurement
 	!   - Automatic gantry position logging
+	! Changes in v1.8.5:
+	!   - Log gantry Floor values using Floor conversion (X+9500, Y/Z inverted)
+	! Changes in v1.8.4:
+	!   - Chunked file logging with WaitTime 0.1 to reduce 41617
 	! Changes in v1.8.1:
 	!   - BUGFIX: Added UpdateRobot2BaseDynamicWobj() call (Line 1918)
 	!   - Fixed Robot2 Floor TCP reporting [0,0,0]
@@ -1951,7 +1957,7 @@ MODULE MainModule
 		Write logfile, "Test Configuration:";
 		WaitTime 0.1;
 		Write logfile, "  Gantry Position (Physical): [" + NumToStr(test_x,0) + ", " + NumToStr(test_y,0) + ", " + NumToStr(test_z,0) + "]";
-		Write logfile, "  Gantry Position (Floor): [" + NumToStr(test_x - 9500,0) + ", " + NumToStr(test_y + 5300,0) + ", " + NumToStr(test_z + 2100,0) + "]";
+		Write logfile, "  Gantry Position (Floor): [" + NumToStr(test_x + 9500,0) + ", " + NumToStr(5300 - test_y,0) + ", " + NumToStr(2100 - test_z,0) + "]";
 		Write logfile, "  Number of R angles: " + NumToStr(num_r_angles,0);
 		Write logfile, "  R angles (degrees): ";
 		WaitTime 0.1;
@@ -1999,7 +2005,7 @@ MODULE MainModule
 			Write logfile, "--------------------";
 			Write logfile, "Gantry (Physical): [" + NumToStr(test_pos.extax.eax_a,0) + ", " + NumToStr(test_pos.extax.eax_b,0) + ", " + NumToStr(test_pos.extax.eax_c,0) + ", " + r_str + "]";
 			WaitTime 0.1;
-			Write logfile, "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a - 9500,0) + ", " + NumToStr(test_pos.extax.eax_b + 5300,0) + ", " + NumToStr(test_pos.extax.eax_c + 2100,0) + ", " + r_str + "]";
+			Write logfile, "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a + 9500,0) + ", " + NumToStr(5300 - test_pos.extax.eax_b,0) + ", " + NumToStr(2100 - test_pos.extax.eax_c,0) + ", " + r_str + "]";
 			Write logfile, "";
 			Write logfile, "Robot1 Floor TCP:";
 			WaitTime 0.1;

@@ -7,6 +7,88 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 
 ---
 
+## [v1.8.5_260104] - 2026-01-04
+
+### Fixed
+- **CRITICAL FIX**: Robot2 coordinate transformation formula correction
+  - **문제**: v1.8.3 테스트에서 R=-45deg만 정확, 다른 각도는 690mm~976mm 오차
+    - R=-90°: Robot1 [9500, 5300], Robot2 [9988, 5788] ❌ 690mm 오프셋
+    - R=-45°: Robot1 [9500, 5300], Robot2 [9500, 5300] ✅ (초기화 각도만 일치)
+    - R=0°: Robot1 [9500, 5300], Robot2 [9012, 4812] ❌ 690mm 오프셋
+    - R=45°: Robot1 [9500, 5300], Robot2 [8810, 4610] ❌ 976mm 오프셋
+    - R=90°: Robot1 [9500, 5300], Robot2 [9012, 4812] ❌ 690mm 오프셋
+  - **원인**: Robot2는 갠트리와 물리적으로 연결되어 있지만, 갠트리에 구성(configured)되어 있지 않음
+    - R축 회전 시 Robot2 base가 물리적으로 회전하지만, 조인트는 고정된 채로 유지
+    - 초기화 각도에서만 TCP가 R-center에 위치, 다른 각도에서는 벗어남
+  - **수정**: UpdateRobot2BaseDynamicWobj() 좌표 변환 공식 수정
+    - **변경 전 (v1.8.2)**: `total_r_deg := 90 + r_deg` (90도 오프셋 사용)
+    - **변경 후 (v1.8.5)**: `total_r_deg := r_deg` (90도 오프셋 제거)
+    - **Robot2 base Floor 계산 수정**:
+      ```rapid
+      ! v1.8.5: 회전된 오프셋으로 base 계산
+      base_floor_x := gantry_floor_x + (488 * Sin(total_r_deg));
+      base_floor_y := gantry_floor_y - (488 * Cos(total_r_deg));
+      ```
+  - **결과**: 모든 R 각도에서 Robot1/Robot2 TCP가 **0.15mm 이내**로 일치! ✅
+
+### Test Results (v1.8.5)
+- **Status**: ✅ **완벽한 성공** (2026-01-04 19:02:16)
+- **모든 R 각도에서 TCP 일치 검증 완료**:
+  - R=-90°: Robot1 [9500.15, 5300.00, 1100.22], Robot2 [9500.00, 5300.00, 1100.00] → **0.15mm** ✅
+  - R=-45°: Robot1 [9500.11, 5299.90, 1100.22], Robot2 [9500.00, 5300.00, 1100.00] → **0.14mm** ✅
+  - R=0°: Robot1 [9500.00, 5299.85, 1100.22], Robot2 [9500.00, 5300.00, 1100.00] → **0.15mm** ✅
+  - R=45°: Robot1 [9499.90, 5299.90, 1100.22], Robot2 [9500.00, 5300.00, 1100.00] → **0.14mm** ✅
+  - R=90°: Robot1 [9499.85, 5300.00, 1100.22], Robot2 [9500.00, 5300.00, 1100.00] → **0.15mm** ✅
+- **v1.8.2 회전 변환 공식 검증 완료**:
+  - 회전 변환 행렬 `[cos(θ) -sin(θ); sin(θ) cos(θ)]` 수학적으로 정확함 확인
+  - v1.8.2에서 추가된 rotation transformation matrix가 올바르게 작동
+- **Z축 일정 오차**: Robot1 Z=1100.22mm (0.22mm 오차), 로봇 특성으로 판단
+
+### Changed
+- **TASK1 MainModule.mod**:
+  - Version: v1.8.3 → v1.8.5 (v1.8.4 경유)
+  - UpdateRobot2BaseDynamicWobj() 좌표 변환 공식 수정
+    - `total_r_deg` 계산: 90도 오프셋 제거
+    - Robot2 base Floor 위치 계산식 변경
+  - 버전 히스토리 업데이트
+- **TASK2 Rob2_MainModule.mod**:
+  - Version: v1.8.3 → v1.8.5 (버전 동기화, 기능 변경 없음)
+  - 버전 히스토리 업데이트
+
+### Version Synchronization
+- **TASK1**: v1.8.3 → v1.8.5
+- **TASK2**: v1.8.3 → v1.8.5 (기능 변경 없음, 버전만 동기화)
+
+### Mathematical Verification
+- **목적**: Robot2가 갠트리에 구성되지 않은 상태에서 수식적 접근 검증
+- **방법**: 모든 R 각도에서 Robot1/Robot2 TCP를 R-center에 위치시켜 좌표 일치 확인
+- **결론**: v1.8.5 좌표 변환 공식이 **수학적으로 정확함** 실험적으로 증명
+
+### Commits
+- C팀: v1.8.5 좌표 변환 공식 수정 및 테스트
+
+---
+
+## [v1.8.4_260104] - 2026-01-04
+
+### Fixed
+- **STABILITY**: Logging-related stability improvements
+  - Error 41617 ("Too intense frequency of Write Instructions") 완화
+  - 연속 Write 명령 사이에 WaitTime 0.1s 추가
+  - 로깅 빈도 조절로 안정성 향상
+
+### Changed
+- **TASK1 MainModule.mod**:
+  - Version: v1.8.3 → v1.8.4
+  - TestGantryRotation() 로깅 방식 개선
+  - 버전 히스토리 업데이트
+
+### Note
+- Error 41617은 경고 성격이며 프로그램 완료에는 영향 없음
+- v1.8.5에서 좌표 공식 수정으로 대체됨
+
+---
+
 ## [v1.8.3_260104] - 2026-01-04
 
 ### Fixed
