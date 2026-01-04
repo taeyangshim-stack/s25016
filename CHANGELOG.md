@@ -15,7 +15,7 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
     - R=-90°: Robot1 [9500, 5300], Robot2 [9988, 5788] ❌ 690mm 오프셋
     - R=-45°: Robot1 [9500, 5300], Robot2 [9500, 5300] ✅ (초기화 각도만 일치)
     - R=0°: Robot1 [9500, 5300], Robot2 [9012, 4812] ❌ 690mm 오프셋
-    - R=45°: Robot1 [9500, 5300], Robot2 [8810, 4610] ❌ 976mm 오프셋
+    - R=45°: Robot1 [9500, 5300], Robot2 [8809.86, 4609.86] ❌ 976mm 오프셋
     - R=90°: Robot1 [9500, 5300], Robot2 [9012, 4812] ❌ 690mm 오프셋
   - **원인**: Robot2는 갠트리와 물리적으로 연결되어 있지만, 갠트리에 구성(configured)되어 있지 않음
     - R축 회전 시 Robot2 base가 물리적으로 회전하지만, 조인트는 고정된 채로 유지
@@ -32,7 +32,7 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
   - **결과**: 모든 R 각도에서 Robot1/Robot2 TCP가 **0.15mm 이내**로 일치! ✅
 
 ### Test Results (v1.8.5)
-- **Status**: ✅ **완벽한 성공** (2026-01-04 19:02:16)
+- **Status**: ✅ **좌표 일치 성공** (2026-01-04 19:02:16)
 - **모든 R 각도에서 TCP 일치 검증 완료**:
   - R=-90°: Robot1 [9500.15, 5300.00, 1100.22], Robot2 [9500.00, 5300.00, 1100.00] → **0.15mm** ✅
   - R=-45°: Robot1 [9500.11, 5299.90, 1100.22], Robot2 [9500.00, 5300.00, 1100.00] → **0.14mm** ✅
@@ -43,6 +43,7 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
   - 회전 변환 행렬 `[cos(θ) -sin(θ); sin(θ) cos(θ)]` 수학적으로 정확함 확인
   - v1.8.2에서 추가된 rotation transformation matrix가 올바르게 작동
 - **Z축 일정 오차**: Robot1 Z=1100.22mm (0.22mm 오차), 로봇 특성으로 판단
+- **Known Issue**: Event Log에 Error 41617 ("Too intense frequency of Write") 경고 발생 (프로그램 완료에는 영향 없음)
 
 ### Changed
 - **TASK1 MainModule.mod**:
@@ -73,7 +74,7 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 
 ### Fixed
 - **STABILITY**: Logging-related stability improvements
-  - Error 41617 ("Too intense frequency of Write Instructions") 완화
+  - Error 41617 ("Too intense frequency of Write Instructions") 완화 시도
   - 연속 Write 명령 사이에 WaitTime 0.1s 추가
   - 로깅 빈도 조절로 안정성 향상
 
@@ -85,7 +86,7 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 
 ### Note
 - Error 41617은 경고 성격이며 프로그램 완료에는 영향 없음
-- v1.8.5에서 좌표 공식 수정으로 대체됨
+- v1.8.5에서도 Event Log에 41617 경고가 재발 가능 (완전 해소되지 않음)
 
 ---
 
@@ -163,7 +164,7 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 - **CRITICAL FIX**: Robot2 TCP coordinate calculation during R-axis rotation
   - **문제**: v1.8.1 테스트에서 Robot2 TCP가 R축 회전 시 잘못된 좌표 출력
     - R=0°: Robot1 [9500, 5300], Robot2 [9500, 5300] ✅ 정확
-    - R=90°: Robot1 [9500, 5300], Robot2 [9012, 5788] ❌ 976mm 오프셋!
+    - R=90°: Robot1 [9500, 5300], Robot2 [9012, 4812] ❌ 690mm 오프셋!
   - **원인**: Robot2 wobj0 좌표를 단순 덧셈으로 처리
     - Robot2 wobj0가 R축과 함께 회전하는데 회전 변환 누락
   - **수정**: 회전 변환 행렬 적용 (MainModule.mod:1230-1232)

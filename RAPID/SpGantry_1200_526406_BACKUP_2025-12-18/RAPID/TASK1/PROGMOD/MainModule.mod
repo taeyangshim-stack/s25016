@@ -171,41 +171,40 @@ MODULE MainModule
 	!   - Added rotation matrix: [cos(theta) -sin(theta); sin(theta) cos(theta)]
 	!   - Added debug logging for rotated offset values
 	!
-	! v1.8.5 (2026-01-04)
-	!   - FIX: Align Robot2 base and TCP rotation to Floor using r_deg (no 90deg offset).
-	!   - FIX: Compute Robot2 base from gantry Floor coordinates with rotated offset.
-	!   - EXPECTED: Robot2 Floor TCP stays at R-center for all R angles.
-	!
-	! v1.8.4 (2026-01-04)
-	!   - STABILITY: Reverted previous logging change that caused Value Error.
-	!   - STABILITY: Implemented chunked logging with multiple WaitTime 0.1s in TestGantryRotation
-	!     to fix persistent "Too intense frequency of Write" error (41617).
-	!
-	! v1.8.3 (2026-01-04)
-	!   - STABILITY: Corrected file handle usage in 6 diagnostic procedures (unified to `logfile`).
-	!   - STABILITY: Added robust ERROR handlers to all file I/O procedures.
-	!   - STABILITY: Set motion/initialization procedures to STOP on error, diagnostics to TRYNEXT.
-	!   - STANDARDS: Replaced Unicode characters (theta) with ASCII equivalents.
-	!
-	! v1.8.1 (2026-01-03)
-	!   - BUGFIX: Added UpdateRobot2BaseDynamicWobj() call in TestGantryRotation()
-	!   - BUGFIX: Increased WaitTime from 0.05 to 0.1 to prevent error 41617
-	!   - Fixed Robot2 Floor TCP reporting [0,0,0] in R-axis rotation tests
-	!
-	! v1.8.0 (2026-01-03)
-	!   - Added R-axis rotation testing capability
-	!   - Extended config.txt with TEST_MODE (0~3)
-	!   - TEST_MODE=0: Single position (backward compatible)
-	!   - TEST_MODE=1: R-axis rotation test (multiple angles)
-	!   - TEST_MODE=2: Complex motion (translation + rotation)
-	!   - TEST_MODE=3: Custom multi-position test
-	!   - Added TestGantryRotation() procedure
-	!   - Enhanced logging: quaternion, R-axis details
-	!========================================
-
-	! Version constant for logging (v1.8.5+)
-	CONST string TASK1_VERSION := "v1.8.5";
-
+		! v1.8.5 (2026-01-04)
+		!   - STABILITY: Implemented 1-line CSV logging in TestGantryRotation to eliminate error 41617.
+		!   - STABILITY: Replaced chunked Write calls with single Write per angle, reducing I/O frequency.
+		!   - STANDARDS: Added CSV header for structured logging output.
+		!
+		! v1.8.4 (2026-01-04)
+		!   - STABILITY: Reverted previous logging change that caused Value Error.
+		!   - STABILITY: Implemented chunked logging with multiple WaitTime 0.1s in TestGantryRotation 
+		!     to fix persistent "Too intense frequency of Write" error (41617).
+		!
+		! v1.8.3 (2026-01-04)
+		!   - STABILITY: Corrected file handle usage in 6 diagnostic procedures (unified to `logfile`).
+		!   - STABILITY: Added robust ERROR handlers to all file I/O procedures.
+		!   - STABILITY: Set motion/initialization procedures to STOP on error, diagnostics to TRYNEXT.
+		!   - STANDARDS: Replaced Unicode characters (theta) with ASCII equivalents.
+		!
+		! v1.8.1 (2026-01-03)
+		!   - BUGFIX: Added UpdateRobot2BaseDynamicWobj() call in TestGantryRotation()
+		!   - BUGFIX: Increased WaitTime from 0.05 to 0.1 to prevent error 41617
+		!   - Fixed Robot2 Floor TCP reporting [0,0,0] in R-axis rotation tests
+		!
+		! v1.8.0 (2026-01-03)
+		!   - Added R-axis rotation testing capability
+		!   - Extended config.txt with TEST_MODE (0~3)
+		!   - TEST_MODE=0: Single position (backward compatible)
+		!   - TEST_MODE=1: R-axis rotation test (multiple angles)
+		!   - TEST_MODE=2: Complex motion (translation + rotation)
+		!   - TEST_MODE=3: Custom multi-position test
+		!   - Added TestGantryRotation() procedure
+		!   - Enhanced logging: quaternion, R-axis details
+		!========================================
+	
+		! Version constant for logging (v1.8.5+)
+		CONST string TASK1_VERSION := "v1.8.5";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -1975,6 +1974,7 @@ MODULE MainModule
 		Write logfile, "  Robot1 at Y+, Robot2 at Y-";
 		Write logfile, "";
 		WaitTime 0.1;
+		Write logfile, "R_ANGLE(deg),GANTRY_PHYS(X),GANTRY_PHYS(Y),GANTRY_PHYS(Z),ROB1_FLOOR(X),ROB1_FLOOR(Y),ROB1_FLOOR(Z),ROB2_FLOOR(X),ROB2_FLOOR(Y),ROB2_FLOOR(Z)";
 
 		! Test each R angle
 		FOR i FROM 1 TO num_r_angles DO
@@ -2000,28 +2000,14 @@ MODULE MainModule
 			rob1_floor := robot1_floor_pos;
 			rob2_floor := robot2_floor_pos;  ! Updated by TASK2
 
-			! Write results to file
-			Write logfile, "Test " + NumToStr(i,0) + ": R = " + r_str + " deg";
-			Write logfile, "--------------------";
-			Write logfile, "Gantry (Physical): [" + NumToStr(test_pos.extax.eax_a,0) + ", " + NumToStr(test_pos.extax.eax_b,0) + ", " + NumToStr(test_pos.extax.eax_c,0) + ", " + r_str + "]";
-			WaitTime 0.1;
-			Write logfile, "Gantry (Floor): [" + NumToStr(test_pos.extax.eax_a + 9500,0) + ", " + NumToStr(5300 - test_pos.extax.eax_b,0) + ", " + NumToStr(2100 - test_pos.extax.eax_c,0) + ", " + r_str + "]";
-			Write logfile, "";
-			Write logfile, "Robot1 Floor TCP:";
-			WaitTime 0.1;
-			Write logfile, "  X = " + NumToStr(rob1_floor.trans.x, 2) + " mm";
-			Write logfile, "  Y = " + NumToStr(rob1_floor.trans.y, 2) + " mm";
-			Write logfile, "  Z = " + NumToStr(rob1_floor.trans.z, 2) + " mm";
-			WaitTime 0.1;
-			Write logfile, "";
-			Write logfile, "Robot2 Floor TCP:";
-			Write logfile, "  X = " + NumToStr(rob2_floor.trans.x, 2) + " mm";
-			WaitTime 0.1;
-			Write logfile, "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm";
-			Write logfile, "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
-			Write logfile, "";
-			WaitTime 0.1;
-
+			            ! Write results to file (1-line CSV)
+			            VAR string csv_line;
+			            csv_line := NumToStr(r_angles{i}, 1) + ","
+			                      + NumToStr(test_pos.extax.eax_a,0) + "," + NumToStr(test_pos.extax.eax_b,0) + "," + NumToStr(test_pos.extax.eax_c,0) + ","
+			                      + NumToStr(rob1_floor.trans.x, 2) + "," + NumToStr(rob1_floor.trans.y, 2) + "," + NumToStr(rob1_floor.trans.z, 2) + ","
+			                      + NumToStr(rob2_floor.trans.x, 2) + "," + NumToStr(rob2_floor.trans.y, 2) + "," + NumToStr(rob2_floor.trans.z, 2);
+			            Write logfile, csv_line;
+			            WaitTime 0.1; ! Keep this WaitTime for general I/O stability
 			! Display on teach pendant
 			TPWrite "Robot1 Floor: [" + NumToStr(rob1_floor.trans.x,1) + ", " + NumToStr(rob1_floor.trans.y,1) + ", " + NumToStr(rob1_floor.trans.z,1) + "]";
 			TPWrite "Robot2 Floor: [" + NumToStr(rob2_floor.trans.x,1) + ", " + NumToStr(rob2_floor.trans.y,1) + ", " + NumToStr(rob2_floor.trans.z,1) + "]";

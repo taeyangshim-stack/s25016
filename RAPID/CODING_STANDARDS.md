@@ -254,6 +254,25 @@ TPWrite "Starting test with parameters: "
 
 ---
 
+### 11. **Write Frequency (Avoid 41617)**
+
+**Rule**: Throttle or batch file writes in loops to avoid 41617 errors.
+
+**Guidelines**:
+- Add `WaitTime 0.1;` between write blocks when logging multiple lines.
+- Prefer batching related lines with `\0A` when safe and readable.
+- Reduce TPWrite volume in fast loops.
+
+**Example**:
+```rapid
+Write logfile, "Header line 1";
+Write logfile, "Header line 2";
+WaitTime 0.1;
+Write logfile, "Header line 3";
+```
+
+---
+
 ## 🔍 Before Committing Checklist
 
 - [ ] **No Korean comments** (search for Hangul characters)

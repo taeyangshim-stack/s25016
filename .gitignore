@@ -36,3 +36,6 @@ cloudinary-uploader/test-files/
 *.swp
 *.swo
 *~
+
+.gemini/
+gha-creds-*.json

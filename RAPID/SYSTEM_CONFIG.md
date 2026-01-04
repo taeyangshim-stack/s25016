@@ -1,8 +1,8 @@
 # System Configuration - SpGantry 1200 Dual Robot System
 
 **Project**: S25016
-**Last Updated**: 2026-01-03
-**Version**: v1.8.2
+**Last Updated**: 2026-01-04
+**Version**: v1.8.5
 
 ---
 
@@ -10,7 +10,7 @@
 
 This document describes the **fundamental system architecture** that must be understood for all coordinate calculations.
 
-> ⚠️ **IMPORTANT**: This configuration explains why Robot2 Floor TCP calculation requires rotation transformation matrix in v1.8.2.
+> ⚠️ **IMPORTANT**: This configuration explains why Robot2 Floor TCP calculation requires rotation transformation matrix in v1.8.5.
 
 ---
 
@@ -69,7 +69,7 @@ Floor (Absolute reference):
 
 | Physical | Floor | Transformation |
 |----------|-------|----------------|
-| [0, 0, 0, 0] | [-9500, 5300, 2100, 0] | Floor = Physical + HOME_offset |
+| [0, 0, 0, 0] | [9500, 5300, 2100, 0] | Floor = Physical + HOME_offset |
 | eax_a | Floor_X - 9500 | Physical_X = Floor_X - 9500 |
 | eax_b | 5300 - Floor_Y | Physical_Y = 5300 - Floor_Y |
 | eax_c | 2100 - Floor_Z | Physical_Z = 2100 - Floor_Z |
@@ -79,7 +79,7 @@ Floor (Absolute reference):
 
 ```
 R-center (Floor coordinates):
-  X = -9500 mm (Physical X = 0)
+  X = 9500 mm (Physical X = 0)
   Y = 5300 mm (Physical Y = 0)
   Z = 2100 mm (Physical Z = 0)
 
@@ -122,9 +122,18 @@ robot2_floor_pos.trans.y := base_floor_y + robot2_tcp_wobj0.trans.y;
 - At R=90°: wobj0 Y-axis = Floor **X-axis** ❌
 - **Cannot simply add!** Must rotate first!
 
-#### The Solution (v1.8.2)
+#### The Solution (v1.8.5)
 
 ```rapid
+! Convert gantry position to Floor coordinates
+gantry_floor_x := current_gantry.extax.eax_a + 9500;
+gantry_floor_y := 5300 - current_gantry.extax.eax_b;
+
+! Robot2 base offset at R=0 is [0, -488] in Floor coordinates
+! Rotate base offset with r_deg (no 90 deg offset)
+base_floor_x := gantry_floor_x + 488 * Sin(r_deg);
+base_floor_y := gantry_floor_y - 488 * Cos(r_deg);
+
 ! Apply 2D rotation transformation matrix
 floor_x_offset := robot2_tcp_wobj0.trans.x * Cos(total_r_deg)
                 - robot2_tcp_wobj0.trans.y * Sin(total_r_deg);
@@ -140,12 +149,12 @@ robot2_floor_pos.trans.y := base_floor_y + floor_y_offset;
 [cos(θ)  -sin(θ)]   [x_wobj0]   [x_floor]
 [sin(θ)   cos(θ)] × [y_wobj0] = [y_floor]
 
-where θ = total_r_deg = 90° + r_deg
+where θ = total_r_deg = r_deg
 ```
 
 ---
 
-## 🧪 Expected Test Results (v1.8.2)
+## 🧪 Expected Test Results (v1.8.5)
 
 With both TCP at R-center, **rotation should NOT change TCP coordinates**:
 
@@ -208,9 +217,9 @@ With both TCP at R-center, **rotation should NOT change TCP coordinates**:
    - wobj0 rotates with R-axis
    - Must apply rotation transformation
 
-3. ❌ **Forgetting the 90° base rotation**
-   - total_r_deg = **90°** + r_deg
-   - R=0 means gantry parallel to Y-axis (not X-axis!)
+3. ❌ **Applying an extra 90 deg offset**
+   - total_r_deg must equal r_deg
+   - wobj0 aligns with Floor at R=0, so no 90 deg shift
 
 4. ❌ **Modifying Robot2 HOME TCP to [0, 0, -1000]**
    - Robot2 base is **NOT at R-center**
@@ -219,6 +228,6 @@ With both TCP at R-center, **rotation should NOT change TCP coordinates**:
 
 ---
 
-**Last verified**: 2026-01-03 (v1.8.2)
+**Last verified**: 2026-01-04 (v1.8.5)
 **Maintainer**: SP 심태양
 **Project**: S25016 SpGantry 1200
