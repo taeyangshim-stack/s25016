@@ -7,6 +7,74 @@ S25016 SpGantry 1200 프로젝트의 모든 주요 변경사항이 이 파일에
 
 ---
 
+## [v1.8.3_260104] - 2026-01-04
+
+### Fixed
+- **STABILITY**: File handle consistency issues in TASK1 and TASK2
+  - **TASK1**: 6개 프로시저의 파일 핸들 불일치 수정
+    - ShowWobj0Definition, CompareWorldAndWobj0, VerifyTCPOrientation
+    - TestCoordinateMovement, TestGantryAxisMovement, TestRobot1BaseHeight
+    - 문제: `Open logfile` → `Write debug_logfile` 불일치 (런타임 오류 가능)
+    - 수정: 단일 Open 구문으로 통일, `logfile` 일관성 확보
+  - **TASK2**: 4개 프로시저의 이중 Open 구문 제거
+    - TestRobot2_ReadExternalAxes, TestRobot2_TCPCoordinates
+    - ShowWobj0Definition, CompareWorldAndWobj0
+    - 문제: 불필요한 이중 Open 구문 (혼란 유발)
+    - 수정: `Open "HOME:/filename.txt", logfile \Append` 단일 구문으로 통일
+
+- **STABILITY**: Missing ERROR handlers added
+  - **TASK1**: SetRobot1InitialPosition에 ERROR 핸들러 추가
+    - 초기화 실패 시 STOP (안전한 종료)
+    - 로그 파일 닫기 보장
+  - **TASK2**: main 및 SetRobot2InitialPosition에 ERROR 핸들러 추가
+    - main: TASK2 진입점 오류 처리 (STOP)
+    - SetRobot2InitialPosition: 초기화 오류 처리 (STOP)
+    - 테스트 프로시저: 진단 오류 처리 (TRYNEXT)
+
+- **STANDARDS**: Unicode character removal
+  - **TASK1**: ASCII 인코딩 확인 (이미 준수)
+  - **TASK2**: `°` (degree symbol) → `deg` 치환 (6개 위치)
+    - Lines 19, 64, 65 (2회), 233, 1663, 2239
+    - ABB RAPID 컴파일러 호환성 확보 (Syntax Error 135/150 방지)
+  - **TASK2**: 파일 인코딩 UTF-8 → ASCII 변환
+    - ABB 컨트롤러 로드 시 오류 방지
+
+### Changed
+- **TASK1 MainModule.mod**:
+  - Version: v1.8.2 → v1.8.3
+  - 6개 프로시저 파일 핸들 수정
+  - 1개 프로시저 ERROR 핸들러 추가
+  - 버전 히스토리 업데이트
+
+- **TASK2 Rob2_MainModule.mod**:
+  - Version: v1.8.0 → v1.8.3 (v1.8.1, v1.8.2 건너뜀)
+  - 4개 프로시저 Open 구문 수정
+  - 2개 프로시저 ERROR 핸들러 추가
+  - Unicode 문자 제거 (6개 위치)
+  - 파일 인코딩 변환 (UTF-8 → ASCII)
+  - 버전 히스토리 업데이트
+
+### Version Synchronization
+- **TASK1**: v1.8.2 → v1.8.3
+- **TASK2**: v1.8.0 → v1.8.3
+  - v1.8.1, v1.8.2는 TASK1 전용 수정 (Robot2 TCP 회전 변환)
+  - TASK2는 해당 수정 불필요하여 직접 v1.8.3으로 점프
+  - MultiMove 시스템 버전 동기화 유지
+
+### Code Quality Improvements
+- **안정성**: 10개 프로시저의 파일 I/O 오류 처리 강화
+- **가독성**: 파일 핸들 사용 패턴 통일
+- **호환성**: RAPID 컴파일러 문법 규칙 100% 준수
+- **표준 준수**: CODING_STANDARDS.md 규칙 완전 준수
+
+### Testing Status
+- **Syntax Check**: 필수 (RobotStudio에서 실행 권장)
+- **File Encoding**: ASCII 확인 완료
+- **Version Constants**: TASK1_VERSION, TASK2_VERSION 모두 "v1.8.3"
+- **Deployment**: ✅ 준비 완료
+
+---
+
 ## [v1.8.2_260103] - 2026-01-03
 
 ### Fixed

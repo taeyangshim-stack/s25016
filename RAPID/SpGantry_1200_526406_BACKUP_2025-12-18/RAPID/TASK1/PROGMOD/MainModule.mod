@@ -1998,6 +1998,7 @@ MODULE MainModule
 			Write logfile, "  X = " + NumToStr(rob2_floor.trans.x, 2) + " mm";
 			Write logfile, "  Y = " + NumToStr(rob2_floor.trans.y, 2) + " mm";
 			Write logfile, "  Z = " + NumToStr(rob2_floor.trans.z, 2) + " mm";
+            WaitTime 0.1;
 			Write logfile, "";
 			WaitTime 0.1;  ! Prevent Write frequency error (increased from 0.05)
 

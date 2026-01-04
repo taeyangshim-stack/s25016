@@ -173,6 +173,13 @@ MODULE Rob2_MainModule
 	!   - No functional changes in TASK2 (changes in TASK1 only)
 	!   - Ready for Phase 2: Complex motion testing
 	!
+	! v1.8.3 (2026-01-04)
+	!   - STABILITY: Added ERROR handlers to main and SetRobot2InitialPosition
+	!   - STABILITY: Corrected file handle usage in 4 procedures (single Open statement)
+	!   - STANDARDS: Replaced Unicode characters (deg symbol) with ASCII equivalents
+	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
+	!   - Version synchronized with TASK1 (jumped from v1.8.0)
+	!
 	! Version constant for logging (v1.8.3+)
 	CONST string TASK2_VERSION := "v1.8.3";
 
@@ -1235,7 +1242,7 @@ MODULE Rob2_MainModule
 		TPWrite "  R  = " + NumToStr(gantry_r, 4) + " rad";
 		TPWrite "  X2 = " + NumToStr(gantry_x2, 4) + " m";
 
-		Open "HOME:/robot2_external_axes_test.txt", logfile \Write;
+			Open "HOME:/robot2_external_axes_test.txt", logfile \Append;
 
 		Write logfile, "========================================";
 		Write logfile, "Robot2 - External Axes Reading Test";
@@ -1307,7 +1314,7 @@ MODULE Rob2_MainModule
 		TPWrite "  Y = " + NumToStr(tcp_wobj0.trans.y, 3) + " mm";
 		TPWrite "  Z = " + NumToStr(tcp_wobj0.trans.z, 3) + " mm";
 
-		Open "HOME:/robot2_tcp_coordinates.txt", logfile \Write;
+			Open "HOME:/robot2_tcp_coordinates.txt", logfile \Append;
 
 		Write logfile, "========================================";
 		Write logfile, "Robot2 - TCP Coordinates Test";
