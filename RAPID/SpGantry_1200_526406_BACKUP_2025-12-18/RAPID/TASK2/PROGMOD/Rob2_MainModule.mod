@@ -16,7 +16,7 @@ MODULE Rob2_MainModule
 	! v1.2.0 (2025-12-18)
 	!   - Added WobjFloor coordinate system
 	!   - Frame: [-9500, 5300, 2100] with quaternion [0, 1, 0, 0]
-	!   - Quaternion [0,1,0,0] = 180° rotation around X-axis (Y,Z inverted)
+	!   - Quaternion [0,1,0,0] = 180deg rotation around X-axis (Y,Z inverted)
 	!   - Added comprehensive coordinate system documentation
 	!
 	! v1.3.0 (2025-12-18)
@@ -61,8 +61,8 @@ MODULE Rob2_MainModule
 	! v1.4.7 (2025-12-24)
 	!   - Fixed singularity error in home position
 	!   - Changed Robot2 home position to [+90,0,0,0,30,0]
-	!   - J1=+90° for Robot2 mounting orientation
-	!   - J5=30° to avoid wrist singularity (not 0°)
+	!   - J1=+90deg for Robot2 mounting orientation
+	!   - J5=30deg to avoid wrist singularity (not 0deg)
 	!
 	! v1.5.0 (2025-12-24) - DUAL COORDINATE SYSTEM
 	!   - Added config.txt MODE support for dual coordinate systems
@@ -173,8 +173,8 @@ MODULE Rob2_MainModule
 	!   - No functional changes in TASK2 (changes in TASK1 only)
 	!   - Ready for Phase 2: Complex motion testing
 	!
-	! Version constant for logging (v1.8.0+)
-	CONST string TASK2_VERSION := "v1.8.0";
+	! Version constant for logging (v1.8.3+)
+	CONST string TASK2_VERSION := "v1.8.3";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -230,7 +230,7 @@ MODULE Rob2_MainModule
     PERS wobjdata WobjRobot2Base_Dynamic;
 
     ! wobjRob2Base: Robot2 Base Frame orientation from MOC.cfg
-    ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45° rotation
+    ! Quaternion [-4.32964E-17, 0.707107, 0.707107, 4.32964E-17] = 45deg rotation
     PERS wobjdata wobjRob2Base := [FALSE, TRUE, "", [[0, 0, 0], [-0.0000000000000000432964, 0.707107, 0.707107, 0.0000000000000000432964]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! Robot Position Monitoring (v1.5.1 2025-12-25)
@@ -603,6 +603,10 @@ MODULE Rob2_MainModule
 
         ! Note: Position updates now handled by TASK1's UpdateRobot2BaseDynamicWobj
         ! No continuous loop needed - TASK1 reads Robot2 position on-demand
+	ERROR
+		TPWrite "ERROR in Rob2_MainModule main: " + NumToStr(ERRNO, 0);
+		Close main_logfile;
+		STOP;
     ENDPROC
 
     PROC rInit()
@@ -1231,8 +1235,7 @@ MODULE Rob2_MainModule
 		TPWrite "  R  = " + NumToStr(gantry_r, 4) + " rad";
 		TPWrite "  X2 = " + NumToStr(gantry_x2, 4) + " m";
 
-		Open "/HOME/", logfile \Write;
-		Open "robot2_external_axes_test.txt", logfile \Append;
+		Open "HOME:/robot2_external_axes_test.txt", logfile \Write;
 
 		Write logfile, "========================================";
 		Write logfile, "Robot2 - External Axes Reading Test";
@@ -1304,8 +1307,7 @@ MODULE Rob2_MainModule
 		TPWrite "  Y = " + NumToStr(tcp_wobj0.trans.y, 3) + " mm";
 		TPWrite "  Z = " + NumToStr(tcp_wobj0.trans.z, 3) + " mm";
 
-		Open "/HOME/", logfile \Write;
-		Open "robot2_tcp_coordinates.txt", logfile \Append;
+		Open "HOME:/robot2_tcp_coordinates.txt", logfile \Write;
 
 		Write logfile, "========================================";
 		Write logfile, "Robot2 - TCP Coordinates Test";
@@ -1547,8 +1549,7 @@ MODULE Rob2_MainModule
 		TPWrite "========================================";
 
 		! Save to file
-		Open "/HOME/", logfile \Write;
-		Open "task2_wobj0_definition.txt", logfile \Append;
+		Open "HOME:/task2_wobj0_definition.txt", logfile \Append;
 
 		Write logfile, "========================================";
 		Write logfile, "TASK2 - wobj0 Definition (v1.1.0)";
@@ -1616,8 +1617,7 @@ MODULE Rob2_MainModule
 		TPWrite "========================================";
 
 		! Save to file
-		Open "/HOME/", logfile \Write;
-		Open "task2_world_vs_wobj0.txt", logfile \Append;
+		Open "HOME:/task2_world_vs_wobj0.txt", logfile \Append;
 
 		Write logfile, "========================================";
 		Write logfile, "TASK2 - Compare World vs wobj0 (v1.1.0)";
@@ -1660,7 +1660,7 @@ MODULE Rob2_MainModule
 	!   1. World - Global coordinate system
 	!   2. wobj0 - Default work object (= World in current config)
 	!   3. WobjFloor - Floor coordinate system at [-9500, 5300, 2100]
-	!   4. wobjRob2Base - Robot2 Base Frame (45° rotation per MOC.cfg)
+	!   4. wobjRob2Base - Robot2 Base Frame (45deg rotation per MOC.cfg)
 	! Output: FlexPendant display + /HOME/task2_tcp_orientation.txt
 	PROC VerifyTCPOrientation()
 		VAR robtarget tcp_world;
@@ -2190,6 +2190,10 @@ MODULE Rob2_MainModule
 
 		! Initialize robot2_floor_pos for cross-task measurement (v1.7.43)
 		UpdateRobot2FloorPosition;
+	ERROR
+		TPWrite "ERROR in SetRobot2InitialPosition: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		STOP;
 	ENDPROC
 
 	! ========================================
@@ -2236,7 +2240,7 @@ MODULE Rob2_MainModule
 		! WobjGantry_Rob2 orientation
 		! IMPORTANT: WobjGantry_Rob2 coordinate system is always aligned with World/Floor
 		! R-axis rotation affects robot base, NOT work object orientation
-		! Robot2 base is physically rotated 90°, but work object remains aligned with World
+		! Robot2 base is physically rotated 90deg, but work object remains aligned with World
 		! Keep quaternion as identity (no rotation)
 		WobjGantry_Rob2.uframe.rot.q1 := 1;
 		WobjGantry_Rob2.uframe.rot.q2 := 0;

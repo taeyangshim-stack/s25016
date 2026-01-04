@@ -171,6 +171,12 @@ MODULE MainModule
 	!   - Added rotation matrix: [cos(theta) -sin(theta); sin(theta) cos(theta)]
 	!   - Added debug logging for rotated offset values
 	!
+	! v1.8.3 (2026-01-04)
+	!   - STABILITY: Corrected file handle usage in 6 diagnostic procedures (unified to `logfile`).
+	!   - STABILITY: Added robust ERROR handlers to all file I/O procedures.
+	!   - STABILITY: Set motion/initialization procedures to STOP on error, diagnostics to TRYNEXT.
+	!   - STANDARDS: Replaced Unicode characters (theta) with ASCII equivalents.
+	!
 	! v1.8.1 (2026-01-03)
 	!   - BUGFIX: Added UpdateRobot2BaseDynamicWobj() call in TestGantryRotation()
 	!   - BUGFIX: Increased WaitTime from 0.05 to 0.1 to prevent error 41617
@@ -187,8 +193,8 @@ MODULE MainModule
 	!   - Enhanced logging: quaternion, R-axis details
 	!========================================
 
-	! Version constant for logging (v1.8.2+)
-	CONST string TASK1_VERSION := "v1.8.2";
+	! Version constant for logging (v1.8.3+)
+	CONST string TASK1_VERSION := "v1.8.3";
 
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
@@ -594,39 +600,38 @@ MODULE MainModule
 		TPWrite "========================================";
 
 		! Save to file
-		Open "/HOME/", logfile \Write;
-		Open "task1_wobj0_definition.txt", logfile \Append;
+		Open "HOME:/task1_wobj0_definition.txt", logfile \Append;
 
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "TASK1 - wobj0 Definition (v1.1.0)";
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "Date: " + CDate();
-		Write debug_logfile, "Time: " + CTime();
-		Write debug_logfile, "";
-		Write debug_logfile, "wobj0.robhold: " + str_robhold;
-		Write debug_logfile, "wobj0.ufprog: " + str_ufprog;
-		Write debug_logfile, "";
-		Write debug_logfile, "User Frame (uframe):";
-		Write debug_logfile, "  X = " + NumToStr(wobj0.uframe.trans.x, 2) + " mm";
-		Write debug_logfile, "  Y = " + NumToStr(wobj0.uframe.trans.y, 2) + " mm";
-		Write debug_logfile, "  Z = " + NumToStr(wobj0.uframe.trans.z, 2) + " mm";
-		Write debug_logfile, "  q1 = " + NumToStr(wobj0.uframe.rot.q1, 4);
-		Write debug_logfile, "  q2 = " + NumToStr(wobj0.uframe.rot.q2, 4);
-		Write debug_logfile, "  q3 = " + NumToStr(wobj0.uframe.rot.q3, 4);
-		Write debug_logfile, "  q4 = " + NumToStr(wobj0.uframe.rot.q4, 4);
-		Write debug_logfile, "";
-		Write debug_logfile, "Object Frame (oframe):";
-		Write debug_logfile, "  X = " + NumToStr(wobj0.oframe.trans.x, 2) + " mm";
-		Write debug_logfile, "  Y = " + NumToStr(wobj0.oframe.trans.y, 2) + " mm";
-		Write debug_logfile, "  Z = " + NumToStr(wobj0.oframe.trans.z, 2) + " mm";
-		Write debug_logfile, "========================================\0A";
+		Write logfile, "========================================";
+		Write logfile, "TASK1 - wobj0 Definition (v1.1.0)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "wobj0.robhold: " + str_robhold;
+		Write logfile, "wobj0.ufprog: " + str_ufprog;
+		Write logfile, "";
+		Write logfile, "User Frame (uframe):";
+		Write logfile, "  X = " + NumToStr(wobj0.uframe.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(wobj0.uframe.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(wobj0.uframe.trans.z, 2) + " mm";
+		Write logfile, "  q1 = " + NumToStr(wobj0.uframe.rot.q1, 4);
+		Write logfile, "  q2 = " + NumToStr(wobj0.uframe.rot.q2, 4);
+		Write logfile, "  q3 = " + NumToStr(wobj0.uframe.rot.q3, 4);
+		Write logfile, "  q4 = " + NumToStr(wobj0.uframe.rot.q4, 4);
+		Write logfile, "";
+		Write logfile, "Object Frame (oframe):";
+		Write logfile, "  X = " + NumToStr(wobj0.oframe.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(wobj0.oframe.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(wobj0.oframe.trans.z, 2) + " mm";
+		Write logfile, "========================================\0A";
 
-		Close debug_logfile;
+		Close logfile;
 		TPWrite "Saved to: /HOME/task1_wobj0_definition.txt";
 
 	ERROR
 		TPWrite "ERROR in ShowWobj0Definition: " + NumToStr(ERRNO, 0);
-		Close debug_logfile;
+		Close logfile;
 		TRYNEXT;
 	ENDPROC
 
@@ -663,37 +668,36 @@ MODULE MainModule
 		TPWrite "========================================";
 
 		! Save to file
-		Open "/HOME/", logfile \Write;
-		Open "task1_world_vs_wobj0.txt", logfile \Append;
+		Open "HOME:/task1_world_vs_wobj0.txt", logfile \Append;
 
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "TASK1 - Compare World vs wobj0 (v1.1.0)";
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "Date: " + CDate();
-		Write debug_logfile, "Time: " + CTime();
-		Write debug_logfile, "";
-		Write debug_logfile, "World Coordinates:";
-		Write debug_logfile, "  X = " + NumToStr(pos_world.trans.x, 2) + " mm";
-		Write debug_logfile, "  Y = " + NumToStr(pos_world.trans.y, 2) + " mm";
-		Write debug_logfile, "  Z = " + NumToStr(pos_world.trans.z, 2) + " mm";
-		Write debug_logfile, "";
-		Write debug_logfile, "wobj0 Coordinates:";
-		Write debug_logfile, "  X = " + NumToStr(pos_wobj0.trans.x, 2) + " mm";
-		Write debug_logfile, "  Y = " + NumToStr(pos_wobj0.trans.y, 2) + " mm";
-		Write debug_logfile, "  Z = " + NumToStr(pos_wobj0.trans.z, 2) + " mm";
-		Write debug_logfile, "";
-		Write debug_logfile, "Difference (World - wobj0):";
-		Write debug_logfile, "  dX = " + NumToStr(pos_world.trans.x - pos_wobj0.trans.x, 2) + " mm";
-		Write debug_logfile, "  dY = " + NumToStr(pos_world.trans.y - pos_wobj0.trans.y, 2) + " mm";
-		Write debug_logfile, "  dZ = " + NumToStr(pos_world.trans.z - pos_wobj0.trans.z, 2) + " mm";
-		Write debug_logfile, "========================================\0A";
+		Write logfile, "========================================";
+		Write logfile, "TASK1 - Compare World vs wobj0 (v1.1.0)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "World Coordinates:";
+		Write logfile, "  X = " + NumToStr(pos_world.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(pos_world.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(pos_world.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "wobj0 Coordinates:";
+		Write logfile, "  X = " + NumToStr(pos_wobj0.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(pos_wobj0.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(pos_wobj0.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "Difference (World - wobj0):";
+		Write logfile, "  dX = " + NumToStr(pos_world.trans.x - pos_wobj0.trans.x, 2) + " mm";
+		Write logfile, "  dY = " + NumToStr(pos_world.trans.y - pos_wobj0.trans.y, 2) + " mm";
+		Write logfile, "  dZ = " + NumToStr(pos_world.trans.z - pos_wobj0.trans.z, 2) + " mm";
+		Write logfile, "========================================\0A";
 
-		Close debug_logfile;
+		Close logfile;
 		TPWrite "Saved to: /HOME/task1_world_vs_wobj0.txt";
 
 	ERROR
 		TPWrite "ERROR in CompareWorldAndWobj0: " + NumToStr(ERRNO, 0);
-		Close debug_logfile;
+		Close logfile;
 		TRYNEXT;
 	ENDPROC
 
@@ -731,36 +735,36 @@ MODULE MainModule
 		! Save to file (with WaitTime to prevent "Too intense frequency" error)
 		Open "HOME:/task1_tcp_orientation.txt", logfile \Append;
 
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "TASK1 - TCP Orientation Verification (v1.2.1)";
-		Write debug_logfile, "Date: " + CDate() + " " + CTime();
-		Write debug_logfile, "========================================";
+		Write logfile, "========================================";
+		Write logfile, "TASK1 - TCP Orientation Verification (v1.2.1)";
+		Write logfile, "Date: " + CDate() + " " + CTime();
+		Write logfile, "========================================";
 		WaitTime 0.05;
 
-		Write debug_logfile, "1. World: Pos=[" + NumToStr(tcp_world.trans.x, 3) + "," + NumToStr(tcp_world.trans.y, 3) + "," + NumToStr(tcp_world.trans.z, 3) + "]";
-		Write debug_logfile, "   Rot=[" + NumToStr(tcp_world.rot.q1, 6) + "," + NumToStr(tcp_world.rot.q2, 6) + "," + NumToStr(tcp_world.rot.q3, 6) + "," + NumToStr(tcp_world.rot.q4, 6) + "]";
+		Write logfile, "1. World: Pos=[" + NumToStr(tcp_world.trans.x, 3) + "," + NumToStr(tcp_world.trans.y, 3) + "," + NumToStr(tcp_world.trans.z, 3) + "]";
+		Write logfile, "   Rot=[" + NumToStr(tcp_world.rot.q1, 6) + "," + NumToStr(tcp_world.rot.q2, 6) + "," + NumToStr(tcp_world.rot.q3, 6) + "," + NumToStr(tcp_world.rot.q4, 6) + "]";
 		WaitTime 0.05;
 
-		Write debug_logfile, "2. wobj0: Pos=[" + NumToStr(tcp_wobj0.trans.x, 3) + "," + NumToStr(tcp_wobj0.trans.y, 3) + "," + NumToStr(tcp_wobj0.trans.z, 3) + "]";
-		Write debug_logfile, "   Rot=[" + NumToStr(tcp_wobj0.rot.q1, 6) + "," + NumToStr(tcp_wobj0.rot.q2, 6) + "," + NumToStr(tcp_wobj0.rot.q3, 6) + "," + NumToStr(tcp_wobj0.rot.q4, 6) + "]";
+		Write logfile, "2. wobj0: Pos=[" + NumToStr(tcp_wobj0.trans.x, 3) + "," + NumToStr(tcp_wobj0.trans.y, 3) + "," + NumToStr(tcp_wobj0.trans.z, 3) + "]";
+		Write logfile, "   Rot=[" + NumToStr(tcp_wobj0.rot.q1, 6) + "," + NumToStr(tcp_wobj0.rot.q2, 6) + "," + NumToStr(tcp_wobj0.rot.q3, 6) + "," + NumToStr(tcp_wobj0.rot.q4, 6) + "]";
 		WaitTime 0.05;
 
-		Write debug_logfile, "3. Floor: Pos=[" + NumToStr(tcp_floor.trans.x, 3) + "," + NumToStr(tcp_floor.trans.y, 3) + "," + NumToStr(tcp_floor.trans.z, 3) + "]";
-		Write debug_logfile, "   Rot=[" + NumToStr(tcp_floor.rot.q1, 6) + "," + NumToStr(tcp_floor.rot.q2, 6) + "," + NumToStr(tcp_floor.rot.q3, 6) + "," + NumToStr(tcp_floor.rot.q4, 6) + "]";
+		Write logfile, "3. Floor: Pos=[" + NumToStr(tcp_floor.trans.x, 3) + "," + NumToStr(tcp_floor.trans.y, 3) + "," + NumToStr(tcp_floor.trans.z, 3) + "]";
+		Write logfile, "   Rot=[" + NumToStr(tcp_floor.rot.q1, 6) + "," + NumToStr(tcp_floor.rot.q2, 6) + "," + NumToStr(tcp_floor.rot.q3, 6) + "," + NumToStr(tcp_floor.rot.q4, 6) + "]";
 		WaitTime 0.05;
 
-		Write debug_logfile, "4. Rob1Base: Pos=[" + NumToStr(tcp_rob_base.trans.x, 3) + "," + NumToStr(tcp_rob_base.trans.y, 3) + "," + NumToStr(tcp_rob_base.trans.z, 3) + "]";
-		Write debug_logfile, "   Rot=[" + NumToStr(tcp_rob_base.rot.q1, 6) + "," + NumToStr(tcp_rob_base.rot.q2, 6) + "," + NumToStr(tcp_rob_base.rot.q3, 6) + "," + NumToStr(tcp_rob_base.rot.q4, 6) + "]";
+		Write logfile, "4. Rob1Base: Pos=[" + NumToStr(tcp_rob_base.trans.x, 3) + "," + NumToStr(tcp_rob_base.trans.y, 3) + "," + NumToStr(tcp_rob_base.trans.z, 3) + "]";
+		Write logfile, "   Rot=[" + NumToStr(tcp_rob_base.rot.q1, 6) + "," + NumToStr(tcp_rob_base.rot.q2, 6) + "," + NumToStr(tcp_rob_base.rot.q3, 6) + "," + NumToStr(tcp_rob_base.rot.q4, 6) + "]";
 		WaitTime 0.05;
 
-		Write debug_logfile, "========================================\0A";
+		Write logfile, "========================================\0A";
 
-		Close debug_logfile;
+		Close logfile;
 		TPWrite "Saved to: /HOME/task1_tcp_orientation.txt";
 
 	ERROR
 		TPWrite "ERROR in VerifyTCPOrientation: " + NumToStr(ERRNO, 0);
-		Close debug_logfile;
+		Close logfile;
 		TRYNEXT;
 	ENDPROC
 
@@ -873,37 +877,37 @@ MODULE MainModule
 		! Save to file
 		Open "HOME:/task1_coordinate_test.txt", logfile \Append;
 
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "TASK1 - Coordinate System Movement Test (v1.3.0)";
-		Write debug_logfile, "Date: " + CDate() + " " + CTime();
-		Write debug_logfile, "========================================";
+		Write logfile, "========================================";
+		Write logfile, "TASK1 - Coordinate System Movement Test (v1.3.0)";
+		Write logfile, "Date: " + CDate() + " " + CTime();
+		Write logfile, "========================================";
 		WaitTime 0.05;
 
-		Write debug_logfile, "Command: Move wobj0 [" + NumToStr(delta_x, 3) + "," + NumToStr(delta_y, 3) + "," + NumToStr(delta_z, 3) + "]";
+		Write logfile, "Command: Move wobj0 [" + NumToStr(delta_x, 3) + "," + NumToStr(delta_y, 3) + "," + NumToStr(delta_z, 3) + "]";
 		WaitTime 0.05;
 
-		Write debug_logfile, "Start wobj0: [" + NumToStr(pos_start_wobj0.trans.x, 3) + "," + NumToStr(pos_start_wobj0.trans.y, 3) + "," + NumToStr(pos_start_wobj0.trans.z, 3) + "]";
-		Write debug_logfile, "Start Floor: [" + NumToStr(pos_start_floor.trans.x, 3) + "," + NumToStr(pos_start_floor.trans.y, 3) + "," + NumToStr(pos_start_floor.trans.z, 3) + "]";
+		Write logfile, "Start wobj0: [" + NumToStr(pos_start_wobj0.trans.x, 3) + "," + NumToStr(pos_start_wobj0.trans.y, 3) + "," + NumToStr(pos_start_wobj0.trans.z, 3) + "]";
+		Write logfile, "Start Floor: [" + NumToStr(pos_start_floor.trans.x, 3) + "," + NumToStr(pos_start_floor.trans.y, 3) + "," + NumToStr(pos_start_floor.trans.z, 3) + "]";
 		WaitTime 0.05;
 
-		Write debug_logfile, "End wobj0: [" + NumToStr(pos_end_wobj0.trans.x, 3) + "," + NumToStr(pos_end_wobj0.trans.y, 3) + "," + NumToStr(pos_end_wobj0.trans.z, 3) + "]";
-		Write debug_logfile, "End Floor: [" + NumToStr(pos_end_floor.trans.x, 3) + "," + NumToStr(pos_end_floor.trans.y, 3) + "," + NumToStr(pos_end_floor.trans.z, 3) + "]";
+		Write logfile, "End wobj0: [" + NumToStr(pos_end_wobj0.trans.x, 3) + "," + NumToStr(pos_end_wobj0.trans.y, 3) + "," + NumToStr(pos_end_wobj0.trans.z, 3) + "]";
+		Write logfile, "End Floor: [" + NumToStr(pos_end_floor.trans.x, 3) + "," + NumToStr(pos_end_floor.trans.y, 3) + "," + NumToStr(pos_end_floor.trans.z, 3) + "]";
 		WaitTime 0.05;
 
-		Write debug_logfile, "wobj0 moved: [" + NumToStr(diff_wobj0_x, 3) + "," + NumToStr(diff_wobj0_y, 3) + "," + NumToStr(diff_wobj0_z, 3) + "]";
-		Write debug_logfile, "Floor moved: [" + NumToStr(diff_floor_x, 3) + "," + NumToStr(diff_floor_y, 3) + "," + NumToStr(diff_floor_z, 3) + "]";
+		Write logfile, "wobj0 moved: [" + NumToStr(diff_wobj0_x, 3) + "," + NumToStr(diff_wobj0_y, 3) + "," + NumToStr(diff_wobj0_z, 3) + "]";
+		Write logfile, "Floor moved: [" + NumToStr(diff_floor_x, 3) + "," + NumToStr(diff_floor_y, 3) + "," + NumToStr(diff_floor_z, 3) + "]";
 		WaitTime 0.05;
 
-		Write debug_logfile, "Verification: If wobj0 and Floor have same direction,";
-		Write debug_logfile, "  movement should be identical in both coordinate systems.";
-		Write debug_logfile, "========================================\0A";
+		Write logfile, "Verification: If wobj0 and Floor have same direction,";
+		Write logfile, "  movement should be identical in both coordinate systems.";
+		Write logfile, "========================================\0A";
 
-		Close debug_logfile;
+		Close logfile;
 		TPWrite "Saved to: /HOME/task1_coordinate_test.txt";
 
 	ERROR
 		TPWrite "ERROR in TestCoordinateMovement: " + NumToStr(ERRNO, 0);
-		Close debug_logfile;
+		Close logfile;
 		TRYNEXT;
 	ENDPROC
 
@@ -989,21 +993,26 @@ MODULE MainModule
 
 		! Save to file
 		Open "HOME:/task1_gantry_test.txt", logfile \Append;
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "TASK1 - Gantry Axis Movement Test (v1.4.0)";
-		Write debug_logfile, "Date: " + CDate() + " " + CTime();
-		Write debug_logfile, "========================================";
+		Write logfile, "========================================";
+		Write logfile, "TASK1 - Gantry Axis Movement Test (v1.4.0)";
+		Write logfile, "Date: " + CDate() + " " + CTime();
+		Write logfile, "========================================";
 		WaitTime 0.05;
-		Write debug_logfile, "Gantry Joint Movement: M1=" + NumToStr(delta_m1, 1) + "mm, M2=" + NumToStr(delta_m2, 1) + "mm, M3=" + NumToStr(delta_m3, 1) + "mm";
+		Write logfile, "Gantry Joint Movement: M1=" + NumToStr(delta_m1, 1) + "mm, M2=" + NumToStr(delta_m2, 1) + "mm, M3=" + NumToStr(delta_m3, 1) + "mm";
 		WaitTime 0.05;
-		Write debug_logfile, "wobj0 TCP moved: [" + NumToStr(wobj0_dx, 3) + ", " + NumToStr(wobj0_dy, 3) + ", " + NumToStr(wobj0_dz, 3) + "] mm";
+		Write logfile, "wobj0 TCP moved: [" + NumToStr(wobj0_dx, 3) + ", " + NumToStr(wobj0_dy, 3) + ", " + NumToStr(wobj0_dz, 3) + "] mm";
 		WaitTime 0.05;
-		Write debug_logfile, "Floor TCP moved: [" + NumToStr(floor_dx, 3) + ", " + NumToStr(floor_dy, 3) + ", " + NumToStr(floor_dz, 3) + "] mm";
+		Write logfile, "Floor TCP moved: [" + NumToStr(floor_dx, 3) + ", " + NumToStr(floor_dy, 3) + ", " + NumToStr(floor_dz, 3) + "] mm";
 		WaitTime 0.05;
-		Write debug_logfile, "========================================";
-		Close debug_logfile;
+		Write logfile, "========================================";
+		Close logfile;
 
 		TPWrite "Saved to: task1_gantry_test.txt";
+
+	ERROR
+		TPWrite "ERROR in TestGantryAxisMovement: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		TRYNEXT;
 	ENDPROC
 
 	! ========================================
@@ -1441,6 +1450,11 @@ MODULE MainModule
 		Write logfile, "Setup completed at " + CTime();
 		Write logfile, "========================================";
 		Close logfile;
+	
+	ERROR
+		TPWrite "ERROR in SetRobot1InitialPosition: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		STOP;
 	ENDPROC
 
 	! ========================================
@@ -1497,31 +1511,31 @@ MODULE MainModule
 		! Save to log file
 		Open "HOME:/robot1_base_height.txt", logfile \Write;
 
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "Robot1 Base Height Test (v1.7.14)";
-		Write debug_logfile, "========================================";
-		Write debug_logfile, "Date: " + CDate();
-		Write debug_logfile, "Time: " + CTime();
-		Write debug_logfile, "";
-		Write debug_logfile, "Joint Angles: [-90, 0, 0, 0, 0, 0]";
-		Write debug_logfile, "";
-		Write debug_logfile, "Robot1 wobj0 (tool0):";
-		Write debug_logfile, "  X = " + NumToStr(tcp_wobj0.trans.x, 2) + " mm";
-		Write debug_logfile, "  Y = " + NumToStr(tcp_wobj0.trans.y, 2) + " mm";
-		Write debug_logfile, "  Z = " + NumToStr(tcp_wobj0.trans.z, 2) + " mm";
-		Write debug_logfile, "";
-		Write debug_logfile, "Robot1 Floor (tool0):";
-		Write debug_logfile, "  X = " + NumToStr(tcp_floor.trans.x, 2) + " mm";
-		Write debug_logfile, "  Y = " + NumToStr(tcp_floor.trans.y, 2) + " mm";
-		Write debug_logfile, "  Z = " + NumToStr(tcp_floor.trans.z, 2) + " mm";
-		Write debug_logfile, "========================================\0A";
+		Write logfile, "========================================";
+		Write logfile, "Robot1 Base Height Test (v1.7.14)";
+		Write logfile, "========================================";
+		Write logfile, "Date: " + CDate();
+		Write logfile, "Time: " + CTime();
+		Write logfile, "";
+		Write logfile, "Joint Angles: [-90, 0, 0, 0, 0, 0]";
+		Write logfile, "";
+		Write logfile, "Robot1 wobj0 (tool0):";
+		Write logfile, "  X = " + NumToStr(tcp_wobj0.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(tcp_wobj0.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(tcp_wobj0.trans.z, 2) + " mm";
+		Write logfile, "";
+		Write logfile, "Robot1 Floor (tool0):";
+		Write logfile, "  X = " + NumToStr(tcp_floor.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(tcp_floor.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(tcp_floor.trans.z, 2) + " mm";
+		Write logfile, "========================================\0A";
 
-		Close debug_logfile;
+		Close logfile;
 		TPWrite "Saved to: /HOME/robot1_base_height.txt";
 
 	ERROR
 		TPWrite "ERROR in TestRobot1BaseHeight: " + NumToStr(ERRNO, 0);
-		Close debug_logfile;
+		Close logfile;
 		TRYNEXT;
 	ENDPROC
 
