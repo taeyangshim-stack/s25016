@@ -179,6 +179,9 @@ MODULE MainModule
 		! v1.8.8 (2026-01-05)
 		!   - STABILITY: Reduced main process log writes to lower 41617 risk.
 		!
+		! v1.8.9 (2026-01-05)
+		!   - STABILITY: Reduced SetRobot1InitialPosition file logging to 1-line summary.
+		!
 		! v1.8.5 (2026-01-04)
 		!   - STABILITY: Implemented 1-line CSV logging in TestGantryRotation to eliminate error 41617.
 		!   - STABILITY: Replaced chunked Write calls with single Write per angle, reducing I/O frequency.
@@ -211,8 +214,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-		! Version constant for logging (v1.8.8+)
-		CONST string TASK1_VERSION := "v1.8.8";
+		! Version constant for logging (v1.8.9+)
+		CONST string TASK1_VERSION := "v1.8.9";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -1155,7 +1158,7 @@ MODULE MainModule
 	! ========================================
 	! Update Robot2 Floor Position (from TASK1)
 	! ========================================
-	! Version: v1.8.7
+	! Version: v1.8.9
 	! Date: 2026-01-05
 	! Purpose: Calculate Robot2 TCP position in Floor coordinates
 	! TASK1 calculates this because TASK2 cannot sense gantry movement
@@ -1298,8 +1301,8 @@ MODULE MainModule
 	! Position: Robot1 TCP [0, 0, 1000] in WobjGantry (dynamic), Gantry HOME=[0,0,0,0]
 	! Uses WobjGantry which tracks current gantry position - safe from any gantry position
 	! Note: Safe from any starting position - synchronizes X1-X2 first
-	! Changes in v1.8.7:
-	!   - Reduced file logging to summary lines to lower 41617 risk
+	! Changes in v1.8.9:
+	!   - Reduced TPWrite output and file logging to 1-line summary
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_joint;
 		VAR jointtarget sync_pos;
@@ -1321,14 +1324,12 @@ MODULE MainModule
 		VAR num max_iterations;
 		VAR num tolerance;
 
-		! Open log file for detailed logging
+		! Open log file (1-line summary)
 		Open "HOME:/robot1_init_position.txt", logfile \Write;
-		Write logfile, "Robot1 Init (" + TASK1_VERSION + ")";
-		Write logfile, "Date: " + CDate() + ", Time: " + CTime();
+		Write logfile, "Robot1 Init (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
-		TPWrite "Step 0: Synchronizing gantry X1-X2 at current position...";
+		TPWrite "Robot1 init: start";
 		sync_pos := CJointT();
-		TPWrite "Current gantry: X1=" + NumToStr(sync_pos.extax.eax_a,0) + ", X2=" + NumToStr(sync_pos.extax.eax_f,0);
 
 		x1_target := sync_pos.extax.eax_a;
 		x2_current := sync_pos.extax.eax_f;
@@ -1337,7 +1338,6 @@ MODULE MainModule
 		! If distance > 100mm, use progressive approach (25%, 50%, 75%, 100%)
 		IF Abs(distance) > 100 THEN
 			TPWrite "Large X1-X2 difference (" + NumToStr(Abs(distance),0) + "mm) - progressive sync";
-			Write logfile, "Large X1-X2 difference (" + NumToStr(Abs(distance),0) + "mm) - progressive sync";
 			sync_pos.extax.eax_f := x2_current + distance * 0.25;
 			MoveAbsJ sync_pos, v10, fine, tool0;
 			sync_pos.extax.eax_f := x2_current + distance * 0.50;
@@ -1349,11 +1349,8 @@ MODULE MainModule
 		! Final synchronization
 		sync_pos.extax.eax_f := x1_target;  ! X2 = X1
 		MoveAbsJ sync_pos, v10, fine, tool0;
-		TPWrite "Gantry X1-X2 synchronized";
-		Write logfile, "Step0: X1=" + NumToStr(x1_target,0) + " X2=" + NumToStr(x2_current,0) + " synced";
 
 		! Step 1: Move Robot1 joints to intermediate position (avoid configuration issue)
-		TPWrite "Step 1: Moving Robot1 to intermediate joint position...";
 		initial_joint := CJointT();
 		! Keep synchronized gantry position
 		initial_joint.extax.eax_f := initial_joint.extax.eax_a;
@@ -1365,15 +1362,12 @@ MODULE MainModule
 		initial_joint.robax.rax_5 := 14.47;
 		initial_joint.robax.rax_6 := 0;
 		MoveAbsJ initial_joint, v100, fine, tool0;
-		TPWrite "Robot1 at intermediate joint position";
-		Write logfile, "Step1: intermediate joint reached";
 
 		! Step 2: Move Robot1 TCP to HOME position at R-axis center with iterative refinement
 		iteration := 0;
 		max_iterations := 3;
 		tolerance := 0.5;  ! mm
 
-		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] using WobjGantry...";
 		! Update WobjGantry to reflect current gantry position
 		UpdateGantryWobj;
 		! TCP position: [0, 0, 1000] in WobjGantry (tracks gantry position)
@@ -1390,12 +1384,8 @@ MODULE MainModule
 			error_x := 0 - current_wobj0.trans.x;  ! Target X=0
 			error_y := 0 - current_wobj0.trans.y;  ! Target Y=0
 
-			TPWrite "Iteration " + NumToStr(iteration, 0) + ": Error X=" + NumToStr(error_x, 2) + ", Y=" + NumToStr(error_y, 2);
-
 			! Check if within tolerance
 			IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
-				TPWrite "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
-				TPWrite "DEBUG: Setting iteration to force loop exit";
 				! Force loop exit by setting iteration >= max_iterations (BREAK has issues)
 				iteration := max_iterations;
 			ELSE
@@ -1407,13 +1397,7 @@ MODULE MainModule
 			ENDIF
 		ENDWHILE
 
-		! Debug: Confirm WHILE loop completed
-		TPWrite "DEBUG: Exited refinement loop";
-		TPWrite "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry) - Refined";
-		Write logfile, "Step2: errX=" + NumToStr(error_x, 2) + " errY=" + NumToStr(error_y, 2) + " iter=" + NumToStr(iteration, 0);
-
 		! Step 3: Move gantry to HOME position (physical origin)
-		TPWrite "Step 3: Moving gantry to HOME [0,0,0,0]...";
 		home_pos := CJointT();  ! Read current position
 		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
 		home_pos.extax.eax_b := 0;      ! Y = Physical origin
@@ -1422,10 +1406,8 @@ MODULE MainModule
 		! eax_e: keep from CJointT() (not used)
 		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
 		MoveAbsJ home_pos, v100, fine, tool0;
-		TPWrite "Gantry at HOME position [0,0,0,0]";
-		TPWrite "Robot1 ready: TCP [0,0,1000], Gantry HOME";
-		Write logfile, "Step3: gantry HOME, Robot1 ready";
-		Write logfile, "Setup completed at " + CTime();
+		TPWrite "Robot1 init: done";
+		Write logfile, "Done errX=" + NumToStr(error_x, 2) + " errY=" + NumToStr(error_y, 2) + " iter=" + NumToStr(iteration, 0) + " at " + CTime();
 		Close logfile;
 	
 	ERROR
