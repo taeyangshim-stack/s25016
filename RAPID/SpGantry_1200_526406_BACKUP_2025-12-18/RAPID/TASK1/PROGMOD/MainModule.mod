@@ -192,6 +192,9 @@ MODULE MainModule
 	!   - FIX: Support NUM_COMPLEX_POS/COMPLEX_POS_* and validate NUM_POS range.
 	!   - FIX: Allow missing TCP_OFFSET_* with default 0 values.
 	!
+	! v1.8.14 (2026-01-06)
+	!   - FIX: Align gantry axis range checks with MOC.cfg limits.
+	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
 	!   - FIX: Add gantry axis range checks before MoveAbsJ.
@@ -228,8 +231,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.13+)
-	CONST string TASK1_VERSION := "v1.8.13";
+	! Version constant for logging (v1.8.14+)
+	CONST string TASK1_VERSION := "v1.8.14";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -1999,7 +2002,7 @@ MODULE MainModule
 	! ========================================
 	! Mode 2 - Gantry + TCP Offset Verification
 	! ========================================
-	! Version: v1.8.13
+	! Version: v1.8.14
 	! Date: 2026-01-06
 	! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
 	! Config (config.txt):
@@ -2007,9 +2010,8 @@ MODULE MainModule
 	!   TCP_OFFSET_X/Y/Z
 	!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
-	! Changes in v1.8.13:
-	!   - Interpret COMPLEX_POS_* as HOME offsets (convert to Floor)
-	!   - Add gantry axis range checks before MoveAbsJ
+	! Changes in v1.8.14:
+	!   - Align gantry axis range checks with MOC.cfg (M1/M2/M3/M4 limits)
 	PROC TestGantryMode2()
 		VAR jointtarget home_pos;
 		VAR jointtarget test_pos;
@@ -2215,7 +2217,8 @@ MODULE MainModule
 			phys_z := 2100 - floor_z;
 			phys_r := 0 - floor_r;
 
-			IF phys_x < -9500 OR phys_x > 9500 OR phys_y < -5300 OR phys_y > 5300 OR phys_z < 0 OR phys_z > 1000 OR phys_r < -90 OR phys_r > 90 THEN
+			! MOC.cfg limits (meters): M1 [-9.51, 12.31], M2 [-0.05, 5.35], M3 [-0.05, 1.05], M4 [-1.74533, 1.74533]
+			IF phys_x < -9510 OR phys_x > 12310 OR phys_y < -50 OR phys_y > 5350 OR phys_z < -50 OR phys_z > 1050 OR phys_r < -100 OR phys_r > 100 THEN
 				Write logfile, "OUT_OF_RANGE idx=" + NumToStr(i,0)
 				              + " floor=[" + NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + "]"
 				              + " phys=[" + NumToStr(phys_x,0) + "," + NumToStr(phys_y,0) + "," + NumToStr(phys_z,0) + "," + NumToStr(phys_r,1) + "]";
