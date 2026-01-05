@@ -176,6 +176,9 @@ MODULE Rob2_MainModule
 	! v1.8.7 (2026-01-05)
 	!   - FIX: Use gantry extax from TASK1 for Robot2 MoveJ/MoveL in SetRobot2InitialPosition.
 	!
+	! v1.8.9 (2026-01-05)
+	!   - STABILITY: Reduced TPWrite output and file writes in SetRobot2InitialPosition.
+	!
 	! v1.8.8 (2026-01-05)
 	!   - STABILITY: Reduced main process log writes to lower 41617 risk.
 	!
@@ -190,8 +193,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.8+)
-	CONST string TASK2_VERSION := "v1.8.8";
+	! Version constant for logging (v1.8.9+)
+	CONST string TASK2_VERSION := "v1.8.9";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2093,6 +2096,10 @@ MODULE Rob2_MainModule
 	!   - Use gantry extax from TASK1 when issuing MoveJ/MoveL targets
 	! NOTE: This procedure does NOT control gantry (only TASK1 can control gantry)
 	! Gantry should already be at HOME [0,0,0,0] by TASK1->SetRobot1InitialPosition
+	! Version: v1.8.9
+	! Date: 2026-01-05
+	! Changes in v1.8.9:
+	!   - Reduced TPWrite output and file logging to lower 41617 risk
 	PROC SetRobot2InitialPosition()
 		VAR jointtarget initial_joint;
 		VAR jointtarget gantry_joint;
@@ -2107,18 +2114,12 @@ MODULE Rob2_MainModule
 		VAR num max_iterations;
 		VAR num tolerance;
 
-		! Open log file for detailed logging
+		! Open log file (summary logging)
 		Open "HOME:/robot2_init_position.txt", logfile \Write;
-		Write logfile, "========================================";
-		Write logfile, "Robot2 Initial Position Setup (" + TASK2_VERSION + ")";
-		Write logfile, "========================================";
-		Write logfile, "Date: " + CDate();
-		Write logfile, "Time: " + CTime();
-		Write logfile, "";
+		Write logfile, "Robot2 Init (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
 		! Step 1: Move Robot2 joints to intermediate position (avoid configuration issue)
-		TPWrite "Step 1: Moving Robot2 to intermediate joint position...";
-		Write logfile, "Step 1: Moving Robot2 to intermediate joint position...";
+		TPWrite "Robot2 init: Step1";
 		initial_joint := CJointT();
 		! Robot2 joint angles: [0, -2.58, -11.88, 0, 14.47, 0]
 		initial_joint.robax.rax_1 := 0;
@@ -2130,17 +2131,15 @@ MODULE Rob2_MainModule
 		! Keep current gantry position (DO NOT modify extax!)
 		! extax values already set by CJointT()
 		MoveAbsJ initial_joint, v100, fine, tool0;
-		TPWrite "Robot2 at intermediate joint position";
-		Write logfile, "Robot2 at intermediate joint position";
-		Write logfile, "";
+		TPWrite "Robot2 init: Step1 done";
+		Write logfile, "Step1 done (intermediate joint)";
 
 		! Step 2: Move Robot2 TCP to HOME position at R-axis center with iterative refinement
 		iteration := 0;
 		max_iterations := 3;
 		tolerance := 0.5;  ! mm
 
-		TPWrite "Step 2: Moving Robot2 TCP to HOME [0, 488, -1000] using WobjGantry_Rob2...";
-		Write logfile, "Step 2: Moving Robot2 TCP to HOME [0, 488, -1000] using WobjGantry_Rob2...";
+		TPWrite "Robot2 init: Step2";
 		! Update WobjGantry_Rob2 to reflect current gantry position from TASK1
 		UpdateGantryWobj_Rob2;
 		! TCP position: [0, 488, -1000] in WobjGantry_Rob2 (tracks gantry position)
@@ -2150,10 +2149,7 @@ MODULE Rob2_MainModule
 		gantry_joint := CJointT(\TaskName:="T_ROB1");
 		home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
 		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;  ! Using WobjGantry_Rob2 instead of wobj0!
-		Write logfile, "Initial move to HOME completed";
-
 		! Iterative refinement to reach precise R-axis center (max 3 iterations)
-		Write logfile, "Starting iterative refinement (tolerance=" + NumToStr(tolerance, 1) + "mm)...";
 		WHILE iteration < max_iterations DO
 			iteration := iteration + 1;
 			! Read current position in WobjGantry_Rob2 (same coordinate system as move target!)
@@ -2161,15 +2157,9 @@ MODULE Rob2_MainModule
 			error_x := 0 - current_wobj0.trans.x;  ! Target X=0
 			error_y := 488 - current_wobj0.trans.y;  ! Target Y=488
 
-			TPWrite "Iteration " + NumToStr(iteration, 0) + ": Error X=" + NumToStr(error_x, 2) + ", Y=" + NumToStr(error_y, 2);
-			Write logfile, "Iteration " + NumToStr(iteration, 0) + ": Error X=" + NumToStr(error_x, 2) + ", Y=" + NumToStr(error_y, 2);
-
 			! Check if within tolerance
 			IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
-				TPWrite "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
-				Write logfile, "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
-				TPWrite "DEBUG: Setting iteration to force loop exit";
-				Write logfile, "DEBUG: Setting iteration to force loop exit";
+				TPWrite "Robot2 init: refined";
 				! Force loop exit by setting iteration >= max_iterations (BREAK has issues)
 				iteration := max_iterations;
 			ELSE
@@ -2178,22 +2168,12 @@ MODULE Rob2_MainModule
 				gantry_joint := CJointT(\TaskName:="T_ROB1");
 				home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
 				MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry_Rob2;
-				Write logfile, "  Correction applied";
 			ENDIF
 		ENDWHILE
 
-		! Debug: Confirm WHILE loop completed
-		TPWrite "DEBUG: Exited refinement loop";
-		Write logfile, "DEBUG: Exited refinement loop";
-
-		TPWrite "Robot2 TCP at HOME [0, 488, -1000] (WobjGantry_Rob2) - Refined";
-		Write logfile, "Robot2 TCP at HOME [0, 488, -1000] (WobjGantry_Rob2) - Refined";
-		TPWrite "Gantry position unchanged (controlled by TASK1)";
-		Write logfile, "Gantry position unchanged (controlled by TASK1)";
-		Write logfile, "";
-		Write logfile, "========================================";
+		TPWrite "Robot2 init: done";
+		Write logfile, "Step2 done errX=" + NumToStr(error_x, 2) + " errY=" + NumToStr(error_y, 2) + " iter=" + NumToStr(iteration, 0);
 		Write logfile, "Setup completed at " + CTime();
-		Write logfile, "========================================";
 		Close logfile;
 
 		! Initialize robot2_floor_pos for cross-task measurement (v1.7.43)
