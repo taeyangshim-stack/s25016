@@ -179,6 +179,9 @@ MODULE Rob2_MainModule
 	! v1.8.9 (2026-01-05)
 	!   - STABILITY: Reduced TPWrite output and file writes in SetRobot2InitialPosition.
 	!
+	! v1.8.10 (2026-01-05)
+	!   - FEAT: Added TEST_MODE=2 Robot2 TCP offset move from config.txt.
+	!
 	! v1.8.8 (2026-01-05)
 	!   - STABILITY: Reduced main process log writes to lower 41617 risk.
 	!
@@ -193,8 +196,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.9+)
-	CONST string TASK2_VERSION := "v1.8.9";
+	! Version constant for logging (v1.8.10+)
+	CONST string TASK2_VERSION := "v1.8.10";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -571,6 +574,10 @@ MODULE Rob2_MainModule
     PROC main()
         VAR num update_counter := 0;
         VAR iodev main_logfile;
+        VAR num test_mode;
+
+        ! Read TEST_MODE from config.txt
+        test_mode := ReadTestMode();
 
         ! Open main process log
         Open "HOME:/task2_main_process.txt", main_logfile \Write;
@@ -586,6 +593,10 @@ MODULE Rob2_MainModule
         SetRobot2InitialPosition;
         TPWrite "TASK2: Robot2 initialization completed";
         Write main_logfile, "Step1 done (Robot2 init)";
+        IF test_mode = 2 THEN
+            SetRobot2OffsetPosition;
+            Write main_logfile, "Mode2 offset applied";
+        ENDIF
 
         ! Set synchronization flag to signal TASK1
         robot2_init_complete := TRUE;
@@ -1726,6 +1737,43 @@ MODULE Rob2_MainModule
 	ENDPROC
 
 	! ========================================
+	! Read TEST_MODE from /HOME/config.txt
+	! ========================================
+	! Returns: 0 if not found or error
+	FUNC num ReadTestMode()
+		VAR iodev configfile;
+		VAR string line;
+		VAR num test_mode;
+		VAR bool found;
+		VAR bool ok;
+
+		test_mode := 0;
+		found := FALSE;
+
+		Open "HOME:/config.txt", configfile \Read;
+
+		WHILE found = FALSE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "TEST_MODE=") = 1 THEN
+				IF StrLen(line) >= 11 THEN
+					ok := StrToVal(StrPart(line, 11, StrLen(line) - 10), test_mode);
+					found := TRUE;
+				ENDIF
+			ENDIF
+		ENDWHILE
+
+		Close configfile;
+		RETURN test_mode;
+
+	ERROR
+		IF ERRNO = ERR_FILEOPEN THEN
+			TPWrite "config.txt not found - using TEST_MODE=0";
+		ENDIF
+		Close configfile;
+		RETURN 0;
+	ENDFUNC
+
+	! ========================================
 	! Read Config Mode from /HOME/config.txt
 	! ========================================
 	! Version: v1.5.0
@@ -2181,6 +2229,76 @@ MODULE Rob2_MainModule
 	ERROR
 		TPWrite "ERROR in SetRobot2InitialPosition: " + NumToStr(ERRNO, 0);
 		Close logfile;
+		STOP;
+	ENDPROC
+
+	! ========================================
+	! Set Robot2 TCP Offset for Mode2
+	! ========================================
+	! Version: v1.8.10
+	! Date: 2026-01-05
+	! Purpose: Move Robot2 TCP to offset using WobjGantry_Rob2
+	PROC SetRobot2OffsetPosition()
+		VAR iodev configfile;
+		VAR string line;
+		VAR string value_str;
+		VAR bool found_value;
+		VAR num tcp_offset_x;
+		VAR num tcp_offset_y;
+		VAR num tcp_offset_z;
+		VAR jointtarget gantry_joint;
+		VAR robtarget offset_tcp;
+
+		tcp_offset_x := 0;
+		tcp_offset_y := 0;
+		tcp_offset_z := 0;
+
+		Open "HOME:/config.txt", configfile \Read;
+
+		WHILE TRUE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
+				value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
+				found_value := StrToVal(value_str, tcp_offset_x);
+				GOTO offset_x_found;
+			ENDIF
+		ENDWHILE
+		offset_x_found:
+
+		WHILE TRUE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
+				value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
+				found_value := StrToVal(value_str, tcp_offset_y);
+				GOTO offset_y_found;
+			ENDIF
+		ENDWHILE
+		offset_y_found:
+
+		WHILE TRUE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
+				value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
+				found_value := StrToVal(value_str, tcp_offset_z);
+				GOTO offset_z_found;
+			ENDIF
+		ENDWHILE
+		offset_z_found:
+
+		Close configfile;
+
+		UpdateGantryWobj_Rob2;
+		gantry_joint := CJointT(\TaskName:="T_ROB1");
+		offset_tcp := [[tcp_offset_x, 488 + tcp_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
+		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
+
+	ERROR
+		IF ERRNO = ERR_FILEOPEN THEN
+			TPWrite "ERROR: Cannot open config.txt";
+		ELSE
+			TPWrite "ERROR in SetRobot2OffsetPosition: " + NumToStr(ERRNO, 0);
+		ENDIF
+		Close configfile;
 		STOP;
 	ENDPROC
 

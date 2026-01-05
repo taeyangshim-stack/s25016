@@ -179,8 +179,11 @@ MODULE MainModule
 		! v1.8.8 (2026-01-05)
 		!   - STABILITY: Reduced main process log writes to lower 41617 risk.
 		!
-		! v1.8.9 (2026-01-05)
-		!   - STABILITY: Reduced SetRobot1InitialPosition file logging to 1-line summary.
+	! v1.8.9 (2026-01-05)
+	!   - STABILITY: Reduced SetRobot1InitialPosition file logging to 1-line summary.
+	!
+	! v1.8.10 (2026-01-05)
+	!   - FEAT: Added TEST_MODE=2 gantry + TCP offset verification.
 		!
 		! v1.8.5 (2026-01-04)
 		!   - STABILITY: Implemented 1-line CSV logging in TestGantryRotation to eliminate error 41617.
@@ -214,8 +217,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-		! Version constant for logging (v1.8.9+)
-		CONST string TASK1_VERSION := "v1.8.9";
+	! Version constant for logging (v1.8.10+)
+	CONST string TASK1_VERSION := "v1.8.10";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -358,11 +361,10 @@ MODULE MainModule
 			Write main_logfile, "Step2 mode=1 type=R-axis";
 			TestGantryRotation;
 		ELSEIF test_mode = 2 THEN
-			! Complex motion test (Phase 2)
-			TPWrite "MAIN: Complex Motion Test - Not implemented yet";
-			Write main_logfile, "Step2 mode=2 type=NotImplemented";
-			TPWrite "ERROR: TEST_MODE=2 not implemented";
-			TPWrite "Please use TEST_MODE=0 or 1";
+			! Mode 2: gantry + TCP offset verification
+			TPWrite "MAIN: Mode2 Test";
+			Write main_logfile, "Step2 mode=2 type=Mode2";
+			TestGantryMode2;
 		ELSEIF test_mode = 3 THEN
 			! Custom multi-position test (Phase 3)
 			TPWrite "MAIN: Custom Multi-Position Test - Not implemented yet";
@@ -1979,6 +1981,175 @@ MODULE MainModule
 		ELSE
 			TPWrite "ERROR in TestGantryRotation: " + NumToStr(ERRNO, 0);
 		ENDIF
+		Close logfile;
+		STOP;
+	ENDPROC
+
+	! ========================================
+	! Mode 2 - Gantry + TCP Offset Verification
+	! ========================================
+	! Version: v1.8.10
+	! Date: 2026-01-05
+	! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
+	! Config (config.txt):
+	!   TEST_MODE=2
+	!   TCP_OFFSET_X/Y/Z
+	!   NUM_POS, POS_1_X/Y/Z/R ...
+	! Output: /HOME/gantry_mode2_test.txt
+	PROC TestGantryMode2()
+		VAR jointtarget home_pos;
+		VAR jointtarget test_pos;
+		VAR robtarget offset_tcp;
+		VAR robtarget rob1_floor;
+		VAR robtarget rob2_floor;
+		VAR iodev logfile;
+		VAR iodev configfile;
+		VAR num tcp_offset_x;
+		VAR num tcp_offset_y;
+		VAR num tcp_offset_z;
+		VAR num pos_x{10};
+		VAR num pos_y{10};
+		VAR num pos_z{10};
+		VAR num pos_r{10};
+		VAR num num_pos;
+		VAR num i;
+		VAR string line;
+		VAR string value_str;
+		VAR bool found_value;
+		VAR string csv_line;
+
+		tcp_offset_x := 0;
+		tcp_offset_y := 0;
+		tcp_offset_z := 0;
+		num_pos := 0;
+
+		Open "HOME:/config.txt", configfile \Read;
+
+		WHILE TRUE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
+				value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
+				found_value := StrToVal(value_str, tcp_offset_x);
+				GOTO offset_x_found;
+			ENDIF
+		ENDWHILE
+		offset_x_found:
+
+		WHILE TRUE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
+				value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
+				found_value := StrToVal(value_str, tcp_offset_y);
+				GOTO offset_y_found;
+			ENDIF
+		ENDWHILE
+		offset_y_found:
+
+		WHILE TRUE DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
+				value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
+				found_value := StrToVal(value_str, tcp_offset_z);
+				GOTO offset_z_found;
+			ENDIF
+		ENDWHILE
+		offset_z_found:
+
+		WHILE num_pos = 0 DO
+			line := ReadStr(configfile \RemoveCR);
+			IF StrFind(line, 1, "NUM_POS=") = 1 THEN
+				value_str := StrPart(line, StrLen("NUM_POS=") + 1, StrLen(line) - StrLen("NUM_POS="));
+				found_value := StrToVal(value_str, num_pos);
+			ENDIF
+		ENDWHILE
+
+		FOR i FROM 1 TO num_pos DO
+			WHILE TRUE DO
+				line := ReadStr(configfile \RemoveCR);
+				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_X=") = 1 THEN
+					value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_X=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_X="));
+					found_value := StrToVal(value_str, pos_x{i});
+					GOTO pos_x_found;
+				ENDIF
+			ENDWHILE
+			pos_x_found:
+
+			WHILE TRUE DO
+				line := ReadStr(configfile \RemoveCR);
+				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_Y=") = 1 THEN
+					value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_Y=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_Y="));
+					found_value := StrToVal(value_str, pos_y{i});
+					GOTO pos_y_found;
+				ENDIF
+			ENDWHILE
+			pos_y_found:
+
+			WHILE TRUE DO
+				line := ReadStr(configfile \RemoveCR);
+				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_Z=") = 1 THEN
+					value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_Z=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_Z="));
+					found_value := StrToVal(value_str, pos_z{i});
+					GOTO pos_z_found;
+				ENDIF
+			ENDWHILE
+			pos_z_found:
+
+			WHILE TRUE DO
+				line := ReadStr(configfile \RemoveCR);
+				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_R=") = 1 THEN
+					value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_R=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_R="));
+					found_value := StrToVal(value_str, pos_r{i});
+					GOTO pos_r_found;
+				ENDIF
+			ENDWHILE
+			pos_r_found:
+		ENDFOR
+
+		Close configfile;
+
+		! Move Robot1 to offset in WobjGantry
+		UpdateGantryWobj;
+		home_pos := CJointT();
+		offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], home_pos.extax];
+		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
+
+		Open "HOME:/gantry_mode2_test.txt", logfile \Write;
+		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
+		Write logfile, "TCP_OFFSET=" + NumToStr(tcp_offset_x,1) + "," + NumToStr(tcp_offset_y,1) + "," + NumToStr(tcp_offset_z,1) + " NUM_POS=" + NumToStr(num_pos,0);
+		Write logfile, "X,Y,Z,R,R1X,R1Y,R1Z,R2X,R2Y,R2Z";
+		WaitTime 0.3;
+
+		FOR i FROM 1 TO num_pos DO
+			test_pos := CJointT();
+			test_pos.extax.eax_a := pos_x{i} - 9500;
+			test_pos.extax.eax_b := 5300 - pos_y{i};
+			test_pos.extax.eax_c := 2100 - pos_z{i};
+			test_pos.extax.eax_d := 0 - pos_r{i};
+			test_pos.extax.eax_f := test_pos.extax.eax_a;
+			MoveAbsJ test_pos, v100, fine, tool0;
+			WaitTime 0.5;
+
+			UpdateRobot1FloorPosition;
+			UpdateRobot2BaseDynamicWobj;
+			rob1_floor := robot1_floor_pos;
+			rob2_floor := robot2_floor_pos;
+
+			csv_line := NumToStr(pos_x{i},0) + "," + NumToStr(pos_y{i},0) + "," + NumToStr(pos_z{i},0) + "," + NumToStr(pos_r{i},1) + ","
+			          + NumToStr(rob1_floor.trans.x, 2) + "," + NumToStr(rob1_floor.trans.y, 2) + "," + NumToStr(rob1_floor.trans.z, 2) + ","
+			          + NumToStr(rob2_floor.trans.x, 2) + "," + NumToStr(rob2_floor.trans.y, 2) + "," + NumToStr(rob2_floor.trans.z, 2);
+			Write logfile, csv_line;
+			WaitTime 0.2;
+		ENDFOR
+
+		Close logfile;
+
+	ERROR
+		IF ERRNO = ERR_FILEOPEN THEN
+			TPWrite "ERROR: Cannot open config.txt or log file";
+		ELSE
+			TPWrite "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
+		ENDIF
+		Close configfile;
 		Close logfile;
 		STOP;
 	ENDPROC
