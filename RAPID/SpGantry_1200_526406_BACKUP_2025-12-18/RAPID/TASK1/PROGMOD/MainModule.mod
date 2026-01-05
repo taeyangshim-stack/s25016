@@ -88,7 +88,7 @@ MODULE MainModule
 	!
 	! v1.7.31 (2025-12-30)
 	!   - Added UpdateRobot2FloorPositionLocal to TASK1
-	!   - Added WobjFloor_Rob2 and robot2_floor_pos
+	!   - Added WobjFloor_Rob2 and robot2_floor_pos_t1
 	!   - Support cross-task Robot2 measurement from TASK1
 	!
 	! v1.7.32 (2025-12-30)
@@ -121,10 +121,10 @@ MODULE MainModule
 	!
 	! v1.7.38 (2025-12-30)
 	!   - Fixed Robot2 Floor measurement in TestGantryFloorCoordinates
-	!   - Changed robot2_floor_pos to alias referencing TASK2's variable
+	!   - Changed robot2_floor_pos_t1 to alias referencing TASK2's variable
 	!   - Removed incorrect UpdateRobot2FloorPositionLocal (used wrong WObj)
 	!   - Removed WobjFloor_Rob2 from TASK1 (only in TASK2)
-	!   - TASK2 now updates robot2_floor_pos automatically via rUpdateR2Position
+	!   - TASK2 now updates robot2_floor_pos_t1 automatically via rUpdateR2Position
 	!
 	! v1.7.42 - v1.7.44 (2025-12-31)
 	!   - Progressive X1-X2 synchronization in SetRobot1InitialPosition
@@ -207,6 +207,9 @@ MODULE MainModule
 	! v1.8.18 (2026-01-06)
 	!   - FIX: Rename robot1_floor_pos to robot1_floor_pos_t1 to avoid PERS ambiguity.
 	!
+	! v1.8.19 (2026-01-06)
+	!   - FIX: Rename robot2_floor_pos to robot2_floor_pos_t1 to avoid PERS ambiguity.
+	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
 	!   - FIX: Add gantry axis range checks before MoveAbsJ.
@@ -243,8 +246,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.18+)
-	CONST string TASK1_VERSION := "v1.8.18";
+	! Version constant for logging (v1.8.19+)
+	CONST string TASK1_VERSION := "v1.8.19";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -288,7 +291,7 @@ MODULE MainModule
 	PERS robtarget robot1_floor_pos_t1 := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 	! Robot2 TCP position in Floor coordinate system (from TASK2)
 	! External reference - initialized and updated by TASK2
-	PERS robtarget robot2_floor_pos;
+	PERS robtarget robot2_floor_pos_t1;
 	! Robot2 initialization complete flag (from TASK2)
 	! External reference - set to TRUE by TASK2 when SetRobot2InitialPosition completes
 	PERS bool robot2_init_complete;
@@ -1198,7 +1201,7 @@ MODULE MainModule
 	!      - Rotation matrix: [cos(theta) -sin(theta); sin(theta) cos(theta)]
 	!      - theta = total_r_deg = r_deg
 	!   4. Combine: Robot2 TCP Floor = Robot2 base Floor + rotated wobj0 offset
-	!   5. Store in robot2_floor_pos (shared variable)
+	!   5. Store in robot2_floor_pos_t1 (shared variable)
 	! Changes in v1.8.5:
 	!   - Align total_r_deg to r_deg (no 90deg offset)
 	!   - Compute Robot2 base from gantry Floor + rotated offset
@@ -1287,9 +1290,9 @@ MODULE MainModule
 		floor_y_offset := robot2_tcp_wobj0.trans.x * Sin(total_r_deg) + robot2_tcp_wobj0.trans.y * Cos(total_r_deg);
 		floor_z_offset := robot2_tcp_wobj0.trans.z;  ! Z-axis not affected by R-axis rotation
 
-		robot2_floor_pos.trans.x := base_floor_x + floor_x_offset;
-		robot2_floor_pos.trans.y := base_floor_y + floor_y_offset;
-		robot2_floor_pos.trans.z := base_floor_z + floor_z_offset;
+		robot2_floor_pos_t1.trans.x := base_floor_x + floor_x_offset;
+		robot2_floor_pos_t1.trans.y := base_floor_y + floor_y_offset;
+		robot2_floor_pos_t1.trans.z := base_floor_z + floor_z_offset;
 
 		TPWrite "Robot2 Base Floor: [" + NumToStr(base_floor_x,0) + ", "
 		                                + NumToStr(base_floor_y,0) + ", "
@@ -1312,12 +1315,12 @@ MODULE MainModule
 		                                                                          + NumToStr(floor_y_offset,1) + ", "
 		                                                                          + NumToStr(floor_z_offset,1) + "]";
 
-		TPWrite "Robot2 TCP Floor: [" + NumToStr(robot2_floor_pos.trans.x,0) + ", "
-		                               + NumToStr(robot2_floor_pos.trans.y,0) + ", "
-		                               + NumToStr(robot2_floor_pos.trans.z,0) + "]";
-		IF enable_debug_logging Write debug_logfile, "Robot2 TCP Floor: [" + NumToStr(robot2_floor_pos.trans.x,0) + ", "
-		                                                         + NumToStr(robot2_floor_pos.trans.y,0) + ", "
-		                                                         + NumToStr(robot2_floor_pos.trans.z,0) + "]";
+		TPWrite "Robot2 TCP Floor: [" + NumToStr(robot2_floor_pos_t1.trans.x,0) + ", "
+		                               + NumToStr(robot2_floor_pos_t1.trans.y,0) + ", "
+		                               + NumToStr(robot2_floor_pos_t1.trans.z,0) + "]";
+		IF enable_debug_logging Write debug_logfile, "Robot2 TCP Floor: [" + NumToStr(robot2_floor_pos_t1.trans.x,0) + ", "
+		                                                         + NumToStr(robot2_floor_pos_t1.trans.y,0) + ", "
+		                                                         + NumToStr(robot2_floor_pos_t1.trans.z,0) + "]";
 	ENDPROC
 
 	! ========================================
@@ -1711,9 +1714,9 @@ MODULE MainModule
 		Write debug_logfile, "";
 		Write debug_logfile, "Measuring HOME TCP positions...";
 		UpdateRobot1FloorPosition;
-		UpdateRobot2BaseDynamicWobj;  ! This also updates robot2_floor_pos
+		UpdateRobot2BaseDynamicWobj;  ! This also updates robot2_floor_pos_t1
 		rob1_floor_home := robot1_floor_pos_t1;
-		rob2_floor_home := robot2_floor_pos;
+		rob2_floor_home := robot2_floor_pos_t1;
 		TPWrite "Robot1 HOME TCP Floor: [" + NumToStr(rob1_floor_home.trans.x,0) + ", "
 		                                    + NumToStr(rob1_floor_home.trans.y,0) + ", "
 		                                    + NumToStr(rob1_floor_home.trans.z,0) + "]";
@@ -1735,9 +1738,9 @@ MODULE MainModule
 		Write debug_logfile, "========================================";
 		UpdateRobot1FloorPosition;
 		UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
-		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
+		! Note: robot2_floor_pos_t1 is updated by TASK2's UpdateRobot2FloorPosition
 		rob1_floor_before := robot1_floor_pos_t1;
-		rob2_floor_before := robot2_floor_pos;
+		rob2_floor_before := robot2_floor_pos_t1;
 
 		! Move gantry with Floor->Physical coordinate transformation
 		TPWrite "Moving gantry with offsets...";
@@ -1758,9 +1761,9 @@ MODULE MainModule
 		Write debug_logfile, "========================================";
 		UpdateRobot1FloorPosition;
 		UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
-		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
+		! Note: robot2_floor_pos_t1 is updated by TASK2's UpdateRobot2FloorPosition
 		rob1_floor_after := robot1_floor_pos_t1;
-		rob2_floor_after := robot2_floor_pos;
+		rob2_floor_after := robot2_floor_pos_t1;
 
 		! Return to HOME position
 		TPWrite "Returning to HOME...";
@@ -1971,9 +1974,9 @@ MODULE MainModule
 			! Measure Floor positions
 			UpdateRobot1FloorPosition;
 			UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
-			! Note: robot2_floor_pos is updated by UpdateRobot2BaseDynamicWobj
+			! Note: robot2_floor_pos_t1 is updated by UpdateRobot2BaseDynamicWobj
 			rob1_floor := robot1_floor_pos_t1;
-			rob2_floor := robot2_floor_pos;  ! Updated by TASK2
+			rob2_floor := robot2_floor_pos_t1;  ! Updated by TASK2
 
 			! Write results to file (1-line CSV)
 			csv_line := NumToStr(r_angles{i}, 1) + ","
@@ -2250,7 +2253,7 @@ MODULE MainModule
 			UpdateRobot1FloorPosition;
 			UpdateRobot2BaseDynamicWobj;
 			rob1_floor := robot1_floor_pos_t1;
-			rob2_floor := robot2_floor_pos;
+			rob2_floor := robot2_floor_pos_t1;
 
 			csv_line := NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + ","
 			          + NumToStr(rob1_floor.trans.x, 2) + "," + NumToStr(rob1_floor.trans.y, 2) + "," + NumToStr(rob1_floor.trans.z, 2) + ","
