@@ -204,6 +204,9 @@ MODULE MainModule
 	! v1.8.17 (2026-01-06)
 	!   - Version sync with TASK2 (robot1_floor_pos_t2 rename in TASK2).
 	!
+	! v1.8.18 (2026-01-06)
+	!   - FIX: Rename robot1_floor_pos to robot1_floor_pos_t1 to avoid PERS ambiguity.
+	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
 	!   - FIX: Add gantry axis range checks before MoveAbsJ.
@@ -240,8 +243,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.17+)
-	CONST string TASK1_VERSION := "v1.8.17";
+	! Version constant for logging (v1.8.18+)
+	CONST string TASK1_VERSION := "v1.8.18";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -282,7 +285,7 @@ MODULE MainModule
 	! Robot Position Monitoring (v1.5.1 2025-12-25)
 	! Robot1 TCP position in Floor coordinate system (for distance measurement)
 	! Shared across tasks - use PERS (not TASK PERS) for cross-task access
-	PERS robtarget robot1_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+	PERS robtarget robot1_floor_pos_t1 := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 	! Robot2 TCP position in Floor coordinate system (from TASK2)
 	! External reference - initialized and updated by TASK2
 	PERS robtarget robot2_floor_pos;
@@ -1142,7 +1145,7 @@ MODULE MainModule
 	! Purpose: Update Robot1 TCP position in Floor coordinate system
 	! Used for distance measurement between robots
 	PROC UpdateRobot1FloorPosition()
-		robot1_floor_pos := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+		robot1_floor_pos_t1 := CRobT(\Tool:=tool0\WObj:=WobjFloor);
 	ENDPROC
 
 	! ========================================
@@ -1709,7 +1712,7 @@ MODULE MainModule
 		Write debug_logfile, "Measuring HOME TCP positions...";
 		UpdateRobot1FloorPosition;
 		UpdateRobot2BaseDynamicWobj;  ! This also updates robot2_floor_pos
-		rob1_floor_home := robot1_floor_pos;
+		rob1_floor_home := robot1_floor_pos_t1;
 		rob2_floor_home := robot2_floor_pos;
 		TPWrite "Robot1 HOME TCP Floor: [" + NumToStr(rob1_floor_home.trans.x,0) + ", "
 		                                    + NumToStr(rob1_floor_home.trans.y,0) + ", "
@@ -1733,7 +1736,7 @@ MODULE MainModule
 		UpdateRobot1FloorPosition;
 		UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
 		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
-		rob1_floor_before := robot1_floor_pos;
+		rob1_floor_before := robot1_floor_pos_t1;
 		rob2_floor_before := robot2_floor_pos;
 
 		! Move gantry with Floor->Physical coordinate transformation
@@ -1756,7 +1759,7 @@ MODULE MainModule
 		UpdateRobot1FloorPosition;
 		UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
 		! Note: robot2_floor_pos is updated by TASK2's UpdateRobot2FloorPosition
-		rob1_floor_after := robot1_floor_pos;
+		rob1_floor_after := robot1_floor_pos_t1;
 		rob2_floor_after := robot2_floor_pos;
 
 		! Return to HOME position
@@ -1969,7 +1972,7 @@ MODULE MainModule
 			UpdateRobot1FloorPosition;
 			UpdateRobot2BaseDynamicWobj;  ! Update Robot2 base coordinate for TASK2
 			! Note: robot2_floor_pos is updated by UpdateRobot2BaseDynamicWobj
-			rob1_floor := robot1_floor_pos;
+			rob1_floor := robot1_floor_pos_t1;
 			rob2_floor := robot2_floor_pos;  ! Updated by TASK2
 
 			! Write results to file (1-line CSV)
@@ -2246,7 +2249,7 @@ MODULE MainModule
 
 			UpdateRobot1FloorPosition;
 			UpdateRobot2BaseDynamicWobj;
-			rob1_floor := robot1_floor_pos;
+			rob1_floor := robot1_floor_pos_t1;
 			rob2_floor := robot2_floor_pos;
 
 			csv_line := NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + ","
