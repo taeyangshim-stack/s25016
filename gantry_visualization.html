@@ -219,7 +219,20 @@
             <p>점 <code>(x, y)</code>를 원점에 대해 <code>θ</code>만큼 회전시킨 새로운 점 <code>(x', y')</code>을 구하기 위해 다음 회전 행렬을 사용합니다.</p>
             <pre>[ x' ] = [ cos(θ)  -sin(θ) ] [ x ]
 [ y' ]   [ sin(θ)   cos(θ) ] [ y ]</pre>
-            <p>이를 풀어서 쓰면 다음과 같습니다: <code>x' = x*cos(θ) - y*sin(θ)</code>,  <code>y' = x*sin(θ) + y*cos(θ)</code></p>
+            <p>이를 풀어서 쓰면 다음과 같은 두 개의 공식이 나옵니다.</p>
+            <ol>
+                <li><code>x' = x * cos(θ) - y * sin(θ)</code></li>
+                <li><code>y' = x * sin(θ) + y * cos(θ)</code></li>
+            </ol>
+            <p>이 웹페이지의 JavaScript에서는 이 공식이 다음과 같이 코드로 구현되어 있습니다:</p>
+            <pre><code class="language-javascript">// 'cos', 'sin'은 angle_rad 값으로 미리 계산됨
+// initial = { x: 0, y: 488 } (로봇 1의 경우)
+
+const rotated = {
+    x: initial.x * cos - initial.y * sin,
+    y: initial.x * sin + initial.y * cos
+};
+</code></pre>
             
             <h4>3단계: 로봇 베이스의 최종 좌표 계산</h4>
             <p>위 공식을 각 로봇의 초기 좌표에 적용합니다.</p>
