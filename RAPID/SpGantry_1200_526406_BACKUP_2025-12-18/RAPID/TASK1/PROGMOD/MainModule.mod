@@ -171,6 +171,11 @@ MODULE MainModule
 	!   - Added rotation matrix: [cos(theta) -sin(theta); sin(theta) cos(theta)]
 	!   - Added debug logging for rotated offset values
 	!
+		! v1.8.7 (2026-01-05)
+		!   - STABILITY: Reduced TestGantryRotation header writes to lower 41617 risk.
+		!   - STABILITY: Minimized SetRobot1InitialPosition file logging (summary-only).
+		!   - STABILITY: Increased per-angle WaitTime to 0.2 in TestGantryRotation.
+		!
 		! v1.8.5 (2026-01-04)
 		!   - STABILITY: Implemented 1-line CSV logging in TestGantryRotation to eliminate error 41617.
 		!   - STABILITY: Replaced chunked Write calls with single Write per angle, reducing I/O frequency.
@@ -203,8 +208,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-		! Version constant for logging (v1.8.5+)
-		CONST string TASK1_VERSION := "v1.8.5";
+		! Version constant for logging (v1.8.7+)
+		CONST string TASK1_VERSION := "v1.8.7";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -1161,8 +1166,8 @@ MODULE MainModule
 	! ========================================
 	! Update Robot2 Floor Position (from TASK1)
 	! ========================================
-	! Version: v1.8.5
-	! Date: 2026-01-04
+	! Version: v1.8.7
+	! Date: 2026-01-05
 	! Purpose: Calculate Robot2 TCP position in Floor coordinates
 	! TASK1 calculates this because TASK2 cannot sense gantry movement
 	! Approach:
@@ -1298,12 +1303,14 @@ MODULE MainModule
 	! ========================================
 	! Set Robot1 Initial Position for Gantry Test
 	! ========================================
-	! Version: v1.7.49
-	! Date: 2025-12-31
+	! Version: v1.8.7
+	! Date: 2026-01-05
 	! Purpose: Move Robot1 to initial test position
 	! Position: Robot1 TCP [0, 0, 1000] in WobjGantry (dynamic), Gantry HOME=[0,0,0,0]
 	! Uses WobjGantry which tracks current gantry position - safe from any gantry position
 	! Note: Safe from any starting position - synchronizes X1-X2 first
+	! Changes in v1.8.7:
+	!   - Reduced file logging to summary lines to lower 41617 risk
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_joint;
 		VAR jointtarget sync_pos;
@@ -1327,18 +1334,12 @@ MODULE MainModule
 
 		! Open log file for detailed logging
 		Open "HOME:/robot1_init_position.txt", logfile \Write;
-		Write logfile, "========================================";
-		Write logfile, "Robot1 Initial Position Setup (" + TASK1_VERSION + ")";
-		Write logfile, "========================================";
-		Write logfile, "Date: " + CDate();
-		Write logfile, "Time: " + CTime();
-		Write logfile, "";
+		Write logfile, "Robot1 Init (" + TASK1_VERSION + ")";
+		Write logfile, "Date: " + CDate() + ", Time: " + CTime();
 
 		TPWrite "Step 0: Synchronizing gantry X1-X2 at current position...";
-		Write logfile, "Step 0: Synchronizing gantry X1-X2 at current position...";
 		sync_pos := CJointT();
 		TPWrite "Current gantry: X1=" + NumToStr(sync_pos.extax.eax_a,0) + ", X2=" + NumToStr(sync_pos.extax.eax_f,0);
-		Write logfile, "Current gantry: X1=" + NumToStr(sync_pos.extax.eax_a,0) + ", X2=" + NumToStr(sync_pos.extax.eax_f,0);
 
 		x1_target := sync_pos.extax.eax_a;
 		x2_current := sync_pos.extax.eax_f;
@@ -1360,12 +1361,10 @@ MODULE MainModule
 		sync_pos.extax.eax_f := x1_target;  ! X2 = X1
 		MoveAbsJ sync_pos, v10, fine, tool0;
 		TPWrite "Gantry X1-X2 synchronized";
-		Write logfile, "Gantry X1-X2 synchronized";
-		Write logfile, "";
+		Write logfile, "Step0: X1=" + NumToStr(x1_target,0) + " X2=" + NumToStr(x2_current,0) + " synced";
 
 		! Step 1: Move Robot1 joints to intermediate position (avoid configuration issue)
 		TPWrite "Step 1: Moving Robot1 to intermediate joint position...";
-		Write logfile, "Step 1: Moving Robot1 to intermediate joint position...";
 		initial_joint := CJointT();
 		! Keep synchronized gantry position
 		initial_joint.extax.eax_f := initial_joint.extax.eax_a;
@@ -1378,8 +1377,7 @@ MODULE MainModule
 		initial_joint.robax.rax_6 := 0;
 		MoveAbsJ initial_joint, v100, fine, tool0;
 		TPWrite "Robot1 at intermediate joint position";
-		Write logfile, "Robot1 at intermediate joint position";
-		Write logfile, "";
+		Write logfile, "Step1: intermediate joint reached";
 
 		! Step 2: Move Robot1 TCP to HOME position at R-axis center with iterative refinement
 		iteration := 0;
@@ -1387,7 +1385,6 @@ MODULE MainModule
 		tolerance := 0.5;  ! mm
 
 		TPWrite "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] using WobjGantry...";
-		Write logfile, "Step 2: Moving Robot1 TCP to HOME [0, 0, 1000] using WobjGantry...";
 		! Update WobjGantry to reflect current gantry position
 		UpdateGantryWobj;
 		! TCP position: [0, 0, 1000] in WobjGantry (tracks gantry position)
@@ -1396,10 +1393,7 @@ MODULE MainModule
 		sync_pos := CJointT();
 		home_tcp := [[0, 0, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
 		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry;
-		Write logfile, "Initial move to HOME completed";
-
 		! Iterative refinement to reach precise R-axis center (max 3 iterations)
-		Write logfile, "Starting iterative refinement (tolerance=" + NumToStr(tolerance, 1) + "mm)...";
 		WHILE iteration < max_iterations DO
 			iteration := iteration + 1;
 			! Read current position in wobj0
@@ -1408,14 +1402,11 @@ MODULE MainModule
 			error_y := 0 - current_wobj0.trans.y;  ! Target Y=0
 
 			TPWrite "Iteration " + NumToStr(iteration, 0) + ": Error X=" + NumToStr(error_x, 2) + ", Y=" + NumToStr(error_y, 2);
-			Write logfile, "Iteration " + NumToStr(iteration, 0) + ": Error X=" + NumToStr(error_x, 2) + ", Y=" + NumToStr(error_y, 2);
 
 			! Check if within tolerance
 			IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
 				TPWrite "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
-				Write logfile, "Position refined: within +/-" + NumToStr(tolerance, 1) + "mm tolerance";
 				TPWrite "DEBUG: Setting iteration to force loop exit";
-				Write logfile, "DEBUG: Setting iteration to force loop exit";
 				! Force loop exit by setting iteration >= max_iterations (BREAK has issues)
 				iteration := max_iterations;
 			ELSE
@@ -1424,21 +1415,16 @@ MODULE MainModule
 				sync_pos := CJointT();
 				home_tcp := [[error_x, error_y, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
 				MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry;
-				Write logfile, "  Correction applied";
 			ENDIF
 		ENDWHILE
 
 		! Debug: Confirm WHILE loop completed
 		TPWrite "DEBUG: Exited refinement loop";
-		Write logfile, "DEBUG: Exited refinement loop";
-
 		TPWrite "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry) - Refined";
-		Write logfile, "Robot1 TCP at HOME [0, 0, 1000] (WobjGantry) - Refined";
-		Write logfile, "";
+		Write logfile, "Step2: errX=" + NumToStr(error_x, 2) + " errY=" + NumToStr(error_y, 2) + " iter=" + NumToStr(iteration, 0);
 
 		! Step 3: Move gantry to HOME position (physical origin)
 		TPWrite "Step 3: Moving gantry to HOME [0,0,0,0]...";
-		Write logfile, "Step 3: Moving gantry to HOME [0,0,0,0]...";
 		home_pos := CJointT();  ! Read current position
 		home_pos.extax.eax_a := 0;      ! X1 = Physical origin
 		home_pos.extax.eax_b := 0;      ! Y = Physical origin
@@ -1448,13 +1434,9 @@ MODULE MainModule
 		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "Gantry at HOME position [0,0,0,0]";
-		Write logfile, "Gantry at HOME position [0,0,0,0]";
 		TPWrite "Robot1 ready: TCP [0,0,1000], Gantry HOME";
-		Write logfile, "Robot1 ready: TCP [0,0,1000], Gantry HOME";
-		Write logfile, "";
-		Write logfile, "========================================";
+		Write logfile, "Step3: gantry HOME, Robot1 ready";
 		Write logfile, "Setup completed at " + CTime();
-		Write logfile, "========================================";
 		Close logfile;
 	
 	ERROR
@@ -1853,13 +1835,16 @@ MODULE MainModule
 	! ========================================
 	! Test Gantry with Multiple R-axis Rotations
 	! ========================================
-	! Version: v1.8.5
-	! Date: 2026-01-04
+	! Version: v1.8.7
+	! Date: 2026-01-05
 	! Purpose: Test Robot1 and Robot2 TCP positions at various R-axis angles
 	! Features:
 	!   - Config-based angle configuration (NUM_R_ANGLES, R_ANGLE_1~10)
 	!   - Robot1 and Robot2 Floor TCP coordinate measurement
 	!   - Automatic gantry position logging
+	! Changes in v1.8.7:
+	!   - Reduced header writes and summarized R_ANGLES for 41617 stability
+	!   - Increased per-angle WaitTime to 0.2 for I/O stability
 	! Changes in v1.8.5:
 	!   - Log gantry Floor values using Floor conversion (X+9500, Y/Z inverted)
 	! Changes in v1.8.4:
@@ -1890,6 +1875,7 @@ MODULE MainModule
 		VAR string r_str;
 		VAR string line;
 		VAR string value_str;
+		VAR string r_list;
 		VAR bool found_value;
 
 		! Initialize
@@ -1930,6 +1916,16 @@ MODULE MainModule
 
 		Close configfile;
 
+		! Build R angle list for header logging
+		r_list := "";
+		FOR i FROM 1 TO num_r_angles DO
+			IF i = 1 THEN
+				r_list := NumToStr(r_angles{i}, 1);
+			ELSE
+				r_list := r_list + "," + NumToStr(r_angles{i}, 1);
+			ENDIF
+		ENDFOR
+
 		TPWrite "========================================";
 		TPWrite "Starting Multiple R-axis Rotation Test";
 		TPWrite "========================================";
@@ -1944,37 +1940,16 @@ MODULE MainModule
 			RETURN;
 		ENDIF
 
-		! Open log file
+		! Open log file (reduced header writes)
 		Open "HOME:/gantry_rotation_test.txt", logfile \Write;
-		Write logfile, "========================================";
 		Write logfile, "Gantry R-axis Rotation Test (" + TASK1_VERSION + ")";
-		Write logfile, "========================================";
-		Write logfile, "Date: " + CDate();
-		WaitTime 0.1;
-		Write logfile, "Time: " + CTime();
-		Write logfile, "";
-		Write logfile, "Test Configuration:";
-		WaitTime 0.1;
-		Write logfile, "  Gantry Position (Physical): [" + NumToStr(test_x,0) + ", " + NumToStr(test_y,0) + ", " + NumToStr(test_z,0) + "]";
-		Write logfile, "  Gantry Position (Floor): [" + NumToStr(test_x + 9500,0) + ", " + NumToStr(5300 - test_y,0) + ", " + NumToStr(2100 - test_z,0) + "]";
-		Write logfile, "  Number of R angles: " + NumToStr(num_r_angles,0);
-		Write logfile, "  R angles (degrees): ";
-		WaitTime 0.1;
-		FOR i FROM 1 TO num_r_angles DO
-			Write logfile, "    R_ANGLE_" + NumToStr(i,0) + " = " + NumToStr(r_angles{i}, 1);
-		ENDFOR
-		Write logfile, "";
-		Write logfile, "Floor Coordinate System:";
-		WaitTime 0.1;
-		Write logfile, "  X+ = right (material flow direction)";
-		Write logfile, "  Y+ = up";
-		Write logfile, "  Z+ = vertical up";
-		WaitTime 0.1;
-		Write logfile, "  R=0: Gantry parallel to Y-axis (perpendicular to X-axis)";
-		Write logfile, "  Robot1 at Y+, Robot2 at Y-";
-		Write logfile, "";
-		WaitTime 0.1;
-		Write logfile, "R_ANGLE(deg),GANTRY_PHYS(X),GANTRY_PHYS(Y),GANTRY_PHYS(Z),ROB1_FLOOR(X),ROB1_FLOOR(Y),ROB1_FLOOR(Z),ROB2_FLOOR(X),ROB2_FLOOR(Y),ROB2_FLOOR(Z)";
+		Write logfile, "Date=" + CDate() + ", Time=" + CTime();
+		Write logfile, "Gantry Phys=[" + NumToStr(test_x,0) + "," + NumToStr(test_y,0) + "," + NumToStr(test_z,0)
+		              + "], Floor=[" + NumToStr(test_x + 9500,0) + "," + NumToStr(5300 - test_y,0) + "," + NumToStr(2100 - test_z,0) + "]";
+		Write logfile, "R_ANGLES=" + r_list;
+		Write logfile, "Floor: X+=right, Y+=up, Z+=up, R0:Y-axis, R1 Y+, R2 Y-";
+		Write logfile, "R_DEG,GX,GY,GZ,R1X,R1Y,R1Z,R2X,R2Y,R2Z";
+		WaitTime 0.3;
 
 		! Test each R angle
 		FOR i FROM 1 TO num_r_angles DO
@@ -2007,7 +1982,7 @@ MODULE MainModule
 			                      + NumToStr(rob1_floor.trans.x, 2) + "," + NumToStr(rob1_floor.trans.y, 2) + "," + NumToStr(rob1_floor.trans.z, 2) + ","
 			                      + NumToStr(rob2_floor.trans.x, 2) + "," + NumToStr(rob2_floor.trans.y, 2) + "," + NumToStr(rob2_floor.trans.z, 2);
 			            Write logfile, csv_line;
-			            WaitTime 0.1; ! Keep this WaitTime for general I/O stability
+			WaitTime 0.2; ! Keep this WaitTime for I/O stability
 			! Display on teach pendant
 			TPWrite "Robot1 Floor: [" + NumToStr(rob1_floor.trans.x,1) + ", " + NumToStr(rob1_floor.trans.y,1) + ", " + NumToStr(rob1_floor.trans.z,1) + "]";
 			TPWrite "Robot2 Floor: [" + NumToStr(rob2_floor.trans.x,1) + ", " + NumToStr(rob2_floor.trans.y,1) + ", " + NumToStr(rob2_floor.trans.z,1) + "]";

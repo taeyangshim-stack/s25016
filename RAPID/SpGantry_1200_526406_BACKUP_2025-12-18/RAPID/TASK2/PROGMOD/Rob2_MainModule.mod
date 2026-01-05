@@ -173,6 +173,9 @@ MODULE Rob2_MainModule
 	!   - No functional changes in TASK2 (changes in TASK1 only)
 	!   - Ready for Phase 2: Complex motion testing
 	!
+	! v1.8.7 (2026-01-05)
+	!   - FIX: Use gantry extax from TASK1 for Robot2 MoveJ/MoveL in SetRobot2InitialPosition.
+	!
 	! v1.8.5 (2026-01-04)
 	!   - Version synchronized with TASK1 (Robot2 angle correction in TASK1).
 	!   - No functional changes in TASK2.
@@ -184,8 +187,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.5+)
-	CONST string TASK2_VERSION := "v1.8.5";
+	! Version constant for logging (v1.8.7+)
+	CONST string TASK2_VERSION := "v1.8.7";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2090,15 +2093,18 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Set Robot2 Initial Position
 	! ========================================
-	! Version: v1.7.50
-	! Date: 2025-12-31
+	! Version: v1.8.7
+	! Date: 2026-01-05
 	! Purpose: Move Robot2 to initial test position TCP [0, 488, -1000]
 	! Position at R-axis center for easy calculation and verification
 	! Uses WobjGantry_Rob2 which tracks current gantry position from TASK1
+	! Changes in v1.8.7:
+	!   - Use gantry extax from TASK1 when issuing MoveJ/MoveL targets
 	! NOTE: This procedure does NOT control gantry (only TASK1 can control gantry)
 	! Gantry should already be at HOME [0,0,0,0] by TASK1->SetRobot1InitialPosition
 	PROC SetRobot2InitialPosition()
 		VAR jointtarget initial_joint;
+		VAR jointtarget gantry_joint;
 		VAR robtarget home_tcp;
 		VAR iodev logfile;
 
@@ -2149,9 +2155,9 @@ MODULE Rob2_MainModule
 		! TCP position: [0, 488, -1000] in WobjGantry_Rob2 (tracks gantry position)
 		! Robot2 needs to move +488mm from base to reach R-axis center
 		! Quaternion: [0.5, -0.5, -0.5, -0.5]
-		! Read current gantry position and preserve it in extax
-		initial_joint := CJointT();
-		home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], initial_joint.extax];
+		! extax: use current gantry extax from TASK1
+		gantry_joint := CJointT(\TaskName:="T_ROB1");
+		home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
 		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;  ! Using WobjGantry_Rob2 instead of wobj0!
 		Write logfile, "Initial move to HOME completed";
 
@@ -2178,8 +2184,8 @@ MODULE Rob2_MainModule
 			ELSE
 				! Apply correction: move to target position [0, 488, -1000] in WobjGantry_Rob2
 				UpdateGantryWobj_Rob2;
-				initial_joint := CJointT();
-				home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], initial_joint.extax];
+				gantry_joint := CJointT(\TaskName:="T_ROB1");
+				home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
 				MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry_Rob2;
 				Write logfile, "  Correction applied";
 			ENDIF
