@@ -2042,11 +2042,11 @@ MODULE MainModule
 		line_count := 0;
 		max_lines := 200;
 
-		WHILE line_count < max_lines AND (NOT found_off_x OR NOT found_off_y OR NOT found_off_z OR NOT found_num_pos) DO
+		WHILE line_count < max_lines AND (found_off_x = FALSE OR found_off_y = FALSE OR found_off_z = FALSE OR found_num_pos = FALSE) DO
 			line := ReadStr(configfile \RemoveCR);
 			line_count := line_count + 1;
 
-			IF (NOT found_off_x) AND StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
+			IF (found_off_x = FALSE) AND StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
 				IF StrLen(line) > StrLen("TCP_OFFSET_X=") THEN
 					value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
 					found_value := StrToVal(value_str, tcp_offset_x);
@@ -2054,7 +2054,7 @@ MODULE MainModule
 				ENDIF
 			ENDIF
 
-			IF (NOT found_off_y) AND StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
+			IF (found_off_y = FALSE) AND StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
 				IF StrLen(line) > StrLen("TCP_OFFSET_Y=") THEN
 					value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
 					found_value := StrToVal(value_str, tcp_offset_y);
@@ -2062,7 +2062,7 @@ MODULE MainModule
 				ENDIF
 			ENDIF
 
-			IF (NOT found_off_z) AND StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
+			IF (found_off_z = FALSE) AND StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
 				IF StrLen(line) > StrLen("TCP_OFFSET_Z=") THEN
 					value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
 					found_value := StrToVal(value_str, tcp_offset_z);
@@ -2070,7 +2070,7 @@ MODULE MainModule
 				ENDIF
 			ENDIF
 
-			IF (NOT found_num_pos) AND StrFind(line, 1, "NUM_POS=") = 1 THEN
+			IF (found_num_pos = FALSE) AND StrFind(line, 1, "NUM_POS=") = 1 THEN
 				IF StrLen(line) > StrLen("NUM_POS=") THEN
 					value_str := StrPart(line, StrLen("NUM_POS=") + 1, StrLen(line) - StrLen("NUM_POS="));
 					found_value := StrToVal(value_str, num_pos);
@@ -2081,7 +2081,7 @@ MODULE MainModule
 
 		Close configfile;
 
-		IF NOT found_off_x OR NOT found_off_y OR NOT found_off_z OR NOT found_num_pos THEN
+		IF found_off_x = FALSE OR found_off_y = FALSE OR found_off_z = FALSE OR found_num_pos = FALSE THEN
 			TPWrite "ERROR: Missing TCP_OFFSET_* or NUM_POS in config.txt";
 			STOP;
 		ENDIF
