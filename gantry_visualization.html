@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gantry System 2D Visualization & Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 2rem;
+            background-color: #f0f2f5;
+            color: #2c3e50;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            border-bottom: 1px solid #dfe6e9;
+            padding-bottom: 0.5rem;
+        }
+        #main-container {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        #visualization-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        canvas {
+            border: 1px solid #bdc3c7;
+            background-color: #ecf0f1;
+        }
+        #controls {
+            margin-top: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .slider-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #dfe6e9;
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        #angle-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2980b9;
+            min-width: 70px;
+            text-align: center;
+        }
+        #calculation-details {
+            background-color: #34495e;
+            color: #ecf0f1;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 400px;
+            flex-shrink: 0;
+        }
+        #calculation-details h2 {
+            margin-top: 0;
+            color: #5dade2;
+            border-bottom: 1px solid #4a657a;
+        }
+        pre {
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            background: #2c3e50;
+            padding: 1rem;
+            border-radius: 5px;
+        }
+        .explanation-section {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid #dfe6e9;
+            padding: 0.8rem;
+            text-align: left;
+        }
+        th {
+            background-color: #ecf0f1;
+        }
+        code {
+            background-color: #ecf0f1;
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            border-radius: 3px;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+        }
+        .flow-image {
+            max-width: 100%;
+            border: 1px solid #dfe6e9;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>갠트리 시스템 2D 시각화 및 계산 가이드</h1>
+        
+        <div id="main-container">
+            <div id="visualization-container">
+                <canvas id="gantryCanvas" width="500" height="500"></canvas>
+                <div id="controls">
+                    <div class="slider-container">
+                        <label for="angle-slider">R축 각도:</label>
+                        <input type="range" id="angle-slider" min="-90" max="90" value="0">
+                        <span id="angle-label">0.0°</span>
+                    </div>
+                </div>
+            </div>
+            <div id="calculation-details">
+                <h2>실시간 계산 과정</h2>
+                <pre id="calc-output"></pre>
+            </div>
+        </div>
+
+        <div class="explanation-section">
+            <h2>좌표 회전 계산 원리</h2>
+            <p>이 섹션은 R축 각도(θ)가 주어졌을 때, <strong>로봇 1</strong>과 <strong>로봇 2</strong> 베이스의 최종 위치 좌표 <code>(x', y')</code>를 계산하는 과정을 단계별로 설명합니다. 모든 계산은 R축 회전 중심을 원점 (0, 0)으로 하는 2D 상면도(Top-Down View)를 기준으로 합니다.</p>
+            
+            <h3>1. 핵심 입력 변수</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>변수</th>
+                        <th>값</th>
+                        <th>설명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>R-Axis Center</strong></td>
+                        <td><code>(0, 0)</code></td>
+                        <td>모든 계산의 기준이 되는 원점입니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Robot 1 Initial Offset</strong> (<code>r1_initial</code>)</td>
+                        <td><code>(x=0, y=488)</code></td>
+                        <td>R=0°일 때, R축 중심에서 로봇 1 베이스까지의 상대 위치입니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Robot 2 Initial Offset</strong> (<code>r2_initial</code>)</td>
+                        <td><code>(x=0, y=-488)</code></td>
+                        <td>R=0°일 때, R축 중심에서 로봇 2 베이스까지의 상대 위치입니다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>R-axis Angle</strong> (<code>θ</code>)</td>
+                        <td><code>-90°</code> ~ <code>+90°</code></td>
+                        <td>사용자가 입력하는 R축의 회전 각도입니다.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2. 계산 흐름 (단계별)</h3>
+            <h4>1단계: 각도(Degree)를 라디안(Radian)으로 변환</h4>
+            <p>JavaScript의 삼각함수는 라디안 값을 사용하므로, 먼저 각도(θ)를 라디안으로 변환합니다. <b>공식:</b> <code>angle_rad = θ * (π / 180)</code></p>
+
+            <h4>2단계: 2D 회전 변환 행렬 (Rotation Matrix)</h4>
+            <p>점 <code>(x, y)</code>를 원점에 대해 <code>θ</code>만큼 회전시킨 새로운 점 <code>(x', y')</code>을 구하기 위해 다음 회전 행렬을 사용합니다.</p>
+            <pre>[ x' ] = [ cos(θ)  -sin(θ) ] [ x ]
+[ y' ]   [ sin(θ)   cos(θ) ] [ y ]</pre>
+            <p>이를 풀어서 쓰면 다음과 같습니다: <code>x' = x*cos(θ) - y*sin(θ)</code>,  <code>y' = x*sin(θ) + y*cos(θ)</code></p>
+            
+            <h4>3단계: 로봇 베이스의 최종 좌표 계산</h4>
+            <p>위 공식을 각 로봇의 초기 좌표에 적용합니다.</p>
+            <p><b>로봇 1 최종 좌표:</b> <code>x' = -488 * sin(θ)</code>, <code>y' = 488 * cos(θ)</code></p>
+            <p><b>로봇 2 최종 좌표:</b> <code>x' = 488 * sin(θ)</code>, <code>y' = -488 * cos(θ)</code></p>
+        </div>
+
+        <div class="explanation-section">
+            <h2>로봇 TCP 좌표 변환 방식 비교</h2>
+            <p>두 로봇은 시스템 구성이 다르기 때문에, 자신의 TCP 위치를 플로어 좌표계로 확인하는 방법 또한 근본적으로 다릅니다.</p>
+
+            <h3>로봇 1: 직접 좌표 확인 (갠트리 설정: ✅)</h3>
+            <p>로봇 1은 갠트리를 외부 축으로 인식하므로, ABB 컨트롤러가 갠트리의 움직임을 포함한 모든 좌표 변환을 <strong>자동으로</strong> 수행합니다. 코드에서는 단일 함수 호출만으로 정확한 플로어 좌표를 얻을 수 있습니다.</p>
+            <pre><code>tcp_in_floor := CRobT(\Tool:=tool0, \WObj:=WobjFloor);</code></pre>
+            <p>컨트롤러는 <code>CRobT</code> 함수가 호출되면 내부적으로 갠트리의 현재 회전 값을 고려하여 `WobjFloor` 기준의 TCP 좌표를 계산해 반환합니다. 수동 계산이 전혀 필요 없습니다.</p>
+            <img src="https://i.imgur.com/gCj1Zk9.png" alt="Robot 1 Transformation Flow" class="flow-image">
+
+            <h3>로봇 2: 간접 좌표 확인 (수동 계산, 갠트리 설정: ❌)</h3>
+            <p>로봇 2는 갠트리와 분리되어 있어 컨트롤러가 갠트리의 움직임을 모릅니다. 따라서, 자신의 절대 위치를 알기 위해 여러 정보를 조합하여 <strong>수동으로 계산</strong>해야 합니다. (`UpdateRobot2BaseDynamicWobj` 프로시저)</p>
+            <ol>
+                <li><strong>갠트리 위치 파악:</strong> 제어 권한이 있는 로봇 1의 관절 값을 읽어 갠트리의 현재 상태(특히 R축 각도)를 가져옵니다.<br><code>gantry_joint := CJointT(\TaskName:="T_ROB1");</code></li>
+                <li><strong>로봇 2 베이스 위치 계산:</strong> 1단계에서 얻은 R축 각도와 기구학적 오프셋(-488mm)을 이용해, 회전된 로봇 2 베이스의 절대 플로어 좌표를 계산합니다.</li>
+                <li><strong>로컬 TCP 좌표 확인:</strong> 자신의 베이스(wobj0)를 기준으로 TCP의 로컬 좌표를 확인합니다.<br><code>robot2_tcp_wobj0 := CRobT(\WObj:=wobj0);</code></li>
+                <li><strong>로컬 TCP 좌표 회전 변환:</strong> 3단계에서 구한 로컬 좌표에 R축 각도를 적용하여 플로어 좌표계 방향으로 정렬합니다.</li>
+                <li><strong>최종 좌표 계산:</strong> **2단계**에서 구한 `베이스의 절대 좌표`와 **4단계**에서 구한 `변환된 TCP 오프셋`을 더하여 최종 플로어 TCP 좌표를 구합니다.</li>
+            </ol>
+            <img src="https://i.imgur.com/VwL0z2k.png" alt="Robot 2 Transformation Flow" class="flow-image">
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gantryCanvas');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('angle-slider');
+        const angleLabel = document.getElementById('angle-label');
+        const calcOutput = document.getElementById('calc-output');
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const scale = 0.4;
+
+        const robotBaseOffsetY = 488;
+
+        function drawGrid() {
+            ctx.beginPath();
+            ctx.strokeStyle = '#dfe4ea';
+            for (let x = 0; x <= canvas.width; x += 50) {
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+            }
+            for (let y = 0; y <= canvas.height; y += 50) {
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+            }
+            ctx.stroke();
+        }
+
+        function drawAxes() {
+            ctx.beginPath();
+            ctx.strokeStyle = '#95a5a6';
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#7f8c8d';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('Floor Y+', centerX + 5, 15);
+            ctx.fillText('Floor X+', canvas.width - 50, centerY - 10);
+        }
+
+        function drawSystem(angle) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            drawAxes();
+
+            const angleRad = angle * Math.PI / 180;
+            const cos = Math.cos(angleRad);
+            const sin = Math.sin(angleRad);
+
+            // R-Axis Center
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#c0392b';
+            ctx.fill();
+            ctx.fillText('R-Axis Center', centerX + 10, centerY - 10);
+
+            // TCP
+            ctx.beginPath();
+            ctx.strokeStyle = '#e67e22';
+            ctx.lineWidth = 2;
+            ctx.moveTo(centerX - 6, centerY - 6);
+            ctx.lineTo(centerX + 6, centerY + 6);
+            ctx.moveTo(centerX + 6, centerY - 6);
+            ctx.lineTo(centerX - 6, centerY + 6);
+            ctx.stroke();
+            ctx.fillText('TCP', centerX + 10, centerY + 20);
+            ctx.lineWidth = 1;
+
+            const r1_initial = { x: 0, y: robotBaseOffsetY };
+            const r1_rotated = {
+                x: r1_initial.x * cos - r1_initial.y * sin,
+                y: r1_initial.x * sin + r1_initial.y * cos
+            };
+            const r1_canvas_x = centerX + r1_rotated.x * scale;
+            const r1_canvas_y = centerY - r1_rotated.y * scale;
+
+            const r2_initial = { x: 0, y: -robotBaseOffsetY };
+            const r2_rotated = {
+                x: r2_initial.x * cos - r2_initial.y * sin,
+                y: r2_initial.x * sin + r2_initial.y * cos
+            };
+            const r2_canvas_x = centerX + r2_rotated.x * scale;
+            const r2_canvas_y = centerY - r2_rotated.y * scale;
+
+            ctx.beginPath();
+            ctx.rect(r1_canvas_x - 15, r1_canvas_y - 15, 30, 30);
+            ctx.fillStyle = 'rgba(41, 128, 185, 0.8)';
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('R1', r1_canvas_x - 7, r1_canvas_y + 5);
+
+            ctx.beginPath();
+            ctx.rect(r2_canvas_x - 15, r2_canvas_y - 15, 30, 30);
+            ctx.fillStyle = 'rgba(39, 174, 96, 0.8)';
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.fillText('R2', r2_canvas_x - 7, r2_canvas_y + 5);
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#2c3e50';
+            ctx.setLineDash([5, 5]);
+            ctx.moveTo(r1_canvas_x, r1_canvas_y);
+            ctx.lineTo(centerX, centerY);
+            ctx.moveTo(r2_canvas_x, r2_canvas_y);
+            ctx.lineTo(centerX, centerY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            updateCalculationText(angle, cos, sin, r1_initial, r1_rotated, r2_initial, r2_rotated);
+        }
+        
+        function updateCalculationText(angle, cos, sin, r1_i, r1_r, r2_i, r2_r) {
+             calcOutput.textContent = `R축 각도 (θ) = ${angle.toFixed(1)}°
+
+Rotation Matrix:
+[ cos(θ), -sin(θ) ]  [ ${cos.toFixed(2)}, ${-sin.toFixed(2)} ]
+[ sin(θ),  cos(θ) ]  [ ${sin.toFixed(2)},  ${cos.toFixed(2)} ]
+
+--- Robot 1 ---
+초기 좌표: [${r1_i.x}, ${r1_i.y}]
+계산:
+x' = ${r1_i.x}*${cos.toFixed(2)} - ${r1_i.y}*${sin.toFixed(2)}
+y' = ${r1_i.x}*${sin.toFixed(2)} + ${r1_i.y}*${cos.toFixed(2)}
+결과 좌표: [${r1_r.x.toFixed(1)}, ${r1_r.y.toFixed(1)}]
+
+--- Robot 2 ---
+초기 좌표: [${r2_i.x}, ${r2_i.y}]
+계산:
+x' = ${r2_i.x}*${cos.toFixed(2)} - ${r2_i.y}*${sin.toFixed(2)}
+y' = ${r2_i.x}*${sin.toFixed(2)} + ${r2_i.y}*${cos.toFixed(2)}
+결과 좌표: [${r2_r.x.toFixed(1)}, ${r2_r.y.toFixed(1)}]`;
+        }
+
+        slider.addEventListener('input', () => {
+            const angle = parseFloat(slider.value);
+            angleLabel.textContent = `${angle.toFixed(1)}°`;
+            drawSystem(angle);
+        });
+
+        // Initial draw
+        drawSystem(parseFloat(slider.value));
+
+    </script>
+</body>
+</html>
