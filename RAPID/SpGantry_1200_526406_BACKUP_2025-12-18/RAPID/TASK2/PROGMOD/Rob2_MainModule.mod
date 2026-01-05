@@ -194,6 +194,9 @@ MODULE Rob2_MainModule
 	! v1.8.14 (2026-01-06)
 	!   - Version sync with TASK1 (MOC.cfg range update).
 	!
+	! v1.8.15 (2026-01-06)
+	!   - FIX: Use TASK PERS for robot1_floor_pos to avoid global PERS ambiguity.
+	!
 	! v1.8.8 (2026-01-05)
 	!   - STABILITY: Reduced main process log writes to lower 41617 risk.
 	!
@@ -208,8 +211,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.14+)
-	CONST string TASK2_VERSION := "v1.8.14";
+	! Version constant for logging (v1.8.15+)
+	CONST string TASK2_VERSION := "v1.8.15";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -269,8 +272,8 @@ MODULE Rob2_MainModule
     PERS wobjdata wobjRob2Base := [FALSE, TRUE, "", [[0, 0, 0], [-0.0000000000000000432964, 0.707107, 0.707107, 0.0000000000000000432964]], [[0, 0, 0], [1, 0, 0, 0]]];
 
     ! Robot Position Monitoring (v1.5.1 2025-12-25)
-    ! Robot1 TCP position from TASK1 (external reference)
-    PERS robtarget robot1_floor_pos;
+    ! Robot1 TCP position from TASK1 (local copy for TASK2)
+    TASK PERS robtarget robot1_floor_pos;
     ! Robot1 wobj0 snapshot from TASK1 (external reference)
     PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
