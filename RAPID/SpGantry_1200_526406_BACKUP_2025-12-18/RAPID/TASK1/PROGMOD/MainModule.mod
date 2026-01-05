@@ -184,6 +184,9 @@ MODULE MainModule
 	!
 	! v1.8.10 (2026-01-05)
 	!   - FEAT: Added TEST_MODE=2 gantry + TCP offset verification.
+	!
+	! v1.8.11 (2026-01-06)
+	!   - FIX: Guard config parsing in TestGantryMode2 to avoid StrPart errors.
 		!
 		! v1.8.5 (2026-01-04)
 		!   - STABILITY: Implemented 1-line CSV logging in TestGantryRotation to eliminate error 41617.
@@ -217,8 +220,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.10+)
-	CONST string TASK1_VERSION := "v1.8.10";
+	! Version constant for logging (v1.8.11+)
+	CONST string TASK1_VERSION := "v1.8.11";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -1988,14 +1991,16 @@ MODULE MainModule
 	! ========================================
 	! Mode 2 - Gantry + TCP Offset Verification
 	! ========================================
-	! Version: v1.8.10
-	! Date: 2026-01-05
+	! Version: v1.8.11
+	! Date: 2026-01-06
 	! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
 	! Config (config.txt):
 	!   TEST_MODE=2
 	!   TCP_OFFSET_X/Y/Z
 	!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
+	! Changes in v1.8.11:
+	!   - Guard config parsing to avoid StrPart errors when values are missing
 	PROC TestGantryMode2()
 		VAR jointtarget home_pos;
 		VAR jointtarget test_pos;
@@ -2017,6 +2022,12 @@ MODULE MainModule
 		VAR string value_str;
 		VAR bool found_value;
 		VAR string csv_line;
+		VAR bool found_off_x;
+		VAR bool found_off_y;
+		VAR bool found_off_z;
+		VAR bool found_num_pos;
+		VAR num line_count;
+		VAR num max_lines;
 
 		tcp_offset_x := 0;
 		tcp_offset_y := 0;
@@ -2024,52 +2035,68 @@ MODULE MainModule
 		num_pos := 0;
 
 		Open "HOME:/config.txt", configfile \Read;
+		found_off_x := FALSE;
+		found_off_y := FALSE;
+		found_off_z := FALSE;
+		found_num_pos := FALSE;
+		line_count := 0;
+		max_lines := 200;
 
-		WHILE TRUE DO
+		WHILE line_count < max_lines AND (NOT found_off_x OR NOT found_off_y OR NOT found_off_z OR NOT found_num_pos) DO
 			line := ReadStr(configfile \RemoveCR);
-			IF StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
-				value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
-				found_value := StrToVal(value_str, tcp_offset_x);
-				GOTO offset_x_found;
+			line_count := line_count + 1;
+
+			IF (NOT found_off_x) AND StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_X=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
+					found_value := StrToVal(value_str, tcp_offset_x);
+					found_off_x := found_value;
+				ENDIF
+			ENDIF
+
+			IF (NOT found_off_y) AND StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_Y=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
+					found_value := StrToVal(value_str, tcp_offset_y);
+					found_off_y := found_value;
+				ENDIF
+			ENDIF
+
+			IF (NOT found_off_z) AND StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_Z=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
+					found_value := StrToVal(value_str, tcp_offset_z);
+					found_off_z := found_value;
+				ENDIF
+			ENDIF
+
+			IF (NOT found_num_pos) AND StrFind(line, 1, "NUM_POS=") = 1 THEN
+				IF StrLen(line) > StrLen("NUM_POS=") THEN
+					value_str := StrPart(line, StrLen("NUM_POS=") + 1, StrLen(line) - StrLen("NUM_POS="));
+					found_value := StrToVal(value_str, num_pos);
+					found_num_pos := found_value;
+				ENDIF
 			ENDIF
 		ENDWHILE
-		offset_x_found:
 
-		WHILE TRUE DO
-			line := ReadStr(configfile \RemoveCR);
-			IF StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
-				value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
-				found_value := StrToVal(value_str, tcp_offset_y);
-				GOTO offset_y_found;
-			ENDIF
-		ENDWHILE
-		offset_y_found:
+		Close configfile;
 
-		WHILE TRUE DO
-			line := ReadStr(configfile \RemoveCR);
-			IF StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
-				value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
-				found_value := StrToVal(value_str, tcp_offset_z);
-				GOTO offset_z_found;
-			ENDIF
-		ENDWHILE
-		offset_z_found:
+		IF NOT found_off_x OR NOT found_off_y OR NOT found_off_z OR NOT found_num_pos THEN
+			TPWrite "ERROR: Missing TCP_OFFSET_* or NUM_POS in config.txt";
+			STOP;
+		ENDIF
 
-		WHILE num_pos = 0 DO
-			line := ReadStr(configfile \RemoveCR);
-			IF StrFind(line, 1, "NUM_POS=") = 1 THEN
-				value_str := StrPart(line, StrLen("NUM_POS=") + 1, StrLen(line) - StrLen("NUM_POS="));
-				found_value := StrToVal(value_str, num_pos);
-			ENDIF
-		ENDWHILE
+		Open "HOME:/config.txt", configfile \Read;
 
 		FOR i FROM 1 TO num_pos DO
 			WHILE TRUE DO
 				line := ReadStr(configfile \RemoveCR);
 				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_X=") = 1 THEN
-					value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_X=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_X="));
-					found_value := StrToVal(value_str, pos_x{i});
-					GOTO pos_x_found;
+					IF StrLen(line) > StrLen("POS_" + NumToStr(i,0) + "_X=") THEN
+						value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_X=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_X="));
+						found_value := StrToVal(value_str, pos_x{i});
+						GOTO pos_x_found;
+					ENDIF
 				ENDIF
 			ENDWHILE
 			pos_x_found:
@@ -2077,9 +2104,11 @@ MODULE MainModule
 			WHILE TRUE DO
 				line := ReadStr(configfile \RemoveCR);
 				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_Y=") = 1 THEN
-					value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_Y=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_Y="));
-					found_value := StrToVal(value_str, pos_y{i});
-					GOTO pos_y_found;
+					IF StrLen(line) > StrLen("POS_" + NumToStr(i,0) + "_Y=") THEN
+						value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_Y=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_Y="));
+						found_value := StrToVal(value_str, pos_y{i});
+						GOTO pos_y_found;
+					ENDIF
 				ENDIF
 			ENDWHILE
 			pos_y_found:
@@ -2087,9 +2116,11 @@ MODULE MainModule
 			WHILE TRUE DO
 				line := ReadStr(configfile \RemoveCR);
 				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_Z=") = 1 THEN
-					value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_Z=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_Z="));
-					found_value := StrToVal(value_str, pos_z{i});
-					GOTO pos_z_found;
+					IF StrLen(line) > StrLen("POS_" + NumToStr(i,0) + "_Z=") THEN
+						value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_Z=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_Z="));
+						found_value := StrToVal(value_str, pos_z{i});
+						GOTO pos_z_found;
+					ENDIF
 				ENDIF
 			ENDWHILE
 			pos_z_found:
@@ -2097,14 +2128,15 @@ MODULE MainModule
 			WHILE TRUE DO
 				line := ReadStr(configfile \RemoveCR);
 				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_R=") = 1 THEN
-					value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_R=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_R="));
-					found_value := StrToVal(value_str, pos_r{i});
-					GOTO pos_r_found;
+					IF StrLen(line) > StrLen("POS_" + NumToStr(i,0) + "_R=") THEN
+						value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_R=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_R="));
+						found_value := StrToVal(value_str, pos_r{i});
+						GOTO pos_r_found;
+					ENDIF
 				ENDIF
 			ENDWHILE
 			pos_r_found:
 		ENDFOR
-
 		Close configfile;
 
 		! Move Robot1 to offset in WobjGantry

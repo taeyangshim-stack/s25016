@@ -182,6 +182,9 @@ MODULE Rob2_MainModule
 	! v1.8.10 (2026-01-05)
 	!   - FEAT: Added TEST_MODE=2 Robot2 TCP offset move from config.txt.
 	!
+	! v1.8.11 (2026-01-06)
+	!   - FIX: Guard config parsing in SetRobot2OffsetPosition to avoid StrPart errors.
+	!
 	! v1.8.8 (2026-01-05)
 	!   - STABILITY: Reduced main process log writes to lower 41617 risk.
 	!
@@ -196,8 +199,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.10+)
-	CONST string TASK2_VERSION := "v1.8.10";
+	! Version constant for logging (v1.8.11+)
+	CONST string TASK2_VERSION := "v1.8.11";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2235,9 +2238,11 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Set Robot2 TCP Offset for Mode2
 	! ========================================
-	! Version: v1.8.10
-	! Date: 2026-01-05
+	! Version: v1.8.11
+	! Date: 2026-01-06
 	! Purpose: Move Robot2 TCP to offset using WobjGantry_Rob2
+	! Changes in v1.8.11:
+	!   - Guard config parsing to avoid StrPart errors when values are missing
 	PROC SetRobot2OffsetPosition()
 		VAR iodev configfile;
 		VAR string line;
@@ -2248,44 +2253,58 @@ MODULE Rob2_MainModule
 		VAR num tcp_offset_z;
 		VAR jointtarget gantry_joint;
 		VAR robtarget offset_tcp;
+		VAR bool found_off_x;
+		VAR bool found_off_y;
+		VAR bool found_off_z;
+		VAR num line_count;
+		VAR num max_lines;
 
 		tcp_offset_x := 0;
 		tcp_offset_y := 0;
 		tcp_offset_z := 0;
 
 		Open "HOME:/config.txt", configfile \Read;
+		found_off_x := FALSE;
+		found_off_y := FALSE;
+		found_off_z := FALSE;
+		line_count := 0;
+		max_lines := 200;
 
-		WHILE TRUE DO
+		WHILE line_count < max_lines AND (NOT found_off_x OR NOT found_off_y OR NOT found_off_z) DO
 			line := ReadStr(configfile \RemoveCR);
-			IF StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
-				value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
-				found_value := StrToVal(value_str, tcp_offset_x);
-				GOTO offset_x_found;
+			line_count := line_count + 1;
+
+			IF (NOT found_off_x) AND StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_X=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
+					found_value := StrToVal(value_str, tcp_offset_x);
+					found_off_x := found_value;
+				ENDIF
+			ENDIF
+
+			IF (NOT found_off_y) AND StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_Y=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
+					found_value := StrToVal(value_str, tcp_offset_y);
+					found_off_y := found_value;
+				ENDIF
+			ENDIF
+
+			IF (NOT found_off_z) AND StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_Z=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
+					found_value := StrToVal(value_str, tcp_offset_z);
+					found_off_z := found_value;
+				ENDIF
 			ENDIF
 		ENDWHILE
-		offset_x_found:
-
-		WHILE TRUE DO
-			line := ReadStr(configfile \RemoveCR);
-			IF StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
-				value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
-				found_value := StrToVal(value_str, tcp_offset_y);
-				GOTO offset_y_found;
-			ENDIF
-		ENDWHILE
-		offset_y_found:
-
-		WHILE TRUE DO
-			line := ReadStr(configfile \RemoveCR);
-			IF StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
-				value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
-				found_value := StrToVal(value_str, tcp_offset_z);
-				GOTO offset_z_found;
-			ENDIF
-		ENDWHILE
-		offset_z_found:
 
 		Close configfile;
+
+		IF NOT found_off_x OR NOT found_off_y OR NOT found_off_z THEN
+			TPWrite "ERROR: Missing TCP_OFFSET_* in config.txt";
+			STOP;
+		ENDIF
 
 		UpdateGantryWobj_Rob2;
 		gantry_joint := CJointT(\TaskName:="T_ROB1");
