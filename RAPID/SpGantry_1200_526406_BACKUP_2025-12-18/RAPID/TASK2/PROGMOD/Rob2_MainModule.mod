@@ -188,6 +188,9 @@ MODULE Rob2_MainModule
 	! v1.8.12 (2026-01-06)
 	!   - FIX: Allow missing TCP_OFFSET_* with default 0 values.
 	!
+	! v1.8.13 (2026-01-06)
+	!   - Version sync with TASK1 (Mode2 range checks).
+	!
 	! v1.8.8 (2026-01-05)
 	!   - STABILITY: Reduced main process log writes to lower 41617 risk.
 	!
@@ -202,8 +205,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.12+)
-	CONST string TASK2_VERSION := "v1.8.12";
+	! Version constant for logging (v1.8.13+)
+	CONST string TASK2_VERSION := "v1.8.13";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete

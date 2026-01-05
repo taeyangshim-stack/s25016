@@ -191,6 +191,10 @@ MODULE MainModule
 	! v1.8.12 (2026-01-06)
 	!   - FIX: Support NUM_COMPLEX_POS/COMPLEX_POS_* and validate NUM_POS range.
 	!   - FIX: Allow missing TCP_OFFSET_* with default 0 values.
+	!
+	! v1.8.13 (2026-01-06)
+	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
+	!   - FIX: Add gantry axis range checks before MoveAbsJ.
 		!
 		! v1.8.5 (2026-01-04)
 		!   - STABILITY: Implemented 1-line CSV logging in TestGantryRotation to eliminate error 41617.
@@ -224,8 +228,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.12+)
-	CONST string TASK1_VERSION := "v1.8.12";
+	! Version constant for logging (v1.8.13+)
+	CONST string TASK1_VERSION := "v1.8.13";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -1995,7 +1999,7 @@ MODULE MainModule
 	! ========================================
 	! Mode 2 - Gantry + TCP Offset Verification
 	! ========================================
-	! Version: v1.8.12
+	! Version: v1.8.13
 	! Date: 2026-01-06
 	! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
 	! Config (config.txt):
@@ -2003,9 +2007,9 @@ MODULE MainModule
 	!   TCP_OFFSET_X/Y/Z
 	!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
-	! Changes in v1.8.12:
-	!   - Support NUM_COMPLEX_POS/COMPLEX_POS_* and validate NUM_POS range
-	!   - Allow missing TCP_OFFSET_* with default 0 values
+	! Changes in v1.8.13:
+	!   - Interpret COMPLEX_POS_* as HOME offsets (convert to Floor)
+	!   - Add gantry axis range checks before MoveAbsJ
 	PROC TestGantryMode2()
 		VAR jointtarget home_pos;
 		VAR jointtarget test_pos;
@@ -2028,6 +2032,14 @@ MODULE MainModule
 		VAR bool found_value;
 		VAR string csv_line;
 		VAR string pos_prefix;
+		VAR num floor_x;
+		VAR num floor_y;
+		VAR num floor_z;
+		VAR num floor_r;
+		VAR num phys_x;
+		VAR num phys_y;
+		VAR num phys_z;
+		VAR num phys_r;
 		VAR string key_x;
 		VAR string key_y;
 		VAR string key_z;
@@ -2186,11 +2198,36 @@ MODULE MainModule
 		WaitTime 0.3;
 
 		FOR i FROM 1 TO num_pos DO
+			IF pos_prefix = "COMPLEX_POS_" THEN
+				floor_x := 9500 + pos_x{i};
+				floor_y := 5300 + pos_y{i};
+				floor_z := 2100 + pos_z{i};
+				floor_r := pos_r{i};
+			ELSE
+				floor_x := pos_x{i};
+				floor_y := pos_y{i};
+				floor_z := pos_z{i};
+				floor_r := pos_r{i};
+			ENDIF
+
+			phys_x := floor_x - 9500;
+			phys_y := 5300 - floor_y;
+			phys_z := 2100 - floor_z;
+			phys_r := 0 - floor_r;
+
+			IF phys_x < -9500 OR phys_x > 9500 OR phys_y < -5300 OR phys_y > 5300 OR phys_z < 0 OR phys_z > 1000 OR phys_r < -90 OR phys_r > 90 THEN
+				Write logfile, "OUT_OF_RANGE idx=" + NumToStr(i,0)
+				              + " floor=[" + NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + "]"
+				              + " phys=[" + NumToStr(phys_x,0) + "," + NumToStr(phys_y,0) + "," + NumToStr(phys_z,0) + "," + NumToStr(phys_r,1) + "]";
+				Close logfile;
+				STOP;
+			ENDIF
+
 			test_pos := CJointT();
-			test_pos.extax.eax_a := pos_x{i} - 9500;
-			test_pos.extax.eax_b := 5300 - pos_y{i};
-			test_pos.extax.eax_c := 2100 - pos_z{i};
-			test_pos.extax.eax_d := 0 - pos_r{i};
+			test_pos.extax.eax_a := phys_x;
+			test_pos.extax.eax_b := phys_y;
+			test_pos.extax.eax_c := phys_z;
+			test_pos.extax.eax_d := phys_r;
 			test_pos.extax.eax_f := test_pos.extax.eax_a;
 			MoveAbsJ test_pos, v100, fine, tool0;
 			WaitTime 0.5;
@@ -2200,7 +2237,7 @@ MODULE MainModule
 			rob1_floor := robot1_floor_pos;
 			rob2_floor := robot2_floor_pos;
 
-			csv_line := NumToStr(pos_x{i},0) + "," + NumToStr(pos_y{i},0) + "," + NumToStr(pos_z{i},0) + "," + NumToStr(pos_r{i},1) + ","
+			csv_line := NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + ","
 			          + NumToStr(rob1_floor.trans.x, 2) + "," + NumToStr(rob1_floor.trans.y, 2) + "," + NumToStr(rob1_floor.trans.z, 2) + ","
 			          + NumToStr(rob2_floor.trans.x, 2) + "," + NumToStr(rob2_floor.trans.y, 2) + "," + NumToStr(rob2_floor.trans.z, 2);
 			Write logfile, csv_line;
