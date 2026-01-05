@@ -176,6 +176,9 @@ MODULE Rob2_MainModule
 	! v1.8.7 (2026-01-05)
 	!   - FIX: Use gantry extax from TASK1 for Robot2 MoveJ/MoveL in SetRobot2InitialPosition.
 	!
+	! v1.8.8 (2026-01-05)
+	!   - STABILITY: Reduced main process log writes to lower 41617 risk.
+	!
 	! v1.8.5 (2026-01-04)
 	!   - Version synchronized with TASK1 (Robot2 angle correction in TASK1).
 	!   - No functional changes in TASK2.
@@ -187,8 +190,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.7+)
-	CONST string TASK2_VERSION := "v1.8.7";
+	! Version constant for logging (v1.8.8+)
+	CONST string TASK2_VERSION := "v1.8.8";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -568,12 +571,7 @@ MODULE Rob2_MainModule
 
         ! Open main process log
         Open "HOME:/task2_main_process.txt", main_logfile \Write;
-        Write main_logfile, "========================================";
-        Write main_logfile, "TASK2 Main Process Log (" + TASK2_VERSION + ")";
-        Write main_logfile, "========================================";
-        Write main_logfile, "Date: " + CDate();
-        Write main_logfile, "Time: " + CTime();
-        Write main_logfile, "";
+        Write main_logfile, "TASK2 Main Log (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
         ! Initialize synchronization flag
         robot2_init_complete := FALSE;
@@ -582,30 +580,23 @@ MODULE Rob2_MainModule
         TPWrite "========================================";
         TPWrite "TASK2: Starting Robot2 initialization...";
         TPWrite "========================================";
-        Write main_logfile, "Step 1: Initializing Robot2...";
         SetRobot2InitialPosition;
         TPWrite "TASK2: Robot2 initialization completed";
-        Write main_logfile, "Step 1: Robot2 initialization completed";
-        Write main_logfile, "";
+        Write main_logfile, "Step1 done (Robot2 init)";
 
         ! Set synchronization flag to signal TASK1
         robot2_init_complete := TRUE;
         TPWrite "TASK2: Synchronization flag set (robot2_init_complete = TRUE)";
-        Write main_logfile, "Robot2 initialization complete - synchronization flag set";
-        Write main_logfile, "";
+        Write main_logfile, "Flag set (robot2_init_complete)";
 
         WaitTime 1.0;
 
         ! Position update ready
         TPWrite "TASK2: Ready for cross-task measurement";
-        Write main_logfile, "TASK2 ready for cross-task measurement";
-        Write main_logfile, "Robot2 will respond to TASK1 position queries";
-        Write main_logfile, "";
+        Write main_logfile, "Ready for cross-task measurement";
 
         ! Close main log
-        Write main_logfile, "========================================";
         Write main_logfile, "TASK2 Main Process completed at " + CTime();
-        Write main_logfile, "========================================";
         Close main_logfile;
 
         TPWrite "========================================";

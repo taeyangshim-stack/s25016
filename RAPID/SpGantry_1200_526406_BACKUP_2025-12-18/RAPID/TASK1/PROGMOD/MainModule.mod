@@ -176,6 +176,9 @@ MODULE MainModule
 		!   - STABILITY: Minimized SetRobot1InitialPosition file logging (summary-only).
 		!   - STABILITY: Increased per-angle WaitTime to 0.2 in TestGantryRotation.
 		!
+		! v1.8.8 (2026-01-05)
+		!   - STABILITY: Reduced main process log writes to lower 41617 risk.
+		!
 		! v1.8.5 (2026-01-04)
 		!   - STABILITY: Implemented 1-line CSV logging in TestGantryRotation to eliminate error 41617.
 		!   - STABILITY: Replaced chunked Write calls with single Write per angle, reducing I/O frequency.
@@ -208,8 +211,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-		! Version constant for logging (v1.8.7+)
-		CONST string TASK1_VERSION := "v1.8.7";
+		! Version constant for logging (v1.8.8+)
+		CONST string TASK1_VERSION := "v1.8.8";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -309,27 +312,19 @@ MODULE MainModule
 
 		! Open main process log
 		Open "HOME:/main_process.txt", main_logfile \Write;
-		Write main_logfile, "========================================";
-		Write main_logfile, "Main Process Log (" + TASK1_VERSION + ")";
-		Write main_logfile, "========================================";
-		Write main_logfile, "Date: " + CDate();
-		Write main_logfile, "Time: " + CTime();
-		Write main_logfile, "";
+		Write main_logfile, "Main Process Log (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
 		! Step 1: Initialize Robot1 and Gantry
 		TPWrite "========================================";
 		TPWrite "MAIN: Starting Robot1 initialization...";
 		TPWrite "========================================";
-		Write main_logfile, "Step 1: Initializing Robot1 and Gantry...";
 		SetRobot1InitialPosition;
 		TPWrite "MAIN: Robot1 initialization completed";
-		Write main_logfile, "Step 1: Robot1 initialization completed";
-		Write main_logfile, "";
+		Write main_logfile, "Step1 done (Robot1 init)";
 
 		! Wait for TASK2 (Robot2) initialization to complete using synchronization flag
 		! This replaces the previous fixed WaitTime 10.0 approach
 		TPWrite "MAIN: Waiting for Robot2 initialization (checking flag)...";
-		Write main_logfile, "Waiting for Robot2 initialization (sync flag method)...";
 		wait_counter := 0;
 		max_wait_cycles := 200;  ! 20 seconds max (200 * 0.1s)
 		WHILE robot2_init_complete = FALSE AND wait_counter < max_wait_cycles DO
@@ -339,39 +334,36 @@ MODULE MainModule
 
 		IF robot2_init_complete = TRUE THEN
 			TPWrite "MAIN: Robot2 initialization confirmed (flag = TRUE)";
-			Write main_logfile, "Robot2 initialization confirmed after " + NumToStr(wait_counter * 0.1, 2) + " seconds";
+			Write main_logfile, "WaitRobot2 ok " + NumToStr(wait_counter * 0.1, 2) + " s";
 		ELSE
 			TPWrite "MAIN: WARNING - Robot2 initialization timeout!";
-			Write main_logfile, "WARNING: Robot2 initialization timeout after " + NumToStr(max_wait_cycles * 0.1, 1) + " seconds";
+			Write main_logfile, "WaitRobot2 timeout " + NumToStr(max_wait_cycles * 0.1, 1) + " s";
 		ENDIF
-		Write main_logfile, "";
 
 		! Step 2: Run Test based on TEST_MODE
 		TPWrite "========================================";
 		TPWrite "MAIN: Starting Test (MODE=" + NumToStr(test_mode,0) + ")...";
 		TPWrite "========================================";
-		Write main_logfile, "Step 2: Running Test (MODE=" + NumToStr(test_mode,0) + ")...";
-
 		IF test_mode = 0 THEN
 			! Single position test (backward compatible)
 			TPWrite "MAIN: Single Position Test";
-			Write main_logfile, "Test Type: Single Position (GANTRY_X/Y/Z/R)";
+			Write main_logfile, "Step2 mode=0 type=Single";
 			TestGantryFloorCoordinates;
 		ELSEIF test_mode = 1 THEN
 			! R-axis rotation test
 			TPWrite "MAIN: R-axis Rotation Test";
-			Write main_logfile, "Test Type: R-axis Rotation (multiple angles)";
+			Write main_logfile, "Step2 mode=1 type=R-axis";
 			TestGantryRotation;
 		ELSEIF test_mode = 2 THEN
 			! Complex motion test (Phase 2)
 			TPWrite "MAIN: Complex Motion Test - Not implemented yet";
-			Write main_logfile, "Test Type: Complex Motion - Not implemented yet";
+			Write main_logfile, "Step2 mode=2 type=NotImplemented";
 			TPWrite "ERROR: TEST_MODE=2 not implemented";
 			TPWrite "Please use TEST_MODE=0 or 1";
 		ELSEIF test_mode = 3 THEN
 			! Custom multi-position test (Phase 3)
 			TPWrite "MAIN: Custom Multi-Position Test - Not implemented yet";
-			Write main_logfile, "Test Type: Custom Multi-Position - Not implemented yet";
+			Write main_logfile, "Step2 mode=3 type=NotImplemented";
 			TPWrite "ERROR: TEST_MODE=3 not implemented";
 			TPWrite "Please use TEST_MODE=0 or 1";
 		ELSE
@@ -381,13 +373,10 @@ MODULE MainModule
 		ENDIF
 
 		TPWrite "MAIN: Test completed";
-		Write main_logfile, "Step 2: Test completed";
-		Write main_logfile, "";
+		Write main_logfile, "Step2 done";
 
 		! Close main log
-		Write main_logfile, "========================================";
 		Write main_logfile, "Main Process completed at " + CTime();
-		Write main_logfile, "========================================";
 		Close main_logfile;
 
 		TPWrite "========================================";
