@@ -185,6 +185,9 @@ MODULE Rob2_MainModule
 	! v1.8.11 (2026-01-06)
 	!   - FIX: Guard config parsing in SetRobot2OffsetPosition to avoid StrPart errors.
 	!
+	! v1.8.12 (2026-01-06)
+	!   - FIX: Allow missing TCP_OFFSET_* with default 0 values.
+	!
 	! v1.8.8 (2026-01-05)
 	!   - STABILITY: Reduced main process log writes to lower 41617 risk.
 	!
@@ -199,8 +202,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.11+)
-	CONST string TASK2_VERSION := "v1.8.11";
+	! Version constant for logging (v1.8.12+)
+	CONST string TASK2_VERSION := "v1.8.12";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2238,11 +2241,11 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Set Robot2 TCP Offset for Mode2
 	! ========================================
-	! Version: v1.8.11
+	! Version: v1.8.12
 	! Date: 2026-01-06
 	! Purpose: Move Robot2 TCP to offset using WobjGantry_Rob2
-	! Changes in v1.8.11:
-	!   - Guard config parsing to avoid StrPart errors when values are missing
+	! Changes in v1.8.12:
+	!   - Allow missing TCP_OFFSET_* with default 0 values
 	PROC SetRobot2OffsetPosition()
 		VAR iodev configfile;
 		VAR string line;
@@ -2302,8 +2305,7 @@ MODULE Rob2_MainModule
 		Close configfile;
 
 		IF found_off_x = FALSE OR found_off_y = FALSE OR found_off_z = FALSE THEN
-			TPWrite "ERROR: Missing TCP_OFFSET_* in config.txt";
-			STOP;
+			TPWrite "Mode2: TCP_OFFSET_* not found, using 0";
 		ENDIF
 
 		UpdateGantryWobj_Rob2;

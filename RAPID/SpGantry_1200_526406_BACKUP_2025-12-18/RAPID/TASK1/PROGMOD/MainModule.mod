@@ -187,6 +187,10 @@ MODULE MainModule
 	!
 	! v1.8.11 (2026-01-06)
 	!   - FIX: Guard config parsing in TestGantryMode2 to avoid StrPart errors.
+	!
+	! v1.8.12 (2026-01-06)
+	!   - FIX: Support NUM_COMPLEX_POS/COMPLEX_POS_* and validate NUM_POS range.
+	!   - FIX: Allow missing TCP_OFFSET_* with default 0 values.
 		!
 		! v1.8.5 (2026-01-04)
 		!   - STABILITY: Implemented 1-line CSV logging in TestGantryRotation to eliminate error 41617.
@@ -220,8 +224,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.11+)
-	CONST string TASK1_VERSION := "v1.8.11";
+	! Version constant for logging (v1.8.12+)
+	CONST string TASK1_VERSION := "v1.8.12";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -1991,7 +1995,7 @@ MODULE MainModule
 	! ========================================
 	! Mode 2 - Gantry + TCP Offset Verification
 	! ========================================
-	! Version: v1.8.11
+	! Version: v1.8.12
 	! Date: 2026-01-06
 	! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
 	! Config (config.txt):
@@ -1999,8 +2003,9 @@ MODULE MainModule
 	!   TCP_OFFSET_X/Y/Z
 	!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
-	! Changes in v1.8.11:
-	!   - Guard config parsing to avoid StrPart errors when values are missing
+	! Changes in v1.8.12:
+	!   - Support NUM_COMPLEX_POS/COMPLEX_POS_* and validate NUM_POS range
+	!   - Allow missing TCP_OFFSET_* with default 0 values
 	PROC TestGantryMode2()
 		VAR jointtarget home_pos;
 		VAR jointtarget test_pos;
@@ -2022,6 +2027,11 @@ MODULE MainModule
 		VAR string value_str;
 		VAR bool found_value;
 		VAR string csv_line;
+		VAR string pos_prefix;
+		VAR string key_x;
+		VAR string key_y;
+		VAR string key_z;
+		VAR string key_r;
 		VAR bool found_off_x;
 		VAR bool found_off_y;
 		VAR bool found_off_z;
@@ -2039,6 +2049,7 @@ MODULE MainModule
 		found_off_y := FALSE;
 		found_off_z := FALSE;
 		found_num_pos := FALSE;
+		pos_prefix := "POS_";
 		line_count := 0;
 		max_lines := 200;
 
@@ -2075,14 +2086,33 @@ MODULE MainModule
 					value_str := StrPart(line, StrLen("NUM_POS=") + 1, StrLen(line) - StrLen("NUM_POS="));
 					found_value := StrToVal(value_str, num_pos);
 					found_num_pos := found_value;
+					pos_prefix := "POS_";
+				ENDIF
+			ENDIF
+
+			IF (found_num_pos = FALSE) AND StrFind(line, 1, "NUM_COMPLEX_POS=") = 1 THEN
+				IF StrLen(line) > StrLen("NUM_COMPLEX_POS=") THEN
+					value_str := StrPart(line, StrLen("NUM_COMPLEX_POS=") + 1, StrLen(line) - StrLen("NUM_COMPLEX_POS="));
+					found_value := StrToVal(value_str, num_pos);
+					found_num_pos := found_value;
+					pos_prefix := "COMPLEX_POS_";
 				ENDIF
 			ENDIF
 		ENDWHILE
 
 		Close configfile;
 
-		IF found_off_x = FALSE OR found_off_y = FALSE OR found_off_z = FALSE OR found_num_pos = FALSE THEN
-			TPWrite "ERROR: Missing TCP_OFFSET_* or NUM_POS in config.txt";
+		IF found_off_x = FALSE OR found_off_y = FALSE OR found_off_z = FALSE THEN
+			TPWrite "Mode2: TCP_OFFSET_* not found, using 0";
+		ENDIF
+
+		IF found_num_pos = FALSE THEN
+			TPWrite "ERROR: Missing NUM_POS/NUM_COMPLEX_POS in config.txt";
+			STOP;
+		ENDIF
+
+		IF num_pos < 1 OR num_pos > 10 THEN
+			TPWrite "ERROR: NUM_POS out of range (1-10)";
 			STOP;
 		ENDIF
 
@@ -2091,9 +2121,10 @@ MODULE MainModule
 		FOR i FROM 1 TO num_pos DO
 			WHILE TRUE DO
 				line := ReadStr(configfile \RemoveCR);
-				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_X=") = 1 THEN
-					IF StrLen(line) > StrLen("POS_" + NumToStr(i,0) + "_X=") THEN
-						value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_X=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_X="));
+				key_x := pos_prefix + NumToStr(i,0) + "_X=";
+				IF StrFind(line, 1, key_x) = 1 THEN
+					IF StrLen(line) > StrLen(key_x) THEN
+						value_str := StrPart(line, StrLen(key_x) + 1, StrLen(line) - StrLen(key_x));
 						found_value := StrToVal(value_str, pos_x{i});
 						GOTO pos_x_found;
 					ENDIF
@@ -2103,9 +2134,10 @@ MODULE MainModule
 
 			WHILE TRUE DO
 				line := ReadStr(configfile \RemoveCR);
-				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_Y=") = 1 THEN
-					IF StrLen(line) > StrLen("POS_" + NumToStr(i,0) + "_Y=") THEN
-						value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_Y=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_Y="));
+				key_y := pos_prefix + NumToStr(i,0) + "_Y=";
+				IF StrFind(line, 1, key_y) = 1 THEN
+					IF StrLen(line) > StrLen(key_y) THEN
+						value_str := StrPart(line, StrLen(key_y) + 1, StrLen(line) - StrLen(key_y));
 						found_value := StrToVal(value_str, pos_y{i});
 						GOTO pos_y_found;
 					ENDIF
@@ -2115,9 +2147,10 @@ MODULE MainModule
 
 			WHILE TRUE DO
 				line := ReadStr(configfile \RemoveCR);
-				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_Z=") = 1 THEN
-					IF StrLen(line) > StrLen("POS_" + NumToStr(i,0) + "_Z=") THEN
-						value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_Z=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_Z="));
+				key_z := pos_prefix + NumToStr(i,0) + "_Z=";
+				IF StrFind(line, 1, key_z) = 1 THEN
+					IF StrLen(line) > StrLen(key_z) THEN
+						value_str := StrPart(line, StrLen(key_z) + 1, StrLen(line) - StrLen(key_z));
 						found_value := StrToVal(value_str, pos_z{i});
 						GOTO pos_z_found;
 					ENDIF
@@ -2127,9 +2160,10 @@ MODULE MainModule
 
 			WHILE TRUE DO
 				line := ReadStr(configfile \RemoveCR);
-				IF StrFind(line, 1, "POS_" + NumToStr(i,0) + "_R=") = 1 THEN
-					IF StrLen(line) > StrLen("POS_" + NumToStr(i,0) + "_R=") THEN
-						value_str := StrPart(line, StrLen("POS_" + NumToStr(i,0) + "_R=") + 1, StrLen(line) - StrLen("POS_" + NumToStr(i,0) + "_R="));
+				key_r := pos_prefix + NumToStr(i,0) + "_R=";
+				IF StrFind(line, 1, key_r) = 1 THEN
+					IF StrLen(line) > StrLen(key_r) THEN
+						value_str := StrPart(line, StrLen(key_r) + 1, StrLen(line) - StrLen(key_r));
 						found_value := StrToVal(value_str, pos_r{i});
 						GOTO pos_r_found;
 					ENDIF
