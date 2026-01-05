@@ -1876,6 +1876,7 @@ MODULE MainModule
 		VAR string line;
 		VAR string value_str;
 		VAR string r_list;
+		VAR string csv_line;
 		VAR bool found_value;
 
 		! Initialize
@@ -1975,13 +1976,12 @@ MODULE MainModule
 			rob1_floor := robot1_floor_pos;
 			rob2_floor := robot2_floor_pos;  ! Updated by TASK2
 
-			            ! Write results to file (1-line CSV)
-			            VAR string csv_line;
-			            csv_line := NumToStr(r_angles{i}, 1) + ","
-			                      + NumToStr(test_pos.extax.eax_a,0) + "," + NumToStr(test_pos.extax.eax_b,0) + "," + NumToStr(test_pos.extax.eax_c,0) + ","
-			                      + NumToStr(rob1_floor.trans.x, 2) + "," + NumToStr(rob1_floor.trans.y, 2) + "," + NumToStr(rob1_floor.trans.z, 2) + ","
-			                      + NumToStr(rob2_floor.trans.x, 2) + "," + NumToStr(rob2_floor.trans.y, 2) + "," + NumToStr(rob2_floor.trans.z, 2);
-			            Write logfile, csv_line;
+			! Write results to file (1-line CSV)
+			csv_line := NumToStr(r_angles{i}, 1) + ","
+			          + NumToStr(test_pos.extax.eax_a,0) + "," + NumToStr(test_pos.extax.eax_b,0) + "," + NumToStr(test_pos.extax.eax_c,0) + ","
+			          + NumToStr(rob1_floor.trans.x, 2) + "," + NumToStr(rob1_floor.trans.y, 2) + "," + NumToStr(rob1_floor.trans.z, 2) + ","
+			          + NumToStr(rob2_floor.trans.x, 2) + "," + NumToStr(rob2_floor.trans.y, 2) + "," + NumToStr(rob2_floor.trans.z, 2);
+			Write logfile, csv_line;
 			WaitTime 0.2; ! Keep this WaitTime for I/O stability
 			! Display on teach pendant
 			TPWrite "Robot1 Floor: [" + NumToStr(rob1_floor.trans.x,1) + ", " + NumToStr(rob1_floor.trans.y,1) + ", " + NumToStr(rob1_floor.trans.z,1) + "]";
