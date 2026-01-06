@@ -213,6 +213,9 @@ MODULE MainModule
 	! v1.8.20 (2026-01-06)
 	!   - Version sync with TASK2 (robot2_floor_pos_t1 rename in TASK2).
 	!
+	! v1.8.21 (2026-01-06)
+	!   - FIX: Return gantry to HOME after Mode2 test (including out-of-range stop).
+	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
 	!   - FIX: Add gantry axis range checks before MoveAbsJ.
@@ -249,8 +252,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.20+)
-	CONST string TASK1_VERSION := "v1.8.20";
+	! Version constant for logging (v1.8.21+)
+	CONST string TASK1_VERSION := "v1.8.21";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2070,11 +2073,13 @@ MODULE MainModule
 		VAR bool found_num_pos;
 		VAR num line_count;
 		VAR num max_lines;
+		VAR bool abort_test;
 
 		tcp_offset_x := 0;
 		tcp_offset_y := 0;
 		tcp_offset_z := 0;
 		num_pos := 0;
+		abort_test := FALSE;
 
 		Open "HOME:/config.txt", configfile \Read;
 		found_off_x := FALSE;
@@ -2236,13 +2241,13 @@ MODULE MainModule
 			phys_r := 0 - floor_r;
 
 			! MOC.cfg limits (meters): M1 [-9.51, 12.31], M2 [-0.05, 5.35], M3 [-0.05, 1.05], M4 [-1.74533, 1.74533]
-			IF phys_x < -9510 OR phys_x > 12310 OR phys_y < -50 OR phys_y > 5350 OR phys_z < -50 OR phys_z > 1050 OR phys_r < -100 OR phys_r > 100 THEN
-				Write logfile, "OUT_OF_RANGE idx=" + NumToStr(i,0)
-				              + " floor=[" + NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + "]"
-				              + " phys=[" + NumToStr(phys_x,0) + "," + NumToStr(phys_y,0) + "," + NumToStr(phys_z,0) + "," + NumToStr(phys_r,1) + "]";
-				Close logfile;
-				STOP;
-			ENDIF
+				IF phys_x < -9510 OR phys_x > 12310 OR phys_y < -50 OR phys_y > 5350 OR phys_z < -50 OR phys_z > 1050 OR phys_r < -100 OR phys_r > 100 THEN
+					Write logfile, "OUT_OF_RANGE idx=" + NumToStr(i,0)
+					              + " floor=[" + NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + "]"
+					              + " phys=[" + NumToStr(phys_x,0) + "," + NumToStr(phys_y,0) + "," + NumToStr(phys_z,0) + "," + NumToStr(phys_r,1) + "]";
+					abort_test := TRUE;
+					GOTO mode2_cleanup;
+				ENDIF
 
 			test_pos := CJointT();
 			test_pos.extax.eax_a := phys_x;
@@ -2263,9 +2268,21 @@ MODULE MainModule
 			          + NumToStr(rob2_floor.trans.x, 2) + "," + NumToStr(rob2_floor.trans.y, 2) + "," + NumToStr(rob2_floor.trans.z, 2);
 			Write logfile, csv_line;
 			WaitTime 0.2;
-		ENDFOR
+			ENDFOR
+		mode2_cleanup:
+			! Always return gantry to HOME after Mode2 test
+			home_pos := CJointT();
+			home_pos.extax.eax_a := 0;
+			home_pos.extax.eax_b := 0;
+			home_pos.extax.eax_c := 0;
+			home_pos.extax.eax_d := 0;
+			home_pos.extax.eax_f := 0;
+			MoveAbsJ home_pos, v100, fine, tool0;
 
-		Close logfile;
+			Close logfile;
+			IF abort_test = TRUE THEN
+				STOP;
+			ENDIF
 
 	ERROR
 		IF ERRNO = ERR_FILEOPEN THEN

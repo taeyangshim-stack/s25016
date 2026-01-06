@@ -209,6 +209,9 @@ MODULE Rob2_MainModule
 	! v1.8.20 (2026-01-06)
 	!   - FIX: Rename robot2_floor_pos to robot2_floor_pos_t1 and remove initializer.
 	!
+	! v1.8.21 (2026-01-06)
+	!   - Version sync with TASK1 (Mode2 gantry HOME return).
+	!
 	! v1.8.17 (2026-01-06)
 	!   - FIX: Rename TASK2 local copy to robot1_floor_pos_t2 to avoid PERS ambiguity.
 	!
@@ -226,8 +229,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.20+)
-	CONST string TASK2_VERSION := "v1.8.20";
+	! Version constant for logging (v1.8.21+)
+	CONST string TASK2_VERSION := "v1.8.21";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
