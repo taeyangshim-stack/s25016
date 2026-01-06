@@ -210,6 +210,9 @@ MODULE MainModule
 	! v1.8.19 (2026-01-06)
 	!   - FIX: Rename robot2_floor_pos to robot2_floor_pos_t1 to avoid PERS ambiguity.
 	!
+	! v1.8.20 (2026-01-06)
+	!   - Version sync with TASK2 (robot2_floor_pos_t1 rename in TASK2).
+	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
 	!   - FIX: Add gantry axis range checks before MoveAbsJ.
@@ -246,8 +249,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.19+)
-	CONST string TASK1_VERSION := "v1.8.19";
+	! Version constant for logging (v1.8.20+)
+	CONST string TASK1_VERSION := "v1.8.20";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];

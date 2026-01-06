@@ -206,6 +206,9 @@ MODULE Rob2_MainModule
 	! v1.8.19 (2026-01-06)
 	!   - Version sync with TASK1 (robot2_floor_pos_t1 rename in TASK1).
 	!
+	! v1.8.20 (2026-01-06)
+	!   - FIX: Rename robot2_floor_pos to robot2_floor_pos_t1 and remove initializer.
+	!
 	! v1.8.17 (2026-01-06)
 	!   - FIX: Rename TASK2 local copy to robot1_floor_pos_t2 to avoid PERS ambiguity.
 	!
@@ -223,8 +226,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.19+)
-	CONST string TASK2_VERSION := "v1.8.19";
+	! Version constant for logging (v1.8.20+)
+	CONST string TASK2_VERSION := "v1.8.20";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -291,7 +294,7 @@ MODULE Rob2_MainModule
 
     ! Robot2 TCP position in Floor coordinate system (for distance measurement)
     ! Shared across tasks - use PERS (not TASK PERS) for cross-task access
-    PERS robtarget robot2_floor_pos := [[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    PERS robtarget robot2_floor_pos_t1;
 
     PERS num nMotionTotalStep{2};
     PERS num nMotionStepCount{2};
@@ -2251,7 +2254,7 @@ MODULE Rob2_MainModule
 		Write logfile, "Setup completed at " + CTime();
 		Close logfile;
 
-		! Initialize robot2_floor_pos for cross-task measurement (v1.7.43)
+		! Initialize robot2_floor_pos_t1 for cross-task measurement (v1.7.43)
 		UpdateRobot2FloorPosition;
 	ERROR
 		TPWrite "ERROR in SetRobot2InitialPosition: " + NumToStr(ERRNO, 0);
@@ -2350,15 +2353,15 @@ MODULE Rob2_MainModule
 	! Version: v1.7.50
 	! Date: 2025-12-31
 	! Purpose: Placeholder - TASK1 calculates Robot2 Floor position
-	! TASK1's UpdateRobot2BaseDynamicWobj() calculates robot2_floor_pos directly
+	! TASK1's UpdateRobot2BaseDynamicWobj() calculates robot2_floor_pos_t1 directly
 	! TASK2 cannot sense gantry movement, so TASK1 does the calculation:
 	!   1. TASK1 reads current gantry position
 	!   2. TASK1 calculates Robot2 base Floor position
 	!   3. TASK1 reads Robot2 TCP wobj0 using CRobT(\TaskName:="T_ROB2")
-	!   4. TASK1 combines: robot2_floor_pos = base Floor + TCP wobj0
-	! This procedure does nothing - robot2_floor_pos already updated by TASK1
+	!   4. TASK1 combines: robot2_floor_pos_t1 = base Floor + TCP wobj0
+	! This procedure does nothing - robot2_floor_pos_t1 already updated by TASK1
 	PROC UpdateRobot2FloorPosition()
-		! Do nothing - TASK1's UpdateRobot2BaseDynamicWobj() already updated robot2_floor_pos
+		! Do nothing - TASK1's UpdateRobot2BaseDynamicWobj() already updated robot2_floor_pos_t1
 		! This procedure kept for backward compatibility
 		RETURN;
 	ENDPROC
@@ -2415,9 +2418,9 @@ MODULE Rob2_MainModule
 		VAR num dy;
 		VAR num dz;
 
-		dx := robot2_floor_pos.trans.x - robot1_floor_pos_t2.trans.x;
-		dy := robot2_floor_pos.trans.y - robot1_floor_pos_t2.trans.y;
-		dz := robot2_floor_pos.trans.z - robot1_floor_pos_t2.trans.z;
+		dx := robot2_floor_pos_t1.trans.x - robot1_floor_pos_t2.trans.x;
+		dy := robot2_floor_pos_t1.trans.y - robot1_floor_pos_t2.trans.y;
+		dz := robot2_floor_pos_t1.trans.z - robot1_floor_pos_t2.trans.z;
 
 		RETURN Sqrt(Pow(dx, 2) + Pow(dy, 2) + Pow(dz, 2));
 	ENDFUNC
@@ -2451,9 +2454,9 @@ MODULE Rob2_MainModule
 		TPWrite "  Z = " + NumToStr(robot1_floor_pos_t2.trans.z, 2) + " mm";
 		TPWrite "";
 		TPWrite "Robot2 Floor Position:";
-		TPWrite "  X = " + NumToStr(robot2_floor_pos.trans.x, 2) + " mm";
-		TPWrite "  Y = " + NumToStr(robot2_floor_pos.trans.y, 2) + " mm";
-		TPWrite "  Z = " + NumToStr(robot2_floor_pos.trans.z, 2) + " mm";
+		TPWrite "  X = " + NumToStr(robot2_floor_pos_t1.trans.x, 2) + " mm";
+		TPWrite "  Y = " + NumToStr(robot2_floor_pos_t1.trans.y, 2) + " mm";
+		TPWrite "  Z = " + NumToStr(robot2_floor_pos_t1.trans.z, 2) + " mm";
 		TPWrite "";
 		TPWrite "Distance between robots: " + NumToStr(distance, 2) + " mm";
 		TPWrite "========================================";
@@ -2473,9 +2476,9 @@ MODULE Rob2_MainModule
 		Write logfile, "  Z = " + NumToStr(robot1_floor_pos_t2.trans.z, 2) + " mm";
 		Write logfile, "";
 		Write logfile, "Robot2 Floor Position (tool0):";
-		Write logfile, "  X = " + NumToStr(robot2_floor_pos.trans.x, 2) + " mm";
-		Write logfile, "  Y = " + NumToStr(robot2_floor_pos.trans.y, 2) + " mm";
-		Write logfile, "  Z = " + NumToStr(robot2_floor_pos.trans.z, 2) + " mm";
+		Write logfile, "  X = " + NumToStr(robot2_floor_pos_t1.trans.x, 2) + " mm";
+		Write logfile, "  Y = " + NumToStr(robot2_floor_pos_t1.trans.y, 2) + " mm";
+		Write logfile, "  Z = " + NumToStr(robot2_floor_pos_t1.trans.z, 2) + " mm";
 		Write logfile, "";
 		Write logfile, "Distance: " + NumToStr(distance, 2) + " mm";
 		Write logfile, "========================================\0A";
@@ -2742,7 +2745,7 @@ MODULE Rob2_MainModule
 		UpdateRobot1FloorPositionLocal;
 		UpdateRobot2FloorPosition;
 		rob1_floor_before := robot1_floor_pos_t2;
-		rob2_floor_before := robot2_floor_pos;
+		rob2_floor_before := robot2_floor_pos_t1;
 
 		! Move gantry axes (HOME + offset)
 		TPWrite "Moving gantry...";
@@ -2761,7 +2764,7 @@ MODULE Rob2_MainModule
 		UpdateRobot1FloorPositionLocal;
 		UpdateRobot2FloorPosition;
 		rob1_floor_after := robot1_floor_pos_t2;
-		rob2_floor_after := robot2_floor_pos;
+		rob2_floor_after := robot2_floor_pos_t1;
 
 		! Return to HOME position
 		TPWrite "Returning to HOME position...";
