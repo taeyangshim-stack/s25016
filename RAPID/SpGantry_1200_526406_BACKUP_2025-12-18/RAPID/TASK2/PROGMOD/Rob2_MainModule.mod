@@ -215,6 +215,9 @@ MODULE Rob2_MainModule
 	! v1.8.22 (2026-01-06)
 	!   - FEAT: Support per-robot TCP offsets (R2) for Mode2 via TCP_OFFSET_R2_*.
 	!
+	! v1.8.23 (2026-01-07)
+	!   - FIX: Make Mode2 TCP offset parsing tolerant of leading whitespace.
+	!
 	! v1.8.17 (2026-01-06)
 	!   - FIX: Rename TASK2 local copy to robot1_floor_pos_t2 to avoid PERS ambiguity.
 	!
@@ -232,8 +235,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.22+)
-	CONST string TASK2_VERSION := "v1.8.22";
+	! Version constant for logging (v1.8.23+)
+	CONST string TASK2_VERSION := "v1.8.23";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2297,6 +2300,8 @@ MODULE Rob2_MainModule
 		VAR bool found_r2_z;
 		VAR num line_count;
 		VAR num max_lines;
+		VAR num key_pos;
+		VAR num value_len;
 
 		tcp_offset_x := 0;
 		tcp_offset_y := 0;
@@ -2319,49 +2324,61 @@ MODULE Rob2_MainModule
 			line := ReadStr(configfile \RemoveCR);
 			line_count := line_count + 1;
 
-			IF (found_r2_x = FALSE) AND StrFind(line, 1, "TCP_OFFSET_R2_X=") = 1 THEN
-				IF StrLen(line) > StrLen("TCP_OFFSET_R2_X=") THEN
-					value_str := StrPart(line, StrLen("TCP_OFFSET_R2_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_R2_X="));
+			key_pos := StrFind(line, 1, "TCP_OFFSET_R2_X=");
+			IF (found_r2_x = FALSE) AND key_pos > 0 THEN
+				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_R2_X=")) + 1;
+				IF value_len > 0 THEN
+					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_R2_X="), value_len);
 					found_value := StrToVal(value_str, tcp_offset_x);
 					found_r2_x := found_value;
 				ENDIF
 			ENDIF
 
-			IF (found_r2_y = FALSE) AND StrFind(line, 1, "TCP_OFFSET_R2_Y=") = 1 THEN
-				IF StrLen(line) > StrLen("TCP_OFFSET_R2_Y=") THEN
-					value_str := StrPart(line, StrLen("TCP_OFFSET_R2_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_R2_Y="));
+			key_pos := StrFind(line, 1, "TCP_OFFSET_R2_Y=");
+			IF (found_r2_y = FALSE) AND key_pos > 0 THEN
+				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_R2_Y=")) + 1;
+				IF value_len > 0 THEN
+					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_R2_Y="), value_len);
 					found_value := StrToVal(value_str, tcp_offset_y);
 					found_r2_y := found_value;
 				ENDIF
 			ENDIF
 
-			IF (found_r2_z = FALSE) AND StrFind(line, 1, "TCP_OFFSET_R2_Z=") = 1 THEN
-				IF StrLen(line) > StrLen("TCP_OFFSET_R2_Z=") THEN
-					value_str := StrPart(line, StrLen("TCP_OFFSET_R2_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_R2_Z="));
+			key_pos := StrFind(line, 1, "TCP_OFFSET_R2_Z=");
+			IF (found_r2_z = FALSE) AND key_pos > 0 THEN
+				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_R2_Z=")) + 1;
+				IF value_len > 0 THEN
+					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_R2_Z="), value_len);
 					found_value := StrToVal(value_str, tcp_offset_z);
 					found_r2_z := found_value;
 				ENDIF
 			ENDIF
 
-			IF (found_off_x = FALSE) AND StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
-				IF StrLen(line) > StrLen("TCP_OFFSET_X=") THEN
-					value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
+			key_pos := StrFind(line, 1, "TCP_OFFSET_X=");
+			IF (found_off_x = FALSE) AND key_pos > 0 THEN
+				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_X=")) + 1;
+				IF value_len > 0 THEN
+					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_X="), value_len);
 					found_value := StrToVal(value_str, legacy_offset_x);
 					found_off_x := found_value;
 				ENDIF
 			ENDIF
 
-			IF (found_off_y = FALSE) AND StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
-				IF StrLen(line) > StrLen("TCP_OFFSET_Y=") THEN
-					value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
+			key_pos := StrFind(line, 1, "TCP_OFFSET_Y=");
+			IF (found_off_y = FALSE) AND key_pos > 0 THEN
+				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_Y=")) + 1;
+				IF value_len > 0 THEN
+					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_Y="), value_len);
 					found_value := StrToVal(value_str, legacy_offset_y);
 					found_off_y := found_value;
 				ENDIF
 			ENDIF
 
-			IF (found_off_z = FALSE) AND StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
-				IF StrLen(line) > StrLen("TCP_OFFSET_Z=") THEN
-					value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
+			key_pos := StrFind(line, 1, "TCP_OFFSET_Z=");
+			IF (found_off_z = FALSE) AND key_pos > 0 THEN
+				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_Z=")) + 1;
+				IF value_len > 0 THEN
+					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_Z="), value_len);
 					found_value := StrToVal(value_str, legacy_offset_z);
 					found_off_z := found_value;
 				ENDIF
