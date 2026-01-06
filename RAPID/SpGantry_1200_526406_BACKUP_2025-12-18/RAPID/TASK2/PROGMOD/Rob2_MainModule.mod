@@ -212,6 +212,9 @@ MODULE Rob2_MainModule
 	! v1.8.21 (2026-01-06)
 	!   - Version sync with TASK1 (Mode2 gantry HOME return).
 	!
+	! v1.8.22 (2026-01-06)
+	!   - FEAT: Support per-robot TCP offsets (R2) for Mode2 via TCP_OFFSET_R2_*.
+	!
 	! v1.8.17 (2026-01-06)
 	!   - FIX: Rename TASK2 local copy to robot1_floor_pos_t2 to avoid PERS ambiguity.
 	!
@@ -229,8 +232,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.21+)
-	CONST string TASK2_VERSION := "v1.8.21";
+	! Version constant for logging (v1.8.22+)
+	CONST string TASK2_VERSION := "v1.8.22";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2270,9 +2273,9 @@ MODULE Rob2_MainModule
 	! ========================================
 	! Version: v1.8.12
 	! Date: 2026-01-06
-	! Purpose: Move Robot2 TCP to offset using WobjGantry_Rob2
-	! Changes in v1.8.12:
-	!   - Allow missing TCP_OFFSET_* with default 0 values
+		! Purpose: Move Robot2 TCP to offset using WobjGantry_Rob2
+		! Changes in v1.8.12:
+		!   - Allow missing TCP_OFFSET_* with default 0 values
 	PROC SetRobot2OffsetPosition()
 		VAR iodev configfile;
 		VAR string line;
@@ -2281,33 +2284,69 @@ MODULE Rob2_MainModule
 		VAR num tcp_offset_x;
 		VAR num tcp_offset_y;
 		VAR num tcp_offset_z;
+		VAR num legacy_offset_x;
+		VAR num legacy_offset_y;
+		VAR num legacy_offset_z;
 		VAR jointtarget gantry_joint;
 		VAR robtarget offset_tcp;
 		VAR bool found_off_x;
 		VAR bool found_off_y;
 		VAR bool found_off_z;
+		VAR bool found_r2_x;
+		VAR bool found_r2_y;
+		VAR bool found_r2_z;
 		VAR num line_count;
 		VAR num max_lines;
 
 		tcp_offset_x := 0;
 		tcp_offset_y := 0;
 		tcp_offset_z := 0;
+		legacy_offset_x := 0;
+		legacy_offset_y := 0;
+		legacy_offset_z := 0;
 
 		Open "HOME:/config.txt", configfile \Read;
 		found_off_x := FALSE;
 		found_off_y := FALSE;
 		found_off_z := FALSE;
+		found_r2_x := FALSE;
+		found_r2_y := FALSE;
+		found_r2_z := FALSE;
 		line_count := 0;
 		max_lines := 200;
 
-		WHILE line_count < max_lines AND (found_off_x = FALSE OR found_off_y = FALSE OR found_off_z = FALSE) DO
+		WHILE line_count < max_lines DO
 			line := ReadStr(configfile \RemoveCR);
 			line_count := line_count + 1;
+
+			IF (found_r2_x = FALSE) AND StrFind(line, 1, "TCP_OFFSET_R2_X=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_R2_X=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_R2_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_R2_X="));
+					found_value := StrToVal(value_str, tcp_offset_x);
+					found_r2_x := found_value;
+				ENDIF
+			ENDIF
+
+			IF (found_r2_y = FALSE) AND StrFind(line, 1, "TCP_OFFSET_R2_Y=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_R2_Y=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_R2_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_R2_Y="));
+					found_value := StrToVal(value_str, tcp_offset_y);
+					found_r2_y := found_value;
+				ENDIF
+			ENDIF
+
+			IF (found_r2_z = FALSE) AND StrFind(line, 1, "TCP_OFFSET_R2_Z=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_R2_Z=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_R2_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_R2_Z="));
+					found_value := StrToVal(value_str, tcp_offset_z);
+					found_r2_z := found_value;
+				ENDIF
+			ENDIF
 
 			IF (found_off_x = FALSE) AND StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
 				IF StrLen(line) > StrLen("TCP_OFFSET_X=") THEN
 					value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
-					found_value := StrToVal(value_str, tcp_offset_x);
+					found_value := StrToVal(value_str, legacy_offset_x);
 					found_off_x := found_value;
 				ENDIF
 			ENDIF
@@ -2315,7 +2354,7 @@ MODULE Rob2_MainModule
 			IF (found_off_y = FALSE) AND StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
 				IF StrLen(line) > StrLen("TCP_OFFSET_Y=") THEN
 					value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
-					found_value := StrToVal(value_str, tcp_offset_y);
+					found_value := StrToVal(value_str, legacy_offset_y);
 					found_off_y := found_value;
 				ENDIF
 			ENDIF
@@ -2323,7 +2362,7 @@ MODULE Rob2_MainModule
 			IF (found_off_z = FALSE) AND StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
 				IF StrLen(line) > StrLen("TCP_OFFSET_Z=") THEN
 					value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
-					found_value := StrToVal(value_str, tcp_offset_z);
+					found_value := StrToVal(value_str, legacy_offset_z);
 					found_off_z := found_value;
 				ENDIF
 			ENDIF
@@ -2331,8 +2370,22 @@ MODULE Rob2_MainModule
 
 		Close configfile;
 
-		IF found_off_x = FALSE OR found_off_y = FALSE OR found_off_z = FALSE THEN
-			TPWrite "Mode2: TCP_OFFSET_* not found, using 0";
+		IF found_r2_x = FALSE AND found_off_x = TRUE THEN
+			tcp_offset_x := legacy_offset_x;
+		ENDIF
+		IF found_r2_y = FALSE AND found_off_y = TRUE THEN
+			tcp_offset_y := legacy_offset_y;
+		ENDIF
+		IF found_r2_z = FALSE AND found_off_z = TRUE THEN
+			tcp_offset_z := legacy_offset_z;
+		ENDIF
+
+		IF found_r2_x = FALSE OR found_r2_y = FALSE OR found_r2_z = FALSE THEN
+			IF found_off_x = TRUE OR found_off_y = TRUE OR found_off_z = TRUE THEN
+				TPWrite "Mode2: TCP_OFFSET_R2_* not found, using TCP_OFFSET_*";
+			ELSE
+				TPWrite "Mode2: TCP_OFFSET_* not found, using 0";
+			ENDIF
 		ENDIF
 
 		UpdateGantryWobj_Rob2;

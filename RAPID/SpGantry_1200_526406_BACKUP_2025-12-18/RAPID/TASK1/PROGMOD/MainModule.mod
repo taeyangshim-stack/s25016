@@ -216,6 +216,9 @@ MODULE MainModule
 	! v1.8.21 (2026-01-06)
 	!   - FIX: Return gantry to HOME after Mode2 test (including out-of-range stop).
 	!
+	! v1.8.22 (2026-01-06)
+	!   - FEAT: Support per-robot TCP offsets (R1) for Mode2 via TCP_OFFSET_R1_*.
+	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
 	!   - FIX: Add gantry axis range checks before MoveAbsJ.
@@ -252,8 +255,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.21+)
-	CONST string TASK1_VERSION := "v1.8.21";
+	! Version constant for logging (v1.8.22+)
+	CONST string TASK1_VERSION := "v1.8.22";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2026,10 +2029,10 @@ MODULE MainModule
 	! Version: v1.8.14
 	! Date: 2026-01-06
 	! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
-	! Config (config.txt):
-	!   TEST_MODE=2
-	!   TCP_OFFSET_X/Y/Z
-	!   NUM_POS, POS_1_X/Y/Z/R ...
+		! Config (config.txt):
+		!   TEST_MODE=2
+		!   TCP_OFFSET_R1_X/Y/Z (fallback: TCP_OFFSET_X/Y/Z)
+		!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
 	! Changes in v1.8.14:
 	!   - Align gantry axis range checks with MOC.cfg (M1/M2/M3/M4 limits)
@@ -2044,6 +2047,9 @@ MODULE MainModule
 		VAR num tcp_offset_x;
 		VAR num tcp_offset_y;
 		VAR num tcp_offset_z;
+		VAR num legacy_offset_x;
+		VAR num legacy_offset_y;
+		VAR num legacy_offset_z;
 		VAR num pos_x{10};
 		VAR num pos_y{10};
 		VAR num pos_z{10};
@@ -2070,6 +2076,9 @@ MODULE MainModule
 		VAR bool found_off_x;
 		VAR bool found_off_y;
 		VAR bool found_off_z;
+		VAR bool found_r1_x;
+		VAR bool found_r1_y;
+		VAR bool found_r1_z;
 		VAR bool found_num_pos;
 		VAR num line_count;
 		VAR num max_lines;
@@ -2078,6 +2087,9 @@ MODULE MainModule
 		tcp_offset_x := 0;
 		tcp_offset_y := 0;
 		tcp_offset_z := 0;
+		legacy_offset_x := 0;
+		legacy_offset_y := 0;
+		legacy_offset_z := 0;
 		num_pos := 0;
 		abort_test := FALSE;
 
@@ -2085,19 +2097,46 @@ MODULE MainModule
 		found_off_x := FALSE;
 		found_off_y := FALSE;
 		found_off_z := FALSE;
+		found_r1_x := FALSE;
+		found_r1_y := FALSE;
+		found_r1_z := FALSE;
 		found_num_pos := FALSE;
 		pos_prefix := "POS_";
 		line_count := 0;
 		max_lines := 200;
 
-		WHILE line_count < max_lines AND (found_off_x = FALSE OR found_off_y = FALSE OR found_off_z = FALSE OR found_num_pos = FALSE) DO
+		WHILE line_count < max_lines DO
 			line := ReadStr(configfile \RemoveCR);
 			line_count := line_count + 1;
+
+			IF (found_r1_x = FALSE) AND StrFind(line, 1, "TCP_OFFSET_R1_X=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_R1_X=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_R1_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_R1_X="));
+					found_value := StrToVal(value_str, tcp_offset_x);
+					found_r1_x := found_value;
+				ENDIF
+			ENDIF
+
+			IF (found_r1_y = FALSE) AND StrFind(line, 1, "TCP_OFFSET_R1_Y=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_R1_Y=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_R1_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_R1_Y="));
+					found_value := StrToVal(value_str, tcp_offset_y);
+					found_r1_y := found_value;
+				ENDIF
+			ENDIF
+
+			IF (found_r1_z = FALSE) AND StrFind(line, 1, "TCP_OFFSET_R1_Z=") = 1 THEN
+				IF StrLen(line) > StrLen("TCP_OFFSET_R1_Z=") THEN
+					value_str := StrPart(line, StrLen("TCP_OFFSET_R1_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_R1_Z="));
+					found_value := StrToVal(value_str, tcp_offset_z);
+					found_r1_z := found_value;
+				ENDIF
+			ENDIF
 
 			IF (found_off_x = FALSE) AND StrFind(line, 1, "TCP_OFFSET_X=") = 1 THEN
 				IF StrLen(line) > StrLen("TCP_OFFSET_X=") THEN
 					value_str := StrPart(line, StrLen("TCP_OFFSET_X=") + 1, StrLen(line) - StrLen("TCP_OFFSET_X="));
-					found_value := StrToVal(value_str, tcp_offset_x);
+					found_value := StrToVal(value_str, legacy_offset_x);
 					found_off_x := found_value;
 				ENDIF
 			ENDIF
@@ -2105,7 +2144,7 @@ MODULE MainModule
 			IF (found_off_y = FALSE) AND StrFind(line, 1, "TCP_OFFSET_Y=") = 1 THEN
 				IF StrLen(line) > StrLen("TCP_OFFSET_Y=") THEN
 					value_str := StrPart(line, StrLen("TCP_OFFSET_Y=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Y="));
-					found_value := StrToVal(value_str, tcp_offset_y);
+					found_value := StrToVal(value_str, legacy_offset_y);
 					found_off_y := found_value;
 				ENDIF
 			ENDIF
@@ -2113,7 +2152,7 @@ MODULE MainModule
 			IF (found_off_z = FALSE) AND StrFind(line, 1, "TCP_OFFSET_Z=") = 1 THEN
 				IF StrLen(line) > StrLen("TCP_OFFSET_Z=") THEN
 					value_str := StrPart(line, StrLen("TCP_OFFSET_Z=") + 1, StrLen(line) - StrLen("TCP_OFFSET_Z="));
-					found_value := StrToVal(value_str, tcp_offset_z);
+					found_value := StrToVal(value_str, legacy_offset_z);
 					found_off_z := found_value;
 				ENDIF
 			ENDIF
@@ -2139,8 +2178,22 @@ MODULE MainModule
 
 		Close configfile;
 
-		IF found_off_x = FALSE OR found_off_y = FALSE OR found_off_z = FALSE THEN
-			TPWrite "Mode2: TCP_OFFSET_* not found, using 0";
+		IF found_r1_x = FALSE AND found_off_x = TRUE THEN
+			tcp_offset_x := legacy_offset_x;
+		ENDIF
+		IF found_r1_y = FALSE AND found_off_y = TRUE THEN
+			tcp_offset_y := legacy_offset_y;
+		ENDIF
+		IF found_r1_z = FALSE AND found_off_z = TRUE THEN
+			tcp_offset_z := legacy_offset_z;
+		ENDIF
+
+		IF found_r1_x = FALSE OR found_r1_y = FALSE OR found_r1_z = FALSE THEN
+			IF found_off_x = TRUE OR found_off_y = TRUE OR found_off_z = TRUE THEN
+				TPWrite "Mode2: TCP_OFFSET_R1_* not found, using TCP_OFFSET_*";
+			ELSE
+				TPWrite "Mode2: TCP_OFFSET_* not found, using 0";
+			ENDIF
 		ENDIF
 
 		IF found_num_pos = FALSE THEN
@@ -2218,7 +2271,7 @@ MODULE MainModule
 
 		Open "HOME:/gantry_mode2_test.txt", logfile \Write;
 		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
-		Write logfile, "TCP_OFFSET=" + NumToStr(tcp_offset_x,1) + "," + NumToStr(tcp_offset_y,1) + "," + NumToStr(tcp_offset_z,1) + " NUM_POS=" + NumToStr(num_pos,0);
+		Write logfile, "TCP_OFFSET_R1=" + NumToStr(tcp_offset_x,1) + "," + NumToStr(tcp_offset_y,1) + "," + NumToStr(tcp_offset_z,1) + " NUM_POS=" + NumToStr(num_pos,0);
 		Write logfile, "X,Y,Z,R,R1X,R1Y,R1Z,R2X,R2Y,R2Z";
 		WaitTime 0.3;
 
