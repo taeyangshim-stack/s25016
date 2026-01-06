@@ -222,6 +222,9 @@ MODULE MainModule
 	! v1.8.23 (2026-01-07)
 	!   - FIX: Make Mode2 TCP offset parsing tolerant of leading whitespace.
 	!
+	! v1.8.24 (2026-01-07)
+	!   - DEBUG: Log Mode2 TCP offset parse results and raw lines.
+	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
 	!   - FIX: Add gantry axis range checks before MoveAbsJ.
@@ -258,8 +261,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.23+)
-	CONST string TASK1_VERSION := "v1.8.23";
+	! Version constant for logging (v1.8.24+)
+	CONST string TASK1_VERSION := "v1.8.24";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2078,6 +2081,12 @@ MODULE MainModule
 		VAR string key_r;
 		VAR num key_pos;
 		VAR num value_len;
+		VAR string r1_x_raw;
+		VAR string r1_y_raw;
+		VAR string r1_z_raw;
+		VAR string off_x_raw;
+		VAR string off_y_raw;
+		VAR string off_z_raw;
 		VAR bool found_off_x;
 		VAR bool found_off_y;
 		VAR bool found_off_z;
@@ -2109,6 +2118,12 @@ MODULE MainModule
 		pos_prefix := "POS_";
 		line_count := 0;
 		max_lines := 200;
+		r1_x_raw := "N/A";
+		r1_y_raw := "N/A";
+		r1_z_raw := "N/A";
+		off_x_raw := "N/A";
+		off_y_raw := "N/A";
+		off_z_raw := "N/A";
 
 		WHILE line_count < max_lines DO
 			line := ReadStr(configfile \RemoveCR);
@@ -2116,61 +2131,67 @@ MODULE MainModule
 
 			key_pos := StrFind(line, 1, "TCP_OFFSET_R1_X=");
 			IF (found_r1_x = FALSE) AND key_pos > 0 THEN
+				r1_x_raw := line;
 				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_R1_X=")) + 1;
 				IF value_len > 0 THEN
 					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_R1_X="), value_len);
 					found_value := StrToVal(value_str, tcp_offset_x);
-					found_r1_x := found_value;
+					found_r1_x := TRUE;
 				ENDIF
 			ENDIF
 
 			key_pos := StrFind(line, 1, "TCP_OFFSET_R1_Y=");
 			IF (found_r1_y = FALSE) AND key_pos > 0 THEN
+				r1_y_raw := line;
 				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_R1_Y=")) + 1;
 				IF value_len > 0 THEN
 					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_R1_Y="), value_len);
 					found_value := StrToVal(value_str, tcp_offset_y);
-					found_r1_y := found_value;
+					found_r1_y := TRUE;
 				ENDIF
 			ENDIF
 
 			key_pos := StrFind(line, 1, "TCP_OFFSET_R1_Z=");
 			IF (found_r1_z = FALSE) AND key_pos > 0 THEN
+				r1_z_raw := line;
 				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_R1_Z=")) + 1;
 				IF value_len > 0 THEN
 					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_R1_Z="), value_len);
 					found_value := StrToVal(value_str, tcp_offset_z);
-					found_r1_z := found_value;
+					found_r1_z := TRUE;
 				ENDIF
 			ENDIF
 
 			key_pos := StrFind(line, 1, "TCP_OFFSET_X=");
 			IF (found_off_x = FALSE) AND key_pos > 0 THEN
+				off_x_raw := line;
 				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_X=")) + 1;
 				IF value_len > 0 THEN
 					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_X="), value_len);
 					found_value := StrToVal(value_str, legacy_offset_x);
-					found_off_x := found_value;
+					found_off_x := TRUE;
 				ENDIF
 			ENDIF
 
 			key_pos := StrFind(line, 1, "TCP_OFFSET_Y=");
 			IF (found_off_y = FALSE) AND key_pos > 0 THEN
+				off_y_raw := line;
 				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_Y=")) + 1;
 				IF value_len > 0 THEN
 					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_Y="), value_len);
 					found_value := StrToVal(value_str, legacy_offset_y);
-					found_off_y := found_value;
+					found_off_y := TRUE;
 				ENDIF
 			ENDIF
 
 			key_pos := StrFind(line, 1, "TCP_OFFSET_Z=");
 			IF (found_off_z = FALSE) AND key_pos > 0 THEN
+				off_z_raw := line;
 				value_len := StrLen(line) - (key_pos + StrLen("TCP_OFFSET_Z=")) + 1;
 				IF value_len > 0 THEN
 					value_str := StrPart(line, key_pos + StrLen("TCP_OFFSET_Z="), value_len);
 					found_value := StrToVal(value_str, legacy_offset_z);
-					found_off_z := found_value;
+					found_off_z := TRUE;
 				ENDIF
 			ENDIF
 
@@ -2280,18 +2301,47 @@ MODULE MainModule
 		ENDFOR
 		Close configfile;
 
+		Open "HOME:/gantry_mode2_test.txt", logfile \Write;
+		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
+		Write logfile, "TCP_OFFSET_R1=" + NumToStr(tcp_offset_x,1) + "," + NumToStr(tcp_offset_y,1) + "," + NumToStr(tcp_offset_z,1) + " NUM_POS=" + NumToStr(num_pos,0);
+		IF found_r1_x THEN
+			Write logfile, "PARSE_R1_X=1 raw=" + r1_x_raw;
+		ELSE
+			Write logfile, "PARSE_R1_X=0 raw=" + r1_x_raw;
+		ENDIF
+		IF found_r1_y THEN
+			Write logfile, "PARSE_R1_Y=1 raw=" + r1_y_raw;
+		ELSE
+			Write logfile, "PARSE_R1_Y=0 raw=" + r1_y_raw;
+		ENDIF
+		IF found_r1_z THEN
+			Write logfile, "PARSE_R1_Z=1 raw=" + r1_z_raw;
+		ELSE
+			Write logfile, "PARSE_R1_Z=0 raw=" + r1_z_raw;
+		ENDIF
+		IF found_off_x THEN
+			Write logfile, "PARSE_OFF_X=1 raw=" + off_x_raw;
+		ELSE
+			Write logfile, "PARSE_OFF_X=0 raw=" + off_x_raw;
+		ENDIF
+		IF found_off_y THEN
+			Write logfile, "PARSE_OFF_Y=1 raw=" + off_y_raw;
+		ELSE
+			Write logfile, "PARSE_OFF_Y=0 raw=" + off_y_raw;
+		ENDIF
+		IF found_off_z THEN
+			Write logfile, "PARSE_OFF_Z=1 raw=" + off_z_raw;
+		ELSE
+			Write logfile, "PARSE_OFF_Z=0 raw=" + off_z_raw;
+		ENDIF
+		Write logfile, "X,Y,Z,R,R1X,R1Y,R1Z,R2X,R2Y,R2Z";
+		WaitTime 0.3;
+
 		! Move Robot1 to offset in WobjGantry
 		UpdateGantryWobj;
 		home_pos := CJointT();
 		offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], home_pos.extax];
 		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
-
-		Open "HOME:/gantry_mode2_test.txt", logfile \Write;
-		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
-		Write logfile, "TCP_OFFSET_R1=" + NumToStr(tcp_offset_x,1) + "," + NumToStr(tcp_offset_y,1) + "," + NumToStr(tcp_offset_z,1) + " NUM_POS=" + NumToStr(num_pos,0);
-		Write logfile, "X,Y,Z,R,R1X,R1Y,R1Z,R2X,R2Y,R2Z";
-		WaitTime 0.3;
-
 		FOR i FROM 1 TO num_pos DO
 			IF pos_prefix = "COMPLEX_POS_" THEN
 				floor_x := 9500 + pos_x{i};

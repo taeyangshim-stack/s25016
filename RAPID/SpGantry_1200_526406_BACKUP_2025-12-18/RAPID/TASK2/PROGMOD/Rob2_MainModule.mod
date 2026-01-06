@@ -218,6 +218,9 @@ MODULE Rob2_MainModule
 	! v1.8.23 (2026-01-07)
 	!   - FIX: Make Mode2 TCP offset parsing tolerant of leading whitespace.
 	!
+	! v1.8.24 (2026-01-07)
+	!   - Version sync with TASK1 (Mode2 TCP offset debug logging).
+	!
 	! v1.8.17 (2026-01-06)
 	!   - FIX: Rename TASK2 local copy to robot1_floor_pos_t2 to avoid PERS ambiguity.
 	!
@@ -235,8 +238,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.23+)
-	CONST string TASK2_VERSION := "v1.8.23";
+	! Version constant for logging (v1.8.24+)
+	CONST string TASK2_VERSION := "v1.8.24";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
