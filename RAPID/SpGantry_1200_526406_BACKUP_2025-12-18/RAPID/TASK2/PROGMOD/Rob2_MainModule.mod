@@ -247,6 +247,9 @@ MODULE Rob2_MainModule
 !
 ! v1.8.33 (2026-01-08)
 !   - DIAG: Log entry at start of TASK2 main before config read.
+!
+! v1.8.34 (2026-01-08)
+!   - DIAG: Bypass ReadTestMode temporarily (force TEST_MODE=2).
 	!
 	! v1.8.30 (2026-01-07)
 	!   - Version sync with TASK1 (stop offset parse once keys are found).
@@ -268,8 +271,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-! Version constant for logging (v1.8.33+)
-CONST string TASK2_VERSION := "v1.8.33";
+! Version constant for logging (v1.8.34+)
+CONST string TASK2_VERSION := "v1.8.34";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -654,8 +657,8 @@ CONST string TASK2_VERSION := "v1.8.33";
         Write main_logfile, "Main entry reached";
         TPWrite "TASK2: main entered";
 
-        ! Read TEST_MODE from config.txt
-        test_mode := ReadTestMode();
+        ! Read TEST_MODE from config.txt (temporarily bypassed)
+        test_mode := 2;
         Write main_logfile, "TEST_MODE=" + NumToStr(test_mode, 0);
 
         ! Initialize synchronization flag
