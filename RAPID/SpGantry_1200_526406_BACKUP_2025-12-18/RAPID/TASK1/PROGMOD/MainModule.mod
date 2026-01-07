@@ -245,6 +245,9 @@ MODULE MainModule
 !
 ! v1.8.31 (2026-01-07)
 !   - FIX: Use TASK PERS for robot2_init_complete to share init flag with TASK2.
+!
+! v1.8.32 (2026-01-08)
+!   - FIX: Initialize TASK PERS robot2_init_complete to satisfy RAPID syntax.
 	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
@@ -282,8 +285,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.31+)
-CONST string TASK1_VERSION := "v1.8.31";
+! Version constant for logging (v1.8.32+)
+CONST string TASK1_VERSION := "v1.8.32";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -330,7 +333,7 @@ CONST string TASK1_VERSION := "v1.8.31";
 	PERS robtarget robot2_floor_pos_t1;
 ! Robot2 initialization complete flag (from TASK2)
 ! External reference - set to TRUE by TASK2 when SetRobot2InitialPosition completes
-TASK PERS bool robot2_init_complete;
+TASK PERS bool robot2_init_complete := FALSE;
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 

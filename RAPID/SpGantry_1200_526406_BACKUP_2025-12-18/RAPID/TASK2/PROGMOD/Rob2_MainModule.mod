@@ -236,11 +236,14 @@ MODULE Rob2_MainModule
 	! v1.8.29 (2026-01-07)
 	!   - Version sync with TASK1 (remove RemoveCR in offset parse loop).
 	!
-	! v1.8.31 (2026-01-07)
-	!   - FIX: Use TASK PERS for robot2_init_complete to share flag with TASK1.
-	!   - FIX: Set robot2_init_complete right after Step1 to avoid TASK1 timeout.
-	!   - FIX: Add EOF-safe config parsing in ReadTestMode and Mode2 offset parse.
-	!   - DIAG: Log Mode2 offset start in main process.
+! v1.8.31 (2026-01-07)
+!   - FIX: Use TASK PERS for robot2_init_complete to share flag with TASK1.
+!   - FIX: Set robot2_init_complete right after Step1 to avoid TASK1 timeout.
+!   - FIX: Add EOF-safe config parsing in ReadTestMode and Mode2 offset parse.
+!   - DIAG: Log Mode2 offset start in main process.
+!
+! v1.8.32 (2026-01-08)
+!   - Version sync with TASK1 (robot2_init_complete init in TASK1).
 	!
 	! v1.8.30 (2026-01-07)
 	!   - Version sync with TASK1 (stop offset parse once keys are found).
@@ -262,8 +265,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.31+)
-	CONST string TASK2_VERSION := "v1.8.31";
+! Version constant for logging (v1.8.32+)
+CONST string TASK2_VERSION := "v1.8.32";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
