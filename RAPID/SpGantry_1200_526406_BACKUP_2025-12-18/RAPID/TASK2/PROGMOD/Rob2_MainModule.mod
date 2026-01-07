@@ -259,6 +259,9 @@ MODULE Rob2_MainModule
 !
 ! v1.8.37 (2026-01-08)
 !   - DIAG: Create Mode2 offset log at entry before config parsing.
+!
+! v1.8.38 (2026-01-08)
+!   - FIX: Guard comment detection to avoid StrPart on empty strings in config parse.
 	!
 	! v1.8.30 (2026-01-07)
 	!   - Version sync with TASK1 (stop offset parse once keys are found).
@@ -280,8 +283,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-! Version constant for logging (v1.8.37+)
-CONST string TASK2_VERSION := "v1.8.37";
+! Version constant for logging (v1.8.38+)
+CONST string TASK2_VERSION := "v1.8.38";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2390,9 +2393,6 @@ PERS bool robot2_init_complete;
 		WHILE line_count < max_lines DO
 			line := ReadStr(configfile \RemoveCR);
 			line_count := line_count + 1;
-			IF StrLen(line) = 0 THEN
-				EXIT;
-			ENDIF
 			trim_pos := 1;
 			WHILE trim_pos <= StrLen(line) DO
 				IF StrPart(line, trim_pos, 1) <> " " THEN
@@ -2402,10 +2402,19 @@ PERS bool robot2_init_complete;
 			ENDWHILE
 			IF trim_pos > StrLen(line) THEN
 				line_trim := "";
+				is_comment := TRUE;
 			ELSE
 				line_trim := StrPart(line, trim_pos, StrLen(line) - trim_pos + 1);
+				IF StrLen(line_trim) = 0 THEN
+					is_comment := TRUE;
+				ELSE
+					IF StrPart(line_trim, 1, 1) = "!" THEN
+						is_comment := TRUE;
+					ELSE
+						is_comment := FALSE;
+					ENDIF
+				ENDIF
 			ENDIF
-			is_comment := (StrLen(line_trim) = 0) OR (StrPart(line_trim, 1, 1) = "!");
 
 			IF is_comment = FALSE THEN
 				key_pos := StrFind(line_trim, 1, "TCP_OFFSET_R2_X=");
