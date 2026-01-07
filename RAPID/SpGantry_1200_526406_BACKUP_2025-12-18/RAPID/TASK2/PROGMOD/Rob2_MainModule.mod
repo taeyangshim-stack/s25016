@@ -253,6 +253,9 @@ MODULE Rob2_MainModule
 !
 ! v1.8.35 (2026-01-08)
 !   - FIX: Revert robot2_init_complete to shared PERS for cross-task sync.
+!
+! v1.8.36 (2026-01-08)
+!   - DIAG: Log Mode2 offset inputs, gantry extax, and target TCP before MoveJ.
 	!
 	! v1.8.30 (2026-01-07)
 	!   - Version sync with TASK1 (stop offset parse once keys are found).
@@ -274,8 +277,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-! Version constant for logging (v1.8.35+)
-CONST string TASK2_VERSION := "v1.8.35";
+! Version constant for logging (v1.8.36+)
+CONST string TASK2_VERSION := "v1.8.36";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2333,6 +2336,7 @@ PERS bool robot2_init_complete;
 		!   - Allow missing TCP_OFFSET_* with default 0 values
 	PROC SetRobot2OffsetPosition()
 		VAR iodev configfile;
+		VAR iodev diagfile;
 		VAR string line;
 		VAR string value_str;
 		VAR bool found_value;
@@ -2496,18 +2500,37 @@ PERS bool robot2_init_complete;
 			ENDIF
 		ENDIF
 
+		Open "HOME:/task2_mode2_offset.txt", diagfile \Append;
+		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
+		Write diagfile, "Offsets R2: X=" + NumToStr(tcp_offset_x, 2) + " Y=" + NumToStr(tcp_offset_y, 2) + " Z=" + NumToStr(tcp_offset_z, 2);
+		Write diagfile, "Offsets legacy: X=" + NumToStr(legacy_offset_x, 2) + " Y=" + NumToStr(legacy_offset_y, 2) + " Z=" + NumToStr(legacy_offset_z, 2);
+
 		UpdateGantryWobj_Rob2;
 		gantry_joint := CJointT(\TaskName:="T_ROB1");
+		Write diagfile, "Gantry extax: X1=" + NumToStr(gantry_joint.extax.eax_a, 1)
+		               + " Y=" + NumToStr(gantry_joint.extax.eax_b, 1)
+		               + " Z=" + NumToStr(gantry_joint.extax.eax_c, 1)
+		               + " R=" + NumToStr(gantry_joint.extax.eax_d, 1)
+		               + " X2=" + NumToStr(gantry_joint.extax.eax_f, 1);
 		offset_tcp := [[tcp_offset_x, 488 + tcp_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
+		Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
+		               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
+		               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
 		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
+		Write diagfile, "MoveJ done";
+		Close diagfile;
 
 	ERROR
+		Open "HOME:/task2_mode2_offset.txt", diagfile \Append;
+		Write diagfile, "ERROR in SetRobot2OffsetPosition: " + NumToStr(ERRNO, 0);
+		Close diagfile;
 		IF ERRNO = ERR_FILEOPEN THEN
 			TPWrite "ERROR: Cannot open config.txt";
 		ELSE
 			TPWrite "ERROR in SetRobot2OffsetPosition: " + NumToStr(ERRNO, 0);
 		ENDIF
 		Close configfile;
+		Close diagfile;
 		STOP;
 	ENDPROC
 
