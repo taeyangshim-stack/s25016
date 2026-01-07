@@ -240,6 +240,9 @@ MODULE MainModule
 	! v1.8.29 (2026-01-07)
 	!   - FIX: Remove RemoveCR option in Mode2 position parsing loops.
 	!
+	! v1.8.30 (2026-01-07)
+	!   - FIX: Stop Mode2 config parsing once required keys are found.
+	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
 	!   - FIX: Add gantry axis range checks before MoveAbsJ.
@@ -276,8 +279,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.29+)
-	CONST string TASK1_VERSION := "v1.8.29";
+	! Version constant for logging (v1.8.30+)
+	CONST string TASK1_VERSION := "v1.8.30";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2145,7 +2148,7 @@ MODULE MainModule
 		off_z_raw := "N/A";
 
 		WHILE line_count < max_lines DO
-			line := ReadStr(configfile \RemoveCR);
+			line := ReadStr(configfile);
 			line_count := line_count + 1;
 			trim_pos := 1;
 			WHILE trim_pos <= StrLen(line) DO
@@ -2245,22 +2248,26 @@ MODULE MainModule
 				ENDIF
 			ENDIF
 
-			IF (found_num_pos = FALSE) AND StrFind(line, 1, "NUM_POS=") = 1 THEN
-				IF StrLen(line) > StrLen("NUM_POS=") THEN
-					value_str := StrPart(line, StrLen("NUM_POS=") + 1, StrLen(line) - StrLen("NUM_POS="));
+			IF (found_num_pos = FALSE) AND StrLen(line_trim) >= StrLen("NUM_POS=") AND StrPart(line_trim, 1, StrLen("NUM_POS=")) = "NUM_POS=" THEN
+				IF StrLen(line_trim) > StrLen("NUM_POS=") THEN
+					value_str := StrPart(line_trim, StrLen("NUM_POS=") + 1, StrLen(line_trim) - StrLen("NUM_POS="));
 					found_value := StrToVal(value_str, num_pos);
 					found_num_pos := found_value;
 					pos_prefix := "POS_";
 				ENDIF
 			ENDIF
 
-			IF (found_num_pos = FALSE) AND StrFind(line, 1, "NUM_COMPLEX_POS=") = 1 THEN
-				IF StrLen(line) > StrLen("NUM_COMPLEX_POS=") THEN
-					value_str := StrPart(line, StrLen("NUM_COMPLEX_POS=") + 1, StrLen(line) - StrLen("NUM_COMPLEX_POS="));
+			IF (found_num_pos = FALSE) AND StrLen(line_trim) >= StrLen("NUM_COMPLEX_POS=") AND StrPart(line_trim, 1, StrLen("NUM_COMPLEX_POS=")) = "NUM_COMPLEX_POS=" THEN
+				IF StrLen(line_trim) > StrLen("NUM_COMPLEX_POS=") THEN
+					value_str := StrPart(line_trim, StrLen("NUM_COMPLEX_POS=") + 1, StrLen(line_trim) - StrLen("NUM_COMPLEX_POS="));
 					found_value := StrToVal(value_str, num_pos);
 					found_num_pos := found_value;
 					pos_prefix := "COMPLEX_POS_";
 				ENDIF
+			ENDIF
+
+			IF found_r1_x AND found_r1_y AND found_r1_z AND found_num_pos THEN
+				EXIT;
 			ENDIF
 		ENDWHILE
 

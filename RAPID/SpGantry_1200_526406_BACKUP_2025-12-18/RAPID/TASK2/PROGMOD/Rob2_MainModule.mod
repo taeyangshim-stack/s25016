@@ -236,6 +236,9 @@ MODULE Rob2_MainModule
 	! v1.8.29 (2026-01-07)
 	!   - Version sync with TASK1 (remove RemoveCR in offset parse loop).
 	!
+	! v1.8.30 (2026-01-07)
+	!   - Version sync with TASK1 (stop offset parse once keys are found).
+	!
 	! v1.8.17 (2026-01-06)
 	!   - FIX: Rename TASK2 local copy to robot1_floor_pos_t2 to avoid PERS ambiguity.
 	!
@@ -253,8 +256,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.29+)
-	CONST string TASK2_VERSION := "v1.8.29";
+	! Version constant for logging (v1.8.30+)
+	CONST string TASK2_VERSION := "v1.8.30";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2429,6 +2432,13 @@ MODULE Rob2_MainModule
 						found_off_z := found_value;
 					ENDIF
 				ENDIF
+			ENDIF
+
+			IF found_r2_x AND found_r2_y AND found_r2_z THEN
+				EXIT;
+			ENDIF
+			IF found_off_x AND found_off_y AND found_off_z THEN
+				EXIT;
 			ENDIF
 		ENDWHILE
 
