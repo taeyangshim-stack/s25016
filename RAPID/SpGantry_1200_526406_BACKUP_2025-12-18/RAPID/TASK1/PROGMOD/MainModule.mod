@@ -257,6 +257,12 @@ MODULE MainModule
 !
 ! v1.8.40 (2026-01-08)
 !   - DIAG: Add Mode2 entry logging and config parse markers.
+!
+! v1.8.41 (2026-01-08)
+!   - DIAG: Log config open, parse entry, and ERRNO in Mode2.
+!
+! v1.8.42 (2026-01-08)
+!   - DIAG: Persist Mode2 error details to gantry_mode2_test.txt.
 	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
@@ -294,8 +300,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.40+)
-CONST string TASK1_VERSION := "v1.8.40";
+! Version constant for logging (v1.8.42+)
+CONST string TASK1_VERSION := "v1.8.42";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2564,13 +2570,15 @@ PERS num mode2_r2_offset_z := 0;
 			ENDIF
 
 	ERROR
+		Open mode2_log, logfile \Append;
+		Write logfile, "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
+		Close logfile;
 		IF ERRNO = ERR_FILEOPEN THEN
 			TPWrite "ERROR: Cannot open config.txt or log file";
 		ELSE
 			TPWrite "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
 		ENDIF
 		Close configfile;
-		Close logfile;
 		STOP;
 	ENDPROC
 
