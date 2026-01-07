@@ -262,6 +262,9 @@ MODULE Rob2_MainModule
 !
 ! v1.8.38 (2026-01-08)
 !   - FIX: Guard comment detection to avoid StrPart on empty strings in config parse.
+!
+! v1.8.39 (2026-01-08)
+!   - FIX: Read Mode2 TCP offsets from TASK1 shared PERS (no config read).
 	!
 	! v1.8.30 (2026-01-07)
 	!   - Version sync with TASK1 (stop offset parse once keys are found).
@@ -283,13 +286,17 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-! Version constant for logging (v1.8.38+)
-CONST string TASK2_VERSION := "v1.8.38";
+! Version constant for logging (v1.8.39+)
+CONST string TASK2_VERSION := "v1.8.39";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
 ! TASK1 waits for this flag before starting gantry floor tests
 PERS bool robot2_init_complete;
+! Mode2 TCP offsets for Robot2 (shared from TASK1)
+PERS num mode2_r2_offset_x;
+PERS num mode2_r2_offset_y;
+PERS num mode2_r2_offset_z;
 
     PERS tasks taskGroup12{2};
     PERS tasks taskGroup13{2};
@@ -2337,188 +2344,25 @@ PERS bool robot2_init_complete;
 	! ========================================
 	! Version: v1.8.12
 	! Date: 2026-01-06
-		! Purpose: Move Robot2 TCP to offset using WobjGantry_Rob2
-		! Changes in v1.8.12:
-		!   - Allow missing TCP_OFFSET_* with default 0 values
+	! Purpose: Move Robot2 TCP to offset using WobjGantry_Rob2
+	! Changes in v1.8.39:
+	!   - Use shared offsets from TASK1 (no config.txt read in TASK2)
 	PROC SetRobot2OffsetPosition()
-		VAR iodev configfile;
 		VAR iodev diagfile;
-		VAR string line;
-		VAR string value_str;
-		VAR bool found_value;
+		VAR jointtarget gantry_joint;
+		VAR robtarget offset_tcp;
 		VAR num tcp_offset_x;
 		VAR num tcp_offset_y;
 		VAR num tcp_offset_z;
-		VAR num legacy_offset_x;
-		VAR num legacy_offset_y;
-		VAR num legacy_offset_z;
-		VAR jointtarget gantry_joint;
-		VAR robtarget offset_tcp;
-		VAR bool found_off_x;
-		VAR bool found_off_y;
-		VAR bool found_off_z;
-		VAR bool found_r2_x;
-		VAR bool found_r2_y;
-		VAR bool found_r2_z;
-		VAR num line_count;
-		VAR num max_lines;
-		VAR num key_pos;
-		VAR num value_len;
-		VAR bool is_comment;
-		VAR string line_trim;
-		VAR num trim_pos;
-		VAR num key_len;
 
-		tcp_offset_x := 0;
-		tcp_offset_y := 0;
-		tcp_offset_z := 0;
-		legacy_offset_x := 0;
-		legacy_offset_y := 0;
-		legacy_offset_z := 0;
+		tcp_offset_x := mode2_r2_offset_x;
+		tcp_offset_y := mode2_r2_offset_y;
+		tcp_offset_z := mode2_r2_offset_z;
 
 		Open "HOME:/task2_mode2_offset.txt", diagfile \Write;
 		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 		Write diagfile, "Enter SetRobot2OffsetPosition";
-
-		Open "HOME:/config.txt", configfile \Read;
-		found_off_x := FALSE;
-		found_off_y := FALSE;
-		found_off_z := FALSE;
-		found_r2_x := FALSE;
-		found_r2_y := FALSE;
-		found_r2_z := FALSE;
-		line_count := 0;
-		max_lines := 200;
-
-		WHILE line_count < max_lines DO
-			line := ReadStr(configfile \RemoveCR);
-			line_count := line_count + 1;
-			trim_pos := 1;
-			WHILE trim_pos <= StrLen(line) DO
-				IF StrPart(line, trim_pos, 1) <> " " THEN
-					EXIT;
-				ENDIF
-				trim_pos := trim_pos + 1;
-			ENDWHILE
-			IF trim_pos > StrLen(line) THEN
-				line_trim := "";
-				is_comment := TRUE;
-			ELSE
-				line_trim := StrPart(line, trim_pos, StrLen(line) - trim_pos + 1);
-				IF StrLen(line_trim) = 0 THEN
-					is_comment := TRUE;
-				ELSE
-					IF StrPart(line_trim, 1, 1) = "!" THEN
-						is_comment := TRUE;
-					ELSE
-						is_comment := FALSE;
-					ENDIF
-				ENDIF
-			ENDIF
-
-			IF is_comment = FALSE THEN
-				key_pos := StrFind(line_trim, 1, "TCP_OFFSET_R2_X=");
-				IF (found_r2_x = FALSE) AND key_pos = 1 THEN
-					value_len := StrLen(line_trim) - StrLen("TCP_OFFSET_R2_X=");
-					IF value_len > 0 THEN
-						value_str := StrPart(line_trim, StrLen("TCP_OFFSET_R2_X=") + 1, value_len);
-						found_value := StrToVal(value_str, tcp_offset_x);
-						found_r2_x := found_value;
-					ENDIF
-				ENDIF
-			ENDIF
-
-			IF is_comment = FALSE THEN
-				key_pos := StrFind(line_trim, 1, "TCP_OFFSET_R2_Y=");
-				IF (found_r2_y = FALSE) AND key_pos = 1 THEN
-					value_len := StrLen(line_trim) - StrLen("TCP_OFFSET_R2_Y=");
-					IF value_len > 0 THEN
-						value_str := StrPart(line_trim, StrLen("TCP_OFFSET_R2_Y=") + 1, value_len);
-						found_value := StrToVal(value_str, tcp_offset_y);
-						found_r2_y := found_value;
-					ENDIF
-				ENDIF
-			ENDIF
-
-			IF is_comment = FALSE THEN
-				key_pos := StrFind(line_trim, 1, "TCP_OFFSET_R2_Z=");
-				IF (found_r2_z = FALSE) AND key_pos = 1 THEN
-					value_len := StrLen(line_trim) - StrLen("TCP_OFFSET_R2_Z=");
-					IF value_len > 0 THEN
-						value_str := StrPart(line_trim, StrLen("TCP_OFFSET_R2_Z=") + 1, value_len);
-						found_value := StrToVal(value_str, tcp_offset_z);
-						found_r2_z := found_value;
-					ENDIF
-				ENDIF
-			ENDIF
-
-			IF is_comment = FALSE THEN
-				key_pos := StrFind(line_trim, 1, "TCP_OFFSET_X=");
-				IF (found_off_x = FALSE) AND key_pos = 1 THEN
-					value_len := StrLen(line_trim) - StrLen("TCP_OFFSET_X=");
-					IF value_len > 0 THEN
-						value_str := StrPart(line_trim, StrLen("TCP_OFFSET_X=") + 1, value_len);
-						found_value := StrToVal(value_str, legacy_offset_x);
-						found_off_x := found_value;
-					ENDIF
-				ENDIF
-			ENDIF
-
-			IF is_comment = FALSE THEN
-				key_pos := StrFind(line_trim, 1, "TCP_OFFSET_Y=");
-				IF (found_off_y = FALSE) AND key_pos = 1 THEN
-					value_len := StrLen(line_trim) - StrLen("TCP_OFFSET_Y=");
-					IF value_len > 0 THEN
-						value_str := StrPart(line_trim, StrLen("TCP_OFFSET_Y=") + 1, value_len);
-						found_value := StrToVal(value_str, legacy_offset_y);
-						found_off_y := found_value;
-					ENDIF
-				ENDIF
-			ENDIF
-
-			IF is_comment = FALSE THEN
-				key_pos := StrFind(line_trim, 1, "TCP_OFFSET_Z=");
-				IF (found_off_z = FALSE) AND key_pos = 1 THEN
-					value_len := StrLen(line_trim) - StrLen("TCP_OFFSET_Z=");
-					IF value_len > 0 THEN
-						value_str := StrPart(line_trim, StrLen("TCP_OFFSET_Z=") + 1, value_len);
-						found_value := StrToVal(value_str, legacy_offset_z);
-						found_off_z := found_value;
-					ENDIF
-				ENDIF
-			ENDIF
-
-			IF found_r2_x AND found_r2_y AND found_r2_z THEN
-				EXIT;
-			ENDIF
-			IF found_off_x AND found_off_y AND found_off_z THEN
-				EXIT;
-			ENDIF
-		ENDWHILE
-
-		Close configfile;
-		Write diagfile, "Config parse done";
-
-		IF found_r2_x = FALSE AND found_off_x = TRUE THEN
-			tcp_offset_x := legacy_offset_x;
-		ENDIF
-		IF found_r2_y = FALSE AND found_off_y = TRUE THEN
-			tcp_offset_y := legacy_offset_y;
-		ENDIF
-		IF found_r2_z = FALSE AND found_off_z = TRUE THEN
-			tcp_offset_z := legacy_offset_z;
-		ENDIF
-
-		IF found_r2_x = FALSE OR found_r2_y = FALSE OR found_r2_z = FALSE THEN
-			IF found_off_x = TRUE OR found_off_y = TRUE OR found_off_z = TRUE THEN
-				TPWrite "Mode2: TCP_OFFSET_R2_* not found, using TCP_OFFSET_*";
-			ELSE
-				TPWrite "Mode2: TCP_OFFSET_* not found, using 0";
-			ENDIF
-		ENDIF
-
 		Write diagfile, "Offsets R2: X=" + NumToStr(tcp_offset_x, 2) + " Y=" + NumToStr(tcp_offset_y, 2) + " Z=" + NumToStr(tcp_offset_z, 2);
-		Write diagfile, "Offsets legacy: X=" + NumToStr(legacy_offset_x, 2) + " Y=" + NumToStr(legacy_offset_y, 2) + " Z=" + NumToStr(legacy_offset_z, 2);
 
 		UpdateGantryWobj_Rob2;
 		gantry_joint := CJointT(\TaskName:="T_ROB1");
@@ -2539,12 +2383,10 @@ PERS bool robot2_init_complete;
 		Write diagfile, "ERROR in SetRobot2OffsetPosition: " + NumToStr(ERRNO, 0);
 		Close diagfile;
 		IF ERRNO = ERR_FILEOPEN THEN
-			TPWrite "ERROR: Cannot open config.txt";
+			TPWrite "ERROR: Cannot open log file";
 		ELSE
 			TPWrite "ERROR in SetRobot2OffsetPosition: " + NumToStr(ERRNO, 0);
 		ENDIF
-		Close configfile;
-		Close diagfile;
 		STOP;
 	ENDPROC
 

@@ -251,6 +251,9 @@ MODULE MainModule
 !
 ! v1.8.35 (2026-01-08)
 !   - FIX: Revert robot2_init_complete to shared PERS for cross-task sync.
+!
+! v1.8.39 (2026-01-08)
+!   - FEAT: Share Mode2 TCP offsets for Robot2 via PERS variables.
 	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
@@ -288,8 +291,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.35+)
-CONST string TASK1_VERSION := "v1.8.35";
+! Version constant for logging (v1.8.39+)
+CONST string TASK1_VERSION := "v1.8.39";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -337,6 +340,10 @@ CONST string TASK1_VERSION := "v1.8.35";
 ! Robot2 initialization complete flag (from TASK2)
 ! External reference - set to TRUE by TASK2 when SetRobot2InitialPosition completes
 PERS bool robot2_init_complete := FALSE;
+! Mode2 TCP offsets for Robot2 (shared with TASK2)
+PERS num mode2_r2_offset_x := 0;
+PERS num mode2_r2_offset_y := 0;
+PERS num mode2_r2_offset_z := 0;
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
@@ -2083,6 +2090,9 @@ PERS bool robot2_init_complete := FALSE;
 		VAR num legacy_offset_x;
 		VAR num legacy_offset_y;
 		VAR num legacy_offset_z;
+		VAR num r2_offset_x;
+		VAR num r2_offset_y;
+		VAR num r2_offset_z;
 		VAR num pos_x{10};
 		VAR num pos_y{10};
 		VAR num pos_z{10};
@@ -2124,6 +2134,9 @@ PERS bool robot2_init_complete := FALSE;
 		VAR bool found_r1_x;
 		VAR bool found_r1_y;
 		VAR bool found_r1_z;
+		VAR bool found_r2_x;
+		VAR bool found_r2_y;
+		VAR bool found_r2_z;
 		VAR bool found_num_pos;
 		VAR num line_count;
 		VAR num max_lines;
@@ -2135,6 +2148,9 @@ PERS bool robot2_init_complete := FALSE;
 		legacy_offset_x := 0;
 		legacy_offset_y := 0;
 		legacy_offset_z := 0;
+		r2_offset_x := 0;
+		r2_offset_y := 0;
+		r2_offset_z := 0;
 		num_pos := 0;
 		abort_test := FALSE;
 
@@ -2145,6 +2161,9 @@ PERS bool robot2_init_complete := FALSE;
 		found_r1_x := FALSE;
 		found_r1_y := FALSE;
 		found_r1_z := FALSE;
+		found_r2_x := FALSE;
+		found_r2_y := FALSE;
+		found_r2_z := FALSE;
 		found_num_pos := FALSE;
 		pos_prefix := "POS_";
 		line_count := 0;
@@ -2211,6 +2230,45 @@ PERS bool robot2_init_complete := FALSE;
 						value_str := StrPart(line_trim, key_len + 1, value_len);
 						found_value := StrToVal(value_str, tcp_offset_z);
 						found_r1_z := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
+
+			IF is_comment = FALSE THEN
+				key_x := "TCP_OFFSET_R2_X=";
+				key_len := StrLen(key_x);
+				IF (found_r2_x = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_x THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, r2_offset_x);
+						found_r2_x := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
+
+			IF is_comment = FALSE THEN
+				key_y := "TCP_OFFSET_R2_Y=";
+				key_len := StrLen(key_y);
+				IF (found_r2_y = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_y THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, r2_offset_y);
+						found_r2_y := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
+
+			IF is_comment = FALSE THEN
+				key_z := "TCP_OFFSET_R2_Z=";
+				key_len := StrLen(key_z);
+				IF (found_r2_z = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_z THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, r2_offset_z);
+						found_r2_z := found_value;
 					ENDIF
 				ENDIF
 			ENDIF
@@ -2299,6 +2357,20 @@ PERS bool robot2_init_complete := FALSE;
 				TPWrite "Mode2: TCP_OFFSET_* not found, using 0";
 			ENDIF
 		ENDIF
+
+		IF found_r2_x = FALSE AND found_off_x = TRUE THEN
+			r2_offset_x := legacy_offset_x;
+		ENDIF
+		IF found_r2_y = FALSE AND found_off_y = TRUE THEN
+			r2_offset_y := legacy_offset_y;
+		ENDIF
+		IF found_r2_z = FALSE AND found_off_z = TRUE THEN
+			r2_offset_z := legacy_offset_z;
+		ENDIF
+
+		mode2_r2_offset_x := r2_offset_x;
+		mode2_r2_offset_y := r2_offset_y;
+		mode2_r2_offset_z := r2_offset_z;
 
 		IF found_num_pos = FALSE THEN
 			TPWrite "ERROR: Missing NUM_POS/NUM_COMPLEX_POS in config.txt";
