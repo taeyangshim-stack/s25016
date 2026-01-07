@@ -300,8 +300,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.42+)
-CONST string TASK1_VERSION := "v1.8.42";
+! Version constant for logging (v1.8.43+)
+CONST string TASK1_VERSION := "v1.8.43";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2170,7 +2170,17 @@ PERS num mode2_r2_offset_z := 0;
 		Write logfile, "Enter TestGantryMode2";
 		Close logfile;
 
+		Open mode2_log, logfile \Append;
+		Write logfile, "Before config.txt open";
+		TPWrite "Mode2: Before config.txt open";
+		Close logfile;
+
 		Open "HOME:/config.txt", configfile \Read;
+
+		Open mode2_log, logfile \Append;
+		Write logfile, "Config open ok";
+		TPWrite "Mode2: Config open ok";
+		Close logfile;
 		found_off_x := FALSE;
 		found_off_y := FALSE;
 		found_off_z := FALSE;
@@ -2190,6 +2200,11 @@ PERS num mode2_r2_offset_z := 0;
 		off_x_raw := "N/A";
 		off_y_raw := "N/A";
 		off_z_raw := "N/A";
+
+		Open mode2_log, logfile \Append;
+		Write logfile, "Parse start";
+		TPWrite "Mode2: Parse start";
+		Close logfile;
 
 		WHILE line_count < max_lines DO
 			line := ReadStr(configfile);
