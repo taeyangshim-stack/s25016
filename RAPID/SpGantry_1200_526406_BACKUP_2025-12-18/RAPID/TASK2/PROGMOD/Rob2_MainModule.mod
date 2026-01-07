@@ -250,6 +250,9 @@ MODULE Rob2_MainModule
 !
 ! v1.8.34 (2026-01-08)
 !   - DIAG: Bypass ReadTestMode temporarily (force TEST_MODE=2).
+!
+! v1.8.35 (2026-01-08)
+!   - FIX: Revert robot2_init_complete to shared PERS for cross-task sync.
 	!
 	! v1.8.30 (2026-01-07)
 	!   - Version sync with TASK1 (stop offset parse once keys are found).
@@ -271,13 +274,13 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-! Version constant for logging (v1.8.34+)
-CONST string TASK2_VERSION := "v1.8.34";
+! Version constant for logging (v1.8.35+)
+CONST string TASK2_VERSION := "v1.8.35";
 
-	! Synchronization flag for TASK1/TASK2 initialization
-	! TASK2 sets this to TRUE when Robot2 initialization is complete
-	! TASK1 waits for this flag before starting gantry floor tests
-	TASK PERS bool robot2_init_complete := FALSE;
+! Synchronization flag for TASK1/TASK2 initialization
+! TASK2 sets this to TRUE when Robot2 initialization is complete
+! TASK1 waits for this flag before starting gantry floor tests
+PERS bool robot2_init_complete;
 
     PERS tasks taskGroup12{2};
     PERS tasks taskGroup13{2};
