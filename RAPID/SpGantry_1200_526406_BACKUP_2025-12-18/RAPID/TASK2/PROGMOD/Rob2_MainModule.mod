@@ -236,6 +236,11 @@ MODULE Rob2_MainModule
 	! v1.8.29 (2026-01-07)
 	!   - Version sync with TASK1 (remove RemoveCR in offset parse loop).
 	!
+	! v1.8.31 (2026-01-07)
+	!   - FIX: Set robot2_init_complete right after Step1 to avoid TASK1 timeout.
+	!   - FIX: Add EOF-safe config parsing in ReadTestMode and Mode2 offset parse.
+	!   - DIAG: Log Mode2 offset start in main process.
+	!
 	! v1.8.30 (2026-01-07)
 	!   - Version sync with TASK1 (stop offset parse once keys are found).
 	!
@@ -256,8 +261,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-	! Version constant for logging (v1.8.30+)
-	CONST string TASK2_VERSION := "v1.8.30";
+	! Version constant for logging (v1.8.31+)
+	CONST string TASK2_VERSION := "v1.8.31";
 
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -653,15 +658,17 @@ MODULE Rob2_MainModule
         SetRobot2InitialPosition;
         TPWrite "TASK2: Robot2 initialization completed";
         Write main_logfile, "Step1 done (Robot2 init)";
+
+        ! Set synchronization flag to signal TASK1 (after Step1)
+        robot2_init_complete := TRUE;
+        TPWrite "TASK2: Synchronization flag set (robot2_init_complete = TRUE)";
+        Write main_logfile, "Flag set (Robot2 init)";
+
         IF test_mode = 2 THEN
+            Write main_logfile, "Mode2 offset start";
             SetRobot2OffsetPosition;
             Write main_logfile, "Mode2 offset applied";
         ENDIF
-
-        ! Set synchronization flag to signal TASK1
-        robot2_init_complete := TRUE;
-        TPWrite "TASK2: Synchronization flag set (robot2_init_complete = TRUE)";
-        Write main_logfile, "Flag set (robot2_init_complete)";
 
         WaitTime 1.0;
 
@@ -1806,14 +1813,22 @@ MODULE Rob2_MainModule
 		VAR num test_mode;
 		VAR bool found;
 		VAR bool ok;
+		VAR num line_count;
+		VAR num max_lines;
 
 		test_mode := 0;
 		found := FALSE;
+		line_count := 0;
+		max_lines := 200;
 
 		Open "HOME:/config.txt", configfile \Read;
 
-		WHILE found = FALSE DO
-			line := ReadStr(configfile);
+		WHILE found = FALSE AND line_count < max_lines DO
+			line := ReadStr(configfile \RemoveCR);
+			line_count := line_count + 1;
+			IF StrLen(line) = 0 THEN
+				EXIT;
+			ENDIF
 			IF StrFind(line, 1, "TEST_MODE=") = 1 THEN
 				IF StrLen(line) >= 11 THEN
 					ok := StrToVal(StrPart(line, 11, StrLen(line) - 10), test_mode);
@@ -2346,8 +2361,11 @@ MODULE Rob2_MainModule
 		max_lines := 200;
 
 		WHILE line_count < max_lines DO
-			line := ReadStr(configfile);
+			line := ReadStr(configfile \RemoveCR);
 			line_count := line_count + 1;
+			IF StrLen(line) = 0 THEN
+				EXIT;
+			ENDIF
 			trim_pos := 1;
 			WHILE trim_pos <= StrLen(line) DO
 				IF StrPart(line, trim_pos, 1) <> " " THEN
