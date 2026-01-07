@@ -256,6 +256,9 @@ MODULE Rob2_MainModule
 !
 ! v1.8.36 (2026-01-08)
 !   - DIAG: Log Mode2 offset inputs, gantry extax, and target TCP before MoveJ.
+!
+! v1.8.37 (2026-01-08)
+!   - DIAG: Create Mode2 offset log at entry before config parsing.
 	!
 	! v1.8.30 (2026-01-07)
 	!   - Version sync with TASK1 (stop offset parse once keys are found).
@@ -277,8 +280,8 @@ MODULE Rob2_MainModule
 	!   - STANDARDS: Changed file encoding from UTF-8 to ASCII
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
-! Version constant for logging (v1.8.36+)
-CONST string TASK2_VERSION := "v1.8.36";
+! Version constant for logging (v1.8.37+)
+CONST string TASK2_VERSION := "v1.8.37";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2370,6 +2373,10 @@ PERS bool robot2_init_complete;
 		legacy_offset_y := 0;
 		legacy_offset_z := 0;
 
+		Open "HOME:/task2_mode2_offset.txt", diagfile \Write;
+		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
+		Write diagfile, "Enter SetRobot2OffsetPosition";
+
 		Open "HOME:/config.txt", configfile \Read;
 		found_off_x := FALSE;
 		found_off_y := FALSE;
@@ -2481,6 +2488,7 @@ PERS bool robot2_init_complete;
 		ENDWHILE
 
 		Close configfile;
+		Write diagfile, "Config parse done";
 
 		IF found_r2_x = FALSE AND found_off_x = TRUE THEN
 			tcp_offset_x := legacy_offset_x;
@@ -2500,8 +2508,6 @@ PERS bool robot2_init_complete;
 			ENDIF
 		ENDIF
 
-		Open "HOME:/task2_mode2_offset.txt", diagfile \Append;
-		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 		Write diagfile, "Offsets R2: X=" + NumToStr(tcp_offset_x, 2) + " Y=" + NumToStr(tcp_offset_y, 2) + " Z=" + NumToStr(tcp_offset_z, 2);
 		Write diagfile, "Offsets legacy: X=" + NumToStr(legacy_offset_x, 2) + " Y=" + NumToStr(legacy_offset_y, 2) + " Z=" + NumToStr(legacy_offset_z, 2);
 
@@ -2521,7 +2527,6 @@ PERS bool robot2_init_complete;
 		Close diagfile;
 
 	ERROR
-		Open "HOME:/task2_mode2_offset.txt", diagfile \Append;
 		Write diagfile, "ERROR in SetRobot2OffsetPosition: " + NumToStr(ERRNO, 0);
 		Close diagfile;
 		IF ERRNO = ERR_FILEOPEN THEN
