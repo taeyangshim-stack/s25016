@@ -237,6 +237,9 @@ MODULE MainModule
 	! v1.8.28 (2026-01-07)
 	!   - FIX: Remove RemoveCR option in Mode2 offset parse loop.
 	!
+	! v1.8.29 (2026-01-07)
+	!   - FIX: Remove RemoveCR option in Mode2 position parsing loops.
+	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
 	!   - FIX: Add gantry axis range checks before MoveAbsJ.
@@ -273,8 +276,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.28+)
-	CONST string TASK1_VERSION := "v1.8.28";
+	! Version constant for logging (v1.8.29+)
+	CONST string TASK1_VERSION := "v1.8.29";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -1645,7 +1648,7 @@ MODULE MainModule
 		! Read GANTRY_X
 		found_x := FALSE;
 		WHILE found_x = FALSE DO
-			line := ReadStr(configfile \RemoveCR);
+			line := ReadStr(configfile);
 			IF StrFind(line, 1, "GANTRY_X=") = 1 THEN
 				IF StrLen(line) >= 10 THEN
 					value_str := StrPart(line, 10, StrLen(line) - 9);
@@ -1933,7 +1936,7 @@ MODULE MainModule
 		! Read R_ANGLE_1 to R_ANGLE_10
 		FOR i FROM 1 TO num_r_angles DO
 			WHILE TRUE DO
-				line := ReadStr(configfile \RemoveCR);
+				line := ReadStr(configfile);
 				IF StrFind(line, 1, "R_ANGLE_" + NumToStr(i,0) + "=") = 1 THEN
 					value_str := StrPart(line, StrLen("R_ANGLE_" + NumToStr(i,0) + "=") + 1, StrLen(line) - StrLen("R_ANGLE_" + NumToStr(i,0) + "="));
 					found_value := StrToVal(value_str, r_angles{i});
@@ -2295,7 +2298,7 @@ MODULE MainModule
 
 		FOR i FROM 1 TO num_pos DO
 			WHILE TRUE DO
-				line := ReadStr(configfile \RemoveCR);
+				line := ReadStr(configfile);
 				key_x := pos_prefix + NumToStr(i,0) + "_X=";
 				IF StrFind(line, 1, key_x) = 1 THEN
 					IF StrLen(line) > StrLen(key_x) THEN
@@ -2308,7 +2311,7 @@ MODULE MainModule
 			pos_x_found:
 
 			WHILE TRUE DO
-				line := ReadStr(configfile \RemoveCR);
+				line := ReadStr(configfile);
 				key_y := pos_prefix + NumToStr(i,0) + "_Y=";
 				IF StrFind(line, 1, key_y) = 1 THEN
 					IF StrLen(line) > StrLen(key_y) THEN
@@ -2321,7 +2324,7 @@ MODULE MainModule
 			pos_y_found:
 
 			WHILE TRUE DO
-				line := ReadStr(configfile \RemoveCR);
+				line := ReadStr(configfile);
 				key_z := pos_prefix + NumToStr(i,0) + "_Z=";
 				IF StrFind(line, 1, key_z) = 1 THEN
 					IF StrLen(line) > StrLen(key_z) THEN
