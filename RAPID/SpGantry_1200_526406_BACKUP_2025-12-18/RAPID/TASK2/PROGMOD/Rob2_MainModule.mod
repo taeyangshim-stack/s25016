@@ -237,6 +237,7 @@ MODULE Rob2_MainModule
 	!   - Version sync with TASK1 (remove RemoveCR in offset parse loop).
 	!
 	! v1.8.31 (2026-01-07)
+	!   - FIX: Use TASK PERS for robot2_init_complete to share flag with TASK1.
 	!   - FIX: Set robot2_init_complete right after Step1 to avoid TASK1 timeout.
 	!   - FIX: Add EOF-safe config parsing in ReadTestMode and Mode2 offset parse.
 	!   - DIAG: Log Mode2 offset start in main process.
@@ -267,7 +268,7 @@ MODULE Rob2_MainModule
 	! Synchronization flag for TASK1/TASK2 initialization
 	! TASK2 sets this to TRUE when Robot2 initialization is complete
 	! TASK1 waits for this flag before starting gantry floor tests
-	PERS bool robot2_init_complete := FALSE;
+	TASK PERS bool robot2_init_complete := FALSE;
 
     PERS tasks taskGroup12{2};
     PERS tasks taskGroup13{2};

@@ -240,8 +240,11 @@ MODULE MainModule
 	! v1.8.29 (2026-01-07)
 	!   - FIX: Remove RemoveCR option in Mode2 position parsing loops.
 	!
-	! v1.8.30 (2026-01-07)
-	!   - FIX: Stop Mode2 config parsing once required keys are found.
+! v1.8.30 (2026-01-07)
+!   - FIX: Stop Mode2 config parsing once required keys are found.
+!
+! v1.8.31 (2026-01-07)
+!   - FIX: Use TASK PERS for robot2_init_complete to share init flag with TASK2.
 	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
@@ -279,8 +282,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-	! Version constant for logging (v1.8.30+)
-	CONST string TASK1_VERSION := "v1.8.30";
+! Version constant for logging (v1.8.31+)
+CONST string TASK1_VERSION := "v1.8.31";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -325,9 +328,9 @@ MODULE MainModule
 	! Robot2 TCP position in Floor coordinate system (from TASK2)
 	! External reference - initialized and updated by TASK2
 	PERS robtarget robot2_floor_pos_t1;
-	! Robot2 initialization complete flag (from TASK2)
-	! External reference - set to TRUE by TASK2 when SetRobot2InitialPosition completes
-	PERS bool robot2_init_complete;
+! Robot2 initialization complete flag (from TASK2)
+! External reference - set to TRUE by TASK2 when SetRobot2InitialPosition completes
+TASK PERS bool robot2_init_complete;
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
 
