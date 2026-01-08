@@ -263,6 +263,9 @@ MODULE MainModule
 !
 ! v1.8.42 (2026-01-08)
 !   - DIAG: Persist Mode2 error details to gantry_mode2_test.txt.
+!
+! v1.8.45 (2026-01-08)
+!   - DIAG: Keep Mode2 log file open to avoid repeated Open/Close.
 	!
 	! v1.8.13 (2026-01-06)
 	!   - FIX: Interpret COMPLEX_POS_* as HOME offsets (convert to Floor).
@@ -300,8 +303,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.44+)
-CONST string TASK1_VERSION := "v1.8.44";
+! Version constant for logging (v1.8.45+)
+CONST string TASK1_VERSION := "v1.8.45";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2168,19 +2171,13 @@ PERS num mode2_r2_offset_z := 0;
 		Open mode2_log, logfile \Write;
 		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 		Write logfile, "Enter TestGantryMode2";
-		Close logfile;
-
-		Open mode2_log, logfile \Append;
 		Write logfile, "Before config.txt open";
 		TPWrite "Mode2: Before config.txt open";
-		Close logfile;
 
 		Open "HOME:/config.txt", configfile \Read;
 
-		Open mode2_log, logfile \Append;
 		Write logfile, "Config open ok";
 		TPWrite "Mode2: Config open ok";
-		Close logfile;
 		found_off_x := FALSE;
 		found_off_y := FALSE;
 		found_off_z := FALSE;
@@ -2201,33 +2198,25 @@ PERS num mode2_r2_offset_z := 0;
 		off_y_raw := "N/A";
 		off_z_raw := "N/A";
 
-		Open mode2_log, logfile \Append;
 		Write logfile, "Parse start";
 		TPWrite "Mode2: Parse start";
-		Close logfile;
 
-		Open mode2_log, logfile \Append;
 		Write logfile, "Entering WHILE loop, line_count=0, max_lines=200";
 		TPWrite "Mode2: Entering WHILE loop";
-		Close logfile;
 
 		WHILE line_count < max_lines DO
 			! Log before first ReadStr
 			IF line_count = 0 THEN
-				Open mode2_log, logfile \Append;
 				Write logfile, "Before first ReadStr, line_count=0";
 				TPWrite "Mode2: Before first ReadStr";
-				Close logfile;
 			ENDIF
 
 			line := ReadStr(configfile);
 
 			! Log after first ReadStr
 			IF line_count = 0 THEN
-				Open mode2_log, logfile \Append;
 				Write logfile, "After first ReadStr, line=" + line;
 				TPWrite "Mode2: After first ReadStr";
-				Close logfile;
 			ENDIF
 
 			line_count := line_count + 1;
@@ -2393,12 +2382,10 @@ PERS num mode2_r2_offset_z := 0;
 
 		Close configfile;
 
-		Open mode2_log, logfile \Append;
 		Write logfile, "Config parse done";
 		Write logfile, "NUM_POS=" + NumToStr(num_pos, 0) + " POS_PREFIX=" + pos_prefix;
 		Write logfile, "R1 raw: X=" + r1_x_raw + " Y=" + r1_y_raw + " Z=" + r1_z_raw;
 		Write logfile, "OFF raw: X=" + off_x_raw + " Y=" + off_y_raw + " Z=" + off_z_raw;
-		Close logfile;
 
 		IF found_r1_x = FALSE AND found_off_x = TRUE THEN
 			tcp_offset_x := legacy_offset_x;
@@ -2433,14 +2420,12 @@ PERS num mode2_r2_offset_z := 0;
 		mode2_r2_offset_z := r2_offset_z;
 
 		IF found_num_pos = FALSE THEN
-			Open mode2_log, logfile \Append;
 			Write logfile, "ERROR: Missing NUM_POS/NUM_COMPLEX_POS in config.txt";
 			Close logfile;
 			RETURN;
 		ENDIF
 
 		IF num_pos < 1 OR num_pos > 10 THEN
-			Open mode2_log, logfile \Append;
 			Write logfile, "ERROR: NUM_POS out of range (1-10): " + NumToStr(num_pos, 0);
 			Close logfile;
 			RETURN;
@@ -2503,7 +2488,6 @@ PERS num mode2_r2_offset_z := 0;
 		ENDFOR
 		Close configfile;
 
-		Open "HOME:/gantry_mode2_test.txt", logfile \Write;
 		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 		Write logfile, "TCP_OFFSET_R1=" + NumToStr(tcp_offset_x,1) + "," + NumToStr(tcp_offset_y,1) + "," + NumToStr(tcp_offset_z,1) + " NUM_POS=" + NumToStr(num_pos,0);
 		IF found_r1_x THEN
@@ -2607,7 +2591,6 @@ PERS num mode2_r2_offset_z := 0;
 			ENDIF
 
 	ERROR
-		Open mode2_log, logfile \Append;
 		Write logfile, "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
 		Close logfile;
 		IF ERRNO = ERR_FILEOPEN THEN
