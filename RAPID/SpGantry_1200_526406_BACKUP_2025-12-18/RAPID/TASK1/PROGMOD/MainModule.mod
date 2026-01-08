@@ -300,8 +300,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.43+)
-CONST string TASK1_VERSION := "v1.8.43";
+! Version constant for logging (v1.8.44+)
+CONST string TASK1_VERSION := "v1.8.44";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2206,8 +2206,30 @@ PERS num mode2_r2_offset_z := 0;
 		TPWrite "Mode2: Parse start";
 		Close logfile;
 
+		Open mode2_log, logfile \Append;
+		Write logfile, "Entering WHILE loop, line_count=0, max_lines=200";
+		TPWrite "Mode2: Entering WHILE loop";
+		Close logfile;
+
 		WHILE line_count < max_lines DO
+			! Log before first ReadStr
+			IF line_count = 0 THEN
+				Open mode2_log, logfile \Append;
+				Write logfile, "Before first ReadStr, line_count=0";
+				TPWrite "Mode2: Before first ReadStr";
+				Close logfile;
+			ENDIF
+
 			line := ReadStr(configfile);
+
+			! Log after first ReadStr
+			IF line_count = 0 THEN
+				Open mode2_log, logfile \Append;
+				Write logfile, "After first ReadStr, line=" + line;
+				TPWrite "Mode2: After first ReadStr";
+				Close logfile;
+			ENDIF
+
 			line_count := line_count + 1;
 			trim_pos := 1;
 			WHILE trim_pos <= StrLen(line) DO
