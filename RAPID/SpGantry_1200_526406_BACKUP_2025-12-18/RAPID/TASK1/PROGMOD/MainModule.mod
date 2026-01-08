@@ -264,6 +264,9 @@ MODULE MainModule
 ! v1.8.42 (2026-01-08)
 !   - DIAG: Persist Mode2 error details to gantry_mode2_test.txt.
 !
+! v1.8.50 (2026-01-08)
+!   - CHG: Hardcode Mode2 defaults and ignore config.txt.
+!
 ! v1.8.49 (2026-01-08)
 !   - FIX: Replace CONTINUE with GOTO label in Mode2 parse loop.
 !
@@ -315,8 +318,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.49+)
-CONST string TASK1_VERSION := "v1.8.49";
+! Version constant for logging (v1.8.50+)
+CONST string TASK1_VERSION := "v1.8.50";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2090,7 +2093,7 @@ PERS num mode2_r2_offset_z := 0;
 	! ========================================
 	! Mode 2 - Gantry + TCP Offset Verification
 	! ========================================
-		! Version: v1.8.49
+		! Version: v1.8.50
 		! Date: 2026-01-08
 		! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
 		! Config (config.txt):
@@ -2098,6 +2101,8 @@ PERS num mode2_r2_offset_z := 0;
 		!   TCP_OFFSET_R1_X/Y/Z (fallback: TCP_OFFSET_X/Y/Z)
 		!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
+		! Changes in v1.8.50:
+		!   - Use hardcoded Mode2 defaults (config.txt ignored).
 		! Changes in v1.8.49:
 		!   - Remove CONTINUE usage in Mode2 parse loop for RAPID compatibility.
 		! Changes in v1.8.48:
@@ -2189,7 +2194,7 @@ PERS num mode2_r2_offset_z := 0;
 		num_pos := 0;
 		abort_test := FALSE;
 		mode2_log := "HOME:/gantry_mode2_test.txt";
-		use_config_parse := TRUE;
+		use_config_parse := FALSE;
 
 		Open mode2_log, logfile \Write;
 		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
@@ -2540,8 +2545,8 @@ PERS num mode2_r2_offset_z := 0;
 		ENDIF
 
 		ELSE
-			TPWrite "Mode2: Config parse bypass";
-			Write logfile, "Config parse bypass - using defaults";
+			TPWrite "Mode2: Config hardcoded";
+			Write logfile, "Config hardcoded - using defaults";
 			found_r1_x := TRUE;
 			found_r1_y := TRUE;
 			found_r1_z := TRUE;
