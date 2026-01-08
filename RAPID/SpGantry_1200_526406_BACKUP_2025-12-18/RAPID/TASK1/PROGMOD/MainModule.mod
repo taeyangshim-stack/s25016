@@ -264,6 +264,9 @@ MODULE MainModule
 ! v1.8.42 (2026-01-08)
 !   - DIAG: Persist Mode2 error details to gantry_mode2_test.txt.
 !
+! v1.8.48 (2026-01-08)
+!   - FIX: Safe single-pass Mode2 config parsing with line guards.
+!
 ! v1.8.47 (2026-01-08)
 !   - TEMP: Bypass Mode2 config parsing and use default offsets/positions.
 !
@@ -309,8 +312,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.47+)
-CONST string TASK1_VERSION := "v1.8.47";
+! Version constant for logging (v1.8.48+)
+CONST string TASK1_VERSION := "v1.8.48";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2084,7 +2087,7 @@ PERS num mode2_r2_offset_z := 0;
 	! ========================================
 	! Mode 2 - Gantry + TCP Offset Verification
 	! ========================================
-		! Version: v1.8.47
+		! Version: v1.8.48
 		! Date: 2026-01-08
 		! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
 		! Config (config.txt):
@@ -2092,6 +2095,8 @@ PERS num mode2_r2_offset_z := 0;
 		!   TCP_OFFSET_R1_X/Y/Z (fallback: TCP_OFFSET_X/Y/Z)
 		!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
+		! Changes in v1.8.48:
+		!   - Rework Mode2 config parsing: single-pass ReadStr loop with guards.
 		! Changes in v1.8.47:
 		!   - TEMP: Bypass config.txt parsing and use default Mode2 offsets/positions.
 		! Changes in v1.8.46:
@@ -2162,6 +2167,7 @@ PERS num mode2_r2_offset_z := 0;
 		VAR bool found_num_pos;
 		VAR num line_count;
 		VAR num max_lines;
+		VAR num empty_count;
 		VAR bool abort_test;
 		VAR string mode2_log;
 		VAR bool use_config_parse;
@@ -2178,7 +2184,7 @@ PERS num mode2_r2_offset_z := 0;
 		num_pos := 0;
 		abort_test := FALSE;
 		mode2_log := "HOME:/gantry_mode2_test.txt";
-		use_config_parse := FALSE;
+		use_config_parse := TRUE;
 
 		Open mode2_log, logfile \Write;
 		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
@@ -2214,25 +2220,22 @@ PERS num mode2_r2_offset_z := 0;
 		Write logfile, "Parse start";
 		TPWrite "Mode2: Parse start";
 
-		Write logfile, "Entering WHILE loop, line_count=0, max_lines=200";
-		TPWrite "Mode2: Entering WHILE loop";
+		line_count := 0;
+		max_lines := 400;
+		empty_count := 0;
 
 		WHILE line_count < max_lines DO
-			! Log before first ReadStr
-			IF line_count = 0 THEN
-				Write logfile, "Before first ReadStr, line_count=0";
-				TPWrite "Mode2: Before first ReadStr";
-			ENDIF
-
+			WaitTime 0.01;
 			line := ReadStr(configfile \RemoveCR);
-
-			! Log after first ReadStr
-			IF line_count = 0 THEN
-				Write logfile, "After first ReadStr, line=" + line;
-				TPWrite "Mode2: After first ReadStr";
-			ENDIF
-
 			line_count := line_count + 1;
+			IF StrLen(line) = 0 THEN
+				empty_count := empty_count + 1;
+				IF empty_count >= 5 THEN
+					EXIT;
+				ENDIF
+				CONTINUE;
+			ENDIF
+			empty_count := 0;
 			trim_pos := 1;
 			WHILE trim_pos <= StrLen(line) DO
 				IF StrPart(line, trim_pos, 1) <> " " THEN
@@ -2388,9 +2391,95 @@ PERS num mode2_r2_offset_z := 0;
 				ENDIF
 			ENDIF
 
-			IF found_r1_x AND found_r1_y AND found_r1_z AND found_num_pos THEN
-				EXIT;
-			ENDIF
+			FOR i FROM 1 TO 10 DO
+				key_x := "COMPLEX_POS_" + NumToStr(i,0) + "_X=";
+				key_len := StrLen(key_x);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_x THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_x{i});
+						pos_prefix := "COMPLEX_POS_";
+					ENDIF
+				ENDIF
+
+				key_y := "COMPLEX_POS_" + NumToStr(i,0) + "_Y=";
+				key_len := StrLen(key_y);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_y THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_y{i});
+						pos_prefix := "COMPLEX_POS_";
+					ENDIF
+				ENDIF
+
+				key_z := "COMPLEX_POS_" + NumToStr(i,0) + "_Z=";
+				key_len := StrLen(key_z);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_z THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_z{i});
+						pos_prefix := "COMPLEX_POS_";
+					ENDIF
+				ENDIF
+
+				key_r := "COMPLEX_POS_" + NumToStr(i,0) + "_R=";
+				key_len := StrLen(key_r);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_r THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_r{i});
+						pos_prefix := "COMPLEX_POS_";
+					ENDIF
+				ENDIF
+
+				key_x := "POS_" + NumToStr(i,0) + "_X=";
+				key_len := StrLen(key_x);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_x THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_x{i});
+						pos_prefix := "POS_";
+					ENDIF
+				ENDIF
+
+				key_y := "POS_" + NumToStr(i,0) + "_Y=";
+				key_len := StrLen(key_y);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_y THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_y{i});
+						pos_prefix := "POS_";
+					ENDIF
+				ENDIF
+
+				key_z := "POS_" + NumToStr(i,0) + "_Z=";
+				key_len := StrLen(key_z);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_z THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_z{i});
+						pos_prefix := "POS_";
+					ENDIF
+				ENDIF
+
+				key_r := "POS_" + NumToStr(i,0) + "_R=";
+				key_len := StrLen(key_r);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_r THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_r{i});
+						pos_prefix := "POS_";
+					ENDIF
+				ENDIF
+			ENDFOR
 		ENDWHILE
 
 		Close configfile;
@@ -2444,62 +2533,6 @@ PERS num mode2_r2_offset_z := 0;
 			RETURN;
 		ENDIF
 
-		Open "HOME:/config.txt", configfile \Read;
-
-		FOR i FROM 1 TO num_pos DO
-			WHILE TRUE DO
-				line := ReadStr(configfile \RemoveCR);
-				key_x := pos_prefix + NumToStr(i,0) + "_X=";
-				IF StrFind(line, 1, key_x) = 1 THEN
-					IF StrLen(line) > StrLen(key_x) THEN
-						value_str := StrPart(line, StrLen(key_x) + 1, StrLen(line) - StrLen(key_x));
-						found_value := StrToVal(value_str, pos_x{i});
-						GOTO pos_x_found;
-					ENDIF
-				ENDIF
-			ENDWHILE
-			pos_x_found:
-
-			WHILE TRUE DO
-				line := ReadStr(configfile);
-				key_y := pos_prefix + NumToStr(i,0) + "_Y=";
-				IF StrFind(line, 1, key_y) = 1 THEN
-					IF StrLen(line) > StrLen(key_y) THEN
-						value_str := StrPart(line, StrLen(key_y) + 1, StrLen(line) - StrLen(key_y));
-						found_value := StrToVal(value_str, pos_y{i});
-						GOTO pos_y_found;
-					ENDIF
-				ENDIF
-			ENDWHILE
-			pos_y_found:
-
-			WHILE TRUE DO
-				line := ReadStr(configfile);
-				key_z := pos_prefix + NumToStr(i,0) + "_Z=";
-				IF StrFind(line, 1, key_z) = 1 THEN
-					IF StrLen(line) > StrLen(key_z) THEN
-						value_str := StrPart(line, StrLen(key_z) + 1, StrLen(line) - StrLen(key_z));
-						found_value := StrToVal(value_str, pos_z{i});
-						GOTO pos_z_found;
-					ENDIF
-				ENDIF
-			ENDWHILE
-			pos_z_found:
-
-			WHILE TRUE DO
-				line := ReadStr(configfile \RemoveCR);
-				key_r := pos_prefix + NumToStr(i,0) + "_R=";
-				IF StrFind(line, 1, key_r) = 1 THEN
-					IF StrLen(line) > StrLen(key_r) THEN
-						value_str := StrPart(line, StrLen(key_r) + 1, StrLen(line) - StrLen(key_r));
-						found_value := StrToVal(value_str, pos_r{i});
-						GOTO pos_r_found;
-					ENDIF
-				ENDIF
-			ENDWHILE
-			pos_r_found:
-		ENDFOR
-		Close configfile;
 		ELSE
 			TPWrite "Mode2: Config parse bypass";
 			Write logfile, "Config parse bypass - using defaults";
