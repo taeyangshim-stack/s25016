@@ -264,6 +264,9 @@ MODULE MainModule
 ! v1.8.42 (2026-01-08)
 !   - DIAG: Persist Mode2 error details to gantry_mode2_test.txt.
 !
+! v1.8.49 (2026-01-08)
+!   - FIX: Replace CONTINUE with GOTO label in Mode2 parse loop.
+!
 ! v1.8.48 (2026-01-08)
 !   - FIX: Safe single-pass Mode2 config parsing with line guards.
 !
@@ -312,8 +315,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.48+)
-CONST string TASK1_VERSION := "v1.8.48";
+! Version constant for logging (v1.8.49+)
+CONST string TASK1_VERSION := "v1.8.49";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2087,7 +2090,7 @@ PERS num mode2_r2_offset_z := 0;
 	! ========================================
 	! Mode 2 - Gantry + TCP Offset Verification
 	! ========================================
-		! Version: v1.8.48
+		! Version: v1.8.49
 		! Date: 2026-01-08
 		! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
 		! Config (config.txt):
@@ -2095,6 +2098,8 @@ PERS num mode2_r2_offset_z := 0;
 		!   TCP_OFFSET_R1_X/Y/Z (fallback: TCP_OFFSET_X/Y/Z)
 		!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
+		! Changes in v1.8.49:
+		!   - Remove CONTINUE usage in Mode2 parse loop for RAPID compatibility.
 		! Changes in v1.8.48:
 		!   - Rework Mode2 config parsing: single-pass ReadStr loop with guards.
 		! Changes in v1.8.47:
@@ -2233,7 +2238,7 @@ PERS num mode2_r2_offset_z := 0;
 				IF empty_count >= 5 THEN
 					EXIT;
 				ENDIF
-				CONTINUE;
+				GOTO mode2_next_line;
 			ENDIF
 			empty_count := 0;
 			trim_pos := 1;
@@ -2480,6 +2485,7 @@ PERS num mode2_r2_offset_z := 0;
 					ENDIF
 				ENDIF
 			ENDFOR
+			mode2_next_line:
 		ENDWHILE
 
 		Close configfile;
