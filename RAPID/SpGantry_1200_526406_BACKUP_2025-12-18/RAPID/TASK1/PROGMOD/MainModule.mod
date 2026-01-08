@@ -264,6 +264,9 @@ MODULE MainModule
 ! v1.8.42 (2026-01-08)
 !   - DIAG: Persist Mode2 error details to gantry_mode2_test.txt.
 !
+! v1.8.46 (2026-01-08)
+!   - FIX: Use ReadStr \RemoveCR in Mode2 config parsing loops.
+!
 ! v1.8.45 (2026-01-08)
 !   - DIAG: Keep Mode2 log file open to avoid repeated Open/Close.
 	!
@@ -303,8 +306,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.45+)
-CONST string TASK1_VERSION := "v1.8.45";
+! Version constant for logging (v1.8.46+)
+CONST string TASK1_VERSION := "v1.8.46";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2078,16 +2081,18 @@ PERS num mode2_r2_offset_z := 0;
 	! ========================================
 	! Mode 2 - Gantry + TCP Offset Verification
 	! ========================================
-	! Version: v1.8.14
-	! Date: 2026-01-06
-	! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
+		! Version: v1.8.46
+		! Date: 2026-01-08
+		! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
 		! Config (config.txt):
 		!   TEST_MODE=2
 		!   TCP_OFFSET_R1_X/Y/Z (fallback: TCP_OFFSET_X/Y/Z)
 		!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
-	! Changes in v1.8.14:
-	!   - Align gantry axis range checks with MOC.cfg (M1/M2/M3/M4 limits)
+		! Changes in v1.8.46:
+		!   - Use ReadStr \RemoveCR in Mode2 parsing loops to avoid blocking on CRLF files.
+		! Changes in v1.8.14:
+		!   - Align gantry axis range checks with MOC.cfg (M1/M2/M3/M4 limits)
 	PROC TestGantryMode2()
 		VAR jointtarget home_pos;
 		VAR jointtarget test_pos;
@@ -2211,7 +2216,7 @@ PERS num mode2_r2_offset_z := 0;
 				TPWrite "Mode2: Before first ReadStr";
 			ENDIF
 
-			line := ReadStr(configfile);
+			line := ReadStr(configfile \RemoveCR);
 
 			! Log after first ReadStr
 			IF line_count = 0 THEN
@@ -2435,7 +2440,7 @@ PERS num mode2_r2_offset_z := 0;
 
 		FOR i FROM 1 TO num_pos DO
 			WHILE TRUE DO
-				line := ReadStr(configfile);
+				line := ReadStr(configfile \RemoveCR);
 				key_x := pos_prefix + NumToStr(i,0) + "_X=";
 				IF StrFind(line, 1, key_x) = 1 THEN
 					IF StrLen(line) > StrLen(key_x) THEN
