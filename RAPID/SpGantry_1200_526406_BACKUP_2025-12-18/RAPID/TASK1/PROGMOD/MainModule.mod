@@ -264,6 +264,9 @@ MODULE MainModule
 ! v1.8.42 (2026-01-08)
 !   - DIAG: Persist Mode2 error details to gantry_mode2_test.txt.
 !
+! v1.8.47 (2026-01-08)
+!   - TEMP: Bypass Mode2 config parsing and use default offsets/positions.
+!
 ! v1.8.46 (2026-01-08)
 !   - FIX: Use ReadStr \RemoveCR in Mode2 config parsing loops.
 !
@@ -306,8 +309,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.46+)
-CONST string TASK1_VERSION := "v1.8.46";
+! Version constant for logging (v1.8.47+)
+CONST string TASK1_VERSION := "v1.8.47";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2081,7 +2084,7 @@ PERS num mode2_r2_offset_z := 0;
 	! ========================================
 	! Mode 2 - Gantry + TCP Offset Verification
 	! ========================================
-		! Version: v1.8.46
+		! Version: v1.8.47
 		! Date: 2026-01-08
 		! Purpose: Verify TCP tracking with offsets while gantry moves in X/Y/Z/R
 		! Config (config.txt):
@@ -2089,6 +2092,8 @@ PERS num mode2_r2_offset_z := 0;
 		!   TCP_OFFSET_R1_X/Y/Z (fallback: TCP_OFFSET_X/Y/Z)
 		!   NUM_POS, POS_1_X/Y/Z/R ...
 	! Output: /HOME/gantry_mode2_test.txt
+		! Changes in v1.8.47:
+		!   - TEMP: Bypass config.txt parsing and use default Mode2 offsets/positions.
 		! Changes in v1.8.46:
 		!   - Use ReadStr \RemoveCR in Mode2 parsing loops to avoid blocking on CRLF files.
 		! Changes in v1.8.14:
@@ -2159,6 +2164,7 @@ PERS num mode2_r2_offset_z := 0;
 		VAR num max_lines;
 		VAR bool abort_test;
 		VAR string mode2_log;
+		VAR bool use_config_parse;
 
 		tcp_offset_x := 0;
 		tcp_offset_y := 0;
@@ -2172,18 +2178,20 @@ PERS num mode2_r2_offset_z := 0;
 		num_pos := 0;
 		abort_test := FALSE;
 		mode2_log := "HOME:/gantry_mode2_test.txt";
+		use_config_parse := FALSE;
 
 		Open mode2_log, logfile \Write;
 		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 		Write logfile, "Enter TestGantryMode2";
-		Write logfile, "Before config.txt open";
-		TPWrite "Mode2: Before config.txt open";
+		IF use_config_parse THEN
+			Write logfile, "Before config.txt open";
+			TPWrite "Mode2: Before config.txt open";
 
-		Open "HOME:/config.txt", configfile \Read;
+			Open "HOME:/config.txt", configfile \Read;
 
-		Write logfile, "Config open ok";
-		TPWrite "Mode2: Config open ok";
-		found_off_x := FALSE;
+			Write logfile, "Config open ok";
+			TPWrite "Mode2: Config open ok";
+			found_off_x := FALSE;
 		found_off_y := FALSE;
 		found_off_z := FALSE;
 		found_r1_x := FALSE;
@@ -2492,6 +2500,51 @@ PERS num mode2_r2_offset_z := 0;
 			pos_r_found:
 		ENDFOR
 		Close configfile;
+		ELSE
+			TPWrite "Mode2: Config parse bypass";
+			Write logfile, "Config parse bypass - using defaults";
+			found_r1_x := TRUE;
+			found_r1_y := TRUE;
+			found_r1_z := TRUE;
+			found_off_x := FALSE;
+			found_off_y := FALSE;
+			found_off_z := FALSE;
+			found_r2_x := TRUE;
+			found_r2_y := TRUE;
+			found_r2_z := TRUE;
+			found_num_pos := TRUE;
+			r1_x_raw := "DEFAULT";
+			r1_y_raw := "DEFAULT";
+			r1_z_raw := "DEFAULT";
+			off_x_raw := "N/A";
+			off_y_raw := "N/A";
+			off_z_raw := "N/A";
+			tcp_offset_x := 0;
+			tcp_offset_y := 100;
+			tcp_offset_z := 0;
+			r2_offset_x := 0;
+			r2_offset_y := -100;
+			r2_offset_z := 0;
+			num_pos := 3;
+			pos_prefix := "COMPLEX_POS_";
+			pos_x{1} := 1200;
+			pos_y{1} := -400;
+			pos_z{1} := -500;
+			pos_r{1} := 30;
+			pos_x{2} := 2600;
+			pos_y{2} := -900;
+			pos_z{2} := -700;
+			pos_r{2} := -45;
+			pos_x{3} := -1500;
+			pos_y{3} := -600;
+			pos_z{3} := -300;
+			pos_r{3} := 60;
+			mode2_r2_offset_x := r2_offset_x;
+			mode2_r2_offset_y := r2_offset_y;
+			mode2_r2_offset_z := r2_offset_z;
+			Write logfile, "DEFAULT_NUM_POS=3 PREFIX=" + pos_prefix;
+			Write logfile, "DEFAULT_R1_OFFSET=0,100,0 DEFAULT_R2_OFFSET=0,-100,0";
+		ENDIF
 
 		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 		Write logfile, "TCP_OFFSET_R1=" + NumToStr(tcp_offset_x,1) + "," + NumToStr(tcp_offset_y,1) + "," + NumToStr(tcp_offset_z,1) + " NUM_POS=" + NumToStr(num_pos,0);
