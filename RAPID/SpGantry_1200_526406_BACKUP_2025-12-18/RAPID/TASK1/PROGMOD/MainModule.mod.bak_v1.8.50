@@ -318,8 +318,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.51+)
-CONST string TASK1_VERSION := "v1.8.51";
+! Version constant for logging (v1.8.50+)
+CONST string TASK1_VERSION := "v1.8.50";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -2130,159 +2130,595 @@ PERS num MODE2_POS_R{10} := [30, -45, 60, 0, 0, 0, 0, 0, 0, 0];
 		!   - Use ReadStr \RemoveCR in Mode2 parsing loops to avoid blocking on CRLF files.
 		! Changes in v1.8.14:
 		!   - Align gantry axis range checks with MOC.cfg (M1/M2/M3/M4 limits)
+	PROC TestGantryMode2()
+		VAR jointtarget home_pos;
+		VAR jointtarget test_pos;
+		VAR robtarget offset_tcp;
+		VAR robtarget rob1_floor;
+		VAR robtarget rob2_floor;
+		VAR iodev logfile;
+		VAR iodev configfile;
+		VAR num tcp_offset_x;
+		VAR num tcp_offset_y;
+		VAR num tcp_offset_z;
+		VAR num legacy_offset_x;
+		VAR num legacy_offset_y;
+		VAR num legacy_offset_z;
+		VAR num r2_offset_x;
+		VAR num r2_offset_y;
+		VAR num r2_offset_z;
+		VAR num pos_x{10};
+		VAR num pos_y{10};
+		VAR num pos_z{10};
+		VAR num pos_r{10};
+		VAR num num_pos;
+		VAR num i;
+		VAR string line;
+		VAR string value_str;
+		VAR bool found_value;
+		VAR string csv_line;
+		VAR string pos_prefix;
+		VAR num floor_x;
+		VAR num floor_y;
+		VAR num floor_z;
+		VAR num floor_r;
+		VAR num phys_x;
+		VAR num phys_y;
+		VAR num phys_z;
+		VAR num phys_r;
+		VAR string key_x;
+		VAR string key_y;
+		VAR string key_z;
+		VAR string key_r;
+		VAR num key_pos;
+		VAR num value_len;
+		VAR string r1_x_raw;
+		VAR string r1_y_raw;
+		VAR string r1_z_raw;
+		VAR string off_x_raw;
+		VAR string off_y_raw;
+		VAR string off_z_raw;
+		VAR bool is_comment;
+		VAR string line_trim;
+		VAR num trim_pos;
+		VAR num key_len;
+		VAR bool found_off_x;
+		VAR bool found_off_y;
+		VAR bool found_off_z;
+		VAR bool found_r1_x;
+		VAR bool found_r1_y;
+		VAR bool found_r1_z;
+		VAR bool found_r2_x;
+		VAR bool found_r2_y;
+		VAR bool found_r2_z;
+		VAR bool found_num_pos;
+		VAR num line_count;
+		VAR num max_lines;
+		VAR num empty_count;
+		VAR bool abort_test;
+		VAR string mode2_log;
+		VAR bool use_config_parse;
 
-! ========================================
-! Mode 2 - Gantry + TCP Offset Verification (v1.8.51)
-! ========================================
-! Version: v1.8.51
-! Date: 2026-01-08
-! Purpose: Verify TCP tracking with offsets using PERS variables
-! No config.txt parsing - all settings from PERS variables
-! Output: /HOME/gantry_mode2_test.txt
-PROC TestGantryMode2()
-	VAR jointtarget home_pos;
-	VAR jointtarget test_pos;
-	VAR robtarget offset_tcp;
-	VAR robtarget rob1_floor;
-	VAR robtarget rob2_floor;
-	VAR iodev logfile;
-	VAR num tcp_offset_x;
-	VAR num tcp_offset_y;
-	VAR num tcp_offset_z;
-	VAR num num_pos;
-	VAR num pos_x{10};
-	VAR num pos_y{10};
-	VAR num pos_z{10};
-	VAR num pos_r{10};
-	VAR num i;
-	VAR string csv_line;
-	VAR num floor_x;
-	VAR num floor_y;
-	VAR num floor_z;
-	VAR num floor_r;
-	VAR num phys_x;
-	VAR num phys_y;
-	VAR num phys_z;
-	VAR num phys_r;
-	VAR bool abort_test;
-	VAR string mode2_log;
+		tcp_offset_x := 0;
+		tcp_offset_y := 0;
+		tcp_offset_z := 0;
+		legacy_offset_x := 0;
+		legacy_offset_y := 0;
+		legacy_offset_z := 0;
+		r2_offset_x := 0;
+		r2_offset_y := 0;
+		r2_offset_z := 0;
+		num_pos := 0;
+		abort_test := FALSE;
+		mode2_log := "HOME:/gantry_mode2_test.txt";
+		use_config_parse := FALSE;
 
-	abort_test := FALSE;
-	mode2_log := "HOME:/gantry_mode2_test.txt";
+		Open mode2_log, logfile \Write;
+		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
+		Write logfile, "Enter TestGantryMode2";
+		IF use_config_parse THEN
+			Write logfile, "Before config.txt open";
+			TPWrite "Mode2: Before config.txt open";
 
-	Open mode2_log, logfile \Write;
-	Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
-	Write logfile, "Enter TestGantryMode2";
-	TPWrite "Mode2: Loading config from PERS variables";
+			Open "HOME:/config.txt", configfile \Read;
 
-	! Read configuration from PERS variables (no file I/O)
-	tcp_offset_x := MODE2_TCP_OFFSET_R1_X;
-	tcp_offset_y := MODE2_TCP_OFFSET_R1_Y;
-	tcp_offset_z := MODE2_TCP_OFFSET_R1_Z;
+			Write logfile, "Config open ok";
+			TPWrite "Mode2: Config open ok";
+			found_off_x := FALSE;
+		found_off_y := FALSE;
+		found_off_z := FALSE;
+		found_r1_x := FALSE;
+		found_r1_y := FALSE;
+		found_r1_z := FALSE;
+		found_r2_x := FALSE;
+		found_r2_y := FALSE;
+		found_r2_z := FALSE;
+		found_num_pos := FALSE;
+		pos_prefix := "POS_";
+		line_count := 0;
+		max_lines := 200;
+		r1_x_raw := "N/A";
+		r1_y_raw := "N/A";
+		r1_z_raw := "N/A";
+		off_x_raw := "N/A";
+		off_y_raw := "N/A";
+		off_z_raw := "N/A";
 
-	! Share Robot2 offsets (already PERS, just log)
-	Write logfile, "R2_OFFSET=" + NumToStr(mode2_r2_offset_x, 1) + ","
-	              + NumToStr(mode2_r2_offset_y, 1) + ","
-	              + NumToStr(mode2_r2_offset_z, 1);
+		Write logfile, "Parse start";
+		TPWrite "Mode2: Parse start";
 
-	! Read test positions
-	num_pos := MODE2_NUM_POS;
-	FOR i FROM 1 TO 10 DO
-		pos_x{i} := MODE2_POS_X{i};
-		pos_y{i} := MODE2_POS_Y{i};
-		pos_z{i} := MODE2_POS_Z{i};
-		pos_r{i} := MODE2_POS_R{i};
-	ENDFOR
+		line_count := 0;
+		max_lines := 400;
+		empty_count := 0;
 
-	Write logfile, "Config loaded from PERS - NUM_POS=" + NumToStr(num_pos, 0);
-	Write logfile, "TCP_OFFSET_R1=" + NumToStr(tcp_offset_x,1) + ","
-	              + NumToStr(tcp_offset_y,1) + ","
-	              + NumToStr(tcp_offset_z,1);
-	Write logfile, "X,Y,Z,R,R1X,R1Y,R1Z,R2X,R2Y,R2Z";
-	TPWrite "Mode2: Config loaded, NUM_POS=" + NumToStr(num_pos, 0);
-	WaitTime 0.3;
+		WHILE line_count < max_lines DO
+			WaitTime 0.01;
+			line := ReadStr(configfile \RemoveCR);
+			line_count := line_count + 1;
+			IF StrLen(line) = 0 THEN
+				empty_count := empty_count + 1;
+				IF empty_count >= 5 THEN
+					EXIT;
+				ENDIF
+				GOTO mode2_next_line;
+			ENDIF
+			empty_count := 0;
+			trim_pos := 1;
+			WHILE trim_pos <= StrLen(line) DO
+				IF StrPart(line, trim_pos, 1) <> " " THEN
+					EXIT;
+				ENDIF
+				trim_pos := trim_pos + 1;
+			ENDWHILE
+			IF trim_pos > StrLen(line) THEN
+				line_trim := "";
+			ELSE
+				line_trim := StrPart(line, trim_pos, StrLen(line) - trim_pos + 1);
+			ENDIF
+			is_comment := (StrLen(line_trim) = 0) OR (StrPart(line_trim, 1, 1) = "!");
 
-	! Move Robot1 to offset in WobjGantry
-	UpdateGantryWobj;
-	home_pos := CJointT();
-	offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], home_pos.extax];
-	MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
-	TPWrite "Mode2: Robot1 at offset TCP";
+			IF is_comment = FALSE THEN
+				key_x := "TCP_OFFSET_R1_X=";
+				key_len := StrLen(key_x);
+				IF (found_r1_x = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_x THEN
+					r1_x_raw := line_trim;
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, tcp_offset_x);
+						found_r1_x := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
 
-	! Test each position
-	FOR i FROM 1 TO num_pos DO
-		! Calculate Floor coordinates (COMPLEX_POS format)
-		floor_x := 9500 + pos_x{i};
-		floor_y := 5300 + pos_y{i};
-		floor_z := 2100 + pos_z{i};
-		floor_r := pos_r{i};
+			IF is_comment = FALSE THEN
+				key_y := "TCP_OFFSET_R1_Y=";
+				key_len := StrLen(key_y);
+				IF (found_r1_y = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_y THEN
+					r1_y_raw := line_trim;
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, tcp_offset_y);
+						found_r1_y := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
 
-		! Convert to physical gantry coordinates
-		phys_x := floor_x - 9500;
-		phys_y := 5300 - floor_y;
-		phys_z := 2100 - floor_z;
-		phys_r := 0 - floor_r;
+			IF is_comment = FALSE THEN
+				key_z := "TCP_OFFSET_R1_Z=";
+				key_len := StrLen(key_z);
+				IF (found_r1_z = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_z THEN
+					r1_z_raw := line_trim;
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, tcp_offset_z);
+						found_r1_z := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
 
-		! Check gantry axis limits (MOC.cfg)
-		! M1 [-9.51, 12.31], M2 [-0.05, 5.35], M3 [-0.05, 1.05], M4 [-100, 100] deg
-		IF phys_x < -9510 OR phys_x > 12310 OR phys_y < -50 OR phys_y > 5350 OR phys_z < -50 OR phys_z > 1050 OR phys_r < -100 OR phys_r > 100 THEN
-			Write logfile, "OUT_OF_RANGE idx=" + NumToStr(i,0)
-			              + " floor=[" + NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + "]"
-			              + " phys=[" + NumToStr(phys_x,0) + "," + NumToStr(phys_y,0) + "," + NumToStr(phys_z,0) + "," + NumToStr(phys_r,1) + "]";
-			TPWrite "Mode2: Position " + NumToStr(i,0) + " out of range!";
-			abort_test := TRUE;
-			GOTO mode2_cleanup;
+			IF is_comment = FALSE THEN
+				key_x := "TCP_OFFSET_R2_X=";
+				key_len := StrLen(key_x);
+				IF (found_r2_x = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_x THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, r2_offset_x);
+						found_r2_x := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
+
+			IF is_comment = FALSE THEN
+				key_y := "TCP_OFFSET_R2_Y=";
+				key_len := StrLen(key_y);
+				IF (found_r2_y = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_y THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, r2_offset_y);
+						found_r2_y := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
+
+			IF is_comment = FALSE THEN
+				key_z := "TCP_OFFSET_R2_Z=";
+				key_len := StrLen(key_z);
+				IF (found_r2_z = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_z THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, r2_offset_z);
+						found_r2_z := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
+
+			IF is_comment = FALSE THEN
+				key_x := "TCP_OFFSET_X=";
+				key_len := StrLen(key_x);
+				IF (found_off_x = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_x THEN
+					off_x_raw := line_trim;
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, legacy_offset_x);
+						found_off_x := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
+
+			IF is_comment = FALSE THEN
+				key_y := "TCP_OFFSET_Y=";
+				key_len := StrLen(key_y);
+				IF (found_off_y = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_y THEN
+					off_y_raw := line_trim;
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, legacy_offset_y);
+						found_off_y := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
+
+			IF is_comment = FALSE THEN
+				key_z := "TCP_OFFSET_Z=";
+				key_len := StrLen(key_z);
+				IF (found_off_z = FALSE) AND StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_z THEN
+					off_z_raw := line_trim;
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, legacy_offset_z);
+						found_off_z := found_value;
+					ENDIF
+				ENDIF
+			ENDIF
+
+			IF (found_num_pos = FALSE) AND StrLen(line_trim) >= StrLen("NUM_POS=") AND StrPart(line_trim, 1, StrLen("NUM_POS=")) = "NUM_POS=" THEN
+				IF StrLen(line_trim) > StrLen("NUM_POS=") THEN
+					value_str := StrPart(line_trim, StrLen("NUM_POS=") + 1, StrLen(line_trim) - StrLen("NUM_POS="));
+					found_value := StrToVal(value_str, num_pos);
+					found_num_pos := found_value;
+					pos_prefix := "POS_";
+				ENDIF
+			ENDIF
+
+			IF (found_num_pos = FALSE) AND StrLen(line_trim) >= StrLen("NUM_COMPLEX_POS=") AND StrPart(line_trim, 1, StrLen("NUM_COMPLEX_POS=")) = "NUM_COMPLEX_POS=" THEN
+				IF StrLen(line_trim) > StrLen("NUM_COMPLEX_POS=") THEN
+					value_str := StrPart(line_trim, StrLen("NUM_COMPLEX_POS=") + 1, StrLen(line_trim) - StrLen("NUM_COMPLEX_POS="));
+					found_value := StrToVal(value_str, num_pos);
+					found_num_pos := found_value;
+					pos_prefix := "COMPLEX_POS_";
+				ENDIF
+			ENDIF
+
+			FOR i FROM 1 TO 10 DO
+				key_x := "COMPLEX_POS_" + NumToStr(i,0) + "_X=";
+				key_len := StrLen(key_x);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_x THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_x{i});
+						pos_prefix := "COMPLEX_POS_";
+					ENDIF
+				ENDIF
+
+				key_y := "COMPLEX_POS_" + NumToStr(i,0) + "_Y=";
+				key_len := StrLen(key_y);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_y THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_y{i});
+						pos_prefix := "COMPLEX_POS_";
+					ENDIF
+				ENDIF
+
+				key_z := "COMPLEX_POS_" + NumToStr(i,0) + "_Z=";
+				key_len := StrLen(key_z);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_z THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_z{i});
+						pos_prefix := "COMPLEX_POS_";
+					ENDIF
+				ENDIF
+
+				key_r := "COMPLEX_POS_" + NumToStr(i,0) + "_R=";
+				key_len := StrLen(key_r);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_r THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_r{i});
+						pos_prefix := "COMPLEX_POS_";
+					ENDIF
+				ENDIF
+
+				key_x := "POS_" + NumToStr(i,0) + "_X=";
+				key_len := StrLen(key_x);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_x THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_x{i});
+						pos_prefix := "POS_";
+					ENDIF
+				ENDIF
+
+				key_y := "POS_" + NumToStr(i,0) + "_Y=";
+				key_len := StrLen(key_y);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_y THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_y{i});
+						pos_prefix := "POS_";
+					ENDIF
+				ENDIF
+
+				key_z := "POS_" + NumToStr(i,0) + "_Z=";
+				key_len := StrLen(key_z);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_z THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_z{i});
+						pos_prefix := "POS_";
+					ENDIF
+				ENDIF
+
+				key_r := "POS_" + NumToStr(i,0) + "_R=";
+				key_len := StrLen(key_r);
+				IF StrLen(line_trim) >= key_len AND StrPart(line_trim, 1, key_len) = key_r THEN
+					value_len := StrLen(line_trim) - key_len;
+					IF value_len > 0 THEN
+						value_str := StrPart(line_trim, key_len + 1, value_len);
+						found_value := StrToVal(value_str, pos_r{i});
+						pos_prefix := "POS_";
+					ENDIF
+				ENDIF
+			ENDFOR
+			mode2_next_line:
+		ENDWHILE
+
+		Close configfile;
+
+		Write logfile, "Config parse done";
+		Write logfile, "NUM_POS=" + NumToStr(num_pos, 0) + " POS_PREFIX=" + pos_prefix;
+		Write logfile, "R1 raw: X=" + r1_x_raw + " Y=" + r1_y_raw + " Z=" + r1_z_raw;
+		Write logfile, "OFF raw: X=" + off_x_raw + " Y=" + off_y_raw + " Z=" + off_z_raw;
+
+		IF found_r1_x = FALSE AND found_off_x = TRUE THEN
+			tcp_offset_x := legacy_offset_x;
+		ENDIF
+		IF found_r1_y = FALSE AND found_off_y = TRUE THEN
+			tcp_offset_y := legacy_offset_y;
+		ENDIF
+		IF found_r1_z = FALSE AND found_off_z = TRUE THEN
+			tcp_offset_z := legacy_offset_z;
 		ENDIF
 
-		! Move gantry to test position
-		test_pos := CJointT();
-		test_pos.extax.eax_a := phys_x;
-		test_pos.extax.eax_b := phys_y;
-		test_pos.extax.eax_c := phys_z;
-		test_pos.extax.eax_d := phys_r;
-		test_pos.extax.eax_f := test_pos.extax.eax_a;
-		MoveAbsJ test_pos, v100, fine, tool0;
-		TPWrite "Mode2: Position " + NumToStr(i,0) + "/" + NumToStr(num_pos,0);
-		WaitTime 0.5;
+		IF found_r1_x = FALSE OR found_r1_y = FALSE OR found_r1_z = FALSE THEN
+			IF found_off_x = TRUE OR found_off_y = TRUE OR found_off_z = TRUE THEN
+				TPWrite "Mode2: TCP_OFFSET_R1_* not found, using TCP_OFFSET_*";
+			ELSE
+				TPWrite "Mode2: TCP_OFFSET_* not found, using 0";
+			ENDIF
+		ENDIF
 
-		! Measure Robot1 and Robot2 TCP positions
-		UpdateRobot1FloorPosition;
-		UpdateRobot2BaseDynamicWobj;
-		rob1_floor := robot1_floor_pos_t1;
-		rob2_floor := robot2_floor_pos_t1;
+		IF found_r2_x = FALSE AND found_off_x = TRUE THEN
+			r2_offset_x := legacy_offset_x;
+		ENDIF
+		IF found_r2_y = FALSE AND found_off_y = TRUE THEN
+			r2_offset_y := legacy_offset_y;
+		ENDIF
+		IF found_r2_z = FALSE AND found_off_z = TRUE THEN
+			r2_offset_z := legacy_offset_z;
+		ENDIF
 
-		! Log result
-		csv_line := NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + ","
-		          + NumToStr(rob1_floor.trans.x, 2) + "," + NumToStr(rob1_floor.trans.y, 2) + "," + NumToStr(rob1_floor.trans.z, 2) + ","
-		          + NumToStr(rob2_floor.trans.x, 2) + "," + NumToStr(rob2_floor.trans.y, 2) + "," + NumToStr(rob2_floor.trans.z, 2);
-		Write logfile, csv_line;
-		WaitTime 0.2;
-	ENDFOR
+		mode2_r2_offset_x := r2_offset_x;
+		mode2_r2_offset_y := r2_offset_y;
+		mode2_r2_offset_z := r2_offset_z;
 
-mode2_cleanup:
-	! Always return gantry to HOME
-	TPWrite "Mode2: Returning to HOME";
-	home_pos := CJointT();
-	home_pos.extax.eax_a := 0;
-	home_pos.extax.eax_b := 0;
-	home_pos.extax.eax_c := 0;
-	home_pos.extax.eax_d := 0;
-	home_pos.extax.eax_f := 0;
-	MoveAbsJ home_pos, v100, fine, tool0;
+		IF found_num_pos = FALSE THEN
+			Write logfile, "ERROR: Missing NUM_POS/NUM_COMPLEX_POS in config.txt";
+			Close logfile;
+			RETURN;
+		ENDIF
 
-	Close logfile;
-	TPWrite "Mode2: Test complete!";
-	IF abort_test = TRUE THEN
-		TPWrite "Mode2: Test aborted (out of range)";
+		IF num_pos < 1 OR num_pos > 10 THEN
+			Write logfile, "ERROR: NUM_POS out of range (1-10): " + NumToStr(num_pos, 0);
+			Close logfile;
+			RETURN;
+		ENDIF
+
+		ELSE
+			TPWrite "Mode2: Config hardcoded";
+			Write logfile, "Config hardcoded - using defaults";
+			found_r1_x := TRUE;
+			found_r1_y := TRUE;
+			found_r1_z := TRUE;
+			found_off_x := FALSE;
+			found_off_y := FALSE;
+			found_off_z := FALSE;
+			found_r2_x := TRUE;
+			found_r2_y := TRUE;
+			found_r2_z := TRUE;
+			found_num_pos := TRUE;
+			r1_x_raw := "DEFAULT";
+			r1_y_raw := "DEFAULT";
+			r1_z_raw := "DEFAULT";
+			off_x_raw := "N/A";
+			off_y_raw := "N/A";
+			off_z_raw := "N/A";
+			tcp_offset_x := 0;
+			tcp_offset_y := 100;
+			tcp_offset_z := 0;
+			r2_offset_x := 0;
+			r2_offset_y := -100;
+			r2_offset_z := 0;
+			num_pos := 3;
+			pos_prefix := "COMPLEX_POS_";
+			pos_x{1} := 1200;
+			pos_y{1} := -400;
+			pos_z{1} := -500;
+			pos_r{1} := 30;
+			pos_x{2} := 2600;
+			pos_y{2} := -900;
+			pos_z{2} := -700;
+			pos_r{2} := -45;
+			pos_x{3} := -1500;
+			pos_y{3} := -600;
+			pos_z{3} := -300;
+			pos_r{3} := 60;
+			mode2_r2_offset_x := r2_offset_x;
+			mode2_r2_offset_y := r2_offset_y;
+			mode2_r2_offset_z := r2_offset_z;
+			Write logfile, "DEFAULT_NUM_POS=3 PREFIX=" + pos_prefix;
+			Write logfile, "DEFAULT_R1_OFFSET=0,100,0 DEFAULT_R2_OFFSET=0,-100,0";
+		ENDIF
+
+		Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
+		Write logfile, "TCP_OFFSET_R1=" + NumToStr(tcp_offset_x,1) + "," + NumToStr(tcp_offset_y,1) + "," + NumToStr(tcp_offset_z,1) + " NUM_POS=" + NumToStr(num_pos,0);
+		IF found_r1_x THEN
+			Write logfile, "PARSE_R1_X=1 raw=" + r1_x_raw;
+		ELSE
+			Write logfile, "PARSE_R1_X=0 raw=" + r1_x_raw;
+		ENDIF
+		IF found_r1_y THEN
+			Write logfile, "PARSE_R1_Y=1 raw=" + r1_y_raw;
+		ELSE
+			Write logfile, "PARSE_R1_Y=0 raw=" + r1_y_raw;
+		ENDIF
+		IF found_r1_z THEN
+			Write logfile, "PARSE_R1_Z=1 raw=" + r1_z_raw;
+		ELSE
+			Write logfile, "PARSE_R1_Z=0 raw=" + r1_z_raw;
+		ENDIF
+		IF found_off_x THEN
+			Write logfile, "PARSE_OFF_X=1 raw=" + off_x_raw;
+		ELSE
+			Write logfile, "PARSE_OFF_X=0 raw=" + off_x_raw;
+		ENDIF
+		IF found_off_y THEN
+			Write logfile, "PARSE_OFF_Y=1 raw=" + off_y_raw;
+		ELSE
+			Write logfile, "PARSE_OFF_Y=0 raw=" + off_y_raw;
+		ENDIF
+		IF found_off_z THEN
+			Write logfile, "PARSE_OFF_Z=1 raw=" + off_z_raw;
+		ELSE
+			Write logfile, "PARSE_OFF_Z=0 raw=" + off_z_raw;
+		ENDIF
+		Write logfile, "X,Y,Z,R,R1X,R1Y,R1Z,R2X,R2Y,R2Z";
+		WaitTime 0.3;
+
+		! Move Robot1 to offset in WobjGantry
+		UpdateGantryWobj;
+		home_pos := CJointT();
+		offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], home_pos.extax];
+		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
+		FOR i FROM 1 TO num_pos DO
+			IF pos_prefix = "COMPLEX_POS_" THEN
+				floor_x := 9500 + pos_x{i};
+				floor_y := 5300 + pos_y{i};
+				floor_z := 2100 + pos_z{i};
+				floor_r := pos_r{i};
+			ELSE
+				floor_x := pos_x{i};
+				floor_y := pos_y{i};
+				floor_z := pos_z{i};
+				floor_r := pos_r{i};
+			ENDIF
+
+			phys_x := floor_x - 9500;
+			phys_y := 5300 - floor_y;
+			phys_z := 2100 - floor_z;
+			phys_r := 0 - floor_r;
+
+			! MOC.cfg limits (meters): M1 [-9.51, 12.31], M2 [-0.05, 5.35], M3 [-0.05, 1.05], M4 [-1.74533, 1.74533]
+				IF phys_x < -9510 OR phys_x > 12310 OR phys_y < -50 OR phys_y > 5350 OR phys_z < -50 OR phys_z > 1050 OR phys_r < -100 OR phys_r > 100 THEN
+					Write logfile, "OUT_OF_RANGE idx=" + NumToStr(i,0)
+					              + " floor=[" + NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + "]"
+					              + " phys=[" + NumToStr(phys_x,0) + "," + NumToStr(phys_y,0) + "," + NumToStr(phys_z,0) + "," + NumToStr(phys_r,1) + "]";
+					abort_test := TRUE;
+					GOTO mode2_cleanup;
+				ENDIF
+
+			test_pos := CJointT();
+			test_pos.extax.eax_a := phys_x;
+			test_pos.extax.eax_b := phys_y;
+			test_pos.extax.eax_c := phys_z;
+			test_pos.extax.eax_d := phys_r;
+			test_pos.extax.eax_f := test_pos.extax.eax_a;
+			MoveAbsJ test_pos, v100, fine, tool0;
+			WaitTime 0.5;
+
+			UpdateRobot1FloorPosition;
+			UpdateRobot2BaseDynamicWobj;
+			rob1_floor := robot1_floor_pos_t1;
+			rob2_floor := robot2_floor_pos_t1;
+
+			csv_line := NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + ","
+			          + NumToStr(rob1_floor.trans.x, 2) + "," + NumToStr(rob1_floor.trans.y, 2) + "," + NumToStr(rob1_floor.trans.z, 2) + ","
+			          + NumToStr(rob2_floor.trans.x, 2) + "," + NumToStr(rob2_floor.trans.y, 2) + "," + NumToStr(rob2_floor.trans.z, 2);
+			Write logfile, csv_line;
+			WaitTime 0.2;
+			ENDFOR
+		mode2_cleanup:
+			! Always return gantry to HOME after Mode2 test
+			home_pos := CJointT();
+			home_pos.extax.eax_a := 0;
+			home_pos.extax.eax_b := 0;
+			home_pos.extax.eax_c := 0;
+			home_pos.extax.eax_d := 0;
+			home_pos.extax.eax_f := 0;
+			MoveAbsJ home_pos, v100, fine, tool0;
+
+			Close logfile;
+			IF abort_test = TRUE THEN
+				STOP;
+			ENDIF
+
+	ERROR
+		Write logfile, "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
+		Close logfile;
+		IF ERRNO = ERR_FILEOPEN THEN
+			TPWrite "ERROR: Cannot open config.txt or log file";
+		ELSE
+			TPWrite "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
+		ENDIF
+		Close configfile;
 		STOP;
-	ENDIF
-
-ERROR
-	Write logfile, "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
-	Close logfile;
-	TPWrite "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
-	STOP;
-ENDPROC
-
+	ENDPROC
 
 ENDMODULE
