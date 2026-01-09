@@ -264,6 +264,20 @@ MODULE MainModule
 ! v1.8.42 (2026-01-08)
 !   - DIAG: Persist Mode2 error details to gantry_mode2_test.txt.
 !
+! v1.8.53 (2026-01-10)
+!   - FIX: Read current_gantry.extax after MoveAbsJ (eax_e mismatch fix)
+!   - FIX: Robot1 TCP now properly stays at offset position during gantry rotation
+!   - FEAT: TP messages saved to tp_messages.txt (separate log file)
+!
+! v1.8.52 (2026-01-09)
+!   - NEW: ConfigModule.mod for MODE2_* PERS settings
+!   - NEW: VersionModule.mod for centralized version tracking
+!
+! v1.8.51 (2026-01-09)
+!   - REFACTOR: Config migrated from file to PERS variables
+!   - REMOVE: config.txt parsing code (590 lines removed)
+!   - FIX: ReadStr hang issue completely resolved
+!
 ! v1.8.50 (2026-01-08)
 !   - CHG: Hardcode Mode2 defaults and ignore config.txt.
 !
@@ -2163,15 +2177,22 @@ PROC TestGantryMode2()
 	VAR num phys_r;
 	VAR bool abort_test;
 	VAR string mode2_log;
+	VAR string tp_log;
+	VAR iodev tp_logfile;
 	VAR jointtarget current_gantry;
 
 	abort_test := FALSE;
 	mode2_log := "HOME:/gantry_mode2_test.txt";
+	tp_log := "HOME:/tp_messages.txt";
 
 	Open mode2_log, logfile \Write;
+	Open tp_log, tp_logfile \Write;
+	Write tp_logfile, "TP Log (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
+	Write tp_logfile, "========================================";
 	Write logfile, "Mode2 Test (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 	Write logfile, "Enter TestGantryMode2";
 	TPWrite "Mode2: Loading config from PERS variables";
+	Write tp_logfile, "Mode2: Loading config from PERS variables";
 
 	! Read configuration from PERS variables (no file I/O)
 	tcp_offset_x := MODE2_TCP_OFFSET_R1_X;
@@ -2203,6 +2224,7 @@ PROC TestGantryMode2()
 	              + NumToStr(tcp_offset_z,1);
 	Write logfile, "X,Y,Z,R,R1X,R1Y,R1Z,R2X,R2Y,R2Z";
 	TPWrite "Mode2: Config loaded, NUM_POS=" + NumToStr(num_pos, 0);
+	Write tp_logfile, "Mode2: Config loaded, NUM_POS=" + NumToStr(num_pos, 0);
 	WaitTime 0.3;
 
 	! Move Robot1 to offset in WobjGantry
@@ -2211,6 +2233,7 @@ PROC TestGantryMode2()
 	offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], home_pos.extax];
 	MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
 	TPWrite "Mode2: Robot1 at offset TCP";
+	Write tp_logfile, "Mode2: Robot1 at offset TCP";
 
 	! Test each position
 	FOR i FROM 1 TO num_pos DO
@@ -2246,6 +2269,7 @@ PROC TestGantryMode2()
 		test_pos.extax.eax_f := test_pos.extax.eax_a;
 		MoveAbsJ test_pos, v100, fine, tool0;
 		TPWrite "Mode2: Gantry moved to position " + NumToStr(i,0) + "/" + NumToStr(num_pos,0);
+		Write tp_logfile, "Mode2: Gantry moved to position " + NumToStr(i,0) + "/" + NumToStr(num_pos,0);
 
 		! Update WobjGantry for new gantry position and rotation
 		UpdateGantryWobj;
@@ -2257,6 +2281,7 @@ PROC TestGantryMode2()
 		offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], current_gantry.extax];
 		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
 		TPWrite "Mode2: Robot1 TCP at offset";
+		Write tp_logfile, "Mode2: Robot1 TCP at offset (pos " + NumToStr(i,0) + ")";
 		WaitTime 0.5;
 
 		! Measure Robot1 and Robot2 TCP positions
@@ -2276,6 +2301,7 @@ PROC TestGantryMode2()
 mode2_cleanup:
 	! Always return gantry to HOME
 	TPWrite "Mode2: Returning to HOME";
+	Write tp_logfile, "Mode2: Returning to HOME";
 	home_pos := CJointT();
 	home_pos.extax.eax_a := 0;
 	home_pos.extax.eax_b := 0;
@@ -2284,8 +2310,11 @@ mode2_cleanup:
 	home_pos.extax.eax_f := 0;
 	MoveAbsJ home_pos, v100, fine, tool0;
 
-	Close logfile;
 	TPWrite "Mode2: Test complete!";
+	Write tp_logfile, "Mode2: Test complete!";
+	Write tp_logfile, "========================================";
+	Close logfile;
+	Close tp_logfile;
 	IF abort_test = TRUE THEN
 		TPWrite "Mode2: Test aborted (out of range)";
 		STOP;
@@ -2293,7 +2322,9 @@ mode2_cleanup:
 
 ERROR
 	Write logfile, "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
+	Write tp_logfile, "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
 	Close logfile;
+	Close tp_logfile;
 	TPWrite "ERROR in TestGantryMode2: " + NumToStr(ERRNO, 0);
 	STOP;
 ENDPROC
