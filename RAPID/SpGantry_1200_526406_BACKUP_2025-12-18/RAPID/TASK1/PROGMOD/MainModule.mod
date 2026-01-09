@@ -2163,6 +2163,7 @@ PROC TestGantryMode2()
 	VAR num phys_r;
 	VAR bool abort_test;
 	VAR string mode2_log;
+	VAR jointtarget current_gantry;
 
 	abort_test := FALSE;
 	mode2_log := "HOME:/gantry_mode2_test.txt";
@@ -2249,8 +2250,11 @@ PROC TestGantryMode2()
 		! Update WobjGantry for new gantry position and rotation
 		UpdateGantryWobj;
 
+		! Read current gantry position AFTER move (fix for eax_e mismatch)
+		current_gantry := CJointT();
+
 		! Move Robot1 TCP back to offset position in updated WobjGantry
-		offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], test_pos.extax];
+		offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], current_gantry.extax];
 		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
 		TPWrite "Mode2: Robot1 TCP at offset";
 		WaitTime 0.5;
