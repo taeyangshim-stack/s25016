@@ -98,17 +98,37 @@ PROC PrintVersionInfo()
     TPWrite "========================================";
 ENDPROC
 
-! Write version information to log file
-PROC LogVersionInfo(iodev logfile)
-    Write logfile, "========================================";
-    Write logfile, PROJECT_NAME;
-    Write logfile, "========================================";
-    Write logfile, "TASK1: " + TASK1_VERSION;
-    Write logfile, "TASK2: " + TASK2_VERSION;
-    Write logfile, "T_BG: " + TASK_BG_VERSION;
-    Write logfile, "Build: " + BUILD_DATE + " " + BUILD_TIME;
-    Write logfile, "========================================";
-ENDPROC
+! Get version information as string array (for logging)
+! Usage: Write logfile, GetVersionLine(1); Write logfile, GetVersionLine(2); ...
+FUNC string GetVersionLine(num line_num)
+    IF line_num = 1 THEN
+        RETURN "========================================";
+    ELSEIF line_num = 2 THEN
+        RETURN PROJECT_NAME;
+    ELSEIF line_num = 3 THEN
+        RETURN "========================================";
+    ELSEIF line_num = 4 THEN
+        RETURN "TASK1: " + TASK1_VERSION;
+    ELSEIF line_num = 5 THEN
+        RETURN "TASK2: " + TASK2_VERSION;
+    ELSEIF line_num = 6 THEN
+        RETURN "T_BG: " + TASK_BG_VERSION;
+    ELSEIF line_num = 7 THEN
+        RETURN "Build: " + BUILD_DATE + " " + BUILD_TIME;
+    ELSEIF line_num = 8 THEN
+        RETURN "========================================";
+    ELSE
+        RETURN "";
+    ENDIF
+ENDFUNC
+
+! Example: Write version info to log file
+! Usage:
+!   Open "HOME:/mylog.txt", logfile \Write;
+!   FOR i FROM 1 TO 8 DO
+!       Write logfile, GetVersionLine(i);
+!   ENDFOR
+!   Close logfile;
 
 ! Get formatted version string for logging
 FUNC string GetVersionString()
