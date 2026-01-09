@@ -317,9 +317,14 @@ MODULE MainModule
 		!   - Added TestGantryRotation() procedure
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
-	
-! Version constant for logging (v1.8.52+)
-CONST string TASK1_VERSION := "v1.8.52";
+
+! ========================================
+! Version Management
+! ========================================
+! NOTE: Version constants moved to VersionModule.mod
+! TASK1_VERSION, TASK2_VERSION, etc. are defined in VersionModule
+! Access them directly: TASK1_VERSION, GetVersionString(), PrintVersionInfo()
+
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
