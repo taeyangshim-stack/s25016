@@ -2276,9 +2276,20 @@ PROC TestGantryMode2()
 
 		! Read current gantry position AFTER move (fix for eax_e mismatch)
 		current_gantry := CJointT();
+		Write tp_logfile, "WobjGantry updated: [" + NumToStr(current_gantry.extax.eax_a,0) + ", "
+		                  + NumToStr(current_gantry.extax.eax_b,0) + ", "
+		                  + NumToStr(current_gantry.extax.eax_c,0) + ", R="
+		                  + NumToStr(current_gantry.extax.eax_d,1) + "]";
+		Write tp_logfile, "current_gantry.extax: [" + NumToStr(current_gantry.extax.eax_a,1) + ", "
+		                  + NumToStr(current_gantry.extax.eax_b,1) + ", "
+		                  + NumToStr(current_gantry.extax.eax_c,1) + ", "
+		                  + NumToStr(current_gantry.extax.eax_d,1) + ", "
+		                  + NumToStr(current_gantry.extax.eax_e,1) + ", "
+		                  + NumToStr(current_gantry.extax.eax_f,1) + "]";
 
 		! Move Robot1 TCP back to offset position in updated WobjGantry
 		offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], current_gantry.extax];
+		Write tp_logfile, "offset_tcp target: [" + NumToStr(tcp_offset_x,1) + ", " + NumToStr(tcp_offset_y,1) + ", " + NumToStr(1000+tcp_offset_z,1) + "] in WobjGantry";
 		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
 		TPWrite "Mode2: Robot1 TCP at offset";
 		Write tp_logfile, "Mode2: Robot1 TCP at offset (pos " + NumToStr(i,0) + ")";
@@ -2289,6 +2300,9 @@ PROC TestGantryMode2()
 		UpdateRobot2BaseDynamicWobj;
 		rob1_floor := robot1_floor_pos_t1;
 		rob2_floor := robot2_floor_pos_t1;
+		Write tp_logfile, "Robot1 Floor: [" + NumToStr(rob1_floor.trans.x,2) + ", " + NumToStr(rob1_floor.trans.y,2) + ", " + NumToStr(rob1_floor.trans.z,2) + "]";
+		Write tp_logfile, "Robot2 Floor: [" + NumToStr(rob2_floor.trans.x,2) + ", " + NumToStr(rob2_floor.trans.y,2) + ", " + NumToStr(rob2_floor.trans.z,2) + "]";
+		Write tp_logfile, "----------------------------------------";
 
 		! Log result
 		csv_line := NumToStr(floor_x,0) + "," + NumToStr(floor_y,0) + "," + NumToStr(floor_z,0) + "," + NumToStr(floor_r,1) + ","
