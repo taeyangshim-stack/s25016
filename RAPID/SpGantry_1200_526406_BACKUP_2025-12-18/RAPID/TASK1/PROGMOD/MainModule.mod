@@ -318,8 +318,8 @@ MODULE MainModule
 		!   - Enhanced logging: quaternion, R-axis details
 		!========================================
 	
-! Version constant for logging (v1.8.51+)
-CONST string TASK1_VERSION := "v1.8.51";
+! Version constant for logging (v1.8.52+)
+CONST string TASK1_VERSION := "v1.8.52";
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
@@ -369,24 +369,16 @@ CONST string TASK1_VERSION := "v1.8.51";
 PERS bool robot2_init_complete := FALSE;
 
 ! ========================================
-! Mode2 Test Configuration (v1.8.51)
+! Mode2 Test Configuration (v1.8.52)
 ! ========================================
-! TCP Offsets for Robot1 (mm, Floor-aligned)
-PERS num MODE2_TCP_OFFSET_R1_X := 0;
-PERS num MODE2_TCP_OFFSET_R1_Y := 100;
-PERS num MODE2_TCP_OFFSET_R1_Z := 0;
+! NOTE: Configuration moved to ConfigModule.mod
+! Edit MODE2_* variables in ConfigModule for easy access
 
-! TCP Offsets for Robot2 (mm, Floor-aligned, shared with TASK2)
+! Robot2 TCP offsets (shared with TASK2)
+! These mirror ConfigModule.MODE2_TCP_OFFSET_R2_* for cross-task access
 PERS num mode2_r2_offset_x := 0;
 PERS num mode2_r2_offset_y := -100;
 PERS num mode2_r2_offset_z := 0;
-
-! Complex Motion Test Positions
-PERS num MODE2_NUM_POS := 3;
-PERS num MODE2_POS_X{10} := [1200, 2600, -1500, 0, 0, 0, 0, 0, 0, 0];
-PERS num MODE2_POS_Y{10} := [-400, -900, -600, 0, 0, 0, 0, 0, 0, 0];
-PERS num MODE2_POS_Z{10} := [-500, -700, -300, 0, 0, 0, 0, 0, 0, 0];
-PERS num MODE2_POS_R{10} := [30, -45, 60, 0, 0, 0, 0, 0, 0, 0];
 
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
@@ -2180,7 +2172,12 @@ PROC TestGantryMode2()
 	tcp_offset_y := MODE2_TCP_OFFSET_R1_Y;
 	tcp_offset_z := MODE2_TCP_OFFSET_R1_Z;
 
-	! Share Robot2 offsets (already PERS, just log)
+	! Sync Robot2 offsets from ConfigModule (for TASK2)
+	mode2_r2_offset_x := MODE2_TCP_OFFSET_R2_X;
+	mode2_r2_offset_y := MODE2_TCP_OFFSET_R2_Y;
+	mode2_r2_offset_z := MODE2_TCP_OFFSET_R2_Z;
+
+	! Log Robot2 offsets
 	Write logfile, "R2_OFFSET=" + NumToStr(mode2_r2_offset_x, 1) + ","
 	              + NumToStr(mode2_r2_offset_y, 1) + ","
 	              + NumToStr(mode2_r2_offset_z, 1);
@@ -2242,7 +2239,15 @@ PROC TestGantryMode2()
 		test_pos.extax.eax_d := phys_r;
 		test_pos.extax.eax_f := test_pos.extax.eax_a;
 		MoveAbsJ test_pos, v100, fine, tool0;
-		TPWrite "Mode2: Position " + NumToStr(i,0) + "/" + NumToStr(num_pos,0);
+		TPWrite "Mode2: Gantry moved to position " + NumToStr(i,0) + "/" + NumToStr(num_pos,0);
+
+		! Update WobjGantry for new gantry position and rotation
+		UpdateGantryWobj;
+
+		! Move Robot1 TCP back to offset position in updated WobjGantry
+		offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], test_pos.extax];
+		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
+		TPWrite "Mode2: Robot1 TCP at offset";
 		WaitTime 0.5;
 
 		! Measure Robot1 and Robot2 TCP positions
