@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.8.53";
-CONST string TASK2_VERSION := "v1.8.39";
+CONST string TASK1_VERSION := "v1.8.55";
+CONST string TASK2_VERSION := "v1.8.55";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -22,8 +22,8 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-01-10";
-CONST string BUILD_TIME := "09:00:00";
+CONST string BUILD_DATE := "2026-01-12";
+CONST string BUILD_TIME := "14:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -36,51 +36,62 @@ CONST string COORD_SYSTEM_VERSION := "v1.8.5";  ! Last stable coordinate calcula
 CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 
 ! Mode2 Test
-CONST string MODE2_TEST_VERSION := "v1.8.53";  ! Latest: TCP offset fix + TP log
+CONST string MODE2_TEST_VERSION := "v1.8.55";  ! Latest: Robot2 offset fix (488mm removed)
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.8.55 (2026-01-12)
+!   - FIX - Remove 488mm from Robot2 offset_tcp calculation
+!   - CAUSE - MoveJ uses WobjGantry_Rob2 (R-center reference)
+!   - 488mm was only needed for wobj0 reference, not WobjGantry_Rob2
+!   - RESULT - TCP distance 200mm fixed (R-angle independent)
+!
+! v1.8.54 (2026-01-10)
+!   - FIX - Robot1 joint angles fixed during Mode2 test
+!   - FIX - Remove MoveJ in loop (no inverse kinematics recalculation)
+!   - RESULT - Robot1 maintains exact offset position throughout test
+!
 ! v1.8.53 (2026-01-10)
-!   - FIX: Read current_gantry.extax after MoveAbsJ (eax_e mismatch fix)
-!   - FIX: Robot1 TCP now properly stays at offset position
-!   - FEAT: TP messages saved to tp_messages.txt
+!   - FIX - Read current_gantry.extax after MoveAbsJ (eax_e mismatch fix)
+!   - FIX - Robot1 TCP now properly stays at offset position
+!   - FEAT - TP messages saved to tp_messages.txt
 !
 ! v1.8.52 (2026-01-09)
-!   - NEW: ConfigModule.mod for settings (MODE2_* PERS variables)
-!   - NEW: VersionModule.mod for version management
+!   - NEW - ConfigModule.mod for settings (MODE2_* PERS variables)
+!   - NEW - VersionModule.mod for version management
 !
 ! v1.8.51 (2026-01-09)
-!   - REFACTOR: Config migrated from file to PERS variables
-!   - REMOVE: config.txt parsing (590 lines removed)
-!   - FIX: ReadStr hang issue completely resolved
+!   - REFACTOR - Config migrated from file to PERS variables
+!   - REMOVE - config.txt parsing (590 lines removed)
+!   - FIX - ReadStr hang issue completely resolved
 !
 ! v1.8.50 (2026-01-08)
-!   - DEBUG: Added logging to trace config.txt hang
-!   - TEMP: Hardcoded config values
+!   - DEBUG - Added logging to trace config.txt hang
+!   - TEMP - Hardcoded config values
 !
 ! v1.8.44 (2026-01-08)
-!   - DEBUG: Detailed WHILE loop logging
-!   - FOUND: First ReadStr succeeds, second ReadStr hangs
+!   - DEBUG - Detailed WHILE loop logging
+!   - FOUND - First ReadStr succeeds, second ReadStr hangs
 !
 ! v1.8.43 (2026-01-08)
-!   - DEBUG: Added config.txt open/parse checkpoints
+!   - DEBUG - Added config.txt open/parse checkpoints
 !
 ! v1.8.39 (2026-01-08)
-!   - FEAT: Share Mode2 TCP offsets via PERS for TASK2
+!   - FEAT - Share Mode2 TCP offsets via PERS for TASK2
 !
 ! v1.8.35 (2026-01-08)
-!   - FIX: Robot2 init complete flag cross-task sync
+!   - FIX - Robot2 init complete flag cross-task sync
 !
 ! v1.8.25 (2026-01-07)
-!   - TEST: Mode2 complex motion verified (0.02mm accuracy)
+!   - TEST - Mode2 complex motion verified (0.02mm accuracy)
 !
 ! v1.8.5 (2026-01-05)
-!   - FIX: Robot2 coordinate transformation formula
-!   - SUCCESS: 0.01-0.03mm accuracy at all R-axis angles
+!   - FIX - Robot2 coordinate transformation formula
+!   - SUCCESS - 0.01-0.03mm accuracy at all R-axis angles
 !
 ! v1.8.0 (2025-12-31)
-!   - INIT: Dual robot gantry coordinate system
+!   - INIT - Dual robot gantry coordinate system
 
 ! ========================================
 ! Utility Procedures

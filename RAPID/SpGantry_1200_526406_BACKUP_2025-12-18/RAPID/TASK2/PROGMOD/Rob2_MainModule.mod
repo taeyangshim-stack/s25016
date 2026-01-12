@@ -264,7 +264,13 @@ MODULE Rob2_MainModule
 !   - FIX: Guard comment detection to avoid StrPart on empty strings in config parse.
 !
 ! v1.8.39 (2026-01-08)
-!   - FIX: Read Mode2 TCP offsets from TASK1 shared PERS (no config read).
+!   - FIX - Read Mode2 TCP offsets from TASK1 shared PERS (no config read).
+!
+! v1.8.55 (2026-01-12)
+!   - FIX - Remove 488mm from offset_tcp calculation
+!   - CAUSE - MoveJ uses WobjGantry_Rob2 (R-center reference)
+!   - 488mm was only needed for wobj0 reference, not WobjGantry_Rob2
+!   - RESULT - TCP distance 200mm fixed (R-angle independent)
 	!
 	! v1.8.30 (2026-01-07)
 	!   - Version sync with TASK1 (stop offset parse once keys are found).
@@ -287,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.39";
+CONST string TASK2_VERSION := "v1.8.55";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2371,7 +2377,7 @@ PERS num mode2_r2_offset_z;
 		               + " Z=" + NumToStr(gantry_joint.extax.eax_c, 1)
 		               + " R=" + NumToStr(gantry_joint.extax.eax_d, 1)
 		               + " X2=" + NumToStr(gantry_joint.extax.eax_f, 1);
-		offset_tcp := [[tcp_offset_x, 488 + tcp_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
+		offset_tcp := [[tcp_offset_x, tcp_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
 		Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
 		               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
 		               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
