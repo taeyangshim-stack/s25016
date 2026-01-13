@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.69";
+CONST string TASK2_VERSION := "v1.8.70";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -312,6 +312,11 @@ PERS bool mode2_r2_reposition_trigger;
 PERS bool mode2_r2_reposition_done;
 ! v1.8.67: Initial offset complete flag
 PERS bool mode2_r2_initial_offset_done;
+
+! v1.8.70: Store Robot2 offset joints (like robot1_offset_joints in TASK1)
+! Initial call: MoveJ then save joints
+! Reposition call: Skip MoveJ (joints already at offset, gantry moved)
+VAR robjoint robot2_offset_joints;
 
     PERS tasks taskGroup12{2};
     PERS tasks taskGroup13{2};
@@ -2440,42 +2445,62 @@ PERS bool mode2_r2_initial_offset_done;
 
 		Write diagfile, "Offsets R2: X=" + NumToStr(tcp_offset_x, 2) + " Y=" + NumToStr(tcp_offset_y, 2) + " Z=" + NumToStr(tcp_offset_z, 2);
 
-		! v1.8.69: Use Robot2's own extax and wobj0 (not WobjGantry_Rob2)
-		! Robot2 is NOT gantry-configured, so controller doesn't know base moves with gantry
-		! Using WobjGantry_Rob2 causes 50050 when gantry is not at HOME
-		! Solution: Use wobj0 (Robot2 base frame) which moves with the robot
+		! v1.8.70: Robot2 offset strategy (like Robot1)
+		! - Initial call: MoveJ to offset (works at HOME), save joints
+		! - Reposition call: Skip MoveJ (joints already at offset)
+		! Robot2 is NOT gantry-configured, so MoveJ fails when gantry not at HOME
+		! Solution: Maintain joints like Robot1 does with robot1_offset_joints
 
-		! Get current Robot2 joint values (not TASK1/gantry)
-		gantry_joint := CJointT();  ! Robot2's own joints
-		Write diagfile, "Robot2 current joints read";
+		IF mode2_r2_reposition_trigger THEN
+			! ===== REPOSITION CALL =====
+			! Gantry has moved, but Robot2 joints should stay at offset position
+			! No MoveJ needed - joints already correct from initial call
+			Write diagfile, "v1.8.70: REPOSITION - Skip MoveJ (joints maintained)";
+			TPWrite "R2: REPOSITION - joints maintained";
 
-		! Read R angle from TASK1 for coordinate transformation
-		task1_joints := CJointT(\TaskName:="T_ROB1");
-		r_angle := task1_joints.extax.eax_d;
-		Write diagfile, "R angle from TASK1: " + NumToStr(r_angle, 1);
+			! Signal done
+			mode2_r2_reposition_done := TRUE;
+			Write diagfile, "mode2_r2_reposition_done=TRUE";
+			TPWrite "R2: Reposition done (no motion)";
+		ELSE
+			! ===== INITIAL CALL =====
+			! At HOME position, MoveJ to offset works
+			Write diagfile, "v1.8.70: INITIAL - MoveJ at HOME";
 
-		! v1.8.69: Calculate offset in Robot2 wobj0 frame
-		! Robot2 wobj0 Y points toward R-center (same as Floor Y at R=0)
-		! tcp_offset_y = -100 means 100mm toward Robot2 base (away from R-center)
-		! In wobj0: Y = 488 + tcp_offset_y (488 = distance to R-center)
-		calc_offset_x := tcp_offset_x;
-		calc_offset_y := 488 + tcp_offset_y;  ! 488 + (-100) = 388mm from base toward R-center
-		Write diagfile, "v1.8.69 FIX: Using wobj0";
-		Write diagfile, "  calc_offset_x=" + NumToStr(calc_offset_x, 2) + " calc_offset_y=" + NumToStr(calc_offset_y, 2);
+			! Use WobjGantry_Rob2 at HOME (like SetRobot2InitialPosition)
+			UpdateGantryWobj_Rob2;
+			gantry_joint := CJointT(\TaskName:="T_ROB1");
+			Write diagfile, "WobjGantry_Rob2 updated, gantry extax read";
 
-		! Use Robot2's own extax (current values)
-		offset_tcp := [[calc_offset_x, calc_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
-		Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
-		               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
-		               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
-		TPWrite "R2: Offset TCP=[" + NumToStr(offset_tcp.trans.x, 0) + "," + NumToStr(offset_tcp.trans.y, 0) + "," + NumToStr(offset_tcp.trans.z, 0) + "]";
+			! Calculate offset in WobjGantry_Rob2 (R-center based)
+			! At HOME, this works because gantry at calibrated position
+			calc_offset_x := tcp_offset_x;
+			calc_offset_y := 488 + tcp_offset_y;  ! 488 + (-100) = 388mm
+			Write diagfile, "  calc_offset_x=" + NumToStr(calc_offset_x, 2) + " calc_offset_y=" + NumToStr(calc_offset_y, 2);
 
-		! v1.8.69: Use wobj0 (Robot2 base frame)
-		! wobj0 moves with Robot2 base, so target is always reachable
-		TPWrite "R2: Starting MoveJ with wobj0...";
-		MoveJ offset_tcp, v100, fine, tool0\WObj:=wobj0;
-		TPWrite "R2: MoveJ done";
-		Write diagfile, "MoveJ done";
+			offset_tcp := [[calc_offset_x, calc_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
+			Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
+			               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
+			               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
+			TPWrite "R2: Offset TCP=[" + NumToStr(offset_tcp.trans.x, 0) + "," + NumToStr(offset_tcp.trans.y, 0) + "," + NumToStr(offset_tcp.trans.z, 0) + "]";
+
+			! MoveJ to offset (at HOME this works)
+			TPWrite "R2: MoveJ to offset (HOME)...";
+			MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
+			TPWrite "R2: MoveJ done";
+			Write diagfile, "MoveJ done at HOME";
+
+			! Save offset joints (like robot1_offset_joints in TASK1)
+			robot2_offset_joints := CJointT().robax;
+			Write diagfile, "Saved robot2_offset_joints";
+			TPWrite "R2: Offset joints saved";
+
+			! Signal initial offset complete
+			mode2_r2_initial_offset_done := TRUE;
+			Write diagfile, "mode2_r2_initial_offset_done=TRUE";
+			TPWrite "R2: Initial offset done";
+		ENDIF
+
 		Close diagfile;
 
 	ERROR

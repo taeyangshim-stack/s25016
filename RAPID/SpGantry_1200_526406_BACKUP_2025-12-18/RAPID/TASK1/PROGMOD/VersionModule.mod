@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.8.67";
-CONST string TASK2_VERSION := "v1.8.67";
+CONST string TASK1_VERSION := "v1.8.70";
+CONST string TASK2_VERSION := "v1.8.70";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -23,7 +23,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! Build Information
 ! ========================================
 CONST string BUILD_DATE := "2026-01-13";
-CONST string BUILD_TIME := "21:50:00";
+CONST string BUILD_TIME := "22:30:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -36,11 +36,23 @@ CONST string COORD_SYSTEM_VERSION := "v1.8.5";  ! Last stable coordinate calcula
 CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 
 ! Mode2 Test
-CONST string MODE2_TEST_VERSION := "v1.8.67";  ! Latest: Wait for Robot2 initial offset
+CONST string MODE2_TEST_VERSION := "v1.8.70";  ! Latest: Robot2 maintains joints (no reposition MoveJ)
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.8.70 (2026-01-13)
+!   - FIX - Robot2 reposition fails with 50050/50426 when gantry not at HOME
+!   - ROOT CAUSE: Robot2 is NOT gantry-configured
+!     Controller doesn't know Robot2 base moves with gantry
+!     MoveJ with WobjGantry_Rob2 or wobj0 both fail at non-HOME positions
+!   - SOLUTION: Maintain joints like Robot1 (robot1_offset_joints approach)
+!     Initial call (HOME): MoveJ to offset, save robot2_offset_joints
+!     Reposition call: Skip MoveJ, joints already at offset position
+!   - Added VAR robjoint robot2_offset_joints in Rob2_MainModule
+!   - SetRobot2OffsetPosition now checks mode2_r2_reposition_trigger
+!   - Flow: Initial offset (MoveJ works) -> Gantry moves -> Joints maintained
+!
 ! v1.8.67 (2026-01-13)
 !   - FIX - Race condition: TASK1 moved gantry before Robot2 reached offset
 !   - ROOT CAUSE: No sync between Robot1 offset and gantry move
