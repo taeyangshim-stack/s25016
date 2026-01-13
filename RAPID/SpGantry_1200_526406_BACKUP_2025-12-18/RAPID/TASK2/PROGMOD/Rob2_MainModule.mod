@@ -2394,6 +2394,7 @@ VAR robjoint robot2_offset_joints;
 		VAR iodev diagfile;
 		VAR jointtarget gantry_joint;
 		VAR jointtarget task1_joints;  ! v1.8.69: For reading R angle from TASK1
+		VAR jointtarget current_joints;  ! v1.8.70: For saving offset joints
 		VAR robtarget offset_tcp;
 		VAR num tcp_offset_x;
 		VAR num tcp_offset_y;
@@ -2491,7 +2492,8 @@ VAR robjoint robot2_offset_joints;
 			Write diagfile, "MoveJ done at HOME";
 
 			! Save offset joints (like robot1_offset_joints in TASK1)
-			robot2_offset_joints := CJointT().robax;
+			current_joints := CJointT();
+			robot2_offset_joints := current_joints.robax;
 			Write diagfile, "Saved robot2_offset_joints";
 			TPWrite "R2: Offset joints saved";
 
