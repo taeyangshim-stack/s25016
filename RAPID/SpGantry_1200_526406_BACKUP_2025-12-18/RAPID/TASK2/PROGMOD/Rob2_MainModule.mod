@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.68";
+CONST string TASK2_VERSION := "v1.8.69";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2388,6 +2388,7 @@ PERS bool mode2_r2_initial_offset_done;
 	PROC SetRobot2OffsetPosition()
 		VAR iodev diagfile;
 		VAR jointtarget gantry_joint;
+		VAR jointtarget task1_joints;  ! v1.8.69: For reading R angle from TASK1
 		VAR robtarget offset_tcp;
 		VAR num tcp_offset_x;
 		VAR num tcp_offset_y;
@@ -2439,32 +2440,40 @@ PERS bool mode2_r2_initial_offset_done;
 
 		Write diagfile, "Offsets R2: X=" + NumToStr(tcp_offset_x, 2) + " Y=" + NumToStr(tcp_offset_y, 2) + " Z=" + NumToStr(tcp_offset_z, 2);
 
-		UpdateGantryWobj_Rob2;
-		gantry_joint := CJointT(\TaskName:="T_ROB1");
-		Write diagfile, "Gantry extax: X1=" + NumToStr(gantry_joint.extax.eax_a, 1)
-		               + " Y=" + NumToStr(gantry_joint.extax.eax_b, 1)
-		               + " Z=" + NumToStr(gantry_joint.extax.eax_c, 1)
-		               + " R=" + NumToStr(gantry_joint.extax.eax_d, 1)
-		               + " X2=" + NumToStr(gantry_joint.extax.eax_f, 1);
-		! v1.8.65 FIX: Keep WobjGantry_Rob2 but use correct offset calculation
-		! Robot2 TCP at Y=488 in WobjGantry_Rob2 is at R-center (Robot2 base)
-		! TCP offset from R-center: tcp_offset_y (negative = toward Robot2 base)
-		! Final Y = 488 + tcp_offset_y (488 = Robot2 base offset from R-center)
-		r_angle := gantry_joint.extax.eax_d;
-		calc_offset_x := tcp_offset_x;  ! X offset in rotating frame (simple for now)
-		calc_offset_y := 488 + tcp_offset_y;  ! Y = base offset + TCP offset
-		Write diagfile, "v1.8.65 FIX: R=" + NumToStr(r_angle, 1);
+		! v1.8.69: Use Robot2's own extax and wobj0 (not WobjGantry_Rob2)
+		! Robot2 is NOT gantry-configured, so controller doesn't know base moves with gantry
+		! Using WobjGantry_Rob2 causes 50050 when gantry is not at HOME
+		! Solution: Use wobj0 (Robot2 base frame) which moves with the robot
+
+		! Get current Robot2 joint values (not TASK1/gantry)
+		gantry_joint := CJointT();  ! Robot2's own joints
+		Write diagfile, "Robot2 current joints read";
+
+		! Read R angle from TASK1 for coordinate transformation
+		task1_joints := CJointT(\TaskName:="T_ROB1");
+		r_angle := task1_joints.extax.eax_d;
+		Write diagfile, "R angle from TASK1: " + NumToStr(r_angle, 1);
+
+		! v1.8.69: Calculate offset in Robot2 wobj0 frame
+		! Robot2 wobj0 Y points toward R-center (same as Floor Y at R=0)
+		! tcp_offset_y = -100 means 100mm toward Robot2 base (away from R-center)
+		! In wobj0: Y = 488 + tcp_offset_y (488 = distance to R-center)
+		calc_offset_x := tcp_offset_x;
+		calc_offset_y := 488 + tcp_offset_y;  ! 488 + (-100) = 388mm from base toward R-center
+		Write diagfile, "v1.8.69 FIX: Using wobj0";
 		Write diagfile, "  calc_offset_x=" + NumToStr(calc_offset_x, 2) + " calc_offset_y=" + NumToStr(calc_offset_y, 2);
-		! Use gantry_joint.extax (same as initialization) for proper motion planning
+
+		! Use Robot2's own extax (current values)
 		offset_tcp := [[calc_offset_x, calc_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
 		Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
 		               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
 		               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
 		TPWrite "R2: Offset TCP=[" + NumToStr(offset_tcp.trans.x, 0) + "," + NumToStr(offset_tcp.trans.y, 0) + "," + NumToStr(offset_tcp.trans.z, 0) + "]";
-		! v1.8.65: Use WobjGantry_Rob2 (tracks gantry position)
-		! Same approach as SetRobot2InitialPosition which works reliably
-		TPWrite "R2: Starting MoveJ...";
-		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
+
+		! v1.8.69: Use wobj0 (Robot2 base frame)
+		! wobj0 moves with Robot2 base, so target is always reachable
+		TPWrite "R2: Starting MoveJ with wobj0...";
+		MoveJ offset_tcp, v100, fine, tool0\WObj:=wobj0;
 		TPWrite "R2: MoveJ done";
 		Write diagfile, "MoveJ done";
 		Close diagfile;
