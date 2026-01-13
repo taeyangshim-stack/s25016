@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.8.70";
-CONST string TASK2_VERSION := "v1.8.70";
+CONST string TASK1_VERSION := "v1.8.71";
+CONST string TASK2_VERSION := "v1.8.71";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -36,11 +36,18 @@ CONST string COORD_SYSTEM_VERSION := "v1.8.5";  ! Last stable coordinate calcula
 CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 
 ! Mode2 Test
-CONST string MODE2_TEST_VERSION := "v1.8.70";  ! Latest: Robot2 maintains joints (no reposition MoveJ)
+CONST string MODE2_TEST_VERSION := "v1.8.71";  ! Latest: Use MoveL instead of MoveJ for Robot2 offset
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.8.71 (2026-01-13)
+!   - FIX - MoveJ still causes 50426 on initial offset
+!   - SetRobot2InitialPosition uses MoveL and works
+!   - SetRobot2OffsetPosition was using MoveJ and failing
+!   - SOLUTION: Use MoveL instead of MoveJ for initial offset
+!   - Reposition still skips motion (joints maintained from v1.8.70)
+!
 ! v1.8.70 (2026-01-13)
 !   - FIX - Robot2 reposition fails with 50050/50426 when gantry not at HOME
 !   - ROOT CAUSE: Robot2 is NOT gantry-configured

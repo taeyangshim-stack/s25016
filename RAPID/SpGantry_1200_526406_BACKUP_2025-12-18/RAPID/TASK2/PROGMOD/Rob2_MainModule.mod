@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.70";
+CONST string TASK2_VERSION := "v1.8.71";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2465,8 +2465,9 @@ VAR robjoint robot2_offset_joints;
 			TPWrite "R2: Reposition done (no motion)";
 		ELSE
 			! ===== INITIAL CALL =====
-			! At HOME position, MoveJ to offset works
-			Write diagfile, "v1.8.70: INITIAL - MoveJ at HOME";
+			! v1.8.71: Use MoveL instead of MoveJ (same as SetRobot2InitialPosition)
+			! MoveJ fails with 50426 but MoveL works
+			Write diagfile, "v1.8.71: INITIAL - MoveL at HOME";
 
 			! Use WobjGantry_Rob2 at HOME (like SetRobot2InitialPosition)
 			UpdateGantryWobj_Rob2;
@@ -2485,11 +2486,11 @@ VAR robjoint robot2_offset_joints;
 			               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
 			TPWrite "R2: Offset TCP=[" + NumToStr(offset_tcp.trans.x, 0) + "," + NumToStr(offset_tcp.trans.y, 0) + "," + NumToStr(offset_tcp.trans.z, 0) + "]";
 
-			! MoveJ to offset (at HOME this works)
-			TPWrite "R2: MoveJ to offset (HOME)...";
-			MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
-			TPWrite "R2: MoveJ done";
-			Write diagfile, "MoveJ done at HOME";
+			! v1.8.71: Use MoveL instead of MoveJ (MoveJ causes 50426)
+			TPWrite "R2: MoveL to offset (HOME)...";
+			MoveL offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
+			TPWrite "R2: MoveL done";
+			Write diagfile, "MoveL done at HOME";
 
 			! Save offset joints (like robot1_offset_joints in TASK1)
 			current_joints := CJointT();
