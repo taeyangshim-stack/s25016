@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.72";
+CONST string TASK2_VERSION := "v1.8.73";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2404,86 +2404,30 @@ VAR robjoint robot2_offset_joints;
 		VAR num calc_offset_x;
 		VAR num calc_offset_y;
 
+		! v1.8.73: COMPLETELY NON-BLOCKING TEST
+		! - No config wait (was causing issues with TASK1 motion planning)
+		! - No motion commands
+		! - Just signal done immediately
+		! Purpose: Test if config sync wait is causing 50426 error in TASK1
+
 		Open "HOME:/task2_mode2_offset.txt", diagfile \Write;
 		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
-		Write diagfile, "Enter SetRobot2OffsetPosition";
-		TPWrite "R2: Enter SetRobot2OffsetPosition";
-
-		! v1.8.68 DEBUG: Check trigger flag value
-		TPWrite "R2: reposition_trigger=" + ValToStr(mode2_r2_reposition_trigger);
-		Write diagfile, "DEBUG: reposition_trigger=" + ValToStr(mode2_r2_reposition_trigger);
-
-		! v1.8.66: Only wait for config sync on initial call (not on reposition)
-		! If called from reposition trigger, config is already ready
-		IF NOT mode2_r2_reposition_trigger THEN
-			TPWrite "R2: Waiting for config_ready...";
-			! Initial call: wait for TASK1 to set config values
-			wait_count := 0;
-			WHILE NOT mode2_config_ready AND wait_count < 100 DO
-				WaitTime 0.1;
-				wait_count := wait_count + 1;
-			ENDWHILE
-			TPWrite "R2: Config wait done, count=" + NumToStr(wait_count, 0);
-			Write diagfile, "SYNC: Waited " + NumToStr(wait_count, 0) + " cycles, mode2_config_ready=" + ValToStr(mode2_config_ready);
-			IF NOT mode2_config_ready THEN
-				Write diagfile, "WARNING: Timeout waiting for TASK1 config sync";
-				TPWrite "R2: WARNING - Config sync timeout";
-			ENDIF
-		ELSE
-			TPWrite "R2: SYNC skipped (reposition)";
-			Write diagfile, "SYNC: Skipped (reposition call)";
-		ENDIF
-
-		! DEBUG: Log PERS values received from TASK1
-		Write diagfile, "DEBUG: PERS from TASK1 (mode2_r2_offset):";
-		Write diagfile, "  mode2_r2_offset_x=" + NumToStr(mode2_r2_offset_x, 2);
-		Write diagfile, "  mode2_r2_offset_y=" + NumToStr(mode2_r2_offset_y, 2);
-		Write diagfile, "  mode2_r2_offset_z=" + NumToStr(mode2_r2_offset_z, 2);
-
-		tcp_offset_x := mode2_r2_offset_x;
-		tcp_offset_y := mode2_r2_offset_y;
-		tcp_offset_z := mode2_r2_offset_z;
-
-		Write diagfile, "Offsets R2: X=" + NumToStr(tcp_offset_x, 2) + " Y=" + NumToStr(tcp_offset_y, 2) + " Z=" + NumToStr(tcp_offset_z, 2);
-
-		! v1.8.70: Robot2 offset strategy (like Robot1)
-		! - Initial call: MoveJ to offset (works at HOME), save joints
-		! - Reposition call: Skip MoveJ (joints already at offset)
-		! Robot2 is NOT gantry-configured, so MoveJ fails when gantry not at HOME
-		! Solution: Maintain joints like Robot1 does with robot1_offset_joints
+		Write diagfile, "v1.8.73: NON-BLOCKING TEST - No wait, no motion";
+		TPWrite "R2: v1.8.73 - Non-blocking test";
 
 		IF mode2_r2_reposition_trigger THEN
-			! ===== REPOSITION CALL =====
-			! Gantry has moved, but Robot2 joints should stay at offset position
-			! No MoveJ needed - joints already correct from initial call
-			Write diagfile, "v1.8.70: REPOSITION - Skip MoveJ (joints maintained)";
-			TPWrite "R2: REPOSITION - joints maintained";
-
-			! Signal done
+			Write diagfile, "REPOSITION: Signal done immediately";
 			mode2_r2_reposition_done := TRUE;
-			Write diagfile, "mode2_r2_reposition_done=TRUE";
-			TPWrite "R2: Reposition done (no motion)";
+			TPWrite "R2: Reposition done (immediate)";
 		ELSE
-			! ===== INITIAL CALL =====
-			! v1.8.72: Skip MoveL entirely - Robot2 already at init position
-			! Just save current joints and signal done
-			! This tests if MoveL is causing 50426 error
-			Write diagfile, "v1.8.72: INITIAL - Skip MoveL (test)";
-			TPWrite "R2: v1.8.72 - Skip MoveL test";
-
-			! Robot2 is already at [0, 488, -1000] after SetRobot2InitialPosition
-			! For testing, we skip movement and just save current joints
-
-			! Save offset joints (current position from init)
+			Write diagfile, "INITIAL: Signal done immediately";
+			! Save current joints
 			current_joints := CJointT();
 			robot2_offset_joints := current_joints.robax;
-			Write diagfile, "Saved robot2_offset_joints (no motion)";
-			TPWrite "R2: Offset joints saved (no motion)";
-
-			! Signal initial offset complete
+			Write diagfile, "Saved robot2_offset_joints";
+			! Signal done
 			mode2_r2_initial_offset_done := TRUE;
-			Write diagfile, "mode2_r2_initial_offset_done=TRUE";
-			TPWrite "R2: Initial offset done (no motion)";
+			TPWrite "R2: Initial offset done (immediate)";
 		ENDIF
 
 		Close diagfile;
