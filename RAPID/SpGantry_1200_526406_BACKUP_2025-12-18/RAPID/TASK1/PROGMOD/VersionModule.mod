@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.8.65";
-CONST string TASK2_VERSION := "v1.8.65";
+CONST string TASK1_VERSION := "v1.8.66";
+CONST string TASK2_VERSION := "v1.8.66";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -23,7 +23,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! Build Information
 ! ========================================
 CONST string BUILD_DATE := "2026-01-13";
-CONST string BUILD_TIME := "19:15:00";
+CONST string BUILD_TIME := "19:25:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -36,11 +36,20 @@ CONST string COORD_SYSTEM_VERSION := "v1.8.5";  ! Last stable coordinate calcula
 CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 
 ! Mode2 Test
-CONST string MODE2_TEST_VERSION := "v1.8.65";  ! Latest: WobjGantry_Rob2 + gantry extax
+CONST string MODE2_TEST_VERSION := "v1.8.66";  ! Latest: Fix deadlock in reposition sync
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.8.66 (2026-01-13)
+!   - FIX - Deadlock in reposition sync between TASK1 and TASK2
+!   - ROOT CAUSE: SetRobot2OffsetPosition waited for mode2_config_ready on every call
+!   - TASK1 waited for mode2_r2_reposition_done, TASK2 waited for mode2_config_ready
+!   - SOLUTION: Skip config sync wait when called from reposition trigger
+!     IF NOT mode2_r2_reposition_trigger THEN wait for config sync
+!   - Initial call: waits for config sync
+!   - Reposition call: skips sync (config already ready)
+!
 ! v1.8.65 (2026-01-13)
 !   - FIX - Revert to WobjGantry_Rob2 + gantry_joint.extax for Robot2 MoveJ
 !   - ROOT CAUSE: wobj0 + [9E9] extax caused 50426 (Out of interpolation objects)

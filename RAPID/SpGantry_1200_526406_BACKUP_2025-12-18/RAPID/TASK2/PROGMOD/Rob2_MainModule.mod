@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.65";
+CONST string TASK2_VERSION := "v1.8.66";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2395,16 +2395,22 @@ PERS bool mode2_r2_reposition_done;
 		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 		Write diagfile, "Enter SetRobot2OffsetPosition";
 
-		! v1.8.57: Wait for TASK1 to set config values
-		wait_count := 0;
-		WHILE NOT mode2_config_ready AND wait_count < 100 DO
-			WaitTime 0.1;
-			wait_count := wait_count + 1;
-		ENDWHILE
-		Write diagfile, "SYNC: Waited " + NumToStr(wait_count, 0) + " cycles, mode2_config_ready=" + ValToStr(mode2_config_ready);
-		IF NOT mode2_config_ready THEN
-			Write diagfile, "WARNING: Timeout waiting for TASK1 config sync";
-			TPWrite "R2: WARNING - Config sync timeout";
+		! v1.8.66: Only wait for config sync on initial call (not on reposition)
+		! If called from reposition trigger, config is already ready
+		IF NOT mode2_r2_reposition_trigger THEN
+			! Initial call: wait for TASK1 to set config values
+			wait_count := 0;
+			WHILE NOT mode2_config_ready AND wait_count < 100 DO
+				WaitTime 0.1;
+				wait_count := wait_count + 1;
+			ENDWHILE
+			Write diagfile, "SYNC: Waited " + NumToStr(wait_count, 0) + " cycles, mode2_config_ready=" + ValToStr(mode2_config_ready);
+			IF NOT mode2_config_ready THEN
+				Write diagfile, "WARNING: Timeout waiting for TASK1 config sync";
+				TPWrite "R2: WARNING - Config sync timeout";
+			ENDIF
+		ELSE
+			Write diagfile, "SYNC: Skipped (reposition call)";
 		ENDIF
 
 		! DEBUG: Log PERS values received from TASK1
