@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.67";
+CONST string TASK2_VERSION := "v1.8.68";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2400,22 +2400,30 @@ PERS bool mode2_r2_initial_offset_done;
 		Open "HOME:/task2_mode2_offset.txt", diagfile \Write;
 		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 		Write diagfile, "Enter SetRobot2OffsetPosition";
+		TPWrite "R2: Enter SetRobot2OffsetPosition";
+
+		! v1.8.68 DEBUG: Check trigger flag value
+		TPWrite "R2: reposition_trigger=" + ValToStr(mode2_r2_reposition_trigger);
+		Write diagfile, "DEBUG: reposition_trigger=" + ValToStr(mode2_r2_reposition_trigger);
 
 		! v1.8.66: Only wait for config sync on initial call (not on reposition)
 		! If called from reposition trigger, config is already ready
 		IF NOT mode2_r2_reposition_trigger THEN
+			TPWrite "R2: Waiting for config_ready...";
 			! Initial call: wait for TASK1 to set config values
 			wait_count := 0;
 			WHILE NOT mode2_config_ready AND wait_count < 100 DO
 				WaitTime 0.1;
 				wait_count := wait_count + 1;
 			ENDWHILE
+			TPWrite "R2: Config wait done, count=" + NumToStr(wait_count, 0);
 			Write diagfile, "SYNC: Waited " + NumToStr(wait_count, 0) + " cycles, mode2_config_ready=" + ValToStr(mode2_config_ready);
 			IF NOT mode2_config_ready THEN
 				Write diagfile, "WARNING: Timeout waiting for TASK1 config sync";
 				TPWrite "R2: WARNING - Config sync timeout";
 			ENDIF
 		ELSE
+			TPWrite "R2: SYNC skipped (reposition)";
 			Write diagfile, "SYNC: Skipped (reposition call)";
 		ENDIF
 
@@ -2452,9 +2460,12 @@ PERS bool mode2_r2_initial_offset_done;
 		Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
 		               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
 		               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
+		TPWrite "R2: Offset TCP=[" + NumToStr(offset_tcp.trans.x, 0) + "," + NumToStr(offset_tcp.trans.y, 0) + "," + NumToStr(offset_tcp.trans.z, 0) + "]";
 		! v1.8.65: Use WobjGantry_Rob2 (tracks gantry position)
 		! Same approach as SetRobot2InitialPosition which works reliably
+		TPWrite "R2: Starting MoveJ...";
 		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
+		TPWrite "R2: MoveJ done";
 		Write diagfile, "MoveJ done";
 		Close diagfile;
 
