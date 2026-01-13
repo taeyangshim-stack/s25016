@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.55";
+CONST string TASK2_VERSION := "v1.8.61";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -303,6 +303,9 @@ PERS bool robot2_init_complete;
 PERS num mode2_r2_offset_x;
 PERS num mode2_r2_offset_y;
 PERS num mode2_r2_offset_z;
+
+! v1.8.57: Synchronization flag - wait for TASK1 to update config values
+PERS bool mode2_config_ready;
 
     PERS tasks taskGroup12{2};
     PERS tasks taskGroup13{2};
@@ -2360,14 +2363,34 @@ PERS num mode2_r2_offset_z;
 		VAR num tcp_offset_x;
 		VAR num tcp_offset_y;
 		VAR num tcp_offset_z;
+		VAR num wait_count;
+
+		Open "HOME:/task2_mode2_offset.txt", diagfile \Write;
+		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
+		Write diagfile, "Enter SetRobot2OffsetPosition";
+
+		! v1.8.57: Wait for TASK1 to set config values
+		wait_count := 0;
+		WHILE NOT mode2_config_ready AND wait_count < 100 DO
+			WaitTime 0.1;
+			wait_count := wait_count + 1;
+		ENDWHILE
+		Write diagfile, "SYNC: Waited " + NumToStr(wait_count, 0) + " cycles, mode2_config_ready=" + ValToStr(mode2_config_ready);
+		IF NOT mode2_config_ready THEN
+			Write diagfile, "WARNING: Timeout waiting for TASK1 config sync";
+			TPWrite "R2: WARNING - Config sync timeout";
+		ENDIF
+
+		! DEBUG: Log PERS values received from TASK1
+		Write diagfile, "DEBUG: PERS from TASK1 (mode2_r2_offset):";
+		Write diagfile, "  mode2_r2_offset_x=" + NumToStr(mode2_r2_offset_x, 2);
+		Write diagfile, "  mode2_r2_offset_y=" + NumToStr(mode2_r2_offset_y, 2);
+		Write diagfile, "  mode2_r2_offset_z=" + NumToStr(mode2_r2_offset_z, 2);
 
 		tcp_offset_x := mode2_r2_offset_x;
 		tcp_offset_y := mode2_r2_offset_y;
 		tcp_offset_z := mode2_r2_offset_z;
 
-		Open "HOME:/task2_mode2_offset.txt", diagfile \Write;
-		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
-		Write diagfile, "Enter SetRobot2OffsetPosition";
 		Write diagfile, "Offsets R2: X=" + NumToStr(tcp_offset_x, 2) + " Y=" + NumToStr(tcp_offset_y, 2) + " Z=" + NumToStr(tcp_offset_z, 2);
 
 		UpdateGantryWobj_Rob2;
@@ -2377,7 +2400,9 @@ PERS num mode2_r2_offset_z;
 		               + " Z=" + NumToStr(gantry_joint.extax.eax_c, 1)
 		               + " R=" + NumToStr(gantry_joint.extax.eax_d, 1)
 		               + " X2=" + NumToStr(gantry_joint.extax.eax_f, 1);
-		offset_tcp := [[tcp_offset_x, tcp_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
+		! v1.8.60: Restore working formula for detailed debug
+		! Robot2 wobj0 is at Robot2 base (488mm from R-center)
+		offset_tcp := [[tcp_offset_x, 488 + tcp_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
 		Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
 		               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
 		               + " Z=" + NumToStr(offset_tcp.trans.z, 2);

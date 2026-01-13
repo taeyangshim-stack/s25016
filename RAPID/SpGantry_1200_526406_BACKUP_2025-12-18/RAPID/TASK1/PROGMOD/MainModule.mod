@@ -395,9 +395,23 @@ PERS bool robot2_init_complete := FALSE;
 
 ! Robot2 TCP offsets (shared with TASK2)
 ! These mirror ConfigModule.MODE2_TCP_OFFSET_R2_* for cross-task access
+! v1.8.57: Default changed to -100 (Robot2 below gantry center)
 PERS num mode2_r2_offset_x := 0;
 PERS num mode2_r2_offset_y := -100;
 PERS num mode2_r2_offset_z := 0;
+
+! Synchronization flag for TASK2 (v1.8.57)
+! TASK2 waits for this flag before reading mode2_r2_offset values
+! Prevents timing issue where TASK2 reads stale default values
+PERS bool mode2_config_ready := FALSE;
+
+! v1.8.61 DEBUG: Robot2 calculation intermediate values
+PERS num debug_r2_wobj0_x := 0;
+PERS num debug_r2_wobj0_y := 0;
+PERS num debug_r2_base_floor_x := 0;
+PERS num debug_r2_base_floor_y := 0;
+PERS num debug_r2_floor_x_offset := 0;
+PERS num debug_r2_floor_y_offset := 0;
 
 	! Robot1 wobj0 snapshot for cross-task comparison
 	PERS wobjdata robot1_wobj0_snapshot := [FALSE, TRUE, "", [[0,0,0],[1,0,0,0]], [[0,0,0],[1,0,0,0]]];
@@ -1384,6 +1398,12 @@ PERS num mode2_r2_offset_z := 0;
 		! Read Robot2 TCP position in wobj0 (from TASK2)
 		robot2_tcp_wobj0 := CRobT(\TaskName:="T_ROB2"\Tool:=tool0\WObj:=wobj0);
 
+		! v1.8.61 DEBUG: Save intermediate values for debugging
+		debug_r2_wobj0_x := robot2_tcp_wobj0.trans.x;
+		debug_r2_wobj0_y := robot2_tcp_wobj0.trans.y;
+		debug_r2_base_floor_x := base_floor_x;
+		debug_r2_base_floor_y := base_floor_y;
+
 		! Calculate Robot2 TCP Floor position with rotation transformation
 		! CRITICAL: Robot2 wobj0 rotates with gantry R-axis!
 		! Apply rotation transformation matrix to convert wobj0 coords to Floor coords
@@ -1393,6 +1413,10 @@ PERS num mode2_r2_offset_z := 0;
 		floor_x_offset := robot2_tcp_wobj0.trans.x * Cos(total_r_deg) - robot2_tcp_wobj0.trans.y * Sin(total_r_deg);
 		floor_y_offset := robot2_tcp_wobj0.trans.x * Sin(total_r_deg) + robot2_tcp_wobj0.trans.y * Cos(total_r_deg);
 		floor_z_offset := robot2_tcp_wobj0.trans.z;  ! Z-axis not affected by R-axis rotation
+
+		! v1.8.61 DEBUG: Save floor offsets for debugging
+		debug_r2_floor_x_offset := floor_x_offset;
+		debug_r2_floor_y_offset := floor_y_offset;
 
 		robot2_floor_pos_t1.trans.x := base_floor_x + floor_x_offset;
 		robot2_floor_pos_t1.trans.y := base_floor_y + floor_y_offset;
@@ -2180,10 +2204,14 @@ PROC TestGantryMode2()
 	VAR string tp_log;
 	VAR iodev tp_logfile;
 	VAR jointtarget current_gantry;
+	VAR robjoint robot1_offset_joints;
 
 	abort_test := FALSE;
 	mode2_log := "HOME:/gantry_mode2_test.txt";
 	tp_log := "HOME:/tp_messages.txt";
+
+	! v1.8.57: Reset sync flag at start (TASK2 must wait)
+	mode2_config_ready := FALSE;
 
 	Open mode2_log, logfile \Write;
 	Open tp_log, tp_logfile \Write;
@@ -2194,6 +2222,14 @@ PROC TestGantryMode2()
 	TPWrite "Mode2: Loading config from PERS variables";
 	Write tp_logfile, "Mode2: Loading config from PERS variables";
 
+	! DEBUG: Log ConfigModule PERS values BEFORE copy
+	Write tp_logfile, "DEBUG: ConfigModule R2 BEFORE copy:";
+	Write tp_logfile, "  MODE2_TCP_OFFSET_R2_X=" + NumToStr(MODE2_TCP_OFFSET_R2_X, 1);
+	Write tp_logfile, "  MODE2_TCP_OFFSET_R2_Y=" + NumToStr(MODE2_TCP_OFFSET_R2_Y, 1);
+	Write tp_logfile, "  MODE2_TCP_OFFSET_R2_Z=" + NumToStr(MODE2_TCP_OFFSET_R2_Z, 1);
+	Write tp_logfile, "DEBUG: mode2_r2_offset BEFORE copy:";
+	Write tp_logfile, "  mode2_r2_offset_y=" + NumToStr(mode2_r2_offset_y, 1);
+
 	! Read configuration from PERS variables (no file I/O)
 	tcp_offset_x := MODE2_TCP_OFFSET_R1_X;
 	tcp_offset_y := MODE2_TCP_OFFSET_R1_Y;
@@ -2203,6 +2239,14 @@ PROC TestGantryMode2()
 	mode2_r2_offset_x := MODE2_TCP_OFFSET_R2_X;
 	mode2_r2_offset_y := MODE2_TCP_OFFSET_R2_Y;
 	mode2_r2_offset_z := MODE2_TCP_OFFSET_R2_Z;
+
+	! v1.8.57: Set sync flag (TASK2 can now read values)
+	mode2_config_ready := TRUE;
+	Write tp_logfile, "SYNC: mode2_config_ready=TRUE (TASK2 can proceed)";
+
+	! DEBUG: Log values AFTER copy
+	Write tp_logfile, "DEBUG: mode2_r2_offset AFTER copy:";
+	Write tp_logfile, "  mode2_r2_offset_y=" + NumToStr(mode2_r2_offset_y, 1);
 
 	! Log Robot2 offsets
 	Write logfile, "R2_OFFSET=" + NumToStr(mode2_r2_offset_x, 1) + ","
@@ -2235,6 +2279,11 @@ PROC TestGantryMode2()
 	TPWrite "Mode2: Robot1 at offset TCP";
 	Write tp_logfile, "Mode2: Robot1 at offset TCP";
 
+	! Save Robot1 joint angles for use in loop (fixed joints = fixed TCP direction)
+	current_gantry := CJointT();
+	robot1_offset_joints := current_gantry.robax;
+	Write tp_logfile, "Robot1 offset joints: saved";
+
 	! Test each position
 	FOR i FROM 1 TO num_pos DO
 		! Calculate Floor coordinates (COMPLEX_POS format)
@@ -2260,8 +2309,9 @@ PROC TestGantryMode2()
 			GOTO mode2_cleanup;
 		ENDIF
 
-		! Move gantry to test position
+		! Move gantry to test position (Robot1 joints fixed to offset position)
 		test_pos := CJointT();
+		test_pos.robax := robot1_offset_joints;  ! Keep Robot1 at offset position
 		test_pos.extax.eax_a := phys_x;
 		test_pos.extax.eax_b := phys_y;
 		test_pos.extax.eax_c := phys_z;
@@ -2287,19 +2337,69 @@ PROC TestGantryMode2()
 		                  + NumToStr(current_gantry.extax.eax_e,1) + ", "
 		                  + NumToStr(current_gantry.extax.eax_f,1) + "]";
 
-		! Move Robot1 TCP back to offset position in updated WobjGantry
-		offset_tcp := [[tcp_offset_x, tcp_offset_y, 1000 + tcp_offset_z], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], current_gantry.extax];
-		Write tp_logfile, "offset_tcp target: [" + NumToStr(tcp_offset_x,1) + ", " + NumToStr(tcp_offset_y,1) + ", " + NumToStr(1000+tcp_offset_z,1) + "] in WobjGantry";
-		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry;
-		TPWrite "Mode2: Robot1 TCP at offset";
-		Write tp_logfile, "Mode2: Robot1 TCP at offset (pos " + NumToStr(i,0) + ")";
-		WaitTime 0.5;
+		! Robot1 already at offset position (joints fixed in MoveAbsJ)
+		Write tp_logfile, "Robot1 maintaining offset joints (pos " + NumToStr(i,0) + ")";
+		WaitTime 0.3;
 
 		! Measure Robot1 and Robot2 TCP positions
 		UpdateRobot1FloorPosition;
 		UpdateRobot2BaseDynamicWobj;
 		rob1_floor := robot1_floor_pos_t1;
 		rob2_floor := robot2_floor_pos_t1;
+
+		! v1.8.60 DEBUG: Detailed position analysis
+		Write tp_logfile, "========== v1.8.60 DETAILED DEBUG ==========";
+		Write tp_logfile, "--- Gantry Position ---";
+		Write tp_logfile, "  Gantry Floor: [" + NumToStr(floor_x, 0) + ", " + NumToStr(floor_y, 0) + ", " + NumToStr(floor_z, 0) + "]";
+		Write tp_logfile, "  Gantry Local (extax): [" + NumToStr(phys_x, 0) + ", " + NumToStr(phys_y, 0) + ", " + NumToStr(phys_z, 0) + ", R=" + NumToStr(phys_r, 1) + "]";
+		Write tp_logfile, "  R-center Floor: [" + NumToStr(floor_x, 0) + ", " + NumToStr(floor_y, 0) + ", " + NumToStr(floor_z, 0) + "]";
+		Write tp_logfile, "";
+		Write tp_logfile, "--- Robot1 (wobj0 at R-center, gantry-configured) ---";
+		Write tp_logfile, "  Robot1 Base Floor = R-center: [" + NumToStr(floor_x, 0) + ", " + NumToStr(floor_y, 0) + ", " + NumToStr(floor_z, 0) + "]";
+		Write tp_logfile, "  Robot1 offset_tcp in WobjGantry: [" + NumToStr(tcp_offset_x, 1) + ", " + NumToStr(tcp_offset_y, 1) + ", " + NumToStr(1000 + tcp_offset_z, 1) + "]";
+		Write tp_logfile, "  Robot1 TCP Floor (measured): [" + NumToStr(rob1_floor.trans.x, 2) + ", " + NumToStr(rob1_floor.trans.y, 2) + ", " + NumToStr(rob1_floor.trans.z, 2) + "]";
+		Write tp_logfile, "  Robot1 TCP offset from R-center: [" + NumToStr(rob1_floor.trans.x - floor_x, 2) + ", " + NumToStr(rob1_floor.trans.y - floor_y, 2) + ", " + NumToStr(rob1_floor.trans.z - floor_z, 2) + "]";
+		Write tp_logfile, "";
+		Write tp_logfile, "--- Robot2 (wobj0 at Robot2 base, NOT gantry-configured) ---";
+		Write tp_logfile, "  Robot2 Base Floor: [" + NumToStr(debug_r2_base_floor_x, 2) + ", " + NumToStr(rob2_floor.trans.y - (debug_r2_wobj0_y * Cos(current_gantry.extax.eax_d)), 2) + "]";
+		Write tp_logfile, "  Robot2 offset_tcp in WobjGantry_Rob2: [0, " + NumToStr(488 + mode2_r2_offset_y, 1) + ", -1000]";
+		Write tp_logfile, "  Robot2 wobj0 (TCP from base): [" + NumToStr(debug_r2_wobj0_x, 2) + ", " + NumToStr(debug_r2_wobj0_y, 2) + "]";
+		Write tp_logfile, "  Robot2 TCP Floor (measured): [" + NumToStr(rob2_floor.trans.x, 2) + ", " + NumToStr(rob2_floor.trans.y, 2) + ", " + NumToStr(rob2_floor.trans.z, 2) + "]";
+		Write tp_logfile, "  Robot2 TCP offset from R-center: [" + NumToStr(rob2_floor.trans.x - floor_x, 2) + ", " + NumToStr(rob2_floor.trans.y - floor_y, 2) + ", " + NumToStr(rob2_floor.trans.z - floor_z, 2) + "]";
+		Write tp_logfile, "";
+		Write tp_logfile, "--- Comparison ---";
+		Write tp_logfile, "  3D Distance: " + NumToStr(Sqrt(Pow(rob1_floor.trans.x - rob2_floor.trans.x, 2) + Pow(rob1_floor.trans.y - rob2_floor.trans.y, 2) + Pow(rob1_floor.trans.z - rob2_floor.trans.z, 2)), 2) + " mm";
+		Write tp_logfile, "  Expected (at R=0): 200.00 mm";
+		Write tp_logfile, "=========================================";
+
+		! v1.8.61 DEBUG: Log X coordinate analysis
+		Write tp_logfile, "DEBUG X Analysis:";
+		Write tp_logfile, "  Gantry X (R-center): " + NumToStr(phys_x + 9500, 1);
+		Write tp_logfile, "  R angle (extax.eax_d): " + NumToStr(current_gantry.extax.eax_d, 1);
+		Write tp_logfile, "  sin(R): " + NumToStr(Sin(current_gantry.extax.eax_d), 4);
+		Write tp_logfile, "  Robot2 wobj0: [" + NumToStr(debug_r2_wobj0_x, 1) + ", " + NumToStr(debug_r2_wobj0_y, 1) + "]";
+		Write tp_logfile, "  Robot2 base_floor_x: " + NumToStr(debug_r2_base_floor_x, 1);
+		Write tp_logfile, "  Robot2 floor_x_offset: " + NumToStr(debug_r2_floor_x_offset, 1);
+		Write tp_logfile, "  Robot2 X = base + offset: " + NumToStr(debug_r2_base_floor_x, 1) + " + " + NumToStr(debug_r2_floor_x_offset, 1) + " = " + NumToStr(rob2_floor.trans.x, 1);
+		Write tp_logfile, "  Robot1 X: " + NumToStr(rob1_floor.trans.x, 2) + " (offset from gantry: " + NumToStr(rob1_floor.trans.x - (phys_x + 9500), 2) + ")";
+		Write tp_logfile, "  Robot2 X: " + NumToStr(rob2_floor.trans.x, 2) + " (offset from gantry: " + NumToStr(rob2_floor.trans.x - (phys_x + 9500), 2) + ")";
+		Write tp_logfile, "  Expected R2 X offset: +" + NumToStr(100 * Sin(current_gantry.extax.eax_d), 2);
+		Write tp_logfile, "  Delta X (R1-R2): " + NumToStr(rob1_floor.trans.x - rob2_floor.trans.x, 2);
+
+		! v1.8.61 DEBUG: Log Y coordinate analysis
+		Write tp_logfile, "DEBUG Y Analysis:";
+		Write tp_logfile, "  Gantry Y (R-center): " + NumToStr(5300 - phys_y, 1);
+		Write tp_logfile, "  cos(R): " + NumToStr(Cos(current_gantry.extax.eax_d), 4);
+		Write tp_logfile, "  Robot2 base_floor_y: " + NumToStr(debug_r2_base_floor_y, 1);
+		Write tp_logfile, "  Robot2 floor_y_offset: " + NumToStr(debug_r2_floor_y_offset, 1);
+		Write tp_logfile, "  Robot2 Y = base + offset: " + NumToStr(debug_r2_base_floor_y, 1) + " + " + NumToStr(debug_r2_floor_y_offset, 1) + " = " + NumToStr(rob2_floor.trans.y, 1);
+		Write tp_logfile, "  Robot1 Y: " + NumToStr(rob1_floor.trans.y, 2) + " (offset from gantry: " + NumToStr(rob1_floor.trans.y - (5300 - phys_y), 2) + ")";
+		Write tp_logfile, "  Robot2 Y: " + NumToStr(rob2_floor.trans.y, 2) + " (offset from gantry: " + NumToStr(rob2_floor.trans.y - (5300 - phys_y), 2) + ")";
+		Write tp_logfile, "  Expected R1 Y offset: +" + NumToStr(100 * Cos(current_gantry.extax.eax_d), 2);
+		Write tp_logfile, "  Expected R2 Y offset: -" + NumToStr(100 * Cos(current_gantry.extax.eax_d), 2);
+		Write tp_logfile, "  Delta Y (R1-R2): " + NumToStr(rob1_floor.trans.y - rob2_floor.trans.y, 2);
+		Write tp_logfile, "  Expected Delta Y: " + NumToStr(200 * Cos(current_gantry.extax.eax_d), 2);
+
 		Write tp_logfile, "Robot1 Floor: [" + NumToStr(rob1_floor.trans.x,2) + ", " + NumToStr(rob1_floor.trans.y,2) + ", " + NumToStr(rob1_floor.trans.z,2) + "]";
 		Write tp_logfile, "Robot2 Floor: [" + NumToStr(rob2_floor.trans.x,2) + ", " + NumToStr(rob2_floor.trans.y,2) + ", " + NumToStr(rob2_floor.trans.z,2) + "]";
 		Write tp_logfile, "----------------------------------------";

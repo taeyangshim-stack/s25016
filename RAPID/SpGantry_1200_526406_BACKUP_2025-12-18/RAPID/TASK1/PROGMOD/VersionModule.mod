@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.8.55";
-CONST string TASK2_VERSION := "v1.8.55";
+CONST string TASK1_VERSION := "v1.8.61";
+CONST string TASK2_VERSION := "v1.8.61";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -22,8 +22,8 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-01-12";
-CONST string BUILD_TIME := "14:00:00";
+CONST string BUILD_DATE := "2026-01-13";
+CONST string BUILD_TIME := "12:30:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -36,11 +36,50 @@ CONST string COORD_SYSTEM_VERSION := "v1.8.5";  ! Last stable coordinate calcula
 CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 
 ! Mode2 Test
-CONST string MODE2_TEST_VERSION := "v1.8.55";  ! Latest: Robot2 offset fix (488mm removed)
+CONST string MODE2_TEST_VERSION := "v1.8.61";  ! Latest: DEBUG - 3 positions (R=0,30,-30) with full X/Y analysis
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.8.61 (2026-01-13)
+!   - DEBUG - 3 test positions: Floor [5000, 5000, 2100] with R=0, 30, -30
+!   - DEBUG - Full X and Y coordinate analysis
+!   - DEBUG - Robot2 base_floor_y and floor_y_offset logging added
+!   - GOAL - Verify X/Y behavior at different R angles
+!
+! v1.8.60 (2026-01-13)
+!   - DEBUG - Restore working formula (488 + tcp_offset_y) for analysis
+!   - DEBUG - Single test position: Floor [5000, 5000, 2100], R=0
+!   - DEBUG - Detailed logging: Gantry pos, Robot1/2 base, TCP, offsets
+!   - GOAL - Step-by-step verification of coordinate system
+!
+! v1.8.59 (2026-01-13)
+!   - FAIL - offset_tcp.y = 588 caused Joint Out of Range
+!   - Robot2 cannot reach 588mm from base (beyond physical limit)
+!
+! v1.8.58 (2026-01-13)
+!   - DEBUG - Added detailed X coordinate analysis logging
+!   - Traced Robot2 intermediate values (wobj0, base_floor_x, floor_x_offset)
+!   - Identified issue: Both robots moving same X direction (should be opposite)
+!
+! v1.8.57 (2026-01-13)
+!   - FIX - Reversed TCP offset direction for both robots
+!   - Robot1: R1_Y changed from +100 to -100 (now above gantry center)
+!   - Robot2: R2_Y changed from +100 to -100 (now below gantry center)
+!   - New layout: R2 tcp <--[Gantry]--> R1 tcp (Y distance = 200*cos(R))
+!   - FEAT - Added mode2_config_ready sync flag for cross-task timing
+!   - TASK1 sets flag to TRUE after copying config values
+!   - TASK2 waits for flag before reading offset values (max 10s timeout)
+!   - Prevents stale default value issue from P-Start timing
+!
+! v1.8.56 (2026-01-12)
+!   - FIX - Robot2 tcp_offset_y sign: -100 -> +100
+!   - CAUSE - Both robots had same Y direction after transformation
+!   - Floor Y effect: R1=-100*cos(R), R2=(488+offset-488)*cos(R)
+!   - With offset=-100: both at -100*cos(R), same Y position
+!   - With offset=+100: R2 at +100*cos(R), opposite direction
+!   - RESULT - Y distance = 200*cos(R), robots on opposite sides
+!
 ! v1.8.55 (2026-01-12)
 !   - FIX - Remove 488mm from Robot2 offset_tcp calculation
 !   - CAUSE - MoveJ uses WobjGantry_Rob2 (R-center reference)
