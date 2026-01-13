@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.61";
+CONST string TASK2_VERSION := "v1.8.65";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2426,26 +2426,23 @@ PERS bool mode2_r2_reposition_done;
 		               + " Z=" + NumToStr(gantry_joint.extax.eax_c, 1)
 		               + " R=" + NumToStr(gantry_joint.extax.eax_d, 1)
 		               + " X2=" + NumToStr(gantry_joint.extax.eax_f, 1);
-		! v1.8.62 FIX: Rotating frame alignment correction
-		! Robot2 wobj0 Y points "toward R-center" = [-sin(R), cos(R)] in Floor
-		! Rotating frame Y = [sin(R), cos(R)] in Floor (X component is opposite!)
-		! To position TCP at [tcp_offset_x, tcp_offset_y] in ROTATING frame:
-		!   wobj0_x = tcp_offset_x * Cos(2R) + tcp_offset_y * Sin(2R)
-		!   wobj0_y = -tcp_offset_x * Sin(2R) + tcp_offset_y * Cos(2R) + 488
+		! v1.8.65 FIX: Keep WobjGantry_Rob2 but use correct offset calculation
+		! Robot2 TCP at Y=488 in WobjGantry_Rob2 is at R-center (Robot2 base)
+		! TCP offset from R-center: tcp_offset_y (negative = toward Robot2 base)
+		! Final Y = 488 + tcp_offset_y (488 = Robot2 base offset from R-center)
 		r_angle := gantry_joint.extax.eax_d;
-		calc_offset_x := tcp_offset_x * Cos(2*r_angle) + tcp_offset_y * Sin(2*r_angle);
-		calc_offset_y := -tcp_offset_x * Sin(2*r_angle) + tcp_offset_y * Cos(2*r_angle) + 488;
-		Write diagfile, "v1.8.62 FIX: R=" + NumToStr(r_angle, 1) + " 2R=" + NumToStr(2*r_angle, 1);
+		calc_offset_x := tcp_offset_x;  ! X offset in rotating frame (simple for now)
+		calc_offset_y := 488 + tcp_offset_y;  ! Y = base offset + TCP offset
+		Write diagfile, "v1.8.65 FIX: R=" + NumToStr(r_angle, 1);
 		Write diagfile, "  calc_offset_x=" + NumToStr(calc_offset_x, 2) + " calc_offset_y=" + NumToStr(calc_offset_y, 2);
-		! v1.8.64: Robot2 has no external axes - use 9E9 (not defined)
-		offset_tcp := [[calc_offset_x, calc_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]];
+		! Use gantry_joint.extax (same as initialization) for proper motion planning
+		offset_tcp := [[calc_offset_x, calc_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
 		Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
 		               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
 		               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
-		! v1.8.64: Use wobj0 (Robot2 base frame) instead of WobjGantry_Rob2
-		! Robot2 is NOT gantry-configured, so wobj0 moves with the robot
-		! The 2R formula already converts rotating frame offset to wobj0 coordinates
-		MoveJ offset_tcp, v100, fine, tool0\WObj:=wobj0;
+		! v1.8.65: Use WobjGantry_Rob2 (tracks gantry position)
+		! Same approach as SetRobot2InitialPosition which works reliably
+		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
 		Write diagfile, "MoveJ done";
 		Close diagfile;
 
