@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.66";
+CONST string TASK2_VERSION := "v1.8.67";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -310,6 +310,8 @@ PERS bool mode2_config_ready;
 ! v1.8.63: Robot2 reposition sync flags
 PERS bool mode2_r2_reposition_trigger;
 PERS bool mode2_r2_reposition_done;
+! v1.8.67: Initial offset complete flag
+PERS bool mode2_r2_initial_offset_done;
 
     PERS tasks taskGroup12{2};
     PERS tasks taskGroup13{2};
@@ -713,6 +715,10 @@ PERS bool mode2_r2_reposition_done;
             Write main_logfile, "Mode2 offset start";
             SetRobot2OffsetPosition;
             Write main_logfile, "Mode2 offset applied";
+
+            ! v1.8.67: Signal TASK1 that initial offset is done
+            mode2_r2_initial_offset_done := TRUE;
+            Write main_logfile, "Mode2: Initial offset done signal sent";
 
             ! v1.8.63: Monitor for reposition triggers
             Write main_logfile, "Mode2: Entering reposition monitor loop";

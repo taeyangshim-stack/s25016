@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.8.66";
-CONST string TASK2_VERSION := "v1.8.66";
+CONST string TASK1_VERSION := "v1.8.67";
+CONST string TASK2_VERSION := "v1.8.67";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -23,7 +23,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! Build Information
 ! ========================================
 CONST string BUILD_DATE := "2026-01-13";
-CONST string BUILD_TIME := "19:25:00";
+CONST string BUILD_TIME := "21:50:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -36,11 +36,21 @@ CONST string COORD_SYSTEM_VERSION := "v1.8.5";  ! Last stable coordinate calcula
 CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 
 ! Mode2 Test
-CONST string MODE2_TEST_VERSION := "v1.8.66";  ! Latest: Fix deadlock in reposition sync
+CONST string MODE2_TEST_VERSION := "v1.8.67";  ! Latest: Wait for Robot2 initial offset
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.8.67 (2026-01-13)
+!   - FIX - Race condition: TASK1 moved gantry before Robot2 reached offset
+!   - ROOT CAUSE: No sync between Robot1 offset and gantry move
+!   - Robot2 offset was called AFTER gantry moved to test position
+!   - 50426 error: Robot2 can't reach offset at non-HOME gantry position
+!   - SOLUTION: New sync flag mode2_r2_initial_offset_done
+!     TASK1: Wait for mode2_r2_initial_offset_done before FOR loop
+!     TASK2: Set mode2_r2_initial_offset_done after SetRobot2OffsetPosition
+!   - Flow: Both robots at offset (HOME) -> Gantry moves -> Robot2 repositions
+!
 ! v1.8.66 (2026-01-13)
 !   - FIX - Deadlock in reposition sync between TASK1 and TASK2
 !   - ROOT CAUSE: SetRobot2OffsetPosition waited for mode2_config_ready on every call

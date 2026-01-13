@@ -409,6 +409,8 @@ PERS bool mode2_config_ready := FALSE;
 ! TASK1 sets trigger, TASK2 repositions and sets done
 PERS bool mode2_r2_reposition_trigger := FALSE;
 PERS bool mode2_r2_reposition_done := FALSE;
+! v1.8.67: Wait for Robot2 initial offset before moving gantry
+PERS bool mode2_r2_initial_offset_done := FALSE;
 
 ! v1.8.61 DEBUG: Robot2 calculation intermediate values
 PERS num debug_r2_wobj0_x := 0;
@@ -2216,8 +2218,9 @@ PROC TestGantryMode2()
 	mode2_log := "HOME:/gantry_mode2_test.txt";
 	tp_log := "HOME:/tp_messages.txt";
 
-	! v1.8.57: Reset sync flag at start (TASK2 must wait)
+	! v1.8.57: Reset sync flags at start (TASK2 must wait)
 	mode2_config_ready := FALSE;
+	mode2_r2_initial_offset_done := FALSE;
 
 	Open mode2_log, logfile \Write;
 	Open tp_log, tp_logfile \Write;
@@ -2289,6 +2292,22 @@ PROC TestGantryMode2()
 	current_gantry := CJointT();
 	robot1_offset_joints := current_gantry.robax;
 	Write tp_logfile, "Robot1 offset joints: saved";
+
+	! v1.8.67: Wait for Robot2 initial offset before moving gantry
+	TPWrite "Mode2: Waiting for Robot2 initial offset...";
+	Write tp_logfile, "SYNC: Waiting for Robot2 initial offset...";
+	wait_count := 0;
+	WHILE NOT mode2_r2_initial_offset_done AND wait_count < 100 DO
+		WaitTime 0.1;
+		wait_count := wait_count + 1;
+	ENDWHILE
+	IF mode2_r2_initial_offset_done THEN
+		Write tp_logfile, "SYNC: Robot2 initial offset done (waited " + NumToStr(wait_count, 0) + " cycles)";
+		TPWrite "Mode2: Robot2 initial offset done";
+	ELSE
+		Write tp_logfile, "WARNING: Robot2 initial offset timeout!";
+		TPWrite "Mode2: WARNING - Robot2 offset timeout!";
+	ENDIF
 
 	! Test each position
 	FOR i FROM 1 TO num_pos DO
