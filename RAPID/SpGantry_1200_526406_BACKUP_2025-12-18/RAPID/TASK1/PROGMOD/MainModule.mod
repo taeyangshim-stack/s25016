@@ -405,6 +405,11 @@ PERS num mode2_r2_offset_z := 0;
 ! Prevents timing issue where TASK2 reads stale default values
 PERS bool mode2_config_ready := FALSE;
 
+! v1.8.63: Robot2 reposition sync flags
+! TASK1 sets trigger, TASK2 repositions and sets done
+PERS bool mode2_r2_reposition_trigger := FALSE;
+PERS bool mode2_r2_reposition_done := FALSE;
+
 ! v1.8.61 DEBUG: Robot2 calculation intermediate values
 PERS num debug_r2_wobj0_x := 0;
 PERS num debug_r2_wobj0_y := 0;
@@ -2205,6 +2210,7 @@ PROC TestGantryMode2()
 	VAR iodev tp_logfile;
 	VAR jointtarget current_gantry;
 	VAR robjoint robot1_offset_joints;
+	VAR num wait_count;
 
 	abort_test := FALSE;
 	mode2_log := "HOME:/gantry_mode2_test.txt";
@@ -2339,6 +2345,22 @@ PROC TestGantryMode2()
 
 		! Robot1 already at offset position (joints fixed in MoveAbsJ)
 		Write tp_logfile, "Robot1 maintaining offset joints (pos " + NumToStr(i,0) + ")";
+
+		! v1.8.63: Trigger Robot2 to reposition at current R angle
+		mode2_r2_reposition_done := FALSE;
+		mode2_r2_reposition_trigger := TRUE;
+		Write tp_logfile, "SYNC: Waiting for Robot2 reposition...";
+		wait_count := 0;
+		WHILE NOT mode2_r2_reposition_done AND wait_count < 100 DO
+			WaitTime 0.1;
+			wait_count := wait_count + 1;
+		ENDWHILE
+		mode2_r2_reposition_trigger := FALSE;
+		IF mode2_r2_reposition_done THEN
+			Write tp_logfile, "SYNC: Robot2 repositioned (waited " + NumToStr(wait_count, 0) + " cycles)";
+		ELSE
+			Write tp_logfile, "SYNC: WARNING - Robot2 reposition timeout!";
+		ENDIF
 		WaitTime 0.3;
 
 		! Measure Robot1 and Robot2 TCP positions
@@ -2427,6 +2449,10 @@ mode2_cleanup:
 	TPWrite "Mode2: Test complete!";
 	Write tp_logfile, "Mode2: Test complete!";
 	Write tp_logfile, "========================================";
+
+	! v1.8.63: Signal TASK2 to exit reposition monitor loop
+	mode2_config_ready := FALSE;
+
 	Close logfile;
 	Close tp_logfile;
 	IF abort_test = TRUE THEN

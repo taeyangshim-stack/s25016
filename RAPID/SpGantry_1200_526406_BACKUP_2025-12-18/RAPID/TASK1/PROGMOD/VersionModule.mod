@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.8.61";
-CONST string TASK2_VERSION := "v1.8.61";
+CONST string TASK1_VERSION := "v1.8.64";
+CONST string TASK2_VERSION := "v1.8.64";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -23,7 +23,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! Build Information
 ! ========================================
 CONST string BUILD_DATE := "2026-01-13";
-CONST string BUILD_TIME := "12:30:00";
+CONST string BUILD_TIME := "19:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -36,11 +36,35 @@ CONST string COORD_SYSTEM_VERSION := "v1.8.5";  ! Last stable coordinate calcula
 CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 
 ! Mode2 Test
-CONST string MODE2_TEST_VERSION := "v1.8.61";  ! Latest: DEBUG - 3 positions (R=0,30,-30) with full X/Y analysis
+CONST string MODE2_TEST_VERSION := "v1.8.64";  ! Latest: Use wobj0 for Robot2 MoveJ
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.8.64 (2026-01-13)
+!   - FIX - Use wobj0 instead of WobjGantry_Rob2 for Robot2 MoveJ
+!   - FIX - Use [9E9,...] extax instead of gantry_joint.extax for Robot2
+!   - ROOT CAUSE 1: WobjGantry_Rob2 set to gantry physical coordinates
+!   - ROOT CAUSE 2: Robot2 has no external axes, gantry extax causes 50426
+!   - Robot2 is NOT gantry-configured, so controller doesn't know base moved
+!   - SOLUTION: Use wobj0 + extax=[9E9,9E9,9E9,9E9,9E9,9E9]
+!   - 2R formula already converts rotating frame to wobj0 coordinates
+!
+! v1.8.63 (2026-01-13)
+!   - FIX - Robot2 reposition at each R angle in test loop
+!   - TASK1 triggers mode2_r2_reposition_trigger after each gantry move
+!   - TASK2 monitors trigger and calls SetRobot2OffsetPosition
+!   - Combined with v1.8.62 2R formula for correct positioning
+!
+! v1.8.62 (2026-01-13)
+!   - FIX - Rotating frame alignment correction for Robot2
+!   - ROOT CAUSE: Robot2 wobj0 Y = [-sin(R), cos(R)], Rotating Y = [sin(R), cos(R)]
+!   - X component opposite! Caused both robots to move same X direction
+!   - SOLUTION: Use 2R formula to convert rotating frame to wobj0
+!     calc_offset_x = tcp_offset_x * Cos(2R) + tcp_offset_y * Sin(2R)
+!     calc_offset_y = -tcp_offset_x * Sin(2R) + tcp_offset_y * Cos(2R) + 488
+!   - EXPECTED: TCP distance = 200mm fixed at all R angles
+!
 ! v1.8.61 (2026-01-13)
 !   - DEBUG - 3 test positions: Floor [5000, 5000, 2100] with R=0, 30, -30
 !   - DEBUG - Full X and Y coordinate analysis

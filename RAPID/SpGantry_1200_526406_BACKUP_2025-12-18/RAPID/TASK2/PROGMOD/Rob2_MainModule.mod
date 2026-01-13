@@ -307,6 +307,10 @@ PERS num mode2_r2_offset_z;
 ! v1.8.57: Synchronization flag - wait for TASK1 to update config values
 PERS bool mode2_config_ready;
 
+! v1.8.63: Robot2 reposition sync flags
+PERS bool mode2_r2_reposition_trigger;
+PERS bool mode2_r2_reposition_done;
+
     PERS tasks taskGroup12{2};
     PERS tasks taskGroup13{2};
     PERS tasks taskGroup23{2};
@@ -709,6 +713,25 @@ PERS bool mode2_config_ready;
             Write main_logfile, "Mode2 offset start";
             SetRobot2OffsetPosition;
             Write main_logfile, "Mode2 offset applied";
+
+            ! v1.8.63: Monitor for reposition triggers
+            Write main_logfile, "Mode2: Entering reposition monitor loop";
+            TPWrite "TASK2: Monitoring for reposition triggers...";
+            WHILE mode2_config_ready DO
+                IF mode2_r2_reposition_trigger THEN
+                    Write main_logfile, "Reposition trigger received";
+                    SetRobot2OffsetPosition;
+                    mode2_r2_reposition_done := TRUE;
+                    Write main_logfile, "Reposition complete, done=TRUE";
+                    ! Wait for trigger to be cleared
+                    WHILE mode2_r2_reposition_trigger DO
+                        WaitTime 0.05;
+                    ENDWHILE
+                    mode2_r2_reposition_done := FALSE;
+                ENDIF
+                WaitTime 0.05;
+            ENDWHILE
+            Write main_logfile, "Mode2: Exited reposition monitor (config_ready=FALSE)";
         ENDIF
 
         WaitTime 1.0;
@@ -2364,6 +2387,9 @@ PERS bool mode2_config_ready;
 		VAR num tcp_offset_y;
 		VAR num tcp_offset_z;
 		VAR num wait_count;
+		VAR num r_angle;
+		VAR num calc_offset_x;
+		VAR num calc_offset_y;
 
 		Open "HOME:/task2_mode2_offset.txt", diagfile \Write;
 		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
@@ -2400,13 +2426,26 @@ PERS bool mode2_config_ready;
 		               + " Z=" + NumToStr(gantry_joint.extax.eax_c, 1)
 		               + " R=" + NumToStr(gantry_joint.extax.eax_d, 1)
 		               + " X2=" + NumToStr(gantry_joint.extax.eax_f, 1);
-		! v1.8.60: Restore working formula for detailed debug
-		! Robot2 wobj0 is at Robot2 base (488mm from R-center)
-		offset_tcp := [[tcp_offset_x, 488 + tcp_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
+		! v1.8.62 FIX: Rotating frame alignment correction
+		! Robot2 wobj0 Y points "toward R-center" = [-sin(R), cos(R)] in Floor
+		! Rotating frame Y = [sin(R), cos(R)] in Floor (X component is opposite!)
+		! To position TCP at [tcp_offset_x, tcp_offset_y] in ROTATING frame:
+		!   wobj0_x = tcp_offset_x * Cos(2R) + tcp_offset_y * Sin(2R)
+		!   wobj0_y = -tcp_offset_x * Sin(2R) + tcp_offset_y * Cos(2R) + 488
+		r_angle := gantry_joint.extax.eax_d;
+		calc_offset_x := tcp_offset_x * Cos(2*r_angle) + tcp_offset_y * Sin(2*r_angle);
+		calc_offset_y := -tcp_offset_x * Sin(2*r_angle) + tcp_offset_y * Cos(2*r_angle) + 488;
+		Write diagfile, "v1.8.62 FIX: R=" + NumToStr(r_angle, 1) + " 2R=" + NumToStr(2*r_angle, 1);
+		Write diagfile, "  calc_offset_x=" + NumToStr(calc_offset_x, 2) + " calc_offset_y=" + NumToStr(calc_offset_y, 2);
+		! v1.8.64: Robot2 has no external axes - use 9E9 (not defined)
+		offset_tcp := [[calc_offset_x, calc_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], [9E9, 9E9, 9E9, 9E9, 9E9, 9E9]];
 		Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
 		               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
 		               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
-		MoveJ offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
+		! v1.8.64: Use wobj0 (Robot2 base frame) instead of WobjGantry_Rob2
+		! Robot2 is NOT gantry-configured, so wobj0 moves with the robot
+		! The 2R formula already converts rotating frame offset to wobj0 coordinates
+		MoveJ offset_tcp, v100, fine, tool0\WObj:=wobj0;
 		Write diagfile, "MoveJ done";
 		Close diagfile;
 
