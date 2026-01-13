@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.71";
+CONST string TASK2_VERSION := "v1.8.72";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2465,43 +2465,25 @@ VAR robjoint robot2_offset_joints;
 			TPWrite "R2: Reposition done (no motion)";
 		ELSE
 			! ===== INITIAL CALL =====
-			! v1.8.71: Use MoveL instead of MoveJ (same as SetRobot2InitialPosition)
-			! MoveJ fails with 50426 but MoveL works
-			Write diagfile, "v1.8.71: INITIAL - MoveL at HOME";
+			! v1.8.72: Skip MoveL entirely - Robot2 already at init position
+			! Just save current joints and signal done
+			! This tests if MoveL is causing 50426 error
+			Write diagfile, "v1.8.72: INITIAL - Skip MoveL (test)";
+			TPWrite "R2: v1.8.72 - Skip MoveL test";
 
-			! Use WobjGantry_Rob2 at HOME (like SetRobot2InitialPosition)
-			UpdateGantryWobj_Rob2;
-			gantry_joint := CJointT(\TaskName:="T_ROB1");
-			Write diagfile, "WobjGantry_Rob2 updated, gantry extax read";
+			! Robot2 is already at [0, 488, -1000] after SetRobot2InitialPosition
+			! For testing, we skip movement and just save current joints
 
-			! Calculate offset in WobjGantry_Rob2 (R-center based)
-			! At HOME, this works because gantry at calibrated position
-			calc_offset_x := tcp_offset_x;
-			calc_offset_y := 488 + tcp_offset_y;  ! 488 + (-100) = 388mm
-			Write diagfile, "  calc_offset_x=" + NumToStr(calc_offset_x, 2) + " calc_offset_y=" + NumToStr(calc_offset_y, 2);
-
-			offset_tcp := [[calc_offset_x, calc_offset_y, -1000 + tcp_offset_z], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
-			Write diagfile, "Offset TCP: X=" + NumToStr(offset_tcp.trans.x, 2)
-			               + " Y=" + NumToStr(offset_tcp.trans.y, 2)
-			               + " Z=" + NumToStr(offset_tcp.trans.z, 2);
-			TPWrite "R2: Offset TCP=[" + NumToStr(offset_tcp.trans.x, 0) + "," + NumToStr(offset_tcp.trans.y, 0) + "," + NumToStr(offset_tcp.trans.z, 0) + "]";
-
-			! v1.8.71: Use MoveL instead of MoveJ (MoveJ causes 50426)
-			TPWrite "R2: MoveL to offset (HOME)...";
-			MoveL offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
-			TPWrite "R2: MoveL done";
-			Write diagfile, "MoveL done at HOME";
-
-			! Save offset joints (like robot1_offset_joints in TASK1)
+			! Save offset joints (current position from init)
 			current_joints := CJointT();
 			robot2_offset_joints := current_joints.robax;
-			Write diagfile, "Saved robot2_offset_joints";
-			TPWrite "R2: Offset joints saved";
+			Write diagfile, "Saved robot2_offset_joints (no motion)";
+			TPWrite "R2: Offset joints saved (no motion)";
 
 			! Signal initial offset complete
 			mode2_r2_initial_offset_done := TRUE;
 			Write diagfile, "mode2_r2_initial_offset_done=TRUE";
-			TPWrite "R2: Initial offset done";
+			TPWrite "R2: Initial offset done (no motion)";
 		ENDIF
 
 		Close diagfile;
