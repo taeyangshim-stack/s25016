@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.73";
+CONST string TASK2_VERSION := "v1.8.74";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -721,7 +721,16 @@ VAR robjoint robot2_offset_joints;
             SetRobot2OffsetPosition;
             Write main_logfile, "Mode2 offset applied";
 
-            ! v1.8.67: Signal TASK1 that initial offset is done
+            ! v1.8.74: Wait for TASK1 to reset flags and set mode2_config_ready
+            ! This prevents race condition where TASK2 sets flag before TASK1 resets it
+            Write main_logfile, "Mode2: Waiting for config_ready before signaling...";
+            TPWrite "TASK2: Waiting for config_ready...";
+            WHILE NOT mode2_config_ready DO
+                WaitTime 0.1;
+            ENDWHILE
+            Write main_logfile, "Mode2: config_ready=TRUE, now signaling initial offset done";
+
+            ! Signal TASK1 that initial offset is done
             mode2_r2_initial_offset_done := TRUE;
             Write main_logfile, "Mode2: Initial offset done signal sent";
 
