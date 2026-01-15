@@ -1386,7 +1386,8 @@ PERS num debug_r2_floor_y_offset := 0;
 		! Calculate Robot2 base position in Floor coordinates
 		! Robot2 base offset at R=0: [0, -488] from R-center in Floor coordinates
 		! Rotate base offset with current R-axis angle
-		base_floor_x := gantry_floor_x + (488 * Sin(total_r_deg));
+		! v1.8.76: CW rotation (Floor coordinate system) - Sin sign inverted
+		base_floor_x := gantry_floor_x - (488 * Sin(total_r_deg));
 		base_floor_y := gantry_floor_y - (488 * Cos(total_r_deg));
 		base_floor_z := gantry_floor_z;
 
@@ -1414,11 +1415,11 @@ PERS num debug_r2_floor_y_offset := 0;
 		! Calculate Robot2 TCP Floor position with rotation transformation
 		! CRITICAL: Robot2 wobj0 rotates with gantry R-axis!
 		! Apply rotation transformation matrix to convert wobj0 coords to Floor coords
-		! Rotation matrix for R-axis (total_r_deg = r_deg):
-		!   [cos(T)  -sin(T)]   [x_wobj0]   [x_floor]
-		!   [sin(T)   cos(T)] x [y_wobj0] = [y_floor]
-		floor_x_offset := robot2_tcp_wobj0.trans.x * Cos(total_r_deg) - robot2_tcp_wobj0.trans.y * Sin(total_r_deg);
-		floor_y_offset := robot2_tcp_wobj0.trans.x * Sin(total_r_deg) + robot2_tcp_wobj0.trans.y * Cos(total_r_deg);
+		! v1.8.76: CW rotation matrix (Floor coordinate system):
+		!   [cos(T)   sin(T)]   [x_wobj0]   [x_floor]
+		!   [-sin(T)  cos(T)] x [y_wobj0] = [y_floor]
+		floor_x_offset := robot2_tcp_wobj0.trans.x * Cos(total_r_deg) + robot2_tcp_wobj0.trans.y * Sin(total_r_deg);
+		floor_y_offset := -robot2_tcp_wobj0.trans.x * Sin(total_r_deg) + robot2_tcp_wobj0.trans.y * Cos(total_r_deg);
 		floor_z_offset := robot2_tcp_wobj0.trans.z;  ! Z-axis not affected by R-axis rotation
 
 		! v1.8.61 DEBUG: Save floor offsets for debugging

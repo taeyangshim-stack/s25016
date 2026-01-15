@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.8.71";
-CONST string TASK2_VERSION := "v1.8.71";
+CONST string TASK1_VERSION := "v1.8.76";
+CONST string TASK2_VERSION := "v1.8.76";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -22,8 +22,8 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-01-13";
-CONST string BUILD_TIME := "22:30:00";
+CONST string BUILD_DATE := "2026-01-15";
+CONST string BUILD_TIME := "17:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -36,11 +36,21 @@ CONST string COORD_SYSTEM_VERSION := "v1.8.5";  ! Last stable coordinate calcula
 CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 
 ! Mode2 Test
-CONST string MODE2_TEST_VERSION := "v1.8.71";  ! Latest: Use MoveL instead of MoveJ for Robot2 offset
+CONST string MODE2_TEST_VERSION := "v1.8.76";  ! Latest: Fix Robot2 rotation direction (CW in Floor coords)
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.8.76 (2026-01-15)
+!   - FIX: Robot2 rotation direction in UpdateRobot2BaseDynamicWobj
+!   - Cause: Robot1 (gantry-configured) rotates CW in Floor coordinates
+!   - Robot2 was using CCW rotation formula, causing X offset to be opposite
+!   - Solution: Invert Sin sign in rotation matrix (CCW -> CW)
+!   - base_floor_x: + 488*Sin(R) -> - 488*Sin(R)
+!   - floor_x_offset: X*Cos - Y*Sin -> X*Cos + Y*Sin
+!   - floor_y_offset: X*Sin + Y*Cos -> -X*Sin + Y*Cos
+!   - Result: TCP distance now 200mm at all R angles
+!
 ! v1.8.71 (2026-01-13)
 !   - FIX - MoveJ still causes 50426 on initial offset
 !   - SetRobot2InitialPosition uses MoveL and works
