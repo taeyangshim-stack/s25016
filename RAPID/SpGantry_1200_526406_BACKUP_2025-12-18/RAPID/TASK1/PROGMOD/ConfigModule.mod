@@ -26,20 +26,32 @@ PERS num MODE2_TCP_OFFSET_R2_Y := -100;
 PERS num MODE2_TCP_OFFSET_R2_Z := 0;
 
 ! Complex Motion Test Positions
-PERS num MODE2_NUM_POS := 3;
+! v1.8.77: 10 random positions with various angles for comprehensive testing
+PERS num MODE2_NUM_POS := 10;
 
 ! Position arrays (COMPLEX_POS format: offset from HOME)
 ! Floor coordinates = HOME + offset
 ! HOME = [9500, 5300, 2100, 0]
-! v1.8.61 DEBUG: Same position, 3 R angles (0, +30, -30)
-! Floor [5000, 5000, 2100] for all positions
-! offset_X = 5000 - 9500 = -4500
-! offset_Y = 5000 - 5300 = -300
-! offset_Z = 2100 - 2100 = 0
-PERS num MODE2_POS_X{10} := [-4500, -4500, -4500, 0, 0, 0, 0, 0, 0, 0];
-PERS num MODE2_POS_Y{10} := [-300, -300, -300, 0, 0, 0, 0, 0, 0, 0];
-PERS num MODE2_POS_Z{10} := [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-PERS num MODE2_POS_R{10} := [0, 30, -30, 0, 0, 0, 0, 0, 0, 0];
+! offset_X = floor_X - 9500, offset_Y = floor_Y - 5300, offset_Z = floor_Z - 2100
+!
+! Gantry limits (Physical):
+!   X: [-9510, 12310] mm, Y: [-50, 5350] mm, Z: [-50, 1050] mm, R: [-100, 100]°
+!
+! Test positions (Floor coords):
+!   1. [5000, 5000, 2100] R=0°   - Center, no rotation
+!   2. [5000, 5000, 2100] R=45°  - Center, 45° CCW
+!   3. [5000, 5000, 2100] R=-45° - Center, 45° CW
+!   4. [5000, 5000, 2100] R=90°  - Center, 90° CCW
+!   5. [5000, 5000, 2100] R=-90° - Center, 90° CW
+!   6. [3000, 4000, 2000] R=30°  - Different XYZ, 30° CCW
+!   7. [7000, 5200, 2100] R=-30° - Different XYZ, 30° CW
+!   8. [2000, 3500, 1800] R=60°  - Low Z, 60° CCW
+!   9. [8000, 4500, 2050] R=-60° - Different XYZ, 60° CW
+!  10. [4500, 5000, 1900] R=15°  - Small angle test
+PERS num MODE2_POS_X{10} := [-4500, -4500, -4500, -4500, -4500, -6500, -2500, -7500, -1500, -5000];
+PERS num MODE2_POS_Y{10} := [-300, -300, -300, -300, -300, -1300, -100, -1800, -800, -300];
+PERS num MODE2_POS_Z{10} := [0, 0, 0, 0, 0, -100, 0, -300, -50, -200];
+PERS num MODE2_POS_R{10} := [0, 45, -45, 90, -90, 30, -30, 60, -60, 15];
 
 ! ========================================
 ! Configuration Notes
