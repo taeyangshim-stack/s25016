@@ -293,7 +293,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.74";
+CONST string TASK2_VERSION := "v1.8.75";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2413,30 +2413,64 @@ VAR robjoint robot2_offset_joints;
 		VAR num calc_offset_x;
 		VAR num calc_offset_y;
 
-		! v1.8.73: COMPLETELY NON-BLOCKING TEST
-		! - No config wait (was causing issues with TASK1 motion planning)
-		! - No motion commands
-		! - Just signal done immediately
-		! Purpose: Test if config sync wait is causing 50426 error in TASK1
+		! v1.8.75: Re-add MoveL for initial offset (50426 error fixed in system config)
+		! - Initial call: MoveL to offset position using WobjGantry_Rob2
+		! - Reposition call: Skip MoveL (joints maintained)
 
 		Open "HOME:/task2_mode2_offset.txt", diagfile \Write;
 		Write diagfile, "Mode2 Offset (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
-		Write diagfile, "v1.8.73: NON-BLOCKING TEST - No wait, no motion";
-		TPWrite "R2: v1.8.73 - Non-blocking test";
 
 		IF mode2_r2_reposition_trigger THEN
-			Write diagfile, "REPOSITION: Signal done immediately";
+			! ===== REPOSITION CALL =====
+			! Gantry has moved, Robot2 joints stay at offset position (no motion needed)
+			Write diagfile, "REPOSITION: Joints maintained (no motion)";
 			mode2_r2_reposition_done := TRUE;
-			TPWrite "R2: Reposition done (immediate)";
+			TPWrite "R2: Reposition done (joints maintained)";
 		ELSE
-			Write diagfile, "INITIAL: Signal done immediately";
-			! Save current joints
+			! ===== INITIAL CALL =====
+			! Move Robot2 TCP to offset position using MoveL
+			Write diagfile, "INITIAL: MoveL to offset position";
+
+			! Read offsets from PERS variables (set by TASK1)
+			tcp_offset_x := mode2_r2_offset_x;
+			tcp_offset_y := mode2_r2_offset_y;
+			tcp_offset_z := mode2_r2_offset_z;
+			Write diagfile, "Offsets: X=" + NumToStr(tcp_offset_x, 1) + " Y=" + NumToStr(tcp_offset_y, 1) + " Z=" + NumToStr(tcp_offset_z, 1);
+
+			! Update WobjGantry_Rob2 to current gantry position
+			UpdateGantryWobj_Rob2;
+			gantry_joint := CJointT(\TaskName:="T_ROB1");
+			Write diagfile, "WobjGantry_Rob2 updated, gantry extax read";
+
+			! Calculate target position in WobjGantry_Rob2
+			! Robot2 init position: [0, 488, -1000] in WobjGantry_Rob2
+			! Offset: tcp_offset_y = -100 means 100mm toward Robot2 base
+			! Target: [0, 488 + (-100), -1000] = [0, 388, -1000]
+			calc_offset_x := tcp_offset_x;
+			calc_offset_y := 488 + tcp_offset_y;  ! 488 + (-100) = 388
+			Write diagfile, "Target: X=" + NumToStr(calc_offset_x, 1) + " Y=" + NumToStr(calc_offset_y, 1);
+
+			offset_tcp := [[calc_offset_x, calc_offset_y, -1000 + tcp_offset_z],
+			               [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
+			Write diagfile, "Offset TCP: [" + NumToStr(offset_tcp.trans.x, 1) + ", "
+			               + NumToStr(offset_tcp.trans.y, 1) + ", "
+			               + NumToStr(offset_tcp.trans.z, 1) + "]";
+
+			! MoveL to offset position (at HOME, this works)
+			TPWrite "R2: MoveL to offset...";
+			MoveL offset_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;
+			TPWrite "R2: MoveL done";
+			Write diagfile, "MoveL completed";
+
+			! Save offset joints for reposition calls
 			current_joints := CJointT();
 			robot2_offset_joints := current_joints.robax;
-			Write diagfile, "Saved robot2_offset_joints";
-			! Signal done
-			mode2_r2_initial_offset_done := TRUE;
-			TPWrite "R2: Initial offset done (immediate)";
+			Write diagfile, "Offset joints saved";
+
+			! Note: mode2_r2_initial_offset_done is set in main() after config_ready wait
+			! This prevents race condition with TASK1's flag reset
+			Write diagfile, "MoveL and joint save complete (flag set by main)";
+			TPWrite "R2: Offset position reached";
 		ENDIF
 
 		Close diagfile;
