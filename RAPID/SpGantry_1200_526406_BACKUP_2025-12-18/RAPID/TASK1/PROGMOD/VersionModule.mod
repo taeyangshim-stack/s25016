@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.8.76";
-CONST string TASK2_VERSION := "v1.8.76";
+CONST string TASK1_VERSION := "v1.9.3";
+CONST string TASK2_VERSION := "v1.9.3";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -22,8 +22,8 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-01-15";
-CONST string BUILD_TIME := "17:00:00";
+CONST string BUILD_DATE := "2026-01-17";
+CONST string BUILD_TIME := "21:30:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -36,11 +36,57 @@ CONST string COORD_SYSTEM_VERSION := "v1.8.5";  ! Last stable coordinate calcula
 CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 
 ! Mode2 Test
-CONST string MODE2_TEST_VERSION := "v1.8.76";  ! Latest: Fix Robot2 rotation direction (CW in Floor coords)
+CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
+
+! Weld Sequence (v1.9.0 NEW)
+CONST string WELD_SEQUENCE_VERSION := "v1.9.3";  ! Fix: RAPID syntax (pos/robconf/extax assignment)
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.3 (2026-01-17)
+!   - FIX: RAPID syntax errors in weld sequence procedures
+!   - FIX: pos type assignment (cannot use [x,y,z] literal)
+!   - FIX: robconf/extax assignment (must use component syntax)
+!   - FIX: ERR_RANYBIN -> ELSE (invalid error constant)
+!   - Changed: r1_start := [x,y,z] -> r1_start.x/y/z := value
+!   - Changed: robconf := [0,0,0,0] -> robconf.cf1/cf4/cf6/cfx := 0
+!   - Changed: extax := [9E9,...] -> extax.eax_a/b/c/d/e/f := 9E9
+!
+! v1.9.2 (2026-01-17)
+!   - ADD: TP Menu System (TestMenu procedure)
+!   - Menu options: Mode2, Weld, Results, Config, Exit
+!   - TEST_MODE=9 triggers interactive menu
+!   - TEST_MODE=3 now runs Weld Sequence (was not implemented)
+!   - ViewLastResults: Display last test results on TP
+!   - ViewCurrentConfig: Display current configuration on TP
+!
+! v1.9.1 (2026-01-17)
+!   - FIX: R-axis angle calculation: Floor X+ = R=0° (was Y+ = 0°)
+!   - FIX: WObj creation: X = weld direction using ATan2(dy, dx)
+!   - FIX: TCP Z offset: 1600mm (was 1500mm)
+!   - FIX: Torch orientation: Rx rotation (around weld line), not Ry
+!   - ADD: Robot weld positions in WObj coordinates
+!     Robot1: (0, -12, 1600), Robot2: (0, 476, -1600)
+!   - ADD: 45° torch angle (Rx rotation around weld line X-axis)
+!     Robot1: Rx +45° [0.9239, 0.3827, 0, 0]
+!     Robot2: Rx -45° [0.9239, -0.3827, 0, 0]
+!   - ADD: WELD_R1/R2_WObj_X/Y/Z variables in ConfigModule
+!
+! v1.9.0 (2026-01-16)
+!   - NEW: Weld Sequence feature
+!   - Input: Robot1/Robot2 weld lines in Floor TCP coordinates
+!   - Calculate center line between two weld lines
+!   - Auto R-axis angle calculation (atan2)
+!   - Dynamic WObj creation for each robot (X = weld direction)
+!   - Gantry moves along center line, robots maintain posture
+!   - ConfigModule: WELD_R1/R2_START/END_X/Y/Z, WELD_R1/R2_ORIENT_Q1~Q4
+!   - MainModule: ExecuteWeldSequence, CalcCenterLine, CreateWeldWobj
+!   - Rob2_MainModule: Robot2_WeldSequence (TASK2 sync)
+!
+! v1.8.77 (2026-01-15)
+!   - ConfigModule: Added 10 test positions with various R angles
+!
 ! v1.8.76 (2026-01-15)
 !   - FIX: Robot2 rotation direction in UpdateRobot2BaseDynamicWobj
 !   - Cause: Robot1 (gantry-configured) rotates CW in Floor coordinates

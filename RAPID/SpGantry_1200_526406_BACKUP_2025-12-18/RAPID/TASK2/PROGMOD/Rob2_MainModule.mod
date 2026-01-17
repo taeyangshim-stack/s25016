@@ -344,6 +344,30 @@ VAR robjoint robot2_offset_joints;
     PERS wobjdata wobjWeldLine2;
     PERS wobjdata wobjRotCtr2;
 
+    ! Weld Sequence Sync Variables (v1.9.0)
+    ! Cross-task synchronization with TASK1
+    PERS bool t2_weld_ready;    ! Robot2 ready signal (set by TASK2)
+    PERS bool t1_weld_start;    ! TASK1 weld start signal (read by TASK2)
+    PERS bool t1_weld_done;     ! TASK1 weld done signal (read by TASK2)
+
+    ! Weld WObj for Robot2 (v1.9.0)
+    ! Created by TASK1, referenced by TASK2
+    PERS wobjdata WobjWeldR2;
+
+    ! Robot2 Weld Orientation from ConfigModule (v1.9.0)
+    ! Cross-task reference to TASK1 ConfigModule
+    PERS num WELD_R2_ORIENT_Q1;
+    PERS num WELD_R2_ORIENT_Q2;
+    PERS num WELD_R2_ORIENT_Q3;
+    PERS num WELD_R2_ORIENT_Q4;
+
+    ! Robot2 Weld Position in WObj (v1.9.1)
+    ! Cross-task reference to TASK1 ConfigModule
+    ! WObj: X=weld direction, Y=perpendicular, Z=Floor Z
+    PERS num WELD_R2_WObj_X;
+    PERS num WELD_R2_WObj_Y;
+    PERS num WELD_R2_WObj_Z;
+
     ! Work Object Definitions (v1.7.13 2025-12-28)
     ! WobjFloor: Floor coordinate system from TASK1 (external reference)
     PERS wobjdata WobjFloor;
@@ -2990,5 +3014,108 @@ VAR robjoint robot2_offset_joints;
 			STOP;
 		ENDIF
 	ENDPROC
+
+! ========================================
+! Weld Sequence Procedures (v1.9.0)
+! ========================================
+! Purpose: Robot2 weld sequence synchronization with TASK1
+! Robot2 waits for TASK1 signal, then moves to weld position
+
+! ----------------------------------------
+! Robot2 Weld Ready - Wait and Move
+! ----------------------------------------
+! Waits for TASK1 weld start signal, then moves Robot2 to weld position
+! Position in WObj: (WELD_R2_WObj_X, WELD_R2_WObj_Y, WELD_R2_WObj_Z)
+! Default: (0, 476, -1600) - below R-center, above Floor by TCP offset
+PROC Robot2_WeldReady()
+	VAR robtarget weld_target;
+	VAR orient weld_orient;
+
+	TPWrite "[R2_WELD] Robot2 weld ready procedure started";
+	TPWrite "[R2_WELD] Waiting for TASK1 weld start signal...";
+
+	! Wait for TASK1 weld start signal
+	WHILE NOT t1_weld_start DO
+		WaitTime 0.1;
+	ENDWHILE
+
+	TPWrite "[R2_WELD] Received weld start signal from TASK1";
+
+	! Create weld orientation from ConfigModule (45° torch angle)
+	weld_orient.q1 := WELD_R2_ORIENT_Q1;
+	weld_orient.q2 := WELD_R2_ORIENT_Q2;
+	weld_orient.q3 := WELD_R2_ORIENT_Q3;
+	weld_orient.q4 := WELD_R2_ORIENT_Q4;
+
+	! Target position in WobjWeldR2 coordinate system
+	! WObj: X=weld direction, Y=perpendicular, Z=Floor Z
+	weld_target.trans.x := WELD_R2_WObj_X;
+	weld_target.trans.y := WELD_R2_WObj_Y;
+	weld_target.trans.z := WELD_R2_WObj_Z;
+	weld_target.rot := weld_orient;
+	weld_target.robconf.cf1 := 0;
+	weld_target.robconf.cf4 := 0;
+	weld_target.robconf.cf6 := 0;
+	weld_target.robconf.cfx := 0;
+	weld_target.extax.eax_a := 9E9;
+	weld_target.extax.eax_b := 9E9;
+	weld_target.extax.eax_c := 9E9;
+	weld_target.extax.eax_d := 9E9;
+	weld_target.extax.eax_e := 9E9;
+	weld_target.extax.eax_f := 9E9;
+
+	TPWrite "[R2_WELD] R2 WObj pos: [" + NumToStr(WELD_R2_WObj_X, 0) + ", "
+	                                   + NumToStr(WELD_R2_WObj_Y, 0) + ", "
+	                                   + NumToStr(WELD_R2_WObj_Z, 0) + "]";
+
+	TPWrite "[R2_WELD] Moving Robot2 to weld position...";
+
+	! Move to weld ready position using tWeld2
+	MoveJ weld_target, v100, fine, tWeld2\WObj:=WobjWeldR2;
+
+	! Signal ready to TASK1
+	t2_weld_ready := TRUE;
+
+	TPWrite "[R2_WELD] Robot2 at weld position, signaled ready";
+ENDPROC
+
+! ----------------------------------------
+! Robot2 Weld Hold - Maintain Position
+! ----------------------------------------
+! Maintains weld posture while TASK1 moves gantry
+! Called after Robot2_WeldReady completes
+PROC Robot2_WeldHold()
+	TPWrite "[R2_WELD] Robot2 holding weld position...";
+
+	! Wait for TASK1 weld complete signal
+	WHILE NOT t1_weld_done DO
+		WaitTime 0.1;
+	ENDWHILE
+
+	TPWrite "[R2_WELD] TASK1 weld complete, Robot2 released";
+ENDPROC
+
+! ----------------------------------------
+! Robot2 Weld Sequence (Combined)
+! ----------------------------------------
+! Combined sequence: wait for signal, move to position, hold until done
+PROC Robot2_WeldSequence()
+	TPWrite "========================================";
+	TPWrite "[R2_WELD] v1.9.0 Robot2 Weld Sequence Start";
+	TPWrite "========================================";
+
+	! Reset ready flag
+	t2_weld_ready := FALSE;
+
+	! Wait for signal and move to weld position
+	Robot2_WeldReady;
+
+	! Hold position until welding complete
+	Robot2_WeldHold;
+
+	TPWrite "========================================";
+	TPWrite "[R2_WELD] Robot2 Weld Sequence Complete!";
+	TPWrite "========================================";
+ENDPROC
 
 ENDMODULE

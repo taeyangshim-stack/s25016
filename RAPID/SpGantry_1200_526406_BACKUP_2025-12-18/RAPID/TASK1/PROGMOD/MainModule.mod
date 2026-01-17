@@ -443,6 +443,29 @@ PERS num debug_r2_floor_y_offset := 0;
 	! Quaternion [0, 0.707107, 0, 0.707107] = Y-axis 90deg rotation
 	PERS wobjdata wobjRob1Base := [FALSE, TRUE, "", [[0, 0, 0], [0, 0.707107, 0, 0.707107]], [[0, 0, 0], [1, 0, 0, 0]]];
 
+	! ========================================
+	! Weld Sequence Work Objects (v1.9.0)
+	! ========================================
+	! WobjWeldR1: Robot1 weld line coordinate system
+	! Origin = weld start point, X = weld direction, Z = down
+	PERS wobjdata WobjWeldR1 := [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+
+	! WobjWeldR2: Robot2 weld line coordinate system
+	! Origin = weld start point, X = weld direction, Z = down
+	PERS wobjdata WobjWeldR2 := [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
+
+	! Weld Sequence Variables (v1.9.0)
+	! Center line calculated from Robot1 and Robot2 weld lines
+	VAR pos weld_center_start;
+	VAR pos weld_center_end;
+	VAR num weld_center_angle;    ! R-axis angle (degrees)
+	VAR num weld_length;          ! Weld line length (mm)
+
+	! TASK2 sync flags for weld sequence
+	PERS bool t2_weld_ready := FALSE;
+	PERS bool t1_weld_start := FALSE;
+	PERS bool t1_weld_done := FALSE;
+
 	PROC main()
 		VAR iodev main_logfile;
 		VAR iodev configfile;
@@ -520,15 +543,19 @@ PERS num debug_r2_floor_y_offset := 0;
 			Write main_logfile, "Step2 mode=2 type=Mode2";
 			TestGantryMode2;
 		ELSEIF test_mode = 3 THEN
-			! Custom multi-position test (Phase 3)
-			TPWrite "MAIN: Custom Multi-Position Test - Not implemented yet";
-			Write main_logfile, "Step2 mode=3 type=NotImplemented";
-			TPWrite "ERROR: TEST_MODE=3 not implemented";
-			TPWrite "Please use TEST_MODE=0 or 1";
+			! Weld Sequence Test
+			TPWrite "MAIN: Weld Sequence Test";
+			Write main_logfile, "Step2 mode=3 type=WeldSequence";
+			ExecuteWeldSequence;
+		ELSEIF test_mode = 9 THEN
+			! Interactive Menu (v1.9.2)
+			TPWrite "MAIN: Starting Test Menu";
+			Write main_logfile, "Step2 mode=9 type=TestMenu";
+			TestMenu;
 		ELSE
 			TPWrite "ERROR: Invalid TEST_MODE=" + NumToStr(test_mode,0);
 			Write main_logfile, "ERROR: Invalid TEST_MODE=" + NumToStr(test_mode,0);
-			TPWrite "Valid values: 0 (Single), 1 (R-axis)";
+			TPWrite "Valid: 0=Single, 1=R-axis, 2=Mode2, 3=Weld, 9=Menu";
 		ENDIF
 
 		TPWrite "MAIN: Test completed";
@@ -2489,5 +2516,524 @@ ERROR
 	STOP;
 ENDPROC
 
+! ========================================
+! Test Menu System (v1.9.2)
+! ========================================
+! Purpose: TP-based menu for test selection
+! Options: Mode2 Test, Weld Sequence, View Results, Exit
+
+! ----------------------------------------
+! Main Test Menu
+! ----------------------------------------
+! Displays menu on TP and executes selected test
+! Loop until user selects Exit
+PROC TestMenu()
+	VAR num menu_sel;
+	VAR bool menu_loop;
+
+	menu_loop := TRUE;
+
+	WHILE menu_loop DO
+		! Display menu
+		TPErase;
+		TPWrite "========================================";
+		TPWrite "  S25016 SpGantry Test Menu (v1.9.2)";
+		TPWrite "========================================";
+		TPWrite "";
+		TPWrite "Select test to run:";
+		TPWrite "";
+
+		! Function key menu
+		TPReadFK menu_sel, "Test Menu", "Mode2", "Weld", "Results", "Config", "Exit";
+
+		TEST menu_sel
+		CASE 1:
+			! Mode2 TCP Tracking Test
+			TPErase;
+			TPWrite "[Menu] Starting Mode2 TCP Test...";
+			TestGantryMode2;
+			TPWrite "";
+			TPWrite "Mode2 Test Complete. Press any key...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 2:
+			! Weld Sequence Test
+			TPErase;
+			TPWrite "[Menu] Starting Weld Sequence...";
+			ExecuteWeldSequence;
+			TPWrite "";
+			TPWrite "Weld Sequence Complete. Press any key...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 3:
+			! View Last Results
+			TPErase;
+			ViewLastResults;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 4:
+			! View/Edit Config
+			TPErase;
+			ViewCurrentConfig;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 5:
+			! Exit
+			TPErase;
+			TPWrite "[Menu] Exiting Test Menu...";
+			menu_loop := FALSE;
+
+		DEFAULT:
+			TPWrite "[Menu] Invalid selection";
+		ENDTEST
+	ENDWHILE
+
+	TPWrite "========================================";
+	TPWrite "Test Menu closed. Returning to main...";
+	TPWrite "========================================";
+ENDPROC
+
+! ----------------------------------------
+! View Last Test Results
+! ----------------------------------------
+! Displays summary of last Mode2 test results
+PROC ViewLastResults()
+	VAR iodev resultfile;
+	VAR string line;
+	VAR num line_count;
+	VAR bool file_ok;
+
+	TPWrite "========================================";
+	TPWrite "  Last Mode2 Test Results";
+	TPWrite "========================================";
+	TPWrite "";
+
+	file_ok := TRUE;
+	Open "HOME:/gantry_mode2_test.txt", resultfile \Read;
+
+	! Read and display first 15 lines
+	line_count := 0;
+	WHILE file_ok AND line_count < 15 DO
+		line := ReadStr(resultfile \Delim:="\0a");
+		IF StrLen(line) > 0 THEN
+			TPWrite line;
+			line_count := line_count + 1;
+		ENDIF
+	ENDWHILE
+
+	Close resultfile;
+
+	TPWrite "";
+	TPWrite "----------------------------------------";
+	TPWrite "Full log: HOME:/gantry_mode2_test.txt";
+	TPWrite "TP log: HOME:/tp_messages.txt";
+
+ERROR
+	IF ERRNO = ERR_FILEOPEN THEN
+		TPWrite "ERROR: Result file not found";
+		TPWrite "Run Mode2 test first!";
+		file_ok := FALSE;
+		TRYNEXT;
+	ELSE
+		! End of file or other read error
+		Close resultfile;
+		file_ok := FALSE;
+		TRYNEXT;
+	ENDIF
+ENDPROC
+
+! ----------------------------------------
+! View Current Configuration
+! ----------------------------------------
+! Displays current Mode2 and Weld configuration
+PROC ViewCurrentConfig()
+	TPWrite "========================================";
+	TPWrite "  Current Configuration (v1.9.2)";
+	TPWrite "========================================";
+	TPWrite "";
+
+	TPWrite "--- Mode2 TCP Offsets ---";
+	TPWrite "R1 Offset: [" + NumToStr(MODE2_TCP_OFFSET_R1_X, 1) + ", "
+	                       + NumToStr(MODE2_TCP_OFFSET_R1_Y, 1) + ", "
+	                       + NumToStr(MODE2_TCP_OFFSET_R1_Z, 1) + "]";
+	TPWrite "R2 Offset: [" + NumToStr(MODE2_TCP_OFFSET_R2_X, 1) + ", "
+	                       + NumToStr(MODE2_TCP_OFFSET_R2_Y, 1) + ", "
+	                       + NumToStr(MODE2_TCP_OFFSET_R2_Z, 1) + "]";
+	TPWrite "Num Positions: " + NumToStr(MODE2_NUM_POS, 0);
+	TPWrite "";
+
+	TPWrite "--- Weld Sequence ---";
+	TPWrite "R1 Start: [" + NumToStr(WELD_R1_START_X, 0) + ", "
+	                      + NumToStr(WELD_R1_START_Y, 0) + ", "
+	                      + NumToStr(WELD_R1_START_Z, 0) + "]";
+	TPWrite "R1 End: [" + NumToStr(WELD_R1_END_X, 0) + ", "
+	                    + NumToStr(WELD_R1_END_Y, 0) + ", "
+	                    + NumToStr(WELD_R1_END_Z, 0) + "]";
+	TPWrite "R2 Start: [" + NumToStr(WELD_R2_START_X, 0) + ", "
+	                      + NumToStr(WELD_R2_START_Y, 0) + ", "
+	                      + NumToStr(WELD_R2_START_Z, 0) + "]";
+	TPWrite "R2 End: [" + NumToStr(WELD_R2_END_X, 0) + ", "
+	                    + NumToStr(WELD_R2_END_Y, 0) + ", "
+	                    + NumToStr(WELD_R2_END_Z, 0) + "]";
+	TPWrite "";
+
+	TPWrite "--- Weld Robot Positions (WObj) ---";
+	TPWrite "R1 WObj: [" + NumToStr(WELD_R1_WObj_X, 0) + ", "
+	                     + NumToStr(WELD_R1_WObj_Y, 0) + ", "
+	                     + NumToStr(WELD_R1_WObj_Z, 0) + "]";
+	TPWrite "R2 WObj: [" + NumToStr(WELD_R2_WObj_X, 0) + ", "
+	                     + NumToStr(WELD_R2_WObj_Y, 0) + ", "
+	                     + NumToStr(WELD_R2_WObj_Z, 0) + "]";
+	TPWrite "TCP Z Offset: " + NumToStr(WELD_R1_TCP_Z_OFFSET, 0) + " mm";
+	TPWrite "Weld Speed: " + NumToStr(WELD_SPEED, 0) + " mm/s";
+ENDPROC
+
+! ========================================
+! Weld Sequence Procedures (v1.9.0)
+! ========================================
+! Purpose: Execute welding sequence with calculated gantry position
+! Input: Weld lines from ConfigModule PERS variables
+! Output: Gantry moves along center line while robots maintain weld posture
+
+! ----------------------------------------
+! Calculate Center Line from Two Weld Lines
+! ----------------------------------------
+! Calculates center point between Robot1 and Robot2 weld lines
+! Sets module variables: weld_center_start, weld_center_end, weld_center_angle, weld_length
+PROC CalcCenterLine()
+	VAR num dx;
+	VAR num dy;
+	VAR num dz;
+
+	TPWrite "[WELD] Calculating center line...";
+
+	! Calculate center start point (average of R1 and R2 start)
+	weld_center_start.x := (WELD_R1_START_X + WELD_R2_START_X) / 2;
+	weld_center_start.y := (WELD_R1_START_Y + WELD_R2_START_Y) / 2;
+	weld_center_start.z := (WELD_R1_START_Z + WELD_R2_START_Z) / 2;
+
+	! Calculate center end point (average of R1 and R2 end)
+	weld_center_end.x := (WELD_R1_END_X + WELD_R2_END_X) / 2;
+	weld_center_end.y := (WELD_R1_END_Y + WELD_R2_END_Y) / 2;
+	weld_center_end.z := (WELD_R1_END_Z + WELD_R2_END_Z) / 2;
+
+	! Calculate weld direction vector
+	dx := weld_center_end.x - weld_center_start.x;
+	dy := weld_center_end.y - weld_center_start.y;
+	dz := weld_center_end.z - weld_center_start.z;
+
+	! Calculate weld length
+	weld_length := Sqrt(dx*dx + dy*dy + dz*dz);
+
+	! Calculate R-axis angle (Floor X+ = R=0°)
+	! atan2(dy, dx) gives angle from X-axis
+	weld_center_angle := ATan2(dy, dx);
+
+	TPWrite "[WELD] Center Start: [" + NumToStr(weld_center_start.x, 1) + ", "
+	                                  + NumToStr(weld_center_start.y, 1) + ", "
+	                                  + NumToStr(weld_center_start.z, 1) + "]";
+	TPWrite "[WELD] Center End: [" + NumToStr(weld_center_end.x, 1) + ", "
+	                                + NumToStr(weld_center_end.y, 1) + ", "
+	                                + NumToStr(weld_center_end.z, 1) + "]";
+	TPWrite "[WELD] R-angle: " + NumToStr(weld_center_angle, 2) + " deg";
+	TPWrite "[WELD] Weld length: " + NumToStr(weld_length, 1) + " mm";
+ENDPROC
+
+! ----------------------------------------
+! Calculate Gantry Position from Floor Coordinates
+! ----------------------------------------
+! Converts Floor TCP coordinates to Physical gantry coordinates
+! Accounts for robot TCP offset from R-center
+! Gantry_Z = 2100 - Floor_Z - TCP_Z_OFFSET
+FUNC pos CalcGantryFromFloor(pos floor_pos)
+	VAR pos gantry_pos;
+	VAR num avg_tcp_offset;
+
+	! Average TCP offset (both robots should be at similar Z)
+	avg_tcp_offset := (WELD_R1_TCP_Z_OFFSET + WELD_R2_TCP_Z_OFFSET) / 2;
+
+	! Floor -> Physical conversion
+	! gantry_x = floor_x - 9500
+	! gantry_y = 5300 - floor_y
+	! gantry_z = 2100 - floor_z - tcp_offset
+	gantry_pos.x := floor_pos.x - 9500;
+	gantry_pos.y := 5300 - floor_pos.y;
+	gantry_pos.z := 2100 - floor_pos.z - avg_tcp_offset;
+
+	TPWrite "[WELD] Floor->Gantry: TCP offset=" + NumToStr(avg_tcp_offset, 0) + "mm";
+	TPWrite "[WELD] Gantry Z = 2100 - " + NumToStr(floor_pos.z, 0) + " - " + NumToStr(avg_tcp_offset, 0) + " = " + NumToStr(gantry_pos.z, 0);
+
+	RETURN gantry_pos;
+ENDFUNC
+
+! ----------------------------------------
+! Create Weld WObj from Weld Line
+! ----------------------------------------
+! Creates a work object where X-axis is weld direction, Z-axis is Floor Z (down)
+! Parameters:
+!   weld_start: Weld line start point (Floor coordinates)
+!   weld_end: Weld line end point (Floor coordinates)
+!   wobj: Output work object to update
+PROC CreateWeldWobj(pos weld_start, pos weld_end, INOUT wobjdata wobj)
+	VAR num dx;
+	VAR num dy;
+	VAR num len_xy;
+	VAR num angle_deg;
+	VAR num cos_half;
+	VAR num sin_half;
+
+	! Calculate weld direction in XY plane
+	dx := weld_end.x - weld_start.x;
+	dy := weld_end.y - weld_start.y;
+	len_xy := Sqrt(dx*dx + dy*dy);
+
+	! Calculate angle from X-axis (Floor X+ = 0 deg)
+	! WObj X+ will align with weld direction
+	angle_deg := ATan2(dy, dx);
+
+	! Create quaternion for Z-axis rotation
+	! Rotation around Z-axis by angle_deg
+	! q = [cos(a/2), 0, 0, sin(a/2)]
+	cos_half := Cos(angle_deg / 2);
+	sin_half := Sin(angle_deg / 2);
+
+	! Set WObj properties
+	wobj.robhold := FALSE;
+	wobj.ufprog := TRUE;
+	wobj.ufmec := "";
+
+	! Set uframe (user frame): origin at weld start, rotated around Z
+	! WObj X = weld direction, Y = perpendicular, Z = Floor Z (down)
+	wobj.uframe.trans := weld_start;
+	wobj.uframe.rot.q1 := cos_half;
+	wobj.uframe.rot.q2 := 0;
+	wobj.uframe.rot.q3 := 0;
+	wobj.uframe.rot.q4 := sin_half;
+
+	! Object frame: identity (no additional offset)
+	wobj.oframe.trans.x := 0;
+	wobj.oframe.trans.y := 0;
+	wobj.oframe.trans.z := 0;
+	wobj.oframe.rot.q1 := 1;
+	wobj.oframe.rot.q2 := 0;
+	wobj.oframe.rot.q3 := 0;
+	wobj.oframe.rot.q4 := 0;
+
+	TPWrite "[WELD] Created WObj at [" + NumToStr(weld_start.x, 1) + ", "
+	                                    + NumToStr(weld_start.y, 1) + ", "
+	                                    + NumToStr(weld_start.z, 1) + "]";
+	TPWrite "[WELD] WObj X+ direction: " + NumToStr(angle_deg, 2) + " deg from Floor X+";
+ENDPROC
+
+! ----------------------------------------
+! Move Gantry to Weld Start Position
+! ----------------------------------------
+! Moves gantry to center line start with correct R-axis angle
+! Robot joints are preserved (robots don't move)
+PROC MoveGantryToWeldStart()
+	VAR jointtarget current_jt;
+	VAR jointtarget target_jt;
+	VAR pos gantry_target;
+
+	TPWrite "[WELD] Moving gantry to weld start...";
+
+	! Get current joint positions (preserve robot joints)
+	current_jt := CJointT();
+
+	! Calculate gantry target from center start (Floor -> Physical)
+	gantry_target := CalcGantryFromFloor(weld_center_start);
+
+	! Create target joint (keep robot joints, set gantry position)
+	target_jt := current_jt;
+	target_jt.extax.eax_a := gantry_target.x;  ! Gantry X
+	target_jt.extax.eax_b := gantry_target.y;  ! Gantry Y
+	target_jt.extax.eax_c := gantry_target.z;  ! Gantry Z
+	target_jt.extax.eax_d := weld_center_angle; ! Gantry R
+
+	TPWrite "[WELD] Gantry target: [" + NumToStr(gantry_target.x, 1) + ", "
+	                                   + NumToStr(gantry_target.y, 1) + ", "
+	                                   + NumToStr(gantry_target.z, 1) + ", R="
+	                                   + NumToStr(weld_center_angle, 2) + "]";
+
+	! Move gantry (robot joints stay same)
+	MoveAbsJ target_jt, v500, fine, tool0;
+
+	! Update WobjGantry after gantry move
+	UpdateGantryWobj;
+
+	TPWrite "[WELD] Gantry at weld start position";
+ENDPROC
+
+! ----------------------------------------
+! Move Robot1 to Weld Ready Position
+! ----------------------------------------
+! Moves Robot1 to weld position with specified orientation
+! Position in WObj: (WELD_R1_WObj_X, WELD_R1_WObj_Y, WELD_R1_WObj_Z)
+! Default: (0, -12, 1600) - above R-center, below Floor by TCP offset
+PROC MoveRobot1ToWeldReady()
+	VAR robtarget weld_target;
+	VAR orient weld_orient;
+
+	TPWrite "[WELD] Moving Robot1 to weld ready...";
+
+	! Create weld orientation from ConfigModule (45° torch angle)
+	weld_orient.q1 := WELD_R1_ORIENT_Q1;
+	weld_orient.q2 := WELD_R1_ORIENT_Q2;
+	weld_orient.q3 := WELD_R1_ORIENT_Q3;
+	weld_orient.q4 := WELD_R1_ORIENT_Q4;
+
+	! Target position in WobjWeldR1 coordinate system
+	! WObj: X=weld direction, Y=perpendicular, Z=Floor Z (down)
+	weld_target.trans.x := WELD_R1_WObj_X;
+	weld_target.trans.y := WELD_R1_WObj_Y;
+	weld_target.trans.z := WELD_R1_WObj_Z;
+	weld_target.rot := weld_orient;
+	weld_target.robconf.cf1 := 0;
+	weld_target.robconf.cf4 := 0;
+	weld_target.robconf.cf6 := 0;
+	weld_target.robconf.cfx := 0;
+	weld_target.extax.eax_a := 9E9;
+	weld_target.extax.eax_b := 9E9;
+	weld_target.extax.eax_c := 9E9;
+	weld_target.extax.eax_d := 9E9;
+	weld_target.extax.eax_e := 9E9;
+	weld_target.extax.eax_f := 9E9;
+
+	TPWrite "[WELD] R1 WObj pos: [" + NumToStr(WELD_R1_WObj_X, 0) + ", "
+	                                + NumToStr(WELD_R1_WObj_Y, 0) + ", "
+	                                + NumToStr(WELD_R1_WObj_Z, 0) + "]";
+
+	! Move to weld ready position using tWeld1
+	MoveJ weld_target, v100, fine, tWeld1\WObj:=WobjWeldR1;
+
+	TPWrite "[WELD] Robot1 ready at weld position";
+ENDPROC
+
+! ----------------------------------------
+! Signal Robot2 to Move to Weld Ready
+! ----------------------------------------
+! Sets sync flag and waits for Robot2 to be ready
+PROC WaitForRobot2WeldReady()
+	TPWrite "[WELD] Waiting for Robot2 weld ready...";
+
+	! Signal Robot2 to move to weld position
+	t1_weld_start := TRUE;
+	t2_weld_ready := FALSE;
+
+	! Wait for Robot2 ready signal
+	WHILE NOT t2_weld_ready DO
+		WaitTime 0.1;
+	ENDWHILE
+
+	TPWrite "[WELD] Robot2 ready!";
+ENDPROC
+
+! ----------------------------------------
+! Move Gantry Along Center Line (Welding)
+! ----------------------------------------
+! Moves gantry from start to end of center line
+! Robots maintain position in their respective WObj (weld posture maintained)
+PROC WeldAlongCenterLine()
+	VAR jointtarget current_jt;
+	VAR jointtarget end_jt;
+	VAR pos gantry_end;
+
+	TPWrite "[WELD] Starting weld along center line...";
+
+	! Get current joint positions
+	current_jt := CJointT();
+
+	! Calculate gantry end position (Floor -> Physical)
+	gantry_end := CalcGantryFromFloor(weld_center_end);
+
+	! Create end joint target (keep robot joints, change gantry XY)
+	end_jt := current_jt;
+	end_jt.extax.eax_a := gantry_end.x;  ! Gantry X
+	end_jt.extax.eax_b := gantry_end.y;  ! Gantry Y
+	! Z and R stay the same
+
+	TPWrite "[WELD] Welding to [" + NumToStr(gantry_end.x, 1) + ", "
+	                               + NumToStr(gantry_end.y, 1) + "]";
+	TPWrite "[WELD] Speed: v100";
+
+	! Move gantry along center line (robots stay in weld posture)
+	! Speed: v100 (modify ConfigModule WELD_SPEED for future use)
+	MoveAbsJ end_jt, v100, fine, tWeld1;
+
+	TPWrite "[WELD] Weld complete!";
+ENDPROC
+
+! ----------------------------------------
+! Execute Complete Weld Sequence
+! ----------------------------------------
+! Main entry point for weld sequence
+! Steps:
+!   1. Calculate center line from weld lines
+!   2. Move gantry to center start with R-axis aligned
+!   3. Create weld WObjs for both robots
+!   4. Move robots to weld ready positions
+!   5. Execute weld (gantry moves, robots maintain posture)
+PROC ExecuteWeldSequence()
+	VAR pos r1_start;
+	VAR pos r1_end;
+	VAR pos r2_start;
+	VAR pos r2_end;
+
+	TPWrite "========================================";
+	TPWrite "[WELD] v1.9.0 Weld Sequence Start";
+	TPWrite "========================================";
+
+	! Reset sync flags
+	t1_weld_start := FALSE;
+	t1_weld_done := FALSE;
+	t2_weld_ready := FALSE;
+
+	! Read weld line positions from ConfigModule
+	r1_start.x := WELD_R1_START_X;
+	r1_start.y := WELD_R1_START_Y;
+	r1_start.z := WELD_R1_START_Z;
+	r1_end.x := WELD_R1_END_X;
+	r1_end.y := WELD_R1_END_Y;
+	r1_end.z := WELD_R1_END_Z;
+	r2_start.x := WELD_R2_START_X;
+	r2_start.y := WELD_R2_START_Y;
+	r2_start.z := WELD_R2_START_Z;
+	r2_end.x := WELD_R2_END_X;
+	r2_end.y := WELD_R2_END_Y;
+	r2_end.z := WELD_R2_END_Z;
+
+	TPWrite "[WELD] R1 Line: [" + NumToStr(r1_start.x, 0) + "," + NumToStr(r1_start.y, 0) + "," + NumToStr(r1_start.z, 0) + "] -> ["
+	                             + NumToStr(r1_end.x, 0) + "," + NumToStr(r1_end.y, 0) + "," + NumToStr(r1_end.z, 0) + "]";
+	TPWrite "[WELD] R2 Line: [" + NumToStr(r2_start.x, 0) + "," + NumToStr(r2_start.y, 0) + "," + NumToStr(r2_start.z, 0) + "] -> ["
+	                             + NumToStr(r2_end.x, 0) + "," + NumToStr(r2_end.y, 0) + "," + NumToStr(r2_end.z, 0) + "]";
+
+	! Step 1: Calculate center line
+	CalcCenterLine;
+
+	! Step 2: Move gantry to weld start position
+	MoveGantryToWeldStart;
+
+	! Step 3: Create weld WObjs
+	CreateWeldWobj r1_start, r1_end, WobjWeldR1;
+	CreateWeldWobj r2_start, r2_end, WobjWeldR2;
+
+	! Step 4: Move robots to weld ready
+	MoveRobot1ToWeldReady;
+	WaitForRobot2WeldReady;
+
+	! Step 5: Execute weld (gantry moves along center line)
+	WeldAlongCenterLine;
+
+	! Signal completion
+	t1_weld_done := TRUE;
+
+	TPWrite "========================================";
+	TPWrite "[WELD] Weld Sequence Complete!";
+	TPWrite "========================================";
+ENDPROC
 
 ENDMODULE
