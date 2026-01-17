@@ -85,17 +85,17 @@ PERS num WELD_R2_END_Y := 4900;
 PERS num WELD_R2_END_Z := 500;
 
 ! Robot Weld Position in WObj (mm)
-! These are the TCP positions relative to WObj origin (weld start point)
-! WObj: X=weld direction, Y=perpendicular, Z=Floor Z (down)
-! Robot1: Y=-12 (above center), Z=1600 (below Floor by TCP offset)
-! Robot2: Y=476 (488-12, below center + robot base offset), Z=-1600 (above Floor)
+! WObj origin = weld start point, Z axis = Floor Z direction
+! Robot TCP at Z=0 means same height as weld line
+! Y=-12 for Robot1 (12mm toward Robot1 side)
+! Y=476 for Robot2 (488-12, toward Robot2 side)
 PERS num WELD_R1_WObj_X := 0;
 PERS num WELD_R1_WObj_Y := -12;
-PERS num WELD_R1_WObj_Z := 1600;
+PERS num WELD_R1_WObj_Z := 0;    ! At weld line Z level
 
 PERS num WELD_R2_WObj_X := 0;
 PERS num WELD_R2_WObj_Y := 476;   ! 488 - 12 = 476
-PERS num WELD_R2_WObj_Z := -1600;
+PERS num WELD_R2_WObj_Z := 0;     ! At weld line Z level
 
 ! Robot1 Weld Orientation (quaternion: q1, q2, q3, q4)
 ! 45° torch angle: rotated around weld line (X-axis)
