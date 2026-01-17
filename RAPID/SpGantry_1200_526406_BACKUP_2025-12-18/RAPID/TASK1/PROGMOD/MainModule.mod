@@ -2877,8 +2877,12 @@ ENDPROC
 PROC MoveRobot1ToWeldReady()
 	VAR robtarget weld_target;
 	VAR orient weld_orient;
+	VAR jointtarget current_jt;
 
 	TPWrite "[WELD] Moving Robot1 to weld ready...";
+
+	! Get current gantry position (Robot1 is gantry-configured)
+	current_jt := CJointT();
 
 	! Create weld orientation from ConfigModule (45° torch angle)
 	weld_orient.q1 := WELD_R1_ORIENT_Q1;
@@ -2896,12 +2900,8 @@ PROC MoveRobot1ToWeldReady()
 	weld_target.robconf.cf4 := 0;
 	weld_target.robconf.cf6 := 0;
 	weld_target.robconf.cfx := 0;
-	weld_target.extax.eax_a := 9E9;
-	weld_target.extax.eax_b := 9E9;
-	weld_target.extax.eax_c := 9E9;
-	weld_target.extax.eax_d := 9E9;
-	weld_target.extax.eax_e := 9E9;
-	weld_target.extax.eax_f := 9E9;
+	! Use current gantry position (Robot1 is gantry-configured, needs valid extax)
+	weld_target.extax := current_jt.extax;
 
 	TPWrite "[WELD] R1 WObj pos: [" + NumToStr(WELD_R1_WObj_X, 0) + ", "
 	                                + NumToStr(WELD_R1_WObj_Y, 0) + ", "

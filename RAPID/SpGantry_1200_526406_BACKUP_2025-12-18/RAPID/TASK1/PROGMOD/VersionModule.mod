@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.3";
-CONST string TASK2_VERSION := "v1.9.3";
+CONST string TASK1_VERSION := "v1.9.4";
+CONST string TASK2_VERSION := "v1.9.4";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,16 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.3";  ! Fix: RAPID syntax (pos/robconf/extax assignment)
+CONST string WELD_SEQUENCE_VERSION := "v1.9.4";  ! Fix: Missing extax for gantry-configured Robot1
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.4 (2026-01-17)
+!   - FIX: Missing External Axis Value (40512) in MoveRobot1ToWeldReady
+!   - Robot1 is gantry-configured, needs valid extax (not 9E9)
+!   - Changed: weld_target.extax := current_jt.extax (from CJointT)
+!
 ! v1.9.3 (2026-01-17)
 !   - FIX: RAPID syntax errors in weld sequence procedures
 !   - FIX: pos type assignment (cannot use [x,y,z] literal)
