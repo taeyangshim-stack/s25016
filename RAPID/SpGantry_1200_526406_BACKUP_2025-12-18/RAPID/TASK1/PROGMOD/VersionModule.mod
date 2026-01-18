@@ -49,7 +49,7 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.6";  ! Fix: TCP_Z_OFFSET 1600->1000
 !   - WELD_R1_TCP_Z_OFFSET: 1600 -> 1000 (actual robot reach from Mode2 test)
 !   - WELD_R2_TCP_Z_OFFSET: 1600 -> 1000 (actual robot reach)
 !   - Now: Gantry Z = 2100 - 500 - 1000 = 600 (valid range [-50, 1050])
-!   - R-center Floor Z = 1500, Robot reach 1000mm -> TCP at Floor Z=500 ✓
+!   - R-center Floor Z = 1500, Robot reach 1000mm -> TCP at Floor Z=500 (OK)
 !
 ! v1.9.5 (2026-01-18)
 !   - FIX: Linked motor error (50246) - robot unreachable position
