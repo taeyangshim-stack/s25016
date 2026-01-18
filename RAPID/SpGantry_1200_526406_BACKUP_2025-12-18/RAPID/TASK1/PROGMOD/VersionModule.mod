@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.14";
-CONST string TASK2_VERSION := "v1.9.14";
+CONST string TASK1_VERSION := "v1.9.15";
+CONST string TASK2_VERSION := "v1.9.15";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,17 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.14";  ! Init X1/X2 state sync
+CONST string WELD_SEQUENCE_VERSION := "v1.9.15";  ! Use 9E9 for eax_f
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.15 (2026-01-18)
+!   - FIX: Use 9E9 for eax_f in all MoveAbsJ commands
+!   - 9E9 means "don't control this axis" - let linked motor system handle X2
+!   - This avoids the stale X2 state comparison issue
+!   - Applied to: SetRobot1InitialPosition, MoveGantryToWeldStart, WeldAlongCenterLine
+!
 ! v1.9.14 (2026-01-18)
 !   - FIX: SetRobot1InitialPosition X1/X2 software state sync
 !   - Set BOTH eax_a AND eax_f to same value (actual physical position)

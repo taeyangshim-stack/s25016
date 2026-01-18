@@ -1529,26 +1529,18 @@ PERS num debug_r2_floor_y_offset := 0;
 		x2_current := sync_pos.extax.eax_f;
 		distance := x1_target - x2_current;
 
-		! v1.9.14: Force X1/X2 software state sync
-		! Set BOTH eax_a and eax_f to same value (actual physical position)
-		! This updates X2 software state without physical movement
+		! v1.9.15: Use 9E9 for eax_f to let linked motor system handle X2 automatically
+		! Setting eax_f to 9E9 means "don't control this axis" - let hardware handle it
 		Write logfile, "Init X1=" + NumToStr(x1_target,1) + " X2=" + NumToStr(x2_current,1) + " diff=" + NumToStr(distance,1);
 		IF Abs(distance) > 1 THEN
-			TPWrite "X1/X2 state mismatch - syncing software state";
-			Write logfile, "Syncing X2 state to X1 position";
-			! Set both to X1's actual position (no physical move needed)
-			sync_pos.extax.eax_a := x1_target;
-			sync_pos.extax.eax_f := x1_target;
-			MoveAbsJ sync_pos, v10, fine, tool0;
-			! Verify sync
-			sync_pos := CJointT();
-			Write logfile, "After sync: X1=" + NumToStr(sync_pos.extax.eax_a,1) + " X2=" + NumToStr(sync_pos.extax.eax_f,1);
+			TPWrite "X1/X2 state mismatch - using 9E9 for eax_f";
+			Write logfile, "Using 9E9 for eax_f (let linked motor system handle X2)";
 		ENDIF
 
 		! Step 1: Move Robot1 joints to intermediate position (avoid configuration issue)
 		initial_joint := CJointT();
-		! Keep synchronized gantry position
-		initial_joint.extax.eax_f := initial_joint.extax.eax_a;
+		! v1.9.15: Set eax_f to 9E9 (undefined) - let linked motor handle X2
+		initial_joint.extax.eax_f := 9E9;
 		! Robot1 joint angles: [0, -2.58, -11.88, 0, 14.47, 0]
 		initial_joint.robax.rax_1 := 0;
 		initial_joint.robax.rax_2 := -2.58;
@@ -1599,7 +1591,8 @@ PERS num debug_r2_floor_y_offset := 0;
 		home_pos.extax.eax_c := 0;      ! Z = Physical origin
 		home_pos.extax.eax_d := 0;      ! R = Physical origin
 		! eax_e: keep from CJointT() (not used)
-		home_pos.extax.eax_f := 0;      ! X2 = X1 (Master-Follower sync!)
+		! v1.9.15: Use 9E9 for eax_f - let linked motor system handle X2
+		home_pos.extax.eax_f := 9E9;
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "Robot1 init: done";
 		Write logfile, "Done errX=" + NumToStr(error_x, 2) + " errY=" + NumToStr(error_y, 2) + " iter=" + NumToStr(iteration, 0) + " at " + CTime();
@@ -2861,7 +2854,8 @@ PROC MoveGantryToWeldStart()
 	target_jt.extax.eax_b := gantry_target.y;  ! Gantry Y
 	target_jt.extax.eax_c := gantry_target.z;  ! Gantry Z
 	target_jt.extax.eax_d := weld_center_angle; ! Gantry R
-	target_jt.extax.eax_f := gantry_target.x;  ! Gantry X2 (must match X1)
+	! v1.9.15: Use 9E9 for eax_f - let linked motor system handle X2
+	target_jt.extax.eax_f := 9E9;
 
 	Write gantry_log, "Command: eax_a=" + NumToStr(target_jt.extax.eax_a,1) + " eax_f=" + NumToStr(target_jt.extax.eax_f,1);
 	Write gantry_log, "Calling MoveAbsJ...";
@@ -2967,7 +2961,8 @@ PROC WeldAlongCenterLine()
 	end_jt := current_jt;
 	end_jt.extax.eax_a := gantry_end.x;  ! Gantry X1
 	end_jt.extax.eax_b := gantry_end.y;  ! Gantry Y
-	end_jt.extax.eax_f := gantry_end.x;  ! Gantry X2 (linked motor, must match X1)
+	! v1.9.15: Use 9E9 for eax_f - let linked motor system handle X2
+	end_jt.extax.eax_f := 9E9;
 	! Z and R stay the same
 
 	TPWrite "[WELD] Welding to [" + NumToStr(gantry_end.x, 1) + ", "
