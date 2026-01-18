@@ -2991,12 +2991,12 @@ PROC ExecuteWeldSequence()
 	VAR num x2_val;
 	VAR num sync_distance;
 
-	! v1.9.10: Added file logging for debugging
+	! v1.9.11: Added file logging for debugging
 	Open "HOME:/weld_sequence.txt", weld_logfile \Write;
 	Write weld_logfile, "Weld Sequence Log (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
 	TPWrite "========================================";
-	TPWrite "[WELD] v1.9.10 Weld Sequence Start";
+	TPWrite "[WELD] v1.9.11 Weld Sequence Start";
 	TPWrite "========================================";
 
 	! Log current gantry position
@@ -3006,26 +3006,47 @@ PROC ExecuteWeldSequence()
 	sync_distance := x1_val - x2_val;
 	Write weld_logfile, "Start extax: X1=" + NumToStr(x1_val,1) + " X2=" + NumToStr(x2_val,1) + " diff=" + NumToStr(sync_distance,1);
 
-	! v1.9.10: Force X1/X2 sync before any movement
+	! v1.9.11: Force X1/X2 sync - BOTH axes must have same value in MoveAbsJ
 	IF Abs(sync_distance) > 1 THEN
 		TPWrite "[WELD] X1/X2 out of sync! Syncing...";
 		Write weld_logfile, "SYNC: X1/X2 out of sync by " + NumToStr(Abs(sync_distance),1) + "mm - forcing sync";
 		sync_jt := current_jt;
 
-		! Progressive sync if distance is large (>100mm)
+		! Strategy: Move X1 to X2's position (so both are at same place)
+		! Then move both together to target (X1's original position)
+		! This ensures eax_a == eax_f in every MoveAbsJ command
+
+		! Step 1: Move X1 to X2's current position (eax_a = eax_f = x2_val)
+		Write weld_logfile, "SYNC Step1: Move X1 to X2 position (" + NumToStr(x2_val,1) + ")";
+		sync_jt.extax.eax_a := x2_val;  ! X1 moves to X2's position
+		sync_jt.extax.eax_f := x2_val;  ! X2 stays at same position
+		MoveAbsJ sync_jt, v100, fine, tool0;
+
+		! Verify step 1
+		current_jt := CJointT();
+		Write weld_logfile, "SYNC Step1 result: X1=" + NumToStr(current_jt.extax.eax_a,1) + " X2=" + NumToStr(current_jt.extax.eax_f,1);
+
+		! Step 2: Move both to X1's original position (target = 0 typically)
+		! Use progressive movement if distance > 100mm
+		sync_distance := x1_val - x2_val;  ! Recalculate for step 2
 		IF Abs(sync_distance) > 100 THEN
-			Write weld_logfile, "SYNC: Using progressive sync (4 steps)";
+			Write weld_logfile, "SYNC Step2: Progressive move to " + NumToStr(x1_val,1) + " (4 steps)";
+			sync_jt.extax.eax_a := x2_val + sync_distance * 0.25;
 			sync_jt.extax.eax_f := x2_val + sync_distance * 0.25;
-			MoveAbsJ sync_jt, v10, fine, tool0;
+			MoveAbsJ sync_jt, v100, fine, tool0;
+			sync_jt.extax.eax_a := x2_val + sync_distance * 0.50;
 			sync_jt.extax.eax_f := x2_val + sync_distance * 0.50;
-			MoveAbsJ sync_jt, v10, fine, tool0;
+			MoveAbsJ sync_jt, v100, fine, tool0;
+			sync_jt.extax.eax_a := x2_val + sync_distance * 0.75;
 			sync_jt.extax.eax_f := x2_val + sync_distance * 0.75;
-			MoveAbsJ sync_jt, v10, fine, tool0;
+			MoveAbsJ sync_jt, v100, fine, tool0;
 		ENDIF
 
-		! Final sync: X2 = X1
+		! Final move: both to X1's original position
+		Write weld_logfile, "SYNC Step2 final: Move both to " + NumToStr(x1_val,1);
+		sync_jt.extax.eax_a := x1_val;
 		sync_jt.extax.eax_f := x1_val;
-		MoveAbsJ sync_jt, v10, fine, tool0;
+		MoveAbsJ sync_jt, v100, fine, tool0;
 
 		! Verify sync
 		current_jt := CJointT();
