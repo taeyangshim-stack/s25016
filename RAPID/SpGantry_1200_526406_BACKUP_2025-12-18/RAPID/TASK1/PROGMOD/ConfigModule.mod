@@ -99,20 +99,19 @@ PERS num WELD_R2_WObj_Y := 476;   ! 488 - 12 = 476
 PERS num WELD_R2_WObj_Z := 0;     ! At weld line Z level
 
 ! Robot1 Weld Orientation (quaternion: q1, q2, q3, q4)
-! 45° torch angle: rotated around weld line (X-axis)
-! Rotation Rx +45°: [cos(22.5°), sin(22.5°), 0, 0]
-! Torch tilts perpendicular to weld direction
-PERS num WELD_R1_ORIENT_Q1 := 0.9239;
-PERS num WELD_R1_ORIENT_Q2 := 0.3827;
+! v1.9.8: Changed to 0 deg (straight down) for testing
+! Previous 45 deg caused "Position outside reach" error
+! Identity quaternion [1, 0, 0, 0] = no rotation from WObj
+PERS num WELD_R1_ORIENT_Q1 := 1;
+PERS num WELD_R1_ORIENT_Q2 := 0;
 PERS num WELD_R1_ORIENT_Q3 := 0;
 PERS num WELD_R1_ORIENT_Q4 := 0;
 
 ! Robot2 Weld Orientation (quaternion: q1, q2, q3, q4)
-! 45° torch angle: rotated around weld line (X-axis)
-! Rotation Rx -45°: [cos(-22.5°), sin(-22.5°), 0, 0]
-! Robot2 tilts opposite direction from Robot1
-PERS num WELD_R2_ORIENT_Q1 := 0.9239;
-PERS num WELD_R2_ORIENT_Q2 := -0.3827;
+! v1.9.8: Changed to 0 deg (straight down) for testing
+! Identity quaternion [1, 0, 0, 0] = no rotation from WObj
+PERS num WELD_R2_ORIENT_Q1 := 1;
+PERS num WELD_R2_ORIENT_Q2 := 0;
 PERS num WELD_R2_ORIENT_Q3 := 0;
 PERS num WELD_R2_ORIENT_Q4 := 0;
 
