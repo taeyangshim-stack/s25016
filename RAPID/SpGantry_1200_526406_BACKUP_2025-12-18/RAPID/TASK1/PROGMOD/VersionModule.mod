@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.5";
-CONST string TASK2_VERSION := "v1.9.5";
+CONST string TASK1_VERSION := "v1.9.6";
+CONST string TASK2_VERSION := "v1.9.6";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -22,8 +22,8 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-01-17";
-CONST string BUILD_TIME := "21:30:00";
+CONST string BUILD_DATE := "2026-01-18";
+CONST string BUILD_TIME := "09:30:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -39,11 +39,18 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.5";  ! Fix: WObj Z coordinate (was 1600, now 0)
+CONST string WELD_SEQUENCE_VERSION := "v1.9.6";  ! Fix: TCP_Z_OFFSET 1600->1000
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.6 (2026-01-18)
+!   - FIX: Linked motor error (50246) - gantry Z calculation wrong
+!   - WELD_R1_TCP_Z_OFFSET: 1600 -> 1000 (actual robot reach from Mode2 test)
+!   - WELD_R2_TCP_Z_OFFSET: 1600 -> 1000 (actual robot reach)
+!   - Now: Gantry Z = 2100 - 500 - 1000 = 600 (valid range [-50, 1050])
+!   - R-center Floor Z = 1500, Robot reach 1000mm -> TCP at Floor Z=500 ✓
+!
 ! v1.9.5 (2026-01-18)
 !   - FIX: Linked motor error (50246) - robot unreachable position
 !   - WELD_R1_WObj_Z: 1600 -> 0 (at weld line Z level)

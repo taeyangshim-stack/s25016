@@ -59,15 +59,16 @@ PERS num MODE2_POS_R{10} := [0, 45, -45, 90, -90, 30, -30, 60, -60, 15];
 ! Weld Sequence Configuration (v1.9.0)
 ! ========================================
 ! Robot TCP Offset from R-center (mm)
-! Distance from gantry R-center to tWeld TCP when robot points down
+! Distance from gantry R-center to robot TCP (actual reach, not tool length)
 ! Used to calculate gantry Z from Floor weld Z
 ! Gantry_Z = 2100 - Floor_Z - TCP_OFFSET
-PERS num WELD_R1_TCP_Z_OFFSET := 1600;  ! Robot1 tWeld1: +Z direction from R-center
-PERS num WELD_R2_TCP_Z_OFFSET := 1600;  ! Robot2 tWeld2: -Z direction from R-center
+! v1.9.6: Changed from 1600 to 1000 (actual robot reach based on Mode2 test)
+PERS num WELD_R1_TCP_Z_OFFSET := 1000;  ! Robot1 tWeld1: actual reach below R-center
+PERS num WELD_R2_TCP_Z_OFFSET := 1000;  ! Robot2 tWeld2: actual reach below R-center
 
 ! Robot1 Weld Line (Floor TCP coordinates, mm)
 ! Floor Z = (2100 - Gantry_Z) - TCP_OFFSET
-! Example: Gantry_Z=0, TCP_OFFSET=1600, Floor_Z = 2100 - 0 - 1600 = 500
+! Example: Gantry_Z=600, TCP_OFFSET=1000, Floor_Z = 2100 - 600 - 1000 = 500
 PERS num WELD_R1_START_X := 5000;
 PERS num WELD_R1_START_Y := 5100;
 PERS num WELD_R1_START_Z := 500;
