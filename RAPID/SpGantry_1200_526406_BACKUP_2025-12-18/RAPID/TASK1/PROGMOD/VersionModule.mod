@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.12";
-CONST string TASK2_VERSION := "v1.9.12";
+CONST string TASK1_VERSION := "v1.9.13";
+CONST string TASK2_VERSION := "v1.9.13";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,16 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.12";  ! Simplified - eax_f is software state
+CONST string WELD_SEQUENCE_VERSION := "v1.9.13";  ! Use tool0 for testing
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.13 (2026-01-18)
+!   - FIX: Changed tWeld1 to tool0 for MoveRobot1ToWeldReady and WeldAlongCenterLine
+!   - tWeld1 has large TCP offset [320, -6, 330] causing "Position outside reach"
+!   - Testing with tool0 (no offset) to verify robot reach
+!
 ! v1.9.12 (2026-01-18)
 !   - ANALYSIS: X1/X2 are physically same axis (linked motors)
 !   - eax_f different value is SOFTWARE STATE issue, not physical

@@ -2919,8 +2919,8 @@ PROC MoveRobot1ToWeldReady()
 	                                + NumToStr(WELD_R1_WObj_Y, 0) + ", "
 	                                + NumToStr(WELD_R1_WObj_Z, 0) + "]";
 
-	! Move to weld ready position using tWeld1
-	MoveJ weld_target, v100, fine, tWeld1\WObj:=WobjWeldR1;
+	! v1.9.13: Use tool0 for testing (tWeld1 has large TCP offset causing reach issues)
+	MoveJ weld_target, v100, fine, tool0\WObj:=WobjWeldR1;
 
 	TPWrite "[WELD] Robot1 ready at weld position";
 ENDPROC
@@ -2975,7 +2975,8 @@ PROC WeldAlongCenterLine()
 
 	! Move gantry along center line (robots stay in weld posture)
 	! Speed: v100 (modify ConfigModule WELD_SPEED for future use)
-	MoveAbsJ end_jt, v100, fine, tWeld1;
+	! v1.9.13: Use tool0 for testing
+	MoveAbsJ end_jt, v100, fine, tool0;
 
 	TPWrite "[WELD] Weld complete!";
 ENDPROC
