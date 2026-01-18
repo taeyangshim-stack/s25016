@@ -244,9 +244,97 @@
             font-size: 0.85rem;
         }
 
+        /* 모바일 반응형 */
         @media (max-width: 768px) {
-            .header h1 { font-size: 1.5rem; }
-            th, td { padding: 8px 10px; font-size: 0.8rem; }
+            body { padding: 10px; }
+            .header { padding: 15px; margin-bottom: 20px; }
+            .header h1 { font-size: 1.3rem; }
+            .header .subtitle { font-size: 0.85rem; }
+            .header .date { font-size: 0.8rem; }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .summary-card { padding: 15px; }
+            .summary-card .number { font-size: 1.8rem; }
+            .summary-card .label { font-size: 0.75rem; }
+
+            .progress-section { padding: 15px; }
+            .progress-bar-container { height: 24px; }
+            .progress-bar { font-size: 0.65rem; }
+
+            .owner-summary {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .owner-card { padding: 10px; }
+            .owner-card h4 { font-size: 0.85rem; margin-bottom: 8px; }
+            .owner-card .task-count { font-size: 0.75rem; padding: 3px 8px; }
+
+            .legend { gap: 10px; margin-bottom: 15px; }
+            .legend-item { font-size: 0.75rem; }
+            .priority { padding: 2px 8px; font-size: 0.7rem; }
+
+            .week-section { margin-bottom: 15px; }
+            .week-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 12px 15px;
+            }
+            .week-header h2 { font-size: 1rem; }
+            .week-header .badge { font-size: 0.75rem; padding: 4px 10px; }
+
+            .week-content { padding: 10px; }
+            .owner-group { margin-bottom: 15px; }
+            .owner-title { font-size: 0.95rem; }
+
+            /* 테이블을 카드 형태로 변환 */
+            table { display: block; }
+            thead { display: none; }
+            tbody { display: block; }
+            tr {
+                display: block;
+                background: rgba(255,255,255,0.03);
+                border-radius: 8px;
+                margin-bottom: 8px;
+                padding: 10px;
+                border-left: 3px solid #00d4ff;
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 4px 0;
+                border-bottom: none;
+                font-size: 0.8rem;
+            }
+            td:first-child {
+                font-weight: 600;
+                color: #00d4ff;
+            }
+            td:nth-child(2) {
+                flex-direction: column;
+                align-items: flex-start;
+                font-size: 0.85rem;
+            }
+            td:nth-child(3) { display: none; }
+            td:last-child, td:nth-last-child(2) {
+                display: inline-flex;
+                margin-right: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.1rem; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .summary-card .number { font-size: 1.5rem; }
+            .owner-summary { grid-template-columns: 1fr; }
+            .week-header h2 { font-size: 0.9rem; }
+            td { font-size: 0.75rem; }
+            .status, .priority { font-size: 0.65rem; padding: 2px 6px; }
         }
     </style>
 </head>

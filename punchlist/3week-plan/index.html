@@ -78,6 +78,53 @@
             display: flex;
             gap: 20px;
         }
+
+        /* 모바일 반응형 */
+        @media (max-width: 768px) {
+            .header-bar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px 15px;
+                text-align: center;
+            }
+            .header-bar .info {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                font-size: 0.75rem;
+            }
+            .tab-nav {
+                padding: 10px;
+                gap: 3px;
+            }
+            .tab-btn {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+                flex: 1;
+                justify-content: center;
+            }
+            .tab-btn .icon {
+                font-size: 1rem;
+            }
+            .tab-frame {
+                height: calc(100vh - 120px);
+            }
+        }
+        @media (max-width: 480px) {
+            .header-bar .title {
+                font-size: 0.9rem;
+            }
+            .header-bar .info {
+                font-size: 0.7rem;
+            }
+            .tab-btn {
+                padding: 8px 8px;
+                font-size: 0.75rem;
+            }
+            .tab-btn .icon {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>

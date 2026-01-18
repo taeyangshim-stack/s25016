@@ -375,14 +375,74 @@
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-        @media (max-width: 600px) {
-            .total-summary {
-                grid-template-columns: repeat(2, 1fr);
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { padding: 15px; margin-bottom: 15px; }
+            .header h1 { font-size: 1.3rem; }
+            .header .meta {
+                flex-direction: column;
+                gap: 5px;
             }
+            .header .meta span { font-size: 0.8rem; }
+
+            .total-summary {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+            .total-card { padding: 12px 8px; }
+            .total-card .number { font-size: 1.5rem; }
+            .total-card .label { font-size: 0.7rem; }
+
+            .legend { gap: 8px; margin: 15px 0; }
+            .legend-item { font-size: 0.7rem; }
+            .legend-dot { width: 10px; height: 10px; }
+
+            .owner-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
             .owner-header {
                 flex-direction: column;
                 gap: 10px;
+                padding: 12px 15px;
             }
+            .owner-header h3 { font-size: 1rem; }
+            .owner-header .avatar { width: 35px; height: 35px; font-size: 0.85rem; }
+            .owner-header .stats { gap: 10px; }
+            .owner-header .stat-num { font-size: 1rem; }
+
+            .progress-section { padding: 10px 15px; }
+            .progress-bar-bg { height: 20px; }
+            .progress-bar-fill { font-size: 0.65rem; }
+
+            .week-status { padding: 8px 15px; gap: 6px; flex-wrap: wrap; }
+            .week-badge { padding: 4px 10px; font-size: 0.7rem; }
+
+            .task-list { max-height: 250px; }
+            .task-item { padding: 10px 12px; gap: 10px; }
+            .task-checkbox { width: 18px; height: 18px; }
+            .task-id { font-size: 0.7rem; }
+            .task-title { font-size: 0.8rem; }
+            .task-meta { gap: 5px; }
+            .task-tag { font-size: 0.6rem; padding: 1px 6px; }
+            .task-status { font-size: 0.65rem; padding: 3px 8px; }
+
+            .issue-section { padding: 12px 15px; }
+            .issue-header h4 { font-size: 0.8rem; }
+            .issue-add-btn { padding: 4px 10px; font-size: 0.75rem; }
+            .issue-item { padding: 8px 10px; font-size: 0.8rem; }
+
+            .footer { padding: 15px; font-size: 0.75rem; }
+        }
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.1rem; }
+            .total-summary { grid-template-columns: repeat(2, 1fr); }
+            .total-card .number { font-size: 1.3rem; }
+            .owner-header .avatar { width: 30px; height: 30px; font-size: 0.75rem; }
+            .task-title { font-size: 0.75rem; }
+            .week-badge { padding: 3px 8px; font-size: 0.65rem; }
         }
     </style>
 </head>

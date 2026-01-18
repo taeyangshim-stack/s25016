@@ -380,10 +380,86 @@
         @media (max-width: 1200px) {
             .gantt-container {
                 overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
             .gantt-header, .week-header, .owner-row, .summary-row {
                 min-width: 1200px;
             }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { padding: 15px; margin-bottom: 15px; }
+            .header h1 { font-size: 1.2rem; }
+            .header-info {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .header-info span { font-size: 0.8rem; }
+
+            .legend { gap: 8px; margin-bottom: 15px; }
+            .legend-item { font-size: 0.7rem; }
+            .legend-dot { width: 10px; height: 10px; }
+
+            .filters { gap: 5px; margin-bottom: 15px; }
+            .filter-btn { padding: 6px 12px; font-size: 0.75rem; }
+
+            /* 간트 차트는 가로 스크롤 유지하고 힌트 제공 */
+            .gantt-container {
+                position: relative;
+            }
+            .gantt-container::before {
+                content: '← 스크롤하여 전체 일정 확인 →';
+                display: block;
+                text-align: center;
+                padding: 8px;
+                background: rgba(0,212,255,0.1);
+                color: #00d4ff;
+                font-size: 0.75rem;
+                border-radius: 8px 8px 0 0;
+            }
+
+            .owner-name {
+                min-width: 150px;
+                padding: 10px;
+            }
+            .owner-avatar { width: 28px; height: 28px; font-size: 0.7rem; }
+            .owner-info .name { font-size: 0.8rem; }
+            .owner-info .count { font-size: 0.65rem; }
+
+            .gantt-header-cell { padding: 8px 3px; }
+            .gantt-header-cell .day { font-size: 0.7rem; }
+            .gantt-header-cell .date { font-size: 0.6rem; }
+
+            .task-bar { padding: 3px 4px; font-size: 0.55rem; }
+
+            /* 상세 일정 카드 모바일 최적화 */
+            .detail-section h2 { font-size: 1rem; padding-left: 8px; margin-bottom: 12px; }
+            .day-schedule {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .day-card-header { padding: 10px 12px; }
+            .day-card-header .day-name { font-size: 0.9rem; }
+            .day-card-header .day-date { font-size: 0.75rem; }
+            .day-card-header .task-count { font-size: 0.7rem; padding: 2px 8px; }
+
+            .day-task-list { padding: 8px; max-height: 250px; }
+            .day-task-item { padding: 8px; font-size: 0.75rem; }
+            .day-task-item .task-id { font-size: 0.65rem; }
+            .day-task-item .task-owner { font-size: 0.65rem; }
+
+            .footer { padding: 15px; font-size: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1rem; }
+            .filter-btn { padding: 5px 8px; font-size: 0.7rem; }
+            .owner-name { min-width: 120px; padding: 8px; }
+            .owner-avatar { width: 24px; height: 24px; font-size: 0.6rem; }
+            .owner-info .name { font-size: 0.75rem; }
+            .task-bar { font-size: 0.5rem; padding: 2px 3px; }
+            .day-task-item { font-size: 0.7rem; }
         }
     </style>
 </head>
