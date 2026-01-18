@@ -2910,9 +2910,11 @@ PROC MoveRobot1ToWeldReady()
 	TPWrite "[WELD] R1 Step1: MoveAbsJ to safe joints";
 	MoveAbsJ safe_jt, v100, fine, tool0;
 
-	! Step 2: Move to wobj0 target position
-	! wobj0 target: [0, 370, 1300]
+	! Step 2: Move to WobjGantry target position
+	! v1.9.21: Use WobjGantry instead of wobj0 (gantry-relative coords)
+	! WobjGantry target: [0, 370, 1300] (relative to R-center)
 	current_jt := CJointT();  ! Re-read after move
+	UpdateGantryWobj;
 	weld_target.trans.x := 0;
 	weld_target.trans.y := 370;
 	weld_target.trans.z := 1300;
@@ -2926,8 +2928,8 @@ PROC MoveRobot1ToWeldReady()
 	weld_target.robconf.cfx := 0;
 	weld_target.extax := current_jt.extax;
 
-	TPWrite "[WELD] R1 Step2: MoveJ to wobj0 [0, 370, 1300]";
-	MoveJ weld_target, v100, fine, tool0\WObj:=wobj0;
+	TPWrite "[WELD] R1 Step2: MoveJ to WobjGantry [0, 370, 1300]";
+	MoveJ weld_target, v100, fine, tool0\WObj:=WobjGantry;
 
 	TPWrite "[WELD] Robot1 ready at weld position";
 ENDPROC
