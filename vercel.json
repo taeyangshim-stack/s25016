@@ -26,7 +26,7 @@
     { "source": "/robot-dashboard", "destination": "/상하축이슈_대시보드.html" },
     { "source": "/cloudinary", "destination": "/cloudinary-uploader/dashboard.html" },
     { "source": "/punchlist", "destination": "/punchlist/index.html" },
-    { "source": "/punchlist/3week-plan", "destination": "/punchlist/260118_펀치리스트정리/260118_통합대시보드.html" },
+    { "source": "/punchlist/3week-plan", "destination": "/punchlist/3week-plan/index.html" },
     { "source": "/punchlist/pages/list", "destination": "/punchlist/pages/list.html" },
     { "source": "/punchlist/pages/detail", "destination": "/punchlist/pages/detail.html" },
     { "source": "/punchlist/pages/create", "destination": "/punchlist/pages/create.html" },

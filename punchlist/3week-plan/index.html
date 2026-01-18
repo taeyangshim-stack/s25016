@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S25016 3주 완료 계획 - 통합 대시보드</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* 탭 네비게이션 */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #0066ff);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,212,255,0.3);
+        }
+        .tab-btn .icon { font-size: 1.1rem; }
+
+        /* 탭 콘텐츠 */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* 공통 iframe 스타일 */
+        .tab-frame {
+            width: 100%;
+            height: calc(100vh - 70px);
+            border: none;
+            background: transparent;
+        }
+
+        /* 헤더 정보 */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.2);
+            font-size: 0.85rem;
+            color: #888;
+        }
+        .header-bar .title {
+            color: #00d4ff;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .header-bar .info {
+            display: flex;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 바 -->
+    <div class="header-bar">
+        <span class="title">S25016 펀치리스트 3주 완료 계획</span>
+        <div class="info">
+            <span>계획기간: 2026.01.19 ~ 2026.02.08</span>
+            <span>총 69건</span>
+            <span>담당: SP 심태양</span>
+        </div>
+    </div>
+
+    <!-- 탭 네비게이션 -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" onclick="showTab('overview')">
+            <span class="icon">📊</span> 주차별 계획
+        </button>
+        <button class="tab-btn" onclick="showTab('owner')">
+            <span class="icon">👥</span> 담당자별 관리
+        </button>
+        <button class="tab-btn" onclick="showTab('gantt')">
+            <span class="icon">📅</span> 일정표 (간트)
+        </button>
+    </nav>
+
+    <!-- 탭 콘텐츠: 주차별 계획 -->
+    <div id="tab-overview" class="tab-content active">
+        <iframe src="weekly.html" class="tab-frame"></iframe>
+    </div>
+
+    <!-- 탭 콘텐츠: 담당자별 관리 -->
+    <div id="tab-owner" class="tab-content">
+        <iframe src="owner.html" class="tab-frame"></iframe>
+    </div>
+
+    <!-- 탭 콘텐츠: 일정표 -->
+    <div id="tab-gantt" class="tab-content">
+        <iframe src="gantt.html" class="tab-frame"></iframe>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // 모든 탭 버튼 비활성화
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            // 모든 탭 콘텐츠 숨기기
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // 선택된 탭 활성화
+            event.target.closest('.tab-btn').classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+    </script>
+</body>
+</html>

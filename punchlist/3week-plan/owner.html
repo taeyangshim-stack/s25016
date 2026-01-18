@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S25016 담당자별 진행 관리</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 헤더 */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            color: #00d4ff;
+            margin-bottom: 8px;
+        }
+        .header .meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .header .meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 전체 요약 */
+        .total-summary {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .total-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .total-card .number {
+            font-size: 2.2rem;
+            font-weight: bold;
+        }
+        .total-card .label {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        .total-card.total .number { color: #00d4ff; }
+        .total-card.completed .number { color: #2ed573; }
+        .total-card.progress .number { color: #ffa502; }
+        .total-card.verify .number { color: #1e90ff; }
+        .total-card.new .number { color: #ff6b6b; }
+
+        /* 담당자 카드 그리드 */
+        .owner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 20px;
+        }
+
+        /* 담당자 카드 */
+        .owner-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+        .owner-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .owner-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+        .owner-header .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #0066ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .owner-header .stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+        }
+        .owner-header .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .owner-header .stat-num {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* 진행률 바 */
+        .progress-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .progress-bar-bg {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            height: 24px;
+            overflow: hidden;
+            display: flex;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: width 0.3s ease;
+        }
+        .progress-bar-fill.completed { background: #2ed573; color: #000; }
+        .progress-bar-fill.verify { background: #1e90ff; }
+        .progress-bar-fill.progress { background: #ffa502; color: #000; }
+        .progress-bar-fill.new { background: #ff6b6b; }
+
+        /* 주차별 현황 */
+        .week-status {
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02);
+        }
+        .week-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .week-badge.w1 { background: rgba(255,107,107,0.2); border: 1px solid #ff6b6b; }
+        .week-badge.w2 { background: rgba(255,217,61,0.2); border: 1px solid #ffd93d; }
+        .week-badge.w3 { background: rgba(107,203,119,0.2); border: 1px solid #6bcb77; }
+
+        /* 업무 목록 */
+        .task-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .task-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+        .task-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .task-checkbox.checked {
+            background: #2ed573;
+            border-color: #2ed573;
+        }
+        .task-checkbox.checked::after {
+            content: '✓';
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .task-info {
+            flex: 1;
+        }
+        .task-id {
+            font-size: 0.75rem;
+            color: #888;
+        }
+        .task-title {
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+        .task-meta {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .task-tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+        }
+        .task-tag.urgent { background: #ff4757; }
+        .task-tag.high { background: #ffa502; color: #000; }
+        .task-tag.normal { background: #2ed573; color: #000; }
+        .task-tag.low { background: #747d8c; }
+
+        .task-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .task-status.new { background: #5352ed; }
+        .task-status.progress { background: #ff6348; }
+        .task-status.verify { background: #1e90ff; }
+        .task-status.completed { background: #2ed573; color: #000; }
+
+        /* 이슈 섹션 */
+        .issue-section {
+            padding: 15px 20px;
+            background: rgba(255,100,100,0.05);
+            border-top: 1px solid rgba(255,100,100,0.2);
+        }
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .issue-header h4 {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .issue-add-btn {
+            background: rgba(255,107,107,0.2);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .issue-add-btn:hover {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        .issue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .issue-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border-left: 3px solid #ff6b6b;
+        }
+        .issue-item .issue-date {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 4px;
+        }
+        .issue-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 10px;
+            color: #fff;
+            font-size: 0.85rem;
+            resize: none;
+            display: none;
+        }
+        .issue-input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+        .issue-input.show {
+            display: block;
+        }
+
+        /* 스크롤바 스타일 */
+        .task-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .task-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        .task-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+
+        /* 범례 */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        /* 푸터 */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #555;
+            font-size: 0.8rem;
+            margin-top: 20px;
+        }
+
+        /* 반응형 */
+        @media (max-width: 1024px) {
+            .owner-grid {
+                grid-template-columns: 1fr;
+            }
+            .total-summary {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .total-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .owner-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 S25016 담당자별 진행 관리</h1>
+            <div class="meta">
+                <span>📅 계획기간: 2026.01.19 ~ 2026.02.08</span>
+                <span>📊 총 69건</span>
+                <span>🔄 최종갱신: 2026.01.18</span>
+            </div>
+        </div>
+
+        <!-- 전체 요약 -->
+        <div class="total-summary">
+            <div class="total-card total">
+                <div class="number">69</div>
+                <div class="label">전체 업무</div>
+            </div>
+            <div class="total-card completed">
+                <div class="number" id="total-completed">0</div>
+                <div class="label">완료</div>
+            </div>
+            <div class="total-card verify">
+                <div class="number">14</div>
+                <div class="label">검증중</div>
+            </div>
+            <div class="total-card progress">
+                <div class="number">39</div>
+                <div class="label">진행중</div>
+            </div>
+            <div class="total-card new">
+                <div class="number">16</div>
+                <div class="label">신규</div>
+            </div>
+        </div>
+
+        <!-- 범례 -->
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#2ed573"></div> 완료</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1e90ff"></div> 검증중</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ffa502"></div> 진행중</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ff6b6b"></div> 신규</div>
+            <div class="legend-item"><div class="legend-dot week-badge w1" style="width:auto;height:auto;padding:2px 8px;border-radius:10px;"></div> 1주차</div>
+            <div class="legend-item"><div class="legend-dot week-badge w2" style="width:auto;height:auto;padding:2px 8px;border-radius:10px;"></div> 2주차</div>
+            <div class="legend-item"><div class="legend-dot week-badge w3" style="width:auto;height:auto;padding:2px 8px;border-radius:10px;"></div> 3주차</div>
+        </div>
+
+        <!-- 담당자 카드 그리드 -->
+        <div class="owner-grid">
+
+            <!-- 박주한 -->
+            <div class="owner-card" data-owner="박주한">
+                <div class="owner-header">
+                    <h3>
+                        <div class="avatar">박</div>
+                        <div>
+                            <div>박주한</div>
+                            <div style="font-size:0.75rem;color:#888;font-weight:normal;">UI/HMI 개발</div>
+                        </div>
+                    </h3>
+                    <div class="stats">
+                        <div class="stat"><span class="stat-num" style="color:#00d4ff;">7</span> 전체</div>
+                        <div class="stat"><span class="stat-num" style="color:#2ed573;">0</span> 완료</div>
+                    </div>
+                </div>
+                <div class="progress-section">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill completed" style="width:0%"></div>
+                        <div class="progress-bar-fill progress" style="width:71%">진행 71%</div>
+                        <div class="progress-bar-fill new" style="width:29%">신규 29%</div>
+                    </div>
+                </div>
+                <div class="week-status">
+                    <span class="week-badge w1">1주 0건</span>
+                    <span class="week-badge w2">2주 2건</span>
+                    <span class="week-badge w3">3주 5건</span>
+                </div>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-060" target="_blank" style="color:#00d4ff;">PL-2025-060</a></div>
+                            <div class="task-title">시뮬레이션 vs 실제 상이한 알람 관련</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-088" target="_blank" style="color:#00d4ff;">PL-2025-088</a></div>
+                            <div class="task-title">작업자 / 관리자 권한 설정</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-089" target="_blank" style="color:#00d4ff;">PL-2025-089</a></div>
+                            <div class="task-title">돌림 용접 구간 개별 옵셋 적용</div>
+                            <div class="task-meta">
+                                <span class="task-tag high">높음</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-093" target="_blank" style="color:#00d4ff;">PL-2025-093</a></div>
+                            <div class="task-title">운영 S/W 최종 매뉴얼 제출</div>
+                            <div class="task-meta">
+                                <span class="task-tag low">낮음</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-104" target="_blank" style="color:#00d4ff;">PL-2025-104</a></div>
+                            <div class="task-title">작업자 사용 이력 로그 기능 추가</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank" style="color:#00d4ff;">PL-2025-157</a></div>
+                            <div class="task-title">터치 오프셋의 일괄 변경 기능 추가</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                </div>
+                <div class="issue-section">
+                    <div class="issue-header">
+                        <h4>⚠️ 이슈사항</h4>
+                        <button class="issue-add-btn" onclick="toggleIssueInput(this)">+ 추가</button>
+                    </div>
+                    <textarea class="issue-input" placeholder="이슈 내용을 입력하세요..." rows="2"></textarea>
+                    <div class="issue-list">
+                        <!-- 이슈 항목이 여기에 추가됨 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 최광년 -->
+            <div class="owner-card" data-owner="최광년">
+                <div class="owner-header">
+                    <h3>
+                        <div class="avatar">최</div>
+                        <div>
+                            <div>최광년</div>
+                            <div style="font-size:0.75rem;color:#888;font-weight:normal;">로봇 티칭/모션</div>
+                        </div>
+                    </h3>
+                    <div class="stats">
+                        <div class="stat"><span class="stat-num" style="color:#00d4ff;">3</span> 전체</div>
+                        <div class="stat"><span class="stat-num" style="color:#2ed573;">0</span> 완료</div>
+                    </div>
+                </div>
+                <div class="progress-section">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill new" style="width:100%">신규 100%</div>
+                    </div>
+                </div>
+                <div class="week-status">
+                    <span class="week-badge w1">1주 0건</span>
+                    <span class="week-badge w2">2주 3건</span>
+                    <span class="week-badge w3">3주 0건</span>
+                </div>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-115" target="_blank" style="color:#00d4ff;">PL-2025-115</a></div>
+                            <div class="task-title">B라인 앵글 회피 거리 향상</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-116" target="_blank" style="color:#00d4ff;">PL-2025-116</a></div>
+                            <div class="task-title">노즐 클리닝 티칭 기능 추가</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-117" target="_blank" style="color:#00d4ff;">PL-2025-117</a></div>
+                            <div class="task-title">스프레이 티칭 기능 추가</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                </div>
+                <div class="issue-section">
+                    <div class="issue-header">
+                        <h4>⚠️ 이슈사항</h4>
+                        <button class="issue-add-btn" onclick="toggleIssueInput(this)">+ 추가</button>
+                    </div>
+                    <textarea class="issue-input" placeholder="이슈 내용을 입력하세요..." rows="2"></textarea>
+                    <div class="issue-list"></div>
+                </div>
+            </div>
+
+            <!-- 이상주 -->
+            <div class="owner-card" data-owner="이상주">
+                <div class="owner-header">
+                    <h3>
+                        <div class="avatar">이</div>
+                        <div>
+                            <div>이상주</div>
+                            <div style="font-size:0.75rem;color:#888;font-weight:normal;">전기/배선</div>
+                        </div>
+                    </h3>
+                    <div class="stats">
+                        <div class="stat"><span class="stat-num" style="color:#00d4ff;">6</span> 전체</div>
+                        <div class="stat"><span class="stat-num" style="color:#2ed573;">0</span> 완료</div>
+                    </div>
+                </div>
+                <div class="progress-section">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill progress" style="width:50%">진행 50%</div>
+                        <div class="progress-bar-fill new" style="width:50%">신규 50%</div>
+                    </div>
+                </div>
+                <div class="week-status">
+                    <span class="week-badge w1">1주 1건</span>
+                    <span class="week-badge w2">2주 2건</span>
+                    <span class="week-badge w3">3주 3건</span>
+                </div>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-083" target="_blank" style="color:#00d4ff;">PL-2025-083</a></div>
+                            <div class="task-title">X축 하드 리밋 무시 결선 확인</div>
+                            <div class="task-meta">
+                                <span class="task-tag high">높음</span>
+                                <span class="task-tag">1주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-109" target="_blank" style="color:#00d4ff;">PL-2025-109</a></div>
+                            <div class="task-title">Weld <> Robot LAN Cable 처리 방안</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-131" target="_blank" style="color:#00d4ff;">PL-2025-131</a></div>
+                            <div class="task-title">PC 전원 인가 방법</div>
+                            <div class="task-meta">
+                                <span class="task-tag low">낮음</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-166" target="_blank" style="color:#00d4ff;">PL-2026-166</a></div>
+                            <div class="task-title">경광등 사용/미사용 셀렉트 스위치 추가</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-167" target="_blank" style="color:#00d4ff;">PL-2026-167</a></div>
+                            <div class="task-title">B라인 센서 명판 부착</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank" style="color:#00d4ff;">PL-2026-168</a></div>
+                            <div class="task-title">불스아이 결선</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                </div>
+                <div class="issue-section">
+                    <div class="issue-header">
+                        <h4>⚠️ 이슈사항</h4>
+                        <button class="issue-add-btn" onclick="toggleIssueInput(this)">+ 추가</button>
+                    </div>
+                    <textarea class="issue-input" placeholder="이슈 내용을 입력하세요..." rows="2"></textarea>
+                    <div class="issue-list"></div>
+                </div>
+            </div>
+
+            <!-- 박기혁 -->
+            <div class="owner-card" data-owner="박기혁">
+                <div class="owner-header">
+                    <h3>
+                        <div class="avatar">박</div>
+                        <div>
+                            <div>박기혁</div>
+                            <div style="font-size:0.75rem;color:#888;font-weight:normal;">기계 설비</div>
+                        </div>
+                    </h3>
+                    <div class="stats">
+                        <div class="stat"><span class="stat-num" style="color:#00d4ff;">4</span> 전체</div>
+                        <div class="stat"><span class="stat-num" style="color:#2ed573;">0</span> 완료</div>
+                    </div>
+                </div>
+                <div class="progress-section">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill progress" style="width:75%">진행 75%</div>
+                        <div class="progress-bar-fill new" style="width:25%">신규 25%</div>
+                    </div>
+                </div>
+                <div class="week-status">
+                    <span class="week-badge w1">1주 0건</span>
+                    <span class="week-badge w2">2주 4건</span>
+                    <span class="week-badge w3">3주 0건</span>
+                </div>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-033" target="_blank" style="color:#00d4ff;">PL-2025-033</a></div>
+                            <div class="task-title">로봇 전원 케이블 타입 변경</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-034" target="_blank" style="color:#00d4ff;">PL-2025-034</a></div>
+                            <div class="task-title">릴, 피더기 위치 상향</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-035" target="_blank" style="color:#00d4ff;">PL-2025-035</a></div>
+                            <div class="task-title">블스아이 설치 후 위치 확정</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-036" target="_blank" style="color:#00d4ff;">PL-2025-036</a></div>
+                            <div class="task-title">거더 상향 조정</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                </div>
+                <div class="issue-section">
+                    <div class="issue-header">
+                        <h4>⚠️ 이슈사항</h4>
+                        <button class="issue-add-btn" onclick="toggleIssueInput(this)">+ 추가</button>
+                    </div>
+                    <textarea class="issue-input" placeholder="이슈 내용을 입력하세요..." rows="2"></textarea>
+                    <div class="issue-list">
+                        <div class="issue-item">
+                            PL-2025-034: 거더 상향 조정 건과 함께 보류 중
+                            <div class="issue-date">2025-12-05</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 제어팀 (미지정) -->
+            <div class="owner-card" data-owner="제어팀">
+                <div class="owner-header">
+                    <h3>
+                        <div class="avatar" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);">팀</div>
+                        <div>
+                            <div>제어팀</div>
+                            <div style="font-size:0.75rem;color:#888;font-weight:normal;">로봇/UI/에러 처리</div>
+                        </div>
+                    </h3>
+                    <div class="stats">
+                        <div class="stat"><span class="stat-num" style="color:#00d4ff;">41</span> 전체</div>
+                        <div class="stat"><span class="stat-num" style="color:#2ed573;">0</span> 완료</div>
+                    </div>
+                </div>
+                <div class="progress-section">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill verify" style="width:29%">검증 29%</div>
+                        <div class="progress-bar-fill progress" style="width:54%">진행 54%</div>
+                        <div class="progress-bar-fill new" style="width:17%">신규 17%</div>
+                    </div>
+                </div>
+                <div class="week-status">
+                    <span class="week-badge w1">1주 19건</span>
+                    <span class="week-badge w2">2주 12건</span>
+                    <span class="week-badge w3">3주 10건</span>
+                </div>
+                <div class="task-list">
+                    <!-- 긴급 항목 -->
+                    <div class="task-item" style="background:rgba(255,71,87,0.1);">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-099" target="_blank" style="color:#00d4ff;">PL-2025-099</a></div>
+                            <div class="task-title">UI 조작 로깅 [104 이슈와 함께 관리]</div>
+                            <div class="task-meta">
+                                <span class="task-tag urgent">긴급</span>
+                                <span class="task-tag">1주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item" style="background:rgba(255,71,87,0.1);">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-111" target="_blank" style="color:#00d4ff;">PL-2025-111</a></div>
+                            <div class="task-title">형상 보간 실패 에러 원인 파악 및 제거</div>
+                            <div class="task-meta">
+                                <span class="task-tag urgent">긴급</span>
+                                <span class="task-tag">1주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item" style="background:rgba(255,71,87,0.1);">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank" style="color:#00d4ff;">PL-2025-113</a></div>
+                            <div class="task-title">Z축 과부하 에러</div>
+                            <div class="task-meta">
+                                <span class="task-tag urgent">긴급</span>
+                                <span class="task-tag">1주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item" style="background:rgba(255,71,87,0.1);">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-139" target="_blank" style="color:#00d4ff;">PL-2025-139</a></div>
+                            <div class="task-title">B라인 로봇 동작 이상현상 대응</div>
+                            <div class="task-meta">
+                                <span class="task-tag urgent">긴급</span>
+                                <span class="task-tag">1주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item" style="background:rgba(255,71,87,0.1);">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-165" target="_blank" style="color:#00d4ff;">PL-2026-165</a></div>
+                            <div class="task-title">용접 포인트의 부재 두깨 반영 여부 선택 기능</div>
+                            <div class="task-meta">
+                                <span class="task-tag urgent">긴급</span>
+                                <span class="task-tag">1주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <!-- 높음 항목 일부 -->
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank" style="color:#00d4ff;">PL-2025-020</a></div>
+                            <div class="task-title">A라인 수직용접</div>
+                            <div class="task-meta">
+                                <span class="task-tag high">높음</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-023" target="_blank" style="color:#00d4ff;">PL-2025-023</a></div>
+                            <div class="task-title">로봇 자동 운전 조건 진단 (용접 활성화)</div>
+                            <div class="task-meta">
+                                <span class="task-tag high">높음</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank" style="color:#00d4ff;">PL-2025-074</a></div>
+                            <div class="task-title">인셉션 에러 내용 세분화 및 상세 표시</div>
+                            <div class="task-meta">
+                                <span class="task-tag high">높음</span>
+                                <span class="task-tag">1주</span>
+                            </div>
+                        </div>
+                        <span class="task-status verify">검증중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-152" target="_blank" style="color:#00d4ff;">PL-2025-152</a></div>
+                            <div class="task-title">LDS 센서 기반 원점 인식 기능 구현</div>
+                            <div class="task-meta">
+                                <span class="task-tag high">높음</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank" style="color:#00d4ff;">PL-2025-155</a></div>
+                            <div class="task-title">홀 센서 기반 원점 인식 기능</div>
+                            <div class="task-meta">
+                                <span class="task-tag high">높음</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <!-- 더보기 표시 -->
+                    <div style="text-align:center;padding:10px;color:#888;font-size:0.85rem;">
+                        ... 외 31건 (스크롤하여 확인)
+                    </div>
+                </div>
+                <div class="issue-section">
+                    <div class="issue-header">
+                        <h4>⚠️ 이슈사항</h4>
+                        <button class="issue-add-btn" onclick="toggleIssueInput(this)">+ 추가</button>
+                    </div>
+                    <textarea class="issue-input" placeholder="이슈 내용을 입력하세요..." rows="2"></textarea>
+                    <div class="issue-list">
+                        <div class="issue-item">
+                            PL-2025-111 형상보간: ABB 대응 중, 12/12 답신 수신
+                            <div class="issue-date">2025-12-12</div>
+                        </div>
+                        <div class="issue-item">
+                            PL-2025-113 Z축과부하: 동절기 그리스 점도 문제, 토크리밋 25→30 변경 완료
+                            <div class="issue-date">2025-12-03</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 기계팀 (미지정) -->
+            <div class="owner-card" data-owner="기계팀">
+                <div class="owner-header">
+                    <h3>
+                        <div class="avatar" style="background:linear-gradient(135deg,#6bcb77,#27ae60);">팀</div>
+                        <div>
+                            <div>기계팀</div>
+                            <div style="font-size:0.75rem;color:#888;font-weight:normal;">구조물/용접 악세서리</div>
+                        </div>
+                    </h3>
+                    <div class="stats">
+                        <div class="stat"><span class="stat-num" style="color:#00d4ff;">11</span> 전체</div>
+                        <div class="stat"><span class="stat-num" style="color:#2ed573;">0</span> 완료</div>
+                    </div>
+                </div>
+                <div class="progress-section">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill progress" style="width:82%">진행 82%</div>
+                        <div class="progress-bar-fill new" style="width:18%">신규 18%</div>
+                    </div>
+                </div>
+                <div class="week-status">
+                    <span class="week-badge w1">1주 0건</span>
+                    <span class="week-badge w2">2주 1건</span>
+                    <span class="week-badge w3">3주 10건</span>
+                </div>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-008" target="_blank" style="color:#00d4ff;">PL-2025-008</a></div>
+                            <div class="task-title">A/B라인 블스아이 용접토치 스프레이 적용</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-026" target="_blank" style="color:#00d4ff;">PL-2025-026</a></div>
+                            <div class="task-title">컨트롤러 보전용 발판 구성</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-027" target="_blank" style="color:#00d4ff;">PL-2025-027</a></div>
+                            <div class="task-title">IN/OUT 차광막 설치</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-030" target="_blank" style="color:#00d4ff;">PL-2025-030</a></div>
+                            <div class="task-title">자율안전신고서 서류준비</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-032" target="_blank" style="color:#00d4ff;">PL-2025-032</a></div>
+                            <div class="task-title">토치 케이블 처짐 방지 컨셉 변경</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-040" target="_blank" style="color:#00d4ff;">PL-2025-040</a></div>
+                            <div class="task-title">레이저 커튼 보완</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-048" target="_blank" style="color:#00d4ff;">PL-2025-048</a></div>
+                            <div class="task-title">Plan B 로봇 시스템 재구성</div>
+                            <div class="task-meta">
+                                <span class="task-tag high">높음</span>
+                                <span class="task-tag">2주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank" style="color:#00d4ff;">PL-2025-097</a></div>
+                            <div class="task-title">로봇 백그라이트(절연볼트,핀,와셔) 부착</div>
+                            <div class="task-meta">
+                                <span class="task-tag normal">보통</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status new">신규</span>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)"></div>
+                        <div class="task-info">
+                            <div class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-103" target="_blank" style="color:#00d4ff;">PL-2025-103</a></div>
+                            <div class="task-title">겐트리 A/B LINE 호기 구분 명판 요청</div>
+                            <div class="task-meta">
+                                <span class="task-tag low">낮음</span>
+                                <span class="task-tag">3주</span>
+                            </div>
+                        </div>
+                        <span class="task-status progress">진행중</span>
+                    </div>
+                </div>
+                <div class="issue-section">
+                    <div class="issue-header">
+                        <h4>⚠️ 이슈사항</h4>
+                        <button class="issue-add-btn" onclick="toggleIssueInput(this)">+ 추가</button>
+                    </div>
+                    <textarea class="issue-input" placeholder="이슈 내용을 입력하세요..." rows="2"></textarea>
+                    <div class="issue-list">
+                        <div class="issue-item">
+                            PL-2025-008: B라인 2,3호기 블스아이 수평전개 예정
+                            <div class="issue-date">2025-11-09</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <p>📄 S25016 프로젝트 담당자별 진행 관리 대시보드</p>
+            <p>생성일: 2026-01-18 | 담당: SP 심태양</p>
+        </div>
+    </div>
+
+    <script>
+        // 체크박스 토글
+        function toggleTask(element) {
+            element.classList.toggle('checked');
+            updateProgress();
+            saveState();
+        }
+
+        // 이슈 입력창 토글
+        function toggleIssueInput(button) {
+            const section = button.closest('.issue-section');
+            const input = section.querySelector('.issue-input');
+            input.classList.toggle('show');
+            if (input.classList.contains('show')) {
+                input.focus();
+            }
+        }
+
+        // 이슈 추가 (Enter 키)
+        document.querySelectorAll('.issue-input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const text = this.value.trim();
+                    if (text) {
+                        const issueList = this.nextElementSibling;
+                        const today = new Date().toISOString().split('T')[0];
+                        const issueItem = document.createElement('div');
+                        issueItem.className = 'issue-item';
+                        issueItem.innerHTML = `${text}<div class="issue-date">${today}</div>`;
+                        issueList.insertBefore(issueItem, issueList.firstChild);
+                        this.value = '';
+                        this.classList.remove('show');
+                        saveState();
+                    }
+                }
+            });
+        });
+
+        // 진행률 업데이트
+        function updateProgress() {
+            let totalCompleted = 0;
+            document.querySelectorAll('.owner-card').forEach(card => {
+                const checkboxes = card.querySelectorAll('.task-checkbox');
+                const checked = card.querySelectorAll('.task-checkbox.checked').length;
+                const total = checkboxes.length;
+
+                // 완료 수 업데이트
+                const completedStat = card.querySelector('.stats .stat:last-child .stat-num');
+                if (completedStat) {
+                    completedStat.textContent = checked;
+                }
+
+                totalCompleted += checked;
+            });
+
+            // 전체 완료 수 업데이트
+            document.getElementById('total-completed').textContent = totalCompleted;
+        }
+
+        // 상태 저장 (localStorage)
+        function saveState() {
+            const state = {
+                checked: [],
+                issues: {}
+            };
+
+            document.querySelectorAll('.task-checkbox.checked').forEach(cb => {
+                const taskId = cb.closest('.task-item').querySelector('.task-id').textContent;
+                state.checked.push(taskId);
+            });
+
+            document.querySelectorAll('.owner-card').forEach(card => {
+                const owner = card.dataset.owner;
+                const issues = [];
+                card.querySelectorAll('.issue-item').forEach(item => {
+                    issues.push(item.innerHTML);
+                });
+                state.issues[owner] = issues;
+            });
+
+            localStorage.setItem('s25016_progress', JSON.stringify(state));
+        }
+
+        // 상태 복원
+        function loadState() {
+            const saved = localStorage.getItem('s25016_progress');
+            if (saved) {
+                const state = JSON.parse(saved);
+
+                // 체크박스 복원
+                state.checked.forEach(taskId => {
+                    document.querySelectorAll('.task-id').forEach(el => {
+                        if (el.textContent === taskId) {
+                            el.closest('.task-item').querySelector('.task-checkbox').classList.add('checked');
+                        }
+                    });
+                });
+
+                updateProgress();
+            }
+        }
+
+        // 페이지 로드 시 상태 복원
+        loadState();
+    </script>
+</body>
+</html>
