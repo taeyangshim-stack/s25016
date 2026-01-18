@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.17";
-CONST string TASK2_VERSION := "v1.9.17";
+CONST string TASK1_VERSION := "v1.9.18";
+CONST string TASK2_VERSION := "v1.9.18";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,17 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.17";  ! TASK2 test_mode sync
+CONST string WELD_SEQUENCE_VERSION := "v1.9.18";  ! WobjGantry for Robot1 weld position
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.18 (2026-01-18)
+!   - FIX: MoveRobot1ToWeldReady uses WobjGantry instead of WobjWeldR1
+!   - WobjWeldR1 was set to Floor coords (unreachable from gantry position)
+!   - Updated WELD_R1_WObj_X/Y/Z to WobjGantry coords from user jog position
+!   - Updated WELD_R1_ORIENT quaternion from user jog position
+!
 ! v1.9.17 (2026-01-18)
 !   - FIX: TASK2 test_mode was hardcoded to 2
 !   - ADD: shared_test_mode PERS variable for cross-task sync

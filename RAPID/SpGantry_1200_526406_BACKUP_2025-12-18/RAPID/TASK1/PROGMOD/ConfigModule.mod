@@ -90,22 +90,21 @@ PERS num WELD_R2_END_Z := 500;
 ! Robot TCP at Z=0 means same height as weld line
 ! Y=-12 for Robot1 (12mm toward Robot1 side)
 ! Y=476 for Robot2 (488-12, toward Robot2 side)
+! v1.9.18: Updated to WobjGantry coordinates (from user jog position)
 PERS num WELD_R1_WObj_X := 0;
-PERS num WELD_R1_WObj_Y := -12;
-PERS num WELD_R1_WObj_Z := 0;    ! At weld line Z level
+PERS num WELD_R1_WObj_Y := 111;   ! From jog: Y=110.59 in wobj0
+PERS num WELD_R1_WObj_Z := -73;   ! From jog: Z=2026.89 - R_center_Z(2100) = -73.11
 
 PERS num WELD_R2_WObj_X := 0;
 PERS num WELD_R2_WObj_Y := 476;   ! 488 - 12 = 476
 PERS num WELD_R2_WObj_Z := 0;     ! At weld line Z level
 
 ! Robot1 Weld Orientation (quaternion: q1, q2, q3, q4)
-! v1.9.8: Changed to 0 deg (straight down) for testing
-! Previous 45 deg caused "Position outside reach" error
-! Identity quaternion [1, 0, 0, 0] = no rotation from WObj
-PERS num WELD_R1_ORIENT_Q1 := 1;
-PERS num WELD_R1_ORIENT_Q2 := 0;
-PERS num WELD_R1_ORIENT_Q3 := 0;
-PERS num WELD_R1_ORIENT_Q4 := 0;
+! v1.9.18: Updated from user jog position
+PERS num WELD_R1_ORIENT_Q1 := 0.70603;
+PERS num WELD_R1_ORIENT_Q2 := 0.03905;
+PERS num WELD_R1_ORIENT_Q3 := -0.03904;
+PERS num WELD_R1_ORIENT_Q4 := 0.70603;
 
 ! Robot2 Weld Orientation (quaternion: q1, q2, q3, q4)
 ! v1.9.8: Changed to 0 deg (straight down) for testing

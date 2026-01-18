@@ -2917,12 +2917,14 @@ PROC MoveRobot1ToWeldReady()
 	! Use current gantry position (Robot1 is gantry-configured, needs valid extax)
 	weld_target.extax := current_jt.extax;
 
-	TPWrite "[WELD] R1 WObj pos: [" + NumToStr(WELD_R1_WObj_X, 0) + ", "
+	TPWrite "[WELD] R1 WobjGantry pos: [" + NumToStr(WELD_R1_WObj_X, 0) + ", "
 	                                + NumToStr(WELD_R1_WObj_Y, 0) + ", "
 	                                + NumToStr(WELD_R1_WObj_Z, 0) + "]";
 
-	! v1.9.13: Use tool0 for testing (tWeld1 has large TCP offset causing reach issues)
-	MoveJ weld_target, v100, fine, tool0\WObj:=WobjWeldR1;
+	! v1.9.18: Use WobjGantry instead of WobjWeldR1 (Floor coords unreachable)
+	! Robot1 is gantry-configured, so use gantry-relative coordinates
+	UpdateGantryWobj;
+	MoveJ weld_target, v100, fine, tool0\WObj:=WobjGantry;
 
 	TPWrite "[WELD] Robot1 ready at weld position";
 ENDPROC
