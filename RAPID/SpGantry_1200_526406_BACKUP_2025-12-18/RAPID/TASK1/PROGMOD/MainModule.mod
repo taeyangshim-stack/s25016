@@ -3094,12 +3094,68 @@ PROC ExecuteWeldSequence()
 	! Signal completion
 	t1_weld_done := TRUE;
 
+	! v1.9.20: Step 6 - Return robots to safe position
+	Write weld_logfile, "Step6: ReturnToSafePosition START";
+	ReturnRobot1ToSafe;
+	Write weld_logfile, "Step6: ReturnToSafePosition DONE";
+
+	! v1.9.20: Step 7 - Return gantry to HOME
+	Write weld_logfile, "Step7: ReturnGantryToHome START";
+	ReturnGantryToHome;
+	Write weld_logfile, "Step7: ReturnGantryToHome DONE";
+
 	Write weld_logfile, "Weld Sequence COMPLETE at " + CTime();
 	Close weld_logfile;
 
 	TPWrite "========================================";
 	TPWrite "[WELD] Weld Sequence Complete!";
 	TPWrite "========================================";
+ENDPROC
+
+! ----------------------------------------
+! Return Robot1 to Safe Position
+! ----------------------------------------
+! v1.9.20: Move Robot1 to safe joint position after weld
+PROC ReturnRobot1ToSafe()
+	VAR jointtarget safe_jt;
+
+	TPWrite "[WELD] Returning Robot1 to safe position...";
+
+	! Get current position and move to safe joints
+	safe_jt := CJointT();
+	safe_jt.robax.rax_1 := 0;
+	safe_jt.robax.rax_2 := -10;
+	safe_jt.robax.rax_3 := -50;
+	safe_jt.robax.rax_4 := 0;
+	safe_jt.robax.rax_5 := -30;
+	safe_jt.robax.rax_6 := 0;
+	MoveAbsJ safe_jt, v100, fine, tool0;
+
+	TPWrite "[WELD] Robot1 at safe position";
+ENDPROC
+
+! ----------------------------------------
+! Return Gantry to HOME Position
+! ----------------------------------------
+! v1.9.20: Move gantry to HOME [0,0,0,0] after weld
+PROC ReturnGantryToHome()
+	VAR jointtarget home_jt;
+
+	TPWrite "[WELD] Returning gantry to HOME...";
+
+	! Get current position
+	home_jt := CJointT();
+
+	! Set gantry to HOME [0,0,0,0]
+	home_jt.extax.eax_a := 0;  ! X1
+	home_jt.extax.eax_b := 0;  ! Y
+	home_jt.extax.eax_c := 0;  ! Z
+	home_jt.extax.eax_d := 0;  ! R
+	home_jt.extax.eax_f := 0;  ! X2 (linked motor)
+
+	MoveAbsJ home_jt, v500, fine, tool0;
+
+	TPWrite "[WELD] Gantry at HOME [0,0,0,0]";
 ENDPROC
 
 ENDMODULE

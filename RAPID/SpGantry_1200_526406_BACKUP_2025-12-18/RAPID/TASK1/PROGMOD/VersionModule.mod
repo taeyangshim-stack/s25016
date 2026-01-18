@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.19";
-CONST string TASK2_VERSION := "v1.9.19";
+CONST string TASK1_VERSION := "v1.9.20";
+CONST string TASK2_VERSION := "v1.9.20";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,16 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.19";  ! 2-step move (JOINT then wobj0)
+CONST string WELD_SEQUENCE_VERSION := "v1.9.20";  ! Home return after weld
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.20 (2026-01-18)
+!   - ADD: Home return after weld sequence complete
+!   - Step6: ReturnRobot1ToSafe - Robot1 to safe joint [0,-10,-50,0,-30,0]
+!   - Step7: ReturnGantryToHome - Gantry to HOME [0,0,0,0]
+!
 ! v1.9.19 (2026-01-18)
 !   - FIX: 2-step weld move approach (safer motion path)
 !   - Step1: MoveAbsJ to safe joint [0,-10,-50,0,-30,0]
