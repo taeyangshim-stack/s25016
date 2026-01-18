@@ -313,6 +313,9 @@ PERS bool mode2_r2_reposition_done;
 ! v1.8.67: Initial offset complete flag
 PERS bool mode2_r2_initial_offset_done;
 
+! v1.9.17: Shared test_mode from TASK1
+PERS num shared_test_mode;
+
 ! v1.8.70: Store Robot2 offset joints (like robot1_offset_joints in TASK1)
 ! Initial call: MoveJ then save joints
 ! Reposition call: Skip MoveJ (joints already at offset, gantry moved)
@@ -720,9 +723,17 @@ VAR robjoint robot2_offset_joints;
         Write main_logfile, "Main entry reached";
         TPWrite "TASK2: main entered";
 
-        ! Read TEST_MODE from config.txt (temporarily bypassed)
-        test_mode := 2;
-        Write main_logfile, "TEST_MODE=" + NumToStr(test_mode, 0);
+        ! v1.9.17: Wait for TASK1 to set shared_test_mode (max 5 seconds)
+        TPWrite "TASK2: Waiting for TASK1 shared_test_mode...";
+        Write main_logfile, "Waiting for shared_test_mode...";
+        VAR num wait_count := 0;
+        WHILE shared_test_mode = 0 AND wait_count < 50 DO
+            WaitTime 0.1;
+            wait_count := wait_count + 1;
+        ENDWHILE
+        test_mode := shared_test_mode;
+        Write main_logfile, "TEST_MODE=" + NumToStr(test_mode, 0) + " (from TASK1)";
+        TPWrite "TASK2: TEST_MODE=" + NumToStr(test_mode, 0);
 
         ! Initialize synchronization flag
         robot2_init_complete := FALSE;
@@ -776,6 +787,12 @@ VAR robjoint robot2_offset_joints;
                 WaitTime 0.05;
             ENDWHILE
             Write main_logfile, "Mode2: Exited reposition monitor (config_ready=FALSE)";
+        ELSEIF test_mode = 3 THEN
+            ! v1.9.17: Weld Sequence - call Robot2_WeldSequence
+            Write main_logfile, "Weld Sequence mode (test_mode=3)";
+            TPWrite "TASK2: Weld Sequence mode";
+            Robot2_WeldSequence;
+            Write main_logfile, "Weld Sequence completed";
         ENDIF
 
         WaitTime 1.0;

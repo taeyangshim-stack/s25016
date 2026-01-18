@@ -412,6 +412,10 @@ PERS bool mode2_r2_reposition_done := FALSE;
 ! v1.8.67: Wait for Robot2 initial offset before moving gantry
 PERS bool mode2_r2_initial_offset_done := FALSE;
 
+! v1.9.17: Shared test_mode for cross-task synchronization
+! TASK1 sets this after reading config.txt, TASK2 reads it
+PERS num shared_test_mode := 0;
+
 ! v1.8.61 DEBUG: Robot2 calculation intermediate values
 PERS num debug_r2_wobj0_x := 0;
 PERS num debug_r2_wobj0_y := 0;
@@ -492,6 +496,9 @@ PERS num debug_r2_floor_y_offset := 0;
 		ENDWHILE
 		test_mode_found:
 		Close configfile;
+
+		! v1.9.17: Share test_mode with TASK2
+		shared_test_mode := test_mode;
 
 		! Open main process log
 		Open "HOME:/main_process.txt", main_logfile \Write;

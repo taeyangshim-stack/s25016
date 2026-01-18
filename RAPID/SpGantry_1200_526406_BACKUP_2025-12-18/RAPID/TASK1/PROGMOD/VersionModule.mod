@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.16";
-CONST string TASK2_VERSION := "v1.9.16";
+CONST string TASK1_VERSION := "v1.9.17";
+CONST string TASK2_VERSION := "v1.9.17";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,18 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.16";  ! Revert 9E9, use eax_f=eax_a
+CONST string WELD_SEQUENCE_VERSION := "v1.9.17";  ! TASK2 test_mode sync
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.17 (2026-01-18)
+!   - FIX: TASK2 test_mode was hardcoded to 2
+!   - ADD: shared_test_mode PERS variable for cross-task sync
+!   - TASK1 sets shared_test_mode after reading config.txt
+!   - TASK2 waits for shared_test_mode (max 5s) then uses it
+!   - TASK2 now calls Robot2_WeldSequence when test_mode=3
+!
 ! v1.9.16 (2026-01-18)
 !   - REVERT: 9E9 approach failed with error 40512 (Missing External Axis Value)
 !   - FIX: Set eax_f := eax_a for all MoveAbsJ commands (linked motor requirement)
