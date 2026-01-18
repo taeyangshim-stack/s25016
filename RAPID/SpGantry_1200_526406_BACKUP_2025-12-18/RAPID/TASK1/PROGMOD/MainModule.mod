@@ -1529,20 +1529,21 @@ PERS num debug_r2_floor_y_offset := 0;
 		x2_current := sync_pos.extax.eax_f;
 		distance := x1_target - x2_current;
 
-		! If distance > 100mm, use progressive approach (25%, 50%, 75%, 100%)
-		IF Abs(distance) > 100 THEN
-			TPWrite "Large X1-X2 difference (" + NumToStr(Abs(distance),0) + "mm) - progressive sync";
-			sync_pos.extax.eax_f := x2_current + distance * 0.25;
+		! v1.9.14: Force X1/X2 software state sync
+		! Set BOTH eax_a and eax_f to same value (actual physical position)
+		! This updates X2 software state without physical movement
+		Write logfile, "Init X1=" + NumToStr(x1_target,1) + " X2=" + NumToStr(x2_current,1) + " diff=" + NumToStr(distance,1);
+		IF Abs(distance) > 1 THEN
+			TPWrite "X1/X2 state mismatch - syncing software state";
+			Write logfile, "Syncing X2 state to X1 position";
+			! Set both to X1's actual position (no physical move needed)
+			sync_pos.extax.eax_a := x1_target;
+			sync_pos.extax.eax_f := x1_target;
 			MoveAbsJ sync_pos, v10, fine, tool0;
-			sync_pos.extax.eax_f := x2_current + distance * 0.50;
-			MoveAbsJ sync_pos, v10, fine, tool0;
-			sync_pos.extax.eax_f := x2_current + distance * 0.75;
-			MoveAbsJ sync_pos, v10, fine, tool0;
+			! Verify sync
+			sync_pos := CJointT();
+			Write logfile, "After sync: X1=" + NumToStr(sync_pos.extax.eax_a,1) + " X2=" + NumToStr(sync_pos.extax.eax_f,1);
 		ENDIF
-
-		! Final synchronization
-		sync_pos.extax.eax_f := x1_target;  ! X2 = X1
-		MoveAbsJ sync_pos, v10, fine, tool0;
 
 		! Step 1: Move Robot1 joints to intermediate position (avoid configuration issue)
 		initial_joint := CJointT();

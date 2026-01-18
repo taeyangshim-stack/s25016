@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.13";
-CONST string TASK2_VERSION := "v1.9.13";
+CONST string TASK1_VERSION := "v1.9.14";
+CONST string TASK2_VERSION := "v1.9.14";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,17 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.13";  ! Use tool0 for testing
+CONST string WELD_SEQUENCE_VERSION := "v1.9.14";  ! Init X1/X2 state sync
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.14 (2026-01-18)
+!   - FIX: SetRobot1InitialPosition X1/X2 software state sync
+!   - Set BOTH eax_a AND eax_f to same value (actual physical position)
+!   - Simulation regain only updates X1 state, X2 state gets stale
+!   - Added detailed logging to robot1_init_position.txt
+!
 ! v1.9.13 (2026-01-18)
 !   - FIX: Changed tWeld1 to tool0 for MoveRobot1ToWeldReady and WeldAlongCenterLine
 !   - tWeld1 has large TCP offset [320, -6, 330] causing "Position outside reach"
