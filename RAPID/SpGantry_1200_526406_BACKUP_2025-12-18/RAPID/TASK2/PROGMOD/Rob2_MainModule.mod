@@ -716,6 +716,7 @@ VAR robjoint robot2_offset_joints;
         VAR num update_counter := 0;
         VAR iodev main_logfile;
         VAR num test_mode;
+        VAR num wait_count := 0;  ! v1.9.17: Wait counter for shared_test_mode
 
         ! Open main process log (do this before config read)
         Open "HOME:/task2_main_process.txt", main_logfile \Write;
@@ -726,7 +727,7 @@ VAR robjoint robot2_offset_joints;
         ! v1.9.17: Wait for TASK1 to set shared_test_mode (max 5 seconds)
         TPWrite "TASK2: Waiting for TASK1 shared_test_mode...";
         Write main_logfile, "Waiting for shared_test_mode...";
-        VAR num wait_count := 0;
+        wait_count := 0;
         WHILE shared_test_mode = 0 AND wait_count < 50 DO
             WaitTime 0.1;
             wait_count := wait_count + 1;
