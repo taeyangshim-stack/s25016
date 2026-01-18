@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.9";
-CONST string TASK2_VERSION := "v1.9.9";
+CONST string TASK1_VERSION := "v1.9.10";
+CONST string TASK2_VERSION := "v1.9.10";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,17 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.8";  ! Test: 0 deg torch angle
+CONST string WELD_SEQUENCE_VERSION := "v1.9.10";  ! Force X1/X2 sync at start
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.10 (2026-01-18)
+!   - FIX: Force X1/X2 sync at ExecuteWeldSequence start
+!   - Added progressive sync (4 steps) for large differences (>100mm)
+!   - Log sync status to weld_sequence.txt
+!   - Prevents linked motor error (50246) from pre-existing desync
+!
 ! v1.9.8 (2026-01-18)
 !   - TEST: Position outside reach (50050) debug
 !   - Changed torch orientation from 45 deg to 0 deg (straight down)

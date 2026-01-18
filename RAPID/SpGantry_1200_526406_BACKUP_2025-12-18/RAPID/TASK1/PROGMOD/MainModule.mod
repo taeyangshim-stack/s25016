@@ -2986,18 +2986,54 @@ PROC ExecuteWeldSequence()
 	VAR pos r2_end;
 	VAR iodev weld_logfile;
 	VAR jointtarget current_jt;
+	VAR jointtarget sync_jt;
+	VAR num x1_val;
+	VAR num x2_val;
+	VAR num sync_distance;
 
-	! v1.9.9: Added file logging for debugging
+	! v1.9.10: Added file logging for debugging
 	Open "HOME:/weld_sequence.txt", weld_logfile \Write;
 	Write weld_logfile, "Weld Sequence Log (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
 	TPWrite "========================================";
-	TPWrite "[WELD] v1.9.9 Weld Sequence Start";
+	TPWrite "[WELD] v1.9.10 Weld Sequence Start";
 	TPWrite "========================================";
 
 	! Log current gantry position
 	current_jt := CJointT();
-	Write weld_logfile, "Start extax: X1=" + NumToStr(current_jt.extax.eax_a,1) + " X2=" + NumToStr(current_jt.extax.eax_f,1);
+	x1_val := current_jt.extax.eax_a;
+	x2_val := current_jt.extax.eax_f;
+	sync_distance := x1_val - x2_val;
+	Write weld_logfile, "Start extax: X1=" + NumToStr(x1_val,1) + " X2=" + NumToStr(x2_val,1) + " diff=" + NumToStr(sync_distance,1);
+
+	! v1.9.10: Force X1/X2 sync before any movement
+	IF Abs(sync_distance) > 1 THEN
+		TPWrite "[WELD] X1/X2 out of sync! Syncing...";
+		Write weld_logfile, "SYNC: X1/X2 out of sync by " + NumToStr(Abs(sync_distance),1) + "mm - forcing sync";
+		sync_jt := current_jt;
+
+		! Progressive sync if distance is large (>100mm)
+		IF Abs(sync_distance) > 100 THEN
+			Write weld_logfile, "SYNC: Using progressive sync (4 steps)";
+			sync_jt.extax.eax_f := x2_val + sync_distance * 0.25;
+			MoveAbsJ sync_jt, v10, fine, tool0;
+			sync_jt.extax.eax_f := x2_val + sync_distance * 0.50;
+			MoveAbsJ sync_jt, v10, fine, tool0;
+			sync_jt.extax.eax_f := x2_val + sync_distance * 0.75;
+			MoveAbsJ sync_jt, v10, fine, tool0;
+		ENDIF
+
+		! Final sync: X2 = X1
+		sync_jt.extax.eax_f := x1_val;
+		MoveAbsJ sync_jt, v10, fine, tool0;
+
+		! Verify sync
+		current_jt := CJointT();
+		Write weld_logfile, "SYNC: After sync - X1=" + NumToStr(current_jt.extax.eax_a,1) + " X2=" + NumToStr(current_jt.extax.eax_f,1);
+		TPWrite "[WELD] X1/X2 synced";
+	ELSE
+		Write weld_logfile, "SYNC: X1/X2 already in sync";
+	ENDIF
 
 	! Reset sync flags
 	t1_weld_start := FALSE;
