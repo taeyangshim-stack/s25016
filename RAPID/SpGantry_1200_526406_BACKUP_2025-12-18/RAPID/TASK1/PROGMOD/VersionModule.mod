@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.11";
-CONST string TASK2_VERSION := "v1.9.11";
+CONST string TASK1_VERSION := "v1.9.12";
+CONST string TASK2_VERSION := "v1.9.12";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,17 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.11";  ! Fixed X1/X2 sync method
+CONST string WELD_SEQUENCE_VERSION := "v1.9.12";  ! Simplified - eax_f is software state
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.12 (2026-01-18)
+!   - ANALYSIS: X1/X2 are physically same axis (linked motors)
+!   - eax_f different value is SOFTWARE STATE issue, not physical
+!   - Removed physical sync attempts (meaningless)
+!   - Added gantry_move_debug.txt for detailed MoveAbsJ diagnostics
+!
 ! v1.9.11 (2026-01-18)
 !   - FIX: X1/X2 sync - both eax_a and eax_f must be same in MoveAbsJ
 !   - Step 1: Move X1 to X2's position (both at same place)

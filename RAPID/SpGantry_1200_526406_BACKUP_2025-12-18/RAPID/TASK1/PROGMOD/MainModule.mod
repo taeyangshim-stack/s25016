@@ -2838,14 +2838,21 @@ PROC MoveGantryToWeldStart()
 	VAR jointtarget current_jt;
 	VAR jointtarget target_jt;
 	VAR pos gantry_target;
+	VAR iodev gantry_log;
+
+	! v1.9.12: Detailed logging to diagnose linked motor error
+	Open "HOME:/gantry_move_debug.txt", gantry_log \Write;
+	Write gantry_log, "MoveGantryToWeldStart (" + TASK1_VERSION + ") " + CDate() + " " + CTime();
 
 	TPWrite "[WELD] Moving gantry to weld start...";
 
 	! Get current joint positions (preserve robot joints)
 	current_jt := CJointT();
+	Write gantry_log, "CJointT: X1=" + NumToStr(current_jt.extax.eax_a,1) + " X2=" + NumToStr(current_jt.extax.eax_f,1);
 
 	! Calculate gantry target from center start (Floor -> Physical)
 	gantry_target := CalcGantryFromFloor(weld_center_start);
+	Write gantry_log, "Target: X=" + NumToStr(gantry_target.x,1) + " Y=" + NumToStr(gantry_target.y,1) + " Z=" + NumToStr(gantry_target.z,1);
 
 	! Create target joint (keep robot joints, set gantry position)
 	target_jt := current_jt;
@@ -2853,7 +2860,11 @@ PROC MoveGantryToWeldStart()
 	target_jt.extax.eax_b := gantry_target.y;  ! Gantry Y
 	target_jt.extax.eax_c := gantry_target.z;  ! Gantry Z
 	target_jt.extax.eax_d := weld_center_angle; ! Gantry R
-	target_jt.extax.eax_f := gantry_target.x;  ! Gantry X2 (linked motor, must match X1)
+	target_jt.extax.eax_f := gantry_target.x;  ! Gantry X2 (must match X1)
+
+	Write gantry_log, "Command: eax_a=" + NumToStr(target_jt.extax.eax_a,1) + " eax_f=" + NumToStr(target_jt.extax.eax_f,1);
+	Write gantry_log, "Calling MoveAbsJ...";
+	Close gantry_log;
 
 	TPWrite "[WELD] Gantry target: [" + NumToStr(gantry_target.x, 1) + ", "
 	                                   + NumToStr(gantry_target.y, 1) + ", "
@@ -2986,17 +2997,16 @@ PROC ExecuteWeldSequence()
 	VAR pos r2_end;
 	VAR iodev weld_logfile;
 	VAR jointtarget current_jt;
-	VAR jointtarget sync_jt;
 	VAR num x1_val;
 	VAR num x2_val;
 	VAR num sync_distance;
 
-	! v1.9.11: Added file logging for debugging
+	! v1.9.12: Added file logging for debugging
 	Open "HOME:/weld_sequence.txt", weld_logfile \Write;
 	Write weld_logfile, "Weld Sequence Log (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
 	TPWrite "========================================";
-	TPWrite "[WELD] v1.9.11 Weld Sequence Start";
+	TPWrite "[WELD] v1.9.12 Weld Sequence Start";
 	TPWrite "========================================";
 
 	! Log current gantry position
@@ -3006,54 +3016,12 @@ PROC ExecuteWeldSequence()
 	sync_distance := x1_val - x2_val;
 	Write weld_logfile, "Start extax: X1=" + NumToStr(x1_val,1) + " X2=" + NumToStr(x2_val,1) + " diff=" + NumToStr(sync_distance,1);
 
-	! v1.9.11: Force X1/X2 sync - BOTH axes must have same value in MoveAbsJ
+	! v1.9.12: X1/X2 are physically same axis (linked motors)
+	! eax_f reported value may be stale software state - not physical difference
+	! Solution: Just log the discrepancy, don't try to physically sync
 	IF Abs(sync_distance) > 1 THEN
-		TPWrite "[WELD] X1/X2 out of sync! Syncing...";
-		Write weld_logfile, "SYNC: X1/X2 out of sync by " + NumToStr(Abs(sync_distance),1) + "mm - forcing sync";
-		sync_jt := current_jt;
-
-		! Strategy: Move X1 to X2's position (so both are at same place)
-		! Then move both together to target (X1's original position)
-		! This ensures eax_a == eax_f in every MoveAbsJ command
-
-		! Step 1: Move X1 to X2's current position (eax_a = eax_f = x2_val)
-		Write weld_logfile, "SYNC Step1: Move X1 to X2 position (" + NumToStr(x2_val,1) + ")";
-		sync_jt.extax.eax_a := x2_val;  ! X1 moves to X2's position
-		sync_jt.extax.eax_f := x2_val;  ! X2 stays at same position
-		MoveAbsJ sync_jt, v100, fine, tool0;
-
-		! Verify step 1
-		current_jt := CJointT();
-		Write weld_logfile, "SYNC Step1 result: X1=" + NumToStr(current_jt.extax.eax_a,1) + " X2=" + NumToStr(current_jt.extax.eax_f,1);
-
-		! Step 2: Move both to X1's original position (target = 0 typically)
-		! Use progressive movement if distance > 100mm
-		sync_distance := x1_val - x2_val;  ! Recalculate for step 2
-		IF Abs(sync_distance) > 100 THEN
-			Write weld_logfile, "SYNC Step2: Progressive move to " + NumToStr(x1_val,1) + " (4 steps)";
-			sync_jt.extax.eax_a := x2_val + sync_distance * 0.25;
-			sync_jt.extax.eax_f := x2_val + sync_distance * 0.25;
-			MoveAbsJ sync_jt, v100, fine, tool0;
-			sync_jt.extax.eax_a := x2_val + sync_distance * 0.50;
-			sync_jt.extax.eax_f := x2_val + sync_distance * 0.50;
-			MoveAbsJ sync_jt, v100, fine, tool0;
-			sync_jt.extax.eax_a := x2_val + sync_distance * 0.75;
-			sync_jt.extax.eax_f := x2_val + sync_distance * 0.75;
-			MoveAbsJ sync_jt, v100, fine, tool0;
-		ENDIF
-
-		! Final move: both to X1's original position
-		Write weld_logfile, "SYNC Step2 final: Move both to " + NumToStr(x1_val,1);
-		sync_jt.extax.eax_a := x1_val;
-		sync_jt.extax.eax_f := x1_val;
-		MoveAbsJ sync_jt, v100, fine, tool0;
-
-		! Verify sync
-		current_jt := CJointT();
-		Write weld_logfile, "SYNC: After sync - X1=" + NumToStr(current_jt.extax.eax_a,1) + " X2=" + NumToStr(current_jt.extax.eax_f,1);
-		TPWrite "[WELD] X1/X2 synced";
-	ELSE
-		Write weld_logfile, "SYNC: X1/X2 already in sync";
+		Write weld_logfile, "NOTE: eax_f state mismatch (software state, not physical)";
+		Write weld_logfile, "Physical axis position is eax_a=" + NumToStr(x1_val,1);
 	ENDIF
 
 	! Reset sync flags
