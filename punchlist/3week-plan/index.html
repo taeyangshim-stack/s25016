@@ -8,28 +8,29 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #f5f7fa;
             min-height: 100vh;
-            color: #fff;
+            color: #333;
         }
 
         /* 탭 네비게이션 */
         .tab-nav {
             display: flex;
             justify-content: center;
-            gap: 5px;
+            gap: 8px;
             padding: 15px 20px;
-            background: rgba(0,0,0,0.3);
+            background: #fff;
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .tab-btn {
             padding: 12px 25px;
-            border: none;
-            background: rgba(255,255,255,0.1);
-            color: #888;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            color: #666;
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.95rem;
@@ -39,11 +40,12 @@
             align-items: center;
             gap: 8px;
         }
-        .tab-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .tab-btn:hover { background: #f0f0f0; color: #333; }
         .tab-btn.active {
-            background: linear-gradient(135deg, #00d4ff, #0066ff);
+            background: #2563eb;
             color: #fff;
-            box-shadow: 0 4px 15px rgba(0,212,255,0.3);
+            border-color: #2563eb;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.3);
         }
         .tab-btn .icon { font-size: 1.1rem; }
 
@@ -56,7 +58,7 @@
             width: 100%;
             height: calc(100vh - 70px);
             border: none;
-            background: transparent;
+            background: #f5f7fa;
         }
 
         /* 헤더 정보 */
@@ -64,19 +66,67 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
-            background: rgba(0,0,0,0.2);
+            padding: 12px 20px;
+            background: #fff;
             font-size: 0.85rem;
-            color: #888;
+            color: #666;
+            border-bottom: 1px solid #e0e0e0;
         }
         .header-bar .title {
-            color: #00d4ff;
+            color: #2563eb;
             font-weight: 600;
             font-size: 1rem;
         }
         .header-bar .info {
             display: flex;
             gap: 20px;
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 768px) {
+            .header-bar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px 15px;
+                text-align: center;
+            }
+            .header-bar .info {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                font-size: 0.75rem;
+            }
+            .tab-nav {
+                padding: 10px;
+                gap: 5px;
+            }
+            .tab-btn {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+                flex: 1;
+                justify-content: center;
+            }
+            .tab-btn .icon {
+                font-size: 1rem;
+            }
+            .tab-frame {
+                height: calc(100vh - 120px);
+            }
+        }
+        @media (max-width: 480px) {
+            .header-bar .title {
+                font-size: 0.9rem;
+            }
+            .header-bar .info {
+                font-size: 0.7rem;
+            }
+            .tab-btn {
+                padding: 8px 8px;
+                font-size: 0.75rem;
+            }
+            .tab-btn .icon {
+                display: none;
+            }
         }
     </style>
 </head>

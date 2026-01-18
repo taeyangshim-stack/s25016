@@ -12,9 +12,9 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #f5f7fa;
             min-height: 100vh;
-            color: #fff;
+            color: #333;
             padding: 20px;
         }
         .container {
@@ -25,23 +25,24 @@
             text-align: center;
             margin-bottom: 30px;
             padding: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .header h1 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-bottom: 10px;
-            color: #00d4ff;
+            color: #2563eb;
         }
         .header .subtitle {
-            color: #888;
+            color: #666;
             font-size: 1rem;
         }
         .header .date {
-            color: #ffd700;
+            color: #059669;
             font-size: 0.9rem;
             margin-top: 5px;
+            font-weight: 500;
         }
 
         /* 요약 카드 */
@@ -52,12 +53,12 @@
             margin-bottom: 30px;
         }
         .summary-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
+            background: #fff;
+            border-radius: 12px;
             padding: 20px;
             text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
         }
         .summary-card .number {
             font-size: 2.5rem;
@@ -65,21 +66,22 @@
             margin-bottom: 5px;
         }
         .summary-card .label {
-            color: #888;
+            color: #666;
             font-size: 0.9rem;
         }
-        .summary-card.total .number { color: #00d4ff; }
-        .summary-card.week1 .number { color: #ff6b6b; }
-        .summary-card.week2 .number { color: #ffd93d; }
-        .summary-card.week3 .number { color: #6bcb77; }
+        .summary-card.total .number { color: #2563eb; }
+        .summary-card.week1 .number { color: #dc2626; }
+        .summary-card.week2 .number { color: #d97706; }
+        .summary-card.week3 .number { color: #059669; }
 
         /* 주차별 섹션 */
         .week-section {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
+            background: #fff;
+            border-radius: 12px;
             margin-bottom: 25px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
         }
         .week-header {
             padding: 15px 20px;
@@ -93,16 +95,18 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            color: #333;
         }
         .week-header .badge {
-            background: rgba(255,255,255,0.2);
+            background: #f3f4f6;
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.9rem;
+            color: #666;
         }
-        .week1 .week-header { background: linear-gradient(90deg, #ff6b6b33, transparent); }
-        .week2 .week-header { background: linear-gradient(90deg, #ffd93d33, transparent); }
-        .week3 .week-header { background: linear-gradient(90deg, #6bcb7733, transparent); }
+        .week1 .week-header { background: linear-gradient(90deg, #fef2f2, #fff); border-left: 4px solid #dc2626; }
+        .week2 .week-header { background: linear-gradient(90deg, #fffbeb, #fff); border-left: 4px solid #d97706; }
+        .week3 .week-header { background: linear-gradient(90deg, #ecfdf5, #fff); border-left: 4px solid #059669; }
 
         .week-content {
             padding: 20px;
@@ -114,10 +118,10 @@
         }
         .owner-title {
             font-size: 1.1rem;
-            color: #00d4ff;
+            color: #2563eb;
             margin-bottom: 10px;
             padding-bottom: 5px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #e5e7eb;
         }
 
         /* 테이블 스타일 */
@@ -129,19 +133,26 @@
         th, td {
             padding: 12px 15px;
             text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #e5e7eb;
         }
         th {
-            background: rgba(255,255,255,0.1);
+            background: #f9fafb;
             font-weight: 600;
-            color: #00d4ff;
+            color: #374151;
             font-size: 0.85rem;
         }
         td {
             font-size: 0.9rem;
         }
         tr:hover {
-            background: rgba(255,255,255,0.05);
+            background: #f9fafb;
+        }
+        td a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        td a:hover {
+            text-decoration: underline;
         }
 
         /* 우선순위 뱃지 */
@@ -151,30 +162,35 @@
             font-size: 0.8rem;
             font-weight: 500;
         }
-        .priority.urgent { background: #ff4757; color: #fff; }
-        .priority.high { background: #ffa502; color: #000; }
-        .priority.normal { background: #2ed573; color: #000; }
-        .priority.low { background: #747d8c; color: #fff; }
+        .priority.urgent { background: #dc2626; color: #fff; }
+        .priority.high { background: #f59e0b; color: #fff; }
+        .priority.normal { background: #10b981; color: #fff; }
+        .priority.low { background: #6b7280; color: #fff; }
 
         /* 상태 뱃지 */
         .status {
             padding: 3px 10px;
             border-radius: 12px;
             font-size: 0.8rem;
+            color: #fff;
         }
-        .status.new { background: #5352ed; }
-        .status.progress { background: #ff6348; }
-        .status.verify { background: #1e90ff; }
+        .status.new { background: #6366f1; }
+        .status.progress { background: #f97316; }
+        .status.verify { background: #3b82f6; }
 
         /* 진행률 바 */
         .progress-section {
             margin-bottom: 30px;
             padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .progress-section h3 {
+            color: #333;
         }
         .progress-bar-container {
-            background: rgba(255,255,255,0.1);
+            background: #e5e7eb;
             border-radius: 10px;
             height: 30px;
             overflow: hidden;
@@ -187,10 +203,11 @@
             justify-content: center;
             font-size: 0.8rem;
             font-weight: bold;
+            color: #fff;
         }
-        .progress-bar.week1 { background: #ff6b6b; }
-        .progress-bar.week2 { background: #ffd93d; color: #000; }
-        .progress-bar.week3 { background: #6bcb77; }
+        .progress-bar.week1 { background: #dc2626; }
+        .progress-bar.week2 { background: #d97706; }
+        .progress-bar.week3 { background: #059669; }
 
         /* 담당자 요약 */
         .owner-summary {
@@ -200,13 +217,13 @@
             margin-top: 20px;
         }
         .owner-card {
-            background: rgba(255,255,255,0.05);
+            background: #f9fafb;
             border-radius: 10px;
             padding: 15px;
-            border-left: 4px solid #00d4ff;
+            border-left: 4px solid #2563eb;
         }
         .owner-card h4 {
-            color: #00d4ff;
+            color: #2563eb;
             margin-bottom: 10px;
         }
         .owner-card .tasks {
@@ -215,10 +232,11 @@
             flex-wrap: wrap;
         }
         .owner-card .task-count {
-            background: rgba(255,255,255,0.1);
+            background: #fff;
             padding: 5px 10px;
             border-radius: 5px;
             font-size: 0.85rem;
+            border: 1px solid #e5e7eb;
         }
 
         /* 범례 */
@@ -234,6 +252,7 @@
             align-items: center;
             gap: 8px;
             font-size: 0.85rem;
+            color: #666;
         }
 
         /* 푸터 */
@@ -244,9 +263,97 @@
             font-size: 0.85rem;
         }
 
+        /* 모바일 반응형 */
         @media (max-width: 768px) {
-            .header h1 { font-size: 1.5rem; }
-            th, td { padding: 8px 10px; font-size: 0.8rem; }
+            body { padding: 10px; }
+            .header { padding: 15px; margin-bottom: 20px; }
+            .header h1 { font-size: 1.3rem; }
+            .header .subtitle { font-size: 0.85rem; }
+            .header .date { font-size: 0.8rem; }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            .summary-card { padding: 15px; }
+            .summary-card .number { font-size: 1.8rem; }
+            .summary-card .label { font-size: 0.75rem; }
+
+            .progress-section { padding: 15px; }
+            .progress-bar-container { height: 24px; }
+            .progress-bar { font-size: 0.65rem; }
+
+            .owner-summary {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .owner-card { padding: 10px; }
+            .owner-card h4 { font-size: 0.85rem; margin-bottom: 8px; }
+            .owner-card .task-count { font-size: 0.75rem; padding: 3px 8px; }
+
+            .legend { gap: 10px; margin-bottom: 15px; }
+            .legend-item { font-size: 0.75rem; }
+            .priority { padding: 2px 8px; font-size: 0.7rem; }
+
+            .week-section { margin-bottom: 15px; }
+            .week-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 12px 15px;
+            }
+            .week-header h2 { font-size: 1rem; }
+            .week-header .badge { font-size: 0.75rem; padding: 4px 10px; }
+
+            .week-content { padding: 10px; }
+            .owner-group { margin-bottom: 15px; }
+            .owner-title { font-size: 0.95rem; }
+
+            /* 테이블을 카드 형태로 변환 */
+            table { display: block; }
+            thead { display: none; }
+            tbody { display: block; }
+            tr {
+                display: block;
+                background: #f9fafb;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                padding: 10px;
+                border-left: 3px solid #2563eb;
+            }
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 4px 0;
+                border-bottom: none;
+                font-size: 0.8rem;
+            }
+            td:first-child {
+                font-weight: 600;
+                color: #2563eb;
+            }
+            td:nth-child(2) {
+                flex-direction: column;
+                align-items: flex-start;
+                font-size: 0.85rem;
+            }
+            td:nth-child(3) { display: none; }
+            td:last-child, td:nth-last-child(2) {
+                display: inline-flex;
+                margin-right: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.1rem; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .summary-card .number { font-size: 1.5rem; }
+            .owner-summary { grid-template-columns: 1fr; }
+            .week-header h2 { font-size: 0.9rem; }
+            td { font-size: 0.75rem; }
+            .status, .priority { font-size: 0.65rem; padding: 2px 6px; }
         }
     </style>
 </head>
@@ -362,35 +469,35 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-099" target="_blank" style="color:#00d4ff;">PL-2025-099</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-099" target="_blank" style="color:#2563eb;">PL-2025-099</a></td>
                                 <td>UI 조작 로깅 [104 이슈와 함께 관리]</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority urgent">긴급</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-111" target="_blank" style="color:#00d4ff;">PL-2025-111</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-111" target="_blank" style="color:#2563eb;">PL-2025-111</a></td>
                                 <td>형상 보간 실패 에러 원인 파악 및 제거</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority urgent">긴급</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank" style="color:#00d4ff;">PL-2025-113</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank" style="color:#2563eb;">PL-2025-113</a></td>
                                 <td>Z축 과부하 에러</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority urgent">긴급</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-139" target="_blank" style="color:#00d4ff;">PL-2025-139</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-139" target="_blank" style="color:#2563eb;">PL-2025-139</a></td>
                                 <td>B라인 로봇 동작 이상현상 대응</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority urgent">긴급</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-165" target="_blank" style="color:#00d4ff;">PL-2026-165</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-165" target="_blank" style="color:#2563eb;">PL-2026-165</a></td>
                                 <td>용접 포인트의 부재 두깨 반영 여부 선택 기능</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority urgent">긴급</span></td>
@@ -414,98 +521,98 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-039" target="_blank" style="color:#00d4ff;">PL-2025-039</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-039" target="_blank" style="color:#2563eb;">PL-2025-039</a></td>
                                 <td>불스아이 스프레이 LOW 경고 처리</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-069" target="_blank" style="color:#00d4ff;">PL-2025-069</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-069" target="_blank" style="color:#2563eb;">PL-2025-069</a></td>
                                 <td>RAPID 자동 상태 확인 에러</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-080" target="_blank" style="color:#00d4ff;">PL-2025-080</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-080" target="_blank" style="color:#2563eb;">PL-2025-080</a></td>
                                 <td>아크 에러 발생 시 운영SW에서 RAPID 제어</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-084" target="_blank" style="color:#00d4ff;">PL-2025-084</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-084" target="_blank" style="color:#2563eb;">PL-2025-084</a></td>
                                 <td>PLC 알람 체크</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank" style="color:#00d4ff;">PL-2025-096</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank" style="color:#2563eb;">PL-2025-096</a></td>
                                 <td>B라인 용접선 길이/두께 차이 시 용접 불가 반환</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-105" target="_blank" style="color:#00d4ff;">PL-2025-105</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-105" target="_blank" style="color:#2563eb;">PL-2025-105</a></td>
                                 <td>로봇/UI 통신 단절 시 UI 프리징 문제</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank" style="color:#00d4ff;">PL-2025-106</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank" style="color:#2563eb;">PL-2025-106</a></td>
                                 <td>UI와 관제(디지털 트윈) 통신 주기 문제</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-124" target="_blank" style="color:#00d4ff;">PL-2025-124</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-124" target="_blank" style="color:#2563eb;">PL-2025-124</a></td>
                                 <td>디바이스넷 통신 상실: 동절기 보드 이상</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-143" target="_blank" style="color:#00d4ff;">PL-2025-143</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-143" target="_blank" style="color:#2563eb;">PL-2025-143</a></td>
                                 <td>용접 가능 범위 제한 기능 확인</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-148" target="_blank" style="color:#00d4ff;">PL-2025-148</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-148" target="_blank" style="color:#2563eb;">PL-2025-148</a></td>
                                 <td>갠트리 이동 가능 범위 변수화 및 DB 관리</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-150" target="_blank" style="color:#00d4ff;">PL-2025-150</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-150" target="_blank" style="color:#2563eb;">PL-2025-150</a></td>
                                 <td>와이어 교체 모드 와이어 피딩기능 보완</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-151" target="_blank" style="color:#00d4ff;">PL-2025-151</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-151" target="_blank" style="color:#2563eb;">PL-2025-151</a></td>
                                 <td>Z홈 모션의 '기본 모드'를 기본값으로 적용</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank" style="color:#00d4ff;">PL-2025-067</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank" style="color:#2563eb;">PL-2025-067</a></td>
                                 <td>공압, 가스(CO2)압, 냉각수, 가스유량 알람처리(UI)</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status verify">검증중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank" style="color:#00d4ff;">PL-2025-074</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank" style="color:#2563eb;">PL-2025-074</a></td>
                                 <td>인셉션 에러(UI) 발생 시, 에러 내용 세분화 및 상세 표시</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
@@ -529,7 +636,7 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-083" target="_blank" style="color:#00d4ff;">PL-2025-083</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-083" target="_blank" style="color:#2563eb;">PL-2025-083</a></td>
                                 <td>X축 하드 리밋 무시 결선 확인</td>
                                 <td>전기/배선</td>
                                 <td><span class="priority high">높음</span></td>
@@ -539,8 +646,8 @@
                     </table>
                 </div>
 
-                <div class="owner-group" style="background: rgba(255,165,2,0.1); padding: 15px; border-radius: 10px; border: 2px solid #ffa502;">
-                    <div class="owner-title" style="color: #ffa502;">🔧 토요일 현장작업 (1/25)</div>
+                <div class="owner-group" style="background: #fffbeb; padding: 15px; border-radius: 10px; border: 2px solid #f59e0b;">
+                    <div class="owner-title" style="color: #d97706;">🔧 토요일 현장작업 (1/25)</div>
                     <table>
                         <thead>
                             <tr>
@@ -553,14 +660,14 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank" style="color:#00d4ff;">PL-2025-097</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank" style="color:#2563eb;">PL-2025-097</a></td>
                                 <td>로봇 절연처리 (백그라이트, 절연볼트, 핀, 와셔 부착)</td>
                                 <td>기계/구조물</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank" style="color:#00d4ff;">PL-2025-142</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank" style="color:#2563eb;">PL-2025-142</a></td>
                                 <td>B라인 BullsEye 설치 위치 선정 및 작업</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority high">높음</span></td>
@@ -593,84 +700,84 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank" style="color:#00d4ff;">PL-2025-020</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank" style="color:#2563eb;">PL-2025-020</a></td>
                                 <td>A라인 수직용접</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-023" target="_blank" style="color:#00d4ff;">PL-2025-023</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-023" target="_blank" style="color:#2563eb;">PL-2025-023</a></td>
                                 <td>로봇 자동 운전 조건 진단 (용접 활성화 여부)</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-048" target="_blank" style="color:#00d4ff;">PL-2025-048</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-048" target="_blank" style="color:#2563eb;">PL-2025-048</a></td>
                                 <td>Plan B 로봇 시스템 재구성</td>
                                 <td>기계/용접</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank" style="color:#00d4ff;">PL-2025-092</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank" style="color:#2563eb;">PL-2025-092</a></td>
                                 <td>A라인 수직용접 터치 센싱 옵셋 값 적용</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-100" target="_blank" style="color:#00d4ff;">PL-2025-100</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-100" target="_blank" style="color:#2563eb;">PL-2025-100</a></td>
                                 <td>터치 모션 파라미터 : X_init 적용</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-132" target="_blank" style="color:#00d4ff;">PL-2025-132</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-132" target="_blank" style="color:#2563eb;">PL-2025-132</a></td>
                                 <td>A라인 계측 홈 / 기본 Z홈 구분</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank" style="color:#00d4ff;">PL-2025-142</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank" style="color:#2563eb;">PL-2025-142</a></td>
                                 <td>B라인 BullsEye 설치 위치 선정 및 모션 확인</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-146" target="_blank" style="color:#00d4ff;">PL-2025-146</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-146" target="_blank" style="color:#2563eb;">PL-2025-146</a></td>
                                 <td>TCP 위치 기반 커맨드 완료/오류 여부 판단</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-149" target="_blank" style="color:#00d4ff;">PL-2025-149</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-149" target="_blank" style="color:#2563eb;">PL-2025-149</a></td>
                                 <td>용접기 복원 매뉴얼 작성</td>
                                 <td>제어/기타</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-152" target="_blank" style="color:#00d4ff;">PL-2025-152</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-152" target="_blank" style="color:#2563eb;">PL-2025-152</a></td>
                                 <td>LDS 센서 기반 원점 인식 기능 구현</td>
                                 <td>제어/계측</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-154" target="_blank" style="color:#00d4ff;">PL-2025-154</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-154" target="_blank" style="color:#2563eb;">PL-2025-154</a></td>
                                 <td>명령 취소 및 가동 준비 시 rInit 동작</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank" style="color:#00d4ff;">PL-2025-155</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank" style="color:#2563eb;">PL-2025-155</a></td>
                                 <td>홀 센서 기반 원점 인식 기능</td>
                                 <td>제어/계측</td>
                                 <td><span class="priority high">높음</span></td>
@@ -694,14 +801,14 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-089" target="_blank" style="color:#00d4ff;">PL-2025-089</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-089" target="_blank" style="color:#2563eb;">PL-2025-089</a></td>
                                 <td>돌림 용접 구간 개별 옵셋 적용</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority high">높음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-088" target="_blank" style="color:#00d4ff;">PL-2025-088</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-088" target="_blank" style="color:#2563eb;">PL-2025-088</a></td>
                                 <td>작업자 / 관리자 권한 설정</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
@@ -725,21 +832,21 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-115" target="_blank" style="color:#00d4ff;">PL-2025-115</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-115" target="_blank" style="color:#2563eb;">PL-2025-115</a></td>
                                 <td>B라인 앵글 회피 거리 향상</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-116" target="_blank" style="color:#00d4ff;">PL-2025-116</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-116" target="_blank" style="color:#2563eb;">PL-2025-116</a></td>
                                 <td>노즐 클리닝 티칭 기능 추가</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-117" target="_blank" style="color:#00d4ff;">PL-2025-117</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-117" target="_blank" style="color:#2563eb;">PL-2025-117</a></td>
                                 <td>스프레이 티칭 기능 추가</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority normal">보통</span></td>
@@ -763,14 +870,14 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-109" target="_blank" style="color:#00d4ff;">PL-2025-109</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-109" target="_blank" style="color:#2563eb;">PL-2025-109</a></td>
                                 <td>Weld <> Robot LAN Cable 처리 방안</td>
                                 <td>전기/배선</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-166" target="_blank" style="color:#00d4ff;">PL-2026-166</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-166" target="_blank" style="color:#2563eb;">PL-2026-166</a></td>
                                 <td>경광등 사용/미사용 셀렉트 스위치 추가</td>
                                 <td>전기/기타</td>
                                 <td><span class="priority normal">보통</span></td>
@@ -794,28 +901,28 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-033" target="_blank" style="color:#00d4ff;">PL-2025-033</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-033" target="_blank" style="color:#2563eb;">PL-2025-033</a></td>
                                 <td>로봇 전원 케이블 타입 변경</td>
                                 <td>기계/기타</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-035" target="_blank" style="color:#00d4ff;">PL-2025-035</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-035" target="_blank" style="color:#2563eb;">PL-2025-035</a></td>
                                 <td>블스아이 설치 후 위치 확정</td>
                                 <td>기계/용접</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-036" target="_blank" style="color:#00d4ff;">PL-2025-036</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-036" target="_blank" style="color:#2563eb;">PL-2025-036</a></td>
                                 <td>거더 상향 조정</td>
                                 <td>기계/구조물</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-034" target="_blank" style="color:#00d4ff;">PL-2025-034</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-034" target="_blank" style="color:#2563eb;">PL-2025-034</a></td>
                                 <td>릴, 피더기 위치 상향</td>
                                 <td>기계/구조물</td>
                                 <td><span class="priority normal">보통</span></td>
@@ -848,77 +955,77 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-021" target="_blank" style="color:#00d4ff;">PL-2025-021</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-021" target="_blank" style="color:#2563eb;">PL-2025-021</a></td>
                                 <td>[A] 사용자 편의성 UI 개선</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority low">낮음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-055" target="_blank" style="color:#00d4ff;">PL-2025-055</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-055" target="_blank" style="color:#2563eb;">PL-2025-055</a></td>
                                 <td>B라인 드라이런 속도 배율 미적용</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-065" target="_blank" style="color:#00d4ff;">PL-2025-065</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-065" target="_blank" style="color:#2563eb;">PL-2025-065</a></td>
                                 <td>실시간 용접 조건 변경 (전압, 피딩)</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-091" target="_blank" style="color:#00d4ff;">PL-2025-091</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-091" target="_blank" style="color:#2563eb;">PL-2025-091</a></td>
                                 <td>수동 용접시 기능 추가</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-121" target="_blank" style="color:#00d4ff;">PL-2025-121</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-121" target="_blank" style="color:#2563eb;">PL-2025-121</a></td>
                                 <td>시작점 터치 센싱을 위한 이동 중 TCP 오프셋 적용</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-126" target="_blank" style="color:#00d4ff;">PL-2025-126</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-126" target="_blank" style="color:#2563eb;">PL-2025-126</a></td>
                                 <td>작업 취소 및 작업 재개 시 속도 0% 설정됨</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-138" target="_blank" style="color:#00d4ff;">PL-2025-138</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-138" target="_blank" style="color:#2563eb;">PL-2025-138</a></td>
                                 <td>B라인 터치 보정 에러 상황 추가 관리</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-141" target="_blank" style="color:#00d4ff;">PL-2025-141</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-141" target="_blank" style="color:#2563eb;">PL-2025-141</a></td>
                                 <td>SMB 배터리 관리 기능 추가</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-147" target="_blank" style="color:#00d4ff;">PL-2025-147</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-147" target="_blank" style="color:#2563eb;">PL-2025-147</a></td>
                                 <td>계측 도중 이동 실패 에러 → 갠트리 X축 범위 확인</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-153" target="_blank" style="color:#00d4ff;">PL-2025-153</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-153" target="_blank" style="color:#2563eb;">PL-2025-153</a></td>
                                 <td>십자 레이저 기반 갠트리 원점 오차 확인 기능</td>
                                 <td>제어/로봇</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-156" target="_blank" style="color:#00d4ff;">PL-2025-156</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-156" target="_blank" style="color:#2563eb;">PL-2025-156</a></td>
                                 <td>경광등 - UI - 관제 에러/정상 상태 표시 동기화</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
@@ -942,28 +1049,28 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-060" target="_blank" style="color:#00d4ff;">PL-2025-060</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-060" target="_blank" style="color:#2563eb;">PL-2025-060</a></td>
                                 <td>시뮬레이션 vs 실제 상이한 알람 관련</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-093" target="_blank" style="color:#00d4ff;">PL-2025-093</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-093" target="_blank" style="color:#2563eb;">PL-2025-093</a></td>
                                 <td>운영 S/W 최종 매뉴얼 제출</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority low">낮음</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-104" target="_blank" style="color:#00d4ff;">PL-2025-104</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-104" target="_blank" style="color:#2563eb;">PL-2025-104</a></td>
                                 <td>작업자 사용 이력 로그 기능 추가</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank" style="color:#00d4ff;">PL-2025-157</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank" style="color:#2563eb;">PL-2025-157</a></td>
                                 <td>터치 오프셋의 일괄 변경 기능 추가</td>
                                 <td>제어/UI</td>
                                 <td><span class="priority normal">보통</span></td>
@@ -987,21 +1094,21 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-131" target="_blank" style="color:#00d4ff;">PL-2025-131</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-131" target="_blank" style="color:#2563eb;">PL-2025-131</a></td>
                                 <td>PC 전원 인가 방법</td>
                                 <td>전기/배선</td>
                                 <td><span class="priority low">낮음</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-167" target="_blank" style="color:#00d4ff;">PL-2026-167</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-167" target="_blank" style="color:#2563eb;">PL-2026-167</a></td>
                                 <td>B라인 센서 명판 부착</td>
                                 <td>전기/기타</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank" style="color:#00d4ff;">PL-2026-168</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank" style="color:#2563eb;">PL-2026-168</a></td>
                                 <td>불스아이 결선</td>
                                 <td>전기/배선</td>
                                 <td><span class="priority normal">보통</span></td>
@@ -1025,56 +1132,56 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-008" target="_blank" style="color:#00d4ff;">PL-2025-008</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-008" target="_blank" style="color:#2563eb;">PL-2025-008</a></td>
                                 <td>A/B라인 블스아이 용접토치 스프레이 적용</td>
                                 <td>기계/용접</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-026" target="_blank" style="color:#00d4ff;">PL-2025-026</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-026" target="_blank" style="color:#2563eb;">PL-2025-026</a></td>
                                 <td>컨트롤러 보전용 발판 구성</td>
                                 <td>기계/보전</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-027" target="_blank" style="color:#00d4ff;">PL-2025-027</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-027" target="_blank" style="color:#2563eb;">PL-2025-027</a></td>
                                 <td>IN/OUT 차광막 설치</td>
                                 <td>기계/기타</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-030" target="_blank" style="color:#00d4ff;">PL-2025-030</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-030" target="_blank" style="color:#2563eb;">PL-2025-030</a></td>
                                 <td>자율안전신고서 서류준비</td>
                                 <td>기계/기타</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-032" target="_blank" style="color:#00d4ff;">PL-2025-032</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-032" target="_blank" style="color:#2563eb;">PL-2025-032</a></td>
                                 <td>토치 케이블 처짐 방지 컨셉 변경</td>
                                 <td>기계/용접</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-040" target="_blank" style="color:#00d4ff;">PL-2025-040</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-040" target="_blank" style="color:#2563eb;">PL-2025-040</a></td>
                                 <td>레이저 커튼 보완</td>
                                 <td>기계/기타</td>
                                 <td><span class="priority normal">보통</span></td>
                                 <td><span class="status new">신규</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-103" target="_blank" style="color:#00d4ff;">PL-2025-103</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-103" target="_blank" style="color:#2563eb;">PL-2025-103</a></td>
                                 <td>겐트리 A/B LINE 호기 구분 명판 요청</td>
                                 <td>기계/기타</td>
                                 <td><span class="priority low">낮음</span></td>
                                 <td><span class="status progress">진행중</span></td>
                             </tr>
                             <tr>
-                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank" style="color:#00d4ff;">PL-2025-097</a></td>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank" style="color:#2563eb;">PL-2025-097</a></td>
                                 <td>로봇 백그라이트(절연볼트,핀,와셔) 부착 필요</td>
                                 <td>기계/구조물</td>
                                 <td><span class="priority normal">보통</span></td>
