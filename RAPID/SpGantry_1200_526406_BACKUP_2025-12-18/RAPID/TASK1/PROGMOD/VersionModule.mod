@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.18";
-CONST string TASK2_VERSION := "v1.9.18";
+CONST string TASK1_VERSION := "v1.9.19";
+CONST string TASK2_VERSION := "v1.9.19";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,18 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.18";  ! WobjGantry for Robot1 weld position
+CONST string WELD_SEQUENCE_VERSION := "v1.9.19";  ! 2-step move (JOINT then wobj0)
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.19 (2026-01-18)
+!   - FIX: 2-step weld move approach (safer motion path)
+!   - Step1: MoveAbsJ to safe joint [0,-10,-50,0,-30,0]
+!   - Step2: MoveJ to wobj0 target
+!   - Robot1: wobj0 [0, 370, 1300]
+!   - Robot2: wobj0 [0, 118, -1300]
+!
 ! v1.9.18 (2026-01-18)
 !   - FIX: MoveRobot1ToWeldReady uses WobjGantry instead of WobjWeldR1
 !   - WobjWeldR1 was set to Floor coords (unreachable from gantry position)

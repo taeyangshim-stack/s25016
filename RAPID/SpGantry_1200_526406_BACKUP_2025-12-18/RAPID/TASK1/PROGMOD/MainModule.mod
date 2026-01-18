@@ -2885,12 +2885,12 @@ ENDPROC
 ! ----------------------------------------
 ! Move Robot1 to Weld Ready Position
 ! ----------------------------------------
-! Moves Robot1 to weld position with specified orientation
-! Position in WObj: (WELD_R1_WObj_X, WELD_R1_WObj_Y, WELD_R1_WObj_Z)
-! Default: (0, -12, 1600) - above R-center, below Floor by TCP offset
+! Moves Robot1 to weld position with 2-step approach
+! v1.9.19: Step1 - MoveAbsJ to safe joint position
+!          Step2 - MoveJ to wobj0 target position
 PROC MoveRobot1ToWeldReady()
 	VAR robtarget weld_target;
-	VAR orient weld_orient;
+	VAR jointtarget safe_jt;
 	VAR jointtarget current_jt;
 
 	TPWrite "[WELD] Moving Robot1 to weld ready...";
@@ -2898,33 +2898,36 @@ PROC MoveRobot1ToWeldReady()
 	! Get current gantry position (Robot1 is gantry-configured)
 	current_jt := CJointT();
 
-	! Create weld orientation from ConfigModule (45° torch angle)
-	weld_orient.q1 := WELD_R1_ORIENT_Q1;
-	weld_orient.q2 := WELD_R1_ORIENT_Q2;
-	weld_orient.q3 := WELD_R1_ORIENT_Q3;
-	weld_orient.q4 := WELD_R1_ORIENT_Q4;
+	! Step 1: Move to safe JOINT position first
+	! Robot joints: [0, -10, -50, 0, -30, 0]
+	safe_jt := current_jt;  ! Keep gantry extax
+	safe_jt.robax.rax_1 := 0;
+	safe_jt.robax.rax_2 := -10;
+	safe_jt.robax.rax_3 := -50;
+	safe_jt.robax.rax_4 := 0;
+	safe_jt.robax.rax_5 := -30;
+	safe_jt.robax.rax_6 := 0;
+	TPWrite "[WELD] R1 Step1: MoveAbsJ to safe joints";
+	MoveAbsJ safe_jt, v100, fine, tool0;
 
-	! Target position in WobjWeldR1 coordinate system
-	! WObj: X=weld direction, Y=perpendicular, Z=Floor Z (down)
-	weld_target.trans.x := WELD_R1_WObj_X;
-	weld_target.trans.y := WELD_R1_WObj_Y;
-	weld_target.trans.z := WELD_R1_WObj_Z;
-	weld_target.rot := weld_orient;
+	! Step 2: Move to wobj0 target position
+	! wobj0 target: [0, 370, 1300]
+	current_jt := CJointT();  ! Re-read after move
+	weld_target.trans.x := 0;
+	weld_target.trans.y := 370;
+	weld_target.trans.z := 1300;
+	weld_target.rot.q1 := WELD_R1_ORIENT_Q1;
+	weld_target.rot.q2 := WELD_R1_ORIENT_Q2;
+	weld_target.rot.q3 := WELD_R1_ORIENT_Q3;
+	weld_target.rot.q4 := WELD_R1_ORIENT_Q4;
 	weld_target.robconf.cf1 := 0;
 	weld_target.robconf.cf4 := 0;
 	weld_target.robconf.cf6 := 0;
 	weld_target.robconf.cfx := 0;
-	! Use current gantry position (Robot1 is gantry-configured, needs valid extax)
 	weld_target.extax := current_jt.extax;
 
-	TPWrite "[WELD] R1 WobjGantry pos: [" + NumToStr(WELD_R1_WObj_X, 0) + ", "
-	                                + NumToStr(WELD_R1_WObj_Y, 0) + ", "
-	                                + NumToStr(WELD_R1_WObj_Z, 0) + "]";
-
-	! v1.9.18: Use WobjGantry instead of WobjWeldR1 (Floor coords unreachable)
-	! Robot1 is gantry-configured, so use gantry-relative coordinates
-	UpdateGantryWobj;
-	MoveJ weld_target, v100, fine, tool0\WObj:=WobjGantry;
+	TPWrite "[WELD] R1 Step2: MoveJ to wobj0 [0, 370, 1300]";
+	MoveJ weld_target, v100, fine, tool0\WObj:=wobj0;
 
 	TPWrite "[WELD] Robot1 ready at weld position";
 ENDPROC

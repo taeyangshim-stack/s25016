@@ -3040,14 +3040,13 @@ VAR robjoint robot2_offset_joints;
 ! Robot2 waits for TASK1 signal, then moves to weld position
 
 ! ----------------------------------------
-! Robot2 Weld Ready - Wait and Move
+! Robot2 Weld Ready - Wait and Move (2-step approach)
 ! ----------------------------------------
-! Waits for TASK1 weld start signal, then moves Robot2 to weld position
-! Position in WObj: (WELD_R2_WObj_X, WELD_R2_WObj_Y, WELD_R2_WObj_Z)
-! Default: (0, 476, -1600) - below R-center, above Floor by TCP offset
+! v1.9.19: Step1 - MoveAbsJ to safe joint position
+!          Step2 - MoveJ to wobj0 target position
 PROC Robot2_WeldReady()
 	VAR robtarget weld_target;
-	VAR orient weld_orient;
+	VAR jointtarget safe_jt;
 
 	TPWrite "[R2_WELD] Robot2 weld ready procedure started";
 	TPWrite "[R2_WELD] Waiting for TASK1 weld start signal...";
@@ -3059,18 +3058,34 @@ PROC Robot2_WeldReady()
 
 	TPWrite "[R2_WELD] Received weld start signal from TASK1";
 
-	! Create weld orientation from ConfigModule (45° torch angle)
-	weld_orient.q1 := WELD_R2_ORIENT_Q1;
-	weld_orient.q2 := WELD_R2_ORIENT_Q2;
-	weld_orient.q3 := WELD_R2_ORIENT_Q3;
-	weld_orient.q4 := WELD_R2_ORIENT_Q4;
+	! Step 1: Move to safe JOINT position first
+	! Robot joints: [0, -10, -50, 0, -30, 0]
+	safe_jt := CJointT();
+	safe_jt.robax.rax_1 := 0;
+	safe_jt.robax.rax_2 := -10;
+	safe_jt.robax.rax_3 := -50;
+	safe_jt.robax.rax_4 := 0;
+	safe_jt.robax.rax_5 := -30;
+	safe_jt.robax.rax_6 := 0;
+	! Robot2 has no external axes
+	safe_jt.extax.eax_a := 9E9;
+	safe_jt.extax.eax_b := 9E9;
+	safe_jt.extax.eax_c := 9E9;
+	safe_jt.extax.eax_d := 9E9;
+	safe_jt.extax.eax_e := 9E9;
+	safe_jt.extax.eax_f := 9E9;
+	TPWrite "[R2_WELD] Step1: MoveAbsJ to safe joints";
+	MoveAbsJ safe_jt, v100, fine, tool0;
 
-	! Target position in WobjWeldR2 coordinate system
-	! WObj: X=weld direction, Y=perpendicular, Z=Floor Z
-	weld_target.trans.x := WELD_R2_WObj_X;
-	weld_target.trans.y := WELD_R2_WObj_Y;
-	weld_target.trans.z := WELD_R2_WObj_Z;
-	weld_target.rot := weld_orient;
+	! Step 2: Move to wobj0 target position
+	! wobj0 target: [0, 118, -1300]
+	weld_target.trans.x := 0;
+	weld_target.trans.y := 118;
+	weld_target.trans.z := -1300;
+	weld_target.rot.q1 := WELD_R2_ORIENT_Q1;
+	weld_target.rot.q2 := WELD_R2_ORIENT_Q2;
+	weld_target.rot.q3 := WELD_R2_ORIENT_Q3;
+	weld_target.rot.q4 := WELD_R2_ORIENT_Q4;
 	weld_target.robconf.cf1 := 0;
 	weld_target.robconf.cf4 := 0;
 	weld_target.robconf.cf6 := 0;
@@ -3082,14 +3097,8 @@ PROC Robot2_WeldReady()
 	weld_target.extax.eax_e := 9E9;
 	weld_target.extax.eax_f := 9E9;
 
-	TPWrite "[R2_WELD] R2 WObj pos: [" + NumToStr(WELD_R2_WObj_X, 0) + ", "
-	                                   + NumToStr(WELD_R2_WObj_Y, 0) + ", "
-	                                   + NumToStr(WELD_R2_WObj_Z, 0) + "]";
-
-	TPWrite "[R2_WELD] Moving Robot2 to weld position...";
-
-	! Move to weld ready position using tWeld2
-	MoveJ weld_target, v100, fine, tWeld2\WObj:=WobjWeldR2;
+	TPWrite "[R2_WELD] Step2: MoveJ to wobj0 [0, 118, -1300]";
+	MoveJ weld_target, v100, fine, tool0\WObj:=wobj0;
 
 	! Signal ready to TASK1
 	t2_weld_ready := TRUE;
