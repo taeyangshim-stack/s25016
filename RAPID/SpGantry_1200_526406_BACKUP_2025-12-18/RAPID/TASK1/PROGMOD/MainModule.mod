@@ -2911,13 +2911,14 @@ PROC MoveRobot1ToWeldReady()
 	MoveAbsJ safe_jt, v100, fine, tool0;
 
 	! Step 2: Move to WobjGantry target position
-	! v1.9.21: Use WobjGantry instead of wobj0 (gantry-relative coords)
-	! WobjGantry target: [0, 370, 1300] (relative to R-center)
+	! v1.9.22: Corrected WobjGantry coords from user jog data
+	! User jog at X=-4500: wobj0 Y=110.59, Z=2026.89
+	! WobjGantry = [0, 111, -73] (Z = 2026.89 - 2100)
 	current_jt := CJointT();  ! Re-read after move
 	UpdateGantryWobj;
 	weld_target.trans.x := 0;
-	weld_target.trans.y := 370;
-	weld_target.trans.z := 1300;
+	weld_target.trans.y := 111;
+	weld_target.trans.z := -73;
 	weld_target.rot.q1 := WELD_R1_ORIENT_Q1;
 	weld_target.rot.q2 := WELD_R1_ORIENT_Q2;
 	weld_target.rot.q3 := WELD_R1_ORIENT_Q3;
@@ -2928,7 +2929,7 @@ PROC MoveRobot1ToWeldReady()
 	weld_target.robconf.cfx := 0;
 	weld_target.extax := current_jt.extax;
 
-	TPWrite "[WELD] R1 Step2: MoveJ to WobjGantry [0, 370, 1300]";
+	TPWrite "[WELD] R1 Step2: MoveJ to WobjGantry [0, 111, -73]";
 	MoveJ weld_target, v100, fine, tool0\WObj:=WobjGantry;
 
 	TPWrite "[WELD] Robot1 ready at weld position";
