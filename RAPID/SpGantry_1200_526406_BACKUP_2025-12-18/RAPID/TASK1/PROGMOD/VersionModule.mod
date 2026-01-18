@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.8";
-CONST string TASK2_VERSION := "v1.9.8";
+CONST string TASK1_VERSION := "v1.9.9";
+CONST string TASK2_VERSION := "v1.9.9";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================

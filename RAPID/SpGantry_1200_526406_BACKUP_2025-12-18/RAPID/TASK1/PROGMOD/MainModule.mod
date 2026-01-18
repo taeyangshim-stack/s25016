@@ -2984,15 +2984,26 @@ PROC ExecuteWeldSequence()
 	VAR pos r1_end;
 	VAR pos r2_start;
 	VAR pos r2_end;
+	VAR iodev weld_logfile;
+	VAR jointtarget current_jt;
+
+	! v1.9.9: Added file logging for debugging
+	Open "HOME:/weld_sequence.txt", weld_logfile \Write;
+	Write weld_logfile, "Weld Sequence Log (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
 	TPWrite "========================================";
-	TPWrite "[WELD] v1.9.0 Weld Sequence Start";
+	TPWrite "[WELD] v1.9.9 Weld Sequence Start";
 	TPWrite "========================================";
+
+	! Log current gantry position
+	current_jt := CJointT();
+	Write weld_logfile, "Start extax: X1=" + NumToStr(current_jt.extax.eax_a,1) + " X2=" + NumToStr(current_jt.extax.eax_f,1);
 
 	! Reset sync flags
 	t1_weld_start := FALSE;
 	t1_weld_done := FALSE;
 	t2_weld_ready := FALSE;
+	Write weld_logfile, "Step0: Sync flags reset";
 
 	! Read weld line positions from ConfigModule
 	r1_start.x := WELD_R1_START_X;
@@ -3008,30 +3019,49 @@ PROC ExecuteWeldSequence()
 	r2_end.y := WELD_R2_END_Y;
 	r2_end.z := WELD_R2_END_Z;
 
+	Write weld_logfile, "R1 Line: [" + NumToStr(r1_start.x, 0) + "," + NumToStr(r1_start.y, 0) + "," + NumToStr(r1_start.z, 0) + "]";
+	Write weld_logfile, "R2 Line: [" + NumToStr(r2_start.x, 0) + "," + NumToStr(r2_start.y, 0) + "," + NumToStr(r2_start.z, 0) + "]";
 	TPWrite "[WELD] R1 Line: [" + NumToStr(r1_start.x, 0) + "," + NumToStr(r1_start.y, 0) + "," + NumToStr(r1_start.z, 0) + "] -> ["
 	                             + NumToStr(r1_end.x, 0) + "," + NumToStr(r1_end.y, 0) + "," + NumToStr(r1_end.z, 0) + "]";
 	TPWrite "[WELD] R2 Line: [" + NumToStr(r2_start.x, 0) + "," + NumToStr(r2_start.y, 0) + "," + NumToStr(r2_start.z, 0) + "] -> ["
 	                             + NumToStr(r2_end.x, 0) + "," + NumToStr(r2_end.y, 0) + "," + NumToStr(r2_end.z, 0) + "]";
 
 	! Step 1: Calculate center line
+	Write weld_logfile, "Step1: CalcCenterLine START";
 	CalcCenterLine;
+	Write weld_logfile, "Step1: CalcCenterLine DONE";
 
 	! Step 2: Move gantry to weld start position
+	Write weld_logfile, "Step2: MoveGantryToWeldStart START";
 	MoveGantryToWeldStart;
+	current_jt := CJointT();
+	Write weld_logfile, "Step2: MoveGantryToWeldStart DONE - X1=" + NumToStr(current_jt.extax.eax_a,1) + " X2=" + NumToStr(current_jt.extax.eax_f,1);
 
 	! Step 3: Create weld WObjs
+	Write weld_logfile, "Step3: CreateWeldWobj START";
 	CreateWeldWobj r1_start, r1_end, WobjWeldR1;
 	CreateWeldWobj r2_start, r2_end, WobjWeldR2;
+	Write weld_logfile, "Step3: CreateWeldWobj DONE";
 
 	! Step 4: Move robots to weld ready
+	Write weld_logfile, "Step4a: MoveRobot1ToWeldReady START";
 	MoveRobot1ToWeldReady;
+	Write weld_logfile, "Step4a: MoveRobot1ToWeldReady DONE";
+
+	Write weld_logfile, "Step4b: WaitForRobot2WeldReady START";
 	WaitForRobot2WeldReady;
+	Write weld_logfile, "Step4b: WaitForRobot2WeldReady DONE";
 
 	! Step 5: Execute weld (gantry moves along center line)
+	Write weld_logfile, "Step5: WeldAlongCenterLine START";
 	WeldAlongCenterLine;
+	Write weld_logfile, "Step5: WeldAlongCenterLine DONE";
 
 	! Signal completion
 	t1_weld_done := TRUE;
+
+	Write weld_logfile, "Weld Sequence COMPLETE at " + CTime();
+	Close weld_logfile;
 
 	TPWrite "========================================";
 	TPWrite "[WELD] Weld Sequence Complete!";
