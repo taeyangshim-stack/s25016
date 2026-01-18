@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.6";
-CONST string TASK2_VERSION := "v1.9.6";
+CONST string TASK1_VERSION := "v1.9.7";
+CONST string TASK2_VERSION := "v1.9.7";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,17 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.6";  ! Fix: TCP_Z_OFFSET 1600->1000
+CONST string WELD_SEQUENCE_VERSION := "v1.9.7";  ! Fix: linked motor X1/X2
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.7 (2026-01-18)
+!   - FIX: Linked motor error (50246) - X1/X2 desync
+!   - MoveGantryToWeldStart: added eax_f := gantry_target.x (X2 linked motor)
+!   - WeldAlongCenterLine: added eax_f := gantry_end.x (X2 linked motor)
+!   - Both X1 (eax_a) and X2 (eax_f) must be set to same value for linked motors
+!
 ! v1.9.6 (2026-01-18)
 !   - FIX: Linked motor error (50246) - gantry Z calculation wrong
 !   - WELD_R1_TCP_Z_OFFSET: 1600 -> 1000 (actual robot reach from Mode2 test)

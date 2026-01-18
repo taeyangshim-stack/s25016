@@ -2849,10 +2849,11 @@ PROC MoveGantryToWeldStart()
 
 	! Create target joint (keep robot joints, set gantry position)
 	target_jt := current_jt;
-	target_jt.extax.eax_a := gantry_target.x;  ! Gantry X
+	target_jt.extax.eax_a := gantry_target.x;  ! Gantry X1
 	target_jt.extax.eax_b := gantry_target.y;  ! Gantry Y
 	target_jt.extax.eax_c := gantry_target.z;  ! Gantry Z
 	target_jt.extax.eax_d := weld_center_angle; ! Gantry R
+	target_jt.extax.eax_f := gantry_target.x;  ! Gantry X2 (linked motor, must match X1)
 
 	TPWrite "[WELD] Gantry target: [" + NumToStr(gantry_target.x, 1) + ", "
 	                                   + NumToStr(gantry_target.y, 1) + ", "
@@ -2952,8 +2953,9 @@ PROC WeldAlongCenterLine()
 
 	! Create end joint target (keep robot joints, change gantry XY)
 	end_jt := current_jt;
-	end_jt.extax.eax_a := gantry_end.x;  ! Gantry X
+	end_jt.extax.eax_a := gantry_end.x;  ! Gantry X1
 	end_jt.extax.eax_b := gantry_end.y;  ! Gantry Y
+	end_jt.extax.eax_f := gantry_end.x;  ! Gantry X2 (linked motor, must match X1)
 	! Z and R stay the same
 
 	TPWrite "[WELD] Welding to [" + NumToStr(gantry_end.x, 1) + ", "
