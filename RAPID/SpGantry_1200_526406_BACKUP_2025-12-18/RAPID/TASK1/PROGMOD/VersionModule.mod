@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.15";
-CONST string TASK2_VERSION := "v1.9.15";
+CONST string TASK1_VERSION := "v1.9.16";
+CONST string TASK2_VERSION := "v1.9.16";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,17 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.15";  ! Use 9E9 for eax_f
+CONST string WELD_SEQUENCE_VERSION := "v1.9.16";  ! Revert 9E9, use eax_f=eax_a
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.16 (2026-01-18)
+!   - REVERT: 9E9 approach failed with error 40512 (Missing External Axis Value)
+!   - FIX: Set eax_f := eax_a for all MoveAbsJ commands (linked motor requirement)
+!   - Applied to: MoveGantryToWeldStart, WeldAlongCenterLine
+!   - NOTE: X1/X2 state sync still not resolved - requires Virtual Controller restart
+!
 ! v1.9.15 (2026-01-18)
 !   - FIX: Use 9E9 for eax_f in all MoveAbsJ commands
 !   - 9E9 means "don't control this axis" - let linked motor system handle X2
