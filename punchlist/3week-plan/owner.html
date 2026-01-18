@@ -12,9 +12,9 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+            background: #f5f7fa;
             min-height: 100vh;
-            color: #fff;
+            color: #333;
             padding: 20px;
         }
         .container {
@@ -27,20 +27,20 @@
             text-align: center;
             margin-bottom: 25px;
             padding: 20px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .header h1 {
             font-size: 1.8rem;
-            color: #00d4ff;
+            color: #2563eb;
             margin-bottom: 8px;
         }
         .header .meta {
             display: flex;
             justify-content: center;
             gap: 30px;
-            color: #888;
+            color: #666;
             font-size: 0.9rem;
         }
         .header .meta span {
@@ -57,26 +57,27 @@
             margin-bottom: 25px;
         }
         .total-card {
-            background: rgba(255,255,255,0.05);
+            background: #fff;
             border-radius: 12px;
             padding: 20px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
         }
         .total-card .number {
             font-size: 2.2rem;
             font-weight: bold;
         }
         .total-card .label {
-            color: #888;
+            color: #666;
             font-size: 0.85rem;
             margin-top: 5px;
         }
-        .total-card.total .number { color: #00d4ff; }
-        .total-card.completed .number { color: #2ed573; }
-        .total-card.progress .number { color: #ffa502; }
-        .total-card.verify .number { color: #1e90ff; }
-        .total-card.new .number { color: #ff6b6b; }
+        .total-card.total .number { color: #2563eb; }
+        .total-card.completed .number { color: #10b981; }
+        .total-card.progress .number { color: #f59e0b; }
+        .total-card.verify .number { color: #3b82f6; }
+        .total-card.new .number { color: #ef4444; }
 
         /* 담당자 카드 그리드 */
         .owner-grid {
@@ -87,9 +88,10 @@
 
         /* 담당자 카드 */
         .owner-card {
-            background: rgba(255,255,255,0.03);
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
             overflow: hidden;
         }
         .owner-header {
@@ -97,29 +99,33 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
         }
         .owner-header h3 {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 1.1rem;
+            color: #333;
         }
         .owner-header .avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #00d4ff, #0066ff);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             font-size: 1rem;
+            color: #fff;
         }
         .owner-header .stats {
             display: flex;
             gap: 15px;
             font-size: 0.85rem;
+            color: #666;
         }
         .owner-header .stat {
             display: flex;
@@ -134,10 +140,10 @@
         /* 진행률 바 */
         .progress-section {
             padding: 15px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid #e5e7eb;
         }
         .progress-bar-bg {
-            background: rgba(255,255,255,0.1);
+            background: #e5e7eb;
             border-radius: 8px;
             height: 24px;
             overflow: hidden;
@@ -151,19 +157,20 @@
             font-size: 0.75rem;
             font-weight: 600;
             transition: width 0.3s ease;
+            color: #fff;
         }
-        .progress-bar-fill.completed { background: #2ed573; color: #000; }
-        .progress-bar-fill.verify { background: #1e90ff; }
-        .progress-bar-fill.progress { background: #ffa502; color: #000; }
-        .progress-bar-fill.new { background: #ff6b6b; }
+        .progress-bar-fill.completed { background: #10b981; }
+        .progress-bar-fill.verify { background: #3b82f6; }
+        .progress-bar-fill.progress { background: #f59e0b; }
+        .progress-bar-fill.new { background: #ef4444; }
 
         /* 주차별 현황 */
         .week-status {
             padding: 10px 20px;
             display: flex;
             gap: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
         }
         .week-badge {
             padding: 5px 12px;
@@ -173,9 +180,9 @@
             align-items: center;
             gap: 5px;
         }
-        .week-badge.w1 { background: rgba(255,107,107,0.2); border: 1px solid #ff6b6b; }
-        .week-badge.w2 { background: rgba(255,217,61,0.2); border: 1px solid #ffd93d; }
-        .week-badge.w3 { background: rgba(107,203,119,0.2); border: 1px solid #6bcb77; }
+        .week-badge.w1 { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+        .week-badge.w2 { background: #fffbeb; border: 1px solid #fde68a; color: #d97706; }
+        .week-badge.w3 { background: #ecfdf5; border: 1px solid #a7f3d0; color: #059669; }
 
         /* 업무 목록 */
         .task-list {
@@ -184,14 +191,14 @@
         }
         .task-item {
             padding: 12px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             gap: 12px;
             transition: background 0.2s;
         }
         .task-item:hover {
-            background: rgba(255,255,255,0.05);
+            background: #f9fafb;
         }
         .task-item:last-child {
             border-bottom: none;
@@ -200,7 +207,7 @@
             width: 20px;
             height: 20px;
             border-radius: 4px;
-            border: 2px solid #555;
+            border: 2px solid #d1d5db;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -208,12 +215,12 @@
             transition: all 0.2s;
         }
         .task-checkbox.checked {
-            background: #2ed573;
-            border-color: #2ed573;
+            background: #10b981;
+            border-color: #10b981;
         }
         .task-checkbox.checked::after {
             content: '✓';
-            color: #000;
+            color: #fff;
             font-size: 0.8rem;
             font-weight: bold;
         }
@@ -222,11 +229,19 @@
         }
         .task-id {
             font-size: 0.75rem;
-            color: #888;
+            color: #666;
+        }
+        .task-id a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .task-id a:hover {
+            text-decoration: underline;
         }
         .task-title {
             font-size: 0.9rem;
             margin-top: 2px;
+            color: #333;
         }
         .task-meta {
             display: flex;
@@ -237,29 +252,31 @@
             font-size: 0.7rem;
             padding: 2px 8px;
             border-radius: 10px;
-            background: rgba(255,255,255,0.1);
+            background: #f3f4f6;
+            color: #666;
         }
-        .task-tag.urgent { background: #ff4757; }
-        .task-tag.high { background: #ffa502; color: #000; }
-        .task-tag.normal { background: #2ed573; color: #000; }
-        .task-tag.low { background: #747d8c; }
+        .task-tag.urgent { background: #dc2626; color: #fff; }
+        .task-tag.high { background: #f59e0b; color: #fff; }
+        .task-tag.normal { background: #10b981; color: #fff; }
+        .task-tag.low { background: #6b7280; color: #fff; }
 
         .task-status {
             padding: 4px 10px;
             border-radius: 12px;
             font-size: 0.75rem;
             font-weight: 500;
+            color: #fff;
         }
-        .task-status.new { background: #5352ed; }
-        .task-status.progress { background: #ff6348; }
-        .task-status.verify { background: #1e90ff; }
-        .task-status.completed { background: #2ed573; color: #000; }
+        .task-status.new { background: #6366f1; }
+        .task-status.progress { background: #f97316; }
+        .task-status.verify { background: #3b82f6; }
+        .task-status.completed { background: #10b981; }
 
         /* 이슈 섹션 */
         .issue-section {
             padding: 15px 20px;
-            background: rgba(255,100,100,0.05);
-            border-top: 1px solid rgba(255,100,100,0.2);
+            background: #fef2f2;
+            border-top: 1px solid #fecaca;
         }
         .issue-header {
             display: flex;
@@ -268,16 +285,16 @@
             margin-bottom: 10px;
         }
         .issue-header h4 {
-            color: #ff6b6b;
+            color: #dc2626;
             font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 5px;
         }
         .issue-add-btn {
-            background: rgba(255,107,107,0.2);
-            border: 1px solid #ff6b6b;
-            color: #ff6b6b;
+            background: #fff;
+            border: 1px solid #dc2626;
+            color: #dc2626;
             padding: 5px 12px;
             border-radius: 15px;
             font-size: 0.8rem;
@@ -285,7 +302,7 @@
             transition: all 0.2s;
         }
         .issue-add-btn:hover {
-            background: #ff6b6b;
+            background: #dc2626;
             color: #fff;
         }
         .issue-list {
@@ -294,31 +311,31 @@
             gap: 8px;
         }
         .issue-item {
-            background: rgba(255,255,255,0.05);
+            background: #fff;
             padding: 10px 12px;
             border-radius: 8px;
             font-size: 0.85rem;
-            border-left: 3px solid #ff6b6b;
+            border-left: 3px solid #dc2626;
         }
         .issue-item .issue-date {
             font-size: 0.75rem;
-            color: #888;
+            color: #666;
             margin-top: 4px;
         }
         .issue-input {
             width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: #fff;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 10px;
-            color: #fff;
+            color: #333;
             font-size: 0.85rem;
             resize: none;
             display: none;
         }
         .issue-input:focus {
             outline: none;
-            border-color: #ff6b6b;
+            border-color: #dc2626;
         }
         .issue-input.show {
             display: block;
@@ -329,10 +346,10 @@
             width: 6px;
         }
         .task-list::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
+            background: #f3f4f6;
         }
         .task-list::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
+            background: #d1d5db;
             border-radius: 3px;
         }
 
@@ -349,7 +366,7 @@
             align-items: center;
             gap: 6px;
             font-size: 0.8rem;
-            color: #888;
+            color: #666;
         }
         .legend-dot {
             width: 12px;
@@ -361,7 +378,7 @@
         .footer {
             text-align: center;
             padding: 20px;
-            color: #555;
+            color: #666;
             font-size: 0.8rem;
             margin-top: 20px;
         }

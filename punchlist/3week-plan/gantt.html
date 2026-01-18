@@ -12,8 +12,8 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
-            color: #fff;
+            background: #f5f7fa;
+            color: #333;
             padding: 20px;
             min-height: 100vh;
         }
@@ -27,12 +27,13 @@
             text-align: center;
             margin-bottom: 25px;
             padding: 20px;
-            background: rgba(255,255,255,0.05);
+            background: #fff;
             border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .header h1 {
             font-size: 1.6rem;
-            color: #00d4ff;
+            color: #2563eb;
             margin-bottom: 10px;
         }
         .header-info {
@@ -40,7 +41,7 @@
             justify-content: center;
             gap: 30px;
             font-size: 0.9rem;
-            color: #888;
+            color: #666;
         }
 
         /* 범례 */
@@ -56,6 +57,7 @@
             align-items: center;
             gap: 6px;
             font-size: 0.8rem;
+            color: #666;
         }
         .legend-dot {
             width: 14px;
@@ -73,34 +75,35 @@
         }
         .filter-btn {
             padding: 8px 16px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
-            color: #fff;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #666;
             border-radius: 20px;
             cursor: pointer;
             font-size: 0.85rem;
             transition: all 0.2s;
         }
         .filter-btn:hover, .filter-btn.active {
-            background: #00d4ff;
-            border-color: #00d4ff;
-            color: #000;
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
         }
 
         /* 간트 차트 컨테이너 */
         .gantt-container {
-            background: rgba(255,255,255,0.03);
+            background: #fff;
             border-radius: 12px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
         }
 
         /* 간트 헤더 (날짜) */
         .gantt-header {
             display: grid;
             grid-template-columns: 200px repeat(16, 1fr);
-            background: rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
             position: sticky;
             top: 0;
             z-index: 10;
@@ -109,34 +112,35 @@
             padding: 10px 5px;
             text-align: center;
             font-size: 0.75rem;
-            border-right: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid #e5e7eb;
+            color: #333;
         }
         .gantt-header-cell.label {
             text-align: left;
             padding-left: 15px;
             font-weight: 600;
-            color: #00d4ff;
+            color: #2563eb;
         }
         .gantt-header-cell .day {
             font-weight: 600;
             font-size: 0.85rem;
         }
         .gantt-header-cell .date {
-            color: #888;
+            color: #666;
             font-size: 0.7rem;
         }
         .gantt-header-cell.weekend {
-            background: rgba(255,100,100,0.1);
+            background: #fef2f2;
         }
         .gantt-header-cell.week-start {
-            border-left: 2px solid #00d4ff;
+            border-left: 2px solid #2563eb;
         }
 
         /* 주차 구분 헤더 */
         .week-header {
             display: grid;
             grid-template-columns: 200px repeat(16, 1fr);
-            background: rgba(0,212,255,0.1);
+            background: #eff6ff;
         }
         .week-header-cell {
             padding: 8px;
@@ -144,22 +148,22 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
-        .week-header-cell.w1 { background: rgba(255,107,107,0.2); color: #ff6b6b; }
-        .week-header-cell.w2 { background: rgba(255,217,61,0.2); color: #ffd93d; }
-        .week-header-cell.w3 { background: rgba(107,203,119,0.2); color: #6bcb77; }
+        .week-header-cell.w1 { background: #fef2f2; color: #dc2626; }
+        .week-header-cell.w2 { background: #fffbeb; color: #d97706; }
+        .week-header-cell.w3 { background: #ecfdf5; color: #059669; }
 
         /* 담당자 섹션 */
         .owner-section {
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #e5e7eb;
         }
         .owner-row {
             display: grid;
             grid-template-columns: 200px repeat(16, 1fr);
-            background: rgba(255,255,255,0.02);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
         }
         .owner-row:hover {
-            background: rgba(255,255,255,0.05);
+            background: #f9fafb;
         }
         .owner-name {
             padding: 12px 15px;
@@ -167,10 +171,10 @@
             align-items: center;
             gap: 10px;
             font-weight: 500;
-            border-right: 1px solid rgba(255,255,255,0.1);
+            border-right: 1px solid #e5e7eb;
             position: sticky;
             left: 0;
-            background: #1e1e3f;
+            background: #fff;
             z-index: 5;
         }
         .owner-avatar {
@@ -182,30 +186,32 @@
             justify-content: center;
             font-size: 0.8rem;
             font-weight: bold;
+            color: #fff;
         }
         .owner-info {
             flex: 1;
         }
         .owner-info .name {
             font-size: 0.9rem;
+            color: #333;
         }
         .owner-info .count {
             font-size: 0.7rem;
-            color: #888;
+            color: #666;
         }
 
         /* 간트 셀 */
         .gantt-cell {
             padding: 8px 4px;
-            border-right: 1px solid rgba(255,255,255,0.03);
+            border-right: 1px solid #f3f4f6;
             min-height: 50px;
             position: relative;
         }
         .gantt-cell.weekend {
-            background: rgba(255,100,100,0.03);
+            background: #fef2f2;
         }
         .gantt-cell.week-start {
-            border-left: 2px solid rgba(0,212,255,0.3);
+            border-left: 2px solid rgba(37,99,235,0.3);
         }
 
         /* 태스크 바 */
@@ -219,18 +225,19 @@
             overflow: hidden;
             text-overflow: ellipsis;
             transition: all 0.2s;
+            color: #fff;
         }
         .task-bar:hover {
             transform: scale(1.02);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             z-index: 10;
             position: relative;
         }
-        .task-bar.urgent { background: #ff4757; }
-        .task-bar.high { background: #ffa502; color: #000; }
-        .task-bar.normal { background: #2ed573; color: #000; }
-        .task-bar.low { background: #747d8c; }
-        .task-bar.verify { background: #1e90ff; }
+        .task-bar.urgent { background: #dc2626; }
+        .task-bar.high { background: #f59e0b; }
+        .task-bar.normal { background: #10b981; }
+        .task-bar.low { background: #6b7280; }
+        .task-bar.verify { background: #3b82f6; }
 
         /* 태스크 상세 (호버) */
         .task-bar .task-tooltip {
@@ -238,15 +245,15 @@
             position: absolute;
             left: 0;
             top: 100%;
-            background: #2d2d5a;
+            background: #fff;
             padding: 10px;
             border-radius: 8px;
             min-width: 250px;
             z-index: 100;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             font-size: 0.8rem;
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.1);
+            color: #333;
+            border: 1px solid #e5e7eb;
         }
         .task-bar:hover .task-tooltip {
             display: block;
@@ -254,7 +261,7 @@
         .task-tooltip .tt-title {
             font-weight: 600;
             margin-bottom: 5px;
-            color: #00d4ff;
+            color: #2563eb;
         }
         .task-tooltip .tt-row {
             display: flex;
@@ -262,7 +269,7 @@
             margin-top: 3px;
         }
         .task-tooltip .tt-label {
-            color: #888;
+            color: #666;
             min-width: 50px;
         }
 
@@ -270,25 +277,25 @@
         .summary-row {
             display: grid;
             grid-template-columns: 200px repeat(16, 1fr);
-            background: rgba(0,212,255,0.05);
-            border-top: 2px solid rgba(0,212,255,0.3);
+            background: #eff6ff;
+            border-top: 2px solid #2563eb;
         }
         .summary-cell {
             padding: 10px 5px;
             text-align: center;
             font-size: 0.75rem;
-            border-right: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid #e5e7eb;
         }
         .summary-cell.label {
             text-align: left;
             padding-left: 15px;
             font-weight: 600;
-            color: #00d4ff;
+            color: #2563eb;
         }
         .summary-cell .num {
             font-size: 1rem;
             font-weight: bold;
-            color: #00d4ff;
+            color: #2563eb;
         }
 
         /* 상세 일정표 */
@@ -296,11 +303,11 @@
             margin-top: 30px;
         }
         .detail-section h2 {
-            color: #00d4ff;
+            color: #2563eb;
             font-size: 1.2rem;
             margin-bottom: 15px;
             padding-left: 10px;
-            border-left: 3px solid #00d4ff;
+            border-left: 3px solid #2563eb;
         }
 
         .day-schedule {
@@ -311,33 +318,36 @@
         }
 
         .day-card {
-            background: rgba(255,255,255,0.03);
+            background: #fff;
             border-radius: 10px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
         }
         .day-card-header {
             padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #e5e7eb;
         }
-        .day-card-header.w1 { background: rgba(255,107,107,0.15); }
-        .day-card-header.w2 { background: rgba(255,217,61,0.15); }
-        .day-card-header.w3 { background: rgba(107,203,119,0.15); }
+        .day-card-header.w1 { background: #fef2f2; }
+        .day-card-header.w2 { background: #fffbeb; }
+        .day-card-header.w3 { background: #ecfdf5; }
         .day-card-header .day-name {
             font-weight: 600;
+            color: #333;
         }
         .day-card-header .day-date {
-            color: #888;
+            color: #666;
             font-size: 0.85rem;
         }
         .day-card-header .task-count {
-            background: rgba(255,255,255,0.2);
+            background: #f3f4f6;
             padding: 3px 10px;
             border-radius: 10px;
             font-size: 0.8rem;
+            color: #666;
         }
 
         .day-task-list {
@@ -347,31 +357,31 @@
         }
         .day-task-item {
             padding: 8px 10px;
-            background: rgba(255,255,255,0.03);
+            background: #f9fafb;
             border-radius: 6px;
             margin-bottom: 6px;
             border-left: 3px solid;
             font-size: 0.8rem;
         }
-        .day-task-item.urgent { border-color: #ff4757; }
-        .day-task-item.high { border-color: #ffa502; }
-        .day-task-item.normal { border-color: #2ed573; }
-        .day-task-item.low { border-color: #747d8c; }
+        .day-task-item.urgent { border-color: #dc2626; }
+        .day-task-item.high { border-color: #f59e0b; }
+        .day-task-item.normal { border-color: #10b981; }
+        .day-task-item.low { border-color: #6b7280; }
         .day-task-item .task-id {
-            color: #888;
+            color: #666;
             font-size: 0.7rem;
         }
         .day-task-item .task-owner {
             float: right;
             font-size: 0.7rem;
-            color: #00d4ff;
+            color: #2563eb;
         }
 
         /* 푸터 */
         .footer {
             text-align: center;
             padding: 20px;
-            color: #555;
+            color: #666;
             font-size: 0.8rem;
             margin-top: 30px;
         }
@@ -413,8 +423,8 @@
                 display: block;
                 text-align: center;
                 padding: 8px;
-                background: rgba(0,212,255,0.1);
-                color: #00d4ff;
+                background: #eff6ff;
+                color: #2563eb;
                 font-size: 0.75rem;
                 border-radius: 8px 8px 0 0;
             }
