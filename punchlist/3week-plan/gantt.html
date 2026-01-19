@@ -1009,7 +1009,7 @@
                 <!-- 1주차 -->
                 <div class="summary-cell weekend">-</div>
                 <div class="summary-cell"><div class="num" style="color:#2ed573;">8</div></div><!-- 1/19 +6 B라인 -->
-                <div class="summary-cell"><div class="num" style="color:#ffa502;">13</div></div><!-- 1/20 +8 B라인 -->
+                <div class="summary-cell"><div class="num" style="color:#ff6b6b;">19</div></div><!-- 1/20: 기존5 + 지연6 + B라인8 -->
                 <div class="summary-cell"><div class="num">5</div></div>
                 <div class="summary-cell"><div class="num">4</div></div>
                 <div class="summary-cell"><div class="num">5</div></div>
@@ -1037,48 +1037,59 @@
             <h2>1주차 상세 일정 (1/19~1/25) - 긴급 + 검증중 완료</h2>
             <div class="day-schedule">
                 <div class="day-card">
-                    <div class="day-card-header w1">
+                    <div class="day-card-header w1" style="background:linear-gradient(135deg,rgba(46,213,115,0.3),rgba(255,165,2,0.3));">
                         <div><span class="day-name">일</span> <span class="day-date">1/19</span></div>
-                        <span class="task-count">8건 (B라인 6건 배포)</span>
+                        <span class="task-count">실적 반영</span>
                     </div>
                     <div class="day-task-list">
-                        <div class="day-task-item normal">
-                            <span class="task-owner">전체</span>
-                            <div>3주 완료 계획 시작 / 담당자별 업무 배분 확인</div>
-                        </div>
-                        <!-- B라인 검증 배포 항목 -->
-                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(46,213,115,0.15);border-radius:6px;border-left:3px solid #2ed573;">
-                            <strong style="color:#2ed573;">B라인 검증 배포 (박주한 주임) - 6건</strong>
+                        <!-- 완료 항목 -->
+                        <div style="margin:5px 0;padding:8px 10px;background:rgba(46,213,115,0.15);border-radius:6px;border-left:3px solid #2ed573;">
+                            <strong style="color:#2ed573;">✅ 완료</strong>
                         </div>
                         <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank" style="color:#2ed573;">#1 PL-2025-106</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>디지털 트윈 (Lag 이슈)</div>
+                            <span class="task-owner">안전</span>
+                            <div>A 테스트 완료</div>
                         </div>
                         <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id" style="color:#2ed573;">#2 PL-096연계</span>
-                            <span class="task-owner">박주한</span>
-                            <div>비정상 용접선 정보 필터링</div>
+                            <span class="task-owner">안전</span>
+                            <div>B 세팅 완료</div>
                         </div>
                         <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-062" target="_blank" style="color:#2ed573;">#7 PL-2025-062</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>갠트리 수동 이동 시 동적 리미트</div>
+                            <span class="task-owner">안전</span>
+                            <div>메뉴얼 전달 완료</div>
                         </div>
                         <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-132" target="_blank" style="color:#2ed573;">#8 PL-2025-132</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>기본 Z홈 선택</div>
+                            <span class="task-owner">B라인</span>
+                            <div>1호기 캘리브레이션 완료 (피딩길이 1호기=3호기)</div>
                         </div>
                         <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id" style="color:#2ed573;">#10 신규</span>
-                            <span class="task-owner">박주한</span>
-                            <div>토크 축 가독/가시성 향상</div>
+                            <span class="task-owner">RAPID</span>
+                            <div>웜업 적용 완료 (UI 적용 대기 - 테스트버전 준비됨)</div>
                         </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank" style="color:#2ed573;">#13 PL-2025-155</a></span>
+
+                        <!-- 지연 항목 -->
+                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(255,107,107,0.15);border-radius:6px;border-left:3px solid #ff6b6b;">
+                            <strong style="color:#ff6b6b;">❌ 지연 → 1/20 이동</strong>
+                        </div>
+                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
                             <span class="task-owner">박주한</span>
-                            <div>홀센서 기반 원점 인식</div>
+                            <div>B라인 UI 6건 (#1,#2,#7,#8,#10,#13) 미배포</div>
+                        </div>
+                        <div style="padding:5px 10px;color:#ff6b6b;font-size:0.8rem;">
+                            사유: 화면전환 프리징 이슈 (X항목 검증완료, 대안 있으나 테스트 못함)
+                        </div>
+
+                        <!-- 확인중 항목 -->
+                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(30,144,255,0.15);border-radius:6px;border-left:3px solid #1e90ff;">
+                            <strong style="color:#1e90ff;">🔍 확인중</strong>
+                        </div>
+                        <div class="day-task-item" style="background:rgba(30,144,255,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank" style="color:#1e90ff;">PL-2025-020</a></span>
+                            <span class="task-owner">A라인</span>
+                            <div>수직용접: nAngleBetweenParts 위치이동 오류 가능성</div>
+                        </div>
+                        <div style="padding:5px 10px;color:#1e90ff;font-size:0.8rem;">
+                            12/09 버전 롤백 테스트도 용접불가 → 테스트 UI 신버전 제작 예정 (박주한)
                         </div>
                     </div>
                 </div>
@@ -1086,7 +1097,7 @@
                 <div class="day-card">
                     <div class="day-card-header w1">
                         <div><span class="day-name">월</span> <span class="day-date">1/20</span></div>
-                        <span class="task-count">13건 (B라인 8건 포함)</span>
+                        <span class="task-count">19건 (지연6 + B라인8 포함)</span>
                     </div>
                     <div class="day-task-list">
                         <div class="day-task-item urgent">
@@ -1108,6 +1119,40 @@
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-039" target="_blank">PL-2025-039</a></span>
                             <span class="task-owner">제어팀</span>
                             <div>불스아이 스프레이 LOW 경고 [검증]</div>
+                        </div>
+                        <!-- 1/19 지연분 B라인 6건 -->
+                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(255,107,107,0.15);border-radius:6px;border-left:3px solid #ff6b6b;">
+                            <strong style="color:#ff6b6b;">⚠️ 1/19 지연분 - B라인 6건 (프리징 이슈)</strong>
+                        </div>
+                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank" style="color:#ff6b6b;">#1 PL-2025-106</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>디지털 트윈</div>
+                        </div>
+                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank" style="color:#ff6b6b;">#2 PL-2025-096</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>비정상 용접선 정보 필터링</div>
+                        </div>
+                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-062" target="_blank" style="color:#ff6b6b;">#7 PL-2025-062</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>갠트리 수동 이동 시 동적 리미트</div>
+                        </div>
+                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-132" target="_blank" style="color:#ff6b6b;">#8 PL-2025-132</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>기본 Z홈 선택</div>
+                        </div>
+                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
+                            <span class="task-id" style="color:#ff6b6b;">#10 신규</span>
+                            <span class="task-owner">박주한</span>
+                            <div>토크 축 가독/가시성 향상</div>
+                        </div>
+                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank" style="color:#ff6b6b;">#13 PL-2025-155</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>홀센서</div>
                         </div>
                         <!-- B라인 검증 진행 항목 -->
                         <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(255,165,2,0.15);border-radius:6px;border-left:3px solid #ffa502;">
