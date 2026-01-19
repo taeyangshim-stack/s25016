@@ -135,7 +135,7 @@
     <div class="header-bar">
         <span class="title">S25016 펀치리스트 3주 완료 계획</span>
         <div class="info">
-            <span>계획기간: 2026.01.19 ~ 2026.02.08</span>
+            <span>계획기간: 2026.01.19 ~ 2026.02.07</span>
             <span>총 69건</span>
             <span>담당: SP 심태양</span>
         </div>
@@ -143,30 +143,30 @@
 
     <!-- 탭 네비게이션 -->
     <nav class="tab-nav">
-        <button class="tab-btn active" onclick="showTab('overview')">
+        <button class="tab-btn active" onclick="showTab('gantt')">
+            <span class="icon">📅</span> 일정표 (간트)
+        </button>
+        <button class="tab-btn" onclick="showTab('overview')">
             <span class="icon">📊</span> 주차별 계획
         </button>
         <button class="tab-btn" onclick="showTab('owner')">
             <span class="icon">👥</span> 담당자별 관리
         </button>
-        <button class="tab-btn" onclick="showTab('gantt')">
-            <span class="icon">📅</span> 일정표 (간트)
-        </button>
     </nav>
 
+    <!-- 탭 콘텐츠: 일정표 (간트) - 메인 -->
+    <div id="tab-gantt" class="tab-content active">
+        <iframe src="gantt.html" class="tab-frame"></iframe>
+    </div>
+
     <!-- 탭 콘텐츠: 주차별 계획 -->
-    <div id="tab-overview" class="tab-content active">
+    <div id="tab-overview" class="tab-content">
         <iframe src="weekly.html" class="tab-frame"></iframe>
     </div>
 
     <!-- 탭 콘텐츠: 담당자별 관리 -->
     <div id="tab-owner" class="tab-content">
         <iframe src="owner.html" class="tab-frame"></iframe>
-    </div>
-
-    <!-- 탭 콘텐츠: 일정표 -->
-    <div id="tab-gantt" class="tab-content">
-        <iframe src="gantt.html" class="tab-frame"></iframe>
     </div>
 
     <script>
