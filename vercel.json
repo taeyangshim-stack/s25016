@@ -27,6 +27,7 @@
     { "source": "/cloudinary", "destination": "/cloudinary-uploader/dashboard.html" },
     { "source": "/punchlist", "destination": "/punchlist/index.html" },
     { "source": "/punchlist/3week-plan", "destination": "/punchlist/3week-plan/index.html" },
+    { "source": "/punchlist/3week-plan/mail", "destination": "/punchlist/3week-plan/mail.html" },
     { "source": "/punchlist/pages/list", "destination": "/punchlist/pages/list.html" },
     { "source": "/punchlist/pages/detail", "destination": "/punchlist/pages/detail.html" },
     { "source": "/punchlist/pages/create", "destination": "/punchlist/pages/create.html" },
