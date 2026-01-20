@@ -209,13 +209,144 @@
 
         <!-- 탭 네비게이션 -->
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="showTab('bline')">B라인 14건 업데이트 요청</button>
+            <button class="tab-btn active" onclick="showTab('daily')">1/19 일일 진행 보고</button>
+            <button class="tab-btn" onclick="showTab('bline')">B라인 14건 업데이트 요청</button>
             <button class="tab-btn" onclick="showTab('history')">발송 히스토리</button>
             <button class="tab-btn" onclick="showTab('template')">메일 템플릿</button>
         </div>
 
+        <!-- 1/19 일일 진행 보고 -->
+        <div id="tab-daily" class="tab-content active">
+            <div class="mail-container">
+                <div class="mail-header">
+                    <label>받는 사람</label>
+                    <input type="text" value="박주한 주임" id="daily-recipient">
+                    <label>제목</label>
+                    <input type="text" value="[S25016] 1/19(월) B라인 검증 진행 현황" id="daily-subject">
+                    <label>첨부파일</label>
+                    <input type="text" value="S25016_3주완료계획_진행현황.csv" id="daily-attachment" readonly style="background:#f3f4f6;">
+                </div>
+
+                <div class="mail-body" id="daily-content">
+                    <p>박주한 주임님,</p>
+                    <p>고생 많으십니다. SP 심태양입니다.</p>
+                    <p>1/19(월) B라인 검증 진행 현황 공유드립니다.</p>
+
+                    <h3>■ 1/19(월) 완료 - 4건</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50px;">No.</th>
+                            <th>항목명</th>
+                            <th style="width:100px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>안전 A/B 테스트 (안전도어, 라이트커튼)</td>
+                            <td style="color:#10b981;font-weight:600;">완료</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>운영 S/W 메뉴얼 전달</td>
+                            <td style="color:#10b981;font-weight:600;">완료</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>B라인 1호기 캘리브레이션 (피딩길이 1호기=3호기)</td>
+                            <td style="color:#10b981;font-weight:600;">완료</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>RAPID 웜업 적용 (<a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-113" target="_blank" class="pl-link">PL-2025-113</a>)</td>
+                            <td style="color:#10b981;font-weight:600;">완료</td>
+                        </tr>
+                    </table>
+
+                    <h3>■ 1/19(월) 지연 - 6건</h3>
+                    <p class="status-delayed">* 사유: UI 화면전환 프리징 이슈 → 1/20(화) 배포 예정</p>
+                    <table>
+                        <tr>
+                            <th style="width:50px;">No.</th>
+                            <th>항목명</th>
+                            <th style="width:120px;">펀치리스트 ID</th>
+                        </tr>
+                        <tr class="highlight">
+                            <td>1</td>
+                            <td>디지털 트윈 (Lag 이슈)</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-106" target="_blank" class="pl-link">PL-2025-106</a></td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>2</td>
+                            <td>비정상 용접선 정보 필터링</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-096" target="_blank" class="pl-link">PL-2025-096</a></td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>3</td>
+                            <td>갠트리 수동 이동 시 동적 리미트</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-062" target="_blank" class="pl-link">PL-2025-062</a></td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>4</td>
+                            <td>기본 Z홈 선택</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-132" target="_blank" class="pl-link">PL-2025-132</a></td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>5</td>
+                            <td>토크 축 가독/가시성 향상</td>
+                            <td>(신규 등록 필요)</td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>6</td>
+                            <td>홀센서 기반 원점 인식</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-155" target="_blank" class="pl-link">PL-2025-155</a></td>
+                        </tr>
+                    </table>
+
+                    <h3>■ 1/20(화) 예정 - 14건</h3>
+                    <p>어제 지연분 6건 + 오늘 예정분 8건</p>
+
+                    <h3>■ 금주 토요일(1/24) 현장작업 예정</h3>
+                    <ul>
+                        <li>로봇 절연처리 (백그라이트, 절연볼트) - <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-097" target="_blank" class="pl-link">PL-2025-097</a></li>
+                        <li>B라인 BullsEye 설치 위치 선정 - <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-142" target="_blank" class="pl-link">PL-2025-142</a></li>
+                    </ul>
+
+                    <h3>■ 첨부파일</h3>
+                    <p>상세 진행 현황은 첨부파일(S25016_3주완료계획_진행현황.csv) 참고 부탁드립니다.</p>
+
+                    <h3>■ 참고</h3>
+                    <p>3주 완료 계획 간트차트: <a href="https://s2501602.vercel.app/punchlist/3week-plan" target="_blank">https://s2501602.vercel.app/punchlist/3week-plan</a></p>
+
+                    <p style="margin-top:20px;">감사합니다.</p>
+                    <div style="margin-top:20px; padding-top:15px; border-top:1px solid #ccc; color:#666; font-size:0.85rem; line-height:1.6;">
+                        <p style="margin:0;"><strong>심태양</strong></p>
+                        <p style="margin:5px 0 0;">㈜에스피시스템스</p>
+                        <p style="margin:0;">연구소 / 부장</p>
+                        <p style="margin:10px 0 0;">[626-220] 경남 양산시 어곡동 858-2 산업단지 3-2</p>
+                        <p style="margin:0;">TEL : 055-371-5661 | FAX : 055-371-5606</p>
+                        <p style="margin:0;">PH. : 010-3381-2852</p>
+                        <p style="margin:15px 0 0; font-size:0.75rem; color:#999;">
+                            상기 메일 또는 첨부자료는 지정된 수신인만을 위한 것이며, 영업비밀, 기밀정보 등을 포함하고 있을 수 있습니다.<br>
+                            여기에 포함된 정보의 전부 또는 일부를 목적 이외 무단으로 공개, 배포, 복사 또는 사용하는 것은 엄격히 금지됩니다.<br>
+                            본 메일이 잘못 전송된 경우, 발신인 또는 당사에 알려주시고, 본 메일은 즉시 삭제하여 주시기 바랍니다.
+                        </p>
+                        <p style="margin:10px 0 0; font-size:0.7rem; color:#aaa;">
+                            This email or any attached documents may be confidential and privileged, and is intended for the sole use of the individual or entity named.<br>
+                            It is prohibited for any unauthorized person to disclose, copy, distribute or use the contents of this message.<br>
+                            If you are not the intended recipient, please notify the sender and destroy this email immediately.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="copyDailyContent()">메일 내용 복사</button>
+                    <button class="btn btn-success" onclick="copyDailyAsHTML()">HTML로 복사</button>
+                    <button class="btn btn-secondary" onclick="downloadCSV()">CSV 다운로드</button>
+                </div>
+            </div>
+        </div>
+
         <!-- B라인 업데이트 요청 메일 -->
-        <div id="tab-bline" class="tab-content active">
+        <div id="tab-bline" class="tab-content">
             <div class="mail-container">
                 <div class="mail-header">
                     <label>받는 사람</label>
@@ -480,6 +611,39 @@
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // 일일 보고 메일 복사
+        function copyDailyContent() {
+            const mailBody = document.getElementById('daily-content');
+            const text = mailBody.innerText;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('텍스트가 복사되었습니다!');
+            });
+        }
+
+        function copyDailyAsHTML() {
+            const mailBody = document.getElementById('daily-content');
+            const html = mailBody.innerHTML;
+
+            const blob = new Blob([html], {type: 'text/html'});
+            const data = [new ClipboardItem({'text/html': blob})];
+
+            navigator.clipboard.write(data).then(() => {
+                showToast('HTML이 복사되었습니다! (서식 유지)');
+            });
+        }
+
+        function downloadCSV() {
+            const csvUrl = '/punchlist/3week-plan/S25016_3주완료계획_진행현황.csv';
+            const link = document.createElement('a');
+            link.href = csvUrl;
+            link.download = 'S25016_3주완료계획_진행현황.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('CSV 다운로드 시작!');
         }
     </script>
 </body>
