@@ -508,7 +508,7 @@
                 <!-- 1주차: 1/19(일)~1/25(토) = 7일 -->
                 <div class="week-header-cell w1" style="grid-column: span 7;">1주차 (22건) 1/19~1/25</div>
                 <!-- 2주차: 1/26(일)~2/1(토) = 7일 -->
-                <div class="week-header-cell w2" style="grid-column: span 7;">2주차 (26건) 1/26~2/1</div>
+                <div class="week-header-cell w2" style="grid-column: span 7;">2주차 (27건) 1/26~2/1</div>
                 <!-- 3주차: 2/2(일)~2/7(금) = 6일 -->
                 <div class="week-header-cell w3" style="grid-column: span 6;">3주차 (25건) 2/2~2/7</div>
             </div>
@@ -870,7 +870,7 @@
                         <div class="owner-avatar" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);">팀</div>
                         <div class="owner-info">
                             <div class="name">제어팀</div>
-                            <div class="count">40건 (로봇/UI/에러)</div>
+                            <div class="count">41건 (로봇/UI/에러)</div>
                         </div>
                     </div>
                     <!-- 1주차 - 긴급 + 검증중 -->
@@ -926,6 +926,7 @@
                     <div class="gantt-cell">
                         <div class="task-bar high">154 rInit</div>
                         <div class="task-bar high">155 홀센서</div>
+                        <div class="task-bar high">169 한팔용접</div>
                     </div>
                     <div class="gantt-cell">
                         <div class="task-bar high">048 PlanB</div>
@@ -1026,7 +1027,7 @@
                 <div class="summary-cell"><div class="num">8</div></div>
                 <div class="summary-cell"><div class="num">8</div></div>
                 <div class="summary-cell"><div class="num">6</div></div>
-                <div class="summary-cell"><div class="num">4</div></div>
+                <div class="summary-cell"><div class="num">5</div></div>
                 <div class="summary-cell"><div class="num">1</div></div>
                 <div class="summary-cell weekend">-</div>
                 <!-- 3주차 -->
@@ -1494,7 +1495,7 @@
                 <div class="day-card">
                     <div class="day-card-header w2">
                         <div><span class="day-name">금</span> <span class="day-date">1/30</span></div>
-                        <span class="task-count">4건</span>
+                        <span class="task-count">5건</span>
                     </div>
                     <div class="day-task-list">
                         <div class="day-task-item normal">
@@ -1516,6 +1517,11 @@
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank">PL-2025-155</a></span>
                             <span class="task-owner">제어팀</span>
                             <div>홀 센서 기반 원점 인식</div>
+                        </div>
+                        <div class="day-task-item high">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-169" target="_blank">PL-2026-169</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>한팔용접 (1xx 매크로)</div>
                         </div>
                     </div>
                 </div>
@@ -1859,8 +1865,12 @@
             '165': '용접 포인트 부재 두깨 반영',
             '166': '경광등 스위치 추가',
             '167': 'B라인 센서 명판 부착',
-            '168': '불스아이 결선'
+            '168': '불스아이 결선',
+            '169': '한팔용접 (1xx 매크로)'
         };
+
+        // 2026년 ID 목록 (PL-2026-XXX)
+        const year2026Ids = ['169', '166'];
 
         // B라인 항목 이름 매핑
         const bLineNames = {
@@ -1888,7 +1898,8 @@
             const numMatch = text.match(/^(\d{3})/);
             if (numMatch) {
                 const num = numMatch[1];
-                const id = 'PL-2025-' + num;
+                const year = year2026Ids.includes(num) ? '2026' : '2025';
+                const id = 'PL-' + year + '-' + num;
                 const fullName = issueNames[num] || text;
                 bar.style.cursor = 'pointer';
                 bar.title = '[' + id + '] ' + fullName + '\n(클릭하여 상세 보기)';
