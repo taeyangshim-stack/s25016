@@ -1,0 +1,43 @@
+
+MODULE user (SYSMODULE)
+    VAR wzstationary home1;
+    VAR wzstationary home2;
+    VAR wzstationary home3;
+ ! Predefined user data
+ !*********************
+
+ ! Declaration of numeric registers reg1...reg5
+ VAR num reg1 := 0;
+ VAR num reg2 := 0;
+ VAR num reg3 := 0;
+ VAR num reg4 := 0;
+ VAR num reg5 := 0;
+
+ ! Declaration of stopwatch clock1
+ VAR clock clock1;
+
+ ! Template for declaration of workobject wobj1
+ !TASK PERS wobjdata wobj1 := [FALSE, TRUE, "", [[0, 0, 0],[1, 0, 0, 0]],[[0, 0, 0],[1, 0, 0, 0]]];
+   PROC power_on()
+
+        VAR shapedata joint_space1;
+        VAR shapedata joint_space2;
+        VAR shapedata joint_space3;
+        CONST jointtarget home_pos1:=[[90,90,-50,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+        CONST jointtarget delta_pos1:=[[2,2,2,2,2,2],[9E+09,9E+09,9E+09,9E+09,9e+09,9e+09]];
+
+        CONST jointtarget home_pos2:=[[40,90,-90,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+        CONST jointtarget delta_pos2:=[[2,2,2,2,2,2],[9e+09,9e+09,9e+09,9e+09,9e+09,9e+09]];
+        
+        CONST jointtarget home_pos3:=[[39.7077,23.0399,30.4536,-87.5281,29.1211,122.951],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+        CONST jointtarget delta_pos3:=[[2,2,2,2,2,2],[9e+09,9e+09,9e+09,9e+09,9e+09,9e+09]];
+
+        WZHomeJointDef\Inside,joint_space1,home_pos1,delta_pos1;
+        WZDOSet\Stat, home1\Inside, joint_space1, sdo_Rob_1_JgHome, 1;
+        WZHomeJointDef\Inside,joint_space2,home_pos2,delta_pos2;
+        WZDOSet\Stat,home2\Inside,joint_space2,sdo_Rob_1_MoveHome,1;
+        WZHomeJointDef\Inside,joint_space3,home_pos3,delta_pos3;
+        WZDOSet\Stat,home3\Inside,joint_space3,sdo_Rob_1_WirecutHome,1;
+
+    ENDPROC
+ENDMODULE

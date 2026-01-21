@@ -1,0 +1,7 @@
+
+MODULE testtt
+	PROC Routine1()
+		MoveExtJ [[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09],[1917.53,2128.64,605.43,-90,9E+09,1917.53]]\UseEOffs, v100, fine;
+	ENDPROC
+
+ENDMODULE
