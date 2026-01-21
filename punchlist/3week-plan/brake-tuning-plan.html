@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>X1/X2 브레이크 딜레이 튜닝 계획 (2026-01-21)</title>
+  <style>
+    :root{
+      --bg:#0b0f17; --card:#121a27; --text:#e6edf3; --muted:#9fb0c0;
+      --accent:#5dd6c8; --warn:#ffcc66; --bad:#ff6b6b; --good:#2ed573; --line:#243247;
+    }
+    body{ margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans KR", sans-serif;
+      background:linear-gradient(180deg,#070a10, var(--bg)); color:var(--text); }
+    .wrap{ max-width:1000px; margin:0 auto; padding:28px 18px 60px; }
+    header{ padding:18px 18px; background:rgba(18,26,39,.75); border:1px solid var(--line); border-radius:16px; }
+    h1{ margin:0 0 6px; font-size:22px; letter-spacing:-.2px; }
+    .sub{ color:var(--muted); font-size:13px; line-height:1.5; }
+    .badge{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600; margin-right:8px; }
+    .badge.date{ background:rgba(93,214,200,.2); color:var(--accent); border:1px solid rgba(93,214,200,.4); }
+    .badge.person{ background:rgba(255,204,102,.2); color:var(--warn); border:1px solid rgba(255,204,102,.4); }
+    nav{ display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 0; }
+    nav a{ color:var(--text); text-decoration:none; font-size:13px; padding:8px 10px;
+      border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.03); }
+    nav a:hover{ border-color:rgba(93,214,200,.6); }
+    section{ margin-top:16px; padding:16px 16px; background:rgba(18,26,39,.75);
+      border:1px solid var(--line); border-radius:16px; }
+    h2{ margin:0 0 10px; font-size:16px; color:var(--accent); }
+    p, li{ color:var(--text); font-size:14px; line-height:1.7; }
+    .muted{ color:var(--muted); }
+    .grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+    @media(min-width:700px){ .grid{ grid-template-columns:1fr 1fr; } }
+    .box{ padding:12px 12px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,.03); }
+    .tag{ display:inline-block; font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); }
+    .tag.ok{ border-color:rgba(93,214,200,.5); color:var(--accent); }
+    .tag.warn{ border-color:rgba(255,204,102,.5); color:var(--warn); }
+    .tag.bad{ border-color:rgba(255,107,107,.5); color:var(--bad); }
+    table{ width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; border:1px solid var(--line); }
+    th, td{ padding:10px 10px; font-size:13px; border-bottom:1px solid var(--line); }
+    th{ text-align:left; background:rgba(255,255,255,.04); color:var(--muted); }
+    tr:last-child td{ border-bottom:none; }
+    code{ background:rgba(0,0,0,.25); padding:2px 6px; border-radius:8px; border:1px solid rgba(255,255,255,.08); }
+    .callout{ border-left:4px solid var(--accent); padding:10px 12px; background:rgba(93,214,200,.06); border-radius:12px; margin:12px 0; }
+    .callout.warn{ border-left-color:var(--warn); background:rgba(255,204,102,.06); }
+    .callout.bad{ border-left-color:var(--bad); background:rgba(255,107,107,.06); }
+    .callout.good{ border-left-color:var(--good); background:rgba(46,213,115,.06); }
+    .small{ font-size:12px; color:var(--muted); }
+    .hr{ height:1px; background:var(--line); margin:12px 0; }
+    .info-table{ margin:12px 0; }
+    .info-table td:first-child{ width:140px; color:var(--muted); font-weight:500; }
+    .checklist{ list-style:none; padding:0; margin:0; }
+    .checklist li{ padding:8px 0; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:10px; }
+    .checklist li:last-child{ border-bottom:none; }
+    .checkbox{ width:20px; height:20px; border:2px solid var(--line); border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .checkbox.checked{ background:var(--good); border-color:var(--good); }
+    .checkbox.checked::after{ content:'✓'; color:#fff; font-size:14px; }
+    .result-input{ background:rgba(0,0,0,.3); border:1px solid var(--line); border-radius:8px; padding:6px 10px; color:var(--text); width:80px; text-align:center; }
+    .status-ok{ color:var(--good); }
+    .status-ng{ color:var(--bad); }
+    .back-link{ display:inline-block; margin-bottom:16px; color:var(--accent); text-decoration:none; font-size:13px; }
+    .back-link:hover{ text-decoration:underline; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <a href="./gantt.html" class="back-link">← 간트차트로 돌아가기</a>
+
+    <header>
+      <div style="margin-bottom:10px;">
+        <span class="badge date">2026-01-21 오후</span>
+        <span class="badge person">담당: 심태양 (SP)</span>
+      </div>
+      <h1>X1/X2 브레이크 딜레이 튜닝 계획</h1>
+      <div class="sub">
+        비상정지 시 브레이크 즉시 체결로 인한 <b>요동(oscillation)과 충격</b>을 줄이기 위해
+        <b>Brake Control On Delay</b>를 단계적으로 조정하여 최적값을 탐색합니다.
+      </div>
+      <nav>
+        <a href="#info">기본 정보</a>
+        <a href="#warning">주의사항</a>
+        <a href="#procedure">테스트 절차</a>
+        <a href="#record">결과 기록</a>
+        <a href="#checklist">체크리스트</a>
+      </nav>
+    </header>
+
+    <section id="info">
+      <h2>1. 기본 정보</h2>
+
+      <table class="info-table">
+        <tr><td>대상 축</td><td><b>X1, X2 (갠트리)</b> - Y, Z, R축은 튜닝 대상 아님</td></tr>
+        <tr><td>튜닝 파라미터</td><td><code>Brake Control On Delay</code></td></tr>
+        <tr><td>고정값</td><td><code>Control Off Speed Limit = 0.02</code></td></tr>
+        <tr><td>테스트 조건</td><td>최대 속도</td></tr>
+        <tr><td>평가 기준</td><td>정지신호 후 밀림양 ≤ <b>200~250mm</b></td></tr>
+        <tr><td>기록 방법</td><td>영상 촬영 + 밀림양 측정</td></tr>
+      </table>
+
+      <div class="grid" style="margin-top:12px;">
+        <div class="box">
+          <span class="tag ok">고정값</span>
+          <ul>
+            <li><b>Control Off Speed Limit</b></li>
+            <li>X1: <code>0.02</code></li>
+            <li>X2: <code>0.02</code></li>
+          </ul>
+        </div>
+        <div class="box">
+          <span class="tag warn">가변값 (튜닝 대상)</span>
+          <ul>
+            <li><b>Brake Control On Delay</b></li>
+            <li>시작: <code>디폴트</code></li>
+            <li>방향: 점진적 감소</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="warning">
+      <h2>2. 주의사항</h2>
+
+      <div class="callout bad">
+        <b>⚠️ E-Stop 안전 규정 검토 미완료</b><br>
+        본 테스트는 "기능 확인" 목적이며, 최종 적용 전 반드시 안전 규정 검토가 필요합니다.
+        안전 기능의 의도적 지연/완화는 안전 규정/리스크 평가 범위에서만 수행해야 합니다.
+      </div>
+
+      <div class="callout warn">
+        <b>테스트 전 필수 확인</b>
+        <ul style="margin:8px 0 0; padding-left:20px;">
+          <li>컨트롤러 백업 완료 여부</li>
+          <li>현재 디폴트 파라미터 값 기록</li>
+          <li>주변 작업자 대피 및 안전 구역 확보</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="procedure">
+      <h2>3. 테스트 절차</h2>
+
+      <div class="callout good">
+        <b>최적값 선정 기준</b>
+        <ol style="margin:8px 0 0; padding-left:20px;">
+          <li>밀림양 ≤ 250mm 이내</li>
+          <li>요동/진동이 허용 수준 이하</li>
+          <li>알람/경고 증가 없음</li>
+        </ol>
+        → 위 조건 충족하는 <b>가장 작은 Delay 값</b> 채택
+      </div>
+
+      <table style="margin-top:12px;">
+        <thead>
+          <tr>
+            <th style="width:60px;">Step</th>
+            <th style="width:100px;">Delay 값</th>
+            <th style="width:80px;">횟수</th>
+            <th>설명</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag">0</span></td>
+            <td><code>디폴트</code></td>
+            <td>3회</td>
+            <td>기준점 확보 - 현재 상태 밀림양 측정</td>
+          </tr>
+          <tr>
+            <td><span class="tag">1</span></td>
+            <td><code>15.0 s</code></td>
+            <td>3회</td>
+            <td>첫 번째 감소 단계</td>
+          </tr>
+          <tr>
+            <td><span class="tag">2</span></td>
+            <td><code>8.0 s</code></td>
+            <td>3회</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><span class="tag">3</span></td>
+            <td><code>4.0 s</code></td>
+            <td>3회</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><span class="tag">4</span></td>
+            <td><code>2.0 s</code></td>
+            <td>3회</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><span class="tag">5</span></td>
+            <td><code>1.0 s</code></td>
+            <td>3회</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><span class="tag">6</span></td>
+            <td><code>0.5 s</code></td>
+            <td>3회</td>
+            <td>최소값 근처 - 요동 증가 여부 확인</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="record">
+      <h2>4. 결과 기록표</h2>
+
+      <p class="small muted">각 Step별로 3회 테스트 후 평균 밀림양과 판정을 기록하세요.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Delay 값</th>
+            <th>밀림양 (1회)</th>
+            <th>밀림양 (2회)</th>
+            <th>밀림양 (3회)</th>
+            <th>평균</th>
+            <th>요동</th>
+            <th>판정</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0</td>
+            <td>디폴트: ___ s</td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option>심함</option><option>보통</option><option>적음</option>
+            </select></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option value="ok">OK</option><option value="ng">NG</option>
+            </select></td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>15.0 s</td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option>심함</option><option>보통</option><option>적음</option>
+            </select></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option value="ok">OK</option><option value="ng">NG</option>
+            </select></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>8.0 s</td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option>심함</option><option>보통</option><option>적음</option>
+            </select></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option value="ok">OK</option><option value="ng">NG</option>
+            </select></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>4.0 s</td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option>심함</option><option>보통</option><option>적음</option>
+            </select></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option value="ok">OK</option><option value="ng">NG</option>
+            </select></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>2.0 s</td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option>심함</option><option>보통</option><option>적음</option>
+            </select></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option value="ok">OK</option><option value="ng">NG</option>
+            </select></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>1.0 s</td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option>심함</option><option>보통</option><option>적음</option>
+            </select></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option value="ok">OK</option><option value="ng">NG</option>
+            </select></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>0.5 s</td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><input type="text" class="result-input" placeholder="mm"></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option>심함</option><option>보통</option><option>적음</option>
+            </select></td>
+            <td><select style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:6px;color:var(--text);">
+              <option>-</option><option value="ok">OK</option><option value="ng">NG</option>
+            </select></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="box" style="margin-top:16px;">
+        <h3 style="margin:0 0 10px; font-size:14px;">최종 결과</h3>
+        <table class="info-table">
+          <tr><td>선정된 최적값</td><td><input type="text" style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--text);width:100px;" placeholder="___ s"></td></tr>
+          <tr><td>해당 Step</td><td><input type="text" style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--text);width:100px;" placeholder="Step-__"></td></tr>
+          <tr><td>평균 밀림양</td><td><input type="text" style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--text);width:100px;" placeholder="___ mm"></td></tr>
+          <tr><td>비고</td><td><input type="text" style="background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--text);width:300px;" placeholder="특이사항 기록"></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="checklist">
+      <h2>5. 작업 체크리스트</h2>
+
+      <div class="box">
+        <h3 style="margin:0 0 12px; font-size:14px; color:var(--warn);">사전 준비</h3>
+        <ul class="checklist">
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> 컨트롤러 백업 완료</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> 현재 디폴트 파라미터 값 기록</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> 영상 촬영 장비 준비</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> 밀림양 측정 도구 준비 (줄자/마킹)</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> 안전 구역 확보 및 주변 작업자 대피</li>
+        </ul>
+      </div>
+
+      <div class="box" style="margin-top:12px;">
+        <h3 style="margin:0 0 12px; font-size:14px; color:var(--accent);">테스트 진행</h3>
+        <ul class="checklist">
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> Step-0: 디폴트 값 기준점 측정 (3회)</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> Step-1: 15.0s 테스트 (3회)</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> Step-2: 8.0s 테스트 (3회)</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> Step-3: 4.0s 테스트 (3회)</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> Step-4: 2.0s 테스트 (3회)</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> Step-5: 1.0s 테스트 (3회)</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> Step-6: 0.5s 테스트 (3회)</li>
+        </ul>
+      </div>
+
+      <div class="box" style="margin-top:12px;">
+        <h3 style="margin:0 0 12px; font-size:14px; color:var(--good);">결과 정리</h3>
+        <ul class="checklist">
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> 최적값 선정 완료</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> 테스트 결과 문서화</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> 영상 파일 저장</li>
+          <li><div class="checkbox" onclick="this.classList.toggle('checked')"></div> 최종값 컨트롤러 적용</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>6. 롤백 계획</h2>
+      <ol>
+        <li>Step 진행 중 NG 발생 시: <b>직전 OK Step으로 즉시 복귀</b></li>
+        <li>지속 NG 시: <b>초기 백업값으로 원복</b> 후 원인 분석</li>
+        <li>원복 후 동일 시나리오 재시험으로 "원상태" 재현 확인</li>
+      </ol>
+    </section>
+
+    <footer style="margin-top:24px; padding:16px; text-align:center; color:var(--muted); font-size:12px; border-top:1px solid var(--line);">
+      <p>S25016 프로젝트 | 브레이크 딜레이 튜닝 테스트 계획서</p>
+      <p>작성일: 2026-01-21 | 담당자: 심태양 (SP)</p>
+    </footer>
+  </div>
+</body>
+</html>
