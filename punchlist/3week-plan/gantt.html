@@ -272,6 +272,16 @@
             content: '⚠ ';
         }
 
+        /* 미처리 항목 - 회색 점선 */
+        .task-bar.pending {
+            background: #9ca3af !important;
+            border: 2px dotted #4b5563;
+            opacity: 0.7;
+        }
+        .task-bar.pending::before {
+            content: '? ';
+        }
+
         /* 태스크 상세 (호버) */
         .task-bar .task-tooltip {
             display: none;
@@ -515,6 +525,7 @@
             <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> 검증중</div>
             <div class="legend-item"><div class="legend-dot" style="background:#059669"></div> ✓ 완료</div>
             <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#dc2626,#dc2626 3px,#fff 3px,#fff 6px);border:1px dashed #991b1b"></div> ⚠ 지연</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#9ca3af;border:2px dotted #4b5563;opacity:0.7"></div> ? 미처리</div>
         </div>
 
         <!-- 필터 -->
@@ -526,6 +537,7 @@
             <button class="filter-btn" onclick="filterTasks('low')">낮음</button>
             <button class="filter-btn" onclick="filterTasks('completed')" style="border-color:#059669;color:#059669;">✓ 완료</button>
             <button class="filter-btn" onclick="filterTasks('delayed')" style="border-color:#dc2626;color:#dc2626;">⚠ 지연</button>
+            <button class="filter-btn" onclick="filterTasks('pending')" style="border-color:#9ca3af;color:#6b7280;">? 미처리</button>
         </div>
 
         <!-- 간트 차트 -->
@@ -634,107 +646,112 @@
                             <div class="count">14건 (박주한 주임)</div>
                         </div>
                     </div>
-                    <!-- 1주차 시작 1/19 (일) - 6개 배포 -->
-                    <div class="gantt-cell week-start">
-                        <div class="task-bar verify" style="font-size:0.65rem;">#1 디지털트윈
+                    <!-- 1주차 시작 1/19 (월) - 4개 완료, 1개 지연, 1개 미처리 -->
+                    <div class="gantt-cell week-start" style="background:#f0fdf4;">
+                        <div class="task-bar delayed" style="font-size:0.65rem;">#1 디지털트윈
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></div>
                                 <div>디지털 트윈 Lag 이슈</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/19 배포</div>
+                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/19</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22 컨펌대기 (지연)</div>
                             </div>
                         </div>
-                        <div class="task-bar verify" style="font-size:0.65rem;">#2 용접선필터
+                        <div class="task-bar completed" style="font-size:0.65rem;">#2 용접선필터
                             <div class="task-tooltip">
                                 <div class="tt-title">PL-2025-096 연계</div>
                                 <div>비정상 용접선 정보 필터링</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/19 배포</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/19 완료</div>
                             </div>
                         </div>
-                        <div class="task-bar verify" style="font-size:0.65rem;">#7 동적리미트
+                        <div class="task-bar completed" style="font-size:0.65rem;">#7 동적리미트
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-062" target="_blank">PL-2025-062 연계</a></div>
                                 <div>갠트리 수동 이동 시 동적 리미트</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/19 배포</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/19 완료</div>
                             </div>
                         </div>
-                        <div class="task-bar verify" style="font-size:0.65rem;">#8 Z홈선택
+                        <div class="task-bar completed" style="font-size:0.65rem;">#8 Z홈선택
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-132" target="_blank">PL-2025-132</a></div>
                                 <div>기본 Z홈 선택</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/19 배포</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/19 완료</div>
                             </div>
                         </div>
-                        <div class="task-bar verify" style="font-size:0.65rem;">#10 토크가시성
+                        <div class="task-bar completed" style="font-size:0.65rem;">#10 토크가시성
                             <div class="task-tooltip">
                                 <div class="tt-title">신규 항목</div>
                                 <div>토크 축 가독/가시성 향상</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/19 배포</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/19 완료</div>
                             </div>
                         </div>
-                        <div class="task-bar verify" style="font-size:0.65rem;">#13 홀센서
+                        <div class="task-bar pending" style="font-size:0.65rem;">#13 홀센서
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank">PL-2025-155</a></div>
                                 <div>홀센서 기반 원점 인식</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/19 배포</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ? 미처리 (확인 필요)</div>
                             </div>
                         </div>
                     </div>
-                    <!-- 1/20 (월) - 8개 진행 -->
+                    <!-- 1/20 (화) - 1개 완료, 3개 1/21완료, 4개 1/22지연 -->
                     <div class="gantt-cell">
-                        <div class="task-bar high" style="font-size:0.65rem;">#3 데드라인
+                        <div class="task-bar completed" style="font-size:0.65rem;">#3 데드라인
                             <div class="task-tooltip">
                                 <div class="tt-title">ID 확인 필요</div>
                                 <div>명령 유형 별 기초 데드라인 구성</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/20 확인</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/20 완료</div>
                             </div>
                         </div>
-                        <div class="task-bar high" style="font-size:0.65rem;">#4 상세에러
+                        <div class="task-bar completed" style="font-size:0.65rem;">#4 상세에러
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank">PL-2025-074 연계</a></div>
                                 <div>명령에 대한 상세 에러 구성</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/20 확인</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 완료 (에러세분화)</div>
                             </div>
                         </div>
-                        <div class="task-bar normal" style="font-size:0.65rem;">#5 유량범위
+                        <div class="task-bar delayed" style="font-size:0.65rem;">#5 유량범위
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></div>
                                 <div>공압, CO2, 냉각수 유량 범위 구성</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/20 진행</div>
+                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/20</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22 지연 (상하한치)</div>
                             </div>
                         </div>
-                        <div class="task-bar normal" style="font-size:0.65rem;">#6 DB상하한
+                        <div class="task-bar delayed" style="font-size:0.65rem;">#6 DB상하한
                             <div class="task-tooltip">
                                 <div class="tt-title">신규 항목</div>
                                 <div>관제 측 이동 시 DB의 상, 하한선 수치 활용</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/20 진행</div>
+                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/20</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22 지연</div>
                             </div>
                         </div>
-                        <div class="task-bar normal" style="font-size:0.65rem;">#9 와이어인칭
+                        <div class="task-bar delayed" style="font-size:0.65rem;">#9 와이어인칭
                             <div class="task-tooltip">
                                 <div class="tt-title">신규 항목</div>
                                 <div>와이어 인칭 시그널 개별 제어 및 리셋</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/20 진행</div>
+                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/20</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22 지연 (동시피딩)</div>
                             </div>
                         </div>
-                        <div class="task-bar normal" style="font-size:0.65rem;">#11 알람전달
+                        <div class="task-bar completed" style="font-size:0.65rem;">#11 알람전달
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-061" target="_blank">PL-2025-061 연계</a></div>
                                 <div>알람 전달</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/20 진행</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 완료 (PLC알람)</div>
                             </div>
                         </div>
-                        <div class="task-bar normal" style="font-size:0.65rem;">#12 웜업
+                        <div class="task-bar delayed" style="font-size:0.65rem;">#12 웜업
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank">PL-2025-113 연계</a></div>
                                 <div>웜업</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/20 진행</div>
+                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/20</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22 지연 (웜업UI)</div>
                             </div>
                         </div>
-                        <div class="task-bar normal" style="font-size:0.65rem;">#14 커스텀팝업
+                        <div class="task-bar completed" style="font-size:0.65rem;">#14 커스텀팝업
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-022" target="_blank">PL-2025-022 연계</a></div>
                                 <div>커스텀 팝업</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/20 진행</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 완료</div>
                             </div>
                         </div>
                     </div>
@@ -769,8 +786,16 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 1/22 (목) - 4개 컨펌대기 (1/20 계획 → 지연) -->
+                    <!-- 1/22 (목) - 5개 컨펌대기 (1/19~1/20 계획 → 지연) -->
                     <div class="gantt-cell" style="background:#fef2f2;">
+                        <div class="task-bar delayed" style="font-size:0.65rem;">#1 트윈Lag
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></div>
+                                <div>디지털 트윈 Lag 이슈</div>
+                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/19</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 컨펌대기 (지연)</div>
+                            </div>
+                        </div>
                         <div class="task-bar delayed" style="font-size:0.65rem;">상하한치
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></div>
