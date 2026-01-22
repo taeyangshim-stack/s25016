@@ -13,7 +13,7 @@
             color: #333;
         }
         .container {
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
             background: #fff;
             border-radius: 12px;
@@ -26,183 +26,248 @@
             padding: 20px 25px;
         }
         .header h1 { font-size: 1.2rem; margin-bottom: 5px; }
-        .header .badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            margin-top: 8px;
-        }
-        .content { padding: 25px; }
-        .field {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+        .header .sub { font-size: 0.85rem; opacity: 0.9; }
+
+        .section {
+            padding: 20px 25px;
             border-bottom: 1px solid #e5e7eb;
         }
-        .field:last-child { border-bottom: none; }
+        .section:last-child { border-bottom: none; }
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #059669;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            margin-bottom: 12px;
+            align-items: start;
+        }
         .field-label {
             font-size: 0.8rem;
             color: #666;
-            margin-bottom: 5px;
             font-weight: 600;
+            padding-top: 2px;
         }
+        .field-label .required { color: #dc2626; }
         .field-value {
-            font-size: 1rem;
-            color: #333;
-            line-height: 1.6;
-        }
-        .highlight {
-            background: #fef3c7;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-        .code-block {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
             font-size: 0.9rem;
-            margin: 10px 0;
-            overflow-x: auto;
+            color: #333;
+            line-height: 1.5;
+            background: #f9fafb;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
         }
-        .status-badge {
+        .field-value.highlight {
+            background: #ecfdf5;
+            border-color: #059669;
+        }
+
+        .badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
         }
-        .status-complete { background: #dcfce7; color: #166534; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
+        .badge-control { background: #dbeafe; color: #1e40af; }
+        .badge-robot { background: #f3e8ff; color: #7c3aed; }
+        .badge-bline { background: #fee2e2; color: #dc2626; }
+        .badge-high { background: #fef3c7; color: #92400e; }
+        .badge-done { background: #dcfce7; color: #166534; }
+
+        .copy-section {
+            background: #f8fafc;
+            padding: 15px 25px;
+            border-top: 2px dashed #e5e7eb;
         }
-        th, td {
+        .copy-title {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .copy-box {
+            background: #fff;
             border: 1px solid #e5e7eb;
-            padding: 10px;
-            text-align: left;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            font-family: inherit;
         }
-        th { background: #f9fafb; font-weight: 600; }
-        .change-arrow { color: #059669; font-weight: bold; }
+        .copy-btn {
+            margin-top: 10px;
+            background: #059669;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .copy-btn:hover { background: #047857; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>펀치리스트 신규 등록 초안</h1>
-            <div class="badge">PL-2026-XXX (ID 미정)</div>
-            <div class="badge">1/21 조치완료</div>
+            <div class="sub">Vercel 앱 등록용 - 복사하여 사용하세요</div>
         </div>
 
-        <div class="content">
-            <div class="field">
-                <div class="field-label">항목명</div>
-                <div class="field-value">B라인 Control Off Speed Limit 설정 수정 (X1/X2축)</div>
+        <!-- 기본 정보 -->
+        <div class="section">
+            <div class="section-title">📋 기본 정보</div>
+
+            <div class="field-row">
+                <div class="field-label">제목 <span class="required">*</span></div>
+                <div class="field-value highlight">B라인 Control Off Speed Limit 설정 수정 (X1/X2축)</div>
             </div>
 
-            <div class="field">
-                <div class="field-label">분류</div>
-                <div class="field-value">제어 > RAPID > 브레이크</div>
+            <div class="field-row">
+                <div class="field-label">분류 <span class="required">*</span></div>
+                <div class="field-value"><span class="badge badge-control">💻 제어</span></div>
             </div>
 
-            <div class="field">
-                <div class="field-label">우선순위</div>
-                <div class="field-value"><span class="status-badge" style="background:#fef3c7;color:#92400e;">높음</span></div>
+            <div class="field-row">
+                <div class="field-label">세부분류 <span class="required">*</span></div>
+                <div class="field-value"><span class="badge badge-robot">로봇</span></div>
             </div>
 
-            <div class="field">
+            <div class="field-row">
+                <div class="field-label">라인 분류 <span class="required">*</span></div>
+                <div class="field-value"><span class="badge badge-bline">B라인</span></div>
+            </div>
+
+            <div class="field-row">
+                <div class="field-label">우선순위 <span class="required">*</span></div>
+                <div class="field-value"><span class="badge badge-high">⚠️ 높음</span></div>
+            </div>
+
+            <div class="field-row">
                 <div class="field-label">상태</div>
-                <div class="field-value"><span class="status-badge status-complete">✓ 조치완료</span></div>
+                <div class="field-value"><span class="badge badge-done">✓ 완료</span></div>
+            </div>
+        </div>
+
+        <!-- 문제 상황 -->
+        <div class="section">
+            <div class="section-title">📝 문제 상황</div>
+
+            <div class="field-row">
+                <div class="field-label">문제 상황 <span class="required">*</span></div>
+                <div class="field-value">B라인 갠트리 X축 브레이크 제어 시, X1(주축)과 X2(종동축)의 Control Off Speed Limit 설정값이 상이하여 브레이크 동작 타이밍 불일치 발생 가능성 확인</div>
             </div>
 
-            <div class="field">
-                <div class="field-label">문제 상황</div>
-                <div class="field-value">
-                    B라인 갠트리 X축 브레이크 제어 시, X1(주축)과 X2(종동축)의
-                    <span class="highlight">Control Off Speed Limit</span> 설정값이 상이하여
-                    브레이크 동작 타이밍 불일치 발생 가능성 확인
-                </div>
-            </div>
-
-            <div class="field">
+            <div class="field-row">
                 <div class="field-label">원인 분석</div>
-                <div class="field-value">
-                    <table>
-                        <tr>
-                            <th>축</th>
-                            <th>기존 설정</th>
-                            <th></th>
-                            <th>수정 설정</th>
-                            <th>설명</th>
-                        </tr>
-                        <tr>
-                            <td><strong>X1 (주축)</strong></td>
-                            <td>0.02 (2%)</td>
-                            <td class="change-arrow">→</td>
-                            <td>0.02 (2%)</td>
-                            <td>유지</td>
-                        </tr>
-                        <tr>
-                            <td><strong>X2 (종동축)</strong></td>
-                            <td style="color:#dc2626;">1 (100%)</td>
-                            <td class="change-arrow">→</td>
-                            <td style="color:#059669;">0.02 (2%)</td>
-                            <td>수정</td>
-                        </tr>
-                    </table>
-                    <div style="margin-top:10px;padding:10px;background:#fef2f2;border-radius:6px;font-size:0.9rem;">
-                        <strong>문제:</strong> X2축이 100% 속도에서 바로 브레이크 → X1축과 동기화 불일치
-                    </div>
-                </div>
+                <div class="field-value">X1축: 0.02 (2%) - 정상
+X2축: 1 (100%) - 문제
+
+X2축이 100% 속도에서 바로 브레이크 작동하여 X1축(2%까지 감속 후 브레이크)과 동기화 불일치 발생</div>
+            </div>
+        </div>
+
+        <!-- 조치 계획 및 결과 -->
+        <div class="section">
+            <div class="section-title">🔧 조치 계획 및 결과</div>
+
+            <div class="field-row">
+                <div class="field-label">조치 계획</div>
+                <div class="field-value">X1, X2 축 모두 Control Off Speed Limit를 0.02 (2%)로 통일하여 브레이크 동작 타이밍 동기화</div>
             </div>
 
-            <div class="field">
-                <div class="field-label">조치 내용</div>
-                <div class="field-value">
-                    X1, X2 축 모두 <span class="highlight">0.02 (2%)</span> 속도까지 감속 후 브레이크 작동하도록 통일
-                    <div class="code-block">
-! B라인 Control Off Speed Limit 설정
-! 파일: 1200-526406 (B3 로봇)
-
-X1_ControlOffSpeedLimit := 0.02;  ! 주축: 2%까지 감속 후 브레이크
-X2_ControlOffSpeedLimit := 0.02;  ! 종동축: 2%까지 감속 후 브레이크 (기존 1 → 0.02 수정)
-                    </div>
-                </div>
-            </div>
-
-            <div class="field">
+            <div class="field-row">
                 <div class="field-label">조치 결과</div>
-                <div class="field-value">
-                    <ul style="padding-left:20px;line-height:1.8;">
-                        <li>X1/X2 축 브레이크 동작 타이밍 동기화</li>
-                        <li>2% 속도 감속 → 브레이크 작동 순서 통일</li>
-                        <li>갠트리 정지 시 축간 위치 편차 최소화</li>
-                    </ul>
-                </div>
+                <div class="field-value">- X1/X2 축 브레이크 동작 타이밍 동기화 완료
+- 2% 속도 감속 후 브레이크 작동 순서 통일
+- 갠트리 정지 시 축간 위치 편차 최소화
+- 파일: 1200-526406 (B3 로봇) 수정 완료</div>
+            </div>
+        </div>
+
+        <!-- 담당 정보 -->
+        <div class="section">
+            <div class="section-title">👥 담당 정보</div>
+
+            <div class="field-row">
+                <div class="field-label">담당자 <span class="required">*</span></div>
+                <div class="field-value">심태양</div>
             </div>
 
-            <div class="field">
-                <div class="field-label">담당자</div>
-                <div class="field-value">심태양 (SP)</div>
+            <div class="field-row">
+                <div class="field-label">승인자</div>
+                <div class="field-value" style="color:#999;">-</div>
             </div>
 
-            <div class="field">
-                <div class="field-label">조치일</div>
-                <div class="field-value">2026-01-21 (수)</div>
+            <div class="field-row">
+                <div class="field-label">협의자</div>
+                <div class="field-value" style="color:#999;">-</div>
+            </div>
+        </div>
+
+        <!-- 일정 정보 -->
+        <div class="section">
+            <div class="section-title">📅 일정 정보</div>
+
+            <div class="field-row">
+                <div class="field-label">요청일 <span class="required">*</span></div>
+                <div class="field-value">2026-01-21</div>
             </div>
 
-            <div class="field">
-                <div class="field-label">비고</div>
-                <div class="field-value">
-                    X1/X2축 브레이크 제어 튜닝 테스트 과정에서 발견 및 조치<br>
-                    관련: 브레이크 튜닝 계획서 참조
-                </div>
+            <div class="field-row">
+                <div class="field-label">목표 완료일 <span class="required">*</span></div>
+                <div class="field-value">2026-01-21</div>
             </div>
+
+            <div class="field-row">
+                <div class="field-label">실제 완료일</div>
+                <div class="field-value highlight">2026-01-21</div>
+            </div>
+        </div>
+
+        <!-- 복사용 텍스트 -->
+        <div class="copy-section">
+            <div class="copy-title">📋 복사용 텍스트 (각 필드에 붙여넣기)</div>
+            <div class="copy-box" id="copyText">【제목】
+B라인 Control Off Speed Limit 설정 수정 (X1/X2축)
+
+【문제 상황】
+B라인 갠트리 X축 브레이크 제어 시, X1(주축)과 X2(종동축)의 Control Off Speed Limit 설정값이 상이하여 브레이크 동작 타이밍 불일치 발생 가능성 확인
+
+【원인 분석】
+X1축: 0.02 (2%) - 정상
+X2축: 1 (100%) - 문제
+X2축이 100% 속도에서 바로 브레이크 작동하여 X1축(2%까지 감속 후 브레이크)과 동기화 불일치 발생
+
+【조치 계획】
+X1, X2 축 모두 Control Off Speed Limit를 0.02 (2%)로 통일하여 브레이크 동작 타이밍 동기화
+
+【조치 결과】
+- X1/X2 축 브레이크 동작 타이밍 동기화 완료
+- 2% 속도 감속 후 브레이크 작동 순서 통일
+- 갠트리 정지 시 축간 위치 편차 최소화
+- 파일: 1200-526406 (B3 로봇) 수정 완료</div>
+            <button class="copy-btn" onclick="copyToClipboard()">전체 복사</button>
         </div>
     </div>
+
+    <script>
+        function copyToClipboard() {
+            const text = document.getElementById('copyText').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('클립보드에 복사되었습니다.');
+            });
+        }
+    </script>
 </body>
 </html>
