@@ -1012,24 +1012,23 @@
                     <!-- 1주차 - 긴급 + 검증중 -->
                     <div class="gantt-cell week-start"></div>
                     <div class="gantt-cell">
-                        <div class="task-bar urgent">099 UI로깅</div>
-                        <div class="task-bar urgent">111 형상보간</div>
                         <div class="task-bar verify">039 스프레이</div>
                     </div>
                     <div class="gantt-cell">
                         <div class="task-bar urgent">113 Z축과부하</div>
-                        <div class="task-bar urgent">139 B라인이상</div>
-                        <div class="task-bar verify">069 RAPID</div>
+                        <div class="task-bar completed">139 B라인이상✓</div>
+                        <div class="task-bar completed">069 RAPID✓</div>
                     </div>
                     <div class="gantt-cell">
                         <div class="task-bar urgent">165 부재두깨</div>
                         <div class="task-bar verify">080 아크에러</div>
                         <div class="task-bar verify">084 PLC알람</div>
+                        <div class="task-bar pending">155 홀센서</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar verify">096 용접불가</div>
+                        <div class="task-bar pending">099 UI로깅</div>
+                        <div class="task-bar low">111 형상보간</div>
                         <div class="task-bar verify">105 통신단절</div>
-                        <div class="task-bar verify">106 통신주기</div>
                     </div>
                     <div class="gantt-cell">
                         <div class="task-bar verify">067 가스알람</div>
@@ -1484,7 +1483,7 @@
                         </div>
                         <!-- 기타 예정 -->
                         <div style="margin:8px 0;padding:6px 8px;background:rgba(107,114,128,0.1);border-radius:6px;border-left:3px solid #6b7280;">
-                            <strong style="color:#6b7280;font-size:0.75rem;">기타 예정 (4건)</strong>
+                            <strong style="color:#6b7280;font-size:0.75rem;">기타 예정 (5건)</strong>
                         </div>
                         <div class="day-task-item urgent">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-165" target="_blank">PL-2026-165</a></span>
@@ -1501,19 +1500,29 @@
                             <span class="task-owner">제어팀</span>
                             <div>PLC 알람 체크 [검증]</div>
                         </div>
+                        <div class="day-task-item high">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank">PL-2025-155</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>홀센서 기반 원점 인식 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">UI준비</span> (A라인 우선, B라인 PlanC 오염)</div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="day-card">
                     <div class="day-card-header w1">
                         <div><span class="day-name">금</span> <span class="day-date">1/23</span></div>
-                        <span class="task-count">4건</span>
+                        <span class="task-count">5건</span>
                     </div>
                     <div class="day-task-list">
-                        <div class="day-task-item high">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank">PL-2025-096</a></span>
+                        <div class="day-task-item" style="background:rgba(59,130,246,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-099" target="_blank">PL-2025-099</a></span>
                             <span class="task-owner">제어팀</span>
-                            <div>B라인 용접 불가 반환 [검증]</div>
+                            <div>UI 조작 로깅 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료예정</span></div>
+                        </div>
+                        <div class="day-task-item low">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-111" target="_blank">PL-2025-111</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>형상 보간 실패 에러 <span style="background:#6b7280;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">기능필요</span></div>
                         </div>
                         <div class="day-task-item high">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-105" target="_blank">PL-2025-105</a></span>
@@ -1521,9 +1530,14 @@
                             <div>로봇/UI 통신 단절 [검증]</div>
                         </div>
                         <div class="day-task-item high">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>UI-관제 통신 주기 [검증]</div>
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank">PL-2025-020</a></span>
+                            <span class="task-owner">A라인</span>
+                            <div>버티컬 용접데이터 관제연동</div>
+                        </div>
+                        <div class="day-task-item high">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-083" target="_blank">PL-2025-083</a></span>
+                            <span class="task-owner">이상주</span>
+                            <div>X축 하드 리밋 결선 조치</div>
                         </div>
                     </div>
                 </div>
