@@ -22,40 +22,6 @@
             margin-bottom: 20px;
             font-size: 1.5rem;
         }
-        h2 {
-            color: #1e40af;
-            margin: 25px 0 15px;
-            font-size: 1.2rem;
-            border-bottom: 2px solid #2563eb;
-            padding-bottom: 8px;
-        }
-
-        /* 탭 네비게이션 */
-        .tab-nav {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 0;
-        }
-        .tab-btn {
-            padding: 12px 20px;
-            border: none;
-            background: #f3f4f6;
-            color: #666;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border-radius: 8px 8px 0 0;
-            transition: all 0.2s;
-        }
-        .tab-btn:hover { background: #e5e7eb; }
-        .tab-btn.active {
-            background: #2563eb;
-            color: #fff;
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
 
         /* 메일 컨테이너 */
         .mail-container {
@@ -78,7 +44,7 @@
             color: #666;
             padding: 8px 0;
         }
-        .mail-header input, .mail-header select {
+        .mail-header input {
             padding: 8px 12px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
@@ -91,20 +57,24 @@
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 20px;
-            min-height: 400px;
             font-family: 'Malgun Gothic', sans-serif;
             font-size: 0.95rem;
             line-height: 1.8;
         }
         .mail-body h3 {
             color: #1e40af;
-            margin: 15px 0 10px;
+            margin: 20px 0 10px;
             font-size: 1rem;
+        }
+        .mail-body h4 {
+            color: #059669;
+            margin: 15px 0 8px;
+            font-size: 0.95rem;
         }
         .mail-body table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
+            margin: 10px 0;
             font-size: 0.85rem;
         }
         .mail-body th, .mail-body td {
@@ -116,10 +86,9 @@
             background: #f3f4f6;
             font-weight: 600;
         }
-        .mail-body .status-delayed { color: #dc2626; font-weight: 600; }
-        .mail-body .status-progress { color: #f59e0b; }
-        .mail-body .status-confirm { color: #3b82f6; }
-        .mail-body .highlight { background: #fef3c7; }
+        .mail-body .status-complete { color: #059669; font-weight: 600; }
+        .mail-body .status-waiting { color: #f59e0b; font-weight: 600; }
+        .mail-body .status-testing { color: #3b82f6; font-weight: 600; }
         .mail-body .pl-link {
             color: #2563eb;
             text-decoration: none;
@@ -127,7 +96,37 @@
         }
         .mail-body .pl-link:hover {
             text-decoration: underline;
-            color: #1d4ed8;
+        }
+        .mail-body .section-bline {
+            border-left: 4px solid #dc2626;
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+        .mail-body .section-aline {
+            border-left: 4px solid #2563eb;
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+        .bead-images {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .bead-images .bead-item {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+        .bead-images img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+        .bead-images .caption {
+            margin-top: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
         }
 
         /* 버튼 */
@@ -150,41 +149,11 @@
             color: #fff;
         }
         .btn-primary:hover { background: #1d4ed8; }
-        .btn-secondary {
-            background: #6b7280;
-            color: #fff;
-        }
-        .btn-secondary:hover { background: #4b5563; }
         .btn-success {
             background: #10b981;
             color: #fff;
         }
         .btn-success:hover { background: #059669; }
-
-        /* 메일 히스토리 */
-        .mail-history {
-            margin-top: 30px;
-        }
-        .history-item {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-        }
-        .history-item .date {
-            color: #6b7280;
-            font-size: 0.8rem;
-        }
-        .history-item .subject {
-            font-weight: 600;
-            color: #1f2937;
-            margin: 5px 0;
-        }
-        .history-item .recipient {
-            color: #2563eb;
-            font-size: 0.85rem;
-        }
 
         /* 복사 알림 */
         .copy-toast {
@@ -201,352 +170,206 @@
             z-index: 1000;
         }
         .copy-toast.show { display: block; }
+
+        .summary-table {
+            margin: 15px 0;
+        }
+        .summary-table td {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>S25016 펀치리스트 - 메일 작성</h1>
+        <h1>S25016 자동용접 시스템 - 1/21(화) 진행현황 메일</h1>
 
-        <!-- 탭 네비게이션 -->
-        <div class="tab-nav">
-            <button class="tab-btn active" onclick="showTab('daily')">1/19 일일 진행 보고</button>
-            <button class="tab-btn" onclick="showTab('bline')">B라인 14건 업데이트 요청</button>
-            <button class="tab-btn" onclick="showTab('history')">발송 히스토리</button>
-            <button class="tab-btn" onclick="showTab('template')">메일 템플릿</button>
-        </div>
+        <div class="mail-container">
+            <div class="mail-header">
+                <label>받는 사람</label>
+                <input type="text" value="이동혁 프로님 (삼성중공업)" id="recipient">
+                <label>참조</label>
+                <input type="text" value="박주한 주임님, 관계자 분들" id="cc">
+                <label>제목</label>
+                <input type="text" value="[S25016] 자동용접 시스템 진행현황 (1/21)" id="subject">
+            </div>
 
-        <!-- 1/19 일일 진행 보고 -->
-        <div id="tab-daily" class="tab-content active">
-            <div class="mail-container">
-                <div class="mail-header">
-                    <label>받는 사람</label>
-                    <input type="text" value="이동혁 프로" id="daily-recipient">
-                    <label>제목</label>
-                    <input type="text" value="[S25016] 1/19(월) B라인 검증 진행 현황" id="daily-subject">
-                    <label>첨부파일</label>
-                    <input type="text" value="S25016_3주완료계획_진행현황.csv" id="daily-attachment" readonly style="background:#f3f4f6;">
+            <div class="mail-body" id="mail-content">
+                <p>안녕하세요, 이동혁 프로님.</p>
+                <p>S25016 자동용접 시스템 1/21(화) 진행현황 공유드립니다.</p>
+
+                <h3>■ 1월 21일 (화) 진행현황</h3>
+
+                <!-- B라인 -->
+                <div class="section-bline">
+                    <h4 style="color:#dc2626;">【B라인】</h4>
+
+                    <p><strong>1. 이동혁 프로 컨펌 (4건)</strong></p>
+                    <table>
+                        <tr>
+                            <th style="width:120px;">펀치리스트 ID</th>
+                            <th>항목명</th>
+                            <th style="width:80px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-022" target="_blank" class="pl-link">PL-2025-022</a></td>
+                            <td>커스텀 팝업 가독성 향상 (창 크기 확대)</td>
+                            <td class="status-complete">배포완료</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-061" target="_blank" class="pl-link">PL-2025-061</a></td>
+                            <td>PLC 알람 관제측 전달 (하트비트, CPU 알람 등)</td>
+                            <td class="status-complete">배포완료</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank" class="pl-link">PL-2025-074</a></td>
+                            <td>에러내용 세분화 (카메라 커버 미완료, 용접 셋업 에러 등)</td>
+                            <td class="status-complete">배포완료</td>
+                        </tr>
+                        <tr>
+                            <td>신규</td>
+                            <td>와이어 동시 피딩 기능 수정</td>
+                            <td class="status-complete">배포완료</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>2. SP 조치 (1건)</strong></p>
+                    <table>
+                        <tr>
+                            <th style="width:120px;">펀치리스트 ID</th>
+                            <th>항목명</th>
+                            <th style="width:80px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td>신규</td>
+                            <td>B라인 Control Off Speed Limit 수정 (X1/X2축 0.02 통일)</td>
+                            <td class="status-complete">조치완료</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>3. 컨펌 대기 (작업 완료, 4건)</strong></p>
+                    <table>
+                        <tr>
+                            <th style="width:120px;">펀치리스트 ID</th>
+                            <th>항목명</th>
+                            <th style="width:80px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank" class="pl-link">PL-2025-067</a></td>
+                            <td>공압/가스/냉각수 상하한치 정상관리</td>
+                            <td class="status-waiting">컨펌대기</td>
+                        </tr>
+                        <tr>
+                            <td>신규</td>
+                            <td>웜업 UI 가시성 (폰트 조정, 경과시간 카운트)</td>
+                            <td class="status-waiting">컨펌대기</td>
+                        </tr>
+                        <tr>
+                            <td>신규</td>
+                            <td>디지털 트윈 개선상황 영상촬영</td>
+                            <td class="status-waiting">컨펌대기</td>
+                        </tr>
+                        <tr>
+                            <td>신규</td>
+                            <td>관제측 DB 상하한선 UI 가시성 개선</td>
+                            <td class="status-waiting">컨펌대기</td>
+                        </tr>
+                    </table>
                 </div>
 
-                <div class="mail-body" id="daily-content">
-                    <p>이동혁 프로님,</p>
-                    <p>고생 많으십니다. SP 심태양입니다.</p>
-                    <p>1/19(월) B라인 검증 진행 현황 공유드립니다.</p>
+                <!-- A라인 -->
+                <div class="section-aline">
+                    <h4 style="color:#2563eb;">【A라인】</h4>
 
-                    <h3>■ 1/19(월) 완료 - 4건</h3>
-                    <table>
-                        <tr>
-                            <th style="width:50px;">No.</th>
-                            <th>항목명</th>
-                            <th style="width:100px;">상태</th>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>안전 A/B 테스트 (안전도어, 라이트커튼)</td>
-                            <td style="color:#10b981;font-weight:600;">완료</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>운영 S/W 메뉴얼 전달</td>
-                            <td style="color:#10b981;font-weight:600;">완료</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>B라인 1호기 캘리브레이션 (피딩길이 1호기=3호기)</td>
-                            <td style="color:#10b981;font-weight:600;">완료</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>RAPID 웜업 적용 (<a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-113" target="_blank" class="pl-link">PL-2025-113</a>)</td>
-                            <td style="color:#10b981;font-weight:600;">완료</td>
-                        </tr>
-                    </table>
-
-                    <h3>■ 1/19(월) 지연 - 6건</h3>
-                    <p class="status-delayed">* 사유: UI 화면전환 프리징 이슈 → 1/20(화) 배포 예정</p>
-                    <table>
-                        <tr>
-                            <th style="width:50px;">No.</th>
-                            <th>항목명</th>
-                            <th style="width:120px;">펀치리스트 ID</th>
-                        </tr>
-                        <tr class="highlight">
-                            <td>1</td>
-                            <td>디지털 트윈 (Lag 이슈)</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-106" target="_blank" class="pl-link">PL-2025-106</a></td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>2</td>
-                            <td>비정상 용접선 정보 필터링</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-096" target="_blank" class="pl-link">PL-2025-096</a></td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>3</td>
-                            <td>갠트리 수동 이동 시 동적 리미트</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-062" target="_blank" class="pl-link">PL-2025-062</a></td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>4</td>
-                            <td>기본 Z홈 선택</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-132" target="_blank" class="pl-link">PL-2025-132</a></td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>5</td>
-                            <td>토크 축 가독/가시성 향상</td>
-                            <td>(신규 등록 필요)</td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>6</td>
-                            <td>홀센서 기반 원점 인식</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-155" target="_blank" class="pl-link">PL-2025-155</a></td>
-                        </tr>
-                    </table>
-
-                    <h3>■ 1/20(화) 예정 - 14건</h3>
-                    <p>어제 지연분 6건 + 오늘 예정분 8건</p>
-
-                    <h3>■ 금주 토요일(1/24) 현장작업 예정</h3>
-                    <ul>
-                        <li>로봇 절연처리 (백그라이트, 절연볼트) - <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-097" target="_blank" class="pl-link">PL-2025-097</a></li>
-                        <li>B라인 BullsEye 설치 위치 선정 - <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-142" target="_blank" class="pl-link">PL-2025-142</a></li>
+                    <p><strong>1. 버티컬 용접데이터 UI 테스트</strong> <span class="status-complete">[품질확인완료]</span></p>
+                    <ul style="margin:10px 0 10px 20px;">
+                        <li>한진범 프로와 품질 확인 완료</li>
+                        <li>비드 사진 비교 (아래 첨부)</li>
                     </ul>
 
-                    <h3>■ 첨부파일</h3>
-                    <p>상세 진행 현황은 첨부파일(S25016_3주완료계획_진행현황.csv) 참고 부탁드립니다.</p>
-
-                    <h3>■ 참고</h3>
-                    <p>3주 완료 계획 간트차트: <a href="https://s2501602.vercel.app/punchlist/3week-plan" target="_blank">https://s2501602.vercel.app/punchlist/3week-plan</a></p>
-
-                    <p style="margin-top:20px;">감사합니다.</p>
-                    <div style="margin-top:20px; padding-top:15px; border-top:1px solid #ccc; color:#666; font-size:0.85rem; line-height:1.6;">
-                        <p style="margin:0;"><strong>심태양</strong></p>
-                        <p style="margin:5px 0 0;">㈜에스피시스템스</p>
-                        <p style="margin:0;">연구소 / 부장</p>
-                        <p style="margin:10px 0 0;">[626-220] 경남 양산시 어곡동 858-2 산업단지 3-2</p>
-                        <p style="margin:0;">TEL : 055-371-5661 | FAX : 055-371-5606</p>
-                        <p style="margin:0;">PH. : 010-3381-2852</p>
-                        <p style="margin:15px 0 0; font-size:0.75rem; color:#999;">
-                            상기 메일 또는 첨부자료는 지정된 수신인만을 위한 것이며, 영업비밀, 기밀정보 등을 포함하고 있을 수 있습니다.<br>
-                            여기에 포함된 정보의 전부 또는 일부를 목적 이외 무단으로 공개, 배포, 복사 또는 사용하는 것은 엄격히 금지됩니다.<br>
-                            본 메일이 잘못 전송된 경우, 발신인 또는 당사에 알려주시고, 본 메일은 즉시 삭제하여 주시기 바랍니다.
-                        </p>
-                        <p style="margin:10px 0 0; font-size:0.7rem; color:#aaa;">
-                            This email or any attached documents may be confidential and privileged, and is intended for the sole use of the individual or entity named.<br>
-                            It is prohibited for any unauthorized person to disclose, copy, distribute or use the contents of this message.<br>
-                            If you are not the intended recipient, please notify the sender and destroy this email immediately.
-                        </p>
+                    <!-- 비드 사진 -->
+                    <div class="bead-images">
+                        <div class="bead-item">
+                            <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1769041255/s25016/punchlist/wz6ntypjz98auyhhu9yflrxgc.png" alt="로봇 수직용접 비드">
+                            <div class="caption" style="color:#2563eb;">로봇 수직용접 비드</div>
+                        </div>
+                        <div class="bead-item">
+                            <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1769041262/s25016/punchlist/qvarq90ko27nhdhaf16nnzs68.png" alt="작업자 수직용접 비드">
+                            <div class="caption" style="color:#059669;">작업자 수직용접 비드</div>
+                        </div>
                     </div>
+
+                    <p><strong>2. 에러플래그 초기화 UI</strong> <span class="status-testing">[테스트중]</span></p>
+                    <ul style="margin:10px 0 10px 20px;">
+                        <li>용접 재시도, 터치에러 횟수, 동일지점 토치에러 초기화</li>
+                        <li>코드 작업 완료, 시뮬레이션 테스트 진행 중</li>
+                        <li>실물 테스트 약 1.5시간 필요 (대기 중)</li>
+                    </ul>
+
+                    <p><strong>3. 디지털 트윈 개선</strong> <span class="status-waiting">[확인대기]</span></p>
+                    <ul style="margin:10px 0 10px 20px;">
+                        <li>B라인 랙 걸림 현상 개선 완료</li>
+                        <li>다파인 김주한 주임 / SP 확인 완료</li>
+                        <li>삼성중공업 조용현 프로 확인만 남음</li>
+                    </ul>
                 </div>
 
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="copyDailyContent()">메일 내용 복사</button>
-                    <button class="btn btn-success" onclick="copyDailyAsHTML()">HTML로 복사</button>
-                    <button class="btn btn-secondary" onclick="downloadCSV()">CSV 다운로드</button>
-                </div>
-            </div>
-        </div>
+                <h3>■ 진행현황 요약</h3>
+                <table class="summary-table">
+                    <tr>
+                        <th>구분</th>
+                        <th>배포완료</th>
+                        <th>컨펌대기</th>
+                        <th>테스트중</th>
+                        <th>확인대기</th>
+                    </tr>
+                    <tr>
+                        <td><strong>B라인</strong></td>
+                        <td style="color:#059669;font-weight:600;">5건</td>
+                        <td>4건</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A라인</strong></td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>1건</td>
+                        <td>2건</td>
+                    </tr>
+                </table>
 
-        <!-- B라인 업데이트 요청 메일 -->
-        <div id="tab-bline" class="tab-content">
-            <div class="mail-container">
-                <div class="mail-header">
-                    <label>받는 사람</label>
-                    <input type="text" value="이동혁 프로" id="recipient">
-                    <label>제목</label>
-                    <input type="text" value="[S25016] B라인 검증 항목 펀치리스트 업데이트 요청 (14건)" id="subject">
-                    <label>날짜</label>
-                    <input type="text" value="2026-01-20" id="mail-date">
-                </div>
+                <h3>■ 다음 액션</h3>
+                <ol style="margin:10px 0 10px 20px;">
+                    <li>B라인 4건 컨펌 진행 요청</li>
+                    <li>A라인 에러플래그 초기화 실물테스트 (1.5시간)</li>
+                    <li>A라인 디지털 트윈 조용현 프로 확인</li>
+                </ol>
 
-                <div class="mail-body" id="mail-content">
-                    <p>이동혁 프로님,</p>
-                    <p>고생 많으십니다. SP 심태양입니다.</p>
-                    <p>B라인 검증 항목 14건에 대해 펀치리스트 업데이트 요청드립니다.</p>
+                <h3>■ 참고</h3>
+                <p>3주 완료 계획 간트차트: <a href="https://s2501602.vercel.app/punchlist/3week-plan/gantt.html" target="_blank" class="pl-link">https://s2501602.vercel.app/punchlist/3week-plan/gantt.html</a></p>
 
-                    <h3>■ 어제(1/19) 지연분 - 6건</h3>
-                    <p class="status-delayed">* 프리징 이슈로 미배포 → 오늘(1/20) 배포 예정</p>
-                    <table>
-                        <tr>
-                            <th style="width:50px;">No.</th>
-                            <th>항목명</th>
-                            <th style="width:120px;">펀치리스트 ID</th>
-                            <th style="width:100px;">상태</th>
-                        </tr>
-                        <tr class="highlight">
-                            <td>#1</td>
-                            <td>디지털 트윈 (Lag 이슈 확인, A/B라인 정량 데이터 측정)</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-106" target="_blank" class="pl-link">PL-2025-106</a></td>
-                            <td class="status-delayed">지연→오늘</td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>#2</td>
-                            <td>비정상 용접선 정보 필터링 (용접선 간 길이 및 두께 차이)</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-096" target="_blank" class="pl-link">PL-2025-096</a></td>
-                            <td class="status-delayed">지연→오늘</td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>#7</td>
-                            <td>갠트리 수동 이동 시 동적 리미트</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-062" target="_blank" class="pl-link">PL-2025-062</a></td>
-                            <td class="status-delayed">지연→오늘</td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>#8</td>
-                            <td>기본 Z홈 선택</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-132" target="_blank" class="pl-link">PL-2025-132</a></td>
-                            <td class="status-delayed">지연→오늘</td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>#10</td>
-                            <td>토크 축 가독/가시성 향상</td>
-                            <td>(신규 등록 필요)</td>
-                            <td class="status-delayed">지연→오늘</td>
-                        </tr>
-                        <tr class="highlight">
-                            <td>#13</td>
-                            <td>홀센서 기반 원점 인식</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-155" target="_blank" class="pl-link">PL-2025-155</a></td>
-                            <td class="status-delayed">지연→오늘</td>
-                        </tr>
-                    </table>
+                <p style="margin-top:20px;">감사합니다.</p>
 
-                    <h3>■ 오늘(1/20) 진행 예정 - 8건</h3>
-                    <table>
-                        <tr>
-                            <th style="width:50px;">No.</th>
-                            <th>항목명</th>
-                            <th style="width:120px;">펀치리스트 ID</th>
-                            <th style="width:100px;">상태</th>
-                        </tr>
-                        <tr>
-                            <td>#3</td>
-                            <td>명령 유형 별 기초 데드라인 구성</td>
-                            <td class="status-confirm">(확인 필요)</td>
-                            <td class="status-confirm">확인 필요</td>
-                        </tr>
-                        <tr>
-                            <td>#4</td>
-                            <td>명령에 대한 상세 에러 구성</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-074" target="_blank" class="pl-link">PL-2025-074</a></td>
-                            <td class="status-confirm">확인 필요</td>
-                        </tr>
-                        <tr>
-                            <td>#5</td>
-                            <td>공압, CO2, 냉각수 유량 범위 구성</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-067" target="_blank" class="pl-link">PL-2025-067</a></td>
-                            <td class="status-progress">진행 중</td>
-                        </tr>
-                        <tr>
-                            <td>#6</td>
-                            <td>관제 측 이동 시 DB의 상/하한선 수치 활용</td>
-                            <td>(신규 등록 필요)</td>
-                            <td class="status-progress">진행 중</td>
-                        </tr>
-                        <tr>
-                            <td>#9</td>
-                            <td>와이어 인칭 시그널 개별 제어 및 리셋</td>
-                            <td>(신규 등록 필요)</td>
-                            <td class="status-progress">진행 중</td>
-                        </tr>
-                        <tr>
-                            <td>#11</td>
-                            <td>알람 전달 (관제 측 에러 알람)</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-061" target="_blank" class="pl-link">PL-2025-061</a></td>
-                            <td class="status-progress">진행 중</td>
-                        </tr>
-                        <tr>
-                            <td>#12</td>
-                            <td>웜업</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-113" target="_blank" class="pl-link">PL-2025-113</a></td>
-                            <td class="status-progress">진행 중</td>
-                        </tr>
-                        <tr>
-                            <td>#14</td>
-                            <td>커스텀 팝업 (크기 및 텍스트 적용)</td>
-                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-022" target="_blank" class="pl-link">PL-2025-022</a></td>
-                            <td class="status-progress">진행 중</td>
-                        </tr>
-                    </table>
-
-                    <h3>■ 요청 사항</h3>
-                    <ol>
-                        <li><strong>#10, #6, #9</strong> 신규 항목 펀치리스트 ID 등록 요청</li>
-                        <li><strong>#3, #4</strong> 내부 소스 점검 상태 및 펀치리스트 ID 확인</li>
-                        <li>각 항목 진행 상태 업데이트 시 펀치리스트 반영 요청</li>
-                    </ol>
-
-                    <h3>■ 참고</h3>
-                    <p>3주 완료 계획 간트차트: <a href="https://s2501602.vercel.app/punchlist/3week-plan" target="_blank">https://s2501602.vercel.app/punchlist/3week-plan</a></p>
-
-                    <p style="margin-top:20px;">감사합니다.</p>
-                    <div style="margin-top:20px; padding-top:15px; border-top:1px solid #ccc; color:#666; font-size:0.85rem; line-height:1.6;">
-                        <p style="margin:0;"><strong>심태양</strong></p>
-                        <p style="margin:5px 0 0;">㈜에스피시스템스</p>
-                        <p style="margin:0;">연구소 / 부장</p>
-                        <p style="margin:10px 0 0;">[626-220] 경남 양산시 어곡동 858-2 산업단지 3-2</p>
-                        <p style="margin:0;">TEL : 055-371-5661 | FAX : 055-371-5606</p>
-                        <p style="margin:0;">PH. : 010-3381-2852</p>
-                        <p style="margin:15px 0 0; font-size:0.75rem; color:#999;">
-                            상기 메일 또는 첨부자료는 지정된 수신인만을 위한 것이며, 영업비밀, 기밀정보 등을 포함하고 있을 수 있습니다.<br>
-                            여기에 포함된 정보의 전부 또는 일부를 목적 이외 무단으로 공개, 배포, 복사 또는 사용하는 것은 엄격히 금지됩니다.<br>
-                            본 메일이 잘못 전송된 경우, 발신인 또는 당사에 알려주시고, 본 메일은 즉시 삭제하여 주시기 바랍니다.
-                        </p>
-                        <p style="margin:10px 0 0; font-size:0.7rem; color:#aaa;">
-                            This email or any attached documents may be confidential and privileged, and is intended for the sole use of the individual or entity named.<br>
-                            It is prohibited for any unauthorized person to disclose, copy, distribute or use the contents of this message.<br>
-                            If you are not the intended recipient, please notify the sender and destroy this email immediately.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="copyMailContent()">메일 내용 복사</button>
-                    <button class="btn btn-success" onclick="copyAsHTML()">HTML로 복사</button>
-                    <button class="btn btn-secondary" onclick="printMail()">인쇄</button>
+                <!-- 서명 -->
+                <div style="margin-top:20px; padding-top:15px; border-top:1px solid #ccc; color:#666; font-size:0.85rem; line-height:1.6;">
+                    <p style="margin:0;"><strong>SP 심태양 드림</strong></p>
+                    <p style="margin:5px 0 0;">S25016 자동용접 시스템</p>
+                    <p style="margin:10px 0 0;">㈜에스피시스템스</p>
+                    <p style="margin:0;">연구소 / 부장</p>
+                    <p style="margin:10px 0 0;">[626-220] 경남 양산시 어곡동 858-2 산업단지 3-2</p>
+                    <p style="margin:0;">TEL : 055-371-5661 | FAX : 055-371-5606</p>
+                    <p style="margin:0;">PH. : 010-3381-2852</p>
+                    <p style="margin:15px 0 0; font-size:0.75rem; color:#999;">
+                        상기 메일 또는 첨부자료는 지정된 수신인만을 위한 것이며, 영업비밀, 기밀정보 등을 포함하고 있을 수 있습니다.<br>
+                        여기에 포함된 정보의 전부 또는 일부를 목적 이외 무단으로 공개, 배포, 복사 또는 사용하는 것은 엄격히 금지됩니다.<br>
+                        본 메일이 잘못 전송된 경우, 발신인 또는 당사에 알려주시고, 본 메일은 즉시 삭제하여 주시기 바랍니다.
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <!-- 발송 히스토리 -->
-        <div id="tab-history" class="tab-content">
-            <div class="mail-container">
-                <h2>발송 히스토리</h2>
-                <div class="mail-history">
-                    <div class="history-item">
-                        <span class="date">2026-01-20</span>
-                        <div class="subject">[S25016] B라인 검증 항목 펀치리스트 업데이트 요청 (14건)</div>
-                        <span class="recipient">박주한 주임</span>
-                    </div>
-                    <div class="history-item">
-                        <span class="date">2026-01-19</span>
-                        <div class="subject">RE: B라인 검증 항목 확인 및 배포 일정 회신</div>
-                        <span class="recipient">박주한 주임</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 메일 템플릿 -->
-        <div id="tab-template" class="tab-content">
-            <div class="mail-container">
-                <h2>메일 템플릿</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
-                    <div class="history-item" style="cursor:pointer;" onclick="alert('펀치리스트 업데이트 요청 템플릿')">
-                        <div class="subject">펀치리스트 업데이트 요청</div>
-                        <span class="date">항목별 진행 상태 업데이트 요청</span>
-                    </div>
-                    <div class="history-item" style="cursor:pointer;" onclick="alert('일일 진행 현황 보고 템플릿')">
-                        <div class="subject">일일 진행 현황 보고</div>
-                        <span class="date">완료/지연/예정 항목 정리</span>
-                    </div>
-                    <div class="history-item" style="cursor:pointer;" onclick="alert('현장작업 일정 공지 템플릿')">
-                        <div class="subject">현장작업 일정 공지</div>
-                        <span class="date">토요일 현장작업 계획 공유</span>
-                    </div>
-                    <div class="history-item" style="cursor:pointer;" onclick="alert('검증 완료 보고 템플릿')">
-                        <div class="subject">검증 완료 보고</div>
-                        <span class="date">검증 완료 항목 결과 보고</span>
-                    </div>
-                </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="copyMailContent()">텍스트 복사</button>
+                <button class="btn btn-success" onclick="copyAsHTML()">HTML로 복사 (서식 유지)</button>
             </div>
         </div>
     </div>
@@ -555,14 +378,6 @@
     <div class="copy-toast" id="copyToast">복사되었습니다!</div>
 
     <script>
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-            event.target.classList.add('active');
-            document.getElementById('tab-' + tabName).classList.add('active');
-        }
-
         function copyMailContent() {
             const mailBody = document.getElementById('mail-content');
             const text = mailBody.innerText;
@@ -584,66 +399,11 @@
             });
         }
 
-        function printMail() {
-            const content = document.getElementById('mail-content').innerHTML;
-            const printWindow = window.open('', '', 'width=800,height=600');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>메일 인쇄</title>
-                    <style>
-                        body { font-family: 'Malgun Gothic', sans-serif; padding: 20px; }
-                        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
-                        th, td { border: 1px solid #333; padding: 8px; }
-                        th { background: #f0f0f0; }
-                        h3 { margin-top: 20px; }
-                    </style>
-                </head>
-                <body>${content}</body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
-        }
-
         function showToast(message) {
             const toast = document.getElementById('copyToast');
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-
-        // 일일 보고 메일 복사
-        function copyDailyContent() {
-            const mailBody = document.getElementById('daily-content');
-            const text = mailBody.innerText;
-
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('텍스트가 복사되었습니다!');
-            });
-        }
-
-        function copyDailyAsHTML() {
-            const mailBody = document.getElementById('daily-content');
-            const html = mailBody.innerHTML;
-
-            const blob = new Blob([html], {type: 'text/html'});
-            const data = [new ClipboardItem({'text/html': blob})];
-
-            navigator.clipboard.write(data).then(() => {
-                showToast('HTML이 복사되었습니다! (서식 유지)');
-            });
-        }
-
-        function downloadCSV() {
-            const csvUrl = '/punchlist/3week-plan/S25016_3주완료계획_진행현황.csv';
-            const link = document.createElement('a');
-            link.href = csvUrl;
-            link.download = 'S25016_3주완료계획_진행현황.csv';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast('CSV 다운로드 시작!');
         }
     </script>
 </body>
