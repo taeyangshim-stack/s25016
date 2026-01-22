@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>펀치리스트 신규 등록 초안 - B라인 브레이크 Speed Limit</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Malgun Gothic', 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: #fff;
+            padding: 20px 25px;
+        }
+        .header h1 { font-size: 1.2rem; margin-bottom: 5px; }
+        .header .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+        .content { padding: 25px; }
+        .field {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .field:last-child { border-bottom: none; }
+        .field-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .field-value {
+            font-size: 1rem;
+            color: #333;
+            line-height: 1.6;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-complete { background: #dcfce7; color: #166534; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+        }
+        th { background: #f9fafb; font-weight: 600; }
+        .change-arrow { color: #059669; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>펀치리스트 신규 등록 초안</h1>
+            <div class="badge">PL-2026-XXX (ID 미정)</div>
+            <div class="badge">1/21 조치완료</div>
+        </div>
+
+        <div class="content">
+            <div class="field">
+                <div class="field-label">항목명</div>
+                <div class="field-value">B라인 Control Off Speed Limit 설정 수정 (X1/X2축)</div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">분류</div>
+                <div class="field-value">제어 > RAPID > 브레이크</div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">우선순위</div>
+                <div class="field-value"><span class="status-badge" style="background:#fef3c7;color:#92400e;">높음</span></div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">상태</div>
+                <div class="field-value"><span class="status-badge status-complete">✓ 조치완료</span></div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">문제 상황</div>
+                <div class="field-value">
+                    B라인 갠트리 X축 브레이크 제어 시, X1(주축)과 X2(종동축)의
+                    <span class="highlight">Control Off Speed Limit</span> 설정값이 상이하여
+                    브레이크 동작 타이밍 불일치 발생 가능성 확인
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">원인 분석</div>
+                <div class="field-value">
+                    <table>
+                        <tr>
+                            <th>축</th>
+                            <th>기존 설정</th>
+                            <th></th>
+                            <th>수정 설정</th>
+                            <th>설명</th>
+                        </tr>
+                        <tr>
+                            <td><strong>X1 (주축)</strong></td>
+                            <td>0.02 (2%)</td>
+                            <td class="change-arrow">→</td>
+                            <td>0.02 (2%)</td>
+                            <td>유지</td>
+                        </tr>
+                        <tr>
+                            <td><strong>X2 (종동축)</strong></td>
+                            <td style="color:#dc2626;">1 (100%)</td>
+                            <td class="change-arrow">→</td>
+                            <td style="color:#059669;">0.02 (2%)</td>
+                            <td>수정</td>
+                        </tr>
+                    </table>
+                    <div style="margin-top:10px;padding:10px;background:#fef2f2;border-radius:6px;font-size:0.9rem;">
+                        <strong>문제:</strong> X2축이 100% 속도에서 바로 브레이크 → X1축과 동기화 불일치
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">조치 내용</div>
+                <div class="field-value">
+                    X1, X2 축 모두 <span class="highlight">0.02 (2%)</span> 속도까지 감속 후 브레이크 작동하도록 통일
+                    <div class="code-block">
+! B라인 Control Off Speed Limit 설정
+! 파일: 1200-526406 (B3 로봇)
+
+X1_ControlOffSpeedLimit := 0.02;  ! 주축: 2%까지 감속 후 브레이크
+X2_ControlOffSpeedLimit := 0.02;  ! 종동축: 2%까지 감속 후 브레이크 (기존 1 → 0.02 수정)
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">조치 결과</div>
+                <div class="field-value">
+                    <ul style="padding-left:20px;line-height:1.8;">
+                        <li>X1/X2 축 브레이크 동작 타이밍 동기화</li>
+                        <li>2% 속도 감속 → 브레이크 작동 순서 통일</li>
+                        <li>갠트리 정지 시 축간 위치 편차 최소화</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">담당자</div>
+                <div class="field-value">심태양 (SP)</div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">조치일</div>
+                <div class="field-value">2026-01-21 (수)</div>
+            </div>
+
+            <div class="field">
+                <div class="field-label">비고</div>
+                <div class="field-value">
+                    X1/X2축 브레이크 제어 튜닝 테스트 과정에서 발견 및 조치<br>
+                    관련: 브레이크 튜닝 계획서 참조
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
