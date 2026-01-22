@@ -215,7 +215,7 @@
 
         <!-- 탭 네비게이션 -->
         <div class="tab-nav">
-            <button class="tab-btn new active" onclick="showTab('daily21')">1/21 진행현황 (신규)</button>
+            <button class="tab-btn new active" onclick="showTab('daily21')">1/20~21 진행현황 (신규)</button>
             <button class="tab-btn" onclick="showTab('daily')">1/19 일일 진행 보고</button>
             <button class="tab-btn" onclick="showTab('bline')">B라인 14건 업데이트 요청</button>
             <button class="tab-btn" onclick="showTab('history')">발송 히스토리</button>
@@ -229,7 +229,7 @@
                     <label>받는 사람</label>
                     <input type="text" value="이동혁 프로" id="daily21-recipient">
                     <label>제목</label>
-                    <input type="text" value="[S25016] 1/21(수) B라인 진행현황 - 배포완료 5건" id="daily21-subject">
+                    <input type="text" value="[S25016] 1/20~21 B라인 진행현황 - 완료 10건" id="daily21-subject">
                     <label>첨부파일</label>
                     <input type="text" value="S25016_3주완료계획_260122.csv" id="daily21-attachment" readonly style="background:#f3f4f6;">
                 </div>
@@ -237,7 +237,47 @@
                 <div class="mail-body" id="daily21-content">
                     <p>이동혁 프로님,</p>
                     <p>고생 많으십니다. SP 심태양입니다.</p>
-                    <p>1/21(수) B라인 진행현황 공유드립니다.</p>
+                    <p>1/20(화)~1/21(수) B라인 진행현황 공유드립니다.</p>
+
+                    <h3>■ 1/20(화) 완료 - 5건 (B라인 UI 4건 + Plan C)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50px;">No.</th>
+                            <th>항목명</th>
+                            <th style="width:120px;">펀치리스트 ID</th>
+                            <th style="width:100px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>토크 모니터링 화면 색상 변경</td>
+                            <td>(신규)</td>
+                            <td class="status-done">완료</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>기본 Z홈 모드 자동 선택</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-132" target="_blank" class="pl-link">PL-2025-132</a></td>
+                            <td class="status-done">완료</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>갠트리 수동 조작 시 유동 리미트</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-062" target="_blank" class="pl-link">PL-2025-062</a></td>
+                            <td class="status-done">완료</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>디지털 트윈 업데이트 주기 개선</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-106" target="_blank" class="pl-link">PL-2025-106</a></td>
+                            <td class="status-done">완료</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Plan C 적용</td>
+                            <td>(신규)</td>
+                            <td class="status-done">완료</td>
+                        </tr>
+                    </table>
 
                     <h3>■ 1/21(수) 배포완료 - 5건</h3>
 
