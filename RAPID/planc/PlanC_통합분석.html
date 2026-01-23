@@ -1248,6 +1248,389 @@
                 </div>
             </div>
 
+            <!-- 8. stReact 상세 분석 -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>8. stReact - 태스크 상태 반응 배열 (상세)</h2>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span class="file-badge">Rob1_MainModule.mod</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="description">
+                        <h4>변경 목적</h4>
+                        <p><code>stReact{3}</code> 배열은 멀티태스크 환경에서 각 로봇의 상태를 공유합니다. Plan C에서 WireCut 관련 케이스의 인덱스가 {1}에서 {2}로 변경되었습니다.</p>
+                        <ul style="margin-top:10px;color:#555;">
+                            <li><code>stReact{1}</code> = T_ROB1 (Rob1 태스크 상태)</li>
+                            <li><code>stReact{2}</code> = T_ROB2 (Rob2 태스크 상태)</li>
+                            <li><code>stReact{3}</code> = T_GANTRY (갠트리 태스크 상태)</li>
+                        </ul>
+                    </div>
+                    <div class="code-compare">
+                        <div class="code-block before">
+                            <div class="code-block-header">
+                                <span>기존 (Plan C 미적용)</span>
+                                <span>Rob1_MainModule.mod</span>
+                            </div>
+                            <pre><span class="code-comment">! WireCut 관련 케이스에서 stReact{1} 사용</span>
+
+<span class="code-keyword">CASE</span> <span class="code-string">"WireCutR2"</span>:
+    <span class="code-keyword">WaitUntil</span> stCommand=<span class="code-string">""</span>;
+    <span class="highlight-line"><span class="code-var">stReact</span>{<span class="code-number">1</span>}:=<span class="code-string">"Ready"</span>;</span>
+
+<span class="code-keyword">CASE</span> <span class="code-string">"WireCutShotR2"</span>:
+    <span class="code-keyword">WaitUntil</span> stCommand=<span class="code-string">""</span>;
+    <span class="highlight-line"><span class="code-var">stReact</span>{<span class="code-number">1</span>}:=<span class="code-string">"Ready"</span>;</span>
+
+<span class="code-keyword">CASE</span> <span class="code-string">"WireCutMoveR2"</span>:
+    <span class="code-keyword">WaitUntil</span> stCommand=<span class="code-string">""</span>;
+    <span class="highlight-line"><span class="code-var">stReact</span>{<span class="code-number">1</span>}:=<span class="code-string">"Ready"</span>;</span>
+
+<span class="code-comment">! 문제: Rob1이 Rob2의 상태를 stReact{1}에 기록</span>
+<span class="code-comment">! Rob1 자신의 상태와 충돌 가능성</span></pre>
+                        </div>
+                        <div class="code-block after">
+                            <div class="code-block-header">
+                                <span>변경 (Plan C 적용)</span>
+                                <span>Rob1_MainModule.mod</span>
+                            </div>
+                            <pre><span class="code-comment">! WireCut 관련 케이스에서 stReact{2} 사용</span>
+
+<span class="code-keyword">CASE</span> <span class="code-string">"WireCutR2"</span>:
+    <span class="code-keyword">WaitUntil</span> stCommand=<span class="code-string">""</span>;
+    <span class="highlight-line green"><span class="code-var">stReact</span>{<span class="code-number">2</span>}:=<span class="code-string">"Ready"</span>;</span>
+
+<span class="code-keyword">CASE</span> <span class="code-string">"WireCutShotR2"</span>:
+    <span class="code-keyword">WaitUntil</span> stCommand=<span class="code-string">""</span>;
+    <span class="highlight-line green"><span class="code-var">stReact</span>{<span class="code-number">2</span>}:=<span class="code-string">"Ready"</span>;</span>
+
+<span class="code-keyword">CASE</span> <span class="code-string">"WireCutMoveR2"</span>:
+    <span class="code-keyword">WaitUntil</span> stCommand=<span class="code-string">""</span>;
+    <span class="highlight-line green"><span class="code-var">stReact</span>{<span class="code-number">2</span>}:=<span class="code-string">"Ready"</span>;</span>
+
+<span class="code-comment">! 수정: Rob2 관련 상태는 stReact{2}에 기록</span>
+<span class="code-comment">! 각 로봇의 상태가 올바른 인덱스에 저장됨</span></pre>
+                        </div>
+                    </div>
+                    <div class="change-grid">
+                        <div class="change-item">
+                            <div class="label">WireCutR2</div>
+                            <div class="values">
+                                <span class="before">stReact{1}</span>
+                                <span class="arrow">→</span>
+                                <span class="after">stReact{2}</span>
+                            </div>
+                        </div>
+                        <div class="change-item">
+                            <div class="label">WireCutShotR2</div>
+                            <div class="values">
+                                <span class="before">stReact{1}</span>
+                                <span class="arrow">→</span>
+                                <span class="after">stReact{2}</span>
+                            </div>
+                        </div>
+                        <div class="change-item">
+                            <div class="label">WireCutMoveR2</div>
+                            <div class="values">
+                                <span class="before">stReact{1}</span>
+                                <span class="arrow">→</span>
+                                <span class="after">stReact{2}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="impact-box">
+                        <h4>적용 영향</h4>
+                        <ul>
+                            <li>멀티태스크 동기화 시 상태 충돌 방지</li>
+                            <li>Rob2 관련 동작의 상태가 올바른 인덱스({2})에 기록됨</li>
+                            <li><code>WaitUntil stReact=["Ready","Ready","Ready"]</code> 조건 검사 정확도 향상</li>
+                            <li>WireCut 시퀀스 중 태스크 간 동기화 안정성 개선</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. MOC.cfg 브레이크/토크 설정 상세 -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>9. MOC.cfg - 모터 토크 및 캘리브레이션 (상세)</h2>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span class="file-badge">SYSPAR/MOC.cfg</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="description">
+                        <h4>변경 목적</h4>
+                        <p>갠트리 외부축 모터의 최대 토크 제한 및 캘리브레이션 오프셋 조정. 토크 감소로 충돌 시 부하 감소, 모터 보호 강화.</p>
+                    </div>
+                    <div class="code-compare">
+                        <div class="code-block before">
+                            <div class="code-block-header">
+                                <span>기존 (Plan C 미적용)</span>
+                                <span>MOC.cfg</span>
+                            </div>
+                            <pre><span class="code-comment">! 모터 캘리브레이션 오프셋</span>
+DRIVE_MODULE:
+  -name <span class="code-string">"M1DM3"</span> -cal_offset <span class="highlight-line"><span class="code-number">4.6375</span></span>
+  -name <span class="code-string">"ELM_X"</span> -cal_offset <span class="highlight-line"><span class="code-number">1.8358</span></span>
+
+<span class="code-comment">! 최대 토크 제한</span>
+DRIVE_MODULE_PARAM:
+  -name <span class="code-string">"M1DM3"</span> -torque_absolute_max <span class="highlight-line"><span class="code-number">30</span></span>
+  -name <span class="code-string">"M3DM3"</span> -torque_absolute_max <span class="highlight-line"><span class="code-number">40</span></span>
+  -name <span class="code-string">"ELM_X"</span> -torque_absolute_max <span class="highlight-line"><span class="code-number">30</span></span>
+
+<span class="code-comment">! M1DM3: 갠트리 1번 축 (X방향)</span>
+<span class="code-comment">! M3DM3: 갠트리 3번 축 (회전)</span>
+<span class="code-comment">! ELM_X: 외부 리니어 모터 X</span></pre>
+                        </div>
+                        <div class="code-block after">
+                            <div class="code-block-header">
+                                <span>변경 (Plan C 적용)</span>
+                                <span>MOC.cfg</span>
+                            </div>
+                            <pre><span class="code-comment">! 모터 캘리브레이션 오프셋</span>
+DRIVE_MODULE:
+  -name <span class="code-string">"M1DM3"</span> -cal_offset <span class="highlight-line green"><span class="code-number">0.1115</span></span>
+  -name <span class="code-string">"ELM_X"</span> -cal_offset <span class="highlight-line green"><span class="code-number">1.9467</span></span>
+
+<span class="code-comment">! 최대 토크 제한 (감소)</span>
+DRIVE_MODULE_PARAM:
+  -name <span class="code-string">"M1DM3"</span> -torque_absolute_max <span class="highlight-line green"><span class="code-number">25</span></span>
+  -name <span class="code-string">"M3DM3"</span> -torque_absolute_max <span class="highlight-line green"><span class="code-number">30</span></span>
+  -name <span class="code-string">"ELM_X"</span> -torque_absolute_max <span class="highlight-line green"><span class="code-number">25</span></span>
+
+<span class="code-comment">! 토크 제한 16~25% 감소</span>
+<span class="code-comment">! 충돌 시 부하 감소, 모터 보호 강화</span></pre>
+                        </div>
+                    </div>
+                    <div class="change-grid">
+                        <div class="change-item">
+                            <div class="label">M1DM3 cal_offset</div>
+                            <div class="values">
+                                <span class="before">4.6375</span>
+                                <span class="arrow">→</span>
+                                <span class="after">0.1115</span>
+                            </div>
+                        </div>
+                        <div class="change-item">
+                            <div class="label">ELM_X cal_offset</div>
+                            <div class="values">
+                                <span class="before">1.8358</span>
+                                <span class="arrow">→</span>
+                                <span class="after">1.9467</span>
+                            </div>
+                        </div>
+                        <div class="change-item">
+                            <div class="label">M1DM3 토크</div>
+                            <div class="values">
+                                <span class="before">30%</span>
+                                <span class="arrow">→</span>
+                                <span class="after">25% (-17%)</span>
+                            </div>
+                        </div>
+                        <div class="change-item">
+                            <div class="label">M3DM3 토크</div>
+                            <div class="values">
+                                <span class="before">40%</span>
+                                <span class="arrow">→</span>
+                                <span class="after">30% (-25%)</span>
+                            </div>
+                        </div>
+                        <div class="change-item">
+                            <div class="label">ELM_X 토크</div>
+                            <div class="values">
+                                <span class="before">30%</span>
+                                <span class="arrow">→</span>
+                                <span class="after">25% (-17%)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="impact-box">
+                        <h4>적용 영향</h4>
+                        <ul>
+                            <li><strong>토크 제한 감소:</strong> 충돌 또는 과부하 시 모터 보호 강화</li>
+                            <li><strong>캘리브레이션 조정:</strong> 실제 기계 원점과의 정렬 개선</li>
+                            <li>급가속/급감속 시 모터 부하 감소</li>
+                            <li>전체적으로 보수적인 운전 모드로 전환</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10. rMoveStep (T-head) 변경사항 -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>10. rMoveStep - T-head 용접 동작 트래킹 파라미터</h2>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span class="file-badge">Head_MoveControl.mod</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="description">
+                        <h4>변경 목적</h4>
+                        <p><code>rMoveStep</code> 프로시저는 T-head 용접 시 로봇1/2의 동작 및 트래킹 데이터를 생성합니다. 트래킹 파라미터 구조가 2개(MaxCorr+Bias)에서 1개(TrackGainZ)로 단순화되었습니다.</p>
+                    </div>
+                    <div class="code-compare">
+                        <div class="code-block before">
+                            <div class="code-block-header">
+                                <span>기존 (Plan C 미적용)</span>
+                                <span>2개 파라미터</span>
+                            </div>
+                            <pre><span class="code-comment">! rMoveStep 내부 - Welds 배열 트래킹 데이터 설정</span>
+<span class="code-comment">! macroStartBuffer, macroEndBuffer에서 복사</span>
+
+<span class="code-comment">! Rob1 용접 포인트 설정</span>
+Welds1{nMotionStepCount{1}}.<span class="highlight-line">MaxCorr</span>:=
+    macroStartBuffer1{nMotionStartStep}.<span class="highlight-line">MaxCorr</span>;
+Welds1{nMotionStepCount{1}}.<span class="highlight-line">Bias</span>:=
+    macroStartBuffer1{nMotionStartStep}.<span class="highlight-line">Bias</span>;
+
+<span class="code-comment">! Rob2 용접 포인트 설정</span>
+Welds2{nMotionStepCount{2}}.<span class="highlight-line">MaxCorr</span>:=
+    macroStartBuffer2{nMotionStartStep}.<span class="highlight-line">MaxCorr</span>;
+Welds2{nMotionStepCount{2}}.<span class="highlight-line">Bias</span>:=
+    macroStartBuffer2{nMotionStartStep}.<span class="highlight-line">Bias</span>;
+
+<span class="code-comment">! MaxCorr: 최대 보정량 (mm)</span>
+<span class="code-comment">! Bias: 고정 오프셋 (mm)</span></pre>
+                        </div>
+                        <div class="code-block after">
+                            <div class="code-block-header">
+                                <span>변경 (Plan C 적용)</span>
+                                <span>1개 파라미터 (통합)</span>
+                            </div>
+                            <pre><span class="code-comment">! rMoveStep 내부 - Welds 배열 트래킹 데이터 설정</span>
+<span class="code-comment">! TrackGainZ로 통합</span>
+
+<span class="code-comment">! Rob1 용접 포인트 설정</span>
+Welds1{nMotionStepCount{1}}.<span class="highlight-line green">TrackGainZ</span>:=
+    macroStartBuffer1{nMotionStartStep}.<span class="highlight-line green">TrackGainZ</span>;
+
+
+<span class="code-comment">! Rob2 용접 포인트 설정</span>
+Welds2{nMotionStepCount{2}}.<span class="highlight-line green">TrackGainZ</span>:=
+    macroStartBuffer2{nMotionStartStep}.<span class="highlight-line green">TrackGainZ</span>;
+
+
+<span class="code-comment">! TrackGainZ: Z방향 트래킹 게인</span>
+<span class="code-comment">! MaxCorr+Bias 기능을 단일 파라미터로 통합</span></pre>
+                        </div>
+                    </div>
+                    <div class="description" style="margin-top:20px;">
+                        <h4>영향 받는 코드 위치 (Head_MoveControl.mod)</h4>
+                        <table class="summary-table" style="margin-top:10px;">
+                            <tr><td>라인 246-247</td><td>macroStartBuffer1 → Welds1</td></tr>
+                            <tr><td>라인 291-292</td><td>macroEndBuffer1 → Welds1 (끝점)</td></tr>
+                            <tr><td>라인 356-357</td><td>macroEndBuffer1 → Welds1 (대칭)</td></tr>
+                            <tr><td>라인 401-402</td><td>macroEndBuffer1 → Welds1 (루프)</td></tr>
+                            <tr><td>라인 522-523</td><td>macroStartBuffer2 → Welds2</td></tr>
+                            <tr><td>라인 567-568</td><td>macroEndBuffer2 → Welds2 (끝점)</td></tr>
+                            <tr><td>라인 593-594</td><td>macroEndBuffer2 → Welds2 (대칭)</td></tr>
+                            <tr><td>라인 633-634</td><td>macroEndBuffer2 → Welds2 (끝점)</td></tr>
+                            <tr><td>라인 679-680</td><td>macroEndBuffer2 → Welds2 (루프)</td></tr>
+                        </table>
+                    </div>
+                    <div class="impact-box">
+                        <h4>적용 영향</h4>
+                        <ul>
+                            <li><strong>파라미터 단순화:</strong> 2개 파라미터(MaxCorr, Bias) → 1개 파라미터(TrackGainZ)</li>
+                            <li>Z방향 트래킹 로직 통합으로 유지보수 용이</li>
+                            <li>targetdata RECORD 구조 호환성 유지 (TrackGainZ 필드 사용)</li>
+                            <li>macroBuffer → Welds 복사 코드 간소화</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 11. rWeld34 설명 -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>11. rWeld34 vs rWeld 프로시저 비교</h2>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span class="file-badge">Rob1/Rob2_MainModule.mod</span>
+                        <span class="file-badge">Gantry_MainModule.mod</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="description">
+                        <h4>프로시저 역할 및 차이점</h4>
+                        <p><code>rWeld34</code>와 <code>rWeld</code>는 서로 다른 모듈에 위치하며 다른 역할을 수행합니다.</p>
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0;">
+                        <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;">
+                            <h4 style="color:#1a73e8;margin-bottom:15px;border-bottom:2px solid #1a73e8;padding-bottom:8px;">rWeld34 (Rob1/Rob2_MainModule.mod)</h4>
+                            <ul style="color:#555;font-size:13px;line-height:1.8;">
+                                <li><strong>위치:</strong> TASK1, TASK2 (로봇 태스크)</li>
+                                <li><strong>역할:</strong> 용접 데이터 배열(wd1~wd40) 설정</li>
+                                <li><strong>기능:</strong>
+                                    <ul style="margin-left:20px;margin-top:5px;">
+                                        <li>Welds1{n} 데이터를 wd{n}으로 변환</li>
+                                        <li>weave1~weave40 위빙 데이터 설정</li>
+                                        <li>Holdwd1~10 홀드 용접 데이터 설정</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Plan C 변경:</strong> 프로시저 자체는 변경 없음</li>
+                            </ul>
+                        </div>
+                        <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px;">
+                            <h4 style="color:#34a853;margin-bottom:15px;border-bottom:2px solid #34a853;padding-bottom:8px;">rWeld (Gantry_MainModule.mod)</h4>
+                            <ul style="color:#555;font-size:13px;line-height:1.8;">
+                                <li><strong>위치:</strong> TASK7 (갠트리 태스크)</li>
+                                <li><strong>역할:</strong> 갠트리 용접 동작 제어</li>
+                                <li><strong>기능:</strong>
+                                    <ul style="margin-left:20px;margin-top:5px;">
+                                        <li>WeldsG 좌표로 갠트리 이동</li>
+                                        <li>로봇 동기화 대기 (WaitSyncTask)</li>
+                                        <li>용접 중 갠트리 추종 동작</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Plan C 변경:</strong> 프로시저 자체는 변경 없음</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="full-code">
+                        <div class="full-code-header">
+                            <span>rWeld34 프로시저 구조 (Rob1_MainModule.mod:1034)</span>
+                        </div>
+                        <pre><span class="code-keyword">PROC</span> <span class="code-proc">rWeld34</span>()
+    <span class="code-keyword">VAR</span> <span class="code-type">num</span> nHoldWeldVel:=<span class="code-number">0.01</span>;
+
+    <span class="code-comment">! ======== welddata 설정 (40개 포인트) ========</span>
+    wd1:=[Welds1{1}.cpm/<span class="code-number">6</span>,<span class="code-number">0</span>,[<span class="code-number">5</span>,<span class="code-number">0</span>,Welds1{1}.voltage,Welds1{1}.wfs,<span class="code-number">0</span>,Welds1{1}.Current,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>],...];
+    wd2:=[Welds1{2}.cpm/<span class="code-number">6</span>,<span class="code-number">0</span>,[<span class="code-number">5</span>,<span class="code-number">0</span>,Welds1{2}.voltage,Welds1{2}.wfs,<span class="code-number">0</span>,Welds1{2}.Current,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>],...];
+    <span class="code-comment">! ... wd3 ~ wd40 동일 패턴</span>
+
+    <span class="code-comment">! ======== Hold welddata 설정 (10개) ========</span>
+    Holdwd1:=[nHoldWeldVel,<span class="code-number">0</span>,[<span class="code-number">5</span>,<span class="code-number">0</span>,Welds1{1}.voltage,Welds1{1}.wfs,<span class="code-number">0</span>,Welds1{1}.Current,...],...];
+    <span class="code-comment">! ... Holdwd2 ~ Holdwd10</span>
+
+    <span class="code-comment">! ======== weavedata 설정 (40개) ========</span>
+    weave1:=[Welds1{1}.WeaveShape,Welds1{1}.WeaveType,Welds1{1}.WeaveLength,...];
+    <span class="code-comment">! ... weave2 ~ weave40</span>
+
+    <span class="code-comment">! ======== 용접 실행 (ArcLStart, ArcL, ArcLEnd) ========</span>
+    <span class="code-comment">! ... 실제 용접 동작</span>
+<span class="code-keyword">ENDPROC</span></pre>
+                    </div>
+                    <div class="impact-box">
+                        <h4>요약</h4>
+                        <ul>
+                            <li><code>rWeld34</code>: 로봇 태스크에서 용접 파라미터 데이터 준비 (Welds → wd 변환)</li>
+                            <li><code>rWeld</code>: 갠트리 태스크에서 용접 중 갠트리 동작 제어</li>
+                            <li>두 프로시저 모두 Plan C에서 로직 변경 없음</li>
+                            <li>변경된 것은 호출 전 설정되는 데이터 값들 (trackdata, welddata, zSync 등)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Tab 3: Files -->
