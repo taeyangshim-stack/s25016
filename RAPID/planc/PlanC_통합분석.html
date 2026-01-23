@@ -12,8 +12,8 @@
         }
         body {
             font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
-            background: #0f0f1a;
-            color: #e0e0e0;
+            background: #f5f7fa;
+            color: #333;
             line-height: 1.7;
         }
 
@@ -23,11 +23,12 @@
             top: 0;
             left: 0;
             right: 0;
-            background: rgba(15, 15, 26, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid #2a2a4a;
+            border-bottom: 1px solid #e0e0e0;
             z-index: 1000;
             padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         .nav-content {
             max-width: 1400px;
@@ -40,7 +41,7 @@
         .nav-logo {
             font-size: 18px;
             font-weight: bold;
-            color: #00d2ff;
+            color: #1a73e8;
         }
         .nav-tabs {
             display: flex;
@@ -50,19 +51,19 @@
             padding: 8px 20px;
             background: transparent;
             border: none;
-            color: #888;
+            color: #666;
             font-size: 14px;
             cursor: pointer;
             border-radius: 6px;
             transition: all 0.2s;
         }
         .nav-tab:hover {
-            background: #1a1a2e;
-            color: #fff;
+            background: #e8f0fe;
+            color: #1a73e8;
         }
         .nav-tab.active {
-            background: #00d2ff;
-            color: #000;
+            background: #1a73e8;
+            color: #fff;
         }
 
         .container {
@@ -76,42 +77,40 @@
             text-align: center;
             padding: 40px 20px;
             margin-bottom: 30px;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
             border-radius: 16px;
-            border: 1px solid #2a2a4a;
+            color: white;
+            box-shadow: 0 4px 20px rgba(26, 115, 232, 0.3);
         }
         header h1 {
             font-size: 32px;
             margin-bottom: 15px;
-            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
         header .subtitle {
-            color: #888;
+            opacity: 0.9;
             font-size: 14px;
             margin-bottom: 20px;
         }
         .header-cards {
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 20px;
             flex-wrap: wrap;
             margin-top: 25px;
         }
         .header-card {
-            background: #0f0f1a;
-            border: 1px solid #2a2a4a;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 12px;
             padding: 20px 30px;
             min-width: 200px;
         }
         .header-card.before { border-left: 4px solid #ffc107; }
-        .header-card.after { border-left: 4px solid #28a745; }
+        .header-card.after { border-left: 4px solid #34a853; }
         .header-card .label {
             font-size: 12px;
-            color: #666;
+            opacity: 0.8;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -120,11 +119,9 @@
             font-weight: bold;
             margin: 8px 0 4px;
         }
-        .header-card.before .value { color: #ffc107; }
-        .header-card.after .value { color: #28a745; }
         .header-card .date {
             font-size: 12px;
-            color: #666;
+            opacity: 0.7;
         }
 
         /* Legend */
@@ -135,15 +132,16 @@
             margin-bottom: 30px;
             flex-wrap: wrap;
             padding: 15px;
-            background: #1a1a2e;
+            background: white;
             border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
         .legend-item {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 13px;
-            color: #aaa;
+            color: #555;
         }
         .legend-box {
             width: 16px;
@@ -151,8 +149,8 @@
             border-radius: 4px;
         }
         .legend-box.before { background: #ffc107; }
-        .legend-box.after { background: #28a745; }
-        .legend-box.removed { background: #dc3545; }
+        .legend-box.after { background: #34a853; }
+        .legend-box.removed { background: #ea4335; }
 
         /* Tab Content */
         .tab-content {
@@ -170,13 +168,14 @@
             margin-bottom: 30px;
         }
         .summary-card {
-            background: #1a1a2e;
+            background: white;
             border-radius: 12px;
             padding: 24px;
-            border: 1px solid #2a2a4a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e8e8e8;
         }
         .summary-card h3 {
-            color: #00d2ff;
+            color: #1a73e8;
             font-size: 16px;
             margin-bottom: 15px;
             display: flex;
@@ -187,7 +186,7 @@
             content: "";
             width: 4px;
             height: 20px;
-            background: #00d2ff;
+            background: #1a73e8;
             border-radius: 2px;
         }
         .summary-table {
@@ -195,7 +194,7 @@
             font-size: 13px;
         }
         .summary-table tr {
-            border-bottom: 1px solid #2a2a4a;
+            border-bottom: 1px solid #f0f0f0;
         }
         .summary-table tr:last-child {
             border-bottom: none;
@@ -204,62 +203,64 @@
             padding: 10px 5px;
         }
         .summary-table td:first-child {
-            color: #888;
+            color: #666;
             width: 40%;
         }
-        .summary-table .before { color: #ffc107; }
-        .summary-table .after { color: #28a745; }
+        .summary-table .before { color: #f9a825; font-weight: 500; }
+        .summary-table .after { color: #34a853; font-weight: 500; }
         .summary-table .arrow {
-            color: #666;
+            color: #999;
             padding: 0 8px;
         }
 
         /* Section */
         .section {
-            background: #1a1a2e;
+            background: white;
             border-radius: 12px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             overflow: hidden;
-            border: 1px solid #2a2a4a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e8e8e8;
         }
         .section-header {
-            background: linear-gradient(90deg, #16213e, #1a1a2e);
+            background: #fafafa;
             padding: 18px 24px;
-            border-bottom: 1px solid #2a2a4a;
+            border-bottom: 1px solid #e8e8e8;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 10px;
             cursor: pointer;
+            transition: background 0.2s;
         }
         .section-header:hover {
-            background: linear-gradient(90deg, #1a2744, #1e2438);
+            background: #f0f4f9;
         }
         .section-header h2 {
             font-size: 17px;
-            color: #00d2ff;
+            color: #1a73e8;
             display: flex;
             align-items: center;
             gap: 12px;
         }
         .section-header .badge {
-            background: #0f3460;
+            background: #e8f0fe;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 11px;
-            color: #00d2ff;
+            color: #1a73e8;
         }
         .section-header .file-badge {
-            background: #2a2a4a;
+            background: #f5f5f5;
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 11px;
-            color: #888;
+            color: #666;
             font-family: monospace;
         }
         .section-header .toggle-icon {
-            color: #666;
+            color: #999;
             transition: transform 0.3s;
         }
         .section.collapsed .toggle-icon {
@@ -274,19 +275,19 @@
 
         /* Description */
         .description {
-            background: #0f0f1a;
+            background: #f8f9fa;
             padding: 15px 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #3a7bd5;
+            border-left: 4px solid #1a73e8;
         }
         .description h4 {
-            color: #3a7bd5;
+            color: #1a73e8;
             font-size: 13px;
             margin-bottom: 8px;
         }
         .description p {
-            color: #aaa;
+            color: #555;
             font-size: 13px;
         }
 
@@ -303,7 +304,7 @@
             }
         }
         .code-block {
-            background: #0a0a14;
+            background: #fafafa;
             border-radius: 8px;
             overflow: hidden;
         }
@@ -311,7 +312,7 @@
             border: 2px solid #ffc107;
         }
         .code-block.after {
-            border: 2px solid #28a745;
+            border: 2px solid #34a853;
         }
         .code-block-header {
             padding: 10px 14px;
@@ -326,7 +327,7 @@
             color: #000;
         }
         .code-block.after .code-block-header {
-            background: #28a745;
+            background: #34a853;
             color: #fff;
         }
         .code-block pre {
@@ -335,27 +336,28 @@
             font-size: 12px;
             line-height: 1.5;
             overflow-x: auto;
-            color: #d0d0d0;
+            color: #333;
             margin: 0;
+            background: #fafafa;
         }
         .highlight-line {
-            background: rgba(255, 193, 7, 0.15);
+            background: rgba(255, 193, 7, 0.2);
             display: block;
             margin: 0 -14px;
             padding: 0 14px;
         }
         .highlight-line.green {
-            background: rgba(40, 167, 69, 0.15);
+            background: rgba(52, 168, 83, 0.15);
         }
         .highlight-line.red {
-            background: rgba(220, 53, 69, 0.15);
+            background: rgba(234, 67, 53, 0.15);
         }
-        .code-keyword { color: #569cd6; }
-        .code-type { color: #4ec9b0; }
-        .code-number { color: #b5cea8; }
-        .code-comment { color: #6a9955; }
-        .code-var { color: #9cdcfe; }
-        .code-proc { color: #dcdcaa; }
+        .code-keyword { color: #0000ff; }
+        .code-type { color: #267f99; }
+        .code-number { color: #098658; }
+        .code-comment { color: #008000; }
+        .code-var { color: #001080; }
+        .code-proc { color: #795e26; }
 
         /* Change Summary */
         .change-grid {
@@ -365,11 +367,11 @@
             margin: 20px 0;
         }
         .change-item {
-            background: #0f0f1a;
+            background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
             text-align: center;
-            border: 1px solid #2a2a4a;
+            border: 1px solid #e8e8e8;
         }
         .change-item .label {
             font-size: 11px;
@@ -383,20 +385,20 @@
             gap: 8px;
             font-size: 14px;
         }
-        .change-item .before { color: #ffc107; }
-        .change-item .after { color: #28a745; }
-        .change-item .arrow { color: #666; }
+        .change-item .before { color: #f9a825; font-weight: 600; }
+        .change-item .after { color: #34a853; font-weight: 600; }
+        .change-item .arrow { color: #999; }
 
         /* Impact Box */
         .impact-box {
-            background: #0f0f1a;
-            border: 1px solid #2a4a6a;
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
             border-radius: 8px;
             padding: 18px;
             margin-top: 20px;
         }
         .impact-box h4 {
-            color: #3a7bd5;
+            color: #2e7d32;
             margin-bottom: 12px;
             font-size: 13px;
         }
@@ -408,45 +410,32 @@
             padding: 6px 0;
             padding-left: 18px;
             position: relative;
-            color: #aaa;
+            color: #555;
             font-size: 13px;
         }
         .impact-box li::before {
             content: "→";
             position: absolute;
             left: 0;
-            color: #3a7bd5;
+            color: #2e7d32;
         }
 
         /* Full Code */
         .full-code {
-            background: #0a0a14;
+            background: #fafafa;
             border-radius: 8px;
             margin: 20px 0;
-            border: 1px solid #2a2a4a;
+            border: 1px solid #e0e0e0;
         }
         .full-code-header {
-            background: #1a1a2e;
+            background: #f0f0f0;
             padding: 10px 14px;
             font-size: 12px;
-            color: #888;
+            color: #666;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #2a2a4a;
-        }
-        .full-code-header .copy-btn {
-            background: #2a2a4a;
-            border: none;
-            color: #888;
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-        .full-code-header .copy-btn:hover {
-            background: #3a3a5a;
-            color: #fff;
+            border-bottom: 1px solid #e0e0e0;
         }
         .full-code pre {
             padding: 14px;
@@ -454,9 +443,10 @@
             font-size: 11px;
             line-height: 1.4;
             overflow-x: auto;
-            color: #d0d0d0;
+            color: #333;
             margin: 0;
             max-height: 350px;
+            background: #fafafa;
         }
 
         /* File List Table */
@@ -466,23 +456,23 @@
             font-size: 13px;
         }
         .file-table th {
-            background: #0f0f1a;
+            background: #f5f5f5;
             padding: 12px 15px;
             text-align: left;
             font-weight: 600;
-            color: #888;
-            border-bottom: 2px solid #2a2a4a;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
         }
         .file-table td {
             padding: 10px 15px;
-            border-bottom: 1px solid #2a2a4a;
+            border-bottom: 1px solid #f0f0f0;
         }
         .file-table tr:hover {
-            background: #16213e;
+            background: #f8f9fa;
         }
         .file-table code {
             font-family: monospace;
-            color: #00d2ff;
+            color: #1a73e8;
             font-size: 12px;
         }
         .tag {
@@ -492,9 +482,9 @@
             font-size: 11px;
             font-weight: 500;
         }
-        .tag-change { background: #fff3cd20; color: #ffc107; border: 1px solid #ffc10740; }
-        .tag-remove { background: #f8d7da20; color: #dc3545; border: 1px solid #dc354540; }
-        .tag-add { background: #d4edda20; color: #28a745; border: 1px solid #28a74540; }
+        .tag-change { background: #fff3cd; color: #856404; }
+        .tag-remove { background: #f8d7da; color: #721c24; }
+        .tag-add { background: #d4edda; color: #155724; }
 
         /* Summary Final */
         .final-summary {
@@ -504,13 +494,14 @@
             margin-top: 30px;
         }
         .final-card {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background: white;
             border-radius: 12px;
             padding: 24px;
-            border: 1px solid #2a2a4a;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
         .final-card h3 {
-            color: #00d2ff;
+            color: #1a73e8;
             font-size: 15px;
             margin-bottom: 15px;
         }
@@ -520,12 +511,12 @@
             gap: 8px;
         }
         .final-card .impact-tag {
-            background: #0f0f1a;
+            background: #f5f5f5;
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 12px;
-            color: #aaa;
-            border: 1px solid #2a2a4a;
+            color: #555;
+            border: 1px solid #e0e0e0;
         }
 
         /* Back to top */
@@ -535,8 +526,8 @@
             right: 30px;
             width: 50px;
             height: 50px;
-            background: #00d2ff;
-            color: #000;
+            background: #1a73e8;
+            color: #fff;
             border: none;
             border-radius: 50%;
             cursor: pointer;
@@ -544,7 +535,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.3);
             transition: transform 0.2s;
         }
         .back-to-top:hover {
@@ -557,13 +548,14 @@
         footer {
             text-align: center;
             padding: 40px;
-            color: #666;
+            color: #888;
             font-size: 12px;
-            border-top: 1px solid #2a2a4a;
+            border-top: 1px solid #e8e8e8;
             margin-top: 40px;
+            background: white;
         }
         footer a {
-            color: #00d2ff;
+            color: #1a73e8;
             text-decoration: none;
         }
     </style>
@@ -1367,69 +1359,69 @@
                         <tbody>
                             <tr>
                                 <td>zSync</td>
-                                <td style="color:#ffc107">[FALSE,200,300,...]</td>
-                                <td style="color:#28a745">[TRUE,0,0,...]</td>
-                                <td style="color:#888">Gantry, Head</td>
+                                <td style="color:#f9a825;font-weight:500">[FALSE,200,300,...]</td>
+                                <td style="color:#34a853;font-weight:500">[TRUE,0,0,...]</td>
+                                <td style="color:#666">Gantry, Head</td>
                             </tr>
                             <tr>
                                 <td>trackdata</td>
-                                <td style="color:#ffc107">3rd param = 10</td>
-                                <td style="color:#28a745">3rd param = 0</td>
-                                <td style="color:#888">Rob1, Rob2</td>
+                                <td style="color:#f9a825;font-weight:500">3rd param = 10</td>
+                                <td style="color:#34a853;font-weight:500">3rd param = 0</td>
+                                <td style="color:#666">Rob1, Rob2</td>
                             </tr>
                             <tr>
                                 <td>welddata</td>
-                                <td style="color:#ffc107">36.8V / 227A</td>
-                                <td style="color:#28a745">36.3V / 232A</td>
-                                <td style="color:#888">Rob2</td>
+                                <td style="color:#f9a825;font-weight:500">36.8V / 227A</td>
+                                <td style="color:#34a853;font-weight:500">36.3V / 232A</td>
+                                <td style="color:#666">Rob2</td>
                             </tr>
                             <tr>
                                 <td>bInstalldir</td>
-                                <td style="color:#ffc107">FALSE</td>
-                                <td style="color:#28a745">TRUE</td>
-                                <td style="color:#888">Rob1, Rob2</td>
+                                <td style="color:#f9a825;font-weight:500">FALSE</td>
+                                <td style="color:#34a853;font-weight:500">TRUE</td>
+                                <td style="color:#666">Rob1, Rob2</td>
                             </tr>
                             <tr>
                                 <td>트래킹</td>
-                                <td style="color:#ffc107">MaxCorr + Bias</td>
-                                <td style="color:#28a745">TrackGainZ</td>
-                                <td style="color:#888">Head_MoveControl</td>
+                                <td style="color:#f9a825;font-weight:500">MaxCorr + Bias</td>
+                                <td style="color:#34a853;font-weight:500">TrackGainZ</td>
+                                <td style="color:#666">Head_MoveControl</td>
                             </tr>
                             <tr>
                                 <td>홈 좌표</td>
-                                <td style="color:#ffc107">주석 (비활성)</td>
-                                <td style="color:#28a745">활성화</td>
-                                <td style="color:#888">Head_MainModule</td>
+                                <td style="color:#f9a825;font-weight:500">주석 (비활성)</td>
+                                <td style="color:#34a853;font-weight:500">활성화</td>
+                                <td style="color:#666">Head_MainModule</td>
                             </tr>
                             <tr>
                                 <td>rWarm_Up</td>
-                                <td style="color:#ffc107">존재</td>
-                                <td style="color:#dc3545">제거됨</td>
-                                <td style="color:#888">Head_MoveControl</td>
+                                <td style="color:#f9a825;font-weight:500">존재</td>
+                                <td style="color:#ea4335;font-weight:500">제거됨</td>
+                                <td style="color:#666">Head_MoveControl</td>
                             </tr>
                             <tr>
                                 <td>rHole_check_X</td>
-                                <td style="color:#ffc107">호출됨</td>
-                                <td style="color:#dc3545">주석 처리</td>
-                                <td style="color:#888">Head_MainModule</td>
+                                <td style="color:#f9a825;font-weight:500">호출됨</td>
+                                <td style="color:#ea4335;font-weight:500">주석 처리</td>
+                                <td style="color:#666">Head_MainModule</td>
                             </tr>
                             <tr>
                                 <td>stReact</td>
-                                <td style="color:#ffc107">{1}</td>
-                                <td style="color:#28a745">{2}</td>
-                                <td style="color:#888">Rob1_MainModule</td>
+                                <td style="color:#f9a825;font-weight:500">{1}</td>
+                                <td style="color:#34a853;font-weight:500">{2}</td>
+                                <td style="color:#666">Rob1_MainModule</td>
                             </tr>
                             <tr>
                                 <td>M1DM3 토크</td>
-                                <td style="color:#ffc107">30</td>
-                                <td style="color:#28a745">25</td>
-                                <td style="color:#888">MOC.cfg</td>
+                                <td style="color:#f9a825;font-weight:500">30</td>
+                                <td style="color:#34a853;font-weight:500">25</td>
+                                <td style="color:#666">MOC.cfg</td>
                             </tr>
                             <tr>
                                 <td>M3DM3 토크</td>
-                                <td style="color:#ffc107">40</td>
-                                <td style="color:#28a745">30</td>
-                                <td style="color:#888">MOC.cfg</td>
+                                <td style="color:#f9a825;font-weight:500">40</td>
+                                <td style="color:#34a853;font-weight:500">30</td>
+                                <td style="color:#666">MOC.cfg</td>
                             </tr>
                         </tbody>
                     </table>
