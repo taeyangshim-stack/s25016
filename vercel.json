@@ -41,6 +41,8 @@
     { "source": "/projects/work-management/pages/조회", "destination": "/projects/work-management/pages/query.html" },
     { "source": "/robot-review-ko", "destination": "/robot_system_review_ko.html" },
     { "source": "/robot-review-en", "destination": "/robot_system_review_en.html" },
-    { "source": "/robot-review", "destination": "/robot_system_review.html" }
+    { "source": "/robot-review", "destination": "/robot_system_review.html" },
+    { "source": "/planc", "destination": "/RAPID/planc/PlanC_비교분석.html" },
+    { "source": "/planc/rapid", "destination": "/RAPID/planc/PlanC_RAPID코드_비교분석.html" }
   ]
 }

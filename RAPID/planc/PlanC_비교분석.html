@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan C 적용 비교 분석 - B3 로봇</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        header .meta {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        header .meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .card.before {
+            border-left: 5px solid #6c757d;
+        }
+        .card.after {
+            border-left: 5px solid #28a745;
+        }
+        .card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        .card .date {
+            font-size: 13px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .section {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .section-header {
+            background: #f8f9fa;
+            padding: 18px 24px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-header h2 {
+            font-size: 18px;
+            color: #333;
+        }
+        .section-header .badge {
+            background: #1e3c72;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .section-content {
+            padding: 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            white-space: nowrap;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .col-item { width: 25%; }
+        .col-before { width: 30%; }
+        .col-after { width: 30%; }
+        .col-note { width: 15%; }
+        .code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #f1f3f4;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #d63384;
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .tag-add { background: #d4edda; color: #155724; }
+        .tag-remove { background: #f8d7da; color: #721c24; }
+        .tag-change { background: #fff3cd; color: #856404; }
+        .tag-param { background: #cce5ff; color: #004085; }
+        .highlight-before {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .highlight-after {
+            background: #d4edda;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .arrow {
+            color: #28a745;
+            font-weight: bold;
+            margin: 0 8px;
+        }
+        .file-path {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+        .comparison-box {
+            display: grid;
+            grid-template-columns: 1fr 40px 1fr;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .comparison-box .before-box,
+        .comparison-box .after-box {
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .comparison-box .before-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+        }
+        .comparison-box .after-box {
+            background: #d4edda;
+            border: 1px solid #28a745;
+        }
+        .comparison-box .arrow-center {
+            text-align: center;
+            font-size: 24px;
+            color: #28a745;
+        }
+        .note-box {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .note-box strong {
+            color: #0066cc;
+        }
+        .impact {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .impact-tag {
+            background: #e9ecef;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .new-feature {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .new-feature h4 {
+            color: #0c5460;
+            margin-bottom: 8px;
+        }
+        .new-feature pre {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            font-size: 13px;
+        }
+        @media print {
+            body { background: white; }
+            .section { box-shadow: none; border: 1px solid #ddd; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Plan C 적용 비교 분석</h1>
+            <div class="meta">
+                <span>프로젝트: S25016 B3 로봇</span>
+                <span>컨트롤러: 1200-526406</span>
+                <span>분석일: 2026-01-22</span>
+            </div>
+        </header>
+
+        <div class="summary-cards">
+            <div class="card before">
+                <h3>기존 (Plan C 미적용)</h3>
+                <div class="value">beforeplanC</div>
+                <div class="date">백업: 2026-01-13 18:56</div>
+            </div>
+            <div class="card after">
+                <h3>변경 (Plan C 적용)</h3>
+                <div class="value">afterPlanC</div>
+                <div class="date">백업: 2025-12-08 18:40</div>
+            </div>
+            <div class="card">
+                <h3>변경된 파일</h3>
+                <div class="value">14개</div>
+                <div class="date">RAPID 모듈 + 시스템 설정</div>
+            </div>
+            <div class="card">
+                <h3>주요 변경 영역</h3>
+                <div class="value">6개</div>
+                <div class="date">용접/트래킹/모션/토크 등</div>
+            </div>
+        </div>
+
+        <!-- 1. zonedata 변경 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>1. Zone Data 설정 변경</h2>
+                <span class="badge">모션 제어</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-item">항목</th>
+                            <th class="col-before">기존 (미적용)</th>
+                            <th class="col-after">변경 (적용)</th>
+                            <th class="col-note">영향</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="code">zSync</code></td>
+                            <td><span class="highlight-before">[FALSE,200,300,300,30,300,30]</span></td>
+                            <td><span class="highlight-after">[TRUE,0,0,0,0,0,0]</span></td>
+                            <td><span class="tag tag-change">정밀도 향상</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="note-box">
+                    <strong>변경 의미:</strong> 코너 패스(Corner Path) 모드에서 정밀 정지(Fine Stop) 모드로 변경<br>
+                    - 기존: 코너에서 감속 없이 연속 이동 (사이클 타임 우선)<br>
+                    - 변경: 각 포인트에서 완전 정지 후 이동 (정밀도 우선)
+                </div>
+                <div class="file-path">파일: Gantry_MainModule.mod, Head_Command.mod</div>
+            </div>
+        </div>
+
+        <!-- 2. trackdata 변경 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>2. Track Data 초기값 변경</h2>
+                <span class="badge">심 트래킹</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-item">항목</th>
+                            <th class="col-before">기존 (미적용)</th>
+                            <th class="col-after">변경 (적용)</th>
+                            <th class="col-note">영향</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="code">track1~track40</code><br>(3번째 파라미터)</td>
+                            <td><span class="highlight-before">10</span></td>
+                            <td><span class="highlight-after">0</span></td>
+                            <td><span class="tag tag-param">초기화</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="comparison-box">
+                    <div class="before-box">TASK PERS trackdata track1:=[0,FALSE,<strong>10</strong>,[0,15,30,0,0,0,0,0,0],[0,0,0,0,0,0,0]];</div>
+                    <div class="arrow-center">→</div>
+                    <div class="after-box">TASK PERS trackdata track1:=[0,FALSE,<strong>0</strong>,[0,15,30,0,0,0,0,0,0],[0,0,0,0,0,0,0]];</div>
+                </div>
+                <div class="file-path">파일: Rob1_MainModule.mod, Rob2_MainModule.mod</div>
+            </div>
+        </div>
+
+        <!-- 3. welddata 변경 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>3. Weld Data 용접 파라미터 변경</h2>
+                <span class="badge">용접 조건</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-item">항목</th>
+                            <th class="col-before">기존 (미적용)</th>
+                            <th class="col-after">변경 (적용)</th>
+                            <th class="col-note">영향</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="code">wd1~wd40</code> 전압</td>
+                            <td><span class="highlight-before">36.8V</span></td>
+                            <td><span class="highlight-after">36.3V</span></td>
+                            <td><span class="tag tag-change">-0.5V</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">wd1~wd40</code> 전류</td>
+                            <td><span class="highlight-before">227A</span></td>
+                            <td><span class="highlight-after">232A</span></td>
+                            <td><span class="tag tag-change">+5A</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">Holdwd1~4</code></td>
+                            <td><span class="highlight-before">36.8V / 227A</span></td>
+                            <td><span class="highlight-after">36.3V / 232A</span></td>
+                            <td><span class="tag tag-change">동일 변경</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="note-box">
+                    <strong>변경 의미:</strong> 전압 감소, 전류 증가로 아크 특성 조정<br>
+                    - 입열량 변화: 더 집중된 아크, 용입 깊이 조정
+                </div>
+                <div class="file-path">파일: Rob2_MainModule.mod</div>
+            </div>
+        </div>
+
+        <!-- 4. 설치 방향 변경 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>4. 설치 방향 플래그 변경</h2>
+                <span class="badge">시스템 설정</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-item">항목</th>
+                            <th class="col-before">기존 (미적용)</th>
+                            <th class="col-after">변경 (적용)</th>
+                            <th class="col-note">영향</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="code">bInstalldir</code></td>
+                            <td><span class="highlight-before">FALSE</span></td>
+                            <td><span class="highlight-after">TRUE</span></td>
+                            <td><span class="tag tag-change">방향 전환</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="file-path">파일: Rob1_MainModule.mod, Rob2_MainModule.mod</div>
+            </div>
+        </div>
+
+        <!-- 5. 트래킹 파라미터 구조 변경 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>5. 트래킹 파라미터 구조 변경</h2>
+                <span class="badge">심 트래킹</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-item">항목</th>
+                            <th class="col-before">기존 (미적용)</th>
+                            <th class="col-after">변경 (적용)</th>
+                            <th class="col-note">영향</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Welds 파라미터</td>
+                            <td>
+                                <span class="highlight-before">MaxCorr</span><br>
+                                <span class="highlight-before">Bias</span><br>
+                                (2개 파라미터)
+                            </td>
+                            <td>
+                                <span class="highlight-after">TrackGainZ</span><br>
+                                (1개 파라미터)
+                            </td>
+                            <td><span class="tag tag-change">구조 단순화</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="comparison-box">
+                    <div class="before-box">Welds1{n}.MaxCorr:=macroStartBuffer1{n}.MaxCorr;
+Welds1{n}.Bias:=macroStartBuffer1{n}.Bias;</div>
+                    <div class="arrow-center">→</div>
+                    <div class="after-box">Welds1{n}.TrackGainZ:=macroStartBuffer1{n}.TrackGainZ;</div>
+                </div>
+                <div class="note-box">
+                    <strong>변경 의미:</strong> 트래킹 보정 방식 변경<br>
+                    - 기존: MaxCorr(최대 보정량) + Bias(편향값) 2개로 세분화 제어<br>
+                    - 변경: TrackGainZ(Z축 게인) 1개로 통합 제어
+                </div>
+                <div class="file-path">파일: Head_MoveControl.mod</div>
+            </div>
+        </div>
+
+        <!-- 6. 갠트리 홈 좌표 계산 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>6. 갠트리 홈 좌표 계산 변경</h2>
+                <span class="badge">좌표계</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-item">항목</th>
+                            <th class="col-before">기존 (미적용)</th>
+                            <th class="col-after">변경 (적용)</th>
+                            <th class="col-note">영향</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>홈 좌표 자동 계산</td>
+                            <td><span class="highlight-before">주석 처리 (비활성)</span></td>
+                            <td><span class="highlight-after">활성화</span></td>
+                            <td><span class="tag tag-add">기능 활성화</span></td>
+                        </tr>
+                        <tr>
+                            <td>WobjFloor 설정</td>
+                            <td><span class="highlight-before">고정값 사용</span></td>
+                            <td><span class="highlight-after">동적 계산</span></td>
+                            <td><span class="tag tag-change">자동화</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="comparison-box">
+                    <div class="before-box">! 주석 처리됨
+!nHomeTcpX:=nLimitX_Negative;
+!nHomeTcpY:=nLimitY_Positive;
+!nHomeTcpZ:=nLimitZ_Positive;
+!WobjFloor.uframe.trans:=[nHomeGantryX,nHomeGantryY,nHomeGantryZ];</div>
+                    <div class="arrow-center">→</div>
+                    <div class="after-box">nHomeTcpX:=nLimitX_Negative;
+nHomeTcpY:=nLimitY_Positive;
+nHomeTcpZ:=nLimitZ_Positive;
+
+nHomeGantryX:=nHomeTcpX+nHomeAdjustX;
+nHomeGantryY:=nHomeTcpY+nHomeAdjustY;
+nHomeGantryZ:=nHomeTcpZ+nHomeAdjustZ;
+
+WobjFloor.uframe.trans:=[nHomeGantryX,nHomeGantryY,nHomeGantryZ];</div>
+                </div>
+                <div class="file-path">파일: Head_MainModule.mod</div>
+            </div>
+        </div>
+
+        <!-- 7. MOC.cfg 모터 설정 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>7. 모터 제어 설정 변경 (MOC.cfg)</h2>
+                <span class="badge">하드웨어</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-item">모터</th>
+                            <th class="col-before">기존 (미적용)</th>
+                            <th class="col-after">변경 (적용)</th>
+                            <th class="col-note">비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="code">M1DM3</code> cal_offset</td>
+                            <td><span class="highlight-before">4.6375</span></td>
+                            <td><span class="highlight-after">0.1115</span></td>
+                            <td><span class="tag tag-change">캘리브레이션</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">ELM_X</code> cal_offset</td>
+                            <td><span class="highlight-before">1.8358</span></td>
+                            <td><span class="highlight-after">1.9467</span></td>
+                            <td><span class="tag tag-change">캘리브레이션</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">M1DM3</code> torque_max</td>
+                            <td><span class="highlight-before">30</span></td>
+                            <td><span class="highlight-after">25</span></td>
+                            <td><span class="tag tag-change">-5 (제한)</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">M3DM3</code> torque_max</td>
+                            <td><span class="highlight-before">40</span></td>
+                            <td><span class="highlight-after">30</span></td>
+                            <td><span class="tag tag-change">-10 (제한)</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">ELM_X</code> torque_max</td>
+                            <td><span class="highlight-before">30</span></td>
+                            <td><span class="highlight-after">25</span></td>
+                            <td><span class="tag tag-change">-5 (제한)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="note-box">
+                    <strong>변경 의미:</strong> Plan C 적용 시 토크 제한값을 낮춤<br>
+                    - 모터 보호 강화 및 보수적 운전 조건 적용
+                </div>
+                <div class="file-path">파일: SYSPAR/MOC.cfg</div>
+            </div>
+        </div>
+
+        <!-- 8. 제거된 기능 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>8. Plan C 적용 시 제거/비활성화된 기능</h2>
+                <span class="badge">기능 제거</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:30%">기능</th>
+                            <th style="width:50%">설명</th>
+                            <th style="width:20%">상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="code">rGantry_C_Home</code></td>
+                            <td>갠트리 C축 홈 위치 이동 프로시저</td>
+                            <td><span class="tag tag-remove">제거됨</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">CMD_MOVE_TO_nWarmUp</code></td>
+                            <td>워밍업 커맨드 (112번)</td>
+                            <td><span class="tag tag-remove">제거됨</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">rWarm_Up</code></td>
+                            <td>갠트리 워밍업 루틴 (X,Y,Z,R축 순차 이동)</td>
+                            <td><span class="tag tag-remove">제거됨</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">rHole_check_X</code></td>
+                            <td>홀 센서 기반 X축 원점 체크</td>
+                            <td><span class="tag tag-remove">주석 처리</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">Head_InspectMechanicalOrigin.mod</code></td>
+                            <td>LDS/홀센서 기계원점 검사 모듈</td>
+                            <td><span class="tag tag-remove">미포함</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="new-feature">
+                    <h4>기존(미적용)에만 있는 rWarm_Up 프로시저</h4>
+                    <pre>PROC rWarm_Up()
+    ! 갠트리 X,Y,Z,R 축 순차 워밍업
+    ! 속도를 점진적으로 증가 (10 → 25 deg/s, 300 → 250 mm/s)
+    ! 설정된 시간(nWarmUpCycle) 동안 반복 실행
+
+    vWarmUp_Speed:=[300,300,10,10];
+    WHILE bWarmUpComplete=FALSE DO
+        ! X축: ±150mm 왕복
+        ! Y축: 0~150mm 왕복
+        ! Z축: 0~100mm 왕복
+        ! R축: ±90° 왕복
+        MoveJgJ jgWarm_Up, vWarmUp_Speed, fine;
+        vWarmUp_Speed.v_reax:=vWarmUp_Speed.v_reax+0.1;  ! 점진 가속
+    ENDWHILE
+ENDPROC</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. 좌표 데이터 변경 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>9. 작업 좌표 및 위치 데이터 변경</h2>
+                <span class="badge">티칭 데이터</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-item">항목</th>
+                            <th class="col-before">기존 (미적용)</th>
+                            <th class="col-after">변경 (적용)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="code">edgeStart{1}</code></td>
+                            <td>[19388.5, 1888.17, 12.97]</td>
+                            <td>[18006.3, 846.64, 13.37]</td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">edgeEnd{1}</code></td>
+                            <td>[21201.8, 1916.16, 11.80]</td>
+                            <td>[15947.8, 845.05, 13.25]</td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">nLengthWeldLine</code></td>
+                            <td>1813.51 mm</td>
+                            <td>2058.51 mm</td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">nclockCycleTime</code></td>
+                            <td>243.54 sec</td>
+                            <td>268.99 sec</td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">jRob1</code></td>
+                            <td>[39.71, 23.04, 30.45, -87.53, 29.12, 122.95]</td>
+                            <td>[90, 90, -50, 0, 0, 0]</td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">jGantry</code></td>
+                            <td>[11692, 3392.87, 0.001, -0.89]</td>
+                            <td>[6457.77, 4451.04, 53.32, 0.002]</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="note-box">
+                    <strong>참고:</strong> 작업 좌표는 실제 티칭 결과에 따라 달라지므로, Plan C 변경의 직접적인 영향이 아닐 수 있음
+                </div>
+                <div class="file-path">파일: Head_Data.mod, Head_Command.mod</div>
+            </div>
+        </div>
+
+        <!-- 변경 파일 목록 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>변경된 파일 전체 목록</h2>
+                <span class="badge">14개 파일</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:50%">파일 경로</th>
+                            <th style="width:30%">변경 내용</th>
+                            <th style="width:20%">유형</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code class="code">RAPID/TASK1/PROGMOD/Rob1_MainModule.mod</code></td>
+                            <td>trackdata, edgedata, bInstalldir</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK1/SYSMOD/LINKEDM.sys</code></td>
+                            <td>시스템 링크</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK2/PROGMOD/Rob2_MainModule.mod</code></td>
+                            <td>welddata, trackdata, bInstalldir</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK2/SYSMOD/LINKEDM.sys</code></td>
+                            <td>시스템 링크</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK7/PROGMOD/Gantry_MainModule.mod</code></td>
+                            <td>zSync 설정</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK7/SYSMOD/LINKEDM.sys</code></td>
+                            <td>시스템 링크</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK8/PROGMOD/Head_MainModule.mod</code></td>
+                            <td>rGantry_C_Home, rWarm_Up 제거</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK8/PROGMOD/Head_MoveControl.mod</code></td>
+                            <td>트래킹 파라미터 변경</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK8/PROGMOD/Head_Command.mod</code></td>
+                            <td>zSync, 조인트 데이터</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK8/PROGMOD/Head_Data.mod</code></td>
+                            <td>좌표, 시간 데이터</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK8/PROGMOD/Head_InspectMechanicalOrigin.mod</code></td>
+                            <td>기계원점 검사 모듈</td>
+                            <td><span class="tag tag-remove">Plan C에서 제거</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">RAPID/TASK9/PROGMOD/Static.mod</code></td>
+                            <td>정적 데이터</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">SYSPAR/MOC.cfg</code></td>
+                            <td>모터 캘리브레이션, 토크 제한</td>
+                            <td><span class="tag tag-change">수정</span></td>
+                        </tr>
+                        <tr>
+                            <td><code class="code">HOME/1200-526406_Backup_20260105jb/</code></td>
+                            <td>추가 백업 폴더</td>
+                            <td><span class="tag tag-remove">Plan C에서 제거</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 요약 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Plan C 적용 요약</h2>
+            </div>
+            <div class="section-content">
+                <div class="summary-cards" style="margin-bottom:0">
+                    <div class="card">
+                        <h3>정밀도 향상</h3>
+                        <div class="impact">
+                            <span class="impact-tag">zSync Fine 모드</span>
+                            <span class="impact-tag">홈 좌표 자동 계산</span>
+                            <span class="impact-tag">TrackGainZ 통합</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>용접 조건 조정</h3>
+                        <div class="impact">
+                            <span class="impact-tag">전압 36.8→36.3V</span>
+                            <span class="impact-tag">전류 227→232A</span>
+                            <span class="impact-tag">trackdata 초기화</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>안전성 강화</h3>
+                        <div class="impact">
+                            <span class="impact-tag">토크 제한 감소</span>
+                            <span class="impact-tag">워밍업 루틴 제거</span>
+                            <span class="impact-tag">보수적 운전</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>기능 단순화</h3>
+                        <div class="impact">
+                            <span class="impact-tag">기계원점검사 제거</span>
+                            <span class="impact-tag">홀체크 비활성화</span>
+                            <span class="impact-tag">파라미터 통합</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            S25016 프로젝트 | Plan C 비교 분석 문서 | 생성일: 2026-01-22
+        </footer>
+    </div>
+</body>
+</html>

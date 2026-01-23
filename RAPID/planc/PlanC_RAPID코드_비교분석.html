@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan C RAPID 코드 비교 분석 - B3 로봇</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            line-height: 1.7;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        header p {
+            color: #888;
+            font-size: 14px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        .legend-box.before { background: #ffc107; }
+        .legend-box.after { background: #28a745; }
+        .legend-box.removed { background: #dc3545; }
+        .legend-box.added { background: #17a2b8; }
+
+        .section {
+            background: #16213e;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 1px solid #0f3460;
+        }
+        .section-header {
+            background: linear-gradient(90deg, #0f3460, #16213e);
+            padding: 20px 25px;
+            border-bottom: 1px solid #0f3460;
+        }
+        .section-header h2 {
+            font-size: 20px;
+            color: #00d2ff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-header .file-badge {
+            background: #0f3460;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        .section-content {
+            padding: 25px;
+        }
+        .description {
+            background: #0f3460;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #00d2ff;
+        }
+        .description h3 {
+            color: #00d2ff;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .description p {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .code-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        @media (max-width: 900px) {
+            .code-compare {
+                grid-template-columns: 1fr;
+            }
+        }
+        .code-block {
+            background: #0d1b2a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .code-block.before {
+            border: 2px solid #ffc107;
+        }
+        .code-block.after {
+            border: 2px solid #28a745;
+        }
+        .code-block-header {
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .code-block.before .code-block-header {
+            background: #ffc107;
+            color: #000;
+        }
+        .code-block.after .code-block-header {
+            background: #28a745;
+            color: #fff;
+        }
+        .code-block pre {
+            padding: 16px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #e0e0e0;
+            margin: 0;
+        }
+        .code-block pre code {
+            display: block;
+        }
+        .highlight-line {
+            background: rgba(255, 193, 7, 0.2);
+            display: block;
+            margin: 0 -16px;
+            padding: 0 16px;
+        }
+        .highlight-line.green {
+            background: rgba(40, 167, 69, 0.2);
+        }
+        .highlight-line.red {
+            background: rgba(220, 53, 69, 0.2);
+        }
+        .code-keyword { color: #569cd6; }
+        .code-type { color: #4ec9b0; }
+        .code-string { color: #ce9178; }
+        .code-number { color: #b5cea8; }
+        .code-comment { color: #6a9955; }
+        .code-var { color: #9cdcfe; }
+        .code-proc { color: #dcdcaa; }
+
+        .change-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .change-item {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .change-item .label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .change-item .value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .change-item .value.before { color: #ffc107; }
+        .change-item .value.after { color: #28a745; }
+        .change-item .arrow {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .impact-box {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid #3a7bd5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .impact-box h4 {
+            color: #3a7bd5;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .impact-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        .impact-box li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #aaa;
+            font-size: 14px;
+        }
+        .impact-box li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #3a7bd5;
+        }
+
+        .full-code {
+            background: #0d1b2a;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #0f3460;
+        }
+        .full-code-header {
+            background: #0f3460;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+        }
+        .full-code pre {
+            padding: 16px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            overflow-x: auto;
+            color: #e0e0e0;
+            margin: 0;
+            max-height: 400px;
+        }
+
+        .nav-toc {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #0f3460;
+        }
+        .nav-toc h3 {
+            color: #00d2ff;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .nav-toc ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        .nav-toc li a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav-toc li a:hover {
+            background: #0f3460;
+            color: #00d2ff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Plan C RAPID 코드 비교 분석</h1>
+            <p>S25016 B3 로봇 | 컨트롤러: 1200-526406 | 분석일: 2026-01-23</p>
+        </header>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box before"></div>
+                <span>기존 (Plan C 미적용)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box after"></div>
+                <span>변경 (Plan C 적용)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box removed"></div>
+                <span>Plan C에서 제거됨</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box added"></div>
+                <span>Plan C에서 추가됨</span>
+            </div>
+        </div>
+
+        <nav class="nav-toc">
+            <h3>목차</h3>
+            <ul>
+                <li><a href="#section1">1. zonedata - 모션 정밀도 설정</a></li>
+                <li><a href="#section2">2. trackdata - 심 트래킹 초기값</a></li>
+                <li><a href="#section3">3. welddata - 용접 파라미터</a></li>
+                <li><a href="#section4">4. bInstalldir - 설치 방향 플래그</a></li>
+                <li><a href="#section5">5. 트래킹 보정 파라미터</a></li>
+                <li><a href="#section6">6. 갠트리 홈 좌표 계산</a></li>
+                <li><a href="#section7">7. rWarm_Up - 워밍업 루틴</a></li>
+                <li><a href="#section8">8. rHole_check_X - 홀 체크 기능</a></li>
+                <li><a href="#section9">9. stReact 상태 반응 배열</a></li>
+            </ul>
+        </nav>
+
+        <!-- Section 1: zonedata -->
+        <div class="section" id="section1">
+            <div class="section-header">
+                <h2>
+                    1. zonedata - 모션 정밀도 설정
+                    <span class="file-badge">Gantry_MainModule.mod / Head_Command.mod</span>
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="description">
+                    <h3>변경 목적</h3>
+                    <p>로봇 이동 시 코너 포인트에서의 동작 방식을 결정합니다. Fine 모드는 각 포인트에서 완전 정지 후 다음 동작을 수행하고, Zone 모드는 지정된 반경 내에서 연속 이동합니다.</p>
+                </div>
+
+                <div class="code-compare">
+                    <div class="code-block before">
+                        <div class="code-block-header">
+                            <span>기존 (Plan C 미적용)</span>
+                            <span>Zone 모드</span>
+                        </div>
+                        <pre><code><span class="code-keyword">PERS</span> <span class="code-type">zonedata</span> <span class="code-var">zSync</span>:=[<span class="highlight-line"><span class="code-number">FALSE</span>,<span class="code-number">200</span>,<span class="code-number">300</span>,<span class="code-number">300</span>,<span class="code-number">30</span>,<span class="code-number">300</span>,<span class="code-number">30</span></span>];
+
+<span class="code-comment">! 파라미터 설명:</span>
+<span class="code-comment">! [finep, pzone_tcp, pzone_ori, pzone_eax, zone_ori, zone_leax, zone_reax]</span>
+<span class="code-comment">!</span>
+<span class="code-comment">! finep = FALSE  → Zone 모드 (연속 이동)</span>
+<span class="code-comment">! pzone_tcp = 200mm  → TCP 코너 반경</span>
+<span class="code-comment">! pzone_ori = 300mm  → 자세 코너 반경</span>
+<span class="code-comment">! zone_ori = 30°     → 자세 회전 허용</span></code></pre>
+                    </div>
+                    <div class="code-block after">
+                        <div class="code-block-header">
+                            <span>변경 (Plan C 적용)</span>
+                            <span>Fine 모드</span>
+                        </div>
+                        <pre><code><span class="code-keyword">PERS</span> <span class="code-type">zonedata</span> <span class="code-var">zSync</span>:=[<span class="highlight-line green"><span class="code-number">TRUE</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span></span>];
+
+<span class="code-comment">! 파라미터 설명:</span>
+<span class="code-comment">! [finep, pzone_tcp, pzone_ori, pzone_eax, zone_ori, zone_leax, zone_reax]</span>
+<span class="code-comment">!</span>
+<span class="code-comment">! finep = TRUE   → Fine 모드 (정밀 정지)</span>
+<span class="code-comment">! 모든 zone = 0  → 각 포인트에서 완전 정지</span>
+<span class="code-comment">!</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="change-summary">
+                    <div class="change-item">
+                        <div class="label">finep (정밀정지)</div>
+                        <div class="value before">FALSE</div>
+                        <div class="arrow">↓</div>
+                        <div class="value after">TRUE</div>
+                    </div>
+                    <div class="change-item">
+                        <div class="label">pzone_tcp</div>
+                        <div class="value before">200mm</div>
+                        <div class="arrow">↓</div>
+                        <div class="value after">0mm</div>
+                    </div>
+                    <div class="change-item">
+                        <div class="label">pzone_ori</div>
+                        <div class="value before">300mm</div>
+                        <div class="arrow">↓</div>
+                        <div class="value after">0mm</div>
+                    </div>
+                    <div class="change-item">
+                        <div class="label">zone_ori</div>
+                        <div class="value before">30°</div>
+                        <div class="arrow">↓</div>
+                        <div class="value after">0°</div>
+                    </div>
+                </div>
+
+                <div class="impact-box">
+                    <h4>적용 영향</h4>
+                    <ul>
+                        <li>각 포인트에서 로봇이 완전히 정지한 후 다음 동작 수행</li>
+                        <li>위치 정밀도 향상 (특히 용접 시작/끝 지점)</li>
+                        <li>사이클 타임 증가 (약 25초 증가: 243초 → 269초)</li>
+                        <li>동기화 정확도 향상 (멀티 로봇 협조 작업)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: trackdata -->
+        <div class="section" id="section2">
+            <div class="section-header">
+                <h2>
+                    2. trackdata - 심 트래킹 초기값
+                    <span class="file-badge">Rob1_MainModule.mod / Rob2_MainModule.mod</span>
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="description">
+                    <h3>변경 목적</h3>
+                    <p>심 트래킹(Seam Tracking)의 초기 설정값을 변경합니다. 3번째 파라미터는 트래킹 시작 전 대기/준비 관련 설정입니다.</p>
+                </div>
+
+                <div class="code-compare">
+                    <div class="code-block before">
+                        <div class="code-block-header">
+                            <span>기존 (Plan C 미적용)</span>
+                            <span>초기값 10</span>
+                        </div>
+                        <pre><code><span class="code-comment">! track1 ~ track40 모두 동일 패턴</span>
+<span class="code-keyword">TASK PERS</span> <span class="code-type">trackdata</span> <span class="code-var">track1</span>:=[
+    <span class="code-number">0</span>,           <span class="code-comment">! 트래킹 타입</span>
+    <span class="code-number">FALSE</span>,       <span class="code-comment">! 활성화 여부</span>
+    <span class="highlight-line"><span class="code-number">10</span>,          <span class="code-comment">! ← 이 값이 변경됨</span></span>
+    [<span class="code-number">0,15,30,0,0,0,0,0,0</span>],  <span class="code-comment">! 트래킹 파라미터</span>
+    [<span class="code-number">0,0,0,0,0,0,0</span>]          <span class="code-comment">! 보정 데이터</span>
+];
+
+<span class="code-keyword">TASK PERS</span> <span class="code-type">trackdata</span> <span class="code-var">track2</span>:=[<span class="code-number">0</span>,<span class="code-number">FALSE</span>,<span class="highlight-line"><span class="code-number">10</span></span>,[<span class="code-number">0,15,30,0,0,0,0,0,0</span>],[<span class="code-number">0,0,0,0,0,0,0</span>]];
+<span class="code-keyword">TASK PERS</span> <span class="code-type">trackdata</span> <span class="code-var">track3</span>:=[<span class="code-number">0</span>,<span class="code-number">FALSE</span>,<span class="highlight-line"><span class="code-number">10</span></span>,[<span class="code-number">0,15,30,0,0,0,0,0,0</span>],[<span class="code-number">0,0,0,0,0,0,0</span>]];
+<span class="code-keyword">TASK PERS</span> <span class="code-type">trackdata</span> <span class="code-var">track4</span>:=[<span class="code-number">0</span>,<span class="code-number">FALSE</span>,<span class="highlight-line"><span class="code-number">10</span></span>,[<span class="code-number">0,15,30,0,0,0,0,0,0</span>],[<span class="code-number">0,0,0,0,0,0,0</span>]];
+<span class="code-comment">! ... track40까지 동일</span></code></pre>
+                    </div>
+                    <div class="code-block after">
+                        <div class="code-block-header">
+                            <span>변경 (Plan C 적용)</span>
+                            <span>초기값 0</span>
+                        </div>
+                        <pre><code><span class="code-comment">! track1 ~ track40 모두 동일 패턴</span>
+<span class="code-keyword">TASK PERS</span> <span class="code-type">trackdata</span> <span class="code-var">track1</span>:=[
+    <span class="code-number">0</span>,           <span class="code-comment">! 트래킹 타입</span>
+    <span class="code-number">FALSE</span>,       <span class="code-comment">! 활성화 여부</span>
+    <span class="highlight-line green"><span class="code-number">0</span>,           <span class="code-comment">! ← 0으로 초기화</span></span>
+    [<span class="code-number">0,15,30,0,0,0,0,0,0</span>],  <span class="code-comment">! 트래킹 파라미터</span>
+    [<span class="code-number">0,0,0,0,0,0,0</span>]          <span class="code-comment">! 보정 데이터</span>
+];
+
+<span class="code-keyword">TASK PERS</span> <span class="code-type">trackdata</span> <span class="code-var">track2</span>:=[<span class="code-number">0</span>,<span class="code-number">FALSE</span>,<span class="highlight-line green"><span class="code-number">0</span></span>,[<span class="code-number">0,15,30,0,0,0,0,0,0</span>],[<span class="code-number">0,0,0,0,0,0,0</span>]];
+<span class="code-keyword">TASK PERS</span> <span class="code-type">trackdata</span> <span class="code-var">track3</span>:=[<span class="code-number">0</span>,<span class="code-number">FALSE</span>,<span class="highlight-line green"><span class="code-number">0</span></span>,[<span class="code-number">0,15,30,0,0,0,0,0,0</span>],[<span class="code-number">0,0,0,0,0,0,0</span>]];
+<span class="code-keyword">TASK PERS</span> <span class="code-type">trackdata</span> <span class="code-var">track4</span>:=[<span class="code-number">0</span>,<span class="code-number">FALSE</span>,<span class="highlight-line green"><span class="code-number">0</span></span>,[<span class="code-number">0,15,30,0,0,0,0,0,0</span>],[<span class="code-number">0,0,0,0,0,0,0</span>]];
+<span class="code-comment">! ... track40까지 동일</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="impact-box">
+                    <h4>적용 영향</h4>
+                    <ul>
+                        <li>트래킹 시작 시 이전 보정값 없이 깨끗한 상태에서 시작</li>
+                        <li>이전 작업의 잔류 데이터 영향 제거</li>
+                        <li>Rob1, Rob2 양쪽 로봇에 동일하게 적용</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: welddata -->
+        <div class="section" id="section3">
+            <div class="section-header">
+                <h2>
+                    3. welddata - 용접 파라미터
+                    <span class="file-badge">Rob2_MainModule.mod</span>
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="description">
+                    <h3>변경 목적</h3>
+                    <p>용접 전압과 전류를 조정하여 아크 특성을 변경합니다. 전압 감소 + 전류 증가는 더 집중된 아크와 깊은 용입을 만듭니다.</p>
+                </div>
+
+                <div class="code-compare">
+                    <div class="code-block before">
+                        <div class="code-block-header">
+                            <span>기존 (Plan C 미적용)</span>
+                            <span>36.8V / 227A</span>
+                        </div>
+                        <pre><code><span class="code-comment">! welddata 구조: [speed, weave, [weld_params], [seam_params]]</span>
+<span class="code-comment">! weld_params: [start_time, crater_time, voltage, current, ...]</span>
+
+<span class="code-keyword">TASK PERS</span> <span class="code-type">welddata</span> <span class="code-var">wd1</span>:=[
+    <span class="code-number">10</span>,   <span class="code-comment">! 용접 속도</span>
+    <span class="code-number">0</span>,    <span class="code-comment">! 위빙</span>
+    [<span class="code-number">5</span>, <span class="code-number">0</span>, <span class="highlight-line"><span class="code-number">36.8</span></span>, <span class="highlight-line"><span class="code-number">227</span></span>, <span class="code-number">0</span>, <span class="code-number">360</span>, <span class="code-number">0</span>, <span class="code-number">0</span>, <span class="code-number">0</span>],
+    <span class="code-comment">!       ↑전압   ↑전류</span>
+    [<span class="code-number">0,0,0,0,0,0,0,0,0</span>]
+];
+
+<span class="code-keyword">TASK PERS</span> <span class="code-type">welddata</span> <span class="code-var">wd2</span>:=[<span class="code-number">10</span>,<span class="code-number">0</span>,[<span class="code-number">5</span>,<span class="code-number">0</span>,<span class="highlight-line"><span class="code-number">36.8</span>,<span class="code-number">227</span></span>,<span class="code-number">0</span>,<span class="code-number">360</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>],[<span class="code-number">0,0,0,0,0,0,0,0,0</span>]];
+<span class="code-keyword">TASK PERS</span> <span class="code-type">welddata</span> <span class="code-var">wd3</span>:=[<span class="code-number">10</span>,<span class="code-number">0</span>,[<span class="code-number">5</span>,<span class="code-number">0</span>,<span class="highlight-line"><span class="code-number">36.8</span>,<span class="code-number">227</span></span>,<span class="code-number">0</span>,<span class="code-number">360</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>],[<span class="code-number">0,0,0,0,0,0,0,0,0</span>]];
+<span class="code-keyword">TASK PERS</span> <span class="code-type">welddata</span> <span class="code-var">wd4</span>:=[<span class="code-number">10</span>,<span class="code-number">0</span>,[<span class="code-number">5</span>,<span class="code-number">0</span>,<span class="highlight-line"><span class="code-number">36.8</span>,<span class="code-number">227</span></span>,<span class="code-number">0</span>,<span class="code-number">360</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>],[<span class="code-number">0,0,0,0,0,0,0,0,0</span>]];
+<span class="code-comment">! ... wd40, Holdwd1~4 까지 동일</span></code></pre>
+                    </div>
+                    <div class="code-block after">
+                        <div class="code-block-header">
+                            <span>변경 (Plan C 적용)</span>
+                            <span>36.3V / 232A</span>
+                        </div>
+                        <pre><code><span class="code-comment">! welddata 구조: [speed, weave, [weld_params], [seam_params]]</span>
+<span class="code-comment">! weld_params: [start_time, crater_time, voltage, current, ...]</span>
+
+<span class="code-keyword">TASK PERS</span> <span class="code-type">welddata</span> <span class="code-var">wd1</span>:=[
+    <span class="code-number">10</span>,   <span class="code-comment">! 용접 속도</span>
+    <span class="code-number">0</span>,    <span class="code-comment">! 위빙</span>
+    [<span class="code-number">5</span>, <span class="code-number">0</span>, <span class="highlight-line green"><span class="code-number">36.3</span></span>, <span class="highlight-line green"><span class="code-number">232</span></span>, <span class="code-number">0</span>, <span class="code-number">360</span>, <span class="code-number">0</span>, <span class="code-number">0</span>, <span class="code-number">0</span>],
+    <span class="code-comment">!       ↑전압   ↑전류 (-0.5V, +5A)</span>
+    [<span class="code-number">0,0,0,0,0,0,0,0,0</span>]
+];
+
+<span class="code-keyword">TASK PERS</span> <span class="code-type">welddata</span> <span class="code-var">wd2</span>:=[<span class="code-number">10</span>,<span class="code-number">0</span>,[<span class="code-number">5</span>,<span class="code-number">0</span>,<span class="highlight-line green"><span class="code-number">36.3</span>,<span class="code-number">232</span></span>,<span class="code-number">0</span>,<span class="code-number">360</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>],[<span class="code-number">0,0,0,0,0,0,0,0,0</span>]];
+<span class="code-keyword">TASK PERS</span> <span class="code-type">welddata</span> <span class="code-var">wd3</span>:=[<span class="code-number">10</span>,<span class="code-number">0</span>,[<span class="code-number">5</span>,<span class="code-number">0</span>,<span class="highlight-line green"><span class="code-number">36.3</span>,<span class="code-number">232</span></span>,<span class="code-number">0</span>,<span class="code-number">360</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>],[<span class="code-number">0,0,0,0,0,0,0,0,0</span>]];
+<span class="code-keyword">TASK PERS</span> <span class="code-type">welddata</span> <span class="code-var">wd4</span>:=[<span class="code-number">10</span>,<span class="code-number">0</span>,[<span class="code-number">5</span>,<span class="code-number">0</span>,<span class="highlight-line green"><span class="code-number">36.3</span>,<span class="code-number">232</span></span>,<span class="code-number">0</span>,<span class="code-number">360</span>,<span class="code-number">0</span>,<span class="code-number">0</span>,<span class="code-number">0</span>],[<span class="code-number">0,0,0,0,0,0,0,0,0</span>]];
+<span class="code-comment">! ... wd40, Holdwd1~4 까지 동일</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="change-summary">
+                    <div class="change-item">
+                        <div class="label">전압 (Voltage)</div>
+                        <div class="value before">36.8V</div>
+                        <div class="arrow">↓</div>
+                        <div class="value after">36.3V</div>
+                    </div>
+                    <div class="change-item">
+                        <div class="label">전류 (Current)</div>
+                        <div class="value before">227A</div>
+                        <div class="arrow">↓</div>
+                        <div class="value after">232A</div>
+                    </div>
+                    <div class="change-item">
+                        <div class="label">변경 비율</div>
+                        <div class="value before">-0.5V</div>
+                        <div class="arrow">↓</div>
+                        <div class="value after">+5A</div>
+                    </div>
+                </div>
+
+                <div class="impact-box">
+                    <h4>적용 영향</h4>
+                    <ul>
+                        <li>아크 길이 감소 (전압↓) → 더 집중된 열원</li>
+                        <li>용착량 증가 (전류↑) → 용입 깊이 증가</li>
+                        <li>스패터 감소 가능성</li>
+                        <li>Rob2에만 적용 (Rob1은 welddata 변경 없음)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: bInstalldir -->
+        <div class="section" id="section4">
+            <div class="section-header">
+                <h2>
+                    4. bInstalldir - 설치 방향 플래그
+                    <span class="file-badge">Rob1_MainModule.mod / Rob2_MainModule.mod</span>
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="description">
+                    <h3>변경 목적</h3>
+                    <p>로봇 또는 용접선의 설치 방향을 나타내는 플래그입니다. 방향에 따라 경로 계산이나 좌표 변환 로직이 달라질 수 있습니다.</p>
+                </div>
+
+                <div class="code-compare">
+                    <div class="code-block before">
+                        <div class="code-block-header">
+                            <span>기존 (Plan C 미적용)</span>
+                        </div>
+                        <pre><code><span class="code-keyword">TASK PERS</span> <span class="code-type">bool</span> <span class="code-var">bInstalldir</span>:=<span class="highlight-line"><span class="code-number">FALSE</span></span>;
+
+<span class="code-comment">! 사용 예시 (추정)</span>
+<span class="code-keyword">IF</span> bInstalldir = <span class="code-number">FALSE</span> <span class="code-keyword">THEN</span>
+    <span class="code-comment">! 정방향 설치 시 로직</span>
+    pTarget.trans.x := pTarget.trans.x;
+<span class="code-keyword">ELSE</span>
+    <span class="code-comment">! 역방향 설치 시 로직</span>
+    pTarget.trans.x := -pTarget.trans.x;
+<span class="code-keyword">ENDIF</span></code></pre>
+                    </div>
+                    <div class="code-block after">
+                        <div class="code-block-header">
+                            <span>변경 (Plan C 적용)</span>
+                        </div>
+                        <pre><code><span class="code-keyword">TASK PERS</span> <span class="code-type">bool</span> <span class="code-var">bInstalldir</span>:=<span class="highlight-line green"><span class="code-number">TRUE</span></span>;
+
+<span class="code-comment">! 사용 예시 (추정)</span>
+<span class="code-keyword">IF</span> bInstalldir = <span class="code-number">TRUE</span> <span class="code-keyword">THEN</span>
+    <span class="code-comment">! 역방향 설치 시 로직 적용</span>
+    pTarget.trans.x := -pTarget.trans.x;
+<span class="code-keyword">ELSE</span>
+    <span class="code-comment">! 정방향 설치 시 로직</span>
+    pTarget.trans.x := pTarget.trans.x;
+<span class="code-keyword">ENDIF</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="impact-box">
+                    <h4>적용 영향</h4>
+                    <ul>
+                        <li>Rob1, Rob2 양쪽 모두 동일하게 FALSE → TRUE 변경</li>
+                        <li>용접선 진행 방향 또는 좌표계 해석 방식 변경</li>
+                        <li>실제 영향은 이 플래그를 참조하는 로직에 따라 다름</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: 트래킹 보정 파라미터 -->
+        <div class="section" id="section5">
+            <div class="section-header">
+                <h2>
+                    5. 트래킹 보정 파라미터 구조 변경
+                    <span class="file-badge">Head_MoveControl.mod</span>
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="description">
+                    <h3>변경 목적</h3>
+                    <p>심 트래킹 보정값 전달 방식을 변경합니다. 기존 2개 파라미터(MaxCorr, Bias)에서 1개 파라미터(TrackGainZ)로 통합되었습니다.</p>
+                </div>
+
+                <div class="code-compare">
+                    <div class="code-block before">
+                        <div class="code-block-header">
+                            <span>기존 (Plan C 미적용)</span>
+                            <span>2개 파라미터</span>
+                        </div>
+                        <pre><code><span class="code-comment">! 용접 시작점 버퍼에서 보정값 복사</span>
+<span class="code-var">Welds1</span>{nMotionStepCount{1}}.<span class="highlight-line"><span class="code-var">MaxCorr</span></span>:=
+    macroStartBuffer1{nMotionStartStep}.<span class="code-var">MaxCorr</span>;
+<span class="code-var">Welds1</span>{nMotionStepCount{1}}.<span class="highlight-line"><span class="code-var">Bias</span></span>:=
+    macroStartBuffer1{nMotionStartStep}.<span class="code-var">Bias</span>;
+
+<span class="code-comment">! 용접 종료점 버퍼에서 보정값 복사</span>
+<span class="code-var">Welds1</span>{nMotionStepCount{1}}.<span class="highlight-line"><span class="code-var">MaxCorr</span></span>:=
+    macroEndBuffer1{1}.<span class="code-var">MaxCorr</span>;
+<span class="code-var">Welds1</span>{nMotionStepCount{1}}.<span class="highlight-line"><span class="code-var">Bias</span></span>:=
+    macroEndBuffer1{1}.<span class="code-var">Bias</span>;
+
+<span class="code-comment">! MaxCorr: 최대 보정 허용량</span>
+<span class="code-comment">! Bias: 보정 편향값 (오프셋)</span></code></pre>
+                    </div>
+                    <div class="code-block after">
+                        <div class="code-block-header">
+                            <span>변경 (Plan C 적용)</span>
+                            <span>1개 파라미터</span>
+                        </div>
+                        <pre><code><span class="code-comment">! 용접 시작점 버퍼에서 보정값 복사</span>
+<span class="code-var">Welds1</span>{nMotionStepCount{1}}.<span class="highlight-line green"><span class="code-var">TrackGainZ</span></span>:=
+    macroStartBuffer1{nMotionStartStep}.<span class="code-var">TrackGainZ</span>;
+
+
+
+<span class="code-comment">! 용접 종료점 버퍼에서 보정값 복사</span>
+<span class="code-var">Welds1</span>{nMotionStepCount{1}}.<span class="highlight-line green"><span class="code-var">TrackGainZ</span></span>:=
+    macroEndBuffer1{1}.<span class="code-var">TrackGainZ</span>;
+
+
+<span class="code-comment">! TrackGainZ: Z축 트래킹 게인 (통합 파라미터)</span>
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="full-code">
+                    <div class="full-code-header">
+                        <span>실제 변경된 코드 위치 (Welds1, Welds2 양쪽)</span>
+                    </div>
+                    <pre><code>! ========== 기존 (2개 파라미터) ==========
+! Line 246-247, 290-291, 354-355, 398-399 (Welds1)
+! Line 518-519, 562-563, 587-588, 626-627, 671-672 (Welds2)
+
+Welds1{nMotionStepCount{1}}.MaxCorr:=macroStartBuffer1{nMotionStartStep}.MaxCorr;
+Welds1{nMotionStepCount{1}}.Bias:=macroStartBuffer1{nMotionStartStep}.Bias;
+
+! ========== 변경 (1개 파라미터) ==========
+Welds1{nMotionStepCount{1}}.TrackGainZ:=macroStartBuffer1{nMotionStartStep}.TrackGainZ;</code></pre>
+                </div>
+
+                <div class="impact-box">
+                    <h4>적용 영향</h4>
+                    <ul>
+                        <li>트래킹 보정 로직 단순화</li>
+                        <li>MaxCorr(최대보정량)와 Bias(편향값)를 TrackGainZ 하나로 통합</li>
+                        <li>Welds1, Welds2 양쪽 모두 동일하게 적용</li>
+                        <li>파라미터 관리 용이성 향상</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: 갠트리 홈 좌표 계산 -->
+        <div class="section" id="section6">
+            <div class="section-header">
+                <h2>
+                    6. 갠트리 홈 좌표 자동 계산
+                    <span class="file-badge">Head_MainModule.mod</span>
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="description">
+                    <h3>변경 목적</h3>
+                    <p>갠트리 홈 위치와 작업 좌표계(WobjFloor)를 리미트 값과 보정값을 기반으로 자동 계산합니다. 기존에는 이 로직이 주석 처리되어 있었습니다.</p>
+                </div>
+
+                <div class="code-compare">
+                    <div class="code-block before">
+                        <div class="code-block-header">
+                            <span>기존 (Plan C 미적용)</span>
+                            <span>주석 처리 (비활성)</span>
+                        </div>
+                        <pre><code><span class="code-comment">! 홈 좌표 계산 로직이 주석 처리됨</span>
+<span class="highlight-line red"><span class="code-comment">!        nHomeTcpX:=nLimitX_Negative;</span></span>
+<span class="highlight-line red"><span class="code-comment">!        nHomeTcpY:=nLimitY_Positive;</span></span>
+<span class="highlight-line red"><span class="code-comment">!        nHomeTcpZ:=nLimitZ_Positive;</span></span>
+
+<span class="highlight-line red"><span class="code-comment">!        nHomeAdjustX:=nDiffGantryX;</span></span>
+<span class="highlight-line red"><span class="code-comment">!        nHomeAdjustY:=nDiffGantryY;</span></span>
+<span class="highlight-line red"><span class="code-comment">!        nHomeAdjustZ:=nDiffGantryZ;</span></span>
+
+<span class="highlight-line red"><span class="code-comment">!        nHomeGantryX:=nHomeTcpX+nHomeAdjustX;</span></span>
+<span class="highlight-line red"><span class="code-comment">!        nHomeGantryY:=nHomeTcpY+nHomeAdjustY;</span></span>
+<span class="highlight-line red"><span class="code-comment">!        nHomeGantryZ:=nHomeTcpZ+nHomeAdjustZ;</span></span>
+
+<span class="highlight-line red"><span class="code-comment">!        WobjFloor.uframe.trans:=[nHomeGantryX,nHomeGantryY,nHomeGantryZ];</span></span>
+
+<span class="code-comment">! → 고정된 WobjFloor 값 사용</span></code></pre>
+                    </div>
+                    <div class="code-block after">
+                        <div class="code-block-header">
+                            <span>변경 (Plan C 적용)</span>
+                            <span>활성화</span>
+                        </div>
+                        <pre><code><span class="code-comment">! 홈 좌표 계산 로직 활성화</span>
+<span class="highlight-line green"><span class="code-var">nHomeTcpX</span>:=<span class="code-var">nLimitX_Negative</span>;</span>
+<span class="highlight-line green"><span class="code-var">nHomeTcpY</span>:=<span class="code-var">nLimitY_Positive</span>;</span>
+<span class="highlight-line green"><span class="code-var">nHomeTcpZ</span>:=<span class="code-var">nLimitZ_Positive</span>;</span>
+
+<span class="highlight-line green"><span class="code-var">nHomeAdjustX</span>:=<span class="code-var">nDiffGantryX</span>;</span>
+<span class="highlight-line green"><span class="code-var">nHomeAdjustY</span>:=<span class="code-var">nDiffGantryY</span>;</span>
+<span class="highlight-line green"><span class="code-var">nHomeAdjustZ</span>:=<span class="code-var">nDiffGantryZ</span>;</span>
+
+<span class="highlight-line green"><span class="code-var">nHomeGantryX</span>:=<span class="code-var">nHomeTcpX</span>+<span class="code-var">nHomeAdjustX</span>;</span>
+<span class="highlight-line green"><span class="code-var">nHomeGantryY</span>:=<span class="code-var">nHomeTcpY</span>+<span class="code-var">nHomeAdjustY</span>;</span>
+<span class="highlight-line green"><span class="code-var">nHomeGantryZ</span>:=<span class="code-var">nHomeTcpZ</span>+<span class="code-var">nHomeAdjustZ</span>;</span>
+
+<span class="highlight-line green"><span class="code-var">WobjFloor</span>.uframe.trans:=[<span class="code-var">nHomeGantryX</span>,<span class="code-var">nHomeGantryY</span>,<span class="code-var">nHomeGantryZ</span>];</span>
+
+<span class="code-comment">! → 리미트 + 보정값 기반 동적 계산</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="impact-box">
+                    <h4>적용 영향</h4>
+                    <ul>
+                        <li>갠트리 리미트 값(nLimitX_Negative 등)을 기준으로 홈 위치 결정</li>
+                        <li>보정값(nDiffGantryX/Y/Z)을 적용하여 최종 홈 좌표 계산</li>
+                        <li>WobjFloor 작업 좌표계가 동적으로 업데이트됨</li>
+                        <li>기계 원점 변화에 자동 대응 가능</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7: rWarm_Up -->
+        <div class="section" id="section7">
+            <div class="section-header">
+                <h2>
+                    7. rWarm_Up - 갠트리 워밍업 루틴
+                    <span class="file-badge">Head_MoveControl.mod</span>
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="description">
+                    <h3>변경 목적</h3>
+                    <p>Plan C 적용 시 워밍업 루틴이 제거되었습니다. 기존에는 갠트리 각 축을 점진적으로 움직여 워밍업하는 기능이 있었습니다.</p>
+                </div>
+
+                <div class="code-compare">
+                    <div class="code-block before">
+                        <div class="code-block-header">
+                            <span>기존 (Plan C 미적용)</span>
+                            <span>워밍업 루틴 존재</span>
+                        </div>
+                        <pre><code><span class="code-comment">! Head_MainModule.mod - 커맨드 처리부</span>
+<span class="code-keyword">CASE</span> CMD_MOVE_TO_nWarmUp:
+    rCheckCmdMacth CMD_MOVE_TO_nWarmUp;
+    <span class="highlight-line"><span class="code-proc">rWarm_Up</span>;</span>
+
+<span class="code-comment">! Head_MoveControl.mod - 워밍업 프로시저</span>
+<span class="code-keyword">PROC</span> <span class="code-proc">rWarm_Up</span>()
+    <span class="code-keyword">VAR</span> <span class="code-type">speeddata</span> vWarmUp_Speed;
+    <span class="code-keyword">VAR</span> <span class="code-type">num</span> nWarmUp_Target_X:=<span class="code-number">12000</span>;
+
+    vWarmUp_Speed:=[<span class="code-number">300</span>,<span class="code-number">300</span>,<span class="code-number">10</span>,<span class="code-number">10</span>];
+
+    <span class="code-keyword">WHILE</span> bWarmUpComplete=<span class="code-number">FALSE</span> <span class="code-keyword">DO</span>
+        <span class="code-comment">! X축: ±150mm 왕복</span>
+        <span class="code-keyword">IF</span> jgWarm_Up.JointG.extax.eax_a < target+<span class="code-number">149</span> ...
+            jgTarget.JointG.extax.eax_a := target-<span class="code-number">150</span>;
+
+        <span class="code-comment">! Y축: 0~150mm 왕복</span>
+        <span class="code-keyword">IF</span> jgWarm_Up.JointG.extax.eax_b > <span class="code-number">149</span> ...
+
+        <span class="code-comment">! Z축: 0~100mm 왕복</span>
+        <span class="code-keyword">IF</span> jgWarm_Up.JointG.extax.eax_c < <span class="code-number">1</span> ...
+
+        <span class="code-comment">! R축: ±90° 왕복</span>
+        <span class="code-keyword">IF</span> jgWarm_Up.JointG.extax.eax_d < -<span class="code-number">81</span> ...
+
+        <span class="code-comment">! 점진 가속</span>
+        MoveJgJ jgWarm_Up, vWarmUp_Speed, fine;
+        vWarmUp_Speed.v_reax := vWarmUp_Speed.v_reax + <span class="code-number">0.1</span>;
+        vWarmUp_Speed.v_leax := vWarmUp_Speed.v_leax + <span class="code-number">0.5</span>;
+
+        <span class="code-keyword">IF</span> nWarmUpTime > nWarmUpCycle ...
+    <span class="code-keyword">ENDWHILE</span>
+<span class="code-keyword">ENDPROC</span></code></pre>
+                    </div>
+                    <div class="code-block after">
+                        <div class="code-block-header">
+                            <span>변경 (Plan C 적용)</span>
+                            <span>워밍업 루틴 제거</span>
+                        </div>
+                        <pre><code><span class="code-comment">! Head_MainModule.mod - 커맨드 처리부</span>
+<span class="code-comment">! CMD_MOVE_TO_nWarmUp 케이스 없음</span>
+<span class="code-comment">! rWarm_Up 호출 없음</span>
+
+
+
+
+<span class="code-comment">! Head_MoveControl.mod</span>
+<span class="code-comment">! rWarm_Up 프로시저 없음</span>
+
+
+
+
+
+
+
+
+
+
+<span class="code-comment">! 워밍업 없이 바로 작업 시작</span>
+
+
+</code></pre>
+                    </div>
+                </div>
+
+                <div class="full-code">
+                    <div class="full-code-header">
+                        <span>제거된 rWarm_Up 전체 코드 (기존에만 존재)</span>
+                    </div>
+                    <pre><code>PROC rWarm_Up()
+    VAR speeddata vWarmUp_Speed;
+    VAR num nWarmUp_Distance_X, nWarmUp_Distance_Y, nWarmUp_Distance_Z, nWarmUp_Distance_R;
+    VAR num nTempDistance:=0;
+    VAR clock clWarmUp;
+    VAR bool bWarmUpComplete:=FALSE;
+    VAR jointgroup jgWarmUpTargetpos;
+    VAR num nWarmUp_Target_X:=0;
+
+    ! 사용자 설정: 갠트리 X 목표 위치
+    nWarmUp_Target_X:=12000;
+
+    jgWarmUpTargetpos:=jgHomeJoint;
+    jgWarmUpTargetpos.JointG.extax.eax_a:=nWarmUp_Target_X;
+    jgWarmUpTargetpos.JointG.extax.eax_f:=nWarmUp_Target_X;
+
+    jgTarget:=MergeJgWith();
+    jgTarget.JointG:=jgWarmUpTargetpos.JointG;
+    jgTarget.JointG.extax.eax_d:=90;
+
+    vWarmUp_Speed:=[300,300,10,10];  ! 초기 속도
+    ClkReset clWarmUp;
+    ClkStart clWarmUp;
+
+    WHILE bWarmUpComplete=FALSE DO
+        jgWarm_Up:=MergeJgWith();
+
+        ! === X축 (eax_a) 왕복 이동 ===
+        IF jgWarm_Up.JointG.extax.eax_a < jgWarmUpTargetpos.JointG.extax.eax_a+149 AND
+           jgWarm_Up.JointG.extax.eax_a > jgWarmUpTargetpos.JointG.extax.eax_a-149 THEN
+            jgTarget.JointG.extax.eax_a:=jgWarmUpTargetpos.JointG.extax.eax_a-150;
+        ELSE
+            IF jgWarm_Up.JointG.extax.eax_a < jgWarmUpTargetpos.JointG.extax.eax_a-150
+                jgTarget.JointG.extax.eax_a:=jgWarmUpTargetpos.JointG.extax.eax_a+150;
+        ENDIF
+        nWarmUp_Distance_X:=jgTarget.JointG.extax.eax_a - jgWarm_Up.JointG.extax.eax_a;
+        IF nWarmUp_Distance_X > 0 THEN nTempDistance:=100; ELSE nTempDistance:=-100; ENDIF
+        jgWarm_Up.JointG.extax.eax_a:=jgWarm_Up.JointG.extax.eax_a + nTempDistance;
+        jgWarm_Up.JointG.extax.eax_f:=jgWarm_Up.JointG.extax.eax_f + nTempDistance;
+
+        ! === Y축 (eax_b) 왕복 이동 ===
+        IF jgWarm_Up.JointG.extax.eax_b > 149 jgTarget.JointG.extax.eax_b:=0;
+        IF jgWarm_Up.JointG.extax.eax_b < 1   jgTarget.JointG.extax.eax_b:=150;
+        ! ... 유사 로직
+
+        ! === Z축 (eax_c) 왕복 이동 ===
+        IF jgWarm_Up.JointG.extax.eax_c < 1  jgTarget.JointG.extax.eax_c:=100;
+        IF jgWarm_Up.JointG.extax.eax_c > 99 jgTarget.JointG.extax.eax_c:=0;
+        ! ... 유사 로직
+
+        ! === R축 (eax_d) 왕복 이동 ===
+        IF jgWarm_Up.JointG.extax.eax_d < -81 jgTarget.JointG.extax.eax_d:=90;
+        IF jgWarm_Up.JointG.extax.eax_d > 81  jgTarget.JointG.extax.eax_d:=-90;
+        ! ... 유사 로직
+
+        ! 리미트 적용 및 이동
+        jgWarm_Up.JointG.extax.eax_b:=Limit(0, 5300, jgWarm_Up.JointG.extax.eax_b);
+        jgWarm_Up.JointG.extax.eax_c:=Limit(0, 100, jgWarm_Up.JointG.extax.eax_c);
+        jgWarm_Up.JointG.extax.eax_d:=Limit(-90, 90, jgWarm_Up.JointG.extax.eax_d);
+        MoveJgJ MergeJgWith(\Gantry:=jgWarm_Up.JointG), vWarmUp_Speed, fine;
+
+        ! 점진 가속
+        vWarmUp_Speed.v_reax:=vWarmUp_Speed.v_reax + 0.1;
+        vWarmUp_Speed.v_leax:=vWarmUp_Speed.v_leax + 0.5;
+        IF vWarmUp_Speed.v_reax > 25  vWarmUp_Speed.v_reax:=25;
+        IF vWarmUp_Speed.v_leax > 250 vWarmUp_Speed.v_leax:=250;
+
+        nWarmUpTime:=ClkRead(clWarmUp);
+        IF nWarmUpTime > nWarmUpCycle bWarmUpComplete:=TRUE;
+    ENDWHILE
+
+    ClkStop clWarmUp;
+    RETURN;
+ENDPROC</code></pre>
+                </div>
+
+                <div class="impact-box">
+                    <h4>적용 영향</h4>
+                    <ul>
+                        <li>시작 전 워밍업 시간 제거 → 사이클 타임 단축</li>
+                        <li>CMD_MOVE_TO_nWarmUp (112번) 커맨드 비활성화</li>
+                        <li>저온 환경에서 초기 동작 시 주의 필요</li>
+                        <li>rGantry_C_Home 프로시저도 함께 제거됨</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8: rHole_check_X -->
+        <div class="section" id="section8">
+            <div class="section-header">
+                <h2>
+                    8. rHole_check_X - 홀 센서 체크 기능
+                    <span class="file-badge">Head_MainModule.mod</span>
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="description">
+                    <h3>변경 목적</h3>
+                    <p>홀 센서를 이용한 X축 원점 체크 기능의 호출이 주석 처리되었습니다. Plan C에서는 이 기능을 비활성화했습니다.</p>
+                </div>
+
+                <div class="code-compare">
+                    <div class="code-block before">
+                        <div class="code-block-header">
+                            <span>기존 (Plan C 미적용)</span>
+                            <span>홀 체크 활성</span>
+                        </div>
+                        <pre><code><span class="code-comment">! Head_MainModule.mod - 커맨드 처리부</span>
+<span class="code-keyword">CASE</span> CMD_Hole_check:
+    rCheckCmdMacth CMD_Hole_check;
+    <span class="highlight-line"><span class="code-proc">rHole_check_X</span>;</span>
+
+<span class="code-comment">! 홀 센서로 X축 기계 원점 편차 측정</span>
+<span class="code-comment">! 결과: nDiffHoleX, nDiffHoleXskew 업데이트</span></code></pre>
+                    </div>
+                    <div class="code-block after">
+                        <div class="code-block-header">
+                            <span>변경 (Plan C 적용)</span>
+                            <span>홀 체크 비활성</span>
+                        </div>
+                        <pre><code><span class="code-comment">! Head_MainModule.mod - 커맨드 처리부</span>
+<span class="code-keyword">CASE</span> CMD_Hole_check:
+    rCheckCmdMacth CMD_Hole_check;
+    <span class="highlight-line red"><span class="code-comment">!                rHole_check_X;</span></span>
+
+<span class="code-comment">! 홀 센서 체크 비활성화</span>
+<span class="code-comment">! 기계 원점 편차 측정 안 함</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="full-code">
+                    <div class="full-code-header">
+                        <span>참고: rHole_check_X 프로시저 (Head_InspectMechanicalOrigin.mod)</span>
+                    </div>
+                    <pre><code>PROC rHole_check_X()
+    CONST string HoleCameraIP{2}:=["192.168.125.121","192.168.125.122"];
+    CONST num HoleCameraPort:=10000;
+
+    rMoveToHoleCheck;  ! 홀 체크 위치로 이동
+
+    FOR i FROM 1 TO 2 DO
+        WHILE bCheck=FALSE DO
+            rHoleConnectSocket HoleCameraIP{i}, HoleCameraPort;
+            X_pos:=StrPart(sReceiveData, 12, 5);
+            Y_pos:=StrPart(sReceiveData, 18, 5);
+
+            bCheck_X:=StrToVal(X_pos, nInspectHoleX{i});
+            bCheck_Y:=StrToVal(Y_pos, nInspectHoleY{i});
+            bCheck:=bCheck_X AND bCheck_Y;
+        ENDWHILE
+        bCheck:=FALSE;
+    ENDFOR
+
+    ! 편차 계산
+    nDiffHoleX:=(nInspectHoleX{1} - nRefHoleX{1});
+    nDiffHoleXskew:=asin(((nInspectHoleX{2}-nRefHoleX{2}) - (nInspectHoleX{1}-nRefHoleX{1})) / 8795);
+
+    RETURN;
+ENDPROC</code></pre>
+                </div>
+
+                <div class="impact-box">
+                    <h4>적용 영향</h4>
+                    <ul>
+                        <li>홀 센서 기반 원점 편차 측정 기능 비활성화</li>
+                        <li>Head_InspectMechanicalOrigin.mod 모듈 전체가 Plan C에서 제외</li>
+                        <li>nDiffHoleX, nDiffHoleXskew 값 업데이트 안 됨</li>
+                        <li>기계 원점 변화 자동 감지 불가 → 수동 관리 필요</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 9: stReact -->
+        <div class="section" id="section9">
+            <div class="section-header">
+                <h2>
+                    9. stReact 상태 반응 배열 인덱스 변경
+                    <span class="file-badge">Rob1_MainModule.mod</span>
+                </h2>
+            </div>
+            <div class="section-content">
+                <div class="description">
+                    <h3>변경 목적</h3>
+                    <p>상태 반응 배열의 인덱스가 변경되었습니다. 어떤 로봇/태스크의 상태를 "Ready"로 설정하는지가 달라집니다.</p>
+                </div>
+
+                <div class="code-compare">
+                    <div class="code-block before">
+                        <div class="code-block-header">
+                            <span>기존 (Plan C 미적용)</span>
+                            <span>인덱스 {1}</span>
+                        </div>
+                        <pre><code><span class="code-comment">! 상태 처리 로직</span>
+<span class="code-keyword">CASE</span> <span class="code-number">1</span>:
+    <span class="code-var">stReact</span>{<span class="highlight-line"><span class="code-number">1</span></span>}:=<span class="code-string">"Ready"</span>;
+
+<span class="code-keyword">CASE</span> <span class="code-number">2</span>:
+    <span class="code-var">stReact</span>{<span class="highlight-line"><span class="code-number">1</span></span>}:=<span class="code-string">"Ready"</span>;
+
+<span class="code-keyword">CASE</span> <span class="code-number">3</span>:
+    <span class="code-var">stReact</span>{<span class="highlight-line"><span class="code-number">1</span></span>}:=<span class="code-string">"Ready"</span>;
+
+<span class="code-comment">! stReact{1} = Rob1 또는 첫 번째 태스크 상태</span></code></pre>
+                    </div>
+                    <div class="code-block after">
+                        <div class="code-block-header">
+                            <span>변경 (Plan C 적용)</span>
+                            <span>인덱스 {2}</span>
+                        </div>
+                        <pre><code><span class="code-comment">! 상태 처리 로직</span>
+<span class="code-keyword">CASE</span> <span class="code-number">1</span>:
+    <span class="code-var">stReact</span>{<span class="highlight-line green"><span class="code-number">2</span></span>}:=<span class="code-string">"Ready"</span>;
+
+<span class="code-keyword">CASE</span> <span class="code-number">2</span>:
+    <span class="code-var">stReact</span>{<span class="highlight-line green"><span class="code-number">2</span></span>}:=<span class="code-string">"Ready"</span>;
+
+<span class="code-keyword">CASE</span> <span class="code-number">3</span>:
+    <span class="code-var">stReact</span>{<span class="highlight-line green"><span class="code-number">2</span></span>}:=<span class="code-string">"Ready"</span>;
+
+<span class="code-comment">! stReact{2} = Rob2 또는 두 번째 태스크 상태</span></code></pre>
+                    </div>
+                </div>
+
+                <div class="impact-box">
+                    <h4>적용 영향</h4>
+                    <ul>
+                        <li>Rob1_MainModule에서 stReact 배열 인덱스 1 → 2 로 변경</li>
+                        <li>태스크 간 상태 동기화 대상 변경</li>
+                        <li>멀티 로봇 협조 작업 시 상태 전파 경로 변경</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 요약 테이블 -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Plan C RAPID 코드 변경 요약</h2>
+            </div>
+            <div class="section-content">
+                <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                    <thead>
+                        <tr style="background:#0f3460;">
+                            <th style="padding:12px; text-align:left; border-bottom:2px solid #3a7bd5;">구분</th>
+                            <th style="padding:12px; text-align:left; border-bottom:2px solid #3a7bd5;">기존 (미적용)</th>
+                            <th style="padding:12px; text-align:left; border-bottom:2px solid #3a7bd5;">변경 (적용)</th>
+                            <th style="padding:12px; text-align:left; border-bottom:2px solid #3a7bd5;">파일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid #0f3460;">
+                            <td style="padding:10px;">zSync</td>
+                            <td style="padding:10px; color:#ffc107;">[FALSE,200,300,...]</td>
+                            <td style="padding:10px; color:#28a745;">[TRUE,0,0,...]</td>
+                            <td style="padding:10px; color:#888;">Gantry, Head</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #0f3460;">
+                            <td style="padding:10px;">trackdata</td>
+                            <td style="padding:10px; color:#ffc107;">3rd param = 10</td>
+                            <td style="padding:10px; color:#28a745;">3rd param = 0</td>
+                            <td style="padding:10px; color:#888;">Rob1, Rob2</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #0f3460;">
+                            <td style="padding:10px;">welddata</td>
+                            <td style="padding:10px; color:#ffc107;">36.8V / 227A</td>
+                            <td style="padding:10px; color:#28a745;">36.3V / 232A</td>
+                            <td style="padding:10px; color:#888;">Rob2</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #0f3460;">
+                            <td style="padding:10px;">bInstalldir</td>
+                            <td style="padding:10px; color:#ffc107;">FALSE</td>
+                            <td style="padding:10px; color:#28a745;">TRUE</td>
+                            <td style="padding:10px; color:#888;">Rob1, Rob2</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #0f3460;">
+                            <td style="padding:10px;">트래킹 파라미터</td>
+                            <td style="padding:10px; color:#ffc107;">MaxCorr + Bias</td>
+                            <td style="padding:10px; color:#28a745;">TrackGainZ</td>
+                            <td style="padding:10px; color:#888;">Head_MoveControl</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #0f3460;">
+                            <td style="padding:10px;">홈 좌표 계산</td>
+                            <td style="padding:10px; color:#ffc107;">주석 (비활성)</td>
+                            <td style="padding:10px; color:#28a745;">활성화</td>
+                            <td style="padding:10px; color:#888;">Head_MainModule</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #0f3460;">
+                            <td style="padding:10px;">rWarm_Up</td>
+                            <td style="padding:10px; color:#ffc107;">존재</td>
+                            <td style="padding:10px; color:#dc3545;">제거됨</td>
+                            <td style="padding:10px; color:#888;">Head_MoveControl</td>
+                        </tr>
+                        <tr style="border-bottom:1px solid #0f3460;">
+                            <td style="padding:10px;">rHole_check_X</td>
+                            <td style="padding:10px; color:#ffc107;">호출됨</td>
+                            <td style="padding:10px; color:#dc3545;">주석 처리</td>
+                            <td style="padding:10px; color:#888;">Head_MainModule</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:10px;">stReact 인덱스</td>
+                            <td style="padding:10px; color:#ffc107;">{1}</td>
+                            <td style="padding:10px; color:#28a745;">{2}</td>
+                            <td style="padding:10px; color:#888;">Rob1_MainModule</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            S25016 프로젝트 | Plan C RAPID 코드 비교 분석 | 생성일: 2026-01-23
+        </footer>
+    </div>
+</body>
+</html>
