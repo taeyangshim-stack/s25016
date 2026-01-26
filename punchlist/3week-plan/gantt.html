@@ -564,8 +564,8 @@
                 <div class="gantt-header-cell"><div class="day">금</div><div class="date">1/23</div></div>
                 <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">1/24</div></div>
                 <div class="gantt-header-cell weekend"><div class="day">일</div><div class="date">1/25</div></div>
-                <!-- 2주차: 1/26(월)~2/1(일) -->
-                <div class="gantt-header-cell week-start"><div class="day">월</div><div class="date">1/26</div></div>
+                <!-- 2주차: 1/26(월)~2/1(일) TODAY -->
+                <div class="gantt-header-cell week-start" style="background:rgba(59,130,246,0.3);border:2px solid #3b82f6;"><div class="day" style="color:#3b82f6;font-weight:bold;">월</div><div class="date" style="color:#3b82f6;font-weight:bold;">1/26</div><div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;">TODAY</div></div>
                 <div class="gantt-header-cell"><div class="day">화</div><div class="date">1/27</div></div>
                 <div class="gantt-header-cell"><div class="day">수</div><div class="date">1/28</div></div>
                 <div class="gantt-header-cell"><div class="day">목</div><div class="date">1/29</div></div>
@@ -599,8 +599,10 @@
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 1/26~2/1 -->
-                    <div class="gantt-cell week-start"></div>
+                    <!-- 2주차 1/26 TODAY -->
+                    <div class="gantt-cell week-start" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
+                        <div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;text-align:center;">TODAY</div>
+                    </div>
                     <div class="gantt-cell">
                         <div class="task-bar high">089 돌림옵셋</div>
                     </div>
@@ -803,56 +805,103 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 1/22 (목) - 6개 진행예정 -->
-                    <div class="gantt-cell" style="background:#eff6ff;">
-                        <div class="task-bar pending" style="font-size:0.65rem;">상하한치
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></div>
-                                <div>공압/가스/냉각수 상하한치</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 진행예정 (DB수정, 야간test 2시간)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar pending" style="font-size:0.65rem;">웜업UI
+                    <!-- 1/22 (목) - 완료 2건 -->
+                    <div class="gantt-cell" style="background:#ecfdf5;">
+                        <div class="task-bar completed" style="font-size:0.65rem;">터치에러
                             <div class="task-tooltip">
                                 <div class="tt-title">신규 항목</div>
-                                <div>웜업 UI 가시성 개선</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 진행예정</div>
+                                <div>B라인 터치에러 핸들링</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/22 삼성컨펌완료</div>
                             </div>
                         </div>
-                        <div class="task-bar pending" style="font-size:0.65rem;">PLC알람
+                        <div class="task-bar completed" style="font-size:0.65rem;">노즐클리닝
                             <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-061" target="_blank">PL-2025-061</a></div>
-                                <div>PLC알람 관제측 전달</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 진행예정 (하트비트, CPU알람, 불스아이LOW)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar pending" style="font-size:0.65rem;">동시피딩
-                            <div class="task-tooltip">
-                                <div class="tt-title">신규 항목</div>
-                                <div>와이어 동시 피딩 기능</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 진행예정 (피딩시간 측정후 적용)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar pending" style="font-size:0.65rem;">트윈영상
-                            <div class="task-tooltip">
-                                <div class="tt-title">신규 항목</div>
-                                <div>디지털 트윈 영상촬영</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 확인예정 (조용현프로와 확인후)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar pending" style="font-size:0.65rem;">필터링
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank">PL-2025-096</a></div>
-                                <div>비정상 용접선 정보 필터링</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 컨펌시도 (코드완료)</div>
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-116" target="_blank">PL-2025-116</a></div>
+                                <div>노즐 클리닝 티칭</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/22 테스트완료 (A라인)</div>
                             </div>
                         </div>
                     </div>
-                    <div class="gantt-cell"></div>
+                    <!-- 1/23 (금) - 완료 1건 -->
+                    <div class="gantt-cell" style="background:#ecfdf5;">
+                        <div class="task-bar completed" style="font-size:0.65rem;">스프레이
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-117" target="_blank">PL-2025-117</a></div>
+                                <div>스프레이 티칭 기능</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/23 테스트완료 (A라인)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 1/24 (토) - 현장작업 완료 3건 -->
+                    <div class="gantt-cell weekend" style="background:#ecfdf5;">
+                        <div class="task-bar completed" style="font-size:0.65rem;">불스아이
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank">PL-2026-168</a></div>
+                                <div>불스아이 결선</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/24 현장작업 완료</div>
+                            </div>
+                        </div>
+                        <div class="task-bar completed" style="font-size:0.65rem;">BullsEye
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank">PL-2025-142</a></div>
+                                <div>B라인 BullsEye 설치</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/24 현장작업 완료</div>
+                            </div>
+                        </div>
+                        <div class="task-bar completed" style="font-size:0.65rem;">절연처리
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank">PL-2025-097</a></div>
+                                <div>로봇 절연처리 (백그라이트)</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/24 현장작업 완료</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="gantt-cell weekend"></div>
-                    <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <!-- 2주차 1/26 (월) TODAY -->
+                    <div class="gantt-cell week-start" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
+                        <div class="task-bar completed" style="font-size:0.65rem;">윤활배관
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-202" target="_blank">PL-2026-202</a></div>
+                                <div>A라인 윤활 배관 수정 작업</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/26 완료</div>
+                            </div>
+                        </div>
+                        <div class="task-bar completed" style="font-size:0.65rem;">웜업UI✓
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-191" target="_blank">PL-2025-191</a></div>
+                                <div>웜업 UI 가시성 개선</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 테스트완료→배포대기</div>
+                            </div>
+                        </div>
+                        <div class="task-bar completed" style="font-size:0.65rem;">동시피딩✓
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-150" target="_blank">PL-2025-150/192</a></div>
+                                <div>와이어 동시 피딩 기능</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 테스트완료→배포대기</div>
+                            </div>
+                        </div>
+                        <div class="task-bar delayed" style="font-size:0.65rem;">상하한치⚠
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></div>
+                                <div>공압/가스/냉각수 상하한치</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
+                            </div>
+                        </div>
+                        <div class="task-bar delayed" style="font-size:0.65rem;">PLC알람⚠
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-061" target="_blank">PL-2025-061</a></div>
+                                <div>PLC알람 관제측 전달</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
+                            </div>
+                        </div>
+                        <div class="task-bar delayed" style="font-size:0.65rem;">필터링⚠
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank">PL-2025-096</a></div>
+                                <div>비정상 용접선 정보 필터링</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
@@ -877,27 +926,30 @@
                     <div class="gantt-cell week-start"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell"></div>
+                    <!-- 1/22 노즐클리닝 완료 -->
+                    <div class="gantt-cell" style="background:#ecfdf5;">
+                        <div class="task-bar completed">116 노즐✓</div>
+                    </div>
+                    <!-- 1/23 스프레이 완료 -->
+                    <div class="gantt-cell" style="background:#ecfdf5;">
+                        <div class="task-bar completed">117 스프레이✓</div>
+                    </div>
                     <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend"></div>
+                    <!-- 2주차 1/26 TODAY -->
+                    <div class="gantt-cell week-start" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
+                        <div class="task-bar high">188 쇼크센서</div>
+                    </div>
                     <div class="gantt-cell">
                         <div class="task-bar normal">115 앵글회피</div>
                     </div>
-                    <div class="gantt-cell">
-                        <div class="task-bar normal">116 노즐클리닝</div>
-                    </div>
-                    <div class="gantt-cell">
-                        <div class="task-bar normal">117 스프레이</div>
-                    </div>
+                    <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
                     <!-- 3주차 -->
+                    <div class="gantt-cell weekend"></div>
                     <div class="gantt-cell week-start"></div>
-                    <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
@@ -927,8 +979,10 @@
                     </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <!-- 2주차 1/26 TODAY -->
+                    <div class="gantt-cell week-start" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
+                        <div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;text-align:center;">TODAY</div>
+                    </div>
                     <div class="gantt-cell">
                         <div class="task-bar normal">109 LAN케이블</div>
                     </div>
@@ -973,8 +1027,10 @@
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <!-- 2주차 1/26 TODAY -->
+                    <div class="gantt-cell week-start" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
+                        <div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;text-align:center;">TODAY</div>
+                    </div>
                     <div class="gantt-cell">
                         <div class="task-bar normal">033 케이블</div>
                     </div>
@@ -1041,8 +1097,14 @@
                         <div class="task-bar verify">150 와이어피딩</div>
                         <div class="task-bar verify">151 Z홈모드</div>
                     </div>
-                    <!-- 2주차 - 높음 -->
-                    <div class="gantt-cell week-start"></div>
+                    <!-- 2주차 1/26 TODAY - 테스트완료/지연 -->
+                    <div class="gantt-cell week-start" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
+                        <div class="task-bar completed" style="font-size:0.6rem;">106 통신✓</div>
+                        <div class="task-bar completed" style="font-size:0.6rem;">191 웜업✓</div>
+                        <div class="task-bar completed" style="font-size:0.6rem;">157 수평✓</div>
+                        <div class="task-bar delayed" style="font-size:0.6rem;">196 팝업⚠</div>
+                        <div class="task-bar high" style="font-size:0.6rem;">092 수직</div>
+                    </div>
                     <div class="gantt-cell">
                         <div class="task-bar high">020 수직용접</div>
                         <div class="task-bar high">023 자동진단</div>
@@ -1109,13 +1171,16 @@
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
-                    <div class="gantt-cell weekend">
-                        <div class="task-bar high">097 로봇절연</div>
-                        <div class="task-bar high">142 불스아이</div>
+                    <!-- 1/24 (토) - 현장작업 완료 2건 -->
+                    <div class="gantt-cell weekend" style="background:#ecfdf5;">
+                        <div class="task-bar completed">097 절연✓</div>
+                        <div class="task-bar completed">142 불스아이✓</div>
                     </div>
                     <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <!-- 2주차 1/26 TODAY -->
+                    <div class="gantt-cell week-start" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
+                        <div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;text-align:center;">TODAY</div>
+                    </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
@@ -1157,8 +1222,8 @@
                 <div class="summary-cell"><div class="num" style="color:#10b981;">6</div></div><!-- 1/23 완료 -->
                 <div class="summary-cell weekend"><div class="num" style="color:#10b981;">3</div></div><!-- 1/24 (토) 완료 -->
                 <div class="summary-cell weekend"><div class="num">2</div></div><!-- 1/25 (일) -->
-                <!-- 2주차 -->
-                <div class="summary-cell weekend" style="background:rgba(59,130,246,0.2);"><div class="num" style="color:#3b82f6;">TODAY</div></div><!-- 1/26 TODAY -->
+                <!-- 2주차 1/26 (월) TODAY -->
+                <div class="summary-cell week-start" style="background:rgba(59,130,246,0.2);border:2px solid #3b82f6;"><div class="num" style="color:#3b82f6;">TODAY</div></div><!-- 1/26 TODAY -->
                 <div class="summary-cell"><div class="num">8</div></div>
                 <div class="summary-cell"><div class="num">8</div></div>
                 <div class="summary-cell"><div class="num">6</div></div>
