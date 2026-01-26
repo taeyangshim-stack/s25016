@@ -1154,11 +1154,11 @@
                 <div class="summary-cell"><div class="num" style="color:#ff6b6b;">19</div></div><!-- 1/20: 기존5 + 지연6 + B라인8 -->
                 <div class="summary-cell"><div class="num">5</div></div><!-- 1/21 -->
                 <div class="summary-cell"><div class="num">4</div></div><!-- 1/22 -->
-                <div class="summary-cell"><div class="num" style="color:#3b82f6;">6</div></div><!-- 1/23 TODAY -->
-                <div class="summary-cell weekend"><div class="num" style="color:#ffa502;">7</div></div><!-- 1/24 (토) 현장작업 -->
+                <div class="summary-cell"><div class="num" style="color:#10b981;">6</div></div><!-- 1/23 완료 -->
+                <div class="summary-cell weekend"><div class="num" style="color:#10b981;">3</div></div><!-- 1/24 (토) 완료 -->
                 <div class="summary-cell weekend"><div class="num">2</div></div><!-- 1/25 (일) -->
                 <!-- 2주차 -->
-                <div class="summary-cell weekend">-</div>
+                <div class="summary-cell weekend" style="background:rgba(59,130,246,0.2);"><div class="num" style="color:#3b82f6;">TODAY</div></div><!-- 1/26 TODAY -->
                 <div class="summary-cell"><div class="num">8</div></div>
                 <div class="summary-cell"><div class="num">8</div></div>
                 <div class="summary-cell"><div class="num">6</div></div>
@@ -1531,10 +1531,10 @@
                     </div>
                 </div>
 
-                <div class="day-card" style="border:2px solid #3b82f6;">
-                    <div class="day-card-header w1" style="background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(59,130,246,0.1));">
-                        <div><span class="day-name">금</span> <span class="day-date">1/23</span> <span class="today-badge" style="background:#3b82f6;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;">TODAY</span></div>
-                        <span class="task-count" style="background:#3b82f6;color:#fff;">6건</span>
+                <div class="day-card" style="border:2px solid #10b981;">
+                    <div class="day-card-header w1" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));">
+                        <div><span class="day-name">금</span> <span class="day-date">1/23</span> <span style="background:#10b981;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;">완료</span></div>
+                        <span class="task-count" style="background:#10b981;color:#fff;">6건 완료</span>
                     </div>
                     <div class="day-task-list">
                         <!-- 1/23 신규 추가: 스프레이 티칭 테스트 -->
@@ -1571,31 +1571,30 @@
                     </div>
                 </div>
 
-                <div class="day-card" style="border: 2px solid #ffa502;">
-                    <div class="day-card-header w1" style="background: rgba(255,165,2,0.3);">
-                        <div><span class="day-name">토 (현장작업)</span> <span class="day-date">1/24</span></div>
-                        <span class="task-count" style="background:#ffa502;color:#fff;">7건</span>
+                <div class="day-card" style="border: 2px solid #10b981;">
+                    <div class="day-card-header w1" style="background: rgba(16,185,129,0.3);">
+                        <div><span class="day-name">토 (현장작업)</span> <span class="day-date">1/24</span> <span style="background:#10b981;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;">완료</span></div>
+                        <span class="task-count" style="background:#10b981;color:#fff;">3건 완료</span>
                     </div>
                     <div class="day-task-list">
-                        <div class="day-task-item high">
+                        <!-- 완료 항목 -->
+                        <div style="margin:5px 0;padding:8px 10px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
+                            <strong style="color:#10b981;">✅ 완료 (3건)</strong>
+                        </div>
+                        <div class="day-task-item high" style="background:rgba(16,185,129,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank">PL-2026-168</a></span>
+                            <span class="task-owner">이상주</span>
+                            <div>불스아이 결선 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
+                        </div>
+                        <div class="day-task-item high" style="background:rgba(16,185,129,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank">PL-2025-142</a></span>
+                            <span class="task-owner">기계팀</span>
+                            <div>B라인 BullsEye 설치 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
+                        </div>
+                        <div class="day-task-item high" style="background:rgba(16,185,129,0.1);">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank">PL-2025-097</a></span>
                             <span class="task-owner">기계팀</span>
-                            <div>로봇 절연처리 (백그라이트, 절연볼트)</div>
-                        </div>
-                        <div class="day-task-item high">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank">PL-2025-142</a></span>
-                            <span class="task-owner">기계팀/제어팀</span>
-                            <div>B라인 BullsEye 설치 위치 선정</div>
-                        </div>
-                        <div class="day-task-item normal">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>가스유량 알람처리 [검증]</div>
-                        </div>
-                        <div class="day-task-item high">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank">PL-2025-074</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>인셉션 에러 세분화 [검증]</div>
+                            <div>로봇 절연처리 (백그라이트) <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
                         </div>
                         <div class="day-task-item normal">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-124" target="_blank">PL-2025-124</a></span>
@@ -1674,15 +1673,53 @@
 
             <h2>2주차 상세 일정 (1/26~2/1) - 높음 우선순위 집중</h2>
             <div class="day-schedule">
-                <div class="day-card">
-                    <div class="day-card-header w2">
-                        <div><span class="day-name">월</span> <span class="day-date">1/26</span></div>
-                        <span class="task-count">점검</span>
+                <div class="day-card" style="border:2px solid #3b82f6;">
+                    <div class="day-card-header w2" style="background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(59,130,246,0.1));">
+                        <div><span class="day-name">월</span> <span class="day-date">1/26</span> <span class="today-badge" style="background:#3b82f6;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;">TODAY</span></div>
+                        <span class="task-count" style="background:#3b82f6;color:#fff;">8건 진행</span>
                     </div>
                     <div class="day-task-list">
-                        <div class="day-task-item normal">
-                            <span class="task-owner">전체</span>
-                            <div>1주차 완료 점검 / 2주차 준비</div>
+                        <!-- 1주차 완료 점검 -->
+                        <div style="margin:5px 0;padding:8px 10px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
+                            <strong style="color:#10b981;">✅ 1주차 완료: 14건</strong>
+                        </div>
+                        <!-- 오늘 진행 항목 -->
+                        <div style="margin:8px 0;padding:6px 8px;background:rgba(59,130,246,0.1);border-radius:6px;border-left:3px solid #3b82f6;">
+                            <strong style="color:#3b82f6;font-size:0.75rem;">오늘 진행 (신규 포함)</strong>
+                        </div>
+                        <div class="day-task-item high" style="background:rgba(59,130,246,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-198" target="_blank">PL-2026-198</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>동일 위치 터치 에러 발생 처리 <span style="background:#ff6b6b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">높음</span></div>
+                        </div>
+                        <div class="day-task-item high" style="background:rgba(59,130,246,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-199" target="_blank">PL-2026-199</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>끝점 터치 후 시작점 이동 에러 <span style="background:#ff6b6b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">높음</span></div>
+                        </div>
+                        <div class="day-task-item high" style="background:rgba(59,130,246,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-200" target="_blank">PL-2026-200</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>수직용접 관제 명령 및 노티 연결 <span style="background:#ff6b6b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">높음</span></div>
+                        </div>
+                        <div class="day-task-item high" style="background:rgba(59,130,246,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-188" target="_blank">PL-2026-188</a></span>
+                            <span class="task-owner">최광년</span>
+                            <div>쇼크센서 시그널 전달 인터페이스 <span style="background:#ff6b6b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">높음</span></div>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(59,130,246,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-165" target="_blank">PL-2026-165</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>용접 포인트 부재 두께 반영 <span style="background:#dc2626;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">긴급</span></div>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-194" target="_blank">PL-2026-194</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>B라인 Z방향 상대이동 표시 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
+                        </div>
+                        <!-- 지연 항목 (1/27 예정) -->
+                        <div style="margin:8px 0;padding:6px 8px;background:rgba(255,107,107,0.15);border-radius:6px;border-left:3px solid #ff6b6b;">
+                            <strong style="color:#ff6b6b;font-size:0.75rem;">⚠ 1/27 지연 (박주한 5건)</strong>
                         </div>
                     </div>
                 </div>
@@ -1690,7 +1727,7 @@
                 <div class="day-card">
                     <div class="day-card-header w2">
                         <div><span class="day-name">화</span> <span class="day-date">1/27</span></div>
-                        <span class="task-count">8건</span>
+                        <span class="task-count">13건 (지연 5건 포함)</span>
                     </div>
                     <div class="day-task-list">
                         <div class="day-task-item high">
