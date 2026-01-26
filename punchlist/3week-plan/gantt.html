@@ -1672,25 +1672,131 @@
             </div>
 
             <h2>2주차 상세 일정 (1/26~2/1) - 높음 우선순위 집중</h2>
+
+            <!-- 1/26 기준 현황 요약 박스 -->
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px;padding:15px;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                <div style="text-align:center;padding:15px;background:linear-gradient(135deg,#10b981,#059669);border-radius:8px;color:#fff;">
+                    <div style="font-size:2rem;font-weight:700;">18</div>
+                    <div style="font-size:0.8rem;opacity:0.9;">✅ 1/26 기준 완료</div>
+                </div>
+                <div style="text-align:center;padding:15px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:8px;color:#fff;">
+                    <div style="font-size:2rem;font-weight:700;">8</div>
+                    <div style="font-size:0.8rem;opacity:0.9;">🔧 진행중/테스트완료</div>
+                </div>
+                <div style="text-align:center;padding:15px;background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:8px;color:#fff;">
+                    <div style="font-size:2rem;font-weight:700;">5</div>
+                    <div style="font-size:0.8rem;opacity:0.9;">⚠️ 지연 (1/27 예정)</div>
+                </div>
+                <div style="text-align:center;padding:15px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:8px;color:#fff;">
+                    <div style="font-size:2rem;font-weight:700;">5</div>
+                    <div style="font-size:0.8rem;opacity:0.9;">🆕 신규 추가</div>
+                </div>
+            </div>
+
+            <!-- 완료/지연 상세 테이블 -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;">
+                <!-- 완료 항목 -->
+                <div style="background:#fff;border-radius:12px;padding:15px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #10b981;">
+                    <h3 style="color:#10b981;margin-bottom:10px;font-size:1rem;">✅ 1/26 기준 완료 (18건)</h3>
+                    <div style="font-size:0.8rem;line-height:1.8;">
+                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/20:</strong> 토크모니터링, Z홈모드, 갠트리리밋, 디지털트윈, PlanC (5건)</div>
+                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/21:</strong> 커스텀팝업, 에러세분화, DB상하한선UI, 데드라인, SpeedLimit, RAPID에러 (6건)</div>
+                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/22:</strong> B라인터치에러, 노즐클리닝 (2건)</div>
+                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/23:</strong> 스프레이티칭, 디지털트윈영상 (2건)</div>
+                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/24:</strong> 불스아이결선, BullsEye설치, 로봇절연처리 (3건)</div>
+                        <div style="padding:4px 0;color:#10b981;font-weight:600;"><strong>1/26:</strong> 윤활배관수정 PL-2026-202 (1건)</div>
+                    </div>
+                </div>
+                <!-- 지연 항목 -->
+                <div style="background:#fff;border-radius:12px;padding:15px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #dc2626;">
+                    <h3 style="color:#dc2626;margin-bottom:10px;font-size:1rem;">⚠️ 지연 항목 (5건) → 1/27 예정</h3>
+                    <div style="font-size:0.8rem;line-height:1.8;">
+                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;">❌ PL-2025-067 공압/가스/냉각수 상하한치 <span style="color:#666;">(박주한)</span></div>
+                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;">❌ PL-2025-061 PLC알람 관제측 전달 <span style="color:#666;">(박주한)</span></div>
+                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;">❌ PL-2025-096 비정상 용접선 정보 필터링 <span style="color:#666;">(박주한)</span></div>
+                        <div style="padding:4px 0;color:#f59e0b;">✅ PL-2025-191 웜업 UI 가시성 <span style="color:#10b981;font-weight:600;">테스트완료→배포대기</span></div>
+                        <div style="padding:4px 0;color:#f59e0b;">✅ PL-2025-150 와이어 동시피딩 <span style="color:#10b981;font-weight:600;">테스트완료→배포대기</span></div>
+                    </div>
+                    <div style="margin-top:10px;padding:8px;background:#fef2f2;border-radius:6px;font-size:0.75rem;color:#dc2626;">
+                        ※ 1/22 예정 → 1/27로 일정 변경
+                    </div>
+                </div>
+            </div>
+
             <div class="day-schedule">
                 <div class="day-card" style="border:2px solid #3b82f6;">
                     <div class="day-card-header w2" style="background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(59,130,246,0.1));">
                         <div><span class="day-name">월</span> <span class="day-date">1/26</span> <span class="today-badge" style="background:#3b82f6;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;">TODAY</span></div>
-                        <span class="task-count" style="background:#3b82f6;color:#fff;">8건 진행</span>
+                        <span class="task-count" style="background:#3b82f6;color:#fff;">완료1 + 신규5 + 긴급1</span>
                     </div>
                     <div class="day-task-list">
-                        <!-- 1주차 완료 점검 -->
-                        <div style="margin:5px 0;padding:8px 10px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
-                            <strong style="color:#10b981;">✅ 1주차 완료: 14건</strong>
-                        </div>
                         <!-- A라인 1/26 완료 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
-                            <strong style="color:#10b981;font-size:0.75rem;">✅ A라인 1/26 완료 (1건)</strong>
+                        <div style="margin:5px 0;padding:8px 10px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
+                            <strong style="color:#10b981;">✅ A라인 1/26 완료 (1건)</strong>
                         </div>
                         <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-202" target="_blank">PL-2026-202</a></span>
                             <span class="task-owner">심태양</span>
                             <div>A라인 윤활 배관 수정 작업 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
+                        </div>
+                        <!-- A라인 테스트완료 (배포대기) -->
+                        <div style="margin:8px 0;padding:6px 8px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
+                            <strong style="color:#10b981;font-size:0.75rem;">✅ A라인 테스트완료 (배포대기 2건)</strong>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-191" target="_blank">PL-2025-191</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>웜업 UI 가시성 개선 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">테스트완료</span></div>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank">PL-2025-157</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>수평 터치 오프셋 일괄 변경 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">테스트완료</span></div>
+                        </div>
+                        <!-- A라인 개선필요 -->
+                        <div style="margin:8px 0;padding:6px 8px;background:rgba(245,158,11,0.15);border-radius:6px;border-left:3px solid #f59e0b;">
+                            <strong style="color:#f59e0b;font-size:0.75rem;">⚠️ A라인 개선필요 (2건)</strong>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>UI와 관제 통신 주기 문제 <span style="background:#f59e0b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">추가확인</span></div>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-196" target="_blank">PL-2025-196</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>커스텀 팝업 (프리징현상) <span style="background:#f59e0b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">개선필요</span></div>
+                        </div>
+                        <!-- A라인 1/27 예정 -->
+                        <div style="margin:8px 0;padding:6px 8px;background:rgba(59,130,246,0.15);border-radius:6px;border-left:3px solid #3b82f6;">
+                            <strong style="color:#3b82f6;font-size:0.75rem;">📅 A라인 1/27 예정 (1건)</strong>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank">PL-2025-092</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>수직 터치 센싱 오프셋 값 적용 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">1/27테스트</span></div>
+                        </div>
+                        <!-- B라인 확인완료 -->
+                        <div style="margin:8px 0;padding:6px 8px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
+                            <strong style="color:#10b981;font-size:0.75rem;">✅ B라인 확인완료 (3건)</strong>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
+                            <span class="task-owner">B라인</span>
+                            <div>불스아이 스프레이/클리닝 동작 확인 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">확인완료</span></div>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-150" target="_blank">PL-2025-150/192</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>와이어 동시 피딩 기능 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">테스트완료</span></div>
+                        </div>
+                        <!-- B라인 진행중 -->
+                        <div style="margin:8px 0;padding:6px 8px;background:rgba(245,158,11,0.15);border-radius:6px;border-left:3px solid #f59e0b;">
+                            <strong style="color:#f59e0b;font-size:0.75rem;">🔧 B라인 진행중 (1건)</strong>
+                        </div>
+                        <div class="day-task-item normal" style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-167" target="_blank">PL-2026-167</a></span>
+                            <span class="task-owner">이상주</span>
+                            <div>B라인 센서 명판 부착 <span style="background:#f59e0b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">40%</span></div>
                         </div>
                         <!-- 1/26 신규 추가 항목 -->
                         <div style="margin:8px 0;padding:6px 8px;background:rgba(139,92,246,0.15);border-radius:6px;border-left:3px solid #8b5cf6;">
