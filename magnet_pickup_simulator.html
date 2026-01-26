@@ -12,13 +12,13 @@
         body {
             margin: 0;
             padding: 20px;
-            background: #1a1a2e;
-            color: #eee;
+            background: #f5f7fa;
+            color: #333;
             min-height: 100vh;
         }
         h1 {
             text-align: center;
-            color: #00d9ff;
+            color: #2563eb;
             margin-bottom: 20px;
         }
         .tabs {
@@ -28,26 +28,28 @@
         }
         .tab {
             padding: 12px 24px;
-            background: #16213e;
+            background: #e5e7eb;
             border: none;
-            color: #888;
+            color: #666;
             cursor: pointer;
             border-radius: 8px 8px 0 0;
             font-size: 14px;
             transition: all 0.3s;
         }
         .tab.active {
-            background: #0f3460;
-            color: #00d9ff;
+            background: #fff;
+            color: #2563eb;
+            font-weight: bold;
         }
         .tab:hover {
-            color: #fff;
+            color: #2563eb;
         }
         .tab-content {
             display: none;
-            background: #0f3460;
+            background: #fff;
             padding: 20px;
             border-radius: 0 8px 8px 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .tab-content.active {
             display: block;
@@ -60,23 +62,25 @@
         }
         .form-group label {
             min-width: 120px;
-            color: #aaa;
+            color: #555;
+            font-weight: 500;
         }
         .form-group input, .form-group select {
             padding: 10px;
-            border: 1px solid #333;
+            border: 1px solid #ddd;
             border-radius: 5px;
-            background: #1a1a2e;
-            color: #fff;
+            background: #fff;
+            color: #333;
             width: 150px;
             font-size: 14px;
         }
         .form-group input:focus {
             outline: none;
-            border-color: #00d9ff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         .form-group .unit {
-            color: #666;
+            color: #888;
             font-size: 12px;
         }
         .btn {
@@ -89,31 +93,33 @@
             transition: all 0.3s;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #00d9ff, #0077ff);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff;
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+            box-shadow: 0 5px 20px rgba(37, 99, 235, 0.4);
         }
         .btn-secondary {
-            background: #e94560;
+            background: #ef4444;
             color: #fff;
         }
         .btn-secondary:hover {
-            background: #ff6b6b;
+            background: #dc2626;
         }
         .canvas-container {
-            background: #1a1a2e;
+            background: #f8fafc;
             border-radius: 8px;
             padding: 15px;
             margin: 20px 0;
             overflow: auto;
+            border: 1px solid #e5e7eb;
         }
         canvas {
             display: block;
             margin: 0 auto;
-            border: 1px solid #333;
+            border: 1px solid #ddd;
+            background: #fff;
         }
         .results-table {
             width: 100%;
@@ -123,28 +129,33 @@
         .results-table th, .results-table td {
             padding: 12px;
             text-align: center;
-            border: 1px solid #333;
+            border: 1px solid #e5e7eb;
         }
         .results-table th {
-            background: #16213e;
-            color: #00d9ff;
+            background: #f1f5f9;
+            color: #2563eb;
+            font-weight: 600;
         }
         .results-table tr:nth-child(even) {
-            background: rgba(255,255,255,0.05);
+            background: #f8fafc;
         }
         .results-table tr:hover {
-            background: rgba(0, 217, 255, 0.1);
+            background: #eff6ff;
         }
         .info-box {
-            background: #16213e;
-            border-left: 4px solid #00d9ff;
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
             padding: 15px;
             margin: 15px 0;
             border-radius: 0 5px 5px 0;
         }
         .info-box h3 {
             margin: 0 0 10px 0;
-            color: #00d9ff;
+            color: #2563eb;
+        }
+        .info-box p {
+            color: #555;
+            margin: 0;
         }
         .stats {
             display: grid;
@@ -153,18 +164,20 @@
             margin: 20px 0;
         }
         .stat-card {
-            background: #16213e;
+            background: #fff;
             padding: 20px;
             border-radius: 8px;
             text-align: center;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .stat-card .value {
             font-size: 28px;
             font-weight: bold;
-            color: #00d9ff;
+            color: #2563eb;
         }
         .stat-card .label {
-            color: #888;
+            color: #666;
             font-size: 12px;
             margin-top: 5px;
         }
@@ -179,11 +192,13 @@
             align-items: center;
             gap: 8px;
             font-size: 13px;
+            color: #555;
         }
         .legend-color {
             width: 20px;
             height: 20px;
             border-radius: 3px;
+            border: 1px solid #ddd;
         }
         .shape-controls {
             display: flex;
@@ -193,20 +208,21 @@
         }
         .preset-btn {
             padding: 8px 16px;
-            background: #16213e;
-            border: 1px solid #333;
-            color: #aaa;
+            background: #fff;
+            border: 1px solid #ddd;
+            color: #555;
             border-radius: 5px;
             cursor: pointer;
             font-size: 12px;
         }
         .preset-btn:hover {
-            border-color: #00d9ff;
-            color: #00d9ff;
+            border-color: #2563eb;
+            color: #2563eb;
+            background: #eff6ff;
         }
         .section-title {
-            color: #00d9ff;
-            border-bottom: 1px solid #333;
+            color: #2563eb;
+            border-bottom: 1px solid #e5e7eb;
             padding-bottom: 10px;
             margin: 25px 0 15px 0;
         }
@@ -321,15 +337,15 @@
 
         <div class="legend">
             <div class="legend-item">
-                <div class="legend-color" style="background: #333;"></div>
+                <div class="legend-color" style="background: #d1d5db;"></div>
                 <span>강판</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: rgba(0, 217, 255, 0.5);"></div>
+                <div class="legend-color" style="background: rgba(37, 99, 235, 0.4);"></div>
                 <span>절단 형상</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #e94560; border-radius: 50%;"></div>
+                <div class="legend-color" style="background: #dc2626; border-radius: 50%;"></div>
                 <span>픽업 위치 (무게중심)</span>
             </div>
         </div>
@@ -392,7 +408,7 @@
         </table>
 
         <h3 class="section-title">좌표 상세 데이터</h3>
-        <div id="detailData" style="background: #1a1a2e; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 300px; overflow: auto;">
+        <div id="detailData" style="background: #f8fafc; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 300px; overflow: auto; border: 1px solid #e5e7eb; color: #555;">
             형상을 생성하면 상세 좌표가 표시됩니다.
         </div>
     </div>
@@ -473,20 +489,20 @@
 
         // 강판 그리기
         function drawPlate() {
-            ctx.fillStyle = '#1a1a2e';
+            ctx.fillStyle = '#f8fafc';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // 강판
-            ctx.fillStyle = '#333';
+            ctx.fillStyle = '#d1d5db';
             ctx.fillRect(10, 10, plate.length * scale, plate.width * scale);
 
             // 테두리
-            ctx.strokeStyle = '#555';
+            ctx.strokeStyle = '#9ca3af';
             ctx.lineWidth = 2;
             ctx.strokeRect(10, 10, plate.length * scale, plate.width * scale);
 
             // 치수 표시
-            ctx.fillStyle = '#888';
+            ctx.fillStyle = '#666';
             ctx.font = '12px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(`${plate.length} mm`, 10 + (plate.length * scale) / 2, canvas.height - 2);
@@ -729,7 +745,7 @@
                 centroid: centroid,
                 area: area,
                 weight: weight,
-                color: `hsla(${randomBetween(180, 220)}, 70%, 50%, 0.6)`
+                color: `hsla(${randomBetween(200, 240)}, 70%, 60%, 0.5)`
             };
         }
 
@@ -780,8 +796,8 @@
                 ctx.closePath();
                 ctx.fillStyle = shape.color;
                 ctx.fill();
-                ctx.strokeStyle = '#00d9ff';
-                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#2563eb';
+                ctx.lineWidth = 2;
                 ctx.stroke();
 
                 // 픽업 위치 (무게중심)
@@ -789,7 +805,7 @@
                 const py = 10 + shape.centroid.y * scale;
 
                 // 십자 표시
-                ctx.strokeStyle = '#e94560';
+                ctx.strokeStyle = '#dc2626';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.moveTo(px - 8, py);
@@ -801,11 +817,11 @@
                 // 원
                 ctx.beginPath();
                 ctx.arc(px, py, 6, 0, Math.PI * 2);
-                ctx.fillStyle = '#e94560';
+                ctx.fillStyle = '#dc2626';
                 ctx.fill();
 
                 // 번호
-                ctx.fillStyle = '#fff';
+                ctx.fillStyle = '#1f2937';
                 ctx.font = 'bold 11px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(shape.id, px, py + 20);
@@ -837,11 +853,11 @@
             const detailDiv = document.getElementById('detailData');
             detailDiv.innerHTML = shapes.map(s => {
                 const pointsStr = s.points.map((p, i) => `  P${i+1}: (${p.x.toFixed(1)}, ${p.y.toFixed(1)})`).join('\n');
-                return `<div style="margin-bottom: 15px; padding: 10px; background: #0f3460; border-radius: 5px;">
-                    <strong style="color: #00d9ff;">[${s.id}] ${s.type}</strong><br>
-                    <span style="color: #e94560;">Pickup: (${s.centroid.x.toFixed(1)}, ${s.centroid.y.toFixed(1)})</span><br>
-                    <span style="color: #888;">좌표:</span><br>
-                    <pre style="margin: 5px 0; color: #aaa;">${pointsStr}</pre>
+                return `<div style="margin-bottom: 15px; padding: 10px; background: #f1f5f9; border-radius: 5px; border: 1px solid #e5e7eb;">
+                    <strong style="color: #2563eb;">[${s.id}] ${s.type}</strong><br>
+                    <span style="color: #dc2626; font-weight: bold;">Pickup: (${s.centroid.x.toFixed(1)}, ${s.centroid.y.toFixed(1)})</span><br>
+                    <span style="color: #666;">좌표:</span><br>
+                    <pre style="margin: 5px 0; color: #555;">${pointsStr}</pre>
                 </div>`;
             }).join('');
         }
