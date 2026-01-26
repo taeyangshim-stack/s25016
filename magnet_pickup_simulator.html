@@ -498,13 +498,18 @@
             ctx.restore();
         }
 
-        // 형상 생성
+        // 형상 생성 (겹침 방지)
         function generateShapes() {
             shapes = [];
             const count = parseInt(document.getElementById('shapeCount').value) || 5;
             const type = document.getElementById('shapeType').value;
             const minSize = parseInt(document.getElementById('minSize').value) || 200;
             const maxSize = parseInt(document.getElementById('maxSize').value) || 800;
+            const maxRetries = 100; // 최대 재시도 횟수
+            const spacing = 20; // 형상 간 최소 간격 (mm)
+
+            let successCount = 0;
+            let totalAttempts = 0;
 
             for (let i = 0; i < count; i++) {
                 let shapeType = type;
@@ -513,15 +518,136 @@
                     shapeType = types[Math.floor(Math.random() * types.length)];
                 }
 
-                const shape = generateRandomShape(shapeType, minSize, maxSize, i);
+                let shape = null;
+                let retries = 0;
+
+                // 겹치지 않는 위치 찾기
+                while (retries < maxRetries) {
+                    totalAttempts++;
+                    const candidate = generateRandomShape(shapeType, minSize, maxSize, successCount);
+
+                    if (candidate && !isOverlapping(candidate, spacing)) {
+                        shape = candidate;
+                        break;
+                    }
+                    retries++;
+                }
+
                 if (shape) {
                     shapes.push(shape);
+                    successCount++;
                 }
             }
+
+            // 형상 ID 재정렬
+            shapes.forEach((s, idx) => s.id = idx + 1);
 
             updateCanvas();
             updateResults();
             updateSimStats();
+
+            // 생성 결과 알림
+            if (successCount < count) {
+                console.log(`${count}개 요청 중 ${successCount}개 생성 (공간 부족)`);
+            }
+        }
+
+        // 형상 겹침 검사
+        function isOverlapping(newShape, spacing) {
+            const newBBox = getBoundingBox(newShape.points, spacing);
+
+            for (const existingShape of shapes) {
+                const existingBBox = getBoundingBox(existingShape.points, spacing);
+
+                // Bounding Box 겹침 검사
+                if (bboxOverlap(newBBox, existingBBox)) {
+                    // 더 정밀한 폴리곤 겹침 검사
+                    if (polygonsOverlap(newShape.points, existingShape.points)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Bounding Box 계산
+        function getBoundingBox(points, padding = 0) {
+            const xs = points.map(p => p.x);
+            const ys = points.map(p => p.y);
+            return {
+                minX: Math.min(...xs) - padding,
+                maxX: Math.max(...xs) + padding,
+                minY: Math.min(...ys) - padding,
+                maxY: Math.max(...ys) + padding
+            };
+        }
+
+        // Bounding Box 겹침 검사
+        function bboxOverlap(a, b) {
+            return !(a.maxX < b.minX || a.minX > b.maxX ||
+                     a.maxY < b.minY || a.minY > b.maxY);
+        }
+
+        // 폴리곤 겹침 검사 (Separating Axis Theorem 간소화)
+        function polygonsOverlap(poly1, poly2) {
+            // 한 폴리곤의 점이 다른 폴리곤 내부에 있는지 검사
+            for (const p of poly1) {
+                if (pointInPolygon(p, poly2)) return true;
+            }
+            for (const p of poly2) {
+                if (pointInPolygon(p, poly1)) return true;
+            }
+
+            // 변 교차 검사
+            for (let i = 0; i < poly1.length; i++) {
+                const a1 = poly1[i];
+                const a2 = poly1[(i + 1) % poly1.length];
+                for (let j = 0; j < poly2.length; j++) {
+                    const b1 = poly2[j];
+                    const b2 = poly2[(j + 1) % poly2.length];
+                    if (lineSegmentsIntersect(a1, a2, b1, b2)) return true;
+                }
+            }
+
+            return false;
+        }
+
+        // 점이 폴리곤 내부에 있는지 검사 (Ray casting)
+        function pointInPolygon(point, polygon) {
+            let inside = false;
+            const n = polygon.length;
+
+            for (let i = 0, j = n - 1; i < n; j = i++) {
+                const xi = polygon[i].x, yi = polygon[i].y;
+                const xj = polygon[j].x, yj = polygon[j].y;
+
+                if (((yi > point.y) !== (yj > point.y)) &&
+                    (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi)) {
+                    inside = !inside;
+                }
+            }
+
+            return inside;
+        }
+
+        // 선분 교차 검사
+        function lineSegmentsIntersect(a1, a2, b1, b2) {
+            const d1 = direction(b1, b2, a1);
+            const d2 = direction(b1, b2, a2);
+            const d3 = direction(a1, a2, b1);
+            const d4 = direction(a1, a2, b2);
+
+            if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
+                ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) {
+                return true;
+            }
+
+            return false;
+        }
+
+        // 방향 계산 (외적)
+        function direction(p1, p2, p3) {
+            return (p3.x - p1.x) * (p2.y - p1.y) - (p2.x - p1.x) * (p3.y - p1.y);
         }
 
         // 랜덤 형상 생성
