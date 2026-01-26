@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마그네트 픽업 위치 시뮬레이터</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Malgun Gothic', 'Segoe UI', sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            color: #00d9ff;
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 0;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: #16213e;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            background: #0f3460;
+            color: #00d9ff;
+        }
+        .tab:hover {
+            color: #fff;
+        }
+        .tab-content {
+            display: none;
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 0 8px 8px 8px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        .form-group label {
+            min-width: 120px;
+            color: #aaa;
+        }
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background: #1a1a2e;
+            color: #fff;
+            width: 150px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+        .form-group .unit {
+            color: #666;
+            font-size: 12px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00d9ff, #0077ff);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+        }
+        .btn-secondary {
+            background: #e94560;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #ff6b6b;
+        }
+        .canvas-container {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            overflow: auto;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #333;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .results-table th, .results-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        .results-table th {
+            background: #16213e;
+            color: #00d9ff;
+        }
+        .results-table tr:nth-child(even) {
+            background: rgba(255,255,255,0.05);
+        }
+        .results-table tr:hover {
+            background: rgba(0, 217, 255, 0.1);
+        }
+        .info-box {
+            background: #16213e;
+            border-left: 4px solid #00d9ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .info-box h3 {
+            margin: 0 0 10px 0;
+            color: #00d9ff;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00d9ff;
+        }
+        .stat-card .label {
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+        .shape-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .preset-btn {
+            padding: 8px 16px;
+            background: #16213e;
+            border: 1px solid #333;
+            color: #aaa;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .preset-btn:hover {
+            border-color: #00d9ff;
+            color: #00d9ff;
+        }
+        .section-title {
+            color: #00d9ff;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin: 25px 0 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>마그네트 픽업 위치 시뮬레이터</h1>
+
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('tab1')">1. 강판 설정</button>
+        <button class="tab" onclick="showTab('tab2')">2. 형상 생성 & 시뮬레이션</button>
+        <button class="tab" onclick="showTab('tab3')">3. 결과 데이터</button>
+    </div>
+
+    <!-- 탭1: 강판 설정 -->
+    <div id="tab1" class="tab-content active">
+        <div class="info-box">
+            <h3>강판 규격 설정</h3>
+            <p>레이저 절단에 사용할 원판 강판의 크기와 물성을 설정합니다.</p>
+        </div>
+
+        <h3 class="section-title">표준 규격 선택</h3>
+        <div class="shape-controls">
+            <button class="preset-btn" onclick="setPlatePreset(1219, 2438, '4x8')">4' x 8'</button>
+            <button class="preset-btn" onclick="setPlatePreset(1524, 3048, '5x10')">5' x 10'</button>
+            <button class="preset-btn" onclick="setPlatePreset(1524, 6096, '5x20')">5' x 20'</button>
+            <button class="preset-btn" onclick="setPlatePreset(1829, 6096, '6x20')">6' x 20' (기본)</button>
+        </div>
+
+        <h3 class="section-title">강판 크기</h3>
+        <div class="form-group">
+            <label>폭 (W)</label>
+            <input type="number" id="plateWidth" value="1829">
+            <span class="unit">mm</span>
+        </div>
+        <div class="form-group">
+            <label>길이 (L)</label>
+            <input type="number" id="plateLength" value="6096">
+            <span class="unit">mm</span>
+        </div>
+
+        <h3 class="section-title">소재 물성</h3>
+        <div class="form-group">
+            <label>두께 (t)</label>
+            <input type="number" id="plateThickness" value="10">
+            <span class="unit">mm</span>
+        </div>
+        <div class="form-group">
+            <label>비중</label>
+            <input type="number" id="plateDensity" value="7850">
+            <span class="unit">kg/m³</span>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="value" id="plateArea">11.15</div>
+                <div class="label">강판 면적 (m²)</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="plateWeight">875.3</div>
+                <div class="label">강판 중량 (kg)</div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="applyPlateSettings(); showTab('tab2');">
+            설정 적용 → 시뮬레이션
+        </button>
+    </div>
+
+    <!-- 탭2: 형상 생성 & 시뮬레이션 -->
+    <div id="tab2" class="tab-content">
+        <div class="info-box">
+            <h3>랜덤 형상 생성</h3>
+            <p>강판 위에 랜덤 절단 형상을 생성하고, 각 형상의 마그네트 픽업 위치를 계산합니다.</p>
+        </div>
+
+        <h3 class="section-title">형상 생성 옵션</h3>
+        <div class="form-group">
+            <label>형상 개수</label>
+            <input type="number" id="shapeCount" value="5" min="1" max="20">
+            <span class="unit">개</span>
+        </div>
+        <div class="form-group">
+            <label>형상 유형</label>
+            <select id="shapeType">
+                <option value="mixed">혼합 (랜덤)</option>
+                <option value="rectangle">직사각형</option>
+                <option value="triangle">삼각형</option>
+                <option value="polygon">다각형 (4~6각)</option>
+                <option value="lshape">L형</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>최소 크기</label>
+            <input type="number" id="minSize" value="200">
+            <span class="unit">mm</span>
+        </div>
+        <div class="form-group">
+            <label>최대 크기</label>
+            <input type="number" id="maxSize" value="800">
+            <span class="unit">mm</span>
+        </div>
+
+        <div class="shape-controls" style="margin: 20px 0;">
+            <button class="btn btn-primary" onclick="generateShapes()">
+                🎲 랜덤 형상 생성
+            </button>
+            <button class="btn btn-secondary" onclick="clearShapes()">
+                🗑️ 초기화
+            </button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #333;"></div>
+                <span>강판</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: rgba(0, 217, 255, 0.5);"></div>
+                <span>절단 형상</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e94560; border-radius: 50%;"></div>
+                <span>픽업 위치 (무게중심)</span>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="simulationCanvas" width="900" height="400"></canvas>
+        </div>
+
+        <div class="stats" id="simStats">
+            <div class="stat-card">
+                <div class="value" id="totalShapes">0</div>
+                <div class="label">생성된 형상</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="totalCutArea">0</div>
+                <div class="label">총 절단 면적 (m²)</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="totalCutWeight">0</div>
+                <div class="label">총 절단 중량 (kg)</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="utilizationRate">0</div>
+                <div class="label">재료 이용률 (%)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 탭3: 결과 데이터 -->
+    <div id="tab3" class="tab-content">
+        <div class="info-box">
+            <h3>픽업 위치 데이터</h3>
+            <p>각 형상별 무게중심 좌표 및 마그네트 픽업 위치입니다. 로봇 인터페이스로 전송할 데이터입니다.</p>
+        </div>
+
+        <button class="btn btn-primary" onclick="exportData()" style="margin-bottom: 20px;">
+            📋 데이터 복사 (CSV)
+        </button>
+        <button class="btn btn-secondary" onclick="exportJSON()" style="margin-bottom: 20px;">
+            📦 JSON 내보내기
+        </button>
+
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>형상</th>
+                    <th>Pickup X (mm)</th>
+                    <th>Pickup Y (mm)</th>
+                    <th>면적 (mm²)</th>
+                    <th>중량 (kg)</th>
+                    <th>꼭지점 수</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+                <tr>
+                    <td colspan="7" style="color: #666;">형상을 생성하면 데이터가 표시됩니다.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="section-title">좌표 상세 데이터</h3>
+        <div id="detailData" style="background: #1a1a2e; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 300px; overflow: auto;">
+            형상을 생성하면 상세 좌표가 표시됩니다.
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let plate = {
+            width: 1829,
+            length: 6096,
+            thickness: 10,
+            density: 7850
+        };
+        let shapes = [];
+        let canvas, ctx;
+        let scale = 1;
+
+        // 초기화
+        window.onload = function() {
+            canvas = document.getElementById('simulationCanvas');
+            ctx = canvas.getContext('2d');
+            updatePlateStats();
+            drawPlate();
+        };
+
+        // 탭 전환
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabId === 'tab2') {
+                updateCanvas();
+            }
+        }
+
+        // 강판 프리셋
+        function setPlatePreset(w, l, name) {
+            document.getElementById('plateWidth').value = w;
+            document.getElementById('plateLength').value = l;
+            updatePlateStats();
+        }
+
+        // 강판 통계 업데이트
+        function updatePlateStats() {
+            plate.width = parseFloat(document.getElementById('plateWidth').value) || 1829;
+            plate.length = parseFloat(document.getElementById('plateLength').value) || 6096;
+            plate.thickness = parseFloat(document.getElementById('plateThickness').value) || 10;
+            plate.density = parseFloat(document.getElementById('plateDensity').value) || 7850;
+
+            const areaM2 = (plate.width * plate.length) / 1000000;
+            const weight = areaM2 * (plate.thickness / 1000) * plate.density;
+
+            document.getElementById('plateArea').textContent = areaM2.toFixed(2);
+            document.getElementById('plateWeight').textContent = weight.toFixed(1);
+        }
+
+        // 강판 설정 적용
+        function applyPlateSettings() {
+            updatePlateStats();
+            updateCanvas();
+        }
+
+        // 캔버스 업데이트
+        function updateCanvas() {
+            // 스케일 계산 (캔버스에 맞추기)
+            const maxCanvasWidth = 880;
+            const maxCanvasHeight = 380;
+
+            scale = Math.min(maxCanvasWidth / plate.length, maxCanvasHeight / plate.width);
+
+            canvas.width = plate.length * scale + 20;
+            canvas.height = plate.width * scale + 20;
+
+            drawPlate();
+            drawShapes();
+        }
+
+        // 강판 그리기
+        function drawPlate() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 강판
+            ctx.fillStyle = '#333';
+            ctx.fillRect(10, 10, plate.length * scale, plate.width * scale);
+
+            // 테두리
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(10, 10, plate.length * scale, plate.width * scale);
+
+            // 치수 표시
+            ctx.fillStyle = '#888';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${plate.length} mm`, 10 + (plate.length * scale) / 2, canvas.height - 2);
+
+            ctx.save();
+            ctx.translate(5, 10 + (plate.width * scale) / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(`${plate.width} mm`, 0, 0);
+            ctx.restore();
+        }
+
+        // 형상 생성
+        function generateShapes() {
+            shapes = [];
+            const count = parseInt(document.getElementById('shapeCount').value) || 5;
+            const type = document.getElementById('shapeType').value;
+            const minSize = parseInt(document.getElementById('minSize').value) || 200;
+            const maxSize = parseInt(document.getElementById('maxSize').value) || 800;
+
+            for (let i = 0; i < count; i++) {
+                let shapeType = type;
+                if (type === 'mixed') {
+                    const types = ['rectangle', 'triangle', 'polygon', 'lshape'];
+                    shapeType = types[Math.floor(Math.random() * types.length)];
+                }
+
+                const shape = generateRandomShape(shapeType, minSize, maxSize, i);
+                if (shape) {
+                    shapes.push(shape);
+                }
+            }
+
+            updateCanvas();
+            updateResults();
+            updateSimStats();
+        }
+
+        // 랜덤 형상 생성
+        function generateRandomShape(type, minSize, maxSize, index) {
+            const margin = 50;
+            const w = randomBetween(minSize, maxSize);
+            const h = randomBetween(minSize, maxSize);
+
+            // 랜덤 위치 (강판 내)
+            const maxX = plate.length - w - margin;
+            const maxY = plate.width - h - margin;
+
+            if (maxX < margin || maxY < margin) return null;
+
+            const x = randomBetween(margin, maxX);
+            const y = randomBetween(margin, maxY);
+
+            let points = [];
+            let shapeName = '';
+
+            switch (type) {
+                case 'rectangle':
+                    points = [
+                        {x: x, y: y},
+                        {x: x + w, y: y},
+                        {x: x + w, y: y + h},
+                        {x: x, y: y + h}
+                    ];
+                    shapeName = '직사각형';
+                    break;
+
+                case 'triangle':
+                    points = [
+                        {x: x + w/2, y: y},
+                        {x: x + w, y: y + h},
+                        {x: x, y: y + h}
+                    ];
+                    shapeName = '삼각형';
+                    break;
+
+                case 'polygon':
+                    const sides = randomBetween(4, 6);
+                    const cx = x + w/2;
+                    const cy = y + h/2;
+                    const r = Math.min(w, h) / 2;
+                    for (let i = 0; i < sides; i++) {
+                        const angle = (i / sides) * Math.PI * 2 - Math.PI / 2;
+                        const px = cx + r * Math.cos(angle) * (0.7 + Math.random() * 0.3);
+                        const py = cy + r * Math.sin(angle) * (0.7 + Math.random() * 0.3);
+                        points.push({x: px, y: py});
+                    }
+                    shapeName = `${sides}각형`;
+                    break;
+
+                case 'lshape':
+                    const cutW = w * 0.4;
+                    const cutH = h * 0.4;
+                    points = [
+                        {x: x, y: y},
+                        {x: x + w, y: y},
+                        {x: x + w, y: y + h - cutH},
+                        {x: x + w - cutW, y: y + h - cutH},
+                        {x: x + w - cutW, y: y + h},
+                        {x: x, y: y + h}
+                    ];
+                    shapeName = 'L형';
+                    break;
+            }
+
+            // 무게중심 계산
+            const centroid = calculateCentroid(points);
+            const area = calculateArea(points);
+            const weight = (area / 1000000) * (plate.thickness / 1000) * plate.density;
+
+            return {
+                id: index + 1,
+                type: shapeName,
+                points: points,
+                centroid: centroid,
+                area: area,
+                weight: weight,
+                color: `hsla(${randomBetween(180, 220)}, 70%, 50%, 0.6)`
+            };
+        }
+
+        // 무게중심 계산 (폴리곤)
+        function calculateCentroid(points) {
+            let cx = 0, cy = 0;
+            let area = 0;
+            const n = points.length;
+
+            for (let i = 0; i < n; i++) {
+                const j = (i + 1) % n;
+                const cross = points[i].x * points[j].y - points[j].x * points[i].y;
+                area += cross;
+                cx += (points[i].x + points[j].x) * cross;
+                cy += (points[i].y + points[j].y) * cross;
+            }
+
+            area /= 2;
+            cx /= (6 * area);
+            cy /= (6 * area);
+
+            return {x: Math.abs(cx), y: Math.abs(cy)};
+        }
+
+        // 면적 계산 (Shoelace formula)
+        function calculateArea(points) {
+            let area = 0;
+            const n = points.length;
+
+            for (let i = 0; i < n; i++) {
+                const j = (i + 1) % n;
+                area += points[i].x * points[j].y;
+                area -= points[j].x * points[i].y;
+            }
+
+            return Math.abs(area / 2);
+        }
+
+        // 형상 그리기
+        function drawShapes() {
+            shapes.forEach(shape => {
+                // 형상 채우기
+                ctx.beginPath();
+                ctx.moveTo(10 + shape.points[0].x * scale, 10 + shape.points[0].y * scale);
+                for (let i = 1; i < shape.points.length; i++) {
+                    ctx.lineTo(10 + shape.points[i].x * scale, 10 + shape.points[i].y * scale);
+                }
+                ctx.closePath();
+                ctx.fillStyle = shape.color;
+                ctx.fill();
+                ctx.strokeStyle = '#00d9ff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // 픽업 위치 (무게중심)
+                const px = 10 + shape.centroid.x * scale;
+                const py = 10 + shape.centroid.y * scale;
+
+                // 십자 표시
+                ctx.strokeStyle = '#e94560';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(px - 8, py);
+                ctx.lineTo(px + 8, py);
+                ctx.moveTo(px, py - 8);
+                ctx.lineTo(px, py + 8);
+                ctx.stroke();
+
+                // 원
+                ctx.beginPath();
+                ctx.arc(px, py, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#e94560';
+                ctx.fill();
+
+                // 번호
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(shape.id, px, py + 20);
+            });
+        }
+
+        // 결과 테이블 업데이트
+        function updateResults() {
+            const tbody = document.getElementById('resultsBody');
+
+            if (shapes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="color: #666;">형상을 생성하면 데이터가 표시됩니다.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = shapes.map(s => `
+                <tr>
+                    <td>${s.id}</td>
+                    <td>${s.type}</td>
+                    <td><strong>${s.centroid.x.toFixed(1)}</strong></td>
+                    <td><strong>${s.centroid.y.toFixed(1)}</strong></td>
+                    <td>${s.area.toFixed(0)}</td>
+                    <td>${s.weight.toFixed(2)}</td>
+                    <td>${s.points.length}</td>
+                </tr>
+            `).join('');
+
+            // 상세 데이터
+            const detailDiv = document.getElementById('detailData');
+            detailDiv.innerHTML = shapes.map(s => {
+                const pointsStr = s.points.map((p, i) => `  P${i+1}: (${p.x.toFixed(1)}, ${p.y.toFixed(1)})`).join('\n');
+                return `<div style="margin-bottom: 15px; padding: 10px; background: #0f3460; border-radius: 5px;">
+                    <strong style="color: #00d9ff;">[${s.id}] ${s.type}</strong><br>
+                    <span style="color: #e94560;">Pickup: (${s.centroid.x.toFixed(1)}, ${s.centroid.y.toFixed(1)})</span><br>
+                    <span style="color: #888;">좌표:</span><br>
+                    <pre style="margin: 5px 0; color: #aaa;">${pointsStr}</pre>
+                </div>`;
+            }).join('');
+        }
+
+        // 시뮬레이션 통계
+        function updateSimStats() {
+            const totalArea = shapes.reduce((sum, s) => sum + s.area, 0);
+            const totalWeight = shapes.reduce((sum, s) => sum + s.weight, 0);
+            const plateArea = plate.width * plate.length;
+            const utilization = (totalArea / plateArea) * 100;
+
+            document.getElementById('totalShapes').textContent = shapes.length;
+            document.getElementById('totalCutArea').textContent = (totalArea / 1000000).toFixed(3);
+            document.getElementById('totalCutWeight').textContent = totalWeight.toFixed(2);
+            document.getElementById('utilizationRate').textContent = utilization.toFixed(1);
+        }
+
+        // 초기화
+        function clearShapes() {
+            shapes = [];
+            updateCanvas();
+            updateResults();
+            updateSimStats();
+        }
+
+        // CSV 내보내기
+        function exportData() {
+            if (shapes.length === 0) {
+                alert('내보낼 데이터가 없습니다.');
+                return;
+            }
+
+            let csv = 'No,Type,Pickup_X,Pickup_Y,Area_mm2,Weight_kg,Vertices\n';
+            shapes.forEach(s => {
+                csv += `${s.id},${s.type},${s.centroid.x.toFixed(1)},${s.centroid.y.toFixed(1)},${s.area.toFixed(0)},${s.weight.toFixed(2)},${s.points.length}\n`;
+            });
+
+            navigator.clipboard.writeText(csv).then(() => {
+                alert('CSV 데이터가 클립보드에 복사되었습니다.');
+            });
+        }
+
+        // JSON 내보내기
+        function exportJSON() {
+            if (shapes.length === 0) {
+                alert('내보낼 데이터가 없습니다.');
+                return;
+            }
+
+            const data = {
+                plate: plate,
+                shapes: shapes.map(s => ({
+                    id: s.id,
+                    type: s.type,
+                    pickup: {x: parseFloat(s.centroid.x.toFixed(1)), y: parseFloat(s.centroid.y.toFixed(1))},
+                    area: parseFloat(s.area.toFixed(0)),
+                    weight: parseFloat(s.weight.toFixed(2)),
+                    vertices: s.points.map(p => ({x: parseFloat(p.x.toFixed(1)), y: parseFloat(p.y.toFixed(1))}))
+                }))
+            };
+
+            const json = JSON.stringify(data, null, 2);
+            navigator.clipboard.writeText(json).then(() => {
+                alert('JSON 데이터가 클립보드에 복사되었습니다.');
+            });
+        }
+
+        // 유틸리티
+        function randomBetween(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+    </script>
+</body>
+</html>
