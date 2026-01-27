@@ -730,7 +730,24 @@
             </div>
 
             <!-- B라인 검증 (박주한) -->
-            <div class="owner-section" style="background:rgba(46,213,115,0.05);border:1px solid rgba(46,213,115,0.3);">
+            <div class="owner-section" style="background:rgba(46,213,115,0.05);border:1px solid rgba(46,213,115,0.3);position:relative;overflow:visible;">
+                <!-- 지연 연결선 SVG 오버레이 -->
+                <svg class="delay-connector" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;overflow:visible;">
+                    <defs>
+                        <marker id="arrow-end" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="#dc2626"/>
+                        </marker>
+                    </defs>
+                    <!-- 연결선 1: 067 상하한치 (1/22 → 1/27) -->
+                    <path d="M 340 85 Q 500 30, 660 85" stroke="#dc2626" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-end)"/>
+                    <!-- 연결선 2: 061 PLC알람 (1/22 → 1/27) -->
+                    <path d="M 340 105 Q 500 50, 660 105" stroke="#ef4444" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-end)"/>
+                    <!-- 연결선 3: 096 필터링 (1/22 → 1/27) -->
+                    <path d="M 340 125 Q 500 70, 660 125" stroke="#f87171" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-end)"/>
+                    <!-- 라벨 -->
+                    <rect x="470" y="25" width="60" height="18" rx="3" fill="#dc2626" opacity="0.9"/>
+                    <text x="500" y="38" text-anchor="middle" fill="white" font-size="10" font-weight="bold">3건 지연</text>
+                </svg>
                 <div class="owner-row">
                     <div class="owner-name">
                         <div class="owner-avatar" style="background:linear-gradient(135deg,#2ed573,#26de81);">B</div>
@@ -1003,46 +1020,6 @@
                                 <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
                             </div>
                         </div>
-                    </div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell weekend"></div>
-                    <div class="gantt-cell weekend"></div>
-                    <div class="gantt-cell week-start"></div>
-                </div>
-                <!-- 지연 화살표 행 (1/22 → 1/27) -->
-                <div class="owner-row" style="height:30px;background:linear-gradient(90deg,transparent 0%,#fef2f2 20%,#fef2f2 50%,transparent 60%);">
-                    <div class="owner-name" style="font-size:0.7rem;color:#dc2626;">
-                        <span style="font-weight:bold;">⚠️ 지연</span>
-                    </div>
-                    <div class="gantt-cell week-start"></div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell"></div>
-                    <!-- 1/22 시작점 -->
-                    <div class="gantt-cell" style="position:relative;overflow:visible;">
-                        <div style="position:absolute;top:50%;left:50%;transform:translateY(-50%);z-index:10;">
-                            <svg width="380" height="24" style="overflow:visible;">
-                                <!-- 화살표 선 -->
-                                <defs>
-                                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                                        <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
-                                    </marker>
-                                </defs>
-                                <line x1="0" y1="12" x2="365" y2="12" stroke="#dc2626" stroke-width="3" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
-                                <!-- 라벨 -->
-                                <rect x="140" y="2" width="90" height="20" rx="4" fill="#dc2626"/>
-                                <text x="185" y="16" text-anchor="middle" fill="white" font-size="11" font-weight="bold">3건 지연</text>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell weekend"></div>
-                    <div class="gantt-cell weekend"></div>
-                    <div class="gantt-cell week-start"></div>
-                    <!-- 1/27 도착점 -->
-                    <div class="gantt-cell" style="position:relative;">
-                        <div style="font-size:0.65rem;color:#dc2626;font-weight:bold;">← 도착</div>
                     </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
