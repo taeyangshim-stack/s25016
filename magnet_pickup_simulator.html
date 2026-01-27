@@ -264,10 +264,7 @@
 
     <div class="visitor-counter">
         <div class="counter-badge">
-            👁️ 총 조회수: <span class="count" id="totalViews">-</span>
-        </div>
-        <div class="counter-badge">
-            📅 오늘: <span class="count" id="todayViews">-</span>
+            👁️ 조회수: <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fs2501602.vercel.app%2Fmagnet_pickup_simulator.html&count_bg=%232563EB&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=today%2Ftotal&edge_flat=true" alt="visitor count" style="vertical-align: middle;">
         </div>
     </div>
 
@@ -465,33 +462,8 @@
         let canvas, ctx;
         let scale = 1;
 
-        // 방문자 카운터 초기화
-        function initVisitorCounter() {
-            // 총 조회수 (CountAPI)
-            fetch('https://api.countapi.xyz/hit/s2501602-magnet/visits')
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById('totalViews').textContent = data.value.toLocaleString();
-                })
-                .catch(() => {
-                    document.getElementById('totalViews').textContent = '-';
-                });
-
-            // 오늘 조회수 (날짜별 키)
-            const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            fetch(`https://api.countapi.xyz/hit/s2501602-magnet/${today}`)
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById('todayViews').textContent = data.value.toLocaleString();
-                })
-                .catch(() => {
-                    document.getElementById('todayViews').textContent = '-';
-                });
-        }
-
         // 초기화
         window.onload = function() {
-            initVisitorCounter();
             canvas = document.getElementById('simulationCanvas');
             ctx = canvas.getContext('2d');
             updatePlateStats();
