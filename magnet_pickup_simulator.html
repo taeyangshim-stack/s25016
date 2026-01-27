@@ -264,7 +264,7 @@
 
     <div class="visitor-counter">
         <div class="counter-badge">
-            👁️ 조회수: <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fs2501602.vercel.app%2Fmagnet_pickup_simulator.html&count_bg=%232563EB&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=today%2Ftotal&edge_flat=true" alt="visitor count" style="vertical-align: middle;">
+            👁️ 조회수: <span class="count" id="visitorCount">-</span>
         </div>
     </div>
 
@@ -462,8 +462,30 @@
         let canvas, ctx;
         let scale = 1;
 
+        // 방문자 카운터 (profile-counter 사용)
+        function initVisitorCounter() {
+            const img = new Image();
+            img.src = 'https://profile-counter.glitch.me/s2501602-magnet-pickup/count.svg';
+            img.onload = function() {
+                // 이미지에서 숫자 추출 불가, 직접 표시
+                document.getElementById('visitorCount').innerHTML =
+                    '<img src="https://profile-counter.glitch.me/s2501602-magnet-pickup/count.svg" style="height: 20px; vertical-align: middle;">';
+            };
+            img.onerror = function() {
+                // 실패 시 localStorage 기반 카운터
+                let count = parseInt(localStorage.getItem('visitor_count') || '0');
+                if (!sessionStorage.getItem('counted')) {
+                    count++;
+                    localStorage.setItem('visitor_count', count);
+                    sessionStorage.setItem('counted', 'true');
+                }
+                document.getElementById('visitorCount').textContent = count;
+            };
+        }
+
         // 초기화
         window.onload = function() {
+            initVisitorCounter();
             canvas = document.getElementById('simulationCanvas');
             ctx = canvas.getContext('2d');
             updatePlateStats();
