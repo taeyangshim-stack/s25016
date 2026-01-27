@@ -1011,6 +1011,46 @@
                     <div class="gantt-cell weekend"></div>
                     <div class="gantt-cell week-start"></div>
                 </div>
+                <!-- 지연 화살표 행 (1/22 → 1/27) -->
+                <div class="owner-row" style="height:30px;background:linear-gradient(90deg,transparent 0%,#fef2f2 20%,#fef2f2 50%,transparent 60%);">
+                    <div class="owner-name" style="font-size:0.7rem;color:#dc2626;">
+                        <span style="font-weight:bold;">⚠️ 지연</span>
+                    </div>
+                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <!-- 1/22 시작점 -->
+                    <div class="gantt-cell" style="position:relative;overflow:visible;">
+                        <div style="position:absolute;top:50%;left:50%;transform:translateY(-50%);z-index:10;">
+                            <svg width="380" height="24" style="overflow:visible;">
+                                <!-- 화살표 선 -->
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+                                    </marker>
+                                </defs>
+                                <line x1="0" y1="12" x2="365" y2="12" stroke="#dc2626" stroke-width="3" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
+                                <!-- 라벨 -->
+                                <rect x="140" y="2" width="90" height="20" rx="4" fill="#dc2626"/>
+                                <text x="185" y="16" text-anchor="middle" fill="white" font-size="11" font-weight="bold">3건 지연</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell week-start"></div>
+                    <!-- 1/27 도착점 -->
+                    <div class="gantt-cell" style="position:relative;">
+                        <div style="font-size:0.65rem;color:#dc2626;font-weight:bold;">← 도착</div>
+                    </div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell week-start"></div>
+                </div>
             </div>
 
             <!-- 최광년 -->
