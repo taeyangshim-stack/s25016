@@ -328,6 +328,45 @@
             margin-right: 2px;
         }
 
+        /* 고스트 마커 (원래 계획 위치) */
+        .task-bar.ghost {
+            background: transparent !important;
+            border: 2px dashed #dc2626;
+            color: #dc2626;
+            opacity: 0.6;
+        }
+        .task-bar.ghost::before {
+            content: '⊘ ';
+        }
+
+        /* 지연 화살표 컨테이너 */
+        .delay-arrow-container {
+            position: relative;
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .delay-arrow-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, #dc2626, #ef4444);
+            border-radius: 2px;
+            animation: pulse-arrow 1.5s ease-in-out infinite;
+        }
+        .delay-arrow-line::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-left: 8px solid #ef4444;
+        }
+        @keyframes pulse-arrow {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
         /* 태스크 상세 (호버) */
         .task-bar .task-tooltip {
             display: none;
@@ -857,8 +896,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 1/22 (목) - 완료 2건 -->
-                    <div class="gantt-cell" style="background:#ecfdf5;">
+                    <!-- 1/22 (목) - 완료 2건 + 지연 3건 (원계획) -->
+                    <div class="gantt-cell" style="background:#ecfdf5;position:relative;">
                         <div class="task-bar completed" style="font-size:0.65rem;">터치에러
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-208" target="_blank">PL-2026-208</a></div>
@@ -873,6 +912,10 @@
                                 <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/22 테스트완료 (A라인)</div>
                             </div>
                         </div>
+                        <!-- 지연 항목 원계획 표시 (고스트) -->
+                        <div class="task-bar ghost" style="font-size:0.6rem;">067 상하한치 →</div>
+                        <div class="task-bar ghost" style="font-size:0.6rem;">061 PLC알람 →</div>
+                        <div class="task-bar ghost" style="font-size:0.6rem;">096 필터링 →</div>
                     </div>
                     <!-- 1/23 (금) - 완료 1건 -->
                     <div class="gantt-cell" style="background:#ecfdf5;">
@@ -932,21 +975,28 @@
                                 <div class="tt-row"><span class="tt-label">상태:</span> ✓ 테스트완료→배포대기</div>
                             </div>
                         </div>
-                        <div class="task-bar delayed" style="font-size:0.65rem;">상하한치<span class="delay-indicator">22→27</span>
+                        <!-- 지연 화살표 (1/22→1/27) -->
+                        <div style="margin-top:4px;padding:2px 4px;background:#fef2f2;border-radius:4px;font-size:0.55rem;color:#dc2626;text-align:center;">
+                            <span style="font-weight:bold;">← 1/22</span> ⚠️3건 지연 <span style="font-weight:bold;">→ 1/27</span>
+                        </div>
+                    </div>
+                    <!-- 1/27 (화) - 지연 항목 3건 -->
+                    <div class="gantt-cell" style="background:#fef2f2;">
+                        <div class="task-bar delayed" style="font-size:0.65rem;">← 067 상하한치
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></div>
                                 <div>공압/가스/냉각수 상하한치</div>
                                 <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
                             </div>
                         </div>
-                        <div class="task-bar delayed" style="font-size:0.65rem;">PLC알람<span class="delay-indicator">22→27</span>
+                        <div class="task-bar delayed" style="font-size:0.65rem;">← 061 PLC알람
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-061" target="_blank">PL-2025-061</a></div>
                                 <div>PLC알람 관제측 전달</div>
                                 <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
                             </div>
                         </div>
-                        <div class="task-bar delayed" style="font-size:0.65rem;">필터링<span class="delay-indicator">22→27</span>
+                        <div class="task-bar delayed" style="font-size:0.65rem;">← 096 필터링
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank">PL-2025-096</a></div>
                                 <div>비정상 용접선 정보 필터링</div>
@@ -954,7 +1004,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
