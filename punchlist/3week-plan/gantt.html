@@ -282,6 +282,52 @@
             content: '? ';
         }
 
+        /* 지연 화살표 표시 (원계획 → 변경) */
+        .delay-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 4px;
+            background: linear-gradient(90deg, #dc2626 0%, #dc2626 calc(100% - 12px), transparent calc(100% - 12px));
+            border-radius: 2px;
+            z-index: 5;
+        }
+        .delay-arrow::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 6px solid transparent;
+            border-left: 10px solid #dc2626;
+        }
+        .delay-arrow-label {
+            position: absolute;
+            top: -18px;
+            left: 0;
+            font-size: 0.6rem;
+            color: #dc2626;
+            font-weight: 600;
+            white-space: nowrap;
+            background: rgba(255,255,255,0.9);
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+        .delay-indicator {
+            display: inline-block;
+            background: #fef2f2;
+            color: #dc2626;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px dashed #dc2626;
+            margin-left: 4px;
+        }
+        .delay-indicator::before {
+            content: '→';
+            margin-right: 2px;
+        }
+
         /* 태스크 상세 (호버) */
         .task-bar .task-tooltip {
             display: none;
@@ -880,21 +926,21 @@
                                 <div class="tt-row"><span class="tt-label">상태:</span> ✓ 테스트완료→배포대기</div>
                             </div>
                         </div>
-                        <div class="task-bar delayed" style="font-size:0.65rem;">상하한치⚠
+                        <div class="task-bar delayed" style="font-size:0.65rem;">상하한치<span class="delay-indicator">22→27</span>
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></div>
                                 <div>공압/가스/냉각수 상하한치</div>
                                 <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
                             </div>
                         </div>
-                        <div class="task-bar delayed" style="font-size:0.65rem;">PLC알람⚠
+                        <div class="task-bar delayed" style="font-size:0.65rem;">PLC알람<span class="delay-indicator">22→27</span>
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-061" target="_blank">PL-2025-061</a></div>
                                 <div>PLC알람 관제측 전달</div>
                                 <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
                             </div>
                         </div>
-                        <div class="task-bar delayed" style="font-size:0.65rem;">필터링⚠
+                        <div class="task-bar delayed" style="font-size:0.65rem;">필터링<span class="delay-indicator">22→27</span>
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank">PL-2025-096</a></div>
                                 <div>비정상 용접선 정보 필터링</div>
