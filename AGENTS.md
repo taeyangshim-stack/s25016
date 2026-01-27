@@ -1,36 +1,222 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-- Root mixes static dashboards (`상하축이슈_대시보드.html`) with project folders. Treat the root as read-only reference material unless a dashboard or index update is required.
-- `250917_상하축이슈/` is the primary workspace. Subfolders map to the issue lifecycle: `01_문제점분석/` (analysis) through `04_작업진행/` (execution), `05_문서자료/` (supporting docs), and `99_공유폴더/` (heavy assets). Create new notes inside the correct stage folder using the `YYMMDD_작성자_제목.ext` convention.
-- Auxiliary domains live at the root (`hexagon/`, `cloudinary-uploader/`, `api/`, `projects/`). Respect their internal structure; place new HTML beside peer files and keep assets local.
-- Agent knowledge bases (`.claude/`, `CLAUDE.md`) are authoritative references; do not edit unless you are updating agent processes.
+> S25016 Project: Robot system development, DeviceNet communication, precision measurement solutions
 
-## Build, Test, and Development Commands
-- `npm install` (root): installs shared dependencies used by scripts and serverless functions.
-- `python3 -m http.server 8000` (root): serves static content for manual review at `http://localhost:8000/상하축이슈_대시보드.html`.
-- `cd cloudinary-uploader && npm run server`: launches the local uploader backend. Keep `.env` secrets out of version control.
-- `vercel --prod`: deploys Vercel-hosted components. Confirm `vercel.json` before publishing.
+## Project Structure
 
-## Coding Style & Naming Conventions
-- Encoding UTF-8, LF endings. HTML/JSON/YAML: 2-space indent; Python snippets/scripts: 4 spaces; JavaScript follows existing style, preferring `const`/`let`.
-- Keep Korean directory names verbatim to preserve links. Use lowercase attribute names and double-quoted values in HTML.
-- Markdown uses `#` headings, fenced code blocks, and relative links. Include brief callouts instead of long paragraphs.
+```
+s25016/
+├── api/                              # Vercel serverless functions (Node.js)
+├── cloudinary-uploader/              # File upload CLI + server
+├── RAPID/                            # ABB RAPID robot code workspace
+│   ├── SpGantry_*/                   # Robot backups
+│   ├── PlanB_ToolControl2/           # Tool control modules
+│   └── scripts/                      # RAPID validation scripts
+├── 250917_상하축이슈/                # Primary workspace (issue lifecycle)
+│   ├── 01_문제점분석/                # Analysis
+│   ├── 02_대책수립/                  # Countermeasures
+│   ├── 03_일정관리/                  # Scheduling
+│   ├── 04_작업진행/                  # Execution
+│   ├── 05_문서자료/                  # Documentation
+│   └── 99_공유폴더/                  # Heavy assets
+├── B_Line_EventMessage/              # Robot event log analysis
+├── punchlist/                        # Punchlist management app
+├── projects/                         # Sub-projects (hexagon, work-management)
+├── scripts/                          # Shell/Python utility scripts
+└── index.html                        # Main dashboard
+```
 
-## Testing Guidelines
-- Manual UI verification is primary: serve locally, open in current Chrome/Edge, validate navigation, console output, and asset loads.
-- When scripts are added, provide a lightweight HTML harness or CLI example and confirm offline compatibility. Document known limitations in the same folder.
-- No automated test suite is configured; if introducing one, colocate configs under `scripts/` and document invocation in this guide.
+**Naming convention for new files:** `YYMMDD_작성자_제목.ext` (e.g., `251028_심태양_진행현황.md`)
 
-## Commit & Pull Request Guidelines
-- Use concise commits with conventional-style scopes, e.g., `feat(progress): add 240923 update log`, `fix(dashboard): correct 분석자료 link`, `docs(plan): refresh 일정`.
-- PRs must state purpose, scope, impacted folders, and include before/after screenshots for HTML changes. Reference related tasks or issues and flag follow-up actions.
+## Build, Test & Development
 
-## Security & Configuration Tips
-- Keep secrets out of the repo. Store temporary configs locally or in `99_공유폴더/README` with redacted placeholders.
-- Large binaries belong in `99_공유폴더/` with a pointer document.
-- Use relative paths in HTML/Markdown so previews and deployments remain portable.
+### Quick Start
+```bash
+npm install                           # Install shared dependencies (Node.js >=18.x)
+python3 -m http.server 8000           # Serve static content at localhost:8000
+```
+
+### Vercel Development
+```bash
+vercel dev                            # Local Vercel dev server at localhost:3000
+vercel --prod                         # Production deployment
+```
+
+### Cloudinary Uploader
+```bash
+cd cloudinary-uploader
+npm install
+npm run server                        # Local server at localhost:3000
+node uploader.js ./files --folder=s25016/docs  # CLI upload
+```
+
+### RAPID Code Validation
+```bash
+cd RAPID/scripts
+python3 validate_and_fix_rapid.py     # Validate RAPID syntax
+python3 check_version.py              # Check version consistency
+```
+
+### Testing
+- **No automated test suite** - manual UI verification is primary
+- Serve locally, open in Chrome/Edge, validate:
+  - Navigation and page loads
+  - Console output (no errors)
+  - Asset loading
+- When adding scripts, provide lightweight HTML harness or CLI example
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/upload` | POST | Cloudinary file upload |
+| `/api/files?folder=` | GET | List uploaded files |
+| `/api/folders` | GET | List Cloudinary folders |
+| `/api/punchlist` | GET/POST | Punchlist CRUD |
+| `/api/work-records` | GET/POST | Work records management |
+
+## Code Style
+
+### JavaScript (Vercel Serverless, Node.js)
+```javascript
+// CommonJS imports
+const cloudinary = require('cloudinary').v2;
+const { IncomingForm } = require('formidable');
+
+// Prefer const/let, never var
+const PORT = process.env.PORT || 3000;
+
+// Async/await for async operations
+module.exports = async (req, res) => {
+  try {
+    const result = await cloudinary.uploader.upload(file);
+    res.status(200).json({ success: true, url: result.secure_url });
+  } catch (error) {
+    console.error('Upload error:', { message: error.message, stack: error.stack });
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// CORS headers for API functions
+res.setHeader('Access-Control-Allow-Origin', '*');
+res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PUT,DELETE');
+```
+
+### Python
+```python
+#!/usr/bin/env python3
+"""Module docstring with brief description."""
+
+import json
+from pathlib import Path
+from collections import defaultdict
+
+class EventLogAnalyzer:
+    """Class docstring."""
+    
+    def __init__(self, base_path):
+        self.base_path = Path(base_path)
+    
+    def scan_logs(self):
+        """Method docstring."""
+        # Handle multiple encodings gracefully
+        encodings = ['utf-8', 'cp949']
+        for encoding in encodings:
+            try:
+                with open(filepath, 'r', encoding=encoding) as f:
+                    return f.read()
+            except UnicodeDecodeError:
+                continue
+
+if __name__ == "__main__":
+    main()
+```
+
+### HTML
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Title</title>
+</head>
+```
+- Lowercase attribute names, double-quoted values
+- 2-space indentation
+- UTF-8 encoding with Korean support
+
+### Formatting Rules
+| Language | Indent | Line endings |
+|----------|--------|--------------|
+| HTML/JSON/YAML | 2 spaces | LF |
+| JavaScript | 2 spaces | LF |
+| Python | 4 spaces | LF |
+| Markdown | 2 spaces | LF |
+
+## Error Handling
+
+### JavaScript
+```javascript
+try {
+  const result = await operation();
+} catch (error) {
+  console.error('Operation failed:', {
+    message: error.message,
+    name: error.name,
+    http_code: error.http_code,
+    stack: error.stack
+  });
+  res.status(500).json({ success: false, error: error.message });
+}
+```
+
+### Python
+```python
+try:
+    result = risky_operation()
+except (json.JSONDecodeError, TypeError) as e:
+    print(f"Error: {e}", file=sys.stderr)
+    return None
+```
+
+## Commit & PR Guidelines
+
+### Conventional Commits
+```bash
+feat(dashboard): add 240923 update log
+fix(api): correct file upload path handling
+docs(plan): refresh project schedule
+refactor(uploader): simplify error handling
+```
+
+### PR Requirements
+- State purpose and scope
+- List impacted folders
+- Include before/after screenshots for HTML changes
+- Reference related tasks or issues
+
+## Security & Configuration
+
+- **Never commit secrets** - use environment variables
+- `.env` files are gitignored
+- Store configs in `99_공유폴더/README` with redacted placeholders
+- Large binaries belong in `99_공유폴더/` with pointer documents
+- Use relative paths for portability
+
+### Environment Variables (Cloudinary)
+```env
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+CLOUDINARY_UPLOAD_FOLDER=s25016
+```
 
 ## Agent-Specific Instructions
-- Organize new artifacts in the stage-matched folder, update dashboards or indexes when adding deliverables, and verify links post-edit.
-- Avoid deleting prior analysis without stakeholder approval; instead, append dated sections or provide change logs.
+
+1. **File Organization**: Place artifacts in stage-matched folders under `250917_상하축이슈/`
+2. **Dashboard Updates**: Update index.html or relevant dashboards when adding deliverables
+3. **Link Verification**: Verify all links work after edits (Korean paths are case-sensitive)
+4. **Preserve History**: Never delete prior analysis without approval; append dated sections
+5. **Korean Names**: Preserve Korean directory/file names verbatim to maintain links
+6. **Offline Compatibility**: Confirm scripts and pages work without network when possible
