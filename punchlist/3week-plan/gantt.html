@@ -730,24 +730,7 @@
             </div>
 
             <!-- B라인 검증 (박주한) -->
-            <div class="owner-section" style="background:rgba(46,213,115,0.05);border:1px solid rgba(46,213,115,0.3);position:relative;overflow:visible;">
-                <!-- 지연 연결선 SVG 오버레이 -->
-                <svg class="delay-connector" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;overflow:visible;">
-                    <defs>
-                        <marker id="arrow-end" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-                            <polygon points="0 0, 8 3, 0 6" fill="#dc2626"/>
-                        </marker>
-                    </defs>
-                    <!-- 연결선 1: 067 상하한치 (1/22 → 1/27) -->
-                    <path d="M 340 85 Q 500 30, 660 85" stroke="#dc2626" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-end)"/>
-                    <!-- 연결선 2: 061 PLC알람 (1/22 → 1/27) -->
-                    <path d="M 340 105 Q 500 50, 660 105" stroke="#ef4444" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-end)"/>
-                    <!-- 연결선 3: 096 필터링 (1/22 → 1/27) -->
-                    <path d="M 340 125 Q 500 70, 660 125" stroke="#f87171" stroke-width="2" fill="none" stroke-dasharray="5,3" marker-end="url(#arrow-end)"/>
-                    <!-- 라벨 -->
-                    <rect x="470" y="25" width="60" height="18" rx="3" fill="#dc2626" opacity="0.9"/>
-                    <text x="500" y="38" text-anchor="middle" fill="white" font-size="10" font-weight="bold">3건 지연</text>
-                </svg>
+            <div class="owner-section" style="background:rgba(46,213,115,0.05);border:1px solid rgba(46,213,115,0.3);">
                 <div class="owner-row">
                     <div class="owner-name">
                         <div class="owner-avatar" style="background:linear-gradient(135deg,#2ed573,#26de81);">B</div>
@@ -1027,6 +1010,35 @@
                     <div class="gantt-cell weekend"></div>
                     <div class="gantt-cell weekend"></div>
                     <div class="gantt-cell week-start"></div>
+                </div>
+                <!-- 지연 연결선 행 -->
+                <div class="owner-row" style="height:24px;background:#fef2f2;">
+                    <div class="owner-name" style="padding:2px 8px;">
+                        <span style="font-size:0.65rem;color:#dc2626;font-weight:bold;">⚠️ 지연</span>
+                    </div>
+                    <div class="gantt-cell week-start" style="height:24px;min-height:24px;"></div>
+                    <div class="gantt-cell" style="height:24px;min-height:24px;"></div>
+                    <div class="gantt-cell" style="height:24px;min-height:24px;"></div>
+                    <!-- 1/22 시작 -->
+                    <div class="gantt-cell" style="height:24px;min-height:24px;position:relative;overflow:visible;">
+                        <div style="position:absolute;right:-5px;top:50%;transform:translateY(-50%);font-size:0.6rem;color:#dc2626;">●</div>
+                    </div>
+                    <div class="gantt-cell" style="height:24px;min-height:24px;border-bottom:3px dashed #dc2626;"></div>
+                    <div class="gantt-cell weekend" style="height:24px;min-height:24px;border-bottom:3px dashed #dc2626;"></div>
+                    <div class="gantt-cell weekend" style="height:24px;min-height:24px;border-bottom:3px dashed #dc2626;"></div>
+                    <div class="gantt-cell week-start" style="height:24px;min-height:24px;border-bottom:3px dashed #dc2626;background:rgba(220,38,38,0.1);">
+                        <div style="font-size:0.55rem;color:#dc2626;text-align:center;">3건→</div>
+                    </div>
+                    <!-- 1/27 도착 -->
+                    <div class="gantt-cell" style="height:24px;min-height:24px;position:relative;">
+                        <div style="position:absolute;left:-5px;top:50%;transform:translateY(-50%);font-size:0.7rem;color:#dc2626;">▶</div>
+                    </div>
+                    <div class="gantt-cell" style="height:24px;min-height:24px;"></div>
+                    <div class="gantt-cell" style="height:24px;min-height:24px;"></div>
+                    <div class="gantt-cell" style="height:24px;min-height:24px;"></div>
+                    <div class="gantt-cell weekend" style="height:24px;min-height:24px;"></div>
+                    <div class="gantt-cell weekend" style="height:24px;min-height:24px;"></div>
+                    <div class="gantt-cell week-start" style="height:24px;min-height:24px;"></div>
                 </div>
             </div>
 
