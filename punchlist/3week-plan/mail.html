@@ -215,7 +215,8 @@
 
         <!-- 탭 네비게이션 -->
         <div class="tab-nav">
-            <button class="tab-btn new active" onclick="showTab('daily27')">1/27 진행현황 (신규)</button>
+            <button class="tab-btn new active" onclick="showTab('daily28')">1/28 진행현황 (신규)</button>
+            <button class="tab-btn" onclick="showTab('daily27')">1/27 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily26')">1/26 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily23')">1/22~23 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily21')">1/20~21 진행현황</button>
@@ -225,8 +226,218 @@
             <button class="tab-btn" onclick="showTab('template')">메일 템플릿</button>
         </div>
 
-        <!-- 1/27 진행현황 (신규) -->
-        <div id="tab-daily27" class="tab-content active">
+        <!-- 1/28 진행현황 (신규) -->
+        <div id="tab-daily28" class="tab-content active">
+            <div class="mail-container">
+                <div class="mail-header">
+                    <label>받는 사람</label>
+                    <input type="text" value="이동혁 프로" id="daily28-recipient">
+                    <label>제목</label>
+                    <input type="text" value="[S25016] 1/28 진행현황 - A라인 3건 계속, B라인 PlanC 연기항목 재개, 레이저 트래커 계측" id="daily28-subject">
+                    <label>첨부파일</label>
+                    <input type="text" value="S25016_3주완료계획_260128.csv" id="daily28-attachment" readonly style="background:#f3f4f6;">
+                </div>
+
+                <div class="mail-body" id="daily28-content">
+                    <p>이동혁 프로님,</p>
+                    <p>고생 많으십니다. SP 심태양입니다.</p>
+                    <p>1/28(수) 진행현황 공유드립니다.</p>
+
+                    <h3 style="color:#1e40af;">■ 요약</h3>
+                    <table style="margin-bottom:20px;">
+                        <tr>
+                            <th style="text-align:center;">구분</th>
+                            <th style="text-align:center;">A라인</th>
+                            <th style="text-align:center;">B라인</th>
+                            <th style="text-align:center;">비고</th>
+                        </tr>
+                        <tr>
+                            <td style="color:#3b82f6;font-weight:600;">27일→28일 계속</td>
+                            <td style="text-align:center;">3건</td>
+                            <td style="text-align:center;">-</td>
+                            <td>092, 020, 106</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#dc2626;font-weight:600;">PlanC 연기→재개</td>
+                            <td style="text-align:center;">-</td>
+                            <td style="text-align:center;">7건</td>
+                            <td>199, 179, 084, 039, 156, 067, 188</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#10b981;font-weight:600;">27일 완료 (컨펌대기)</td>
+                            <td style="text-align:center;">1건</td>
+                            <td style="text-align:center;">4건</td>
+                            <td>196, 126, 154, 177, 170</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#8b5cf6;font-weight:600;">신규 계측</td>
+                            <td style="text-align:center;" colspan="2">레이저 트래커</td>
+                            <td>비전 캘리브레이션</td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#2563eb;">■ A라인 - 1/27→1/28 계속 진행 (3건)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50px;">No.</th>
+                            <th>항목명</th>
+                            <th style="width:120px;">펀치리스트 ID</th>
+                            <th style="width:130px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>수직 터치 센싱 오프셋 값 적용 - UI DB처리 디버깅</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-092" target="_blank" class="pl-link">PL-2025-092</a></td>
+                            <td class="status-progress">UI 디버깅</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>수직 용접 CSV 작성 1/3 - 삼성 발송</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-020" target="_blank" class="pl-link">PL-2025-020</a></td>
+                            <td class="status-progress">이마룬 사원</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>UI와 관제 통신 주기 문제</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-106" target="_blank" class="pl-link">PL-2025-106</a></td>
+                            <td class="status-progress">진행중</td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#dc2626;">■ B라인 - PlanC 연기 → 1/28 재개 (7건)</h3>
+                    <p style="background:#fef2f2;border-left:3px solid #dc2626;padding:10px 15px;margin:10px 0 15px;font-size:0.9em;color:#991b1b;">
+                        <strong>1/27 PlanC 긴급 점검으로 연기되었던 B라인 작업 재개</strong>
+                    </p>
+                    <table>
+                        <tr>
+                            <th style="width:50px;">No.</th>
+                            <th>항목명</th>
+                            <th style="width:120px;">펀치리스트 ID</th>
+                            <th style="width:100px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>끝점 터치 후 시작점 이동 에러</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-199" target="_blank" class="pl-link">PL-2026-199</a></td>
+                            <td class="status-progress">진행</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>매크로 미선택 시 전체 용접데이터 표시</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-179" target="_blank" class="pl-link">PL-2026-179</a></td>
+                            <td class="status-progress">진행</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>PLC 알람 전달</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-084" target="_blank" class="pl-link">PL-2025-084</a></td>
+                            <td class="status-progress">진행</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>불스아이 스프레이 LOW 경고</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-039" target="_blank" class="pl-link">PL-2025-039</a></td>
+                            <td class="status-progress">진행</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>경광등-UI-관제 동기화</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-156" target="_blank" class="pl-link">PL-2025-156</a></td>
+                            <td class="status-progress">테스트</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>공압/가스/냉각수 상하한치 아날로그 센싱 알람</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-067" target="_blank" class="pl-link">PL-2025-067</a></td>
+                            <td class="status-progress">진행</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>CCLink IO CO_16_HeadShock (쇼크센서) - B라인</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-188" target="_blank" class="pl-link">PL-2026-188</a></td>
+                            <td class="status-progress">B라인 적용</td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#8b5cf6;">■ 레이저 트래커 계측 (신규)</h3>
+                    <div style="background:#f5f3ff;border-left:3px solid #8b5cf6;padding:15px;margin:10px 0;">
+                        <p style="font-weight:600;color:#6d28d9;margin-bottom:10px;">비전 캘리브레이션 타겟구 공간위치 재확인</p>
+                        <table>
+                            <tr>
+                                <th style="width:100px;">항목</th>
+                                <th>내용</th>
+                            </tr>
+                            <tr>
+                                <td>목적</td>
+                                <td>비전 캘리브레이션용 타겟구의 공간 위치 정확도 검증</td>
+                            </tr>
+                            <tr>
+                                <td>장비</td>
+                                <td>Hexagon 레이저 트래커</td>
+                            </tr>
+                            <tr>
+                                <td>측정 대상</td>
+                                <td>타겟구 (Target Ball) 위치</td>
+                            </tr>
+                            <tr>
+                                <td>결과 활용</td>
+                                <td>로봇 비전 시스템 정밀도 향상</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="color:#10b981;">■ 1/27 완료 항목 (컨펌대기 5건)</h3>
+                    <table>
+                        <tr>
+                            <th style="width:50px;">No.</th>
+                            <th>항목명</th>
+                            <th style="width:120px;">펀치리스트 ID</th>
+                            <th style="width:100px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>커스텀 팝업 프리징 문제 해결 (UI스레드 처리)</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-196" target="_blank" class="pl-link">PL-2026-196</a></td>
+                            <td class="status-confirm">컨펌대기</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>작업 취소/재개 시 속도 0% 문제 해결</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-126" target="_blank" class="pl-link">PL-2025-126</a></td>
+                            <td class="status-confirm">컨펌대기</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>명령 취소/가동준비/작업재개 시 리트라이 동작 방지</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-154" target="_blank" class="pl-link">PL-2025-154</a></td>
+                            <td class="status-confirm">컨펌대기</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>터치/아크에러 후 로봇 초기화</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-177" target="_blank" class="pl-link">PL-2026-177</a></td>
+                            <td class="status-confirm">컨펌대기</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>갠트리 상대 이동 조깅 기능</td>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-170" target="_blank" class="pl-link">PL-2026-170</a></td>
+                            <td class="status-confirm">컨펌대기</td>
+                        </tr>
+                    </table>
+
+                    <p style="margin-top:20px;">감사합니다.</p>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="copyMailContent('daily28-content')">메일 본문 복사</button>
+                    <button class="btn btn-secondary" onclick="copySubject('daily28-subject')">제목 복사</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1/27 진행현황 -->
+        <div id="tab-daily27" class="tab-content">
             <div class="mail-container">
                 <div class="mail-header">
                     <label>받는 사람</label>
