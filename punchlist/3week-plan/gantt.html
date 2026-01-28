@@ -206,10 +206,9 @@
 
         /* 간트 셀 */
         .gantt-cell {
-            padding: 6px 4px;
+            padding: 6px 3px;
             border-right: 1px solid #f3f4f6;
-            min-height: 50px;
-            min-width: 55px;
+            min-height: 45px;
             position: relative;
         }
         .gantt-cell.weekend {
@@ -221,151 +220,28 @@
 
         /* 태스크 바 */
         .task-bar {
-            padding: 4px 5px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            margin-bottom: 3px;
+            padding: 3px 4px;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            margin-bottom: 2px;
             cursor: pointer;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             transition: all 0.2s;
             color: #fff;
-            font-weight: 500;
-            line-height: 1.3;
         }
         .task-bar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 3px 12px rgba(0,0,0,0.25);
-            z-index: 100;
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 10;
             position: relative;
-            white-space: normal;
-            overflow: visible;
-            min-width: 120px;
         }
         .task-bar.urgent { background: #dc2626; }
         .task-bar.high { background: #f59e0b; }
         .task-bar.normal { background: #10b981; }
         .task-bar.low { background: #6b7280; }
         .task-bar.verify { background: #3b82f6; }
-
-        /* 완료 항목 - 체크마크 + 녹색 배경 */
-        .task-bar.completed {
-            background: #059669 !important;
-        }
-        .task-bar.completed::before {
-            content: '✓ ';
-        }
-
-        /* 지연 항목 - 빗금 패턴 + 점선 테두리 */
-        .task-bar.delayed {
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 3px,
-                rgba(255,255,255,0.3) 3px,
-                rgba(255,255,255,0.3) 6px
-            ), #dc2626 !important;
-            border: 2px dashed #991b1b;
-        }
-        .task-bar.delayed::before {
-            content: '⚠ ';
-        }
-
-        /* 미처리 항목 - 회색 점선 */
-        .task-bar.pending {
-            background: #9ca3af !important;
-            border: 2px dotted #4b5563;
-            opacity: 0.7;
-        }
-        .task-bar.pending::before {
-            content: '? ';
-        }
-
-        /* 지연 화살표 표시 (원계획 → 변경) */
-        .delay-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            height: 4px;
-            background: linear-gradient(90deg, #dc2626 0%, #dc2626 calc(100% - 12px), transparent calc(100% - 12px));
-            border-radius: 2px;
-            z-index: 5;
-        }
-        .delay-arrow::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 6px solid transparent;
-            border-left: 10px solid #dc2626;
-        }
-        .delay-arrow-label {
-            position: absolute;
-            top: -18px;
-            left: 0;
-            font-size: 0.6rem;
-            color: #dc2626;
-            font-weight: 600;
-            white-space: nowrap;
-            background: rgba(255,255,255,0.9);
-            padding: 1px 4px;
-            border-radius: 3px;
-        }
-        .delay-indicator {
-            display: inline-block;
-            background: #fef2f2;
-            color: #dc2626;
-            font-size: 0.6rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px dashed #dc2626;
-            margin-left: 4px;
-        }
-        .delay-indicator::before {
-            content: '→';
-            margin-right: 2px;
-        }
-
-        /* 고스트 마커 (원래 계획 위치) */
-        .task-bar.ghost {
-            background: transparent !important;
-            border: 2px dashed #dc2626;
-            color: #dc2626;
-            opacity: 0.6;
-        }
-        .task-bar.ghost::before {
-            content: '⊘ ';
-        }
-
-        /* 지연 화살표 컨테이너 */
-        .delay-arrow-container {
-            position: relative;
-            height: 20px;
-            display: flex;
-            align-items: center;
-        }
-        .delay-arrow-line {
-            position: absolute;
-            height: 3px;
-            background: linear-gradient(90deg, #dc2626, #ef4444);
-            border-radius: 2px;
-            animation: pulse-arrow 1.5s ease-in-out infinite;
-        }
-        .delay-arrow-line::after {
-            content: '';
-            position: absolute;
-            right: -8px;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 5px solid transparent;
-            border-left: 8px solid #ef4444;
-        }
-        @keyframes pulse-arrow {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
 
         /* 태스크 상세 (호버) */
         .task-bar .task-tooltip {
@@ -568,7 +444,7 @@
             .gantt-header-cell .day { font-size: 0.65rem; }
             .gantt-header-cell .date { font-size: 0.55rem; }
 
-            .task-bar { padding: 3px 4px; font-size: 0.6rem; }
+            .task-bar { padding: 2px 3px; font-size: 0.5rem; }
 
             .detail-section h2 { font-size: 1rem; padding-left: 8px; margin-bottom: 12px; }
             .day-schedule {
@@ -594,10 +470,9 @@
         <div class="header">
             <h1>S25016 3주 완료 계획 일정표 (Full)</h1>
             <div class="header-info">
-                <span>총 53건</span>
+                <span>총 69건</span>
                 <span>담당자 6명</span>
                 <span>2026.01.19 ~ 2026.02.07 (20일)</span>
-                <span style="background:#fbbf24;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:0.8rem;">Updated: 1/27</span>
             </div>
         </div>
 
@@ -608,9 +483,6 @@
             <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> 보통</div>
             <div class="legend-item"><div class="legend-dot" style="background:#6b7280"></div> 낮음</div>
             <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> 검증중</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#059669"></div> ✓ 완료</div>
-            <div class="legend-item"><div class="legend-dot" style="background:repeating-linear-gradient(45deg,#dc2626,#dc2626 3px,#fff 3px,#fff 6px);border:1px dashed #991b1b"></div> ⚠ 지연</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#9ca3af;border:2px dotted #4b5563;opacity:0.7"></div> ? 미처리</div>
         </div>
 
         <!-- 필터 -->
@@ -620,9 +492,6 @@
             <button class="filter-btn" onclick="filterTasks('high')">높음</button>
             <button class="filter-btn" onclick="filterTasks('normal')">보통</button>
             <button class="filter-btn" onclick="filterTasks('low')">낮음</button>
-            <button class="filter-btn" onclick="filterTasks('completed')" style="border-color:#059669;color:#059669;">✓ 완료</button>
-            <button class="filter-btn" onclick="filterTasks('delayed')" style="border-color:#dc2626;color:#dc2626;">⚠ 지연</button>
-            <button class="filter-btn" onclick="filterTasks('pending')" style="border-color:#9ca3af;color:#6b7280;">? 미처리</button>
         </div>
 
         <!-- 간트 차트 -->
@@ -630,40 +499,40 @@
             <!-- 주차 구분 -->
             <div class="week-header">
                 <div class="week-header-cell"></div>
-                <!-- 1주차: 1/19(월)~1/25(일) = 7일 -->
-                <div class="week-header-cell w1" style="grid-column: span 7;">1주차 (29건) 1/19~1/25</div>
-                <!-- 2주차: 1/26(월)~2/1(일) = 7일 -->
-                <div class="week-header-cell w2" style="grid-column: span 7;">2주차 (27건) 1/26~2/1</div>
-                <!-- 3주차: 2/2(월)~2/7(토) = 6일 -->
-                <div class="week-header-cell w3" style="grid-column: span 6;">3주차 (31건) 2/2~2/7</div>
+                <!-- 1주차: 1/19(일)~1/25(토) = 7일 -->
+                <div class="week-header-cell w1" style="grid-column: span 7;">1주차 (22건) 1/19~1/25</div>
+                <!-- 2주차: 1/26(일)~2/1(토) = 7일 -->
+                <div class="week-header-cell w2" style="grid-column: span 7;">2주차 (26건) 1/26~2/1</div>
+                <!-- 3주차: 2/2(일)~2/7(금) = 6일 -->
+                <div class="week-header-cell w3" style="grid-column: span 6;">3주차 (25건) 2/2~2/7</div>
             </div>
 
             <!-- 날짜 헤더 - 20일 전체 -->
             <div class="gantt-header">
                 <div class="gantt-header-cell label">담당자</div>
-                <!-- 1주차: 1/19(월)~1/25(일) -->
-                <div class="gantt-header-cell week-start"><div class="day">월</div><div class="date">1/19</div></div>
-                <div class="gantt-header-cell"><div class="day">화</div><div class="date">1/20</div></div>
-                <div class="gantt-header-cell"><div class="day">수</div><div class="date">1/21</div></div>
-                <div class="gantt-header-cell"><div class="day">목</div><div class="date">1/22</div></div>
-                <div class="gantt-header-cell"><div class="day">금</div><div class="date">1/23</div></div>
-                <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">1/24</div></div>
-                <div class="gantt-header-cell weekend"><div class="day">일</div><div class="date">1/25</div></div>
-                <!-- 2주차: 1/26(월)~2/1(일) -->
-                <div class="gantt-header-cell week-start"><div class="day">월</div><div class="date">1/26</div></div>
-                <div class="gantt-header-cell" style="background:rgba(59,130,246,0.3);border:2px solid #3b82f6;"><div class="day" style="color:#3b82f6;font-weight:bold;">화</div><div class="date" style="color:#3b82f6;font-weight:bold;">1/27</div><div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;">TODAY</div></div>
-                <div class="gantt-header-cell"><div class="day">수</div><div class="date">1/28</div></div>
-                <div class="gantt-header-cell"><div class="day">목</div><div class="date">1/29</div></div>
-                <div class="gantt-header-cell"><div class="day">금</div><div class="date">1/30</div></div>
-                <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">1/31</div></div>
-                <div class="gantt-header-cell weekend"><div class="day">일</div><div class="date">2/1</div></div>
-                <!-- 3주차: 2/2(월)~2/7(토) -->
-                <div class="gantt-header-cell week-start"><div class="day">월</div><div class="date">2/2</div></div>
-                <div class="gantt-header-cell"><div class="day">화</div><div class="date">2/3</div></div>
-                <div class="gantt-header-cell"><div class="day">수</div><div class="date">2/4</div></div>
-                <div class="gantt-header-cell"><div class="day">목</div><div class="date">2/5</div></div>
-                <div class="gantt-header-cell"><div class="day">금</div><div class="date">2/6</div></div>
-                <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">2/7</div></div>
+                <!-- 1주차 -->
+                <div class="gantt-header-cell weekend week-start"><div class="day">일</div><div class="date">1/19</div></div>
+                <div class="gantt-header-cell"><div class="day">월</div><div class="date">1/20</div></div>
+                <div class="gantt-header-cell"><div class="day">화</div><div class="date">1/21</div></div>
+                <div class="gantt-header-cell"><div class="day">수</div><div class="date">1/22</div></div>
+                <div class="gantt-header-cell"><div class="day">목</div><div class="date">1/23</div></div>
+                <div class="gantt-header-cell"><div class="day">금</div><div class="date">1/24</div></div>
+                <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">1/25</div></div>
+                <!-- 2주차 -->
+                <div class="gantt-header-cell weekend week-start"><div class="day">일</div><div class="date">1/26</div></div>
+                <div class="gantt-header-cell"><div class="day">월</div><div class="date">1/27</div></div>
+                <div class="gantt-header-cell"><div class="day">화</div><div class="date">1/28</div></div>
+                <div class="gantt-header-cell"><div class="day">수</div><div class="date">1/29</div></div>
+                <div class="gantt-header-cell"><div class="day">목</div><div class="date">1/30</div></div>
+                <div class="gantt-header-cell"><div class="day">금</div><div class="date">1/31</div></div>
+                <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">2/1</div></div>
+                <!-- 3주차 -->
+                <div class="gantt-header-cell weekend week-start"><div class="day">일</div><div class="date">2/2</div></div>
+                <div class="gantt-header-cell"><div class="day">월</div><div class="date">2/3</div></div>
+                <div class="gantt-header-cell"><div class="day">화</div><div class="date">2/4</div></div>
+                <div class="gantt-header-cell"><div class="day">수</div><div class="date">2/5</div></div>
+                <div class="gantt-header-cell"><div class="day">목</div><div class="date">2/6</div></div>
+                <div class="gantt-header-cell"><div class="day">금</div><div class="date">2/7</div></div>
             </div>
 
             <!-- 박주한 -->
@@ -673,422 +542,51 @@
                         <div class="owner-avatar" style="background:linear-gradient(135deg,#00d4ff,#0066ff);">박</div>
                         <div class="owner-info">
                             <div class="name">박주한</div>
-                            <div class="count">8건 (UI/HMI)</div>
+                            <div class="count">7건 (UI/HMI)</div>
                         </div>
                     </div>
                     <!-- 1주차 1/19~1/25 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 1/26 -->
-                    <div class="gantt-cell week-start">
-                        <div class="task-bar normal" style="font-size:0.65rem;">193 수동티칭
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-193" target="_blank">PL-2026-193</a></div>
-                                <div>A라인 수동 티칭 (노즐 클리너)</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/26 개발, 1/27 테스트</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 1/27 TODAY -->
-                    <div class="gantt-cell" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
-                        <div class="task-bar high">089 돌림옵셋
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-089" target="_blank">PL-2025-089</a></div>
-                                <div>돌림 오프셋 조정</div>
-                            </div>
-                        </div>
+                    <!-- 2주차 1/26~2/1 -->
+                    <div class="gantt-cell weekend week-start"></div>
+                    <div class="gantt-cell">
+                        <div class="task-bar high">089 돌림옵셋</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar high">089 계속
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-089" target="_blank">PL-2025-089</a></div>
-                                <div>돌림 오프셋 조정 (계속)</div>
-                            </div>
-                        </div>
+                        <div class="task-bar high">089 계속</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">088 권한설정
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-088" target="_blank">PL-2025-088</a></div>
-                                <div>권한 설정 기능</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">088 권한설정</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">088 계속
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-088" target="_blank">PL-2025-088</a></div>
-                                <div>권한 설정 기능 (계속)</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">088 계속</div>
                     </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
                     <!-- 3주차 2/2~2/7 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">060 알람
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-060" target="_blank">PL-2025-060</a></div>
-                                <div>시뮬레이션 vs 실제 상이한 알람</div>
-                            </div>
-                        </div>
-                        <div class="task-bar normal">104 로그
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-104" target="_blank">PL-2025-104</a></div>
-                                <div>UI 조작 로그 기능</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">060 알람</div>
+                        <div class="task-bar normal">104 로그</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">157 터치옵셋
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank">PL-2025-157</a></div>
-                                <div>터치 오프셋 일괄 변경 기능</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">157 터치옵셋</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">157 계속
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank">PL-2025-157</a></div>
-                                <div>터치 오프셋 일괄 변경 기능 (계속)</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">157 계속</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar low">093 매뉴얼
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-093" target="_blank">PL-2025-093</a></div>
-                                <div>사용자 매뉴얼 작성</div>
-                            </div>
-                        </div>
+                        <div class="task-bar low">093 매뉴얼</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar low">093 계속
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-093" target="_blank">PL-2025-093</a></div>
-                                <div>사용자 매뉴얼 작성 (계속)</div>
-                            </div>
-                        </div>
+                        <div class="task-bar low">093 계속</div>
                     </div>
-                </div>
-            </div>
-
-            <!-- B라인 검증 (박주한) -->
-            <div class="owner-section" style="background:rgba(46,213,115,0.05);border:1px solid rgba(46,213,115,0.3);">
-                <div class="owner-row">
-                    <div class="owner-name">
-                        <div class="owner-avatar" style="background:linear-gradient(135deg,#2ed573,#26de81);">B</div>
-                        <div class="owner-info">
-                            <div class="name">B라인 검증</div>
-                            <div class="count">14건 (박주한) <span style="font-size:0.6rem;color:#10b981;">✓9</span> <span style="font-size:0.6rem;color:#dc2626;">⚠3</span></div>
-                        </div>
-                    </div>
-                    <!-- 1주차 시작 1/19 (월) - 4개 완료, 1개 지연, 1개 컨펌대기 -->
-                    <div class="gantt-cell week-start" style="background:#f0fdf4;">
-                        <div class="task-bar ghost" style="font-size:0.65rem;opacity:0.4;">#1 디지털트윈 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></div>
-                                <div>디지털 트윈 Lag 이슈</div>
-                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/19</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/19→1/27 이동</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">#2 용접선필터
-                            <div class="task-tooltip">
-                                <div class="tt-title">PL-2025-096 연계</div>
-                                <div>비정상 용접선 정보 필터링</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/19 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">#7 동적리미트
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-062" target="_blank">PL-2025-062 연계</a></div>
-                                <div>갠트리 수동 이동 시 동적 리미트</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/19 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">#8 Z홈선택
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-132" target="_blank">PL-2025-132</a></div>
-                                <div>기본 Z홈 선택</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/19 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">#10 토크가시성
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-203" target="_blank">PL-2026-203</a></div>
-                                <div>토크 축 가독/가시성 향상</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/19 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar high" style="font-size:0.65rem;">#13 홀센서
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank">PL-2025-155</a></div>
-                                <div>홀센서 기반 원점 인식</div>
-                                <div class="tt-row"><span class="tt-label">UI:</span> ✓ 완료 (박주한)</div>
-                                <div class="tt-row"><span class="tt-label">RAPID:</span> 대기중</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 1/22 삼중 컨펌 예정</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 1/20 (화) - 1개 완료, 3개 1/21완료, 4개 1/22지연 -->
-                    <div class="gantt-cell">
-                        <div class="task-bar completed" style="font-size:0.65rem;">#3 데드라인
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-204" target="_blank">PL-2026-204</a></div>
-                                <div>명령 유형 별 기초 데드라인 구성</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/20 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">#4 상세에러
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank">PL-2025-074 연계</a></div>
-                                <div>명령에 대한 상세 에러 구성</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 완료 (에러세분화)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar ghost" style="font-size:0.65rem;opacity:0.4;">#5 유량범위 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></div>
-                                <div>공압, CO2, 냉각수 유량 범위 구성</div>
-                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/20</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/20→1/27 이동</div>
-                            </div>
-                        </div>
-                        <div class="task-bar ghost" style="font-size:0.65rem;opacity:0.4;">#6 DB상하한 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-205" target="_blank">PL-2026-205</a></div>
-                                <div>관제 측 이동 시 DB의 상, 하한선 수치 활용</div>
-                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/20</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/20→1/27 이동</div>
-                            </div>
-                        </div>
-                        <div class="task-bar ghost" style="font-size:0.65rem;opacity:0.4;">#9 와이어인칭 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-206" target="_blank">PL-2026-206</a></div>
-                                <div>와이어 인칭 시그널 개별 제어 및 리셋</div>
-                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/20</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/20→1/27 이동</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">#11 알람전달
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-061" target="_blank">PL-2025-061 연계</a></div>
-                                <div>알람 전달</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 완료 (PLC알람)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar ghost" style="font-size:0.65rem;opacity:0.4;">#12 웜업 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank">PL-2025-113 연계</a></div>
-                                <div>웜업</div>
-                                <div class="tt-row"><span class="tt-label">원계획:</span> 1/20</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/20→1/27 이동</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">#14 커스텀팝업
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-022" target="_blank">PL-2025-022 연계</a></div>
-                                <div>커스텀 팝업</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 완료</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 1/21 (수) - 6개 완료 (B라인 4건 + SP 2건) -->
-                    <div class="gantt-cell" style="background:#ecfdf5;">
-                        <div class="task-bar completed" style="font-size:0.65rem;">커스텀팝업
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-022" target="_blank">PL-2025-022</a></div>
-                                <div>커스텀 팝업 가독성 향상</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 배포완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">에러세분화
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank">PL-2025-074</a></div>
-                                <div>에러내용 세분화</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 배포완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">DB상하한
-                            <div class="task-tooltip">
-                                <div class="tt-title">신규 항목</div>
-                                <div>관제측 DB 상하한선 UI</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">데드라인
-                            <div class="task-tooltip">
-                                <div class="tt-title">신규 항목</div>
-                                <div>명령 유형 별 데드라인</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">브레이크
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-207" target="_blank">PL-2026-207</a></div>
-                                <div>B라인 Control Off Speed Limit 수정</div>
-                                <div class="tt-row"><span class="tt-label">내용:</span> X1/X2축 설정 통일 (0.02/1 → 0.02/0.02)</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 SP조치완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">RAPID
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-069" target="_blank">PL-2025-069</a></div>
-                                <div>RAPID 자동 상태 확인 에러</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 SP조치완료</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 1/22 (목) - 완료 2건 + 지연 3건 (원계획) -->
-                    <div class="gantt-cell" style="background:#ecfdf5;position:relative;">
-                        <div class="task-bar completed" style="font-size:0.65rem;">터치에러
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-208" target="_blank">PL-2026-208</a></div>
-                                <div>B라인 터치에러 핸들링</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/22 삼성컨펌완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">노즐클리닝
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-116" target="_blank">PL-2025-116</a></div>
-                                <div>노즐 클리닝 티칭</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/22 테스트완료 (A라인)</div>
-                            </div>
-                        </div>
-                        <!-- 지연 항목 원계획 표시 (고스트) -->
-                        <div class="task-bar ghost" style="font-size:0.55rem;">067 ━━━━━━━━━━━━━━▶ <span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/27</span></div>
-                        <div class="task-bar ghost" style="font-size:0.55rem;">061 ━━━━━━━━━━━━━━▶ <span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/27</span></div>
-                        <div class="task-bar ghost" style="font-size:0.55rem;">096 ━━━━━━━━━━━━━━▶ <span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/27</span></div>
-                    </div>
-                    <!-- 1/23 (금) - 완료 1건 -->
-                    <div class="gantt-cell" style="background:#ecfdf5;">
-                        <div class="task-bar completed" style="font-size:0.65rem;">스프레이
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-117" target="_blank">PL-2025-117</a></div>
-                                <div>스프레이 티칭 기능</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/23 테스트완료 (A라인)</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 1/24 (토) - 현장작업 완료 3건 -->
-                    <div class="gantt-cell weekend" style="background:#ecfdf5;">
-                        <div class="task-bar completed" style="font-size:0.65rem;">불스아이
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank">PL-2026-168</a></div>
-                                <div>불스아이 결선</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/24 현장작업 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">BullsEye
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank">PL-2025-142</a></div>
-                                <div>B라인 BullsEye 설치</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/24 현장작업 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">절연처리
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank">PL-2025-097</a></div>
-                                <div>로봇 절연처리 (백그라이트)</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/24 현장작업 완료</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 1/26 (월) -->
-                    <div class="gantt-cell week-start">
-                        <div class="task-bar completed" style="font-size:0.65rem;">윤활배관
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-202" target="_blank">PL-2026-202</a></div>
-                                <div>A라인 윤활 배관 수정 작업</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/26 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">웜업UI✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-191" target="_blank">PL-2026-191</a></div>
-                                <div>웜업 UI 가시성 개선</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 테스트완료→배포대기</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.65rem;">동시피딩✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-150" target="_blank">PL-2025-150</a> / <a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-192" target="_blank">PL-2026-192</a></div>
-                                <div>와이어 동시 피딩 기능</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 테스트완료→배포대기</div>
-                            </div>
-                        </div>
-                        <!-- 지연 화살표 (1/19~22→1/27) -->
-                        <div style="margin-top:4px;padding:2px 4px;background:#fef2f2;border-radius:4px;font-size:0.55rem;color:#dc2626;text-align:center;">
-                            <span style="font-weight:bold;">← 1/19~22</span> ⚠️7건 지연 <span style="font-weight:bold;">→ 1/27</span>
-                        </div>
-                    </div>
-                    <!-- 1/27 (화) TODAY - 지연 항목 7건 -->
-                    <div class="gantt-cell" style="background:linear-gradient(135deg,rgba(59,130,246,0.15),#fef2f2);border:2px solid #3b82f6;">
-                        <div class="task-bar delayed" style="font-size:0.55rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/19</span>▶ 106 디지털트윈
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></div>
-                                <div>디지털 트윈 Lag 이슈</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/19→1/27 지연</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.55rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/20</span>▶ 205 DB상하한
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-205" target="_blank">PL-2026-205</a></div>
-                                <div>관제 측 DB 상,하한선 수치 활용</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/20→1/27 지연</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.55rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/20</span>▶ 206 와이어인칭
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-206" target="_blank">PL-2026-206</a></div>
-                                <div>와이어 인칭 개별제어</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/20→1/27 지연</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.55rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/20</span>▶ 113 웜업
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank">PL-2025-113</a></div>
-                                <div>웜업 기능</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/20→1/27 지연</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.55rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/22</span>▶ 067 상하한치
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></div>
-                                <div>공압/가스/냉각수 상하한치</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.55rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/22</span>▶ 061 PLC알람
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-061" target="_blank">PL-2025-061</a></div>
-                                <div>PLC알람 관제측 전달</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.55rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">1/22</span>▶ 096 필터링
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank">PL-2025-096</a></div>
-                                <div>비정상 용접선 정보 필터링</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/22→1/27 지연</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell weekend"></div>
-                    <div class="gantt-cell weekend"></div>
-                    <div class="gantt-cell week-start"></div>
                 </div>
             </div>
 
@@ -1103,73 +601,30 @@
                         </div>
                     </div>
                     <!-- 1주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
-                    <!-- 1/22 노즐클리닝 완료 -->
-                    <div class="gantt-cell" style="background:#ecfdf5;">
-                        <div class="task-bar completed">116 노즐✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-116" target="_blank">PL-2025-116</a></div>
-                                <div>노즐 클리닝 티칭</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 완료</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 1/23 스프레이 완료 -->
-                    <div class="gantt-cell" style="background:#ecfdf5;">
-                        <div class="task-bar completed">117 스프레이✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-117" target="_blank">PL-2025-117</a></div>
-                                <div>스프레이 티칭 기능</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 완료</div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
-                    <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 1/26 -->
-                    <div class="gantt-cell week-start">
-                        <div class="task-bar ghost" style="font-size:0.6rem;opacity:0.4;">188 쇼크센서 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-188" target="_blank">PL-2026-188</a></div>
-                                <div>쇼크센서 기반 티칭 (CCLink IO)</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 📅 1/26→1/27 이동</div>
-                            </div>
-                        </div>
+                    <!-- 2주차 -->
+                    <div class="gantt-cell weekend week-start"></div>
+                    <div class="gantt-cell">
+                        <div class="task-bar normal">115 앵글회피</div>
                     </div>
-                    <!-- 1/27 TODAY -->
-                    <div class="gantt-cell" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
-                        <div class="task-bar normal">115 앵글회피
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-115" target="_blank">PL-2025-115</a></div>
-                                <div>앵글 회피 로직</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.55rem;">188 쇼크센서 A✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-188" target="_blank">PL-2026-188</a></div>
-                                <div>CCLink IO CO_16_HeadShock 생성</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✅ A라인 적용완료</div>
-                            </div>
-                        </div>
+                    <div class="gantt-cell">
+                        <div class="task-bar normal">116 노즐클리닝</div>
                     </div>
-                    <!-- 1/28 -->
-                    <div class="gantt-cell" style="background:rgba(251,191,36,0.1);">
-                        <div class="task-bar delayed" style="font-size:0.55rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">B</span> 188 B라인적용
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-188" target="_blank">PL-2026-188</a></div>
-                                <div>CCLink IO CO_16_HeadShock - B라인 적용</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ PlanC 연기 (1/27→1/28)</div>
-                            </div>
-                        </div>
+                    <div class="gantt-cell">
+                        <div class="task-bar normal">117 스프레이</div>
                     </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
                     <!-- 3주차 -->
-                    <div class="gantt-cell weekend"></div>
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
+                    <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
@@ -1188,75 +643,39 @@
                         </div>
                     </div>
                     <!-- 1주차 -->
-                    <div class="gantt-cell week-start"></div>
-                    <div class="gantt-cell"></div>
-                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell">
-                        <div class="task-bar verify">083 확인
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-083" target="_blank">PL-2025-083</a></div>
-                                <div>X축 하드 리밋 결선 확인</div>
-                            </div>
-                        </div>
+                        <div class="task-bar high">083 X축리밋</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar high">083 조치
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-083" target="_blank">PL-2025-083</a></div>
-                                <div>X축 하드 리밋 결선 조치</div>
-                            </div>
-                        </div>
+                        <div class="task-bar high">083 계속</div>
                     </div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 1/26 -->
-                    <div class="gantt-cell week-start"></div>
-                    <!-- 1/27 TODAY -->
-                    <div class="gantt-cell" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
-                        <div class="task-bar normal">109 LAN케이블
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-109" target="_blank">PL-2025-109</a></div>
-                                <div>LAN 케이블 교체</div>
-                            </div>
-                        </div>
+                    <!-- 2주차 -->
+                    <div class="gantt-cell weekend week-start"></div>
+                    <div class="gantt-cell">
+                        <div class="task-bar normal">109 LAN케이블</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">166 경광등
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-166" target="_blank">PL-2026-166</a></div>
-                                <div>경광등 설치</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">166 경광등</div>
                     </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
                     <!-- 3주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell">
-                        <div class="task-bar low">131 PC전원
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-131" target="_blank">PL-2025-131</a></div>
-                                <div>PC 전원 OFF 문제</div>
-                            </div>
-                        </div>
+                        <div class="task-bar low">131 PC전원</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">167 명판
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-167" target="_blank">PL-2026-167</a></div>
-                                <div>명판 부착</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">167 명판</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">168 결선
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank">PL-2026-168</a></div>
-                                <div>불스아이 결선</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">168 결선</div>
                     </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
@@ -1274,52 +693,31 @@
                         </div>
                     </div>
                     <!-- 1주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 1/26 -->
-                    <div class="gantt-cell week-start"></div>
-                    <!-- 1/27 TODAY -->
-                    <div class="gantt-cell" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;">
-                        <div class="task-bar normal">033 케이블
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-033" target="_blank">PL-2025-033</a></div>
-                                <div>케이블 정리</div>
-                            </div>
-                        </div>
+                    <!-- 2주차 -->
+                    <div class="gantt-cell weekend week-start"></div>
+                    <div class="gantt-cell">
+                        <div class="task-bar normal">033 케이블</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">034 릴피더기
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-034" target="_blank">PL-2025-034</a></div>
-                                <div>릴피더기 설치</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">034 릴피더기</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">035 블스아이
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-035" target="_blank">PL-2025-035</a></div>
-                                <div>불스아이 설치</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">035 블스아이</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar low" style="text-decoration:line-through;opacity:0.6;">036 거더상향 [보류]
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-036" target="_blank">PL-2025-036</a></div>
-                                <div>거더 상향 조정 [보류]</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">036 거더상향</div>
                     </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
                     <!-- 3주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
@@ -1335,395 +733,89 @@
                         <div class="owner-avatar" style="background:linear-gradient(135deg,#ff6b6b,#ee5a24);">팀</div>
                         <div class="owner-info">
                             <div class="name">제어팀</div>
-                            <div class="count">25건 (로봇/UI/에러) <span style="font-size:0.6rem;color:#10b981;">✓3</span> <span style="font-size:0.6rem;color:#dc2626;">⚠1</span></div>
+                            <div class="count">40건 (로봇/UI/에러)</div>
                         </div>
                     </div>
                     <!-- 1주차 - 긴급 + 검증중 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell">
-                        <div class="task-bar ghost" style="font-size:0.6rem;opacity:0.4;">039 스프레이 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-039" target="_blank">PL-2025-039</a></div>
-                                <div>불스아이 스프레이 LOW 경고 처리</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 📅 1/22→1/27 이동</div>
-                            </div>
-                        </div>
+                        <div class="task-bar urgent">099 UI로깅</div>
+                        <div class="task-bar urgent">111 형상보간</div>
+                        <div class="task-bar verify">039 스프레이</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar completed">139 B라인이상✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-139" target="_blank">PL-2025-139</a></div>
-                                <div>B라인 로봇 동작 이상현상 대응</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/21 완료</div>
-                            </div>
-                        </div>
+                        <div class="task-bar urgent">113 Z축과부하</div>
+                        <div class="task-bar urgent">139 B라인이상</div>
+                        <div class="task-bar verify">069 RAPID</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar urgent">165 부재두깨
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-165" target="_blank">PL-2026-165</a></div>
-                                <div>용접 포인트 부재 두깨 반영</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed">080 아크에러✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-080" target="_blank">PL-2025-080</a></div>
-                                <div>아크 에러 시 RAPID 제어</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 1/22 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar ghost" style="font-size:0.6rem;opacity:0.4;">084 PLC알람 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-084" target="_blank">PL-2025-084</a></div>
-                                <div>PLC 알람 체크</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 📅 1/22→1/27 이동</div>
-                            </div>
-                        </div>
+                        <div class="task-bar urgent">165 부재두깨</div>
+                        <div class="task-bar verify">080 아크에러</div>
+                        <div class="task-bar verify">084 PLC알람</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar pending">099 UI로깅
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-099" target="_blank">PL-2025-099</a></div>
-                                <div>UI 조작 로깅</div>
-                            </div>
-                        </div>
-                        <div class="task-bar low">111 형상보간
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-111" target="_blank">PL-2025-111</a></div>
-                                <div>형상 보간 실패 에러</div>
-                            </div>
-                        </div>
-                        <div class="task-bar verify">105 통신단절
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-105" target="_blank">PL-2025-105</a></div>
-                                <div>로봇/UI 통신 단절 시 프리징</div>
-                            </div>
-                        </div>
+                        <div class="task-bar verify">096 용접불가</div>
+                        <div class="task-bar verify">105 통신단절</div>
+                        <div class="task-bar verify">106 통신주기</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar completed">124 디바이스넷 ✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-124" target="_blank">PL-2025-124</a></div>
-                                <div>디바이스넷 통신 상실</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar verify">143 용접범위
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-143" target="_blank">PL-2025-143</a></div>
-                                <div>용접 가능 범위 제한</div>
-                            </div>
-                        </div>
+                        <div class="task-bar verify">067 가스알람</div>
+                        <div class="task-bar verify">074 인셉션</div>
+                        <div class="task-bar verify">124 디바이스넷</div>
+                        <div class="task-bar verify">143 용접범위</div>
                     </div>
                     <div class="gantt-cell weekend">
-                        <div class="task-bar verify">148 갠트리범위
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-148" target="_blank">PL-2025-148</a></div>
-                                <div>갠트리 이동 범위 변수화</div>
-                            </div>
-                        </div>
-                        <div class="task-bar verify">151 Z홈모드
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-151" target="_blank">PL-2025-151</a></div>
-                                <div>Z홈 기본 모드 적용</div>
-                            </div>
-                        </div>
+                        <div class="task-bar verify">148 갠트리범위</div>
+                        <div class="task-bar verify">150 와이어피딩</div>
+                        <div class="task-bar verify">151 Z홈모드</div>
                     </div>
-                    <!-- 2주차 1/26 - 테스트완료/지연 -->
-                    <div class="gantt-cell week-start">
-                        <div class="task-bar completed" style="font-size:0.6rem;">157 터치옵셋✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank">PL-2025-157</a></div>
-                                <div>터치 오프셋 일괄 변경</div>
-                            </div>
-                        </div>
-                        <div class="task-bar ghost" style="font-size:0.6rem;opacity:0.4;">196 팝업 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-196" target="_blank">PL-2026-196</a></div>
-                                <div>커스텀 팝업 (프리징)</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 1/26→1/27 이동</div>
-                            </div>
-                        </div>
-                        <div class="task-bar high" style="font-size:0.6rem;">092 수직
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank">PL-2025-092</a></div>
-                                <div>수직용접 터치 센싱 옵셋</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 1/27 TODAY -->
-                    <div class="gantt-cell" style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(16,185,129,0.1));border:2px solid #3b82f6;">
-                        <!-- 완료 항목 -->
-                        <div class="task-bar completed" style="font-size:0.55rem;">196 팝업 ✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-196" target="_blank">PL-2026-196</a></div>
-                                <div>커스텀 팝업 (프리징) - UI스레드 처리</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✅ 배포대기/컨펌대기</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.55rem;">126 속도0% ✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-126" target="_blank">PL-2025-126</a></div>
-                                <div>작업 취소/재개 시 속도 0%</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✅ 테스트완료 (A/B라인 공통)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.55rem;">154 rInit ✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-154" target="_blank">PL-2025-154</a></div>
-                                <div>명령 취소 시 리트라이 방지</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✅ 테스트완료 (A/B라인 공통)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.55rem;">177 에러초기화 ✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-177" target="_blank">PL-2026-177</a></div>
-                                <div>터치/아크에러 후 로봇 초기화</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✅ 테스트완료 (A/B라인 공통)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed" style="font-size:0.55rem;">170 갠트리조깅 ✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-170" target="_blank">PL-2026-170</a></div>
-                                <div>갠트리 상대 이동 조깅 기능</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✅ 테스트완료/컨펌대기</div>
-                            </div>
-                        </div>
-                        <!-- A라인 28일 계속 -->
-                        <div class="task-bar delayed" style="font-size:0.55rem;">092 터치옵셋 →28
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank">PL-2025-092</a></div>
-                                <div>수직용접 터치 센싱 옵셋</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ UI DB처리 이슈 → 28일 디버깅</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.55rem;">020 수직CSV →28
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank">PL-2025-020</a></div>
-                                <div>A라인 수직용접 CSV 작성 1/3</div>
-                                <div class="tt-row"><span class="tt-label">담당:</span> 이마룬 사원 (간섭확인용 자세정보)</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 28일 삼성 발송 예정</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.55rem;">106 통신 →28
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></div>
-                                <div>UI와 관제 통신 주기 문제</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ 28일 진행 예정</div>
-                            </div>
-                        </div>
-                        <!-- B라인 PlanC 연기 -->
-                        <div class="task-bar pending" style="font-size:0.5rem;background:#fef3c7;color:#92400e;border-color:#f59e0b;">PlanC점검 →B라인 28일 연기
-                            <div class="task-tooltip">
-                                <div class="tt-title" style="color:#dc2626;">B라인 긴급 공지</div>
-                                <div>긴급 PlanC 점검으로 B라인 작업 1/28 연기</div>
-                                <div class="tt-row"><span class="tt-label">연기항목:</span> 084, 199, 179, 039, 156, 188</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 1/28 -->
-                    <div class="gantt-cell" style="background:rgba(251,191,36,0.1);">
-                        <!-- A라인 계속 -->
-                        <div class="task-bar verify" style="font-size:0.55rem;"><span style="background:#2563eb;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">A</span> 092 UI디버깅
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank">PL-2025-092</a></div>
-                                <div>수직용접 터치 센싱 옵셋</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 🔧 UI DB처리 디버깅</div>
-                            </div>
-                        </div>
-                        <div class="task-bar verify" style="font-size:0.55rem;"><span style="background:#2563eb;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">A</span> 020 CSV발송
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank">PL-2025-020</a></div>
-                                <div>수직용접 CSV 삼성 발송</div>
-                                <div class="tt-row"><span class="tt-label">담당:</span> 이마룬 사원</div>
-                            </div>
-                        </div>
-                        <div class="task-bar verify" style="font-size:0.55rem;"><span style="background:#2563eb;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">A</span> 106 통신
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></div>
-                                <div>UI와 관제 통신 주기 문제</div>
-                            </div>
-                        </div>
-                        <!-- B라인 PlanC 연기 항목 -->
-                        <div class="task-bar delayed" style="font-size:0.5rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">B</span> 199 터치에러2
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-199" target="_blank">PL-2026-199</a></div>
-                                <div>끝점 터치 후 시작점 이동 에러</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ PlanC 연기 (1/27→1/28)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.5rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">B</span> 179 매크로
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-179" target="_blank">PL-2026-179</a></div>
-                                <div>매크로 미선택 시 전체 용접데이터</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ PlanC 연기 (1/27→1/28)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.5rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">B</span> 084 PLC알람
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-084" target="_blank">PL-2025-084</a></div>
-                                <div>PLC 알람 전달</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ PlanC 연기 (1/27→1/28)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.5rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">B</span> 039 스프레이
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-039" target="_blank">PL-2025-039</a></div>
-                                <div>불스아이 스프레이 LOW 경고</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ PlanC 연기 (1/27→1/28)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.5rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">B</span> 156 경광등
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-156" target="_blank">PL-2025-156</a></div>
-                                <div>경광등-UI-관제 동기화</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 코드준비완료, 테스트예정</div>
-                            </div>
-                        </div>
-                        <div class="task-bar delayed" style="font-size:0.5rem;"><span style="background:#dc2626;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">B</span> 067 센싱알람
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></div>
-                                <div>공압/가스/냉각수 상하한치 아날로그 센싱 알람</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ⚠ PlanC 연기 (1/27→1/28)</div>
-                            </div>
-                        </div>
-                        <div class="task-bar high">100 X_init
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-100" target="_blank">PL-2025-100</a></div>
-                                <div>터치 모션 X_init 적용</div>
-                            </div>
-                        </div>
+                    <!-- 2주차 - 높음 -->
+                    <div class="gantt-cell weekend week-start"></div>
+                    <div class="gantt-cell">
+                        <div class="task-bar high">020 수직용접</div>
+                        <div class="task-bar high">023 자동진단</div>
+                        <div class="task-bar high">092 터치옵셋</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar high">146 TCP위치
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-146" target="_blank">PL-2025-146</a></div>
-                                <div>TCP 위치 기반 커맨드 판단</div>
-                            </div>
-                        </div>
-                        <div class="task-bar high">149 매뉴얼
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-149" target="_blank">PL-2025-149</a></div>
-                                <div>용접기 복원 매뉴얼</div>
-                            </div>
-                        </div>
-                        <div class="task-bar high">152 LDS센서
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-152" target="_blank">PL-2025-152</a></div>
-                                <div>LDS 센서 원점 인식</div>
-                            </div>
-                        </div>
+                        <div class="task-bar high">100 X_init</div>
+                        <div class="task-bar high">132 Z홈구분</div>
+                        <div class="task-bar high">142 BullsEye</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar ghost" style="font-size:0.6rem;opacity:0.4;">154 rInit →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-154" target="_blank">PL-2025-154</a></div>
-                                <div>명령 취소 시 리트라이 방지</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 📅 1/30→1/27 앞당김</div>
-                            </div>
-                        </div>
-                        <div class="task-bar high">169 한팔용접
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-169" target="_blank">PL-2026-169</a></div>
-                                <div>B라인 한팔용접 (1xx)</div>
-                            </div>
-                        </div>
+                        <div class="task-bar high">146 TCP위치</div>
+                        <div class="task-bar high">149 매뉴얼</div>
+                        <div class="task-bar high">152 LDS센서</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar high">048 PlanB
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-048" target="_blank">PL-2025-048</a></div>
-                                <div>Plan B 로봇 재구성</div>
-                            </div>
-                        </div>
+                        <div class="task-bar high">154 rInit</div>
+                        <div class="task-bar high">155 홀센서</div>
+                    </div>
+                    <div class="gantt-cell">
+                        <div class="task-bar high">048 PlanB</div>
                     </div>
                     <div class="gantt-cell weekend"></div>
                     <!-- 3주차 - 보통/낮음 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell">
-                        <div class="task-bar low">021 UI개선
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-021" target="_blank">PL-2025-021</a></div>
-                                <div>사용자 편의성 UI 개선</div>
-                            </div>
-                        </div>
-                        <div class="task-bar normal">055 드라이런
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-055" target="_blank">PL-2025-055</a></div>
-                                <div>B라인 드라이런 속도 배율</div>
-                            </div>
-                        </div>
-                        <div class="task-bar normal">065 용접조건
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-065" target="_blank">PL-2025-065</a></div>
-                                <div>실시간 용접 조건 변경</div>
-                            </div>
-                        </div>
+                        <div class="task-bar low">021 UI개선</div>
+                        <div class="task-bar normal">055 드라이런</div>
+                        <div class="task-bar normal">065 용접조건</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">091 수동용접
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-091" target="_blank">PL-2025-091</a></div>
-                                <div>수동 용접시 기능 추가</div>
-                            </div>
-                        </div>
-                        <div class="task-bar normal">121 TCP오프셋
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-121" target="_blank">PL-2025-121</a></div>
-                                <div>시작점 터치 TCP 오프셋</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">091 수동용접</div>
+                        <div class="task-bar normal">121 TCP오프셋</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar ghost" style="font-size:0.6rem;opacity:0.4;">126 속도0% →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-126" target="_blank">PL-2025-126</a></div>
-                                <div>작업 취소/재개 시 속도 0%</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 📅 2/4→1/27 앞당김</div>
-                            </div>
-                        </div>
-                        <div class="task-bar normal">138 터치보정
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-138" target="_blank">PL-2025-138</a></div>
-                                <div>B라인 터치 보정 에러</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">126 속도0%</div>
+                        <div class="task-bar normal">138 터치보정</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">141 SMB배터리
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-141" target="_blank">PL-2025-141</a></div>
-                                <div>SMB 배터리 관리</div>
-                            </div>
-                        </div>
-                        <div class="task-bar normal">147 X축범위
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-147" target="_blank">PL-2025-147</a></div>
-                                <div>계측 도중 X축 범위 확인</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">141 SMB배터리</div>
+                        <div class="task-bar normal">147 X축범위</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">153 십자레이저
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-153" target="_blank">PL-2025-153</a></div>
-                                <div>십자 레이저 갠트리 원점</div>
-                            </div>
-                        </div>
-                        <div class="task-bar ghost" style="font-size:0.6rem;opacity:0.4;">156 경광등 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-156" target="_blank">PL-2025-156</a></div>
-                                <div>경광등-UI-관제 동기화</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 📅 2/7→1/27 앞당김</div>
-                            </div>
-                        </div>
-                        <div class="task-bar ghost" style="font-size:0.6rem;opacity:0.4;">170 갠트리조깅 →1/27
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-170" target="_blank">PL-2026-170</a></div>
-                                <div>갠트리 상대 이동 조깅 기능</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> 📅 2/7→1/27 앞당김</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">153 십자레이저</div>
+                        <div class="task-bar normal">156 경광등동기화</div>
                     </div>
                 </div>
             </div>
@@ -1739,97 +831,43 @@
                         </div>
                     </div>
                     <!-- 1주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
-                    <!-- 1/24 (토) - 현장작업 완료 2건 -->
-                    <div class="gantt-cell weekend" style="background:#ecfdf5;">
-                        <div class="task-bar completed">097 절연✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank">PL-2025-097</a></div>
-                                <div>로봇 절연처리 (백그라이트)</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 완료</div>
-                            </div>
-                        </div>
-                        <div class="task-bar completed">142 불스아이✓
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank">PL-2025-142</a></div>
-                                <div>B라인 BullsEye 설치</div>
-                                <div class="tt-row"><span class="tt-label">상태:</span> ✓ 완료</div>
-                            </div>
-                        </div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend">
+                        <div class="task-bar high">097 로봇절연</div>
+                        <div class="task-bar high">142 불스아이</div>
                     </div>
-                    <div class="gantt-cell weekend"></div>
-                    <!-- 2주차 1/26 -->
-                    <div class="gantt-cell week-start"></div>
-                    <!-- 1/27 TODAY -->
-                    <div class="gantt-cell" style="background:rgba(59,130,246,0.15);border:2px solid #3b82f6;"></div>
+                    <!-- 2주차 -->
+                    <div class="gantt-cell weekend week-start"></div>
+                    <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
                     <!-- 3주차 -->
-                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell weekend week-start"></div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">008 스프레이
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-008" target="_blank">PL-2025-008</a></div>
-                                <div>스프레이 설치</div>
-                            </div>
-                        </div>
-                        <div class="task-bar normal">026 발판
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-026" target="_blank">PL-2025-026</a></div>
-                                <div>발판 설치</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">008 스프레이</div>
+                        <div class="task-bar normal">026 발판</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">027 차광막
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-027" target="_blank">PL-2025-027</a></div>
-                                <div>차광막 설치</div>
-                            </div>
-                        </div>
-                        <div class="task-bar normal">030 안전신고
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-030" target="_blank">PL-2025-030</a></div>
-                                <div>안전 신고</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">027 차광막</div>
+                        <div class="task-bar normal">030 안전신고</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">032 토치케이블
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-032" target="_blank">PL-2025-032</a></div>
-                                <div>토치 케이블 정리</div>
-                            </div>
-                        </div>
-                        <div class="task-bar normal">040 레이저커튼
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-040" target="_blank">PL-2025-040</a></div>
-                                <div>레이저 커튼 설치</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">032 토치케이블</div>
+                        <div class="task-bar normal">040 레이저커튼</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar normal">097 백그라이트
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank">PL-2025-097</a></div>
-                                <div>백그라이트 절연</div>
-                            </div>
-                        </div>
+                        <div class="task-bar normal">097 백그라이트</div>
                     </div>
                     <div class="gantt-cell">
-                        <div class="task-bar low">103 호기명판
-                            <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-103" target="_blank">PL-2025-103</a></div>
-                                <div>호기 명판 부착</div>
-                            </div>
-                        </div>
+                        <div class="task-bar low">103 호기명판</div>
                     </div>
                 </div>
             </div>
@@ -1839,20 +877,18 @@
                 <div class="summary-cell label">일별 업무량</div>
                 <!-- 1주차 -->
                 <div class="summary-cell weekend">-</div>
-                <div class="summary-cell"><div class="num" style="color:#2ed573;">8</div></div><!-- 1/19 +6 B라인 -->
-                <div class="summary-cell"><div class="num" style="color:#ff6b6b;">19</div></div><!-- 1/20: 기존5 + 지연6 + B라인8 -->
-                <div class="summary-cell"><div class="num">5</div></div><!-- 1/21 -->
-                <div class="summary-cell"><div class="num">4</div></div><!-- 1/22 -->
-                <div class="summary-cell"><div class="num" style="color:#10b981;">6</div></div><!-- 1/23 완료 -->
-                <div class="summary-cell weekend"><div class="num" style="color:#10b981;">3</div></div><!-- 1/24 (토) 완료 -->
-                <div class="summary-cell weekend"><div class="num">-</div></div><!-- 1/25 (일) 휴무 -->
-                <!-- 2주차 1/26 (월) -->
-                <div class="summary-cell week-start"><div class="num">5</div></div><!-- 1/26 -->
-                <!-- 1/27 TODAY -->
-                <div class="summary-cell" style="background:rgba(59,130,246,0.2);border:2px solid #3b82f6;"><div class="num" style="color:#3b82f6;">TODAY</div></div><!-- 1/27 TODAY -->
+                <div class="summary-cell"><div class="num">5</div></div>
+                <div class="summary-cell"><div class="num">5</div></div>
+                <div class="summary-cell"><div class="num">5</div></div>
+                <div class="summary-cell"><div class="num">4</div></div>
+                <div class="summary-cell"><div class="num">5</div></div>
+                <div class="summary-cell weekend"><div class="num">5</div></div>
+                <!-- 2주차 -->
+                <div class="summary-cell weekend">-</div>
+                <div class="summary-cell"><div class="num">8</div></div>
                 <div class="summary-cell"><div class="num">8</div></div>
                 <div class="summary-cell"><div class="num">6</div></div>
-                <div class="summary-cell"><div class="num">5</div></div>
+                <div class="summary-cell"><div class="num">4</div></div>
                 <div class="summary-cell"><div class="num">1</div></div>
                 <div class="summary-cell weekend">-</div>
                 <!-- 3주차 -->
@@ -1870,334 +906,82 @@
             <h2>1주차 상세 일정 (1/19~1/25) - 긴급 + 검증중 완료</h2>
             <div class="day-schedule">
                 <div class="day-card">
-                    <div class="day-card-header w1" style="background:linear-gradient(135deg,rgba(46,213,115,0.3),rgba(255,165,2,0.3));">
-                        <div><span class="day-name">월</span> <span class="day-date">1/19</span></div>
-                        <span class="task-count">실적 반영</span>
+                    <div class="day-card-header w1">
+                        <div><span class="day-name">일</span> <span class="day-date">1/19</span></div>
+                        <span class="task-count">킥오프</span>
                     </div>
                     <div class="day-task-list">
-                        <!-- 완료 항목 -->
-                        <div style="margin:5px 0;padding:8px 10px;background:rgba(46,213,115,0.15);border-radius:6px;border-left:3px solid #2ed573;">
-                            <strong style="color:#2ed573;">✅ 완료</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-owner">안전</span>
-                            <div>A 테스트 완료</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-owner">안전</span>
-                            <div>B 세팅 완료</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-owner">안전</span>
-                            <div>메뉴얼 전달 완료</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-owner">B라인</span>
-                            <div>1호기 캘리브레이션 완료 (피딩길이 1호기=3호기)</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-owner">RAPID</span>
-                            <div>웜업 적용 완료 (UI 적용 대기 - 테스트버전 준비됨)</div>
-                        </div>
-
-                        <!-- 지연 항목 -->
-                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(255,107,107,0.15);border-radius:6px;border-left:3px solid #ff6b6b;">
-                            <strong style="color:#ff6b6b;">❌ 지연 → 1/20 이동</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
-                            <span class="task-owner">박주한</span>
-                            <div>B라인 UI 6건 (#1,#2,#7,#8,#10,#13) 미배포</div>
-                        </div>
-                        <div style="padding:5px 10px;color:#ff6b6b;font-size:0.8rem;">
-                            사유: 화면전환 프리징 이슈 (X항목 검증완료, 대안 있으나 테스트 못함)
-                        </div>
-
-                        <!-- 확인중 항목 -->
-                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(30,144,255,0.15);border-radius:6px;border-left:3px solid #1e90ff;">
-                            <strong style="color:#1e90ff;">🔍 확인중</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(30,144,255,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank" style="color:#1e90ff;">PL-2025-020</a></span>
-                            <span class="task-owner">A라인</span>
-                            <div>수직용접: nAngleBetweenParts 위치이동 오류 가능성</div>
-                        </div>
-                        <div style="padding:5px 10px;color:#1e90ff;font-size:0.8rem;">
-                            12/09 버전 롤백 테스트도 용접불가 → 테스트 UI 신버전 제작 예정 (박주한)
+                        <div class="day-task-item normal">
+                            <span class="task-owner">전체</span>
+                            <div>3주 완료 계획 시작 / 담당자별 업무 배분 확인</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="day-card">
-                    <div class="day-card-header w1" style="background:linear-gradient(135deg,rgba(46,213,115,0.3),rgba(30,144,255,0.2));">
-                        <div><span class="day-name">화</span> <span class="day-date">1/20</span></div>
-                        <span class="task-count">1건 완료 + 4건 지연</span>
+                    <div class="day-card-header w1">
+                        <div><span class="day-name">월</span> <span class="day-date">1/20</span></div>
+                        <span class="task-count">5건</span>
                     </div>
                     <div class="day-task-list">
-                        <!-- 1/20 완료 -->
-                        <div style="margin:5px 0;padding:8px 10px;background:rgba(46,213,115,0.15);border-radius:6px;border-left:3px solid #2ed573;">
-                            <strong style="color:#2ed573;">✓ 1/20 완료</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id" style="color:#2ed573;">#3</span>
+                        <div class="day-task-item urgent">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-099" target="_blank">PL-2025-099</a></span>
                             <span class="task-owner">제어팀</span>
-                            <div>명령 유형별 데드라인 구성</div>
-                        </div>
-                        <!-- 1/22 지연 -->
-                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(255,107,107,0.15);border-radius:6px;border-left:3px solid #ff6b6b;">
-                            <strong style="color:#ff6b6b;">⚠ 1/22 지연 (4건)</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank" style="color:#ff6b6b;">#5 PL-2025-067</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>공압/CO2/냉각수 유량범위 → 상하한치</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
-                            <span class="task-id" style="color:#ff6b6b;">#6 신규</span>
-                            <span class="task-owner">박주한</span>
-                            <div>DB 상하한선 수치 활용</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
-                            <span class="task-id" style="color:#ff6b6b;">#9 신규</span>
-                            <span class="task-owner">제어팀</span>
-                            <div>와이어 인칭 시그널 개별 제어 → 동시피딩</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank" style="color:#ff6b6b;">#12 PL-2025-113</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>웜업 UI 가시성 개선</div>
-                        </div>
-                        <!-- Plan C 적용 -->
-                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(46,213,115,0.15);border-radius:6px;border-left:3px solid #2ed573;">
-                            <strong style="color:#2ed573;">Plan C 적용 완료</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-174" target="_blank" style="color:#2ed573;">PL-2026-174</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>B라인 전호기 Plan C 적용 ✓</div>
-                        </div>
-                        <!-- A라인 진행 -->
-                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(30,144,255,0.15);border-radius:6px;border-left:3px solid #1e90ff;">
-                            <strong style="color:#1e90ff;">A라인 진행현황</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank" style="color:#2ed573;">PL-2025-113</a></span>
-                            <span class="task-owner">A라인</span>
-                            <div>웜업 적용 (타이머 표시 개선 잔여)</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,165,2,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank" style="color:#ffa502;">PL-2025-020</a></span>
-                            <span class="task-owner">A라인</span>
-                            <div>수직용접 모션 테스트 성공</div>
-                        </div>
-                        <!-- 수직용접 테스트 결과 테이블 -->
-                        <div style="margin-top:10px;padding:10px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;">
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:0.75rem;">
-                                <!-- X: -120 테이블 -->
-                                <div>
-                                    <div style="background:#2563eb;color:#fff;padding:6px 8px;border-radius:6px 6px 0 0;font-weight:600;text-align:center;">X: -120</div>
-                                    <table style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;">
-                                        <tr style="background:#f9fafb;">
-                                            <th style="padding:4px 6px;border:1px solid #e5e7eb;text-align:left;">위치</th>
-                                            <th style="padding:4px 6px;border:1px solid #e5e7eb;text-align:center;">Angle</th>
-                                            <th style="padding:4px 6px;border:1px solid #e5e7eb;text-align:center;width:40px;">Result</th>
-                                        </tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;font-weight:500;">Front</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">316°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">0°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">45°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">90°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">135°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">136°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">180°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;font-weight:500;">Back</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">225°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">270°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">315°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                    </table>
-                                    <div style="background:#2ed573;color:#fff;padding:4px;text-align:center;border-radius:0 0 6px 6px;font-weight:600;">10/10 PASS</div>
-                                </div>
-                                <!-- X: +120 테이블 -->
-                                <div>
-                                    <div style="background:#dc2626;color:#fff;padding:6px 8px;border-radius:6px 6px 0 0;font-weight:600;text-align:center;">X: +120</div>
-                                    <table style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;">
-                                        <tr style="background:#f9fafb;">
-                                            <th style="padding:4px 6px;border:1px solid #e5e7eb;text-align:left;">위치</th>
-                                            <th style="padding:4px 6px;border:1px solid #e5e7eb;text-align:center;">Angle</th>
-                                            <th style="padding:4px 6px;border:1px solid #e5e7eb;text-align:center;width:40px;">Result</th>
-                                        </tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">315°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">0°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;font-weight:500;">Front</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">45°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">226°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">270°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">314°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr style="background:#fef2f2;"><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;font-weight:600;color:#dc2626;">46°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#dc2626;font-weight:bold;">✗</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">90°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;font-weight:500;">Back</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">135°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">180°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                        <tr><td style="padding:3px 6px;border:1px solid #e5e7eb;"></td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;">225°</td><td style="padding:3px 6px;border:1px solid #e5e7eb;text-align:center;color:#2ed573;">✓</td></tr>
-                                    </table>
-                                    <div style="background:#ffa502;color:#fff;padding:4px;text-align:center;border-radius:0 0 6px 6px;font-weight:600;">10/11 (46° NG)</div>
-                                </div>
-                            </div>
-                            <div style="margin-top:8px;padding:8px;background:#fef2f2;border-radius:6px;font-size:0.75rem;color:#dc2626;border-left:3px solid #dc2626;">
-                                <b>46° NG 원인:</b> X_shift 양수 + 46도 각 → 와이어 하네스-카메라 마찰로 쇼크센서 작동<br>
-                                <b>조치:</b> 정자세 수행 가능 여부 확인 중
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="day-card">
-                    <div class="day-card-header w1" style="background:linear-gradient(135deg,rgba(46,213,115,0.3),rgba(255,165,2,0.2));">
-                        <div><span class="day-name">수</span> <span class="day-date">1/21</span></div>
-                        <span class="task-count">완료 6건 + 기타 4건</span>
-                    </div>
-                    <div class="day-task-list">
-                        <!-- B라인 완료 4건 -->
-                        <div style="margin:5px 0;padding:8px 10px;background:rgba(46,213,115,0.15);border-radius:6px;border-left:3px solid #2ed573;">
-                            <strong style="color:#2ed573;">✓ B라인 완료 (4건)</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-022" target="_blank" style="color:#2ed573;">PL-2025-022</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>커스텀 팝업 가독성 향상 (창 크기 확대)</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank" style="color:#2ed573;">PL-2025-074</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>에러내용 세분화 (카메라 커버, 용접 셋업 에러)</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id" style="color:#2ed573;">신규</span>
-                            <span class="task-owner">박주한</span>
-                            <div>관제측 DB 상하한선 UI (로직 적용완료, UI 가시성개선)</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id" style="color:#2ed573;">신규</span>
-                            <span class="task-owner">박주한</span>
-                            <div>명령 유형 별 데드라인</div>
-                        </div>
-                        <!-- SP 조치 2건 -->
-                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(5,150,105,0.15);border-radius:6px;border-left:3px solid #059669;">
-                            <strong style="color:#059669;">✓ SP 조치 (2건)</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(5,150,105,0.1);">
-                            <span class="task-id" style="color:#059669;">신규</span>
-                            <span class="task-owner">심태양</span>
-                            <div>B라인 Control Off Speed Limit 수정 (X1/X2축 0.02 통일)</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(5,150,105,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-069" target="_blank" style="color:#059669;">PL-2025-069</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>RAPID 자동 상태 확인 에러 (통신끊김과 동시 발생, 통신자동연결과 같이 조치)</div>
-                        </div>
-                        <!-- 기타 진행 -->
-                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(255,165,2,0.15);border-radius:6px;border-left:3px solid #ffa502;">
-                            <strong style="color:#d97706;">기타 진행</strong>
+                            <div>UI 조작 로깅</div>
                         </div>
                         <div class="day-task-item urgent">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank">PL-2025-113</a></span>
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-111" target="_blank">PL-2025-111</a></span>
                             <span class="task-owner">제어팀</span>
-                            <div>Z축 과부하 에러 [검증중]</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(46,213,115,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-139" target="_blank" style="color:#2ed573;">PL-2025-139</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>B라인 로봇 동작 이상현상 대응 ✓완료</div>
+                            <div>형상 보간 실패 에러 원인 파악</div>
                         </div>
                         <div class="day-task-item high">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-083" target="_blank">PL-2025-083</a></span>
                             <span class="task-owner">이상주</span>
-                            <div>X축 하드 리밋 결선 [1/22확인, 1/23조치예정]</div>
+                            <div>X축 하드 리밋 무시 결선 확인</div>
                         </div>
-                        <div class="day-task-item urgent">
-                            <span class="task-id"><a href="brake-tuning-plan.html" target="_blank">브레이크</a></span>
-                            <span class="task-owner">심태양</span>
-                            <div>X1/X2축 브레이크 제어 튜닝 테스트</div>
+                        <div class="day-task-item normal">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-039" target="_blank">PL-2025-039</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>불스아이 스프레이 LOW 경고 [검증]</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="day-card" style="border:2px solid #10b981;">
-                    <div class="day-card-header w1" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));">
-                        <div><span class="day-name">목</span> <span class="day-date">1/22</span></div>
-                        <span class="task-count" style="background:#10b981;color:#fff;">완료 2건 + 지연 5건</span>
+                <div class="day-card">
+                    <div class="day-card-header w1">
+                        <div><span class="day-name">화</span> <span class="day-date">1/21</span></div>
+                        <span class="task-count">5건</span>
                     </div>
                     <div class="day-task-list">
-                        <!-- 1/22 완료 -->
-                        <div style="margin-bottom:8px;padding:6px 8px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
-                            <strong style="color:#10b981;font-size:0.75rem;">✓ 1/22 완료 (2건)</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(16,185,129,0.1);">
-                            <span class="task-id">신규</span>
-                            <span class="task-owner" style="color:#10b981;">제어팀</span>
-                            <div>B라인 터치에러 핸들링 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">삼성컨펌완료</span></div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(16,185,129,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-116" target="_blank" style="color:#10b981;">PL-2025-116</a></span>
-                            <span class="task-owner" style="color:#10b981;">최광년</span>
-                            <div>노즐 클리닝 티칭 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">테스트완료</span> (A라인 적용)</div>
-                        </div>
-                        <!-- 1/27 지연 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(255,107,107,0.15);border-radius:6px;border-left:3px solid #ff6b6b;">
-                            <strong style="color:#ff6b6b;font-size:0.75rem;">⚠ 1/27 지연 (박주한 담당 5건)</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank" style="color:#ff6b6b;">PL-2025-067</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>공압/가스/냉각수 상하한치 → 1/27</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
-                            <span class="task-id" style="color:#ff6b6b;">신규</span>
-                            <span class="task-owner">박주한</span>
-                            <div>웜업 UI 가시성 개선 → 1/27</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-061" target="_blank" style="color:#3b82f6;">PL-2025-061</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>PLC알람 관제측 전달 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">PL-2025-084 연계진행</span></div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
-                            <span class="task-id" style="color:#ff6b6b;">신규</span>
-                            <span class="task-owner">박주한</span>
-                            <div>와이어 동시 피딩 기능 → 1/27</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(255,107,107,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank" style="color:#ff6b6b;">PL-2025-096</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>비정상 용접선 정보 필터링 → 1/27</div>
-                        </div>
-                        <!-- A라인 진행 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(37,99,235,0.1);border-radius:6px;border-left:3px solid #2563eb;">
-                            <strong style="color:#2563eb;font-size:0.75rem;">A라인 진행 (3건)</strong>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(16,185,129,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank">PL-2025-020</a></span>
-                            <span class="task-owner" style="color:#10b981;">A라인</span>
-                            <div>버티컬 용접데이터 UI <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">품질확인완료</span> (관제연동 23일 예정)</div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(16,185,129,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-177" target="_blank">PL-2026-177</a></span>
-                            <span class="task-owner" style="color:#10b981;">박주한</span>
-                            <div>에러플래그 초기화 UI <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">전달완료</span></div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(245,158,11,0.1);">
-                            <span class="task-id">신규</span>
-                            <span class="task-owner" style="color:#f59e0b;">조용현</span>
-                            <div>A라인 디지털 트윈 개선 <span style="background:#f59e0b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">확인대기</span> (B라인 개선완료)</div>
-                        </div>
-                        <!-- 긴급 - Plan C 관련 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(220,38,38,0.15);border-radius:6px;border-left:3px solid #dc2626;">
-                            <strong style="color:#dc2626;font-size:0.75rem;">🔴 긴급 (1건)</strong>
+                        <div class="day-task-item urgent">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-113" target="_blank">PL-2025-113</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>Z축 과부하 에러</div>
                         </div>
                         <div class="day-task-item urgent">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-184" target="_blank">PL-2026-184</a></span>
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-139" target="_blank">PL-2025-139</a></span>
                             <span class="task-owner">제어팀</span>
-                            <div>Plan C 아크에러 동기화 에러 <span style="background:#dc2626;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">검증중</span></div>
+                            <div>B라인 로봇 동작 이상현상 대응</div>
                         </div>
-                        <!-- 기타 예정 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(107,114,128,0.1);border-radius:6px;border-left:3px solid #6b7280;">
-                            <strong style="color:#6b7280;font-size:0.75rem;">기타 예정 (5건)</strong>
+                        <div class="day-task-item high">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-083" target="_blank">PL-2025-083</a></span>
+                            <span class="task-owner">이상주</span>
+                            <div>X축 하드 리밋 (계속)</div>
                         </div>
+                        <div class="day-task-item normal">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-069" target="_blank">PL-2025-069</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>RAPID 자동 상태 확인 에러 [검증]</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day-card">
+                    <div class="day-card-header w1">
+                        <div><span class="day-name">수</span> <span class="day-date">1/22</span></div>
+                        <span class="task-count">5건</span>
+                    </div>
+                    <div class="day-task-list">
                         <div class="day-task-item urgent">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-165" target="_blank">PL-2026-165</a></span>
                             <span class="task-owner">제어팀</span>
@@ -2208,40 +992,24 @@
                             <span class="task-owner">제어팀</span>
                             <div>아크 에러 시 RAPID 제어 [검증]</div>
                         </div>
-                        <div class="day-task-item high" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
+                        <div class="day-task-item high">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-084" target="_blank">PL-2025-084</a></span>
                             <span class="task-owner">제어팀</span>
-                            <div>PLC 알람 체크 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">PL-2025-061 연계진행</span></div>
-                        </div>
-                        <div class="day-task-item high">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-155" target="_blank">PL-2025-155</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>홀센서 기반 원점 인식 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">UI준비</span> (A라인 우선, B라인 PlanC 오염)</div>
+                            <div>PLC 알람 체크 [검증]</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="day-card" style="border:2px solid #10b981;">
-                    <div class="day-card-header w1" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.1));">
-                        <div><span class="day-name">금</span> <span class="day-date">1/23</span> <span style="background:#10b981;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;">완료</span></div>
-                        <span class="task-count" style="background:#10b981;color:#fff;">6건 완료</span>
+                <div class="day-card">
+                    <div class="day-card-header w1">
+                        <div><span class="day-name">목</span> <span class="day-date">1/23</span></div>
+                        <span class="task-count">4건</span>
                     </div>
                     <div class="day-task-list">
-                        <!-- 1/23 신규 추가: 스프레이 티칭 테스트 -->
-                        <div class="day-task-item high" style="background:rgba(16,185,129,0.15);border-left:3px solid #10b981;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-117" target="_blank">PL-2025-117</a></span>
-                            <span class="task-owner">최광년</span>
-                            <div>스프레이 티칭 기능 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">테스트예정</span></div>
-                        </div>
-                        <div class="day-task-item" style="background:rgba(59,130,246,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-099" target="_blank">PL-2025-099</a></span>
+                        <div class="day-task-item high">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank">PL-2025-096</a></span>
                             <span class="task-owner">제어팀</span>
-                            <div>UI 조작 로깅 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료예정</span></div>
-                        </div>
-                        <div class="day-task-item low">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-111" target="_blank">PL-2025-111</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>형상 보간 실패 에러 <span style="background:#6b7280;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">기능필요</span></div>
+                            <div>B라인 용접 불가 반환 [검증]</div>
                         </div>
                         <div class="day-task-item high">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-105" target="_blank">PL-2025-105</a></span>
@@ -2249,52 +1017,57 @@
                             <div>로봇/UI 통신 단절 [검증]</div>
                         </div>
                         <div class="day-task-item high">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank">PL-2025-020</a></span>
-                            <span class="task-owner">A라인</span>
-                            <div>버티컬 용접데이터 관제연동</div>
-                        </div>
-                        <div class="day-task-item high">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-083" target="_blank">PL-2025-083</a></span>
-                            <span class="task-owner">이상주</span>
-                            <div>X축 하드 리밋 결선 조치</div>
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>UI-관제 통신 주기 [검증]</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="day-card" style="border: 2px solid #10b981;">
-                    <div class="day-card-header w1" style="background: rgba(16,185,129,0.3);">
-                        <div><span class="day-name">토 (현장작업)</span> <span class="day-date">1/24</span> <span style="background:#10b981;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.65rem;margin-left:4px;">완료</span></div>
-                        <span class="task-count" style="background:#10b981;color:#fff;">3건 완료</span>
+                <div class="day-card">
+                    <div class="day-card-header w1">
+                        <div><span class="day-name">금</span> <span class="day-date">1/24</span></div>
+                        <span class="task-count">5건</span>
                     </div>
                     <div class="day-task-list">
-                        <!-- 완료 항목 -->
-                        <div style="margin:5px 0;padding:8px 10px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
-                            <strong style="color:#10b981;">✅ 완료 (3건)</strong>
+                        <div class="day-task-item normal">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-067" target="_blank">PL-2025-067</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>가스유량 알람처리 [검증]</div>
                         </div>
-                        <div class="day-task-item high" style="background:rgba(16,185,129,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank">PL-2026-168</a></span>
-                            <span class="task-owner">이상주</span>
-                            <div>불스아이 결선 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
+                        <div class="day-task-item high">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-074" target="_blank">PL-2025-074</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>인셉션 에러 세분화 [검증]</div>
                         </div>
-                        <div class="day-task-item high" style="background:rgba(16,185,129,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank">PL-2025-142</a></span>
-                            <span class="task-owner">기계팀</span>
-                            <div>B라인 BullsEye 설치 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
-                        </div>
-                        <div class="day-task-item high" style="background:rgba(16,185,129,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank">PL-2025-097</a></span>
-                            <span class="task-owner">기계팀</span>
-                            <div>로봇 절연처리 (백그라이트) <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
+                        <div class="day-task-item normal">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-124" target="_blank">PL-2025-124</a></span>
                             <span class="task-owner">제어팀</span>
-                            <div>디바이스넷 통신 상실 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
+                            <div>디바이스넷 통신 상실 [검증]</div>
                         </div>
                         <div class="day-task-item high">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-143" target="_blank">PL-2025-143</a></span>
                             <span class="task-owner">제어팀</span>
                             <div>용접 가능 범위 제한 [검증]</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day-card" style="border: 2px solid #ffa502;">
+                    <div class="day-card-header w1" style="background: rgba(255,165,2,0.3);">
+                        <div><span class="day-name">토 (현장작업)</span> <span class="day-date">1/25</span></div>
+                        <span class="task-count" style="background:#ffa502;color:#fff;">5건</span>
+                    </div>
+                    <div class="day-task-list">
+                        <div class="day-task-item high">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-097" target="_blank">PL-2025-097</a></span>
+                            <span class="task-owner">기계팀</span>
+                            <div>로봇 절연처리 (백그라이트, 절연볼트)</div>
+                        </div>
+                        <div class="day-task-item high">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-142" target="_blank">PL-2025-142</a></span>
+                            <span class="task-owner">기계팀/제어팀</span>
+                            <div>B라인 BullsEye 설치 위치 선정</div>
                         </div>
                         <div class="day-task-item normal">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-148" target="_blank">PL-2025-148</a></span>
@@ -2302,220 +1075,38 @@
                             <div>갠트리 이동 가능 범위 변수화 [검증]</div>
                         </div>
                         <div class="day-task-item normal">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank">PL-2026-168</a></span>
-                            <span class="task-owner">이상주</span>
-                            <div>불스아이 결선</div>
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-150" target="_blank">PL-2025-150</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>와이어 교체 모드 피딩기능 [검증]</div>
+                        </div>
+                        <div class="day-task-item normal">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-151" target="_blank">PL-2025-151</a></span>
+                            <span class="task-owner">제어팀</span>
+                            <div>Z홈 모션 기본 모드 [검증]</div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <h2>2주차 상세 일정 (1/26~2/1) - 높음 우선순위 집중</h2>
-
-            <!-- 1/26 기준 현황 요약 박스 -->
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px;padding:15px;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-                <div style="text-align:center;padding:15px;background:linear-gradient(135deg,#10b981,#059669);border-radius:8px;color:#fff;">
-                    <div style="font-size:2rem;font-weight:700;">18</div>
-                    <div style="font-size:0.8rem;opacity:0.9;">✅ 1/26 기준 완료</div>
-                </div>
-                <div style="text-align:center;padding:15px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:8px;color:#fff;">
-                    <div style="font-size:2rem;font-weight:700;">8</div>
-                    <div style="font-size:0.8rem;opacity:0.9;">🔧 진행중/테스트완료</div>
-                </div>
-                <div style="text-align:center;padding:15px;background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:8px;color:#fff;">
-                    <div style="font-size:2rem;font-weight:700;">5</div>
-                    <div style="font-size:0.8rem;opacity:0.9;">⚠️ 지연 (1/27 예정)</div>
-                </div>
-                <div style="text-align:center;padding:15px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:8px;color:#fff;">
-                    <div style="font-size:2rem;font-weight:700;">5</div>
-                    <div style="font-size:0.8rem;opacity:0.9;">🆕 신규 추가</div>
-                </div>
-            </div>
-
-            <!-- 완료/지연 상세 테이블 -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;">
-                <!-- 완료 항목 -->
-                <div style="background:#fff;border-radius:12px;padding:15px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #10b981;">
-                    <h3 style="color:#10b981;margin-bottom:10px;font-size:1rem;">✅ 1/26 기준 완료 (18건)</h3>
-                    <div style="font-size:0.8rem;line-height:1.8;">
-                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/20:</strong> 토크모니터링, Z홈모드, 갠트리리밋, 디지털트윈, PlanC (5건)</div>
-                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/21:</strong> 커스텀팝업, 에러세분화, DB상하한선UI, 데드라인, SpeedLimit, RAPID에러 (6건)</div>
-                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/22:</strong> B라인터치에러, 노즐클리닝 (2건)</div>
-                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/23:</strong> 스프레이티칭, 디지털트윈영상 (2건)</div>
-                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;"><strong>1/24:</strong> 불스아이결선, BullsEye설치, 로봇절연처리 (3건)</div>
-                        <div style="padding:4px 0;color:#10b981;font-weight:600;"><strong>1/26:</strong> 윤활배관수정 PL-2026-202 (1건)</div>
-                    </div>
-                </div>
-                <!-- 지연 항목 -->
-                <div style="background:#fff;border-radius:12px;padding:15px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #dc2626;">
-                    <h3 style="color:#dc2626;margin-bottom:10px;font-size:1rem;">⚠️ 지연 항목 (5건) → 1/27 예정</h3>
-                    <div style="font-size:0.8rem;line-height:1.8;">
-                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;">❌ PL-2025-067 공압/가스/냉각수 상하한치 <span style="color:#666;">(박주한)</span></div>
-                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;">❌ PL-2025-061 PLC알람 관제측 전달 <span style="color:#666;">(박주한)</span></div>
-                        <div style="padding:4px 0;border-bottom:1px dashed #e5e7eb;">❌ PL-2025-096 비정상 용접선 정보 필터링 <span style="color:#666;">(박주한)</span></div>
-                        <div style="padding:4px 0;color:#f59e0b;">✅ PL-2026-191 웜업 UI 가시성 <span style="color:#10b981;font-weight:600;">테스트완료→배포대기</span></div>
-                        <div style="padding:4px 0;color:#f59e0b;">✅ PL-2025-150 와이어 동시피딩 <span style="color:#10b981;font-weight:600;">테스트완료→배포대기</span></div>
-                    </div>
-                    <div style="margin-top:10px;padding:8px;background:#fef2f2;border-radius:6px;font-size:0.75rem;color:#dc2626;">
-                        ※ 1/22 예정 → 1/27로 일정 변경
-                    </div>
-                </div>
-            </div>
-
             <div class="day-schedule">
                 <div class="day-card">
                     <div class="day-card-header w2">
-                        <div><span class="day-name">월</span> <span class="day-date">1/26</span></div>
-                        <span class="task-count">완료1 + 신규5 + 긴급1</span>
+                        <div><span class="day-name">일</span> <span class="day-date">1/26</span></div>
+                        <span class="task-count">점검</span>
                     </div>
                     <div class="day-task-list">
-                        <!-- A라인 1/26 완료 -->
-                        <div style="margin:5px 0;padding:8px 10px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
-                            <strong style="color:#10b981;">✅ A라인 1/26 완료 (1건)</strong>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-202" target="_blank">PL-2026-202</a></span>
-                            <span class="task-owner">심태양</span>
-                            <div>A라인 윤활 배관 수정 작업 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
-                        </div>
-                        <!-- A라인 테스트완료 (배포대기) -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
-                            <strong style="color:#10b981;font-size:0.75rem;">✅ A라인 테스트완료 (배포대기 2건)</strong>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-191" target="_blank">PL-2026-191</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>웜업 UI 가시성 개선 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">테스트완료</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank">PL-2025-157</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>수평 터치 오프셋 일괄 변경 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">테스트완료</span></div>
-                        </div>
-                        <!-- A라인 개선필요 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(245,158,11,0.15);border-radius:6px;border-left:3px solid #f59e0b;">
-                            <strong style="color:#f59e0b;font-size:0.75rem;">⚠️ A라인 개선필요 (2건)</strong>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-106" target="_blank">PL-2025-106</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>UI와 관제 통신 주기 문제 <span style="background:#f59e0b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">추가확인</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-196" target="_blank">PL-2026-196</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>커스텀 팝업 (프리징현상) <span style="background:#f59e0b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">개선필요</span></div>
-                        </div>
-                        <!-- 1/27 예정 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(59,130,246,0.15);border-radius:6px;border-left:3px solid #3b82f6;">
-                            <strong style="color:#3b82f6;font-size:0.75rem;">📅 1/27 예정 (8건)</strong>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank">PL-2025-092</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>수직 터치 센싱 오프셋 값 적용 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">1/27테스트</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-020" target="_blank">PL-2025-020</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>수직용접 CSV작성 1/3 (간섭확인용 자세정보→삼성전달) <span style="background:#8b5cf6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">진행대기</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-170" target="_blank">PL-2026-170</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>갠트리 상대 이동 조깅 기능 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">2/7→1/27</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-084" target="_blank">PL-2025-084</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>PLC 알람 체크 (061 연계) <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">1/22→1/27</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-179" target="_blank">PL-2026-179</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>매크로 미선택 시 전체 용접데이터 표시 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">1/27진행</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-039" target="_blank">PL-2025-039</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>불스아이 스프레이 LOW 경고 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">1/22→1/27</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-156" target="_blank">PL-2025-156</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>경광등-UI-관제 동기화 (UI알람 표시) <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">2/7→1/27</span></div>
-                        </div>
-                        <!-- B라인 확인완료 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(16,185,129,0.15);border-radius:6px;border-left:3px solid #10b981;">
-                            <strong style="color:#10b981;font-size:0.75rem;">✅ B라인 확인완료 (3건)</strong>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
-                            <span class="task-owner">B라인</span>
-                            <div>불스아이 스프레이/클리닝 동작 확인 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">확인완료</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(16,185,129,0.1);border-left:3px solid #10b981;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-150" target="_blank">PL-2025-150</a> / <a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-192" target="_blank">192</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>와이어 동시 피딩 기능 <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">테스트완료</span></div>
-                        </div>
-                        <!-- B라인 진행중 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(245,158,11,0.15);border-radius:6px;border-left:3px solid #f59e0b;">
-                            <strong style="color:#f59e0b;font-size:0.75rem;">🔧 B라인 진행중 (1건)</strong>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-167" target="_blank">PL-2026-167</a></span>
-                            <span class="task-owner">이상주</span>
-                            <div>B라인 센서 명판 부착 <span style="background:#f59e0b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">40%</span></div>
-                        </div>
-                        <!-- 1/26 신규 추가 항목 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(139,92,246,0.15);border-radius:6px;border-left:3px solid #8b5cf6;">
-                            <strong style="color:#8b5cf6;font-size:0.75rem;">🆕 1/26 신규 추가 (5건)</strong>
-                        </div>
-                        <div class="day-task-item high" style="background:rgba(139,92,246,0.1);border-left:3px solid #8b5cf6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-198" target="_blank">PL-2026-198</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>동일 위치 터치 에러 발생 처리 <span style="background:#8b5cf6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">NEW</span> <span style="background:#ff6b6b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">높음</span></div>
-                        </div>
-                        <div class="day-task-item high" style="background:rgba(139,92,246,0.1);border-left:3px solid #8b5cf6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-199" target="_blank">PL-2026-199</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>끝점 터치 후 시작점 이동 에러 (터치에러2단계) <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">1/27진행</span> <span style="background:#ff6b6b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">높음</span></div>
-                        </div>
-                        <div class="day-task-item high" style="background:rgba(139,92,246,0.1);border-left:3px solid #8b5cf6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-200" target="_blank">PL-2026-200</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>수직용접 관제 명령 및 노티 연결 <span style="background:#8b5cf6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">NEW</span> <span style="background:#ff6b6b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">높음</span></div>
-                        </div>
-                        <div class="day-task-item high" style="background:rgba(139,92,246,0.1);border-left:3px solid #8b5cf6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-188" target="_blank">PL-2026-188</a></span>
-                            <span class="task-owner">최광년</span>
-                            <div>CCLink IO CO_16_HeadShock 생성 <span style="background:#3b82f6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">1/27진행</span> <span style="background:#ff6b6b;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">높음</span></div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(139,92,246,0.1);border-left:3px solid #8b5cf6;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-194" target="_blank">PL-2026-194</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>B라인 Z방향 상대이동 표시 <span style="background:#8b5cf6;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">NEW</span> <span style="background:#10b981;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">완료</span></div>
-                        </div>
-                        <!-- 긴급 진행 항목 -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(220,38,38,0.1);border-radius:6px;border-left:3px solid #dc2626;">
-                            <strong style="color:#dc2626;font-size:0.75rem;">🔴 긴급 진행</strong>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(220,38,38,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-165" target="_blank">PL-2026-165</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>용접 포인트 부재 두께 반영 <span style="background:#dc2626;color:#fff;padding:1px 4px;border-radius:3px;font-size:0.6rem;">긴급</span></div>
-                        </div>
-                        <!-- 지연 항목 (1/27 예정) -->
-                        <div style="margin:8px 0;padding:6px 8px;background:rgba(255,107,107,0.15);border-radius:6px;border-left:3px solid #ff6b6b;">
-                            <strong style="color:#ff6b6b;font-size:0.75rem;">⚠ 1/27 지연 (박주한 5건)</strong>
+                        <div class="day-task-item normal">
+                            <span class="task-owner">전체</span>
+                            <div>1주차 완료 점검 / 2주차 준비</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="day-card">
                     <div class="day-card-header w2">
-                        <div><span class="day-name">화</span> <span class="day-date">1/27</span></div>
-                        <span class="task-count">13건 (지연 5건 포함)</span>
+                        <div><span class="day-name">월</span> <span class="day-date">1/27</span></div>
+                        <span class="task-count">8건</span>
                     </div>
                     <div class="day-task-list">
                         <div class="day-task-item high">
@@ -2553,17 +1144,12 @@
                             <span class="task-owner">제어팀</span>
                             <div>A라인 수직용접 터치 옵셋</div>
                         </div>
-                        <div class="day-task-item high">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-169" target="_blank">PL-2026-169</a></span>
-                            <span class="task-owner">제어팀</span>
-                            <div>한팔용접 (1xx 매크로) [1/27~29]</div>
-                        </div>
                     </div>
                 </div>
 
                 <div class="day-card">
                     <div class="day-card-header w2">
-                        <div><span class="day-name">수</span> <span class="day-date">1/28</span></div>
+                        <div><span class="day-name">화</span> <span class="day-date">1/28</span></div>
                         <span class="task-count">8건</span>
                     </div>
                     <div class="day-task-list">
@@ -2607,7 +1193,7 @@
 
                 <div class="day-card">
                     <div class="day-card-header w2">
-                        <div><span class="day-name">목</span> <span class="day-date">1/29</span></div>
+                        <div><span class="day-name">수</span> <span class="day-date">1/29</span></div>
                         <span class="task-count">6건</span>
                     </div>
                     <div class="day-task-list">
@@ -2646,8 +1232,8 @@
 
                 <div class="day-card">
                     <div class="day-card-header w2">
-                        <div><span class="day-name">금</span> <span class="day-date">1/30</span></div>
-                        <span class="task-count">5건</span>
+                        <div><span class="day-name">목</span> <span class="day-date">1/30</span></div>
+                        <span class="task-count">4건</span>
                     </div>
                     <div class="day-task-list">
                         <div class="day-task-item normal">
@@ -2655,10 +1241,10 @@
                             <span class="task-owner">박주한</span>
                             <div>권한 설정 (계속)</div>
                         </div>
-                        <div class="day-task-item normal" style="background:rgba(107,114,128,0.15);border-left:3px solid #6b7280;">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-036" target="_blank" style="color:#6b7280;">PL-2025-036</a></span>
+                        <div class="day-task-item normal">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-036" target="_blank">PL-2025-036</a></span>
                             <span class="task-owner">박기혁</span>
-                            <div><span style="color:#6b7280;">[보류]</span> 거더 상향 조정</div>
+                            <div>거더 상향 조정</div>
                         </div>
                         <div class="day-task-item high">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-154" target="_blank">PL-2025-154</a></span>
@@ -2675,7 +1261,7 @@
 
                 <div class="day-card">
                     <div class="day-card-header w2">
-                        <div><span class="day-name">토</span> <span class="day-date">1/31</span></div>
+                        <div><span class="day-name">금</span> <span class="day-date">1/31</span></div>
                         <span class="task-count">1건</span>
                     </div>
                     <div class="day-task-list">
@@ -2689,7 +1275,7 @@
 
                 <div class="day-card">
                     <div class="day-card-header w2">
-                        <div><span class="day-name">일</span> <span class="day-date">2/1</span></div>
+                        <div><span class="day-name">토</span> <span class="day-date">2/1</span></div>
                         <span class="task-count">점검</span>
                     </div>
                     <div class="day-task-list">
@@ -2705,7 +1291,7 @@
             <div class="day-schedule">
                 <div class="day-card">
                     <div class="day-card-header w3">
-                        <div><span class="day-name">월</span> <span class="day-date">2/2</span></div>
+                        <div><span class="day-name">일</span> <span class="day-date">2/2</span></div>
                         <span class="task-count">점검</span>
                     </div>
                     <div class="day-task-list">
@@ -2718,7 +1304,7 @@
 
                 <div class="day-card">
                     <div class="day-card-header w3">
-                        <div><span class="day-name">화</span> <span class="day-date">2/3</span></div>
+                        <div><span class="day-name">월</span> <span class="day-date">2/3</span></div>
                         <span class="task-count">7건</span>
                     </div>
                     <div class="day-task-list">
@@ -2762,17 +1348,12 @@
                             <span class="task-owner">제어팀</span>
                             <div>실시간 용접 조건 변경</div>
                         </div>
-                        <div class="day-task-item normal">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-167" target="_blank">PL-2026-167</a></span>
-                            <span class="task-owner">이상주</span>
-                            <div>B라인 센서 명판 부착</div>
-                        </div>
                     </div>
                 </div>
 
                 <div class="day-card">
                     <div class="day-card-header w3">
-                        <div><span class="day-name">수</span> <span class="day-date">2/4</span></div>
+                        <div><span class="day-name">화</span> <span class="day-date">2/4</span></div>
                         <span class="task-count">5건</span>
                     </div>
                     <div class="day-task-list">
@@ -2780,6 +1361,11 @@
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank">PL-2025-157</a></span>
                             <span class="task-owner">박주한</span>
                             <div>터치 오프셋 일괄 변경</div>
+                        </div>
+                        <div class="day-task-item normal">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-167" target="_blank">PL-2026-167</a></span>
+                            <span class="task-owner">이상주</span>
+                            <div>B라인 센서 명판 부착</div>
                         </div>
                         <div class="day-task-item normal">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-027" target="_blank">PL-2025-027</a></span>
@@ -2806,7 +1392,7 @@
 
                 <div class="day-card">
                     <div class="day-card-header w3">
-                        <div><span class="day-name">목</span> <span class="day-date">2/5</span></div>
+                        <div><span class="day-name">수</span> <span class="day-date">2/5</span></div>
                         <span class="task-count">5건</span>
                     </div>
                     <div class="day-task-list">
@@ -2814,6 +1400,11 @@
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-157" target="_blank">PL-2025-157</a></span>
                             <span class="task-owner">박주한</span>
                             <div>터치 오프셋 (계속)</div>
+                        </div>
+                        <div class="day-task-item normal">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-168" target="_blank">PL-2026-168</a></span>
+                            <span class="task-owner">이상주</span>
+                            <div>불스아이 결선</div>
                         </div>
                         <div class="day-task-item normal">
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-032" target="_blank">PL-2025-032</a></span>
@@ -2840,7 +1431,7 @@
 
                 <div class="day-card">
                     <div class="day-card-header w3">
-                        <div><span class="day-name">금</span> <span class="day-date">2/6</span></div>
+                        <div><span class="day-name">목</span> <span class="day-date">2/6</span></div>
                         <span class="task-count">4건</span>
                     </div>
                     <div class="day-task-list">
@@ -2869,7 +1460,7 @@
 
                 <div class="day-card" style="border: 2px solid #059669;">
                     <div class="day-card-header w3" style="background: rgba(5,150,105,0.2);">
-                        <div><span class="day-name">토 (완료)</span> <span class="day-date">2/7</span></div>
+                        <div><span class="day-name">금 (완료)</span> <span class="day-date">2/7</span></div>
                         <span class="task-count" style="background:#059669;color:#fff;">최종일</span>
                     </div>
                     <div class="day-task-list">
@@ -2892,40 +1483,6 @@
                             <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-156" target="_blank">PL-2025-156</a></span>
                             <span class="task-owner">제어팀</span>
                             <div>경광등-UI-관제 동기화</div>
-                        </div>
-                        <!-- 1/21 신규 추가 - 보통 우선순위 6건 -->
-                        <div style="margin:10px 0 5px;padding:8px 10px;background:rgba(155,89,182,0.15);border-radius:6px;border-left:3px solid #9b59b6;">
-                            <strong style="color:#9b59b6;">🆕 1/21 신규 추가 (보통 6건)</strong>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(155,89,182,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-170" target="_blank" style="color:#9b59b6;">PL-2026-170</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>갠트리 조깅 기능</div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(155,89,182,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-172" target="_blank" style="color:#9b59b6;">PL-2026-172</a></span>
-                            <span class="task-owner">최광년</span>
-                            <div>노즐 클리닝/스프레이 기능</div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(155,89,182,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-173" target="_blank" style="color:#9b59b6;">PL-2026-173</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>노즐 클리닝/스프레이 수동 티칭</div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(155,89,182,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-175" target="_blank" style="color:#9b59b6;">PL-2026-175</a></span>
-                            <span class="task-owner">박주한</span>
-                            <div>체크한 포인트만 용접</div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(155,89,182,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-178" target="_blank" style="color:#9b59b6;">PL-2026-178</a></span>
-                            <span class="task-owner">최광년</span>
-                            <div>터치 보정 필터링</div>
-                        </div>
-                        <div class="day-task-item normal" style="background:rgba(155,89,182,0.1);">
-                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-181" target="_blank" style="color:#9b59b6;">PL-2026-181</a></span>
-                            <span class="task-owner">황민철</span>
-                            <div>노즐 클리너 용액 누수</div>
                         </div>
                         <div class="day-task-item normal">
                             <span class="task-owner">전체</span>
@@ -2967,153 +1524,6 @@
                 }
             });
         }
-
-        // 이슈 ID별 전체 이름 매핑
-        const issueNames = {
-            '008': '블스아이 용접토치 스프레이',
-            '020': 'A라인 수직용접',
-            '021': '사용자 편의성 UI 개선',
-            '022': '커스텀 팝업',
-            '023': '로봇 자동 운전 조건 진단',
-            '026': '컨트롤러 보전용 발판',
-            '027': 'IN/OUT 차광막 설치',
-            '030': '자율안전신고서 서류준비',
-            '032': '토치 케이블 처짐 방지',
-            '033': '로봇 전원 케이블 타입',
-            '034': '릴, 피더기 위치 상향',
-            '035': '블스아이 위치 확정',
-            '036': '거더 상향 조정',
-            '039': '불스아이 스프레이 LOW 경고',
-            '040': '레이저 커튼 보완',
-            '048': 'Plan B 로봇 시스템 재구성',
-            '055': 'B라인 드라이런 속도 배율',
-            '060': '시뮬레이션 vs 실제 알람',
-            '061': '알람 전달',
-            '062': '갠트리 수동 이동 시 동적 리미트',
-            '065': '실시간 용접 조건 변경',
-            '067': '가스유량 알람처리',
-            '069': 'RAPID 자동 상태 확인 에러',
-            '074': '인셉션 에러 세분화',
-            '080': '아크 에러 시 RAPID 제어',
-            '083': 'X축 하드 리밋 무시 결선',
-            '084': 'PLC 알람 체크',
-            '088': '작업자/관리자 권한 설정',
-            '089': '돌림 용접 구간 개별 옵셋',
-            '091': '수동 용접시 기능 추가',
-            '092': 'A라인 수직용접 터치 옵셋',
-            '093': '운영 S/W 최종 매뉴얼',
-            '096': 'B라인 용접 불가 반환',
-            '097': '로봇 절연처리 (백그라이트, 절연볼트)',
-            '099': 'UI 조작 로깅',
-            '100': '터치 모션 파라미터 X_init',
-            '103': '겐트리 호기 구분 명판',
-            '104': '작업자 사용 이력 로그',
-            '105': '로봇/UI 통신 단절',
-            '106': 'UI-관제 통신 주기 / 디지털트윈',
-            '109': 'Weld-Robot LAN Cable',
-            '111': '형상 보간 실패 에러 원인',
-            '113': 'Z축 과부하 에러 / 웜업',
-            '115': 'B라인 앵글 회피 거리',
-            '116': '노즐 클리닝 티칭',
-            '117': '스프레이 티칭 기능',
-            '121': '시작점 터치 TCP 오프셋',
-            '124': '디바이스넷 통신 상실',
-            '126': '작업 취소 시 속도 0% 문제',
-            '131': 'PC 전원 인가 방법',
-            '132': 'A라인 계측 홈 / 기본 Z홈 구분',
-            '138': 'B라인 터치 보정 에러',
-            '139': 'B라인 로봇 동작 이상현상',
-            '141': 'SMB 배터리 관리',
-            '142': 'B라인 BullsEye 설치/모션',
-            '143': '용접 가능 범위 제한',
-            '146': 'TCP 위치 기반 커맨드 판단',
-            '147': '계측 도중 X축 범위 확인',
-            '148': '갠트리 이동 가능 범위 변수화',
-            '149': '용접기 복원 매뉴얼 작성',
-            '150': '와이어 교체 모드 피딩기능',
-            '151': 'Z홈 모션 기본 모드',
-            '152': 'LDS 센서 기반 원점 인식',
-            '153': '십자 레이저 기반 갠트리 원점',
-            '154': '명령 취소 시 rInit 동작',
-            '155': '홀 센서 기반 원점 인식',
-            '156': '경광등-UI-관제 동기화',
-            '157': '터치 오프셋 일괄 변경',
-            '165': '용접 포인트 부재 두깨 반영',
-            '166': '경광등 스위치 추가',
-            '167': 'B라인 센서 명판 부착',
-            '168': '불스아이 결선',
-            '169': '한팔용접 (1xx 매크로)',
-            '170': '갠트리 조깅 기능',
-            '171': '와이어 커팅 수동 티칭',
-            '172': '노즐 클리닝/스프레이 기능',
-            '173': '노즐 클리닝/스프레이 수동 티칭',
-            '175': '체크한 포인트만 용접',
-            '176': '터치 끝 점 리트라이 수정',
-            '177': '터치/아크에러 후 로봇 초기화',
-            '178': '터치 보정 필터링',
-            '179': '매크로 미선택 시 용접데이터',
-            '180': '매크로 미선택 시 용접데이터(2)',
-            '181': '노즐 클리너 용액 누수'
-        };
-
-        // 2026년 ID 목록 (PL-2026-XXX)
-        const year2026Ids = ['165', '166', '167', '168', '169', '170', '171', '172', '173', '175', '176', '177', '178', '179', '180', '181'];
-
-        // B라인 항목 이름 매핑
-        const bLineNames = {
-            '1': '디지털 트윈 (Lag 이슈 확인)',
-            '2': '비정상 용접선 정보 필터링',
-            '3': '명령 유형 별 기초 데드라인',
-            '4': '명령에 대한 상세 에러 구성',
-            '5': '공압, CO2, 냉각수 유량 범위',
-            '6': '관제 측 이동 시 DB 상/하한선',
-            '7': '갠트리 수동 이동 시 동적 리미트',
-            '8': '기본 Z홈 선택',
-            '9': '와이어 인칭 시그널 개별 제어',
-            '10': '토크 축 가독/가시성 향상',
-            '11': '알람 전달',
-            '12': '웜업',
-            '13': '홀센서 기반 원점 인식',
-            '14': '커스텀 팝업'
-        };
-
-        // task-bar 클릭 시 이슈 상세 페이지로 이동
-        document.querySelectorAll('.task-bar').forEach(bar => {
-            const text = bar.textContent.trim();
-
-            // 숫자 3자리로 시작하는 경우 (예: 089 돌림옵셋)
-            const numMatch = text.match(/^(\d{3})/);
-            if (numMatch) {
-                const num = numMatch[1];
-                const year = year2026Ids.includes(num) ? '2026' : '2025';
-                const id = 'PL-' + year + '-' + num;
-                const fullName = issueNames[num] || text;
-                bar.style.cursor = 'pointer';
-                bar.title = '[' + id + '] ' + fullName + '\n(클릭하여 상세 보기)';
-                bar.onclick = () => window.open('https://s2501602.vercel.app/punchlist/pages/detail.html?id=' + id, '_blank');
-                return;
-            }
-
-            // B라인 검증 항목 (#1, #2 등)
-            const bLineMatch = text.match(/^#(\d+)/);
-            if (bLineMatch) {
-                const num = bLineMatch[1];
-                const bLineIds = {
-                    '1': 'PL-2025-106', '2': 'PL-2025-096', '3': null,
-                    '4': 'PL-2025-074', '5': 'PL-2025-067', '6': null,
-                    '7': 'PL-2025-062', '8': 'PL-2025-132', '9': null,
-                    '10': null, '11': 'PL-2025-061', '12': 'PL-2025-113',
-                    '13': 'PL-2025-155', '14': 'PL-2025-022'
-                };
-                const id = bLineIds[num];
-                const fullName = bLineNames[num] || text;
-                bar.title = (id ? '[' + id + '] ' : '[B라인 #' + num + '] ') + fullName + (id ? '\n(클릭하여 상세 보기)' : '');
-                if (id) {
-                    bar.style.cursor = 'pointer';
-                    bar.onclick = () => window.open('https://s2501602.vercel.app/punchlist/pages/detail.html?id=' + id, '_blank');
-                }
-            }
-        });
     </script>
 </body>
 </html>
