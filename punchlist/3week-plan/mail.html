@@ -215,7 +215,8 @@
 
         <!-- 탭 네비게이션 -->
         <div class="tab-nav">
-            <button class="tab-btn new active" onclick="showTab('daily28')">1/28 진행현황 (신규)</button>
+            <button class="tab-btn new active" onclick="showTab('daily29')">1/29 진행현황 (신규)</button>
+            <button class="tab-btn" onclick="showTab('daily28')">1/28 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily27')">1/27 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily26')">1/26 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily23')">1/22~23 진행현황</button>
@@ -226,8 +227,197 @@
             <button class="tab-btn" onclick="showTab('template')">메일 템플릿</button>
         </div>
 
-        <!-- 1/28 진행현황 (신규) -->
-        <div id="tab-daily28" class="tab-content active">
+        <!-- 1/29 진행현황 (신규) -->
+        <div id="tab-daily29" class="tab-content active">
+            <div class="mail-container">
+                <div class="mail-header">
+                    <label>받는 사람</label>
+                    <input type="text" value="이동혁 프로" id="daily29-recipient">
+                    <label>제목</label>
+                    <input type="text" value="[S25016] 1/29 진행현황 - 1/28 완료 2건, 신규 3건 추가, B라인 테스트 계속" id="daily29-subject">
+                    <label>첨부파일</label>
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <a href="S25016_3주완료계획_260129.csv" download style="padding:6px 12px;background:#2563eb;color:#fff;border-radius:4px;text-decoration:none;font-size:0.85rem;">📎 CSV 다운로드</a>
+                        <a href="gantt.html" target="_blank" style="padding:6px 12px;background:#059669;color:#fff;border-radius:4px;text-decoration:none;font-size:0.85rem;">📊 간트차트 보기</a>
+                    </div>
+                </div>
+
+                <div class="mail-body" id="daily29-content">
+                    <p>이동혁 프로님,</p>
+                    <p>고생 많으십니다. SP 심태양입니다.</p>
+                    <p>1/29(목) 진행현황 공유드립니다.</p>
+
+                    <h3 style="color:#1e40af;">■ 요약</h3>
+                    <table style="margin-bottom:20px;">
+                        <tr>
+                            <th style="text-align:center;">구분</th>
+                            <th style="text-align:center;">A라인</th>
+                            <th style="text-align:center;">B라인</th>
+                            <th style="text-align:center;">항목</th>
+                        </tr>
+                        <tr>
+                            <td style="color:#059669;font-weight:600;">1/28 완료</td>
+                            <td style="text-align:center;">2건</td>
+                            <td style="text-align:center;">-</td>
+                            <td style="font-size:0.85em;">
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-157" target="_blank" class="pl-link">PL-2025-157</a> 터치 오프셋 일괄 변경<br>
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-106" target="_blank" class="pl-link">PL-2025-106</a> UI와 관제 통신 주기
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color:#3b82f6;font-weight:600;">1/29 신규 추가</td>
+                            <td style="text-align:center;">1건</td>
+                            <td style="text-align:center;">2건</td>
+                            <td style="font-size:0.85em;">
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-125" target="_blank" class="pl-link">PL-2025-125</a> B라인 노즐 클리너 커맨드<br>
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-180" target="_blank" class="pl-link">PL-2026-180</a> B라인 매크로 미선택 표시<br>
+                                (신규) 터치/갠트리 오프셋 엑셀 관리
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color:#f59e0b;font-weight:600;">1/29 A라인 진행</td>
+                            <td style="text-align:center;">3건</td>
+                            <td style="text-align:center;">-</td>
+                            <td style="font-size:0.85em;">
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-067" target="_blank" class="pl-link">PL-2025-067</a> 공압/가스/냉각수 알람(UI) 개선<br>
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-170" target="_blank" class="pl-link">PL-2026-170</a> 갠트리 조깅 기능 개선<br>
+                                (신규) 터치/갠트리 오프셋 엑셀 관리
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color:#8b5cf6;font-weight:600;">1/29 B라인 진행</td>
+                            <td style="text-align:center;">-</td>
+                            <td style="text-align:center;">4건</td>
+                            <td style="font-size:0.85em;">
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-171" target="_blank" class="pl-link">PL-2026-171</a> 와이어 커팅 수동 티칭 (UI)<br>
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-173" target="_blank" class="pl-link">PL-2026-173</a> 노즐 클리닝 수동 티칭 (UI)<br>
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-125" target="_blank" class="pl-link">PL-2025-125</a> 노즐 클리너 커맨드 테스트<br>
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-180" target="_blank" class="pl-link">PL-2026-180</a> 매크로 미선택 표시 테스트
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color:#dc2626;font-weight:600;">일정 변경</td>
+                            <td style="text-align:center;" colspan="2">1건</td>
+                            <td style="font-size:0.85em;">
+                                <a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-096" target="_blank" class="pl-link">PL-2025-096</a> 비정상 용접선 필터링 → 2/2 진행
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#059669;">■ 1/28 완료 (2건)</h3>
+                    <table style="margin-bottom:20px;">
+                        <tr>
+                            <th style="width:120px;">ID</th>
+                            <th>항목</th>
+                            <th style="width:80px;">담당</th>
+                            <th style="width:100px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-157" target="_blank" class="pl-link">PL-2025-157</a></td>
+                            <td>터치 오프셋 일괄 변경 기능 추가</td>
+                            <td>박주한</td>
+                            <td style="color:#059669;font-weight:600;">✓ 완료</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-106" target="_blank" class="pl-link">PL-2025-106</a></td>
+                            <td>UI와 관제(디지털 트윈) 통신 주기 문제</td>
+                            <td>박주한</td>
+                            <td style="color:#059669;font-weight:600;">✓ 완료</td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#3b82f6;">■ 1/29 신규 추가 (3건)</h3>
+                    <table style="margin-bottom:20px;">
+                        <tr>
+                            <th style="width:120px;">ID</th>
+                            <th>항목</th>
+                            <th style="width:80px;">담당</th>
+                            <th style="width:100px;">상태</th>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-125" target="_blank" class="pl-link">PL-2025-125</a></td>
+                            <td>B라인 노즐 클리너 커맨드 실행</td>
+                            <td>박주한</td>
+                            <td style="color:#3b82f6;">개발→테스트</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-180" target="_blank" class="pl-link">PL-2026-180</a></td>
+                            <td>B라인 매크로 미선택 시 전체 용접 데이터 표시</td>
+                            <td>박주한</td>
+                            <td style="color:#3b82f6;">개발→테스트</td>
+                        </tr>
+                        <tr>
+                            <td>(신규)</td>
+                            <td>터치/갠트리 오프셋 및 속도 엑셀 관리</td>
+                            <td>박주한</td>
+                            <td style="color:#3b82f6;">A라인 개발</td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#dc2626;">■ 일정 변경 (1건)</h3>
+                    <table style="margin-bottom:20px;">
+                        <tr>
+                            <th style="width:120px;">ID</th>
+                            <th>항목</th>
+                            <th style="width:80px;">담당</th>
+                            <th style="width:150px;">변경 내용</th>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-096" target="_blank" class="pl-link">PL-2025-096</a></td>
+                            <td>비정상 용접선 정보 필터링</td>
+                            <td>박주한</td>
+                            <td style="color:#dc2626;">1/28 → <strong>2/2 진행</strong></td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#6b7280;">■ 잔존 이슈 (A/B라인 공통)</h3>
+                    <table style="margin-bottom:20px;">
+                        <tr>
+                            <th style="width:120px;">ID</th>
+                            <th>항목</th>
+                            <th style="width:80px;">담당</th>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-195" target="_blank" class="pl-link">PL-2026-195</a></td>
+                            <td>캘리브레이션/제어모드 이원화</td>
+                            <td>박주한</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-175" target="_blank" class="pl-link">PL-2026-175</a></td>
+                            <td>체크한 포인트만 용접</td>
+                            <td>박주한</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-089" target="_blank" class="pl-link">PL-2025-089</a></td>
+                            <td>돌림 용접 구간 개별 옵셋 적용</td>
+                            <td>박주한</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-088" target="_blank" class="pl-link">PL-2025-088</a></td>
+                            <td>작업자/관리자 권한 설정</td>
+                            <td>박주한</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-093" target="_blank" class="pl-link">PL-2025-093</a></td>
+                            <td>운영 S/W 최종 매뉴얼 제출</td>
+                            <td>박주한</td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#6366f1;">■ 첨부 및 참고자료</h3>
+                    <ul style="margin-bottom:15px;">
+                        <li>상세 진행현황: <strong>S25016_3주완료계획_260129.csv</strong> (별도 첨부)</li>
+                        <li>간트차트: <a href="https://s2501602.vercel.app/punchlist/3week-plan/gantt.html" target="_blank">https://s2501602.vercel.app/punchlist/3week-plan/gantt.html</a></li>
+                    </ul>
+
+                    <p style="margin-top:20px;">감사합니다.</p>
+                </div>
+                <button class="copy-btn" onclick="copyMailContent('daily29')">📋 메일 본문 복사</button>
+            </div>
+        </div>
+
+        <!-- 1/28 진행현황 -->
+        <div id="tab-daily28" class="tab-content">
             <div class="mail-container">
                 <div class="mail-header">
                     <label>받는 사람</label>
