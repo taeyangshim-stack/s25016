@@ -33,13 +33,14 @@
         .alarm-old .intro-text { color: #666; }
         .alarm-old .alarm-item { margin-left: 10px; }
         .alarm-old .alarm-item::before { content: "- "; }
-        .alarm-new .alarm-content p { font-size: 1.05rem; font-weight: 600; color: #1a1a1a; padding: 12px 15px; background: #fff8e1; border-left: 4px solid #ff9800; border-radius: 0 6px 6px 0; margin-bottom: 0; }
+        .alarm-new .alarm-content p { font-size: 1.05rem; font-weight: 600; color: #1a1a1a; padding: 12px 15px; background: #fff8e1; border-left: 4px solid #ff9800; border-radius: 0 6px 6px 0; margin-bottom: 8px; }
+        .alarm-new .alarm-content p:last-child { margin-bottom: 0; }
         .improvements { background: #0f172a; border-radius: 8px; padding: 20px; margin-top: 20px; }
         .improvements h3 { color: #22c55e; margin-bottom: 15px; font-size: 1rem; }
         .improvements ul { list-style: none; color: #e2e8f0; }
         .improvements li { padding: 8px 0; padding-left: 25px; position: relative; font-size: 0.9rem; }
         .improvements li::before { content: "✓"; position: absolute; left: 0; color: #22c55e; font-weight: bold; }
-        .alarm-selector { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .alarm-selector { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
         .alarm-btn { padding: 8px 16px; background: #334155; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
         .alarm-btn:hover { background: #475569; }
         .alarm-btn.active { background: #f59e0b; color: #000; }
@@ -74,31 +75,18 @@
             <div class="panel panel-after">
                 <div class="panel-title"><span class="badge badge-after">개선</span>개선된 알람 팝업</div>
                 <div class="alarm-selector">
-                    <button class="alarm-btn active" onclick="showAlarm('air')">공압 알람</button>
-                    <button class="alarm-btn" onclick="showAlarm('co2')">CO2 알람</button>
-                    <button class="alarm-btn" onclick="showAlarm('water')">냉각수 알람</button>
+                    <span style="color:#94a3b8;font-size:0.85rem;margin-right:10px;">알람 선택 (복수 선택 가능):</span>
+                    <button class="alarm-btn active" onclick="toggleAlarm('air', this)">공압</button>
+                    <button class="alarm-btn" onclick="toggleAlarm('co2', this)">CO2</button>
+                    <button class="alarm-btn" onclick="toggleAlarm('water', this)">냉각수</button>
                 </div>
-                <div class="alarm-popup alarm-new" id="alarm-air">
+                <div class="alarm-popup alarm-new" id="alarm-combined">
                     <div class="alarm-header">알람 발생</div>
                     <div class="alarm-body">
                         <div class="alarm-icon"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M24 4L4 44h40L24 4z"/><path fill="#000" d="M22 18h4v14h-4zM22 34h4v4h-4z"/></svg></div>
-                        <div class="alarm-content"><p><strong>공압</strong>이 최소치 또는 최대치를 벗어났습니다.</p></div>
-                    </div>
-                    <div class="alarm-footer"><button class="btn-confirm">확인</button></div>
-                </div>
-                <div class="alarm-popup alarm-new" id="alarm-co2" style="display:none;">
-                    <div class="alarm-header">알람 발생</div>
-                    <div class="alarm-body">
-                        <div class="alarm-icon"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M24 4L4 44h40L24 4z"/><path fill="#000" d="M22 18h4v14h-4zM22 34h4v4h-4z"/></svg></div>
-                        <div class="alarm-content"><p><strong>CO2 압력</strong>이 최소치 또는 최대치를 벗어났습니다.</p></div>
-                    </div>
-                    <div class="alarm-footer"><button class="btn-confirm">확인</button></div>
-                </div>
-                <div class="alarm-popup alarm-new" id="alarm-water" style="display:none;">
-                    <div class="alarm-header">알람 발생</div>
-                    <div class="alarm-body">
-                        <div class="alarm-icon"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M24 4L4 44h40L24 4z"/><path fill="#000" d="M22 18h4v14h-4zM22 34h4v4h-4z"/></svg></div>
-                        <div class="alarm-content"><p><strong>냉각수 유량</strong>이 최소치 또는 최대치를 벗어났습니다.</p></div>
+                        <div class="alarm-content" id="alarm-messages">
+                            <p class="alarm-msg"><strong>공압</strong>이 최소치 또는 최대치를 벗어났습니다.</p>
+                        </div>
                     </div>
                     <div class="alarm-footer"><button class="btn-confirm">확인</button></div>
                 </div>
@@ -106,7 +94,7 @@
                     <h3>개선 사항</h3>
                     <ul>
                         <li>"다음 알람이 발생했습니다:" 중복 멘트 삭제</li>
-                        <li>각 상황별 개별 알람 표시 (공압/CO2/냉각수)</li>
+                        <li>해당 알람만 표시 (단독/동시 발생 모두 지원)</li>
                         <li>핵심 키워드 볼드 강조 처리</li>
                         <li>창 크기에 따라 폰트 자동 조절</li>
                         <li>좌측 강조 바로 가독성 향상</li>
@@ -116,14 +104,19 @@
         </div>
     </div>
     <script>
-        function showAlarm(type) {
-            document.getElementById('alarm-air').style.display = 'none';
-            document.getElementById('alarm-co2').style.display = 'none';
-            document.getElementById('alarm-water').style.display = 'none';
-            document.querySelectorAll('.alarm-btn').forEach(btn => btn.classList.remove('active'));
-            if (type === 'air') { document.getElementById('alarm-air').style.display = 'block'; document.querySelectorAll('.alarm-btn')[0].classList.add('active'); }
-            else if (type === 'co2') { document.getElementById('alarm-co2').style.display = 'block'; document.querySelectorAll('.alarm-btn')[1].classList.add('active'); }
-            else if (type === 'water') { document.getElementById('alarm-water').style.display = 'block'; document.querySelectorAll('.alarm-btn')[2].classList.add('active'); }
+        const alarmState = { air: true, co2: false, water: false };
+        function toggleAlarm(type, btn) {
+            alarmState[type] = !alarmState[type];
+            btn.classList.toggle('active');
+            updateAlarmMessages();
+        }
+        function updateAlarmMessages() {
+            const container = document.getElementById('alarm-messages');
+            container.innerHTML = '';
+            if (alarmState.air) container.innerHTML += '<p class="alarm-msg"><strong>공압</strong>이 최소치 또는 최대치를 벗어났습니다.</p>';
+            if (alarmState.co2) container.innerHTML += '<p class="alarm-msg"><strong>CO2 압력</strong>이 최소치 또는 최대치를 벗어났습니다.</p>';
+            if (alarmState.water) container.innerHTML += '<p class="alarm-msg"><strong>냉각수 유량</strong>이 최소치 또는 최대치를 벗어났습니다.</p>';
+            if (!alarmState.air && !alarmState.co2 && !alarmState.water) container.innerHTML = '<p class="alarm-msg" style="color:#999;font-weight:normal;">알람을 선택하세요</p>';
         }
     </script>
 </body>
