@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PL-2026-170 갠트리 조깅 UI 개선안</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        @media (max-width: 1000px) {
+            .comparison { grid-template-columns: 1fr; }
+        }
+        .panel {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #0f3460;
+        }
+        .panel-title {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .panel-before .panel-title {
+            background: #4a4a4a;
+            color: #ccc;
+        }
+        .panel-after .panel-title {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+        }
+
+        /* UI Layout */
+        .ui-container {
+            display: grid;
+            grid-template-columns: 200px 150px 300px;
+            gap: 15px;
+            align-items: start;
+        }
+
+        /* Coordinate Display */
+        .coord-display {
+            background: #0a0a15;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .coord-display img {
+            max-width: 100%;
+            border-radius: 4px;
+        }
+        .coord-visual {
+            width: 180px;
+            height: 180px;
+            position: relative;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0a0a15 100%);
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .coord-visual-improved {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f1a2e 100%);
+        }
+        .axis-arrow {
+            position: absolute;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        /* Before - gray */
+        .gray .axis-arrow { color: #888; }
+        /* After - colored */
+        .colored .x-axis { color: #ef4444; }
+        .colored .y-axis { color: #22c55e; }
+        .colored .z-axis { color: #3b82f6; }
+
+        .robot-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+        }
+
+        /* Distance Buttons */
+        .distance-section {
+            background: #0a0a15;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .section-label {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .distance-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 2px solid #333;
+            background: #1a1a2e;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .distance-btn:hover {
+            background: #2a2a4e;
+            border-color: #555;
+        }
+        .distance-btn.active {
+            background: #fbbf24;
+            color: #000;
+            border-color: #fbbf24;
+            font-weight: bold;
+        }
+        .current-distance {
+            background: #000;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        .hidden { display: none; }
+
+        /* Position Table */
+        .position-section {
+            background: #0a0a15;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .pos-header {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #888;
+        }
+        .pos-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .pos-table th, .pos-table td {
+            padding: 8px 12px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        .pos-table th {
+            background: #1a1a2e;
+        }
+        .pos-table .axis-header {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        /* Gray headers for before */
+        .gray-headers .axis-header { color: #888; }
+        /* Colored headers for after */
+        .colored-headers .x-col { color: #ef4444; border-color: #ef4444; }
+        .colored-headers .y-col { color: #22c55e; border-color: #22c55e; }
+        .colored-headers .z-col { color: #3b82f6; border-color: #3b82f6; }
+
+        .pos-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #555;
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+        .pos-btn:hover {
+            background: #3a3a5e;
+        }
+        .pos-btn:active {
+            transform: scale(0.95);
+            background: #4a4a6e;
+        }
+
+        .pos-value {
+            font-family: 'Consolas', monospace;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 8px !important;
+        }
+        .pos-label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        /* Warning colors */
+        .warning { color: #fbbf24 !important; background: rgba(251, 191, 36, 0.1); }
+        .danger { color: #ef4444 !important; background: rgba(239, 68, 68, 0.1); }
+
+        /* Speed Buttons */
+        .speed-section {
+            margin-top: 15px;
+            background: #0a0a15;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .speed-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .speed-btn {
+            padding: 12px 8px;
+            border: 2px solid #333;
+            background: #1a1a2e;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .speed-btn:hover {
+            background: #2a2a4e;
+            border-color: #555;
+        }
+        .speed-btn.active {
+            background: #fbbf24;
+            color: #000;
+            border-color: #fbbf24;
+            font-weight: bold;
+        }
+
+        /* Close button */
+        .close-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 15px;
+        }
+        .close-btn:hover {
+            background: #444;
+        }
+
+        /* Legend */
+        .legend {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .legend h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .legend-item {
+            background: #0a0a15;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .legend-item h4 {
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .legend-item ul {
+            list-style: none;
+            padding-left: 10px;
+        }
+        .legend-item li {
+            padding: 5px 0;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .legend-item li::before {
+            content: "→ ";
+            color: #667eea;
+        }
+
+        /* Status display */
+        .status-bar {
+            background: #0f3460;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PL-2026-170 갠트리 조깅 UI 개선안</h1>
+        <p class="subtitle">기존 UI vs 개선 UI 비교 | 버튼 클릭으로 동작 확인 가능</p>
+
+        <div class="comparison">
+            <!-- Before -->
+            <div class="panel panel-before">
+                <div class="panel-title">기존 UI</div>
+                <div class="ui-container">
+                    <!-- Coordinate Visual -->
+                    <div class="coord-display">
+                        <div class="coord-visual gray">
+                            <div class="axis-arrow" style="top:15px;left:50%;transform:translateX(-50%);">Z+</div>
+                            <div class="axis-arrow" style="bottom:15px;left:50%;transform:translateX(-50%);">Z-</div>
+                            <div class="axis-arrow" style="left:15px;top:50%;transform:translateY(-50%);">Y-</div>
+                            <div class="axis-arrow" style="right:15px;top:50%;transform:translateY(-50%);">X-</div>
+                            <div class="axis-arrow" style="left:15px;top:25%;">X+</div>
+                            <div class="axis-arrow" style="right:15px;bottom:25%;">Y+</div>
+                            <div class="robot-icon">🤖</div>
+                        </div>
+                    </div>
+
+                    <!-- Distance Section -->
+                    <div class="distance-section">
+                        <div class="section-label">이동 간격</div>
+                        <button class="distance-btn" onclick="setDistance(this, 'before', 50)">50mm</button>
+                        <button class="distance-btn active" onclick="setDistance(this, 'before', 100)">100mm</button>
+                        <button class="distance-btn" onclick="setDistance(this, 'before', 200)">200mm</button>
+                        <button class="distance-btn" onclick="setDistance(this, 'before', 300)">300mm</button>
+                        <button class="distance-btn" onclick="setDistance(this, 'before', 500)">500mm</button>
+                        <button class="distance-btn" onclick="setDistance(this, 'before', 1000)">1000mm</button>
+                        <div class="current-distance" id="before-distance">100</div>
+                    </div>
+
+                    <!-- Position Table -->
+                    <div class="position-section">
+                        <div class="pos-header">위치 이동</div>
+                        <table class="pos-table gray-headers">
+                            <tr>
+                                <th></th>
+                                <th class="axis-header">X</th>
+                                <th class="axis-header">Y</th>
+                                <th class="axis-header">Z</th>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><button class="pos-btn" onclick="moveAxis('before', 'x', 1)">+</button></td>
+                                <td><button class="pos-btn" onclick="moveAxis('before', 'y', 1)">+</button></td>
+                                <td><button class="pos-btn" onclick="moveAxis('before', 'z', 1)">+</button></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><button class="pos-btn" onclick="moveAxis('before', 'x', -1)">-</button></td>
+                                <td><button class="pos-btn" onclick="moveAxis('before', 'y', -1)">-</button></td>
+                                <td><button class="pos-btn" onclick="moveAxis('before', 'z', -1)">-</button></td>
+                            </tr>
+                            <tr>
+                                <td class="pos-label">최소 위치</td>
+                                <td class="pos-value">-2281.09</td>
+                                <td class="pos-value">-5987.5</td>
+                                <td class="pos-value">-232.5</td>
+                            </tr>
+                            <tr>
+                                <td class="pos-label">최대 위치</td>
+                                <td class="pos-value">11328.90</td>
+                                <td class="pos-value">14.5</td>
+                                <td class="pos-value">1019.5</td>
+                            </tr>
+                            <tr>
+                                <td class="pos-label">현 위치</td>
+                                <td class="pos-value" id="before-x">10976.1</td>
+                                <td class="pos-value" id="before-y">5986.5</td>
+                                <td class="pos-value" id="before-z">1731.5</td>
+                            </tr>
+                        </table>
+
+                        <div class="speed-section">
+                            <div class="section-label">배속</div>
+                            <div class="speed-buttons">
+                                <button class="speed-btn" onclick="setSpeed(this, 'before', 25)">25%</button>
+                                <button class="speed-btn active" onclick="setSpeed(this, 'before', 50)">50%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'before', 75)">75%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'before', 100)">100%</button>
+                            </div>
+                        </div>
+
+                        <button class="close-btn">닫기</button>
+                    </div>
+                </div>
+                <div class="status-bar">현재 속도: 50% | 이동 거리: 100mm</div>
+            </div>
+
+            <!-- After -->
+            <div class="panel panel-after">
+                <div class="panel-title">개선 UI (제안)</div>
+                <div class="ui-container">
+                    <!-- Coordinate Visual - Improved -->
+                    <div class="coord-display">
+                        <div class="coord-visual coord-visual-improved colored">
+                            <div class="axis-arrow z-axis" style="top:15px;left:50%;transform:translateX(-50%);">Z+ ↑</div>
+                            <div class="axis-arrow z-axis" style="bottom:15px;left:50%;transform:translateX(-50%);">Z-</div>
+                            <div class="axis-arrow x-axis" style="left:10px;top:50%;transform:translateY(-50%);">← X+</div>
+                            <div class="axis-arrow x-axis" style="right:10px;top:50%;transform:translateY(-50%);">X-</div>
+                            <div class="axis-arrow y-axis" style="left:20px;bottom:20px;">Y+ ↗</div>
+                            <div class="axis-arrow y-axis" style="right:20px;top:20px;">↙ Y-</div>
+                            <div class="robot-icon">🤖</div>
+                        </div>
+                    </div>
+
+                    <!-- Distance Section - No current display -->
+                    <div class="distance-section">
+                        <div class="section-label">이동 간격</div>
+                        <button class="distance-btn" onclick="setDistance(this, 'after', 50)">50mm</button>
+                        <button class="distance-btn active" onclick="setDistance(this, 'after', 100)">100mm</button>
+                        <button class="distance-btn" onclick="setDistance(this, 'after', 200)">200mm</button>
+                        <button class="distance-btn" onclick="setDistance(this, 'after', 300)">300mm</button>
+                        <button class="distance-btn" onclick="setDistance(this, 'after', 500)">500mm</button>
+                        <button class="distance-btn" onclick="setDistance(this, 'after', 1000)">1000mm</button>
+                        <!-- Removed: current-distance display -->
+                    </div>
+
+                    <!-- Position Table - Colored -->
+                    <div class="position-section">
+                        <div class="pos-header">위치 이동</div>
+                        <table class="pos-table colored-headers">
+                            <tr>
+                                <th></th>
+                                <th class="axis-header x-col">X</th>
+                                <th class="axis-header y-col">Y</th>
+                                <th class="axis-header z-col">Z</th>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><button class="pos-btn" style="border-color:#ef4444;" onclick="moveAxis('after', 'x', 1)">+</button></td>
+                                <td><button class="pos-btn" style="border-color:#22c55e;" onclick="moveAxis('after', 'y', 1)">+</button></td>
+                                <td><button class="pos-btn" style="border-color:#3b82f6;" onclick="moveAxis('after', 'z', 1)">+</button></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><button class="pos-btn" style="border-color:#ef4444;" onclick="moveAxis('after', 'x', -1)">-</button></td>
+                                <td><button class="pos-btn" style="border-color:#22c55e;" onclick="moveAxis('after', 'y', -1)">-</button></td>
+                                <td><button class="pos-btn" style="border-color:#3b82f6;" onclick="moveAxis('after', 'z', -1)">-</button></td>
+                            </tr>
+                            <!-- Removed empty row -->
+                            <tr>
+                                <td class="pos-label">최소 위치</td>
+                                <td class="pos-value" style="color:#ef4444;">-2281.09</td>
+                                <td class="pos-value" style="color:#22c55e;">-5987.5</td>
+                                <td class="pos-value" style="color:#3b82f6;">-232.5</td>
+                            </tr>
+                            <tr>
+                                <td class="pos-label">최대 위치</td>
+                                <td class="pos-value" style="color:#ef4444;">11328.90</td>
+                                <td class="pos-value" style="color:#22c55e;">14.5</td>
+                                <td class="pos-value" style="color:#3b82f6;">1019.5</td>
+                            </tr>
+                            <tr>
+                                <td class="pos-label">현 위치</td>
+                                <td class="pos-value" id="after-x">10976.1</td>
+                                <td class="pos-value" id="after-y">5986.5</td>
+                                <td class="pos-value" id="after-z">1731.5</td>
+                            </tr>
+                        </table>
+
+                        <div class="speed-section">
+                            <div class="section-label">배속</div>
+                            <div class="speed-buttons">
+                                <button class="speed-btn" onclick="setSpeed(this, 'after', 25)">25%</button>
+                                <button class="speed-btn active" onclick="setSpeed(this, 'after', 50)">50%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'after', 75)">75%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'after', 100)">100%</button>
+                            </div>
+                        </div>
+
+                        <button class="close-btn">닫기</button>
+                    </div>
+                </div>
+                <div class="status-bar" id="after-status">현재 속도: 50% | 이동 거리: 100mm</div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <h3>개선 내용 요약</h3>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <h4>1. 시각적 피드백 강화</h4>
+                    <ul>
+                        <li><span style="color:#ef4444;font-weight:bold;">X축 (빨강)</span> / <span style="color:#22c55e;font-weight:bold;">Y축 (초록)</span> / <span style="color:#3b82f6;font-weight:bold;">Z축 (파랑)</span></li>
+                        <li>리밋 근접 시 <span style="color:#fbbf24;">노란색(주의)</span> → <span style="color:#ef4444;">빨간색(경고)</span> 표시</li>
+                    </ul>
+                </div>
+                <div class="legend-item">
+                    <h4>2. 좌표계 표현 개선</h4>
+                    <ul>
+                        <li>X축: 좌우 방향 (← 왼쪽이 +)</li>
+                        <li>Z축: 상하 방향 (↑ 위쪽이 +)</li>
+                        <li>Y축: 좌측하단→우측상단 (↗ 좌측하단이 +)</li>
+                    </ul>
+                </div>
+                <div class="legend-item">
+                    <h4>3. 불필요 요소 제거</h4>
+                    <ul>
+                        <li>이동간격 하단 "100" 표시 제거</li>
+                        <li>"최소위치" 위 빈 공간 제거</li>
+                    </ul>
+                </div>
+                <div class="legend-item">
+                    <h4>4. 동작 테스트</h4>
+                    <ul>
+                        <li>+/- 버튼 클릭으로 위치 변경 확인</li>
+                        <li>최대/최소 근접 시 색상 경고 확인</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        const state = {
+            before: { x: 10976.1, y: 5986.5, z: 1731.5, distance: 100, speed: 50 },
+            after: { x: 10976.1, y: 5986.5, z: 1731.5, distance: 100, speed: 50 }
+        };
+
+        const limits = {
+            x: { min: -2281.09, max: 11328.90 },
+            y: { min: -5987.5, max: 14.5 },
+            z: { min: -232.5, max: 1019.5 }
+        };
+
+        function setDistance(btn, panel, value) {
+            // Update active state
+            const section = btn.parentElement;
+            section.querySelectorAll('.distance-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Update state
+            state[panel].distance = value;
+
+            // Update display (only for before)
+            if (panel === 'before') {
+                document.getElementById('before-distance').textContent = value;
+            }
+
+            updateStatus(panel);
+        }
+
+        function setSpeed(btn, panel, value) {
+            // Update active state
+            const section = btn.parentElement;
+            section.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Update state
+            state[panel].speed = value;
+            updateStatus(panel);
+        }
+
+        function moveAxis(panel, axis, direction) {
+            const distance = state[panel].distance * direction;
+            state[panel][axis] += distance;
+
+            // Clamp to limits
+            state[panel][axis] = Math.max(limits[axis].min, Math.min(limits[axis].max, state[panel][axis]));
+
+            // Update display
+            updatePosition(panel, axis);
+        }
+
+        function updatePosition(panel, axis) {
+            const el = document.getElementById(`${panel}-${axis}`);
+            const value = state[panel][axis].toFixed(1);
+            el.textContent = value;
+
+            // Check limits for warning (only for 'after' panel)
+            if (panel === 'after') {
+                const limit = limits[axis];
+                const range = limit.max - limit.min;
+                const fromMin = state[panel][axis] - limit.min;
+                const fromMax = limit.max - state[panel][axis];
+
+                el.classList.remove('warning', 'danger');
+
+                // Warning at 10% from limits
+                if (fromMin < range * 0.1 || fromMax < range * 0.1) {
+                    el.classList.add('warning');
+                }
+                // Danger at 5% from limits
+                if (fromMin < range * 0.05 || fromMax < range * 0.05) {
+                    el.classList.remove('warning');
+                    el.classList.add('danger');
+                }
+            }
+        }
+
+        function updateStatus(panel) {
+            if (panel === 'after') {
+                document.getElementById('after-status').textContent =
+                    `현재 속도: ${state[panel].speed}% | 이동 거리: ${state[panel].distance}mm`;
+            }
+        }
+
+        // Initialize colors for after panel
+        ['x', 'y', 'z'].forEach(axis => {
+            updatePosition('after', axis);
+        });
+    </script>
+</body>
+</html>
