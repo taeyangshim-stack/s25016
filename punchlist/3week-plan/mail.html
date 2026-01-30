@@ -334,6 +334,90 @@
                         </tr>
                     </table>
 
+                    <h3 style="color:#059669;">■ 테스트 결과 상세</h3>
+                    <div style="background:#f8fafc;padding:15px;border-radius:8px;margin-bottom:20px;border-left:4px solid #059669;">
+                        <p style="margin:0 0 10px 0;font-weight:600;">1. PL-2025-067 커스텀 알람 사이즈</p>
+                        <ul style="margin:0 0 15px 20px;padding:0;">
+                            <li>기존: 폰트 32 고정 → 창 축소 시 알람 내용 잘림 발생</li>
+                            <li>개선: 창 크기에 따라 폰트 자동 조절 (가독성 확보)</li>
+                            <li><strong style="color:#f59e0b;">피드백:</strong> 알람 우선순위별 표시 방식 논의 필요 → 1/30 삼성 내부협의</li>
+                        </ul>
+                        <p style="margin:0 0 10px 0;font-weight:600;">2. PL-2026-170 갠트리 조깅 기능</p>
+                        <ul style="margin:0 0 15px 20px;padding:0;">
+                            <li>속도조절 버튼 (25%, 50%, 75%, 100%) 추가 완료</li>
+                            <li>이동 상/하한치 및 현위치 표시 추가 완료</li>
+                            <li><strong style="color:#f59e0b;">피드백:</strong> 버튼 레이아웃 개선 요청 → SP-디파인 협의 후 삼성 승인 필요</li>
+                        </ul>
+                        <p style="margin:0 0 10px 0;font-weight:600;">3. PL-2026-191 웜업 타이머 개선</p>
+                        <ul style="margin:0 0 15px 20px;padding:0;">
+                            <li>진행시간 → 카운트다운 방식 변경 ✓</li>
+                            <li>폰트 크기 증가 (가시성 향상) ✓</li>
+                            <li><strong style="color:#ea580c;">이슈:</strong> 창 닫힘 시 타이머 상태가 미반영되는 예외 상황 발견 → 수정 필요</li>
+                        </ul>
+                        <p style="margin:0 0 10px 0;font-weight:600;">4. PL-2025-125 B라인 노즐 클리너</p>
+                        <ul style="margin:0 0 0 20px;padding:0;">
+                            <li>RAPID 모션 정상 확인됨</li>
+                            <li><strong style="color:#6b7280;">미진행 사유:</strong> 속도 이슈로 실제 테스트 진행 불가 → 속도 조정 후 재테스트</li>
+                        </ul>
+                    </div>
+
+                    <h3 style="color:#3b82f6;">■ 1/29 진행 과정</h3>
+                    <div style="background:#eff6ff;padding:15px;border-radius:8px;margin-bottom:20px;border-left:4px solid #3b82f6;">
+                        <table style="width:100%;border:none;margin:0;">
+                            <tr style="background:transparent;">
+                                <td style="width:80px;font-weight:600;border:none;padding:5px 0;">19:00</td>
+                                <td style="border:none;padding:5px 0;">A라인 1호기 테스트 시작 (커스텀알람, 갠트리조깅, 웜업타이머)</td>
+                            </tr>
+                            <tr style="background:transparent;">
+                                <td style="font-weight:600;border:none;padding:5px 0;">19:30</td>
+                                <td style="border:none;padding:5px 0;">커스텀 알람 - 기능 확인 완료, 우선순위 협의 필요 의견</td>
+                            </tr>
+                            <tr style="background:transparent;">
+                                <td style="font-weight:600;border:none;padding:5px 0;">20:00</td>
+                                <td style="border:none;padding:5px 0;">갠트리 조깅 - 기능 OK, 레이아웃 개선 요청</td>
+                            </tr>
+                            <tr style="background:transparent;">
+                                <td style="font-weight:600;border:none;padding:5px 0;">20:30</td>
+                                <td style="border:none;padding:5px 0;">웜업 타이머 - 카운트다운/폰트 OK, 창닫힘 예외 발견</td>
+                            </tr>
+                            <tr style="background:transparent;">
+                                <td style="font-weight:600;border:none;padding:5px 0;">21:00</td>
+                                <td style="border:none;padding:5px 0;">B라인 노즐클리너 - RAPID 모션 확인, 속도이슈로 테스트 중단</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 style="color:#dc2626;">■ 후속 조치 계획</h3>
+                    <div style="background:#fef2f2;padding:15px;border-radius:8px;margin-bottom:20px;border-left:4px solid #dc2626;">
+                        <table style="width:100%;margin:0;">
+                            <tr>
+                                <th style="width:120px;text-align:left;">ID</th>
+                                <th style="text-align:left;">조치 내용</th>
+                                <th style="width:100px;text-align:center;">예정일</th>
+                            </tr>
+                            <tr>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-067" target="_blank" class="pl-link">PL-2025-067</a></td>
+                                <td>삼성 내부협의 후 알람 우선순위 방식 확정</td>
+                                <td style="text-align:center;">1/30 오전</td>
+                            </tr>
+                            <tr>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-170" target="_blank" class="pl-link">PL-2026-170</a></td>
+                                <td>SP-디파인 UI 레이아웃 협의 → 삼성 승인 후 적용</td>
+                                <td style="text-align:center;">1/30 오후</td>
+                            </tr>
+                            <tr>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2026-191" target="_blank" class="pl-link">PL-2026-191</a></td>
+                                <td>창 닫힘 시 상태 미반영 이슈 수정 개발</td>
+                                <td style="text-align:center;">1/30~31</td>
+                            </tr>
+                            <tr>
+                                <td><a href="https://s2501602.vercel.app/punchlist/pages/detail?id=PL-2025-125" target="_blank" class="pl-link">PL-2025-125</a></td>
+                                <td>속도 조정 후 B라인 노즐클리너 재테스트</td>
+                                <td style="text-align:center;">1/31</td>
+                            </tr>
+                        </table>
+                    </div>
+
                     <h3 style="color:#8b5cf6;">■ 1/30 예정 사항</h3>
                     <table style="margin-bottom:20px;">
                         <tr>
