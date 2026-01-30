@@ -67,6 +67,13 @@
             align-items: start;
         }
 
+        /* Left Column - 좌표 + 배속 */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         /* Coordinate Display */
         .coord-display {
             background: #4a4a4a;
@@ -227,6 +234,11 @@
             padding-top: 10px;
             border-top: 1px solid #666;
         }
+        .speed-section-bottom {
+            background: #4a4a4a;
+            border-radius: 4px;
+            padding: 10px;
+        }
         .speed-buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -327,16 +339,27 @@
             <div class="panel panel-before">
                 <div class="panel-title">기존 UI</div>
                 <div class="ui-container">
-                    <!-- Coordinate Visual -->
-                    <div class="coord-display">
-                        <div class="coord-visual">
-                            <div class="axis-arrow" style="top:8px;left:50%;transform:translateX(-50%);">Z+</div>
-                            <div class="axis-arrow" style="bottom:8px;left:50%;transform:translateX(-50%);">Z-</div>
-                            <div class="axis-arrow" style="left:8px;top:35%;">Y-</div>
-                            <div class="axis-arrow" style="right:8px;top:35%;">X-</div>
-                            <div class="axis-arrow" style="left:8px;top:60%;">X+</div>
-                            <div class="axis-arrow" style="right:8px;bottom:25%;">Y+</div>
-                            <div class="robot-icon">🔧</div>
+                    <!-- Coordinate Visual + Speed -->
+                    <div class="left-column">
+                        <div class="coord-display">
+                            <div class="coord-visual">
+                                <div class="axis-arrow" style="top:8px;left:50%;transform:translateX(-50%);">Z+</div>
+                                <div class="axis-arrow" style="bottom:8px;left:50%;transform:translateX(-50%);">Z-</div>
+                                <div class="axis-arrow" style="left:8px;top:35%;">Y-</div>
+                                <div class="axis-arrow" style="right:8px;top:35%;">X-</div>
+                                <div class="axis-arrow" style="left:8px;top:60%;">X+</div>
+                                <div class="axis-arrow" style="right:8px;bottom:25%;">Y+</div>
+                                <div class="robot-icon">🔧</div>
+                            </div>
+                        </div>
+                        <div class="speed-section-bottom">
+                            <div class="section-label">배속</div>
+                            <div class="speed-buttons">
+                                <button class="speed-btn" onclick="setSpeed(this, 'before', 25)">25%</button>
+                                <button class="speed-btn active" onclick="setSpeed(this, 'before', 50)">50%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'before', 75)">75%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'before', 100)">100%</button>
+                            </div>
                         </div>
                     </div>
 
@@ -350,16 +373,6 @@
                         <button class="distance-btn" onclick="setDistance(this, 'before', 500)">500mm</button>
                         <button class="distance-btn" onclick="setDistance(this, 'before', 1000)">1000mm</button>
                         <div class="current-distance" id="before-distance">100</div>
-
-                        <div class="speed-section">
-                            <div class="section-label">배속</div>
-                            <div class="speed-buttons">
-                                <button class="speed-btn" onclick="setSpeed(this, 'before', 25)">25%</button>
-                                <button class="speed-btn active" onclick="setSpeed(this, 'before', 50)">50%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'before', 75)">75%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'before', 100)">100%</button>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Position Table -->
@@ -391,12 +404,6 @@
                                 <td></td>
                             </tr>
                             <tr>
-                                <td class="pos-label">최소 위치</td>
-                                <td class="pos-value">-2281.09</td>
-                                <td class="pos-value">-5987.5</td>
-                                <td class="pos-value">-232.5</td>
-                            </tr>
-                            <tr>
                                 <td class="pos-label">최대 위치</td>
                                 <td class="pos-value">11328.90</td>
                                 <td class="pos-value">14.5</td>
@@ -407,6 +414,12 @@
                                 <td class="pos-value" id="before-x">10976.1</td>
                                 <td class="pos-value" id="before-y">5986.5</td>
                                 <td class="pos-value" id="before-z">731.5</td>
+                            </tr>
+                            <tr>
+                                <td class="pos-label">최소 위치</td>
+                                <td class="pos-value">-2281.09</td>
+                                <td class="pos-value">-5987.5</td>
+                                <td class="pos-value">-232.5</td>
                             </tr>
                         </table>
 
@@ -419,16 +432,27 @@
             <div class="panel panel-after">
                 <div class="panel-title">개선 UI (제안)</div>
                 <div class="ui-container">
-                    <!-- Coordinate Visual - 개선 -->
-                    <div class="coord-display">
-                        <div class="coord-visual">
-                            <div class="axis-arrow" style="top:8px;left:50%;transform:translateX(-50%);background:#2196f3;color:#fff;">Z+ ↑</div>
-                            <div class="axis-arrow" style="bottom:8px;left:50%;transform:translateX(-50%);background:#2196f3;color:#fff;">Z-</div>
-                            <div class="axis-arrow" style="left:5px;top:50%;transform:translateY(-50%);background:#ff5252;color:#fff;">← X+</div>
-                            <div class="axis-arrow" style="right:5px;top:50%;transform:translateY(-50%);background:#ff5252;color:#fff;">X-</div>
-                            <div class="axis-arrow" style="left:10px;bottom:15px;background:#4caf50;color:#fff;">Y+ ↗</div>
-                            <div class="axis-arrow" style="right:10px;top:15px;background:#4caf50;color:#fff;">↙ Y-</div>
-                            <div class="robot-icon">🔧</div>
+                    <!-- Coordinate Visual + Speed - 개선 -->
+                    <div class="left-column">
+                        <div class="coord-display">
+                            <div class="coord-visual">
+                                <div class="axis-arrow" style="top:8px;left:50%;transform:translateX(-50%);background:#2196f3;color:#fff;">Z+ ↑</div>
+                                <div class="axis-arrow" style="bottom:8px;left:50%;transform:translateX(-50%);background:#2196f3;color:#fff;">Z-</div>
+                                <div class="axis-arrow" style="left:5px;top:50%;transform:translateY(-50%);background:#ff5252;color:#fff;">← X+</div>
+                                <div class="axis-arrow" style="right:5px;top:50%;transform:translateY(-50%);background:#ff5252;color:#fff;">X-</div>
+                                <div class="axis-arrow" style="left:10px;bottom:15px;background:#4caf50;color:#fff;">Y+ ↗</div>
+                                <div class="axis-arrow" style="right:10px;top:15px;background:#4caf50;color:#fff;">↙ Y-</div>
+                                <div class="robot-icon">🔧</div>
+                            </div>
+                        </div>
+                        <div class="speed-section-bottom">
+                            <div class="section-label">배속</div>
+                            <div class="speed-buttons">
+                                <button class="speed-btn" onclick="setSpeed(this, 'after', 25)">25%</button>
+                                <button class="speed-btn active" onclick="setSpeed(this, 'after', 50)">50%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'after', 75)">75%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'after', 100)">100%</button>
+                            </div>
                         </div>
                     </div>
 
@@ -442,16 +466,6 @@
                         <button class="distance-btn" onclick="setDistance(this, 'after', 500)">500mm</button>
                         <button class="distance-btn" onclick="setDistance(this, 'after', 1000)">1000mm</button>
                         <!-- 100 표시 제거됨 -->
-
-                        <div class="speed-section">
-                            <div class="section-label">배속</div>
-                            <div class="speed-buttons">
-                                <button class="speed-btn" onclick="setSpeed(this, 'after', 25)">25%</button>
-                                <button class="speed-btn active" onclick="setSpeed(this, 'after', 50)">50%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'after', 75)">75%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'after', 100)">100%</button>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Position Table - 색상 적용 -->
@@ -478,12 +492,6 @@
                             </tr>
                             <!-- 빈 행 제거됨 -->
                             <tr>
-                                <td class="pos-label">최소 위치</td>
-                                <td class="pos-value x-val">-2281.09</td>
-                                <td class="pos-value y-val">-5987.5</td>
-                                <td class="pos-value z-val">-232.5</td>
-                            </tr>
-                            <tr>
                                 <td class="pos-label">최대 위치</td>
                                 <td class="pos-value x-val">11328.90</td>
                                 <td class="pos-value y-val">14.5</td>
@@ -494,6 +502,12 @@
                                 <td class="pos-value x-val" id="after-x">10976.1</td>
                                 <td class="pos-value y-val" id="after-y">5986.5</td>
                                 <td class="pos-value z-val" id="after-z">731.5</td>
+                            </tr>
+                            <tr>
+                                <td class="pos-label">최소 위치</td>
+                                <td class="pos-value x-val">-2281.09</td>
+                                <td class="pos-value y-val">-5987.5</td>
+                                <td class="pos-value z-val">-232.5</td>
                             </tr>
                         </table>
 
