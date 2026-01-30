@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PL-2026-170 갠트리 조깅 UI 개선안</title>
+    <title>PL-2026-170 갠트리 상대 위치 조깅 UI</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'Malgun Gothic', Tahoma, sans-serif;
             background: #2d2d2d;
             color: #fff;
             min-height: 100vh;
@@ -33,7 +33,7 @@
             gap: 30px;
             margin-bottom: 30px;
         }
-        @media (max-width: 1000px) {
+        @media (max-width: 1200px) {
             .comparison { grid-template-columns: 1fr; }
         }
         .panel {
@@ -55,7 +55,7 @@
             color: #ccc;
         }
         .panel-after .panel-title {
-            background: #4a7c4a;
+            background: #0078d4;
             color: #fff;
         }
 
@@ -69,227 +69,331 @@
             border: 1px solid #666;
         }
 
-        /* UI Layout - 기존 UI 스타일 */
-        .ui-container {
-            display: grid;
-            grid-template-columns: 180px 140px 1fr;
-            gap: 10px;
-            align-items: start;
+        /* ========================================
+           WinForms Style UI - New Layout
+           ======================================== */
+        .winforms-window {
+            background: #2d2d2d;
+            border: 1px solid #0078d4;
+        }
+        .winforms-titlebar {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+        }
+        .winforms-titlebar-icon {
+            margin-right: 8px;
+        }
+        .winforms-titlebar-btns {
+            display: flex;
+            gap: 2px;
+        }
+        .winforms-titlebar-btn {
+            width: 32px;
+            height: 24px;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .winforms-titlebar-btn:hover {
+            background: #444;
+            color: #fff;
+        }
+        .winforms-titlebar-btn.close:hover {
+            background: #e81123;
+            color: #fff;
+        }
+        .winforms-content {
+            padding: 10px;
+            background: #1e1e1e;
         }
 
-        /* Left Column - 좌표 + 배속 */
-        .left-column {
+        /* Main Layout - 3 columns */
+        .wf-main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+        }
+
+        /* Left Column: Coordinate Image + Speed */
+        .wf-left-column {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
-        /* Coordinate Display */
-        .coord-display {
-            background: #4a4a4a;
-            border-radius: 4px;
-            padding: 10px;
-            text-align: center;
-        }
-        .coord-visual {
-            width: 160px;
-            height: 160px;
+        /* Coordinate Image Box */
+        .wf-coord-box {
+            background: #000;
+            border: 1px solid #444;
             position: relative;
-            margin: 0 auto;
-            background: #555;
-            border-radius: 4px;
-            border: 1px solid #666;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
-        .axis-arrow {
+        .wf-coord-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .wf-axis-label {
             position: absolute;
+            font-size: 0.85rem;
             font-weight: bold;
-            font-size: 0.75rem;
-            background: #ffeb3b;
-            color: #000;
-            padding: 2px 4px;
+            padding: 4px 8px;
             border-radius: 2px;
         }
-        .robot-icon {
-            position: absolute;
+        .wf-axis-label.x-plus {
+            background: #c00;
+            color: #fff;
+            left: 10px;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.8rem;
+            transform: translateY(-50%);
+        }
+        .wf-axis-label.x-minus {
+            background: #c00;
+            color: #fff;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .wf-axis-label.y-plus {
+            background: #060;
+            color: #fff;
+            left: 30%;
+            bottom: 15px;
+        }
+        .wf-axis-label.y-minus {
+            background: #006;
+            color: #fff;
+            right: 25%;
+            top: 15px;
+        }
+        .wf-axis-label.z-plus {
+            background: #006;
+            color: #fff;
+            left: 35%;
+            top: 15px;
+        }
+        .wf-axis-label.z-minus {
+            background: #060;
+            color: #fff;
+            right: 35%;
+            bottom: 15px;
         }
 
-        /* Distance Section - 기존 스타일 유지 */
-        .distance-section {
-            background: #4a4a4a;
-            border-radius: 4px;
+        /* Speed Section */
+        .wf-speed-section {
+            background: #2a2a2a;
+            border: 1px solid #444;
             padding: 10px;
         }
-        .section-label {
+        .wf-section-title {
             text-align: center;
-            margin-bottom: 8px;
-            color: #ccc;
-            font-size: 0.85rem;
-        }
-        .distance-btn {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 5px;
-            border: 1px solid #666;
-            background: #5a5a5a;
-            color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: all 0.15s;
-        }
-        .distance-btn:hover {
-            background: #6a6a6a;
-        }
-        .distance-btn.active {
-            background: #ffeb3b;
-            color: #000;
-            border-color: #ffeb3b;
-            font-weight: bold;
-        }
-        .current-distance {
-            background: #000;
-            color: #fff;
-            padding: 12px;
-            text-align: center;
-            font-size: 1.4rem;
-            font-weight: bold;
-            border-radius: 4px;
-            margin-top: 8px;
-        }
-        .hidden { display: none; }
-
-        /* Position Table - 기존 스타일 유지 */
-        .position-section {
-            background: #4a4a4a;
-            border-radius: 4px;
-            padding: 10px;
-        }
-        .pos-header {
-            text-align: center;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #ccc;
+            color: #aaa;
             font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: 500;
         }
-        .pos-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .pos-table th, .pos-table td {
-            padding: 6px 8px;
-            text-align: center;
-            border: 1px solid #666;
-        }
-        .pos-table th {
-            background: #5a5a5a;
-        }
-        .pos-table .axis-header {
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .pos-btn {
-            width: 36px;
-            height: 36px;
-            border: 1px solid #666;
-            background: #5a5a5a;
-            color: #fff;
-            font-size: 1.3rem;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.1s;
-        }
-        .pos-btn:hover {
-            background: #6a6a6a;
-        }
-        .pos-btn:active {
-            transform: scale(0.95);
-            background: #7a7a7a;
-        }
-
-        .pos-value {
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 0.95rem;
-            font-weight: bold;
-            padding: 6px !important;
-            background: #000;
-            color: #fff;
-        }
-        .pos-label {
-            color: #ccc;
-            font-size: 0.8rem;
-            background: #5a5a5a;
-        }
-
-        /* Warning colors - 개선 UI용 */
-        .warning { color: #ffeb3b !important; background: #3a3a00 !important; }
-        .danger { color: #ff5252 !important; background: #3a0000 !important; }
-
-        /* 개선 UI - 축별 색상 */
-        .colored-headers .x-col { color: #ff5252; }
-        .colored-headers .y-col { color: #4caf50; }
-        .colored-headers .z-col { color: #2196f3; }
-        .colored-headers .pos-value.x-val { border-left: 3px solid #ff5252; }
-        .colored-headers .pos-value.y-val { border-left: 3px solid #4caf50; }
-        .colored-headers .pos-value.z-val { border-left: 3px solid #2196f3; }
-
-        /* Speed Buttons - 기존 스타일 */
-        .speed-section {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #666;
-        }
-        .speed-section-bottom {
-            background: #4a4a4a;
-            border-radius: 4px;
-            padding: 10px;
-        }
-        .speed-buttons {
+        .wf-speed-btns {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 5px;
         }
-        .speed-btn {
-            padding: 10px 5px;
-            border: 1px solid #666;
-            background: #5a5a5a;
-            color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.15s;
-        }
-        .speed-btn:hover {
-            background: #6a6a6a;
-        }
-        .speed-btn.active {
-            background: #ffeb3b;
-            color: #000;
-            border-color: #ffeb3b;
-            font-weight: bold;
+
+        /* Center Column: Position Table */
+        .wf-center-column {
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Close button */
-        .close-btn {
-            display: block;
+        /* Position Section Header */
+        .wf-position-header {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-bottom: none;
+            padding: 10px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Position Table */
+        .wf-position-table {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Axis Headers */
+        .wf-axis-headers {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid #444;
+        }
+        .wf-axis-header {
+            padding: 12px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-right: 1px solid #333;
+        }
+        .wf-axis-header:last-child {
+            border-right: none;
+        }
+        .wf-axis-header.x { color: #ff4444; }
+        .wf-axis-header.y { color: #44ff44; }
+        .wf-axis-header.z { color: #4488ff; }
+
+        /* Button Row */
+        .wf-btn-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid #333;
+        }
+        .wf-btn-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-right: 1px solid #333;
+        }
+        .wf-btn-cell:last-child {
+            border-right: none;
+        }
+
+        /* Value Row */
+        .wf-value-row {
+            display: grid;
+            grid-template-columns: 80px repeat(3, 1fr);
+            border-bottom: 1px solid #333;
+        }
+        .wf-value-label {
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #aaa;
+            background: #252525;
+            border-right: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wf-value-cell {
+            padding: 10px;
+            text-align: center;
+            font-family: 'Consolas', 'D2Coding', monospace;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fff;
+            background: #1a1a1a;
+            border-right: 1px solid #333;
+        }
+        .wf-value-cell:last-child {
+            border-right: none;
+        }
+        .wf-value-cell.current {
+            background: #0a2a0a;
+        }
+
+        /* Close Button Row */
+        .wf-close-row {
+            padding: 10px;
+            background: #252525;
+        }
+        .wf-close-btn {
             width: 100%;
             padding: 10px;
-            background: #5a5a5a;
+            background: #3a3a3a;
+            border: 1px solid #555;
             color: #fff;
-            border: 1px solid #666;
-            border-radius: 4px;
-            cursor: pointer;
             font-size: 0.95rem;
-            margin-top: 10px;
+            cursor: pointer;
         }
-        .close-btn:hover {
-            background: #6a6a6a;
+        .wf-close-btn:hover {
+            background: #4a4a4a;
         }
+
+        /* Right Column: Distance */
+        .wf-right-column {
+            display: flex;
+            flex-direction: column;
+        }
+        .wf-distance-header {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-bottom: none;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #aaa;
+        }
+        .wf-distance-btns {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        /* WinForms Button */
+        .wf-btn {
+            background: #3a3a3a;
+            border: 1px solid #555;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            text-align: center;
+            transition: background 0.1s;
+        }
+        .wf-btn:hover {
+            background: #4a4a4a;
+        }
+        .wf-btn:active {
+            background: #555;
+        }
+        .wf-btn.active {
+            background: #0078d4;
+            border-color: #005a9e;
+        }
+        .wf-btn.axis-btn {
+            width: 60px;
+            height: 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .wf-btn.distance-btn {
+            flex: 1;
+            border-bottom: none;
+            font-size: 1rem;
+            padding: 12px;
+        }
+        .wf-btn.distance-btn:last-child {
+            border-bottom: 1px solid #555;
+        }
+
+        /* Warning colors */
+        .wf-warning { background: #3d3d00 !important; color: #ffeb3b !important; }
+        .wf-danger { background: #3d0000 !important; color: #ff5252 !important; }
 
         /* Legend */
         .legend {
@@ -305,7 +409,7 @@
         }
         .legend-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
         }
         .legend-item {
@@ -332,78 +436,83 @@
             color: #4caf50;
         }
 
-        /* Empty row for before UI */
-        .empty-row td {
-            height: 40px;
-            background: #4a4a4a;
+        /* Code Section */
+        .code-section {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 1px solid #555;
         }
-
-        /* 개선 UI - 꽉 찬 레이아웃 */
-        .panel-after .ui-container {
-            grid-template-columns: 1fr 1fr 2fr;
-            gap: 8px;
-            align-items: stretch;
-        }
-        .panel-after .left-column {
-            gap: 8px;
-        }
-        .panel-after .distance-section {
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .panel-after .distance-btn {
-            padding: 10px 8px;
-            margin-bottom: 4px;
-            flex: 1;
-        }
-        .panel-after .position-section {
-            padding: 8px;
-        }
-        .panel-after .pos-table th,
-        .panel-after .pos-table td {
-            padding: 6px 8px;
-        }
-        .panel-after .pos-btn {
-            width: 40px;
-            height: 40px;
+        .code-section h2 {
+            color: #569cd6;
+            margin-bottom: 20px;
             font-size: 1.3rem;
         }
-        .panel-after .coord-display {
-            padding: 8px;
-            flex: 1;
+        .code-section h3 {
+            color: #4ec9b0;
+            margin: 25px 0 10px 0;
+            font-size: 1rem;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+        .code-block {
+            background: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+        .code-block pre {
+            margin: 0;
+            font-family: 'Consolas', 'D2Coding', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #d4d4d4;
+        }
+        .code-block .keyword { color: #569cd6; }
+        .code-block .type { color: #4ec9b0; }
+        .code-block .string { color: #ce9178; }
+        .code-block .comment { color: #6a9955; }
+        .code-block .number { color: #b5cea8; }
+        .code-block .method { color: #dcdcaa; }
+
+        .file-tabs {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            gap: 2px;
+            margin-bottom: -1px;
         }
-        .panel-after .coord-visual {
-            width: 140px;
-            height: 140px;
+        .file-tab {
+            background: #2d2d2d;
+            border: 1px solid #444;
+            border-bottom: none;
+            padding: 8px 15px;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-radius: 4px 4px 0 0;
         }
-        .panel-after .speed-section-bottom {
-            padding: 8px;
+        .file-tab.active {
+            background: #1e1e1e;
+            color: #fff;
+            border-color: #555;
         }
-        .panel-after .speed-buttons {
-            gap: 4px;
+        .file-tab:hover:not(.active) {
+            background: #333;
         }
-        .panel-after .speed-btn {
-            padding: 10px 5px;
-            font-size: 0.9rem;
+        .code-content {
+            display: none;
         }
-        .panel-after .close-btn {
-            padding: 10px;
-            margin-top: 8px;
-        }
-        .panel-after .section-label {
-            margin-bottom: 6px;
+        .code-content.active {
+            display: block;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>PL-2026-170 갠트리 조깅 UI 개선안</h1>
-        <p class="subtitle">기존 UI vs 개선 UI 비교 | 버튼 클릭으로 동작 확인</p>
+        <h1>PL-2026-170 갠트리 상대 위치 조깅 UI</h1>
+        <p class="subtitle">기존 UI vs 개선 UI (WinForms Style) | 버튼 클릭으로 동작 확인</p>
 
         <div class="comparison">
             <!-- 기존 UI -->
@@ -414,88 +523,110 @@
                 </div>
             </div>
 
-            <!-- 개선 UI -->
+            <!-- 개선 UI - WinForms Style -->
             <div class="panel panel-after">
-                <div class="panel-title">개선 UI (제안)</div>
-                <div class="ui-container">
-                    <!-- Coordinate Visual + Speed - 개선 -->
-                    <div class="left-column">
-                        <div class="coord-display">
-                            <div class="coord-visual">
-                                <div class="axis-arrow" style="top:8px;left:50%;transform:translateX(-50%);background:#2196f3;color:#fff;">Z+ ↑</div>
-                                <div class="axis-arrow" style="bottom:8px;left:50%;transform:translateX(-50%);background:#2196f3;color:#fff;">Z-</div>
-                                <div class="axis-arrow" style="left:5px;top:50%;transform:translateY(-50%);background:#ff5252;color:#fff;">← X+</div>
-                                <div class="axis-arrow" style="right:5px;top:50%;transform:translateY(-50%);background:#ff5252;color:#fff;">X-</div>
-                                <div class="axis-arrow" style="left:10px;bottom:15px;background:#4caf50;color:#fff;">Y+ ↗</div>
-                                <div class="axis-arrow" style="right:10px;top:15px;background:#4caf50;color:#fff;">↙ Y-</div>
-                                <div class="robot-icon">🔧</div>
-                            </div>
-                        </div>
-                        <div class="speed-section-bottom">
-                            <div class="section-label">배속</div>
-                            <div class="speed-buttons">
-                                <button class="speed-btn" onclick="setSpeed(this, 'after', 25)">25%</button>
-                                <button class="speed-btn active" onclick="setSpeed(this, 'after', 50)">50%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'after', 75)">75%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'after', 100)">100%</button>
-                            </div>
+                <div class="panel-title">개선 UI (WinForms Style)</div>
+
+                <div class="winforms-window">
+                    <div class="winforms-titlebar">
+                        <span><span class="winforms-titlebar-icon">⚙</span>갠트리 상대 위치 조깅</span>
+                        <div class="winforms-titlebar-btns">
+                            <button class="winforms-titlebar-btn">─</button>
+                            <button class="winforms-titlebar-btn">□</button>
+                            <button class="winforms-titlebar-btn close">✕</button>
                         </div>
                     </div>
+                    <div class="winforms-content">
+                        <div class="wf-main-layout">
+                            <!-- Left: Coordinate Image + Speed -->
+                            <div class="wf-left-column">
+                                <div class="wf-coord-box">
+                                    <!-- Placeholder for robot image -->
+                                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a3a1a 0%,#0a2a0a 100%);display:flex;align-items:center;justify-content:center;">
+                                        <div style="font-size:3rem;opacity:0.3;">🔧</div>
+                                    </div>
+                                    <!-- Axis Labels -->
+                                    <div class="wf-axis-label x-plus">X+</div>
+                                    <div class="wf-axis-label x-minus">X-</div>
+                                    <div class="wf-axis-label y-plus">Y+</div>
+                                    <div class="wf-axis-label y-minus">Y-</div>
+                                    <div class="wf-axis-label z-plus">Z+</div>
+                                    <div class="wf-axis-label z-minus">Z-</div>
+                                </div>
+                                <div class="wf-speed-section">
+                                    <div class="wf-section-title">배속</div>
+                                    <div class="wf-speed-btns">
+                                        <button class="wf-btn" onclick="setSpeed(this, 25)">25%</button>
+                                        <button class="wf-btn active" onclick="setSpeed(this, 50)">50%</button>
+                                        <button class="wf-btn" onclick="setSpeed(this, 75)">75%</button>
+                                        <button class="wf-btn" onclick="setSpeed(this, 100)">100%</button>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Distance Section - 100 제거 -->
-                    <div class="distance-section">
-                        <div class="section-label">이동 간격</div>
-                        <button class="distance-btn" onclick="setDistance(this, 'after', 50)">50mm</button>
-                        <button class="distance-btn active" onclick="setDistance(this, 'after', 100)">100mm</button>
-                        <button class="distance-btn" onclick="setDistance(this, 'after', 200)">200mm</button>
-                        <button class="distance-btn" onclick="setDistance(this, 'after', 300)">300mm</button>
-                        <button class="distance-btn" onclick="setDistance(this, 'after', 500)">500mm</button>
-                        <button class="distance-btn" onclick="setDistance(this, 'after', 1000)">1000mm</button>
-                    </div>
+                            <!-- Center: Position Table -->
+                            <div class="wf-center-column">
+                                <div class="wf-position-header">위치 이동</div>
+                                <div class="wf-position-table">
+                                    <!-- Axis Headers -->
+                                    <div class="wf-axis-headers">
+                                        <div class="wf-axis-header x">X</div>
+                                        <div class="wf-axis-header y">Y</div>
+                                        <div class="wf-axis-header z">Z</div>
+                                    </div>
+                                    <!-- Plus Buttons -->
+                                    <div class="wf-btn-row">
+                                        <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('x', 1)">+</button></div>
+                                        <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('y', 1)">+</button></div>
+                                        <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('z', 1)">+</button></div>
+                                    </div>
+                                    <!-- Minus Buttons -->
+                                    <div class="wf-btn-row">
+                                        <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('x', -1)">-</button></div>
+                                        <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('y', -1)">-</button></div>
+                                        <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('z', -1)">-</button></div>
+                                    </div>
+                                    <!-- Max Position -->
+                                    <div class="wf-value-row">
+                                        <div class="wf-value-label">최대 위치</div>
+                                        <div class="wf-value-cell">11905</div>
+                                        <div class="wf-value-cell">5496.5</div>
+                                        <div class="wf-value-cell">-44</div>
+                                    </div>
+                                    <!-- Current Position -->
+                                    <div class="wf-value-row">
+                                        <div class="wf-value-label">현 위치</div>
+                                        <div class="wf-value-cell current" id="val-x">10400</div>
+                                        <div class="wf-value-cell current" id="val-y">504.5</div>
+                                        <div class="wf-value-cell current" id="val-z">2795</div>
+                                    </div>
+                                    <!-- Min Position -->
+                                    <div class="wf-value-row">
+                                        <div class="wf-value-label">최소 위치</div>
+                                        <div class="wf-value-cell">-1705</div>
+                                        <div class="wf-value-cell">-505.5</div>
+                                        <div class="wf-value-cell">-1296</div>
+                                    </div>
+                                    <!-- Close Button -->
+                                    <div class="wf-close-row">
+                                        <button class="wf-close-btn" onclick="alert('창이 닫힙니다')">닫기</button>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Position Table - 색상 적용 -->
-                    <div class="position-section">
-                        <div class="pos-header">위치 이동</div>
-                        <table class="pos-table colored-headers">
-                            <tr>
-                                <th></th>
-                                <th class="axis-header x-col">X</th>
-                                <th class="axis-header y-col">Y</th>
-                                <th class="axis-header z-col">Z</th>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td><button class="pos-btn" style="border-color:#ff5252;" onclick="moveAxis('after', 'x', 1)">+</button></td>
-                                <td><button class="pos-btn" style="border-color:#4caf50;" onclick="moveAxis('after', 'y', 1)">+</button></td>
-                                <td><button class="pos-btn" style="border-color:#2196f3;" onclick="moveAxis('after', 'z', 1)">+</button></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td><button class="pos-btn" style="border-color:#ff5252;" onclick="moveAxis('after', 'x', -1)">-</button></td>
-                                <td><button class="pos-btn" style="border-color:#4caf50;" onclick="moveAxis('after', 'y', -1)">-</button></td>
-                                <td><button class="pos-btn" style="border-color:#2196f3;" onclick="moveAxis('after', 'z', -1)">-</button></td>
-                            </tr>
-                            <tr>
-                                <td class="pos-label">최대 위치</td>
-                                <td class="pos-value x-val">11328.90</td>
-                                <td class="pos-value y-val">14.5</td>
-                                <td class="pos-value z-val">1019.5</td>
-                            </tr>
-                            <tr>
-                                <td class="pos-label">현 위치</td>
-                                <td class="pos-value x-val" id="after-x">10976.1</td>
-                                <td class="pos-value y-val" id="after-y">5986.5</td>
-                                <td class="pos-value z-val" id="after-z">731.5</td>
-                            </tr>
-                            <tr>
-                                <td class="pos-label">최소 위치</td>
-                                <td class="pos-value x-val">-2281.09</td>
-                                <td class="pos-value y-val">-5987.5</td>
-                                <td class="pos-value z-val">-232.5</td>
-                            </tr>
-                        </table>
-
-                        <button class="close-btn">닫기</button>
+                            <!-- Right: Distance -->
+                            <div class="wf-right-column">
+                                <div class="wf-distance-header">이동 간격</div>
+                                <div class="wf-distance-btns">
+                                    <button class="wf-btn distance-btn" onclick="setDistance(this, 50)">50mm</button>
+                                    <button class="wf-btn distance-btn active" onclick="setDistance(this, 100)">100mm</button>
+                                    <button class="wf-btn distance-btn" onclick="setDistance(this, 200)">200mm</button>
+                                    <button class="wf-btn distance-btn" onclick="setDistance(this, 300)">300mm</button>
+                                    <button class="wf-btn distance-btn" onclick="setDistance(this, 500)">500mm</button>
+                                    <button class="wf-btn distance-btn" onclick="setDistance(this, 1000)">1000mm</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -508,97 +639,521 @@
                 <div class="legend-item">
                     <h4>1. 축별 색상 구분</h4>
                     <ul>
-                        <li><span style="color:#ff5252;font-weight:bold;">X축 (빨강)</span></li>
-                        <li><span style="color:#4caf50;font-weight:bold;">Y축 (초록)</span></li>
-                        <li><span style="color:#2196f3;font-weight:bold;">Z축 (파랑)</span></li>
+                        <li><span style="color:#ff4444;font-weight:bold;">X축 (빨강)</span> - 좌우 이동</li>
+                        <li><span style="color:#44ff44;font-weight:bold;">Y축 (초록)</span> - 전후 이동</li>
+                        <li><span style="color:#4488ff;font-weight:bold;">Z축 (파랑)</span> - 상하 이동</li>
                     </ul>
                 </div>
                 <div class="legend-item">
-                    <h4>2. 좌표계 방향 명확화</h4>
+                    <h4>2. 레이아웃 구성</h4>
                     <ul>
-                        <li>X축: 좌우 (← 왼쪽이 +)</li>
-                        <li>Z축: 상하 (↑ 위쪽이 +)</li>
-                        <li>Y축: ↗ 방향 (좌하단이 +)</li>
+                        <li>좌측: 좌표계 이미지 + 배속</li>
+                        <li>중앙: 위치 이동 테이블</li>
+                        <li>우측: 이동 간격 선택</li>
                     </ul>
                 </div>
                 <div class="legend-item">
                     <h4>3. 리밋 경고 표시</h4>
                     <ul>
-                        <li>최대/최소 근접 시 <span style="color:#ffeb3b;">노란색</span></li>
-                        <li>위험 구간 시 <span style="color:#ff5252;">빨간색</span></li>
+                        <li>최대/최소 근접 시 <span style="background:#3d3d00;color:#ffeb3b;padding:2px 5px;">노란색</span></li>
+                        <li>위험 구간 시 <span style="background:#3d0000;color:#ff5252;padding:2px 5px;">빨간색</span></li>
                     </ul>
                 </div>
                 <div class="legend-item">
-                    <h4>4. 불필요 요소 제거</h4>
+                    <h4>4. 새 리밋 값</h4>
                     <ul>
-                        <li>"100" 현재값 표시 제거</li>
-                        <li>최소위치 위 빈 행 제거</li>
+                        <li>X: -1705 ~ 11905</li>
+                        <li>Y: -505.5 ~ 5496.5</li>
+                        <li>Z: -1296 ~ -44</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+
+        <!-- C# Sample Code Section -->
+        <div class="code-section">
+            <h2>C# WinForms 구현 샘플 코드</h2>
+
+            <div class="file-tabs">
+                <button class="file-tab active" onclick="showCode('designer')">GantryJogForm.Designer.cs</button>
+                <button class="file-tab" onclick="showCode('form')">GantryJogForm.cs</button>
+                <button class="file-tab" onclick="showCode('model')">JogState.cs</button>
+            </div>
+
+            <div id="code-designer" class="code-content active">
+                <div class="code-block">
+<pre><span class="keyword">namespace</span> <span class="type">GantryJogUI</span>
+{
+    <span class="keyword">partial class</span> <span class="type">GantryJogForm</span>
+    {
+        <span class="keyword">private</span> System.ComponentModel.IContainer components = <span class="keyword">null</span>;
+
+        <span class="keyword">protected override void</span> <span class="method">Dispose</span>(<span class="keyword">bool</span> disposing)
+        {
+            <span class="keyword">if</span> (disposing && (components != <span class="keyword">null</span>))
+                components.<span class="method">Dispose</span>();
+            <span class="keyword">base</span>.<span class="method">Dispose</span>(disposing);
+        }
+
+        <span class="keyword">private void</span> <span class="method">InitializeComponent</span>()
+        {
+            <span class="comment">// === 메인 TableLayoutPanel (3열: 좌표계|위치테이블|이동간격) ===</span>
+            <span class="keyword">this</span>.tlpMain = <span class="keyword">new</span> <span class="type">TableLayoutPanel</span>();
+            <span class="keyword">this</span>.tlpMain.ColumnCount = <span class="number">3</span>;
+            <span class="keyword">this</span>.tlpMain.ColumnStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">35</span>F));  <span class="comment">// 좌표계</span>
+            <span class="keyword">this</span>.tlpMain.ColumnStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">45</span>F));  <span class="comment">// 위치 테이블</span>
+            <span class="keyword">this</span>.tlpMain.ColumnStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">20</span>F));  <span class="comment">// 이동 간격</span>
+            <span class="keyword">this</span>.tlpMain.RowCount = <span class="number">1</span>;
+            <span class="keyword">this</span>.tlpMain.Dock = DockStyle.Fill;
+            <span class="keyword">this</span>.tlpMain.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">30</span>, <span class="number">30</span>, <span class="number">30</span>);
+
+            <span class="comment">// === 좌측 패널 (좌표계 + 배속) ===</span>
+            <span class="keyword">this</span>.pnlLeft = <span class="keyword">new</span> <span class="type">TableLayoutPanel</span>();
+            <span class="keyword">this</span>.pnlLeft.RowCount = <span class="number">2</span>;
+            <span class="keyword">this</span>.pnlLeft.RowStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">RowStyle</span>(SizeType.Percent, <span class="number">75</span>F));  <span class="comment">// 좌표계 이미지</span>
+            <span class="keyword">this</span>.pnlLeft.RowStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">RowStyle</span>(SizeType.Percent, <span class="number">25</span>F));  <span class="comment">// 배속</span>
+            <span class="keyword">this</span>.pnlLeft.Dock = DockStyle.Fill;
+
+            <span class="comment">// === PictureBox - 좌표계 이미지 ===</span>
+            <span class="keyword">this</span>.picCoordinate = <span class="keyword">new</span> <span class="type">PictureBox</span>();
+            <span class="keyword">this</span>.picCoordinate.Dock = DockStyle.Fill;
+            <span class="keyword">this</span>.picCoordinate.BackColor = <span class="type">Color</span>.Black;
+            <span class="keyword">this</span>.picCoordinate.SizeMode = PictureBoxSizeMode.Zoom;
+            <span class="keyword">this</span>.picCoordinate.BorderStyle = BorderStyle.FixedSingle;
+            <span class="comment">// picCoordinate.Image = Properties.Resources.CoordinateImage;</span>
+            <span class="keyword">this</span>.pnlLeft.Controls.<span class="method">Add</span>(<span class="keyword">this</span>.picCoordinate, <span class="number">0</span>, <span class="number">0</span>);
+
+            <span class="comment">// === 배속 패널 ===</span>
+            <span class="keyword">this</span>.pnlSpeed = <span class="keyword">new</span> <span class="type">Panel</span>();
+            <span class="keyword">this</span>.pnlSpeed.Dock = DockStyle.Fill;
+            <span class="keyword">this</span>.pnlSpeed.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">42</span>, <span class="number">42</span>, <span class="number">42</span>);
+            <span class="method">CreateSpeedButtons</span>();
+            <span class="keyword">this</span>.pnlLeft.Controls.<span class="method">Add</span>(<span class="keyword">this</span>.pnlSpeed, <span class="number">0</span>, <span class="number">1</span>);
+
+            <span class="keyword">this</span>.tlpMain.Controls.<span class="method">Add</span>(<span class="keyword">this</span>.pnlLeft, <span class="number">0</span>, <span class="number">0</span>);
+
+            <span class="comment">// === 중앙 패널 (위치 테이블) ===</span>
+            <span class="keyword">this</span>.pnlCenter = <span class="keyword">new</span> <span class="type">Panel</span>();
+            <span class="keyword">this</span>.pnlCenter.Dock = DockStyle.Fill;
+            <span class="method">CreatePositionTable</span>();
+            <span class="keyword">this</span>.tlpMain.Controls.<span class="method">Add</span>(<span class="keyword">this</span>.pnlCenter, <span class="number">1</span>, <span class="number">0</span>);
+
+            <span class="comment">// === 우측 패널 (이동 간격) ===</span>
+            <span class="keyword">this</span>.pnlRight = <span class="keyword">new</span> <span class="type">Panel</span>();
+            <span class="keyword">this</span>.pnlRight.Dock = DockStyle.Fill;
+            <span class="method">CreateDistanceButtons</span>();
+            <span class="keyword">this</span>.tlpMain.Controls.<span class="method">Add</span>(<span class="keyword">this</span>.pnlRight, <span class="number">2</span>, <span class="number">0</span>);
+
+            <span class="comment">// === Form 설정 ===</span>
+            <span class="keyword">this</span>.Text = <span class="string">"갠트리 상대 위치 조깅"</span>;
+            <span class="keyword">this</span>.ClientSize = <span class="keyword">new</span> <span class="type">Size</span>(<span class="number">800</span>, <span class="number">450</span>);
+            <span class="keyword">this</span>.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">30</span>, <span class="number">30</span>, <span class="number">30</span>);
+            <span class="keyword">this</span>.ForeColor = <span class="type">Color</span>.White;
+            <span class="keyword">this</span>.FormBorderStyle = FormBorderStyle.FixedDialog;
+            <span class="keyword">this</span>.MaximizeBox = <span class="keyword">false</span>;
+            <span class="keyword">this</span>.StartPosition = FormStartPosition.CenterScreen;
+            <span class="keyword">this</span>.Controls.<span class="method">Add</span>(<span class="keyword">this</span>.tlpMain);
+        }
+
+        <span class="keyword">private</span> <span class="type">TableLayoutPanel</span> tlpMain, pnlLeft;
+        <span class="keyword">private</span> <span class="type">Panel</span> pnlSpeed, pnlCenter, pnlRight;
+        <span class="keyword">private</span> <span class="type">PictureBox</span> picCoordinate;
+        <span class="keyword">private</span> <span class="type">Button</span>[] speedButtons, distanceButtons;
+        <span class="keyword">private</span> <span class="type">Label</span>[] positionLabels; <span class="comment">// X, Y, Z 현위치 표시</span>
+    }
+}</pre>
+                </div>
+            </div>
+
+            <div id="code-form" class="code-content">
+                <div class="code-block">
+<pre><span class="keyword">using</span> System;
+<span class="keyword">using</span> System.Drawing;
+<span class="keyword">using</span> System.Windows.Forms;
+
+<span class="keyword">namespace</span> <span class="type">GantryJogUI</span>
+{
+    <span class="keyword">public partial class</span> <span class="type">GantryJogForm</span> : <span class="type">Form</span>
+    {
+        <span class="keyword">private</span> <span class="type">JogState</span> _state = <span class="keyword">new</span> <span class="type">JogState</span>();
+        <span class="keyword">private readonly int</span>[] _distances = { <span class="number">50</span>, <span class="number">100</span>, <span class="number">200</span>, <span class="number">300</span>, <span class="number">500</span>, <span class="number">1000</span> };
+        <span class="keyword">private readonly int</span>[] _speeds = { <span class="number">25</span>, <span class="number">50</span>, <span class="number">75</span>, <span class="number">100</span> };
+
+        <span class="keyword">public</span> <span class="method">GantryJogForm</span>()
+        {
+            <span class="method">InitializeComponent</span>();
+            <span class="method">UpdatePositionDisplay</span>();
+        }
+
+        <span class="comment">// === 배속 버튼 생성 (4개 가로 배열) ===</span>
+        <span class="keyword">private void</span> <span class="method">CreateSpeedButtons</span>()
+        {
+            <span class="keyword">var</span> lblSpeed = <span class="keyword">new</span> <span class="type">Label</span>
+            {
+                Text = <span class="string">"배속"</span>,
+                ForeColor = <span class="type">Color</span>.Gray,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Top,
+                Height = <span class="number">25</span>
+            };
+            pnlSpeed.Controls.<span class="method">Add</span>(lblSpeed);
+
+            <span class="keyword">var</span> tlpSpeed = <span class="keyword">new</span> <span class="type">TableLayoutPanel</span>
+            {
+                ColumnCount = <span class="number">4</span>,
+                RowCount = <span class="number">1</span>,
+                Dock = DockStyle.Fill,
+                Padding = <span class="keyword">new</span> <span class="type">Padding</span>(<span class="number">5</span>)
+            };
+
+            speedButtons = <span class="keyword">new</span> <span class="type">Button</span>[_speeds.Length];
+            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < _speeds.Length; i++)
+            {
+                tlpSpeed.ColumnStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">25</span>F));
+                speedButtons[i] = <span class="method">CreateButton</span>($<span class="string">"{_speeds[i]}%"</span>, _speeds[i]);
+                speedButtons[i].Click += <span class="method">SpeedBtn_Click</span>;
+                tlpSpeed.Controls.<span class="method">Add</span>(speedButtons[i], i, <span class="number">0</span>);
+            }
+            <span class="method">SetActiveButton</span>(speedButtons, speedButtons[<span class="number">1</span>]); <span class="comment">// 50% 기본</span>
+            pnlSpeed.Controls.<span class="method">Add</span>(tlpSpeed);
+        }
+
+        <span class="comment">// === 이동 간격 버튼 생성 (6개 세로 배열) ===</span>
+        <span class="keyword">private void</span> <span class="method">CreateDistanceButtons</span>()
+        {
+            <span class="keyword">var</span> lblDist = <span class="keyword">new</span> <span class="type">Label</span>
+            {
+                Text = <span class="string">"이동 간격"</span>,
+                ForeColor = <span class="type">Color</span>.Gray,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Top,
+                Height = <span class="number">30</span>
+            };
+            pnlRight.Controls.<span class="method">Add</span>(lblDist);
+
+            <span class="keyword">var</span> tlpDist = <span class="keyword">new</span> <span class="type">TableLayoutPanel</span>
+            {
+                ColumnCount = <span class="number">1</span>,
+                RowCount = _distances.Length,
+                Dock = DockStyle.Fill
+            };
+
+            distanceButtons = <span class="keyword">new</span> <span class="type">Button</span>[_distances.Length];
+            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < _distances.Length; i++)
+            {
+                tlpDist.RowStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">RowStyle</span>(SizeType.Percent, <span class="number">100</span>F / _distances.Length));
+                distanceButtons[i] = <span class="method">CreateButton</span>($<span class="string">"{_distances[i]}mm"</span>, _distances[i]);
+                distanceButtons[i].Click += <span class="method">DistanceBtn_Click</span>;
+                distanceButtons[i].Dock = DockStyle.Fill;
+                tlpDist.Controls.<span class="method">Add</span>(distanceButtons[i], <span class="number">0</span>, i);
+            }
+            <span class="method">SetActiveButton</span>(distanceButtons, distanceButtons[<span class="number">1</span>]); <span class="comment">// 100mm 기본</span>
+            pnlRight.Controls.<span class="method">Add</span>(tlpDist);
+        }
+
+        <span class="comment">// === 위치 테이블 생성 ===</span>
+        <span class="keyword">private void</span> <span class="method">CreatePositionTable</span>()
+        {
+            <span class="keyword">var</span> lblHeader = <span class="keyword">new</span> <span class="type">Label</span>
+            {
+                Text = <span class="string">"위치 이동"</span>,
+                ForeColor = <span class="type">Color</span>.White,
+                BackColor = <span class="type">Color</span>.FromArgb(<span class="number">42</span>, <span class="number">42</span>, <span class="number">42</span>),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.Top,
+                Height = <span class="number">30</span>,
+                Font = <span class="keyword">new</span> <span class="type">Font</span>(<span class="string">"맑은 고딕"</span>, <span class="number">10</span>F, FontStyle.Bold)
+            };
+            pnlCenter.Controls.<span class="method">Add</span>(lblHeader);
+
+            <span class="keyword">var</span> tlpPos = <span class="keyword">new</span> <span class="type">TableLayoutPanel</span>
+            {
+                ColumnCount = <span class="number">4</span>, <span class="comment">// 라벨 + X + Y + Z</span>
+                RowCount = <span class="number">6</span>,    <span class="comment">// 헤더 + + + - + 최대 + 현위치 + 최소</span>
+                Dock = DockStyle.Fill,
+                BackColor = <span class="type">Color</span>.FromArgb(<span class="number">26</span>, <span class="number">26</span>, <span class="number">26</span>)
+            };
+
+            <span class="comment">// 컬럼 스타일</span>
+            tlpPos.ColumnStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Absolute, <span class="number">70</span>F));
+            tlpPos.ColumnStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">33.3</span>F));
+            tlpPos.ColumnStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">33.3</span>F));
+            tlpPos.ColumnStyles.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">33.3</span>F));
+
+            <span class="comment">// 축 헤더 (X, Y, Z)</span>
+            <span class="keyword">var</span> axisColors = <span class="keyword">new</span>[] { <span class="type">Color</span>.Red, <span class="type">Color</span>.LimeGreen, <span class="type">Color</span>.DodgerBlue };
+            <span class="keyword">var</span> axisNames = <span class="keyword">new</span>[] { <span class="string">"X"</span>, <span class="string">"Y"</span>, <span class="string">"Z"</span> };
+
+            tlpPos.Controls.<span class="method">Add</span>(<span class="keyword">new</span> <span class="type">Label</span>(), <span class="number">0</span>, <span class="number">0</span>); <span class="comment">// 빈 셀</span>
+            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < <span class="number">3</span>; i++)
+            {
+                <span class="keyword">var</span> lbl = <span class="keyword">new</span> <span class="type">Label</span>
+                {
+                    Text = axisNames[i],
+                    ForeColor = axisColors[i],
+                    Font = <span class="keyword">new</span> <span class="type">Font</span>(<span class="string">"맑은 고딕"</span>, <span class="number">14</span>F, FontStyle.Bold),
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill
+                };
+                tlpPos.Controls.<span class="method">Add</span>(lbl, i + <span class="number">1</span>, <span class="number">0</span>);
+            }
+
+            <span class="comment">// + 버튼 행</span>
+            <span class="method">AddButtonRow</span>(tlpPos, <span class="number">1</span>, <span class="string">"+"</span>, <span class="number">1</span>);
+            <span class="comment">// - 버튼 행</span>
+            <span class="method">AddButtonRow</span>(tlpPos, <span class="number">2</span>, <span class="string">"-"</span>, -<span class="number">1</span>);
+
+            <span class="comment">// 값 행 추가</span>
+            positionLabels = <span class="keyword">new</span> <span class="type">Label</span>[<span class="number">3</span>];
+            <span class="method">AddValueRow</span>(tlpPos, <span class="number">3</span>, <span class="string">"최대 위치"</span>, <span class="keyword">new</span>[] { <span class="string">"11905"</span>, <span class="string">"5496.5"</span>, <span class="string">"-44"</span> }, <span class="keyword">false</span>);
+            <span class="method">AddValueRow</span>(tlpPos, <span class="number">4</span>, <span class="string">"현 위치"</span>, <span class="keyword">null</span>, <span class="keyword">true</span>); <span class="comment">// 현위치는 동적</span>
+            <span class="method">AddValueRow</span>(tlpPos, <span class="number">5</span>, <span class="string">"최소 위치"</span>, <span class="keyword">new</span>[] { <span class="string">"-1705"</span>, <span class="string">"-505.5"</span>, <span class="string">"-1296"</span> }, <span class="keyword">false</span>);
+
+            pnlCenter.Controls.<span class="method">Add</span>(tlpPos);
+
+            <span class="comment">// 닫기 버튼</span>
+            <span class="keyword">var</span> btnClose = <span class="keyword">new</span> <span class="type">Button</span>
+            {
+                Text = <span class="string">"닫기"</span>,
+                Dock = DockStyle.Bottom,
+                Height = <span class="number">35</span>,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = <span class="type">Color</span>.FromArgb(<span class="number">58</span>, <span class="number">58</span>, <span class="number">58</span>),
+                ForeColor = <span class="type">Color</span>.White
+            };
+            btnClose.Click += (s, e) => <span class="keyword">this</span>.<span class="method">Close</span>();
+            pnlCenter.Controls.<span class="method">Add</span>(btnClose);
+        }
+
+        <span class="comment">// === 축 이동 처리 ===</span>
+        <span class="keyword">public void</span> <span class="method">MoveAxis</span>(<span class="keyword">string</span> axis, <span class="keyword">int</span> direction)
+        {
+            <span class="keyword">double</span> delta = _state.Distance * direction;
+            <span class="keyword">switch</span> (axis)
+            {
+                <span class="keyword">case</span> <span class="string">"X"</span>: _state.X = <span class="type">Math</span>.<span class="method">Clamp</span>(_state.X + delta, <span class="type">JogState</span>.MinX, <span class="type">JogState</span>.MaxX); <span class="keyword">break</span>;
+                <span class="keyword">case</span> <span class="string">"Y"</span>: _state.Y = <span class="type">Math</span>.<span class="method">Clamp</span>(_state.Y + delta, <span class="type">JogState</span>.MinY, <span class="type">JogState</span>.MaxY); <span class="keyword">break</span>;
+                <span class="keyword">case</span> <span class="string">"Z"</span>: _state.Z = <span class="type">Math</span>.<span class="method">Clamp</span>(_state.Z + delta, <span class="type">JogState</span>.MinZ, <span class="type">JogState</span>.MaxZ); <span class="keyword">break</span>;
+            }
+            <span class="method">UpdatePositionDisplay</span>();
+        }
+
+        <span class="comment">// === 위치 표시 업데이트 + 경고 색상 ===</span>
+        <span class="keyword">private void</span> <span class="method">UpdatePositionDisplay</span>()
+        {
+            <span class="keyword">var</span> values = <span class="keyword">new</span>[] { _state.X, _state.Y, _state.Z };
+            <span class="keyword">var</span> limits = <span class="keyword">new</span>[] {
+                (<span class="type">JogState</span>.MinX, <span class="type">JogState</span>.MaxX),
+                (<span class="type">JogState</span>.MinY, <span class="type">JogState</span>.MaxY),
+                (<span class="type">JogState</span>.MinZ, <span class="type">JogState</span>.MaxZ)
+            };
+
+            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i < <span class="number">3</span>; i++)
+            {
+                positionLabels[i].Text = values[i].<span class="method">ToString</span>(<span class="string">"F1"</span>);
+                <span class="method">ApplyLimitWarning</span>(positionLabels[i], values[i], limits[i].Item1, limits[i].Item2);
+            }
+        }
+
+        <span class="keyword">private void</span> <span class="method">ApplyLimitWarning</span>(<span class="type">Label</span> lbl, <span class="keyword">double</span> value, <span class="keyword">double</span> min, <span class="keyword">double</span> max)
+        {
+            <span class="keyword">double</span> range = max - min;
+            <span class="keyword">double</span> ratio = <span class="type">Math</span>.<span class="method">Min</span>(value - min, max - value) / range;
+
+            <span class="keyword">if</span> (ratio < <span class="number">0.05</span>) <span class="comment">// 5% 이내 - 위험</span>
+            {
+                lbl.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">61</span>, <span class="number">0</span>, <span class="number">0</span>);
+                lbl.ForeColor = <span class="type">Color</span>.FromArgb(<span class="number">255</span>, <span class="number">82</span>, <span class="number">82</span>);
+            }
+            <span class="keyword">else if</span> (ratio < <span class="number">0.10</span>) <span class="comment">// 10% 이내 - 경고</span>
+            {
+                lbl.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">61</span>, <span class="number">61</span>, <span class="number">0</span>);
+                lbl.ForeColor = <span class="type">Color</span>.FromArgb(<span class="number">255</span>, <span class="number">235</span>, <span class="number">59</span>);
+            }
+            <span class="keyword">else</span> <span class="comment">// 정상</span>
+            {
+                lbl.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">10</span>, <span class="number">42</span>, <span class="number">10</span>);
+                lbl.ForeColor = <span class="type">Color</span>.White;
+            }
+        }
+
+        <span class="comment">// === 헬퍼 메서드 ===</span>
+        <span class="keyword">private</span> <span class="type">Button</span> <span class="method">CreateButton</span>(<span class="keyword">string</span> text, <span class="keyword">int</span> tag)
+        {
+            <span class="keyword">return new</span> <span class="type">Button</span>
+            {
+                Text = text,
+                Tag = tag,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = <span class="type">Color</span>.FromArgb(<span class="number">58</span>, <span class="number">58</span>, <span class="number">58</span>),
+                ForeColor = <span class="type">Color</span>.White,
+                Dock = DockStyle.Fill,
+                Margin = <span class="keyword">new</span> <span class="type">Padding</span>(<span class="number">2</span>)
+            };
+        }
+
+        <span class="keyword">private void</span> <span class="method">SetActiveButton</span>(<span class="type">Button</span>[] buttons, <span class="type">Button</span> active)
+        {
+            <span class="keyword">foreach</span> (<span class="keyword">var</span> btn <span class="keyword">in</span> buttons)
+            {
+                btn.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">58</span>, <span class="number">58</span>, <span class="number">58</span>);
+            }
+            active.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">0</span>, <span class="number">120</span>, <span class="number">212</span>);
+        }
+
+        <span class="keyword">private void</span> <span class="method">SpeedBtn_Click</span>(<span class="keyword">object</span> sender, <span class="type">EventArgs</span> e)
+        {
+            <span class="keyword">var</span> btn = (<span class="type">Button</span>)sender;
+            _state.Speed = (<span class="keyword">int</span>)btn.Tag;
+            <span class="method">SetActiveButton</span>(speedButtons, btn);
+        }
+
+        <span class="keyword">private void</span> <span class="method">DistanceBtn_Click</span>(<span class="keyword">object</span> sender, <span class="type">EventArgs</span> e)
+        {
+            <span class="keyword">var</span> btn = (<span class="type">Button</span>)sender;
+            _state.Distance = (<span class="keyword">int</span>)btn.Tag;
+            <span class="method">SetActiveButton</span>(distanceButtons, btn);
+        }
+    }
+}</pre>
+                </div>
+            </div>
+
+            <div id="code-model" class="code-content">
+                <div class="code-block">
+<pre><span class="keyword">namespace</span> <span class="type">GantryJogUI</span>
+{
+    <span class="comment">/// &lt;summary&gt;</span>
+    <span class="comment">/// 갠트리 상대 위치 조깅 상태 관리</span>
+    <span class="comment">/// &lt;/summary&gt;</span>
+    <span class="keyword">public class</span> <span class="type">JogState</span>
+    {
+        <span class="comment">// === 축별 리밋 값 (새 값 반영) ===</span>
+        <span class="keyword">public const double</span> MaxX = <span class="number">11905</span>;
+        <span class="keyword">public const double</span> MinX = <span class="number">-1705</span>;
+        <span class="keyword">public const double</span> MaxY = <span class="number">5496.5</span>;
+        <span class="keyword">public const double</span> MinY = <span class="number">-505.5</span>;
+        <span class="keyword">public const double</span> MaxZ = <span class="number">-44</span>;
+        <span class="keyword">public const double</span> MinZ = <span class="number">-1296</span>;
+
+        <span class="comment">// === 현재 위치 ===</span>
+        <span class="keyword">public double</span> X { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">10400</span>;
+        <span class="keyword">public double</span> Y { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">504.5</span>;
+        <span class="keyword">public double</span> Z { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">2795</span>;
+
+        <span class="comment">// === 이동 설정 ===</span>
+        <span class="keyword">public int</span> Distance { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">100</span>;  <span class="comment">// mm</span>
+        <span class="keyword">public int</span> Speed { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">50</span>;      <span class="comment">// %</span>
+
+        <span class="comment">/// &lt;summary&gt;</span>
+        <span class="comment">/// 축별 리밋 근접 비율 계산 (0.0 ~ 1.0)</span>
+        <span class="comment">/// &lt;/summary&gt;</span>
+        <span class="keyword">public double</span> <span class="method">GetLimitRatio</span>(<span class="keyword">string</span> axis)
+        {
+            <span class="keyword">double</span> value, min, max;
+            <span class="keyword">switch</span> (axis)
+            {
+                <span class="keyword">case</span> <span class="string">"X"</span>: value = X; min = MinX; max = MaxX; <span class="keyword">break</span>;
+                <span class="keyword">case</span> <span class="string">"Y"</span>: value = Y; min = MinY; max = MaxY; <span class="keyword">break</span>;
+                <span class="keyword">case</span> <span class="string">"Z"</span>: value = Z; min = MinZ; max = MaxZ; <span class="keyword">break</span>;
+                <span class="keyword">default</span>: <span class="keyword">return</span> <span class="number">1.0</span>;
+            }
+            <span class="keyword">double</span> range = <span class="type">Math</span>.<span class="method">Abs</span>(max - min);
+            <span class="keyword">double</span> fromMin = <span class="type">Math</span>.<span class="method">Abs</span>(value - min);
+            <span class="keyword">double</span> fromMax = <span class="type">Math</span>.<span class="method">Abs</span>(max - value);
+            <span class="keyword">return</span> <span class="type">Math</span>.<span class="method">Min</span>(fromMin, fromMax) / range;
+        }
+
+        <span class="keyword">public</span> <span class="type">WarningLevel</span> <span class="method">GetWarningLevel</span>(<span class="keyword">string</span> axis)
+        {
+            <span class="keyword">double</span> ratio = <span class="method">GetLimitRatio</span>(axis);
+            <span class="keyword">if</span> (ratio < <span class="number">0.05</span>) <span class="keyword">return</span> <span class="type">WarningLevel</span>.Danger;
+            <span class="keyword">if</span> (ratio < <span class="number">0.10</span>) <span class="keyword">return</span> <span class="type">WarningLevel</span>.Warning;
+            <span class="keyword">return</span> <span class="type">WarningLevel</span>.Normal;
+        }
+    }
+
+    <span class="keyword">public enum</span> <span class="type">WarningLevel</span>
+    {
+        Normal,   <span class="comment">// 정상</span>
+        Warning,  <span class="comment">// 경고 (10% 이내)</span>
+        Danger    <span class="comment">// 위험 (5% 이내)</span>
+    }
+}</pre>
+                </div>
+            </div>
+
+            <h3>프로젝트 구조</h3>
+            <div class="code-block">
+<pre>GantryJogUI/
+├── GantryJogForm.cs           <span class="comment">// Form 메인 로직</span>
+├── GantryJogForm.Designer.cs  <span class="comment">// UI 컴포넌트 정의</span>
+├── JogState.cs                <span class="comment">// 상태 모델</span>
+├── Resources/
+│   └── CoordinateImage.png    <span class="comment">// 좌표계 이미지</span>
+└── Program.cs                 <span class="comment">// 진입점</span>
+</pre>
             </div>
         </div>
     </div>
 
     <script>
-        const state = {
-            before: { x: 10976.1, y: 5986.5, z: 731.5, distance: 100, speed: 50 },
-            after: { x: 10976.1, y: 5986.5, z: 731.5, distance: 100, speed: 50 }
-        };
-
+        const state = { x: 10400, y: 504.5, z: 2795, distance: 100, speed: 50 };
         const limits = {
-            x: { min: -2281.09, max: 11328.90 },
-            y: { min: -5987.5, max: 14.5 },
-            z: { min: -232.5, max: 1019.5 }
+            x: { min: -1705, max: 11905 },
+            y: { min: -505.5, max: 5496.5 },
+            z: { min: -1296, max: -44 }
         };
 
-        function setDistance(btn, panel, value) {
-            const section = btn.parentElement;
-            section.querySelectorAll('.distance-btn').forEach(b => b.classList.remove('active'));
+        function setDistance(btn, value) {
+            const btns = btn.parentElement.querySelectorAll('.wf-btn');
+            btns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            state[panel].distance = value;
-            if (panel === 'before') {
-                document.getElementById('before-distance').textContent = value;
+            state.distance = value;
+        }
+
+        function setSpeed(btn, value) {
+            const btns = btn.parentElement.querySelectorAll('.wf-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.speed = value;
+        }
+
+        function moveAxis(axis, direction) {
+            const delta = state.distance * direction;
+            state[axis] += delta;
+            state[axis] = Math.max(limits[axis].min, Math.min(limits[axis].max, state[axis]));
+            updatePosition(axis);
+        }
+
+        function updatePosition(axis) {
+            const el = document.getElementById(`val-${axis}`);
+            el.textContent = state[axis].toFixed(1);
+
+            const limit = limits[axis];
+            const range = Math.abs(limit.max - limit.min);
+            const fromMin = Math.abs(state[axis] - limit.min);
+            const fromMax = Math.abs(limit.max - state[axis]);
+            const ratio = Math.min(fromMin, fromMax) / range;
+
+            el.classList.remove('wf-warning', 'wf-danger');
+
+            if (ratio < 0.05) {
+                el.classList.add('wf-danger');
+            } else if (ratio < 0.1) {
+                el.classList.add('wf-warning');
             }
         }
 
-        function setSpeed(btn, panel, value) {
-            const section = btn.parentElement;
-            section.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            state[panel].speed = value;
+        function showCode(tab) {
+            document.querySelectorAll('.file-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.code-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[onclick="showCode('${tab}')"]`).classList.add('active');
+            document.getElementById(`code-${tab}`).classList.add('active');
         }
 
-        function moveAxis(panel, axis, direction) {
-            const distance = state[panel].distance * direction;
-            state[panel][axis] += distance;
-            state[panel][axis] = Math.max(limits[axis].min, Math.min(limits[axis].max, state[panel][axis]));
-            updatePosition(panel, axis);
-        }
-
-        function updatePosition(panel, axis) {
-            const el = document.getElementById(`${panel}-${axis}`);
-            const value = state[panel][axis].toFixed(1);
-            el.textContent = value;
-
-            if (panel === 'after') {
-                const limit = limits[axis];
-                const range = limit.max - limit.min;
-                const fromMin = state[panel][axis] - limit.min;
-                const fromMax = limit.max - state[panel][axis];
-
-                el.classList.remove('warning', 'danger');
-
-                if (fromMin < range * 0.1 || fromMax < range * 0.1) {
-                    el.classList.add('warning');
-                }
-                if (fromMin < range * 0.05 || fromMax < range * 0.05) {
-                    el.classList.remove('warning');
-                    el.classList.add('danger');
-                }
-            }
-        }
-
-        ['x', 'y', 'z'].forEach(axis => updatePosition('after', axis));
+        // Initialize
+        ['x', 'y', 'z'].forEach(axis => updatePosition(axis));
     </script>
 </body>
 </html>
