@@ -338,46 +338,65 @@
             background: #4a4a4a;
         }
 
-        /* 개선 UI - 컴팩트 스타일 */
+        /* 개선 UI - 꽉 찬 레이아웃 */
+        .panel-after .ui-container {
+            grid-template-columns: 1fr 1fr 2fr;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .panel-after .left-column {
+            gap: 8px;
+        }
         .panel-after .distance-section {
             padding: 8px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
         .panel-after .distance-btn {
-            padding: 8px;
-            margin-bottom: 3px;
+            padding: 10px 8px;
+            margin-bottom: 4px;
+            flex: 1;
         }
         .panel-after .position-section {
             padding: 8px;
         }
         .panel-after .pos-table th,
         .panel-after .pos-table td {
-            padding: 4px 6px;
+            padding: 6px 8px;
         }
         .panel-after .pos-btn {
-            width: 32px;
-            height: 32px;
-            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            font-size: 1.3rem;
         }
         .panel-after .coord-display {
             padding: 8px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .panel-after .coord-visual {
-            width: 150px;
-            height: 150px;
+            width: 140px;
+            height: 140px;
         }
         .panel-after .speed-section-bottom {
             padding: 8px;
         }
         .panel-after .speed-buttons {
-            gap: 3px;
+            gap: 4px;
         }
         .panel-after .speed-btn {
-            padding: 8px 4px;
-            font-size: 0.85rem;
+            padding: 10px 5px;
+            font-size: 0.9rem;
         }
         .panel-after .close-btn {
-            padding: 8px;
+            padding: 10px;
             margin-top: 8px;
+        }
+        .panel-after .section-label {
+            margin-bottom: 6px;
         }
     </style>
 </head>
