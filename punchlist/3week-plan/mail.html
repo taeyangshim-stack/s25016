@@ -215,7 +215,8 @@
 
         <!-- 탭 네비게이션 -->
         <div class="tab-nav">
-            <button class="tab-btn new active" onclick="showTab('daily29')">1/29 진행현황 (신규)</button>
+            <button class="tab-btn new active" onclick="showTab('daily30')">1/30 삼성검토요청 (신규)</button>
+            <button class="tab-btn" onclick="showTab('daily29')">1/29 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily28')">1/28 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily27')">1/27 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily26')">1/26 진행현황</button>
@@ -227,8 +228,131 @@
             <button class="tab-btn" onclick="showTab('template')">메일 템플릿</button>
         </div>
 
-        <!-- 1/29 진행현황 (신규) -->
-        <div id="tab-daily29" class="tab-content active">
+        <!-- 1/30 삼성검토요청 (신규) -->
+        <div id="tab-daily30" class="tab-content active">
+            <div class="mail-container">
+                <div class="mail-header">
+                    <label>받는 사람</label>
+                    <input type="text" value="이동혁 프로" id="daily30-recipient">
+                    <label>제목</label>
+                    <input type="text" value="[S25016] UI 개선안 검토 요청 - 갠트리 조깅 UI (PL-2026-170), 공압/가스 알람 (PL-2025-067)" id="daily30-subject">
+                    <label>첨부파일</label>
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <a href="S25016_3주완료계획_260130.csv" download style="padding:6px 12px;background:#2563eb;color:#fff;border-radius:4px;text-decoration:none;font-size:0.85rem;">📎 CSV 다운로드</a>
+                        <a href="gantt.html" target="_blank" style="padding:6px 12px;background:#059669;color:#fff;border-radius:4px;text-decoration:none;font-size:0.85rem;">📊 간트차트 보기</a>
+                    </div>
+                </div>
+
+                <div class="mail-body" id="daily30-content">
+                    <p>이동혁 프로님,</p>
+                    <p>고생 많으십니다. SP 심태양입니다.</p>
+                    <p>현재 진행 중인 UI 개선 항목에 대해 검토 요청드립니다.<br>피드백 주시면 반영하여 진행하겠습니다.</p>
+
+                    <h3 style="color:#1e40af;">■ 1. 갠트리 조깅 UI 개선안 (PL-2026-170)</h3>
+                    <p><strong>▶ 데모 페이지:</strong> <a href="https://s2501602.vercel.app/punchlist/3week-plan/gantry-jog-ui-demo.html" target="_blank" class="pl-link">gantry-jog-ui-demo.html</a></p>
+                    <p style="color:#dc2626;font-size:0.85em;">※ 유의사항: 데모 버전은 HTML로 구성되어 있어 실제 적용 시 색상이 다를 수 있습니다. 버튼 구성 및 기능 배치에 대해 확인 부탁드립니다.</p>
+
+                    <p><strong>▶ 주요 개선 내용:</strong></p>
+                    <table style="margin-bottom:20px;">
+                        <tr>
+                            <th style="width:30%;">개선 항목</th>
+                            <th style="width:70%;">내용</th>
+                        </tr>
+                        <tr>
+                            <td>1) 속도 조절 기능</td>
+                            <td>25%, 50%, 75%, 100% 배속 버튼 추가 (좌측 하단 배치)</td>
+                        </tr>
+                        <tr>
+                            <td>2) 위치 정보 표시</td>
+                            <td>최대위치 → 현위치 → 최소위치 순서로 배치, X/Y/Z축별 실시간 좌표 표시</td>
+                        </tr>
+                        <tr>
+                            <td>3) 축 방향 표시</td>
+                            <td>X축: 좌우(← →), Z축: 상하(↑ ↓), Y축: 좌측하단→우측상단(↗)</td>
+                        </tr>
+                        <tr>
+                            <td>4) 불필요 요소 제거</td>
+                            <td>이동간격 하단 "100" 표시 제거, "최소위치" 위 빈 공간 제거</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>▶ 검토 요청 사항:</strong> 버튼 레이아웃 적절성, 위치 정보 표시 순서, 속도 조절 버튼 위치</p>
+
+                    <h3 style="color:#1e40af;margin-top:25px;">■ 2. 공압/가스 알람 처리 기준 (PL-2025-067)</h3>
+                    <p>1/29(목) 협의한 내용을 정리하였습니다. 아래 기준으로 적용해도 되는지 검토 부탁드립니다.</p>
+
+                    <p><strong>▶ 1) 공압 (Air Pressure)</strong></p>
+                    <table style="margin-bottom:15px;">
+                        <tr>
+                            <th>구분</th>
+                            <th>기준</th>
+                            <th>처리</th>
+                        </tr>
+                        <tr>
+                            <td>정상치</td>
+                            <td>6 bar</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>상한치</td>
+                            <td>제한 없음</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td style="background:#fef3c7;">알람</td>
+                            <td style="background:#fef3c7;">5 bar 이하 5초 유지</td>
+                            <td style="background:#fef3c7;">⚠️ 알람</td>
+                        </tr>
+                        <tr>
+                            <td style="background:#fee2e2;">에러</td>
+                            <td style="background:#fee2e2;">3 bar 이하 5초 유지</td>
+                            <td style="background:#fee2e2;">🛑 에러</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>▶ 2) 가스 (CO2 Gas)</strong></p>
+                    <table style="margin-bottom:15px;">
+                        <tr>
+                            <th>구분</th>
+                            <th>기준</th>
+                            <th>처리</th>
+                        </tr>
+                        <tr>
+                            <td style="background:#fee2e2;">에러</td>
+                            <td style="background:#fee2e2;">0.5 bar 이하 5초 유지</td>
+                            <td style="background:#fee2e2;">🛑 에러</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>▶ 커스텀 알람 팝업 개선 사항:</strong></p>
+                    <ul style="margin:10px 0 10px 20px;line-height:1.8;">
+                        <li>기존: 폰트 32 고정 → 창 축소 시 알람 내용 잘림 발생</li>
+                        <li>개선: 창 크기에 따라 폰트 자동 조절 (가독성 확보)</li>
+                        <li>중복 멘트 "다음 알람이 발생했습니다:" 삭제</li>
+                        <li>해당 알람만 표시 (단독/동시 발생 모두 지원)</li>
+                        <li>핵심 키워드 볼드 강조 처리로 가독성 향상</li>
+                    </ul>
+
+                    <p><strong>▶ 알람 팝업 데모 페이지:</strong> <a href="https://s2501602.vercel.app/punchlist/3week-plan/alarm-popup-demo.html" target="_blank" class="pl-link">alarm-popup-demo.html</a></p>
+
+                    <h3 style="color:#1e40af;margin-top:25px;">■ 피드백 요청</h3>
+                    <p>위 두 가지 항목에 대해 검토 후 피드백 부탁드립니다.<br>
+                    수정/보완 사항 있으시면 말씀해 주시기 바랍니다.<br>
+                    피드백 내용 반영 후 적용 진행하겠습니다.</p>
+
+                    <p style="margin-top:20px;">감사합니다.</p>
+                    <p style="color:#666;border-top:1px solid #e5e7eb;padding-top:15px;margin-top:15px;">SP 심태양 드림</p>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="copyToClipboard('daily30-content')">📋 본문 복사</button>
+                    <button class="btn btn-secondary" onclick="copySubject('daily30-subject')">📧 제목 복사</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1/29 진행현황 -->
+        <div id="tab-daily29" class="tab-content">
             <div class="mail-container">
                 <div class="mail-header">
                     <label>받는 사람</label>
