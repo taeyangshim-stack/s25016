@@ -350,6 +350,16 @@
                         <button class="distance-btn" onclick="setDistance(this, 'before', 500)">500mm</button>
                         <button class="distance-btn" onclick="setDistance(this, 'before', 1000)">1000mm</button>
                         <div class="current-distance" id="before-distance">100</div>
+
+                        <div class="speed-section">
+                            <div class="section-label">배속</div>
+                            <div class="speed-buttons">
+                                <button class="speed-btn" onclick="setSpeed(this, 'before', 25)">25%</button>
+                                <button class="speed-btn active" onclick="setSpeed(this, 'before', 50)">50%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'before', 75)">75%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'before', 100)">100%</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Position Table -->
@@ -400,16 +410,6 @@
                             </tr>
                         </table>
 
-                        <div class="speed-section">
-                            <div class="section-label">배속</div>
-                            <div class="speed-buttons">
-                                <button class="speed-btn" onclick="setSpeed(this, 'before', 25)">25%</button>
-                                <button class="speed-btn active" onclick="setSpeed(this, 'before', 50)">50%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'before', 75)">75%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'before', 100)">100%</button>
-                            </div>
-                        </div>
-
                         <button class="close-btn">닫기</button>
                     </div>
                 </div>
@@ -442,6 +442,16 @@
                         <button class="distance-btn" onclick="setDistance(this, 'after', 500)">500mm</button>
                         <button class="distance-btn" onclick="setDistance(this, 'after', 1000)">1000mm</button>
                         <!-- 100 표시 제거됨 -->
+
+                        <div class="speed-section">
+                            <div class="section-label">배속</div>
+                            <div class="speed-buttons">
+                                <button class="speed-btn" onclick="setSpeed(this, 'after', 25)">25%</button>
+                                <button class="speed-btn active" onclick="setSpeed(this, 'after', 50)">50%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'after', 75)">75%</button>
+                                <button class="speed-btn" onclick="setSpeed(this, 'after', 100)">100%</button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Position Table - 색상 적용 -->
@@ -486,16 +496,6 @@
                                 <td class="pos-value z-val" id="after-z">731.5</td>
                             </tr>
                         </table>
-
-                        <div class="speed-section">
-                            <div class="section-label">배속</div>
-                            <div class="speed-buttons">
-                                <button class="speed-btn" onclick="setSpeed(this, 'after', 25)">25%</button>
-                                <button class="speed-btn active" onclick="setSpeed(this, 'after', 50)">50%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'after', 75)">75%</button>
-                                <button class="speed-btn" onclick="setSpeed(this, 'after', 100)">100%</button>
-                            </div>
-                        </div>
 
                         <button class="close-btn">닫기</button>
                     </div>
