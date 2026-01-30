@@ -489,14 +489,122 @@
                 </div>
             </div>
 
-            <!-- 개선 UI -->
+            <!-- 보완 UI -->
             <div class="panel panel-after">
                 <div class="panel-title">
-                    <span class="badge badge-after">개선</span>
-                    개선 UI (WinForms)
+                    <span class="badge badge-after">보완</span>
+                    보완 UI
                 </div>
-                <div class="ui-image">
-                    <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1769757216/s25016/punchlist/v6jpplqiph0vde6trwa4ojvo5.png" alt="개선된 갠트리 조깅 UI">
+
+                <!-- 탭 네비게이션 -->
+                <div class="tab-nav" style="display:flex;gap:5px;margin-bottom:15px;">
+                    <button class="tab-btn active" onclick="showUITab('layout')" style="flex:1;padding:10px;background:#0d9488;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">레이아웃 확인</button>
+                    <button class="tab-btn" onclick="showUITab('demo')" style="flex:1;padding:10px;background:#374151;color:#9ca3af;border:none;border-radius:6px;cursor:pointer;font-weight:600;">기능 확인 (데모)</button>
+                </div>
+
+                <!-- 레이아웃 확인 탭 -->
+                <div id="tab-layout" class="ui-tab-content">
+                    <div class="ui-image">
+                        <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1769757216/s25016/punchlist/v6jpplqiph0vde6trwa4ojvo5.png" alt="보완된 갠트리 조깅 UI">
+                    </div>
+                    <div style="margin-top:10px;text-align:center;">
+                        <a href="https://res.cloudinary.com/dmmjpofcc/image/upload/v1769757216/s25016/punchlist/v6jpplqiph0vde6trwa4ojvo5.png" target="_blank" style="color:#60a5fa;text-decoration:none;font-size:0.9rem;">원본 이미지 보기 ↗</a>
+                    </div>
+                </div>
+
+                <!-- 기능 확인 탭 (데모) -->
+                <div id="tab-demo" class="ui-tab-content" style="display:none;">
+                    <div class="winforms-window" style="max-width:100%;">
+                        <div class="winforms-titlebar">
+                            <span>갠트리 상대 위치 조깅</span>
+                            <div class="winforms-titlebar-btns">
+                                <button class="winforms-titlebar-btn">─</button>
+                                <button class="winforms-titlebar-btn">□</button>
+                                <button class="winforms-titlebar-btn close">✕</button>
+                            </div>
+                        </div>
+                        <div class="winforms-content">
+                            <div class="wf-main-layout">
+                                <!-- Left: Coordinate + Speed -->
+                                <div class="wf-left-column">
+                                    <div class="wf-coord-box" style="height:160px;">
+                                        <div style="font-size:2rem;opacity:0.3;">🔧</div>
+                                        <div class="wf-axis-label x-plus">X+</div>
+                                        <div class="wf-axis-label x-minus">X-</div>
+                                        <div class="wf-axis-label y-plus">Y+</div>
+                                        <div class="wf-axis-label y-minus">Y-</div>
+                                        <div class="wf-axis-label z-plus">Z+</div>
+                                        <div class="wf-axis-label z-minus">Z-</div>
+                                    </div>
+                                    <div class="wf-speed-section">
+                                        <div class="wf-section-title">배속</div>
+                                        <div class="wf-speed-btns">
+                                            <button class="wf-btn" onclick="setSpeed(this, 25)">25%</button>
+                                            <button class="wf-btn active" onclick="setSpeed(this, 50)">50%</button>
+                                            <button class="wf-btn" onclick="setSpeed(this, 75)">75%</button>
+                                            <button class="wf-btn" onclick="setSpeed(this, 100)">100%</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Center: Position Table -->
+                                <div class="wf-center-column">
+                                    <div class="wf-position-header">위치 이동</div>
+                                    <div class="wf-position-table">
+                                        <div class="wf-axis-headers">
+                                            <div class="wf-axis-header x">X</div>
+                                            <div class="wf-axis-header y">Y</div>
+                                            <div class="wf-axis-header z">Z</div>
+                                        </div>
+                                        <div class="wf-btn-row">
+                                            <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('x', 1)">+</button></div>
+                                            <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('y', 1)">+</button></div>
+                                            <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('z', 1)">+</button></div>
+                                        </div>
+                                        <div class="wf-btn-row">
+                                            <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('x', -1)">-</button></div>
+                                            <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('y', -1)">-</button></div>
+                                            <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('z', -1)">-</button></div>
+                                        </div>
+                                        <div class="wf-value-row">
+                                            <div class="wf-value-label">최대</div>
+                                            <div class="wf-value-cell">11905</div>
+                                            <div class="wf-value-cell">5496.5</div>
+                                            <div class="wf-value-cell">-44</div>
+                                        </div>
+                                        <div class="wf-value-row">
+                                            <div class="wf-value-label">현위치</div>
+                                            <div class="wf-value-cell current" id="val-x2">10400</div>
+                                            <div class="wf-value-cell current" id="val-y2">504.5</div>
+                                            <div class="wf-value-cell current" id="val-z2">2795</div>
+                                        </div>
+                                        <div class="wf-value-row">
+                                            <div class="wf-value-label">최소</div>
+                                            <div class="wf-value-cell">-1705</div>
+                                            <div class="wf-value-cell">-505.5</div>
+                                            <div class="wf-value-cell">-1296</div>
+                                        </div>
+                                        <div class="wf-close-row">
+                                            <button class="wf-close-btn">닫기</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right: Distance -->
+                                <div class="wf-right-column">
+                                    <div class="wf-distance-header">이동 간격</div>
+                                    <div class="wf-distance-btns">
+                                        <button class="wf-btn distance-btn" onclick="setDistance(this, 50)">50mm</button>
+                                        <button class="wf-btn distance-btn active" onclick="setDistance(this, 100)">100mm</button>
+                                        <button class="wf-btn distance-btn" onclick="setDistance(this, 200)">200mm</button>
+                                        <button class="wf-btn distance-btn" onclick="setDistance(this, 300)">300mm</button>
+                                        <button class="wf-btn distance-btn" onclick="setDistance(this, 500)">500mm</button>
+                                        <button class="wf-btn distance-btn" onclick="setDistance(this, 1000)">1000mm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -841,6 +949,22 @@
             z: { min: -1296, max: -44 }
         };
 
+        function showUITab(tab) {
+            // 탭 버튼 스타일 변경
+            document.querySelectorAll('.tab-nav .tab-btn').forEach(btn => {
+                btn.style.background = '#374151';
+                btn.style.color = '#9ca3af';
+                btn.classList.remove('active');
+            });
+            event.target.style.background = '#0d9488';
+            event.target.style.color = '#fff';
+            event.target.classList.add('active');
+
+            // 탭 콘텐츠 전환
+            document.getElementById('tab-layout').style.display = tab === 'layout' ? 'block' : 'none';
+            document.getElementById('tab-demo').style.display = tab === 'demo' ? 'block' : 'none';
+        }
+
         function setDistance(btn, value) {
             btn.parentElement.querySelectorAll('.wf-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -861,16 +985,25 @@
         }
 
         function updatePosition(axis) {
-            const el = document.getElementById(`val-${axis}`);
-            el.textContent = state[axis].toFixed(1);
+            // 두 데모의 요소 모두 업데이트
+            const el1 = document.getElementById(`val-${axis}`);
+            const el2 = document.getElementById(`val-${axis}2`);
+            const value = state[axis].toFixed(1);
+
+            if (el1) el1.textContent = value;
+            if (el2) el2.textContent = value;
 
             const limit = limits[axis];
             const range = Math.abs(limit.max - limit.min);
             const ratio = Math.min(Math.abs(state[axis] - limit.min), Math.abs(limit.max - state[axis])) / range;
 
-            el.classList.remove('wf-warning', 'wf-danger');
-            if (ratio < 0.05) el.classList.add('wf-danger');
-            else if (ratio < 0.1) el.classList.add('wf-warning');
+            // 경고 색상 적용
+            [el1, el2].forEach(el => {
+                if (!el) return;
+                el.classList.remove('wf-warning', 'wf-danger');
+                if (ratio < 0.05) el.classList.add('wf-danger');
+                else if (ratio < 0.1) el.classList.add('wf-warning');
+            });
         }
 
         function showCode(tab) {
