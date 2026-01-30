@@ -125,6 +125,168 @@
         .layout-diagram .section { color: #60a5fa; }
         .layout-diagram .element { color: #34d399; }
 
+        /* Visual Layout Diagram */
+        .visual-layout {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .vl-titlebar {
+            background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #fff;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .vl-titlebar-btns { display: flex; gap: 8px; font-size: 0.8rem; }
+        .vl-content {
+            display: grid;
+            grid-template-columns: 35% 45% 20%;
+            gap: 8px;
+            padding: 10px;
+            background: #0f172a;
+        }
+        .vl-column { display: flex; flex-direction: column; gap: 8px; }
+        .vl-col-header {
+            background: #334155;
+            color: #94a3b8;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .vl-box {
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            overflow: hidden;
+            flex: 1;
+        }
+        .vl-box-title {
+            background: #334155;
+            color: #e2e8f0;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .vl-box-content {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .vl-axis-labels {
+            margin-top: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.75rem;
+            line-height: 1.6;
+        }
+        .vl-btn-row, .vl-btn-col { display: flex; gap: 4px; padding: 8px; }
+        .vl-btn-col { flex-direction: column; }
+        .vl-btn {
+            background: #374151;
+            color: #d1d5db;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            text-align: center;
+            flex: 1;
+        }
+        .vl-btn-active { background: #3b82f6; color: #fff; }
+        .vl-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+        .vl-table th, .vl-table td {
+            padding: 4px 6px;
+            border: 1px solid #475569;
+            text-align: center;
+        }
+        .vl-table th { background: #334155; font-weight: 600; }
+        .vl-table td { background: #1e293b; color: #d1d5db; }
+        .vl-current td { background: #064e3b; color: #34d399; }
+        .vl-btn-sm {
+            display: inline-block;
+            background: #374151;
+            color: #fff;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .vl-close-btn {
+            background: #374151;
+            color: #d1d5db;
+            padding: 6px;
+            text-align: center;
+            font-size: 0.8rem;
+            margin: 8px;
+            border-radius: 4px;
+        }
+
+        /* Control Mapping */
+        .control-mapping {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .cm-item { margin-bottom: 8px; }
+        .cm-header {
+            background: #334155;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .cm-form > .cm-header { background: #1d4ed8; }
+        .cm-panel > .cm-header { background: #0d9488; }
+        .cm-children { padding: 10px 0 0 15px; }
+        .cm-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 10px;
+        }
+        .cm-col {
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        .cm-col-header {
+            color: #60a5fa;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #334155;
+        }
+        .cm-control {
+            padding: 4px 0;
+            font-size: 0.8rem;
+        }
+        .cm-control.cm-sub { padding-left: 12px; opacity: 0.8; }
+        .cm-type { color: #a78bfa; font-weight: 500; }
+        .cm-name { color: #34d399; }
+        .cm-desc { color: #6b7280; font-size: 0.75rem; }
+        .cm-info { color: #94a3b8; font-size: 0.8rem; font-weight: normal; }
+
+        @media (max-width: 800px) {
+            .vl-content { grid-template-columns: 1fr; }
+            .cm-columns { grid-template-columns: 1fr; }
+        }
+
         /* Interactive Demo */
         .demo-section {
             background: #16213e;
@@ -614,66 +776,133 @@
             <h2>레이아웃 구조 설명</h2>
 
             <h3>전체 레이아웃 (TableLayoutPanel 3열)</h3>
-            <div class="layout-diagram">
-<pre><span class="comment">/* 전체 Form 구조 - TableLayoutPanel 3열 구성 */</span>
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ <span class="highlight">Title Bar</span>: "갠트리 상대 위치 조깅"                              [─] [□] [✕] │
-├─────────────────────┬────────────────────────────┬──────────────────────────┤
-│                     │                            │                          │
-│  <span class="section">[Column 1: 35%]</span>    │    <span class="section">[Column 2: 45%]</span>         │   <span class="section">[Column 3: 20%]</span>       │
-│                     │                            │                          │
-│  ┌───────────────┐  │  ┌────────────────────┐    │  ┌──────────────────┐   │
-│  │ <span class="element">PictureBox</span>    │  │  │   <span class="highlight">"위치 이동"</span>        │    │  │  <span class="highlight">"이동 간격"</span>     │   │
-│  │               │  │  ├──────┬──────┬──────┤    │  ├──────────────────┤   │
-│  │  좌표계 이미지  │  │  │  <span style="color:#ff4444;">X</span>   │  <span style="color:#44ff44;">Y</span>   │  <span style="color:#4488ff;">Z</span>   │    │  │    50mm         │   │
-│  │  (축 방향 표시) │  │  ├──────┼──────┼──────┤    │  │   <span class="highlight">100mm</span>         │   │
-│  │               │  │  │  [+] │  [+] │  [+] │    │  │   200mm         │   │
-│  │  X+←  →X-    │  │  ├──────┼──────┼──────┤    │  │   300mm         │   │
-│  │  Y+↗  ↙Y-    │  │  │  [-] │  [-] │  [-] │    │  │   500mm         │   │
-│  │  Z+↑  ↓Z-    │  │  ├──────┼──────┼──────┤    │  │  1000mm         │   │
-│  │               │  │  │최대위치│11905│5496.5│-44 │    │  └──────────────────┘   │
-│  └───────────────┘  │  ├──────┼──────┼──────┤    │                          │
-│                     │  │<span class="highlight">현 위치</span>│<span style="color:#44ff44;">10400</span>│<span style="color:#44ff44;">504.5</span>│<span style="color:#44ff44;">2795</span>│    │                          │
-│  ┌───────────────┐  │  ├──────┼──────┼──────┤    │                          │
-│  │  <span class="highlight">"배속"</span>       │  │  │최소위치│-1705│-505.5│-1296│    │                          │
-│  ├───────────────┤  │  ├──────┴──────┴──────┤    │                          │
-│  │ 25%│50%│75%│100%│  │  │      [닫기]        │    │                          │
-│  └───────────────┘  │  └────────────────────┘    │                          │
-│                     │                            │                          │
-└─────────────────────┴────────────────────────────┴──────────────────────────┘</pre>
+
+            <!-- Visual Layout Diagram -->
+            <div class="visual-layout">
+                <!-- Title Bar -->
+                <div class="vl-titlebar">
+                    <span>갠트리 상대 위치 조깅</span>
+                    <div class="vl-titlebar-btns">
+                        <span>─</span><span>□</span><span style="color:#e81123;">✕</span>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="vl-content">
+                    <!-- Column 1: 35% -->
+                    <div class="vl-column vl-col1">
+                        <div class="vl-col-header">Column 1 (35%)</div>
+                        <div class="vl-box vl-picturebox">
+                            <div class="vl-box-title">PictureBox</div>
+                            <div class="vl-box-content">
+                                <div>좌표계 이미지</div>
+                                <div class="vl-axis-labels">
+                                    <span style="color:#ff4444;">X+←  →X-</span><br>
+                                    <span style="color:#44ff44;">Y+↗  ↙Y-</span><br>
+                                    <span style="color:#4488ff;">Z+↑  ↓Z-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vl-box vl-speed">
+                            <div class="vl-box-title">배속</div>
+                            <div class="vl-btn-row">
+                                <span class="vl-btn">25%</span>
+                                <span class="vl-btn vl-btn-active">50%</span>
+                                <span class="vl-btn">75%</span>
+                                <span class="vl-btn">100%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: 45% -->
+                    <div class="vl-column vl-col2">
+                        <div class="vl-col-header">Column 2 (45%)</div>
+                        <div class="vl-box vl-position">
+                            <div class="vl-box-title">위치 이동</div>
+                            <table class="vl-table">
+                                <tr>
+                                    <th></th>
+                                    <th style="color:#ff4444;">X</th>
+                                    <th style="color:#44ff44;">Y</th>
+                                    <th style="color:#4488ff;">Z</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><span class="vl-btn-sm">+</span></td>
+                                    <td><span class="vl-btn-sm">+</span></td>
+                                    <td><span class="vl-btn-sm">+</span></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><span class="vl-btn-sm">-</span></td>
+                                    <td><span class="vl-btn-sm">-</span></td>
+                                    <td><span class="vl-btn-sm">-</span></td>
+                                </tr>
+                                <tr><td>최대</td><td>11905</td><td>5496.5</td><td>-44</td></tr>
+                                <tr class="vl-current"><td>현위치</td><td>10400</td><td>504.5</td><td>2795</td></tr>
+                                <tr><td>최소</td><td>-1705</td><td>-505.5</td><td>-1296</td></tr>
+                            </table>
+                            <div class="vl-close-btn">닫기</div>
+                        </div>
+                    </div>
+
+                    <!-- Column 3: 20% -->
+                    <div class="vl-column vl-col3">
+                        <div class="vl-col-header">Column 3 (20%)</div>
+                        <div class="vl-box vl-distance">
+                            <div class="vl-box-title">이동 간격</div>
+                            <div class="vl-btn-col">
+                                <span class="vl-btn">50mm</span>
+                                <span class="vl-btn vl-btn-active">100mm</span>
+                                <span class="vl-btn">200mm</span>
+                                <span class="vl-btn">300mm</span>
+                                <span class="vl-btn">500mm</span>
+                                <span class="vl-btn">1000mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <h3>WinForms 컨트롤 매핑</h3>
-            <div class="layout-diagram">
-<pre><span class="comment">/* C# WinForms 컨트롤 구조 */</span>
 
-<span class="type">Form</span> (GantryJogForm)
-├── <span class="type">TableLayoutPanel</span> <span class="element">tlpMain</span> (3 columns: 35%, 45%, 20%)
-│   │
-│   ├── <span class="section">[Column 0]</span> <span class="type">TableLayoutPanel</span> <span class="element">pnlLeft</span> (2 rows)
-│   │   ├── <span class="type">PictureBox</span> <span class="element">picCoordinate</span>      <span class="comment">// 좌표계 이미지</span>
-│   │   │   └── <span class="type">Label[]</span> <span class="element">axisLabels</span>        <span class="comment">// X+, X-, Y+, Y-, Z+, Z- 라벨</span>
-│   │   └── <span class="type">Panel</span> <span class="element">pnlSpeed</span>
-│   │       ├── <span class="type">Label</span> <span class="element">lblSpeedTitle</span>       <span class="comment">// "배속"</span>
-│   │       └── <span class="type">Button[]</span> <span class="element">speedButtons</span>     <span class="comment">// 25%, 50%, 75%, 100%</span>
-│   │
-│   ├── <span class="section">[Column 1]</span> <span class="type">Panel</span> <span class="element">pnlCenter</span>
-│   │   ├── <span class="type">Label</span> <span class="element">lblPositionTitle</span>       <span class="comment">// "위치 이동"</span>
-│   │   ├── <span class="type">TableLayoutPanel</span> <span class="element">tlpPosition</span>
-│   │   │   ├── <span class="type">Label[]</span> <span class="element">axisHeaders</span>      <span class="comment">// X, Y, Z (색상별)</span>
-│   │   │   ├── <span class="type">Button[]</span> <span class="element">plusButtons</span>     <span class="comment">// [+] 버튼 3개</span>
-│   │   │   ├── <span class="type">Button[]</span> <span class="element">minusButtons</span>    <span class="comment">// [-] 버튼 3개</span>
-│   │   │   ├── <span class="type">Label[]</span> <span class="element">maxLabels</span>       <span class="comment">// 최대 위치 값</span>
-│   │   │   ├── <span class="type">Label[]</span> <span class="element">currentLabels</span>   <span class="comment">// 현 위치 값 (동적 업데이트)</span>
-│   │   │   └── <span class="type">Label[]</span> <span class="element">minLabels</span>       <span class="comment">// 최소 위치 값</span>
-│   │   └── <span class="type">Button</span> <span class="element">btnClose</span>            <span class="comment">// "닫기"</span>
-│   │
-│   └── <span class="section">[Column 2]</span> <span class="type">Panel</span> <span class="element">pnlRight</span>
-│       ├── <span class="type">Label</span> <span class="element">lblDistanceTitle</span>      <span class="comment">// "이동 간격"</span>
-│       └── <span class="type">Button[]</span> <span class="element">distanceButtons</span>   <span class="comment">// 50mm ~ 1000mm</span>
-│
-└── <span class="type">StatusStrip</span> <span class="element">statusStrip</span> (선택사항)
-    └── <span class="type">ToolStripStatusLabel</span> <span class="element">lblStatus</span></pre>
+            <!-- Visual Control Mapping -->
+            <div class="control-mapping">
+                <div class="cm-item cm-form">
+                    <div class="cm-header">Form (GantryJogForm)</div>
+                    <div class="cm-children">
+                        <div class="cm-item cm-panel">
+                            <div class="cm-header">TableLayoutPanel <span class="cm-name">tlpMain</span> <span class="cm-info">(3 columns)</span></div>
+                            <div class="cm-children cm-columns">
+                                <!-- Column 0 -->
+                                <div class="cm-col">
+                                    <div class="cm-col-header">Column 0 (35%)</div>
+                                    <div class="cm-control"><span class="cm-type">PictureBox</span> <span class="cm-name">picCoordinate</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Label[]</span> <span class="cm-name">axisLabels</span> <span class="cm-desc">X+, X-, Y+, Y-, Z+, Z-</span></div>
+                                    <div class="cm-control"><span class="cm-type">Panel</span> <span class="cm-name">pnlSpeed</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Button[]</span> <span class="cm-name">speedButtons</span> <span class="cm-desc">25%, 50%, 75%, 100%</span></div>
+                                </div>
+                                <!-- Column 1 -->
+                                <div class="cm-col">
+                                    <div class="cm-col-header">Column 1 (45%)</div>
+                                    <div class="cm-control"><span class="cm-type">Label</span> <span class="cm-name">lblPositionTitle</span> <span class="cm-desc">"위치 이동"</span></div>
+                                    <div class="cm-control"><span class="cm-type">TableLayoutPanel</span> <span class="cm-name">tlpPosition</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Label[]</span> <span class="cm-name">axisHeaders</span> <span class="cm-desc">X, Y, Z</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Button[]</span> <span class="cm-name">plusButtons</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Button[]</span> <span class="cm-name">minusButtons</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Label[]</span> <span class="cm-name">positionLabels</span></div>
+                                    <div class="cm-control"><span class="cm-type">Button</span> <span class="cm-name">btnClose</span></div>
+                                </div>
+                                <!-- Column 2 -->
+                                <div class="cm-col">
+                                    <div class="cm-col-header">Column 2 (20%)</div>
+                                    <div class="cm-control"><span class="cm-type">Label</span> <span class="cm-name">lblDistanceTitle</span> <span class="cm-desc">"이동 간격"</span></div>
+                                    <div class="cm-control"><span class="cm-type">Button[]</span> <span class="cm-name">distanceButtons</span> <span class="cm-desc">50mm ~ 1000mm</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="improvements-grid">
