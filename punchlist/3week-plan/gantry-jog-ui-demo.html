@@ -327,6 +327,48 @@
             height: 40px;
             background: #4a4a4a;
         }
+
+        /* 개선 UI - 컴팩트 스타일 */
+        .panel-after .distance-section {
+            padding: 8px;
+        }
+        .panel-after .distance-btn {
+            padding: 8px;
+            margin-bottom: 3px;
+        }
+        .panel-after .position-section {
+            padding: 8px;
+        }
+        .panel-after .pos-table th,
+        .panel-after .pos-table td {
+            padding: 4px 6px;
+        }
+        .panel-after .pos-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 1.2rem;
+        }
+        .panel-after .coord-display {
+            padding: 8px;
+        }
+        .panel-after .coord-visual {
+            width: 150px;
+            height: 150px;
+        }
+        .panel-after .speed-section-bottom {
+            padding: 8px;
+        }
+        .panel-after .speed-buttons {
+            gap: 3px;
+        }
+        .panel-after .speed-btn {
+            padding: 8px 4px;
+            font-size: 0.85rem;
+        }
+        .panel-after .close-btn {
+            padding: 8px;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -465,7 +507,6 @@
                         <button class="distance-btn" onclick="setDistance(this, 'after', 300)">300mm</button>
                         <button class="distance-btn" onclick="setDistance(this, 'after', 500)">500mm</button>
                         <button class="distance-btn" onclick="setDistance(this, 'after', 1000)">1000mm</button>
-                        <!-- 100 표시 제거됨 -->
                     </div>
 
                     <!-- Position Table - 색상 적용 -->
@@ -490,7 +531,6 @@
                                 <td><button class="pos-btn" style="border-color:#4caf50;" onclick="moveAxis('after', 'y', -1)">-</button></td>
                                 <td><button class="pos-btn" style="border-color:#2196f3;" onclick="moveAxis('after', 'z', -1)">-</button></td>
                             </tr>
-                            <!-- 빈 행 제거됨 -->
                             <tr>
                                 <td class="pos-label">최대 위치</td>
                                 <td class="pos-value x-val">11328.90</td>
