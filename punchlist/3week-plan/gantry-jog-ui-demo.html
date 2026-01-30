@@ -13,20 +13,9 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-        .subtitle {
-            text-align: center;
-            color: #94a3b8;
-            margin-bottom: 30px;
-        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 10px; color: #fff; }
+        .subtitle { text-align: center; color: #94a3b8; margin-bottom: 30px; }
 
         /* Comparison Section */
         .comparison {
@@ -76,9 +65,7 @@
         .badge-after { background: #10b981; }
 
         /* UI Images */
-        .ui-image {
-            text-align: center;
-        }
+        .ui-image { text-align: center; }
         .ui-image img {
             max-width: 100%;
             border-radius: 8px;
@@ -86,229 +73,31 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        /* Layout Explanation Section */
-        .layout-section {
-            background: #16213e;
-            border-radius: 12px;
-            padding: 25px;
-            margin-top: 30px;
-            border: 1px solid #334155;
-        }
-        .layout-section h2 {
-            color: #60a5fa;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-            border-bottom: 2px solid #334155;
-            padding-bottom: 10px;
-        }
-        .layout-section h3 {
-            color: #34d399;
-            margin: 20px 0 15px 0;
-            font-size: 1.1rem;
-        }
-
-        /* Layout Diagram */
-        .layout-diagram {
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            font-family: 'Consolas', 'D2Coding', monospace;
-            font-size: 0.85rem;
-            line-height: 1.6;
-            overflow-x: auto;
-            color: #e2e8f0;
-        }
-        .layout-diagram .comment { color: #6b7280; }
-        .layout-diagram .highlight { color: #fbbf24; font-weight: bold; }
-        .layout-diagram .section { color: #60a5fa; }
-        .layout-diagram .element { color: #34d399; }
-
-        /* Visual Layout Diagram */
-        .visual-layout {
-            background: #1e293b;
-            border: 2px solid #334155;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-        .vl-titlebar {
-            background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
-            color: #fff;
-            padding: 8px 12px;
+        /* Tab Navigation */
+        .tab-nav {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 0.9rem;
+            gap: 5px;
+            margin-bottom: 15px;
         }
-        .vl-titlebar-btns { display: flex; gap: 8px; font-size: 0.8rem; }
-        .vl-content {
-            display: grid;
-            grid-template-columns: 35% 45% 20%;
-            gap: 8px;
-            padding: 10px;
-            background: #0f172a;
-        }
-        .vl-column { display: flex; flex-direction: column; gap: 8px; }
-        .vl-col-header {
-            background: #334155;
-            color: #94a3b8;
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            text-align: center;
-            border-radius: 4px;
-        }
-        .vl-box {
-            background: #1e293b;
-            border: 1px solid #475569;
-            border-radius: 6px;
-            overflow: hidden;
+        .tab-btn {
             flex: 1;
-        }
-        .vl-box-title {
-            background: #334155;
-            color: #e2e8f0;
-            padding: 6px 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-align: center;
-        }
-        .vl-box-content {
             padding: 10px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-        .vl-axis-labels {
-            margin-top: 8px;
-            font-family: 'Consolas', monospace;
-            font-size: 0.75rem;
-            line-height: 1.6;
-        }
-        .vl-btn-row, .vl-btn-col { display: flex; gap: 4px; padding: 8px; }
-        .vl-btn-col { flex-direction: column; }
-        .vl-btn {
-            background: #374151;
-            color: #d1d5db;
-            padding: 4px 8px;
-            border-radius: 3px;
-            font-size: 0.75rem;
-            text-align: center;
-            flex: 1;
-        }
-        .vl-btn-active { background: #3b82f6; color: #fff; }
-        .vl-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-        }
-        .vl-table th, .vl-table td {
-            padding: 4px 6px;
-            border: 1px solid #475569;
-            text-align: center;
-        }
-        .vl-table th { background: #334155; font-weight: 600; }
-        .vl-table td { background: #1e293b; color: #d1d5db; }
-        .vl-current td { background: #064e3b; color: #34d399; }
-        .vl-btn-sm {
-            display: inline-block;
-            background: #374151;
-            color: #fff;
-            width: 20px;
-            height: 20px;
-            line-height: 20px;
-            border-radius: 3px;
-            font-weight: bold;
-        }
-        .vl-close-btn {
-            background: #374151;
-            color: #d1d5db;
-            padding: 6px;
-            text-align: center;
-            font-size: 0.8rem;
-            margin: 8px;
-            border-radius: 4px;
-        }
-
-        /* Control Mapping */
-        .control-mapping {
-            background: #1e293b;
-            border: 2px solid #334155;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-        .cm-item { margin-bottom: 8px; }
-        .cm-header {
-            background: #334155;
-            color: #e2e8f0;
-            padding: 8px 12px;
+            border: none;
             border-radius: 6px;
-            font-size: 0.9rem;
+            cursor: pointer;
             font-weight: 600;
+            transition: all 0.2s;
         }
-        .cm-form > .cm-header { background: #1d4ed8; }
-        .cm-panel > .cm-header { background: #0d9488; }
-        .cm-children { padding: 10px 0 0 15px; }
-        .cm-columns {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            padding: 10px;
-        }
-        .cm-col {
-            background: #0f172a;
-            border: 1px solid #475569;
-            border-radius: 6px;
-            padding: 10px;
-        }
-        .cm-col-header {
-            color: #60a5fa;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #334155;
-        }
-        .cm-control {
-            padding: 4px 0;
-            font-size: 0.8rem;
-        }
-        .cm-control.cm-sub { padding-left: 12px; opacity: 0.8; }
-        .cm-type { color: #a78bfa; font-weight: 500; }
-        .cm-name { color: #34d399; }
-        .cm-desc { color: #6b7280; font-size: 0.75rem; }
-        .cm-info { color: #94a3b8; font-size: 0.8rem; font-weight: normal; }
+        .tab-btn.active { background: #0d9488; color: #fff; }
+        .tab-btn:not(.active) { background: #374151; color: #9ca3af; }
+        .tab-btn:hover:not(.active) { background: #4b5563; }
 
-        @media (max-width: 800px) {
-            .vl-content { grid-template-columns: 1fr; }
-            .cm-columns { grid-template-columns: 1fr; }
-        }
-
-        /* Interactive Demo */
-        .demo-section {
-            background: #16213e;
-            border-radius: 12px;
-            padding: 25px;
-            margin-top: 30px;
-            border: 1px solid #334155;
-        }
-        .demo-section h2 {
-            color: #f59e0b;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-            border-bottom: 2px solid #334155;
-            padding-bottom: 10px;
-        }
-
-        /* WinForms Style Demo */
+        /* WinForms Demo */
         .winforms-window {
             background: #2d2d2d;
             border: 1px solid #0078d4;
-            max-width: 900px;
-            margin: 0 auto;
+            border-radius: 4px;
+            overflow: hidden;
         }
         .winforms-titlebar {
             background: #1a1a2e;
@@ -319,12 +108,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #444;
         }
-        .winforms-titlebar-btns {
-            display: flex;
-            gap: 2px;
-        }
+        .winforms-titlebar-btns { display: flex; gap: 2px; }
         .winforms-titlebar-btn {
             width: 32px;
             height: 24px;
@@ -336,28 +121,18 @@
         }
         .winforms-titlebar-btn:hover { background: #444; color: #fff; }
         .winforms-titlebar-btn.close:hover { background: #e81123; }
-        .winforms-content {
-            padding: 10px;
-            background: #1e1e1e;
-        }
+        .winforms-content { padding: 10px; background: #1e1e1e; }
 
-        /* Main Layout */
         .wf-main-layout {
             display: grid;
             grid-template-columns: 1fr 1fr auto;
             gap: 10px;
         }
-
-        /* Left Column */
-        .wf-left-column {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .wf-left-column { display: flex; flex-direction: column; gap: 10px; }
         .wf-coord-box {
             background: #000;
             border: 1px solid #444;
-            height: 220px;
+            height: 160px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -377,28 +152,11 @@
         .wf-axis-label.z-plus { background: #006; color: #fff; left: 35%; top: 12px; }
         .wf-axis-label.z-minus { background: #060; color: #fff; right: 30%; bottom: 12px; }
 
-        .wf-speed-section {
-            background: #2a2a2a;
-            border: 1px solid #444;
-            padding: 10px;
-        }
-        .wf-section-title {
-            text-align: center;
-            color: #aaa;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-        }
-        .wf-speed-btns {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
-        }
+        .wf-speed-section { background: #2a2a2a; border: 1px solid #444; padding: 10px; }
+        .wf-section-title { text-align: center; color: #aaa; font-size: 0.85rem; margin-bottom: 8px; }
+        .wf-speed-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
 
-        /* Center Column */
-        .wf-center-column {
-            display: flex;
-            flex-direction: column;
-        }
+        .wf-center-column { display: flex; flex-direction: column; }
         .wf-position-header {
             background: #2a2a2a;
             border: 1px solid #444;
@@ -469,18 +227,9 @@
         }
         .wf-value-cell:last-child { border-right: none; }
         .wf-value-cell.current { background: #0a2a0a; }
+        .wf-close-row { padding: 8px; background: #252525; }
 
-        .wf-close-row {
-            padding: 8px;
-            background: #252525;
-        }
-
-        /* Right Column */
-        .wf-right-column {
-            display: flex;
-            flex-direction: column;
-            min-width: 100px;
-        }
+        .wf-right-column { display: flex; flex-direction: column; min-width: 100px; }
         .wf-distance-header {
             background: #2a2a2a;
             border: 1px solid #444;
@@ -498,7 +247,6 @@
             flex: 1;
         }
 
-        /* Buttons */
         .wf-btn {
             background: #3a3a3a;
             border: 1px solid #555;
@@ -511,17 +259,8 @@
         }
         .wf-btn:hover { background: #4a4a4a; }
         .wf-btn.active { background: #0078d4; border-color: #005a9e; }
-        .wf-btn.axis-btn {
-            width: 45px;
-            height: 40px;
-            font-size: 1.3rem;
-            font-weight: bold;
-        }
-        .wf-btn.distance-btn {
-            flex: 1;
-            border-bottom: none;
-            font-size: 0.9rem;
-        }
+        .wf-btn.axis-btn { width: 45px; height: 40px; font-size: 1.3rem; font-weight: bold; }
+        .wf-btn.distance-btn { flex: 1; border-bottom: none; font-size: 0.9rem; }
         .wf-btn.distance-btn:last-child { border-bottom: 1px solid #555; }
         .wf-close-btn {
             width: 100%;
@@ -532,76 +271,28 @@
             cursor: pointer;
         }
 
-        /* Warning Colors */
         .wf-warning { background: #3d3d00 !important; color: #ffeb3b !important; }
         .wf-danger { background: #3d0000 !important; color: #ff5252 !important; }
 
-        /* Code Section */
-        .code-section {
-            background: #0f172a;
+        /* Improvements Summary */
+        .improvements-section {
+            background: #16213e;
             border-radius: 12px;
             padding: 25px;
             margin-top: 30px;
             border: 1px solid #334155;
         }
-        .code-section h2 {
-            color: #a78bfa;
+        .improvements-section h2 {
+            color: #10b981;
             margin-bottom: 20px;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             border-bottom: 2px solid #334155;
             padding-bottom: 10px;
         }
-        .code-block {
-            background: #1e1e2e;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            padding: 15px;
-            overflow-x: auto;
-            margin: 15px 0;
-        }
-        .code-block pre {
-            margin: 0;
-            font-family: 'Consolas', 'D2Coding', monospace;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: #e2e8f0;
-        }
-        .code-block .keyword { color: #c792ea; }
-        .code-block .type { color: #82aaff; }
-        .code-block .string { color: #c3e88d; }
-        .code-block .comment { color: #676e95; }
-        .code-block .number { color: #f78c6c; }
-
-        .file-tabs {
-            display: flex;
-            gap: 2px;
-            margin-bottom: -1px;
-        }
-        .file-tab {
-            background: #1e1e2e;
-            border: 1px solid #334155;
-            border-bottom: none;
-            padding: 8px 15px;
-            color: #64748b;
-            cursor: pointer;
-            font-size: 0.85rem;
-            border-radius: 6px 6px 0 0;
-        }
-        .file-tab.active {
-            background: #0f172a;
-            color: #fff;
-            border-color: #475569;
-        }
-        .file-tab:hover:not(.active) { background: #1e293b; }
-        .code-content { display: none; }
-        .code-content.active { display: block; }
-
-        /* Improvement List */
         .improvements-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
-            margin-top: 20px;
         }
         .improvement-item {
             background: #1e293b;
@@ -614,10 +305,7 @@
             margin-bottom: 10px;
             font-size: 0.95rem;
         }
-        .improvement-item ul {
-            list-style: none;
-            padding-left: 0;
-        }
+        .improvement-item ul { list-style: none; padding-left: 0; }
         .improvement-item li {
             padding: 5px 0;
             color: #94a3b8;
@@ -631,12 +319,33 @@
             left: 0;
             color: #10b981;
         }
+
+        /* Code Link */
+        .code-link-section {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+            border: 1px solid #475569;
+        }
+        .code-link-section a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #7c3aed;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .code-link-section a:hover { background: #6d28d9; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>PL-2026-170 갠트리 상대 위치 조깅 UI 개선안</h1>
-        <p class="subtitle">기존 UI vs 개선 UI 비교 | WinForms C# 구현 가이드</p>
+        <p class="subtitle">기존 UI vs 보완 UI 비교</p>
 
         <!-- UI Comparison -->
         <div class="comparison">
@@ -659,9 +368,9 @@
                 </div>
 
                 <!-- 탭 네비게이션 -->
-                <div class="tab-nav" style="display:flex;gap:5px;margin-bottom:15px;">
-                    <button class="tab-btn active" onclick="showUITab('layout')" style="flex:1;padding:10px;background:#0d9488;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">레이아웃 확인</button>
-                    <button class="tab-btn" onclick="showUITab('demo')" style="flex:1;padding:10px;background:#374151;color:#9ca3af;border:none;border-radius:6px;cursor:pointer;font-weight:600;">기능 확인 (데모)</button>
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="showUITab('layout')">레이아웃 확인</button>
+                    <button class="tab-btn" onclick="showUITab('demo')">기능 확인 (데모)</button>
                 </div>
 
                 <!-- 레이아웃 확인 탭 -->
@@ -676,7 +385,7 @@
 
                 <!-- 기능 확인 탭 (데모) -->
                 <div id="tab-demo" class="ui-tab-content" style="display:none;">
-                    <div class="winforms-window" style="max-width:100%;">
+                    <div class="winforms-window">
                         <div class="winforms-titlebar">
                             <span>갠트리 상대 위치 조깅</span>
                             <div class="winforms-titlebar-btns">
@@ -689,7 +398,7 @@
                             <div class="wf-main-layout">
                                 <!-- Left: Coordinate + Speed -->
                                 <div class="wf-left-column">
-                                    <div class="wf-coord-box" style="height:160px;">
+                                    <div class="wf-coord-box">
                                         <div style="font-size:2rem;opacity:0.3;">🔧</div>
                                         <div class="wf-axis-label x-plus">X+</div>
                                         <div class="wf-axis-label x-minus">X-</div>
@@ -736,9 +445,9 @@
                                         </div>
                                         <div class="wf-value-row">
                                             <div class="wf-value-label">현위치</div>
-                                            <div class="wf-value-cell current" id="val-x2">10400</div>
-                                            <div class="wf-value-cell current" id="val-y2">504.5</div>
-                                            <div class="wf-value-cell current" id="val-z2">2795</div>
+                                            <div class="wf-value-cell current" id="val-x">10400</div>
+                                            <div class="wf-value-cell current" id="val-y">504.5</div>
+                                            <div class="wf-value-cell current" id="val-z">2795</div>
                                         </div>
                                         <div class="wf-value-row">
                                             <div class="wf-value-label">최소</div>
@@ -771,143 +480,21 @@
             </div>
         </div>
 
-        <!-- Layout Explanation -->
-        <div class="layout-section">
-            <h2>레이아웃 구조 설명</h2>
-
-            <h3>전체 레이아웃 (TableLayoutPanel 3열)</h3>
-
-            <!-- Visual Layout Diagram -->
-            <div class="visual-layout">
-                <!-- Title Bar -->
-                <div class="vl-titlebar">
-                    <span>갠트리 상대 위치 조깅</span>
-                    <div class="vl-titlebar-btns">
-                        <span>─</span><span>□</span><span style="color:#e81123;">✕</span>
-                    </div>
-                </div>
-
-                <!-- Main Content -->
-                <div class="vl-content">
-                    <!-- Column 1: 35% -->
-                    <div class="vl-column vl-col1">
-                        <div class="vl-col-header">Column 1 (35%)</div>
-                        <div class="vl-box vl-picturebox">
-                            <div class="vl-box-title">PictureBox</div>
-                            <div class="vl-box-content">
-                                <div>좌표계 이미지</div>
-                                <div class="vl-axis-labels">
-                                    <span style="color:#ff4444;">X+←  →X-</span><br>
-                                    <span style="color:#44ff44;">Y+↗  ↙Y-</span><br>
-                                    <span style="color:#4488ff;">Z+↑  ↓Z-</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="vl-box vl-speed">
-                            <div class="vl-box-title">배속</div>
-                            <div class="vl-btn-row">
-                                <span class="vl-btn">25%</span>
-                                <span class="vl-btn vl-btn-active">50%</span>
-                                <span class="vl-btn">75%</span>
-                                <span class="vl-btn">100%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Column 2: 45% -->
-                    <div class="vl-column vl-col2">
-                        <div class="vl-col-header">Column 2 (45%)</div>
-                        <div class="vl-box vl-position">
-                            <div class="vl-box-title">위치 이동</div>
-                            <table class="vl-table">
-                                <tr>
-                                    <th></th>
-                                    <th style="color:#ff4444;">X</th>
-                                    <th style="color:#44ff44;">Y</th>
-                                    <th style="color:#4488ff;">Z</th>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td><span class="vl-btn-sm">+</span></td>
-                                    <td><span class="vl-btn-sm">+</span></td>
-                                    <td><span class="vl-btn-sm">+</span></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td><span class="vl-btn-sm">-</span></td>
-                                    <td><span class="vl-btn-sm">-</span></td>
-                                    <td><span class="vl-btn-sm">-</span></td>
-                                </tr>
-                                <tr><td>최대</td><td>11905</td><td>5496.5</td><td>-44</td></tr>
-                                <tr class="vl-current"><td>현위치</td><td>10400</td><td>504.5</td><td>2795</td></tr>
-                                <tr><td>최소</td><td>-1705</td><td>-505.5</td><td>-1296</td></tr>
-                            </table>
-                            <div class="vl-close-btn">닫기</div>
-                        </div>
-                    </div>
-
-                    <!-- Column 3: 20% -->
-                    <div class="vl-column vl-col3">
-                        <div class="vl-col-header">Column 3 (20%)</div>
-                        <div class="vl-box vl-distance">
-                            <div class="vl-box-title">이동 간격</div>
-                            <div class="vl-btn-col">
-                                <span class="vl-btn">50mm</span>
-                                <span class="vl-btn vl-btn-active">100mm</span>
-                                <span class="vl-btn">200mm</span>
-                                <span class="vl-btn">300mm</span>
-                                <span class="vl-btn">500mm</span>
-                                <span class="vl-btn">1000mm</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <h3>WinForms 컨트롤 매핑</h3>
-
-            <!-- Visual Control Mapping -->
-            <div class="control-mapping">
-                <div class="cm-item cm-form">
-                    <div class="cm-header">Form (GantryJogForm)</div>
-                    <div class="cm-children">
-                        <div class="cm-item cm-panel">
-                            <div class="cm-header">TableLayoutPanel <span class="cm-name">tlpMain</span> <span class="cm-info">(3 columns)</span></div>
-                            <div class="cm-children cm-columns">
-                                <!-- Column 0 -->
-                                <div class="cm-col">
-                                    <div class="cm-col-header">Column 0 (35%)</div>
-                                    <div class="cm-control"><span class="cm-type">PictureBox</span> <span class="cm-name">picCoordinate</span></div>
-                                    <div class="cm-control cm-sub"><span class="cm-type">Label[]</span> <span class="cm-name">axisLabels</span> <span class="cm-desc">X+, X-, Y+, Y-, Z+, Z-</span></div>
-                                    <div class="cm-control"><span class="cm-type">Panel</span> <span class="cm-name">pnlSpeed</span></div>
-                                    <div class="cm-control cm-sub"><span class="cm-type">Button[]</span> <span class="cm-name">speedButtons</span> <span class="cm-desc">25%, 50%, 75%, 100%</span></div>
-                                </div>
-                                <!-- Column 1 -->
-                                <div class="cm-col">
-                                    <div class="cm-col-header">Column 1 (45%)</div>
-                                    <div class="cm-control"><span class="cm-type">Label</span> <span class="cm-name">lblPositionTitle</span> <span class="cm-desc">"위치 이동"</span></div>
-                                    <div class="cm-control"><span class="cm-type">TableLayoutPanel</span> <span class="cm-name">tlpPosition</span></div>
-                                    <div class="cm-control cm-sub"><span class="cm-type">Label[]</span> <span class="cm-name">axisHeaders</span> <span class="cm-desc">X, Y, Z</span></div>
-                                    <div class="cm-control cm-sub"><span class="cm-type">Button[]</span> <span class="cm-name">plusButtons</span></div>
-                                    <div class="cm-control cm-sub"><span class="cm-type">Button[]</span> <span class="cm-name">minusButtons</span></div>
-                                    <div class="cm-control cm-sub"><span class="cm-type">Label[]</span> <span class="cm-name">positionLabels</span></div>
-                                    <div class="cm-control"><span class="cm-type">Button</span> <span class="cm-name">btnClose</span></div>
-                                </div>
-                                <!-- Column 2 -->
-                                <div class="cm-col">
-                                    <div class="cm-col-header">Column 2 (20%)</div>
-                                    <div class="cm-control"><span class="cm-type">Label</span> <span class="cm-name">lblDistanceTitle</span> <span class="cm-desc">"이동 간격"</span></div>
-                                    <div class="cm-control"><span class="cm-type">Button[]</span> <span class="cm-name">distanceButtons</span> <span class="cm-desc">50mm ~ 1000mm</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <!-- Improvements Summary -->
+        <div class="improvements-section">
+            <h2>주요 개선 내용</h2>
             <div class="improvements-grid">
                 <div class="improvement-item">
-                    <h4>1. 축별 색상 구분</h4>
+                    <h4>1. 레이아웃 재구성</h4>
+                    <ul>
+                        <li>3열 구성 (35% / 45% / 20%)</li>
+                        <li>좌측: 좌표계 이미지 + 배속</li>
+                        <li>중앙: 위치 이동 테이블</li>
+                        <li>우측: 이동 간격 선택</li>
+                    </ul>
+                </div>
+                <div class="improvement-item">
+                    <h4>2. 축별 색상 구분</h4>
                     <ul>
                         <li><span style="color:#ff4444;font-weight:bold;">X축 (빨강)</span> - 좌우 이동</li>
                         <li><span style="color:#44ff44;font-weight:bold;">Y축 (초록)</span> - 전후 이동</li>
@@ -915,19 +502,10 @@
                     </ul>
                 </div>
                 <div class="improvement-item">
-                    <h4>2. 레이아웃 개선</h4>
+                    <h4>3. 좌표계 이미지</h4>
                     <ul>
-                        <li>3열 구성으로 명확한 영역 분리</li>
-                        <li>좌표계 이미지로 직관적 방향 인식</li>
-                        <li>배속/이동간격 독립 영역 배치</li>
-                    </ul>
-                </div>
-                <div class="improvement-item">
-                    <h4>3. 새 리밋 값</h4>
-                    <ul>
-                        <li>X: -1705 ~ 11905</li>
-                        <li>Y: -505.5 ~ 5496.5</li>
-                        <li>Z: -1296 ~ -44</li>
+                        <li>실제 장비 사진에 축 방향 표시</li>
+                        <li>직관적인 방향 인식 가능</li>
                     </ul>
                 </div>
                 <div class="improvement-item">
@@ -940,233 +518,9 @@
             </div>
         </div>
 
-        <!-- Interactive Demo -->
-        <div class="demo-section">
-            <h2>인터랙티브 데모 (HTML 구현)</h2>
-
-            <div class="winforms-window">
-                <div class="winforms-titlebar">
-                    <span>갠트리 상대 위치 조깅</span>
-                    <div class="winforms-titlebar-btns">
-                        <button class="winforms-titlebar-btn">─</button>
-                        <button class="winforms-titlebar-btn">□</button>
-                        <button class="winforms-titlebar-btn close">✕</button>
-                    </div>
-                </div>
-                <div class="winforms-content">
-                    <div class="wf-main-layout">
-                        <!-- Left: Coordinate + Speed -->
-                        <div class="wf-left-column">
-                            <div class="wf-coord-box">
-                                <div style="font-size:2.5rem;opacity:0.3;">🔧</div>
-                                <div class="wf-axis-label x-plus">X+</div>
-                                <div class="wf-axis-label x-minus">X-</div>
-                                <div class="wf-axis-label y-plus">Y+</div>
-                                <div class="wf-axis-label y-minus">Y-</div>
-                                <div class="wf-axis-label z-plus">Z+</div>
-                                <div class="wf-axis-label z-minus">Z-</div>
-                            </div>
-                            <div class="wf-speed-section">
-                                <div class="wf-section-title">배속</div>
-                                <div class="wf-speed-btns">
-                                    <button class="wf-btn" onclick="setSpeed(this, 25)">25%</button>
-                                    <button class="wf-btn active" onclick="setSpeed(this, 50)">50%</button>
-                                    <button class="wf-btn" onclick="setSpeed(this, 75)">75%</button>
-                                    <button class="wf-btn" onclick="setSpeed(this, 100)">100%</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Center: Position Table -->
-                        <div class="wf-center-column">
-                            <div class="wf-position-header">위치 이동</div>
-                            <div class="wf-position-table">
-                                <div class="wf-axis-headers">
-                                    <div class="wf-axis-header x">X</div>
-                                    <div class="wf-axis-header y">Y</div>
-                                    <div class="wf-axis-header z">Z</div>
-                                </div>
-                                <div class="wf-btn-row">
-                                    <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('x', 1)">+</button></div>
-                                    <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('y', 1)">+</button></div>
-                                    <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('z', 1)">+</button></div>
-                                </div>
-                                <div class="wf-btn-row">
-                                    <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('x', -1)">-</button></div>
-                                    <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('y', -1)">-</button></div>
-                                    <div class="wf-btn-cell"><button class="wf-btn axis-btn" onclick="moveAxis('z', -1)">-</button></div>
-                                </div>
-                                <div class="wf-value-row">
-                                    <div class="wf-value-label">최대 위치</div>
-                                    <div class="wf-value-cell">11905</div>
-                                    <div class="wf-value-cell">5496.5</div>
-                                    <div class="wf-value-cell">-44</div>
-                                </div>
-                                <div class="wf-value-row">
-                                    <div class="wf-value-label">현 위치</div>
-                                    <div class="wf-value-cell current" id="val-x">10400</div>
-                                    <div class="wf-value-cell current" id="val-y">504.5</div>
-                                    <div class="wf-value-cell current" id="val-z">2795</div>
-                                </div>
-                                <div class="wf-value-row">
-                                    <div class="wf-value-label">최소 위치</div>
-                                    <div class="wf-value-cell">-1705</div>
-                                    <div class="wf-value-cell">-505.5</div>
-                                    <div class="wf-value-cell">-1296</div>
-                                </div>
-                                <div class="wf-close-row">
-                                    <button class="wf-close-btn" onclick="alert('창이 닫힙니다')">닫기</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right: Distance -->
-                        <div class="wf-right-column">
-                            <div class="wf-distance-header">이동 간격</div>
-                            <div class="wf-distance-btns">
-                                <button class="wf-btn distance-btn" onclick="setDistance(this, 50)">50mm</button>
-                                <button class="wf-btn distance-btn active" onclick="setDistance(this, 100)">100mm</button>
-                                <button class="wf-btn distance-btn" onclick="setDistance(this, 200)">200mm</button>
-                                <button class="wf-btn distance-btn" onclick="setDistance(this, 300)">300mm</button>
-                                <button class="wf-btn distance-btn" onclick="setDistance(this, 500)">500mm</button>
-                                <button class="wf-btn distance-btn" onclick="setDistance(this, 1000)">1000mm</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- C# Sample Code -->
-        <div class="code-section">
-            <h2>C# WinForms 구현 코드</h2>
-
-            <div class="file-tabs">
-                <button class="file-tab active" onclick="showCode('designer')">Designer.cs</button>
-                <button class="file-tab" onclick="showCode('form')">Form.cs</button>
-                <button class="file-tab" onclick="showCode('model')">JogState.cs</button>
-            </div>
-
-            <div id="code-designer" class="code-content active">
-                <div class="code-block">
-<pre><span class="keyword">private void</span> InitializeComponent()
-{
-    <span class="comment">// === 메인 TableLayoutPanel (3열) ===</span>
-    <span class="keyword">this</span>.tlpMain = <span class="keyword">new</span> <span class="type">TableLayoutPanel</span>();
-    <span class="keyword">this</span>.tlpMain.ColumnCount = <span class="number">3</span>;
-    <span class="keyword">this</span>.tlpMain.ColumnStyles.Add(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">35</span>F));
-    <span class="keyword">this</span>.tlpMain.ColumnStyles.Add(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">45</span>F));
-    <span class="keyword">this</span>.tlpMain.ColumnStyles.Add(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">20</span>F));
-    <span class="keyword">this</span>.tlpMain.Dock = DockStyle.Fill;
-    <span class="keyword">this</span>.tlpMain.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">30</span>, <span class="number">30</span>, <span class="number">30</span>);
-
-    <span class="comment">// === 좌측: 좌표계 + 배속 ===</span>
-    <span class="keyword">this</span>.pnlLeft = <span class="keyword">new</span> <span class="type">TableLayoutPanel</span>();
-    <span class="keyword">this</span>.pnlLeft.RowCount = <span class="number">2</span>;
-    <span class="keyword">this</span>.pnlLeft.RowStyles.Add(<span class="keyword">new</span> <span class="type">RowStyle</span>(SizeType.Percent, <span class="number">75</span>F));
-    <span class="keyword">this</span>.pnlLeft.RowStyles.Add(<span class="keyword">new</span> <span class="type">RowStyle</span>(SizeType.Percent, <span class="number">25</span>F));
-
-    <span class="comment">// PictureBox - 좌표계 이미지</span>
-    <span class="keyword">this</span>.picCoordinate = <span class="keyword">new</span> <span class="type">PictureBox</span>();
-    <span class="keyword">this</span>.picCoordinate.Dock = DockStyle.Fill;
-    <span class="keyword">this</span>.picCoordinate.BackColor = <span class="type">Color</span>.Black;
-    <span class="keyword">this</span>.picCoordinate.SizeMode = PictureBoxSizeMode.Zoom;
-    <span class="keyword">this</span>.picCoordinate.Image = Properties.Resources.CoordinateImage;
-
-    <span class="comment">// 배속 버튼 (가로 4개)</span>
-    CreateSpeedButtons();  <span class="comment">// 25%, 50%, 75%, 100%</span>
-
-    <span class="comment">// === 중앙: 위치 테이블 ===</span>
-    CreatePositionTable();
-
-    <span class="comment">// === 우측: 이동 간격 ===</span>
-    CreateDistanceButtons();  <span class="comment">// 50mm ~ 1000mm (세로 배열)</span>
-
-    <span class="comment">// Form 설정</span>
-    <span class="keyword">this</span>.Text = <span class="string">"갠트리 상대 위치 조깅"</span>;
-    <span class="keyword">this</span>.ClientSize = <span class="keyword">new</span> <span class="type">Size</span>(<span class="number">800</span>, <span class="number">450</span>);
-    <span class="keyword">this</span>.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">30</span>, <span class="number">30</span>, <span class="number">30</span>);
-    <span class="keyword">this</span>.ForeColor = <span class="type">Color</span>.White;
-}</pre>
-                </div>
-            </div>
-
-            <div id="code-form" class="code-content">
-                <div class="code-block">
-<pre><span class="keyword">public partial class</span> <span class="type">GantryJogForm</span> : <span class="type">Form</span>
-{
-    <span class="keyword">private</span> <span class="type">JogState</span> _state = <span class="keyword">new</span> <span class="type">JogState</span>();
-
-    <span class="comment">// 축 이동</span>
-    <span class="keyword">public void</span> MoveAxis(<span class="keyword">string</span> axis, <span class="keyword">int</span> direction)
-    {
-        <span class="keyword">double</span> delta = _state.Distance * direction;
-        <span class="keyword">switch</span> (axis)
-        {
-            <span class="keyword">case</span> <span class="string">"X"</span>: _state.X = <span class="type">Math</span>.Clamp(_state.X + delta, <span class="type">JogState</span>.MinX, <span class="type">JogState</span>.MaxX); <span class="keyword">break</span>;
-            <span class="keyword">case</span> <span class="string">"Y"</span>: _state.Y = <span class="type">Math</span>.Clamp(_state.Y + delta, <span class="type">JogState</span>.MinY, <span class="type">JogState</span>.MaxY); <span class="keyword">break</span>;
-            <span class="keyword">case</span> <span class="string">"Z"</span>: _state.Z = <span class="type">Math</span>.Clamp(_state.Z + delta, <span class="type">JogState</span>.MinZ, <span class="type">JogState</span>.MaxZ); <span class="keyword">break</span>;
-        }
-        UpdatePositionDisplay();
-    }
-
-    <span class="comment">// 리밋 경고 색상 적용</span>
-    <span class="keyword">private void</span> ApplyLimitWarning(<span class="type">Label</span> lbl, <span class="keyword">double</span> value, <span class="keyword">double</span> min, <span class="keyword">double</span> max)
-    {
-        <span class="keyword">double</span> range = <span class="type">Math</span>.Abs(max - min);
-        <span class="keyword">double</span> ratio = <span class="type">Math</span>.Min(<span class="type">Math</span>.Abs(value - min), <span class="type">Math</span>.Abs(max - value)) / range;
-
-        <span class="keyword">if</span> (ratio < <span class="number">0.05</span>)  <span class="comment">// 5% 이내 - 위험</span>
-        {
-            lbl.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">61</span>, <span class="number">0</span>, <span class="number">0</span>);
-            lbl.ForeColor = <span class="type">Color</span>.FromArgb(<span class="number">255</span>, <span class="number">82</span>, <span class="number">82</span>);
-        }
-        <span class="keyword">else if</span> (ratio < <span class="number">0.10</span>)  <span class="comment">// 10% 이내 - 경고</span>
-        {
-            lbl.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">61</span>, <span class="number">61</span>, <span class="number">0</span>);
-            lbl.ForeColor = <span class="type">Color</span>.FromArgb(<span class="number">255</span>, <span class="number">235</span>, <span class="number">59</span>);
-        }
-        <span class="keyword">else</span>  <span class="comment">// 정상</span>
-        {
-            lbl.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">10</span>, <span class="number">42</span>, <span class="number">10</span>);
-            lbl.ForeColor = <span class="type">Color</span>.White;
-        }
-    }
-}</pre>
-                </div>
-            </div>
-
-            <div id="code-model" class="code-content">
-                <div class="code-block">
-<pre><span class="keyword">public class</span> <span class="type">JogState</span>
-{
-    <span class="comment">// 축별 리밋 값</span>
-    <span class="keyword">public const double</span> MaxX = <span class="number">11905</span>,  MinX = <span class="number">-1705</span>;
-    <span class="keyword">public const double</span> MaxY = <span class="number">5496.5</span>, MinY = <span class="number">-505.5</span>;
-    <span class="keyword">public const double</span> MaxZ = <span class="number">-44</span>,    MinZ = <span class="number">-1296</span>;
-
-    <span class="comment">// 현재 위치</span>
-    <span class="keyword">public double</span> X { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">10400</span>;
-    <span class="keyword">public double</span> Y { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">504.5</span>;
-    <span class="keyword">public double</span> Z { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">2795</span>;
-
-    <span class="comment">// 이동 설정</span>
-    <span class="keyword">public int</span> Distance { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">100</span>;  <span class="comment">// mm</span>
-    <span class="keyword">public int</span> Speed { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">50</span>;      <span class="comment">// %</span>
-
-    <span class="comment">// 리밋 근접 비율 계산</span>
-    <span class="keyword">public</span> <span class="type">WarningLevel</span> GetWarningLevel(<span class="keyword">string</span> axis)
-    {
-        <span class="keyword">double</span> ratio = GetLimitRatio(axis);
-        <span class="keyword">if</span> (ratio < <span class="number">0.05</span>) <span class="keyword">return</span> <span class="type">WarningLevel</span>.Danger;
-        <span class="keyword">if</span> (ratio < <span class="number">0.10</span>) <span class="keyword">return</span> <span class="type">WarningLevel</span>.Warning;
-        <span class="keyword">return</span> <span class="type">WarningLevel</span>.Normal;
-    }
-}
-
-<span class="keyword">public enum</span> <span class="type">WarningLevel</span> { Normal, Warning, Danger }</pre>
-                </div>
-            </div>
+        <!-- Code Link -->
+        <div class="code-link-section">
+            <a href="gantry-jog-winforms-code.html">C# WinForms 구현 코드 보기 →</a>
         </div>
     </div>
 
@@ -1179,17 +533,8 @@
         };
 
         function showUITab(tab) {
-            // 탭 버튼 스타일 변경
-            document.querySelectorAll('.tab-nav .tab-btn').forEach(btn => {
-                btn.style.background = '#374151';
-                btn.style.color = '#9ca3af';
-                btn.classList.remove('active');
-            });
-            event.target.style.background = '#0d9488';
-            event.target.style.color = '#fff';
+            document.querySelectorAll('.tab-nav .tab-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-
-            // 탭 콘텐츠 전환
             document.getElementById('tab-layout').style.display = tab === 'layout' ? 'block' : 'none';
             document.getElementById('tab-demo').style.display = tab === 'demo' ? 'block' : 'none';
         }
@@ -1214,32 +559,18 @@
         }
 
         function updatePosition(axis) {
-            // 두 데모의 요소 모두 업데이트
-            const el1 = document.getElementById(`val-${axis}`);
-            const el2 = document.getElementById(`val-${axis}2`);
-            const value = state[axis].toFixed(1);
+            const el = document.getElementById(`val-${axis}`);
+            if (!el) return;
 
-            if (el1) el1.textContent = value;
-            if (el2) el2.textContent = value;
+            el.textContent = state[axis].toFixed(1);
 
             const limit = limits[axis];
             const range = Math.abs(limit.max - limit.min);
             const ratio = Math.min(Math.abs(state[axis] - limit.min), Math.abs(limit.max - state[axis])) / range;
 
-            // 경고 색상 적용
-            [el1, el2].forEach(el => {
-                if (!el) return;
-                el.classList.remove('wf-warning', 'wf-danger');
-                if (ratio < 0.05) el.classList.add('wf-danger');
-                else if (ratio < 0.1) el.classList.add('wf-warning');
-            });
-        }
-
-        function showCode(tab) {
-            document.querySelectorAll('.file-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.code-content').forEach(c => c.classList.remove('active'));
-            document.querySelector(`[onclick="showCode('${tab}')"]`).classList.add('active');
-            document.getElementById(`code-${tab}`).classList.add('active');
+            el.classList.remove('wf-warning', 'wf-danger');
+            if (ratio < 0.05) el.classList.add('wf-danger');
+            else if (ratio < 0.1) el.classList.add('wf-warning');
         }
 
         ['x', 'y', 'z'].forEach(axis => updatePosition(axis));

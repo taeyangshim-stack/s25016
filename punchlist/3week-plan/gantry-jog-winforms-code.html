@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PL-2026-170 갠트리 조깅 UI - WinForms 구현 코드</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', Tahoma, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 10px; color: #a78bfa; }
+        .subtitle { text-align: center; color: #94a3b8; margin-bottom: 30px; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        /* Layout Section */
+        .layout-section {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #334155;
+        }
+        .layout-section h2 {
+            color: #34d399;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        /* Visual Layout */
+        .visual-layout {
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .vl-titlebar {
+            background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #fff;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .vl-titlebar-btns { display: flex; gap: 8px; font-size: 0.8rem; }
+        .vl-content {
+            display: grid;
+            grid-template-columns: 35% 45% 20%;
+            gap: 8px;
+            padding: 10px;
+            background: #0f172a;
+        }
+        .vl-column { display: flex; flex-direction: column; gap: 8px; }
+        .vl-col-header {
+            background: #334155;
+            color: #94a3b8;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .vl-box {
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            overflow: hidden;
+            flex: 1;
+        }
+        .vl-box-title {
+            background: #334155;
+            color: #e2e8f0;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .vl-box-content {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .vl-axis-labels {
+            margin-top: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.75rem;
+            line-height: 1.6;
+        }
+        .vl-btn-row, .vl-btn-col { display: flex; gap: 4px; padding: 8px; }
+        .vl-btn-col { flex-direction: column; }
+        .vl-btn {
+            background: #374151;
+            color: #d1d5db;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            text-align: center;
+            flex: 1;
+        }
+        .vl-btn-active { background: #3b82f6; color: #fff; }
+        .vl-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+        .vl-table th, .vl-table td {
+            padding: 4px 6px;
+            border: 1px solid #475569;
+            text-align: center;
+        }
+        .vl-table th { background: #334155; font-weight: 600; }
+        .vl-table td { background: #1e293b; color: #d1d5db; }
+        .vl-current td { background: #064e3b; color: #34d399; }
+        .vl-btn-sm {
+            display: inline-block;
+            background: #374151;
+            color: #fff;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .vl-close-btn {
+            background: #374151;
+            color: #d1d5db;
+            padding: 6px;
+            text-align: center;
+            font-size: 0.8rem;
+            margin: 8px;
+            border-radius: 4px;
+        }
+
+        /* Control Mapping */
+        .control-mapping {
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .cm-item { margin-bottom: 8px; }
+        .cm-header {
+            background: #334155;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .cm-form > .cm-header { background: #1d4ed8; }
+        .cm-panel > .cm-header { background: #0d9488; }
+        .cm-children { padding: 10px 0 0 15px; }
+        .cm-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 10px;
+        }
+        .cm-col {
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        .cm-col-header {
+            color: #60a5fa;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #334155;
+        }
+        .cm-control { padding: 4px 0; font-size: 0.8rem; }
+        .cm-control.cm-sub { padding-left: 12px; opacity: 0.8; }
+        .cm-type { color: #a78bfa; font-weight: 500; }
+        .cm-name { color: #34d399; }
+        .cm-desc { color: #6b7280; font-size: 0.75rem; }
+        .cm-info { color: #94a3b8; font-size: 0.8rem; font-weight: normal; }
+
+        /* Code Section */
+        .code-section {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #334155;
+        }
+        .code-section h2 {
+            color: #a78bfa;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+        }
+        .file-tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: -1px;
+        }
+        .file-tab {
+            background: #1e1e2e;
+            border: 1px solid #334155;
+            border-bottom: none;
+            padding: 8px 15px;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-radius: 6px 6px 0 0;
+        }
+        .file-tab.active { background: #0f172a; color: #fff; border-color: #475569; }
+        .file-tab:hover:not(.active) { background: #1e293b; }
+        .code-content { display: none; }
+        .code-content.active { display: block; }
+        .code-block {
+            background: #1e1e2e;
+            border: 1px solid #334155;
+            border-radius: 0 6px 6px 6px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+        .code-block pre {
+            margin: 0;
+            font-family: 'Consolas', 'D2Coding', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+        .code-block .keyword { color: #c792ea; }
+        .code-block .type { color: #82aaff; }
+        .code-block .string { color: #c3e88d; }
+        .code-block .comment { color: #676e95; }
+        .code-block .number { color: #f78c6c; }
+
+        @media (max-width: 800px) {
+            .vl-content { grid-template-columns: 1fr; }
+            .cm-columns { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="gantry-jog-ui-demo.html" class="back-link">&larr; UI 데모 페이지로 돌아가기</a>
+
+        <h1>C# WinForms 구현 가이드</h1>
+        <p class="subtitle">PL-2026-170 갠트리 상대 위치 조깅 UI</p>
+
+        <!-- Layout Structure -->
+        <div class="layout-section">
+            <h2>레이아웃 구조</h2>
+
+            <div class="visual-layout">
+                <div class="vl-titlebar">
+                    <span>갠트리 상대 위치 조깅</span>
+                    <div class="vl-titlebar-btns">
+                        <span>─</span><span>□</span><span style="color:#e81123;">✕</span>
+                    </div>
+                </div>
+                <div class="vl-content">
+                    <div class="vl-column">
+                        <div class="vl-col-header">Column 0 (35%)</div>
+                        <div class="vl-box">
+                            <div class="vl-box-title">PictureBox</div>
+                            <div class="vl-box-content">
+                                <div>좌표계 이미지</div>
+                                <div class="vl-axis-labels">
+                                    <span style="color:#ff4444;">X+←  →X-</span><br>
+                                    <span style="color:#44ff44;">Y+↗  ↙Y-</span><br>
+                                    <span style="color:#4488ff;">Z+↑  ↓Z-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="vl-box">
+                            <div class="vl-box-title">배속</div>
+                            <div class="vl-btn-row">
+                                <span class="vl-btn">25%</span>
+                                <span class="vl-btn vl-btn-active">50%</span>
+                                <span class="vl-btn">75%</span>
+                                <span class="vl-btn">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vl-column">
+                        <div class="vl-col-header">Column 1 (45%)</div>
+                        <div class="vl-box">
+                            <div class="vl-box-title">위치 이동</div>
+                            <table class="vl-table">
+                                <tr>
+                                    <th></th>
+                                    <th style="color:#ff4444;">X</th>
+                                    <th style="color:#44ff44;">Y</th>
+                                    <th style="color:#4488ff;">Z</th>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><span class="vl-btn-sm">+</span></td>
+                                    <td><span class="vl-btn-sm">+</span></td>
+                                    <td><span class="vl-btn-sm">+</span></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><span class="vl-btn-sm">-</span></td>
+                                    <td><span class="vl-btn-sm">-</span></td>
+                                    <td><span class="vl-btn-sm">-</span></td>
+                                </tr>
+                                <tr><td>최대</td><td>11905</td><td>5496.5</td><td>-44</td></tr>
+                                <tr class="vl-current"><td>현위치</td><td>10400</td><td>504.5</td><td>2795</td></tr>
+                                <tr><td>최소</td><td>-1705</td><td>-505.5</td><td>-1296</td></tr>
+                            </table>
+                            <div class="vl-close-btn">닫기</div>
+                        </div>
+                    </div>
+                    <div class="vl-column">
+                        <div class="vl-col-header">Column 2 (20%)</div>
+                        <div class="vl-box">
+                            <div class="vl-box-title">이동 간격</div>
+                            <div class="vl-btn-col">
+                                <span class="vl-btn">50mm</span>
+                                <span class="vl-btn vl-btn-active">100mm</span>
+                                <span class="vl-btn">200mm</span>
+                                <span class="vl-btn">300mm</span>
+                                <span class="vl-btn">500mm</span>
+                                <span class="vl-btn">1000mm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-mapping">
+                <div class="cm-item cm-form">
+                    <div class="cm-header">Form (GantryJogForm)</div>
+                    <div class="cm-children">
+                        <div class="cm-item cm-panel">
+                            <div class="cm-header">TableLayoutPanel <span class="cm-name">tlpMain</span> <span class="cm-info">(3 columns)</span></div>
+                            <div class="cm-children cm-columns">
+                                <div class="cm-col">
+                                    <div class="cm-col-header">Column 0 (35%)</div>
+                                    <div class="cm-control"><span class="cm-type">PictureBox</span> <span class="cm-name">picCoordinate</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Label[]</span> <span class="cm-name">axisLabels</span> <span class="cm-desc">X+, X-, Y+, Y-, Z+, Z-</span></div>
+                                    <div class="cm-control"><span class="cm-type">Panel</span> <span class="cm-name">pnlSpeed</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Button[]</span> <span class="cm-name">speedButtons</span> <span class="cm-desc">25%, 50%, 75%, 100%</span></div>
+                                </div>
+                                <div class="cm-col">
+                                    <div class="cm-col-header">Column 1 (45%)</div>
+                                    <div class="cm-control"><span class="cm-type">Label</span> <span class="cm-name">lblPositionTitle</span> <span class="cm-desc">"위치 이동"</span></div>
+                                    <div class="cm-control"><span class="cm-type">TableLayoutPanel</span> <span class="cm-name">tlpPosition</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Label[]</span> <span class="cm-name">axisHeaders</span> <span class="cm-desc">X, Y, Z</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Button[]</span> <span class="cm-name">plusButtons</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Button[]</span> <span class="cm-name">minusButtons</span></div>
+                                    <div class="cm-control cm-sub"><span class="cm-type">Label[]</span> <span class="cm-name">positionLabels</span></div>
+                                    <div class="cm-control"><span class="cm-type">Button</span> <span class="cm-name">btnClose</span></div>
+                                </div>
+                                <div class="cm-col">
+                                    <div class="cm-col-header">Column 2 (20%)</div>
+                                    <div class="cm-control"><span class="cm-type">Label</span> <span class="cm-name">lblDistanceTitle</span> <span class="cm-desc">"이동 간격"</span></div>
+                                    <div class="cm-control"><span class="cm-type">Button[]</span> <span class="cm-name">distanceButtons</span> <span class="cm-desc">50mm ~ 1000mm</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Code -->
+        <div class="code-section">
+            <h2>샘플 코드</h2>
+
+            <div class="file-tabs">
+                <button class="file-tab active" onclick="showCode('designer')">Designer.cs</button>
+                <button class="file-tab" onclick="showCode('form')">Form.cs</button>
+                <button class="file-tab" onclick="showCode('model')">JogState.cs</button>
+            </div>
+
+            <div id="code-designer" class="code-content active">
+                <div class="code-block">
+<pre><span class="keyword">private void</span> InitializeComponent()
+{
+    <span class="comment">// === 메인 TableLayoutPanel (3열) ===</span>
+    <span class="keyword">this</span>.tlpMain = <span class="keyword">new</span> <span class="type">TableLayoutPanel</span>();
+    <span class="keyword">this</span>.tlpMain.ColumnCount = <span class="number">3</span>;
+    <span class="keyword">this</span>.tlpMain.ColumnStyles.Add(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">35</span>F));
+    <span class="keyword">this</span>.tlpMain.ColumnStyles.Add(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">45</span>F));
+    <span class="keyword">this</span>.tlpMain.ColumnStyles.Add(<span class="keyword">new</span> <span class="type">ColumnStyle</span>(SizeType.Percent, <span class="number">20</span>F));
+    <span class="keyword">this</span>.tlpMain.Dock = DockStyle.Fill;
+    <span class="keyword">this</span>.tlpMain.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">30</span>, <span class="number">30</span>, <span class="number">30</span>);
+
+    <span class="comment">// === 좌측 패널: 좌표계 + 배속 ===</span>
+    <span class="keyword">this</span>.pnlLeft = <span class="keyword">new</span> <span class="type">TableLayoutPanel</span>();
+    <span class="keyword">this</span>.pnlLeft.RowCount = <span class="number">2</span>;
+    <span class="keyword">this</span>.pnlLeft.RowStyles.Add(<span class="keyword">new</span> <span class="type">RowStyle</span>(SizeType.Percent, <span class="number">75</span>F));
+    <span class="keyword">this</span>.pnlLeft.RowStyles.Add(<span class="keyword">new</span> <span class="type">RowStyle</span>(SizeType.Percent, <span class="number">25</span>F));
+    <span class="keyword">this</span>.pnlLeft.Dock = DockStyle.Fill;
+
+    <span class="comment">// PictureBox - 좌표계 이미지</span>
+    <span class="keyword">this</span>.picCoordinate = <span class="keyword">new</span> <span class="type">PictureBox</span>();
+    <span class="keyword">this</span>.picCoordinate.Dock = DockStyle.Fill;
+    <span class="keyword">this</span>.picCoordinate.BackColor = <span class="type">Color</span>.Black;
+    <span class="keyword">this</span>.picCoordinate.SizeMode = PictureBoxSizeMode.Zoom;
+    <span class="keyword">this</span>.picCoordinate.Image = Properties.Resources.CoordinateImage;
+
+    <span class="comment">// 배속 버튼 패널</span>
+    <span class="keyword">this</span>.pnlSpeed = <span class="keyword">new</span> <span class="type">FlowLayoutPanel</span>();
+    <span class="keyword">this</span>.pnlSpeed.Dock = DockStyle.Fill;
+    <span class="keyword">this</span>.pnlSpeed.FlowDirection = FlowDirection.LeftToRight;
+    CreateSpeedButtons();  <span class="comment">// 25%, 50%, 75%, 100%</span>
+
+    <span class="comment">// === 중앙 패널: 위치 이동 테이블 ===</span>
+    <span class="keyword">this</span>.pnlCenter = <span class="keyword">new</span> <span class="type">Panel</span>();
+    <span class="keyword">this</span>.pnlCenter.Dock = DockStyle.Fill;
+    CreatePositionTable();
+
+    <span class="comment">// === 우측 패널: 이동 간격 ===</span>
+    <span class="keyword">this</span>.pnlRight = <span class="keyword">new</span> <span class="type">FlowLayoutPanel</span>();
+    <span class="keyword">this</span>.pnlRight.Dock = DockStyle.Fill;
+    <span class="keyword">this</span>.pnlRight.FlowDirection = FlowDirection.TopDown;
+    CreateDistanceButtons();  <span class="comment">// 50mm ~ 1000mm</span>
+
+    <span class="comment">// 패널 배치</span>
+    <span class="keyword">this</span>.tlpMain.Controls.Add(<span class="keyword">this</span>.pnlLeft, <span class="number">0</span>, <span class="number">0</span>);
+    <span class="keyword">this</span>.tlpMain.Controls.Add(<span class="keyword">this</span>.pnlCenter, <span class="number">1</span>, <span class="number">0</span>);
+    <span class="keyword">this</span>.tlpMain.Controls.Add(<span class="keyword">this</span>.pnlRight, <span class="number">2</span>, <span class="number">0</span>);
+
+    <span class="comment">// Form 설정</span>
+    <span class="keyword">this</span>.Text = <span class="string">"갠트리 상대 위치 조깅"</span>;
+    <span class="keyword">this</span>.ClientSize = <span class="keyword">new</span> <span class="type">Size</span>(<span class="number">800</span>, <span class="number">450</span>);
+    <span class="keyword">this</span>.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">30</span>, <span class="number">30</span>, <span class="number">30</span>);
+    <span class="keyword">this</span>.ForeColor = <span class="type">Color</span>.White;
+    <span class="keyword">this</span>.Controls.Add(<span class="keyword">this</span>.tlpMain);
+}
+
+<span class="keyword">private void</span> CreateSpeedButtons()
+{
+    <span class="keyword">int</span>[] speeds = { <span class="number">25</span>, <span class="number">50</span>, <span class="number">75</span>, <span class="number">100</span> };
+    <span class="keyword">foreach</span> (<span class="keyword">int</span> speed <span class="keyword">in</span> speeds)
+    {
+        <span class="type">Button</span> btn = <span class="keyword">new</span> <span class="type">Button</span>();
+        btn.Text = $<span class="string">"{speed}%"</span>;
+        btn.Size = <span class="keyword">new</span> <span class="type">Size</span>(<span class="number">60</span>, <span class="number">35</span>);
+        btn.Tag = speed;
+        btn.Click += SpeedButton_Click;
+        <span class="keyword">this</span>.pnlSpeed.Controls.Add(btn);
+    }
+}
+
+<span class="keyword">private void</span> CreateDistanceButtons()
+{
+    <span class="keyword">int</span>[] distances = { <span class="number">50</span>, <span class="number">100</span>, <span class="number">200</span>, <span class="number">300</span>, <span class="number">500</span>, <span class="number">1000</span> };
+    <span class="keyword">foreach</span> (<span class="keyword">int</span> dist <span class="keyword">in</span> distances)
+    {
+        <span class="type">Button</span> btn = <span class="keyword">new</span> <span class="type">Button</span>();
+        btn.Text = $<span class="string">"{dist}mm"</span>;
+        btn.Dock = DockStyle.Top;
+        btn.Height = <span class="number">40</span>;
+        btn.Tag = dist;
+        btn.Click += DistanceButton_Click;
+        <span class="keyword">this</span>.pnlRight.Controls.Add(btn);
+    }
+}</pre>
+                </div>
+            </div>
+
+            <div id="code-form" class="code-content">
+                <div class="code-block">
+<pre><span class="keyword">public partial class</span> <span class="type">GantryJogForm</span> : <span class="type">Form</span>
+{
+    <span class="keyword">private</span> <span class="type">JogState</span> _state = <span class="keyword">new</span> <span class="type">JogState</span>();
+    <span class="keyword">private</span> <span class="type">Label</span>[] _positionLabels;
+    <span class="keyword">private</span> <span class="type">Button</span> _activeSpeedBtn;
+    <span class="keyword">private</span> <span class="type">Button</span> _activeDistanceBtn;
+
+    <span class="keyword">public</span> GantryJogForm()
+    {
+        InitializeComponent();
+        UpdateAllDisplays();
+    }
+
+    <span class="comment">// 축 이동 버튼 클릭</span>
+    <span class="keyword">private void</span> AxisButton_Click(<span class="keyword">object</span> sender, <span class="type">EventArgs</span> e)
+    {
+        <span class="type">Button</span> btn = (<span class="type">Button</span>)sender;
+        <span class="keyword">string</span> axis = btn.Tag.ToString().Substring(<span class="number">0</span>, <span class="number">1</span>);
+        <span class="keyword">int</span> direction = btn.Tag.ToString().Contains(<span class="string">"+"</span>) ? <span class="number">1</span> : <span class="number">-1</span>;
+        MoveAxis(axis, direction);
+    }
+
+    <span class="keyword">public void</span> MoveAxis(<span class="keyword">string</span> axis, <span class="keyword">int</span> direction)
+    {
+        <span class="keyword">double</span> delta = _state.Distance * direction;
+
+        <span class="keyword">switch</span> (axis.ToUpper())
+        {
+            <span class="keyword">case</span> <span class="string">"X"</span>:
+                _state.X = <span class="type">Math</span>.Clamp(_state.X + delta, <span class="type">JogState</span>.MinX, <span class="type">JogState</span>.MaxX);
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> <span class="string">"Y"</span>:
+                _state.Y = <span class="type">Math</span>.Clamp(_state.Y + delta, <span class="type">JogState</span>.MinY, <span class="type">JogState</span>.MaxY);
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> <span class="string">"Z"</span>:
+                _state.Z = <span class="type">Math</span>.Clamp(_state.Z + delta, <span class="type">JogState</span>.MinZ, <span class="type">JogState</span>.MaxZ);
+                <span class="keyword">break</span>;
+        }
+
+        UpdatePositionDisplay(axis);
+    }
+
+    <span class="comment">// 위치 표시 업데이트</span>
+    <span class="keyword">private void</span> UpdatePositionDisplay(<span class="keyword">string</span> axis)
+    {
+        <span class="keyword">int</span> index = axis.ToUpper() <span class="keyword">switch</span>
+        {
+            <span class="string">"X"</span> => <span class="number">0</span>,
+            <span class="string">"Y"</span> => <span class="number">1</span>,
+            <span class="string">"Z"</span> => <span class="number">2</span>,
+            _ => -<span class="number">1</span>
+        };
+
+        <span class="keyword">if</span> (index < <span class="number">0</span>) <span class="keyword">return</span>;
+
+        <span class="keyword">double</span> value = axis.ToUpper() <span class="keyword">switch</span>
+        {
+            <span class="string">"X"</span> => _state.X,
+            <span class="string">"Y"</span> => _state.Y,
+            <span class="string">"Z"</span> => _state.Z,
+            _ => <span class="number">0</span>
+        };
+
+        _positionLabels[index].Text = value.ToString(<span class="string">"F1"</span>);
+        ApplyLimitWarning(_positionLabels[index], axis);
+    }
+
+    <span class="comment">// 리밋 경고 색상 적용</span>
+    <span class="keyword">private void</span> ApplyLimitWarning(<span class="type">Label</span> lbl, <span class="keyword">string</span> axis)
+    {
+        <span class="type">WarningLevel</span> level = _state.GetWarningLevel(axis);
+
+        <span class="keyword">switch</span> (level)
+        {
+            <span class="keyword">case</span> <span class="type">WarningLevel</span>.Danger:  <span class="comment">// 5% 이내</span>
+                lbl.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">61</span>, <span class="number">0</span>, <span class="number">0</span>);
+                lbl.ForeColor = <span class="type">Color</span>.FromArgb(<span class="number">255</span>, <span class="number">82</span>, <span class="number">82</span>);
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> <span class="type">WarningLevel</span>.Warning:  <span class="comment">// 10% 이내</span>
+                lbl.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">61</span>, <span class="number">61</span>, <span class="number">0</span>);
+                lbl.ForeColor = <span class="type">Color</span>.FromArgb(<span class="number">255</span>, <span class="number">235</span>, <span class="number">59</span>);
+                <span class="keyword">break</span>;
+            <span class="keyword">default</span>:  <span class="comment">// 정상</span>
+                lbl.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">10</span>, <span class="number">42</span>, <span class="number">10</span>);
+                lbl.ForeColor = <span class="type">Color</span>.White;
+                <span class="keyword">break</span>;
+        }
+    }
+
+    <span class="comment">// 배속/거리 버튼 토글</span>
+    <span class="keyword">private void</span> SpeedButton_Click(<span class="keyword">object</span> sender, <span class="type">EventArgs</span> e)
+    {
+        <span class="keyword">if</span> (_activeSpeedBtn != <span class="keyword">null</span>)
+            _activeSpeedBtn.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">58</span>, <span class="number">58</span>, <span class="number">58</span>);
+
+        _activeSpeedBtn = (<span class="type">Button</span>)sender;
+        _activeSpeedBtn.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">0</span>, <span class="number">120</span>, <span class="number">212</span>);
+        _state.Speed = (<span class="keyword">int</span>)_activeSpeedBtn.Tag;
+    }
+
+    <span class="keyword">private void</span> DistanceButton_Click(<span class="keyword">object</span> sender, <span class="type">EventArgs</span> e)
+    {
+        <span class="keyword">if</span> (_activeDistanceBtn != <span class="keyword">null</span>)
+            _activeDistanceBtn.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">58</span>, <span class="number">58</span>, <span class="number">58</span>);
+
+        _activeDistanceBtn = (<span class="type">Button</span>)sender;
+        _activeDistanceBtn.BackColor = <span class="type">Color</span>.FromArgb(<span class="number">0</span>, <span class="number">120</span>, <span class="number">212</span>);
+        _state.Distance = (<span class="keyword">int</span>)_activeDistanceBtn.Tag;
+    }
+}</pre>
+                </div>
+            </div>
+
+            <div id="code-model" class="code-content">
+                <div class="code-block">
+<pre><span class="keyword">public class</span> <span class="type">JogState</span>
+{
+    <span class="comment">// 축별 리밋 값</span>
+    <span class="keyword">public const double</span> MaxX = <span class="number">11905</span>,  MinX = <span class="number">-1705</span>;
+    <span class="keyword">public const double</span> MaxY = <span class="number">5496.5</span>, MinY = <span class="number">-505.5</span>;
+    <span class="keyword">public const double</span> MaxZ = <span class="number">-44</span>,    MinZ = <span class="number">-1296</span>;
+
+    <span class="comment">// 현재 위치</span>
+    <span class="keyword">public double</span> X { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">10400</span>;
+    <span class="keyword">public double</span> Y { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">504.5</span>;
+    <span class="keyword">public double</span> Z { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">2795</span>;
+
+    <span class="comment">// 이동 설정</span>
+    <span class="keyword">public int</span> Distance { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">100</span>;  <span class="comment">// mm</span>
+    <span class="keyword">public int</span> Speed { <span class="keyword">get</span>; <span class="keyword">set</span>; } = <span class="number">50</span>;      <span class="comment">// %</span>
+
+    <span class="comment">// 리밋 근접 비율 계산</span>
+    <span class="keyword">public double</span> GetLimitRatio(<span class="keyword">string</span> axis)
+    {
+        <span class="keyword">double</span> value, min, max;
+
+        <span class="keyword">switch</span> (axis.ToUpper())
+        {
+            <span class="keyword">case</span> <span class="string">"X"</span>:
+                value = X; min = MinX; max = MaxX;
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> <span class="string">"Y"</span>:
+                value = Y; min = MinY; max = MaxY;
+                <span class="keyword">break</span>;
+            <span class="keyword">case</span> <span class="string">"Z"</span>:
+                value = Z; min = MinZ; max = MaxZ;
+                <span class="keyword">break</span>;
+            <span class="keyword">default</span>:
+                <span class="keyword">return</span> <span class="number">1.0</span>;
+        }
+
+        <span class="keyword">double</span> range = <span class="type">Math</span>.Abs(max - min);
+        <span class="keyword">return</span> <span class="type">Math</span>.Min(<span class="type">Math</span>.Abs(value - min), <span class="type">Math</span>.Abs(max - value)) / range;
+    }
+
+    <span class="comment">// 경고 레벨 반환</span>
+    <span class="keyword">public</span> <span class="type">WarningLevel</span> GetWarningLevel(<span class="keyword">string</span> axis)
+    {
+        <span class="keyword">double</span> ratio = GetLimitRatio(axis);
+
+        <span class="keyword">if</span> (ratio < <span class="number">0.05</span>) <span class="keyword">return</span> <span class="type">WarningLevel</span>.Danger;
+        <span class="keyword">if</span> (ratio < <span class="number">0.10</span>) <span class="keyword">return</span> <span class="type">WarningLevel</span>.Warning;
+        <span class="keyword">return</span> <span class="type">WarningLevel</span>.Normal;
+    }
+}
+
+<span class="keyword">public enum</span> <span class="type">WarningLevel</span>
+{
+    Normal,   <span class="comment">// 정상</span>
+    Warning,  <span class="comment">// 10% 이내 - 노란색</span>
+    Danger    <span class="comment">// 5% 이내 - 빨간색</span>
+}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showCode(tab) {
+            document.querySelectorAll('.file-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.code-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[onclick="showCode('${tab}')"]`).classList.add('active');
+            document.getElementById(`code-${tab}`).classList.add('active');
+        }
+    </script>
+</body>
+</html>
