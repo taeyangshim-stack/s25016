@@ -15,6 +15,7 @@
   "author": "SP 심태양",
   "license": "MIT",
   "dependencies": {
+    "@notionhq/client": "^2.2.14",
     "cloudinary": "^1.41.0",
     "formidable": "^3.5.1"
   },

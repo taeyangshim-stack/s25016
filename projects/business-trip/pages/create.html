@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>출장 신청서 작성 - S25016</title>
+  <link rel="stylesheet" href="../../../shared/styles/variables.css">
+  <link rel="stylesheet" href="../../../shared/styles/reset.css">
+  <style>
+    :root {
+      --primary: #667eea;
+      --primary-dark: #764ba2;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --gray: #6b7280;
+      --bg: #f0f2f5;
+      --card-bg: #ffffff;
+      --warning-bg: #fff9db;
+      --warning-border: #f1c40f;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    /* 헤더 */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 24px 30px;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+
+    /* 탭 */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 0 30px;
+      background: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    .tab-btn {
+      padding: 14px 24px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      color: #666;
+      font-size: 14px;
+      transition: 0.3s;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* 탭 콘텐츠 */
+    .tab-content {
+      display: none;
+      padding: 30px;
+      animation: fadeIn 0.3s;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* 섹션 */
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #eee;
+    }
+
+    /* 폼 그리드 */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .form-group label .required {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* 특기사항 박스 */
+    .special-note {
+      background: var(--warning-bg);
+      padding: 16px;
+      border-left: 5px solid var(--warning-border);
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+
+    .special-note strong {
+      color: var(--danger);
+    }
+
+    /* 일정 테이블 */
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .schedule-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .schedule-table input {
+      width: 100%;
+      border: none;
+      padding: 6px;
+      font-size: 14px;
+    }
+
+    .schedule-table input:focus {
+      outline: none;
+      background: #f0f7ff;
+    }
+
+    .btn-add-row {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: #f0f0f0;
+      border: 1px dashed #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .btn-add-row:hover {
+      background: #e8e8e8;
+    }
+
+    .btn-remove-row {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    /* 비용 입력 */
+    .cost-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .cost-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cost-item label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .cost-item input {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      text-align: right;
+    }
+
+    .cost-total {
+      background: #f0f7ff;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: right;
+      margin-top: 16px;
+    }
+
+    .cost-total .label {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .cost-total .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* 체크박스 */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    /* 버튼 */
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding: 24px 30px;
+      background: #f8f9fa;
+      border-top: 1px solid #eee;
+    }
+
+    .btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+
+    /* 미리보기 */
+    .preview-section {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .preview-table th,
+    .preview-table td {
+      border: 1px solid #ddd;
+      padding: 10px 14px;
+    }
+
+    .preview-table th {
+      background: #f0f0f0;
+      width: 25%;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+      .container { margin: 10px; }
+      .tabs { padding: 0 15px; }
+      .tab-btn { padding: 12px 16px; font-size: 13px; }
+      .tab-content { padding: 20px; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 헤더 -->
+    <header class="header">
+      <h1>출장 신청서</h1>
+      <p>S25016 프로젝트 출장 관리 시스템</p>
+    </header>
+
+    <!-- 탭 -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="openTab(event, 'basic')">기본 정보</button>
+      <button class="tab-btn" onclick="openTab(event, 'schedule')">상세 일정</button>
+      <button class="tab-btn" onclick="openTab(event, 'cost')">출장비</button>
+      <button class="tab-btn" onclick="openTab(event, 'preview')">검토/제출</button>
+    </div>
+
+    <form id="trip-form">
+      <!-- 기본 정보 탭 -->
+      <div id="basic" class="tab-content active">
+        <div class="section">
+          <h3 class="section-title">출장 기본 정보</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>신청번호</label>
+              <input type="text" id="requestNumber" readonly>
+            </div>
+            <div class="form-group">
+              <label>기안일자</label>
+              <input type="date" id="requestDate" readonly>
+            </div>
+            <div class="form-group">
+              <label>신청자 <span class="required">*</span></label>
+              <select id="applicant" required>
+                <option value="">선택</option>
+                <option value="심태양">심태양</option>
+                <option value="이마룬">이마룬</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>기안부서</label>
+              <input type="text" id="department" value="개발팀">
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">출장 정보</h3>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label>출장 제목 <span class="required">*</span></label>
+              <input type="text" id="title" placeholder="예: 삼성중공업 거재조선소 자동용접시스템 시운전 대응" required>
+            </div>
+            <div class="form-group">
+              <label>출장 구분 <span class="required">*</span></label>
+              <select id="tripCategory" required>
+                <option value="국내출장">국내출장</option>
+                <option value="해외출장">해외출장</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>출장 유형 <span class="required">*</span></label>
+              <select id="tripType" required>
+                <option value="">선택</option>
+                <option value="시운전">시운전</option>
+                <option value="회의">회의</option>
+                <option value="교육">교육</option>
+                <option value="점검">점검</option>
+                <option value="기술지원">기술지원</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>목적지 <span class="required">*</span></label>
+              <select id="destination" required>
+                <option value="">선택</option>
+                <optgroup label="국내">
+                  <option value="거제">거제</option>
+                  <option value="창원">창원</option>
+                  <option value="울산">울산</option>
+                  <option value="포항">포항</option>
+                  <option value="부산">부산</option>
+                  <option value="광양">광양</option>
+                  <option value="서울">서울</option>
+                </optgroup>
+                <optgroup label="해외">
+                  <option value="이탈리아">이탈리아</option>
+                  <option value="독일">독일</option>
+                  <option value="미국">미국</option>
+                  <option value="중국">중국</option>
+                  <option value="일본">일본</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>목적지 상세</label>
+              <input type="text" id="destinationDetail" placeholder="예: 삼성중공업 거제 조선소">
+            </div>
+            <div class="form-group">
+              <label>출발일 <span class="required">*</span></label>
+              <input type="date" id="startDate" required>
+            </div>
+            <div class="form-group">
+              <label>복귀일 <span class="required">*</span></label>
+              <input type="date" id="endDate" required>
+            </div>
+            <div class="form-group">
+              <label>우선순위</label>
+              <select id="priority">
+                <option value="보통">보통</option>
+                <option value="긴급">긴급</option>
+                <option value="높음">높음</option>
+                <option value="낮음">낮음</option>
+              </select>
+            </div>
+            <div class="form-group full-width">
+              <label>출장 목적 <span class="required">*</span></label>
+              <textarea id="purpose" placeholder="출장 목적을 상세히 기술하세요" required></textarea>
+            </div>
+            <div class="form-group">
+              <label>펀치리스트 ID</label>
+              <input type="text" id="punchlistId" placeholder="예: PL-2026-001">
+            </div>
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="hasVacancy">
+                <label for="hasVacancy" style="margin-bottom: 0;">인력 공백 발생</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="special-note" id="vacancy-note" style="display: none;">
+          <strong>인력 운용 리스크:</strong> 인력 공백이 발생하는 경우, 상세 일정 탭에서 대응 계획을 반드시 기술해 주세요.
+        </div>
+      </div>
+
+      <!-- 상세 일정 탭 -->
+      <div id="schedule" class="tab-content">
+        <div class="section">
+          <h3 class="section-title">출장 일정별 업무 계획</h3>
+          <p style="color: #666; margin-bottom: 16px;">일자별 방문처와 업무 내용을 입력하세요.</p>
+
+          <table class="schedule-table" id="schedule-table">
+            <thead>
+              <tr>
+                <th style="width: 130px;">일자</th>
+                <th style="width: 80px;">시간</th>
+                <th>방문처</th>
+                <th>업무 내용</th>
+                <th style="width: 60px;"></th>
+              </tr>
+            </thead>
+            <tbody id="schedule-body">
+              <!-- 동적 생성 -->
+            </tbody>
+          </table>
+
+          <button type="button" class="btn-add-row" onclick="addScheduleRow()">+ 일정 추가</button>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">특기 사항 및 리스크 관리</h3>
+          <div class="form-group full-width">
+            <textarea id="remarks" rows="5" placeholder="인력 부재 대응, 리스크 관리 계획 등을 기술하세요"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 출장비 탭 -->
+      <div id="cost" class="tab-content">
+        <div class="section">
+          <h3 class="section-title">출장비 가불 신청</h3>
+
+          <div class="cost-grid">
+            <div class="cost-item">
+              <label>숙박비</label>
+              <input type="number" id="accommodationCost" value="0" min="0" oninput="calculateTotal()">
+            </div>
+            <div class="cost-item">
+              <label>교통비</label>
+              <input type="number" id="transportCost" value="0" min="0" oninput="calculateTotal()">
+            </div>
+            <div class="cost-item">
+              <label>식대</label>
+              <input type="number" id="mealCost" value="0" min="0" oninput="calculateTotal()">
+            </div>
+            <div class="cost-item">
+              <label>기타 비용</label>
+              <input type="number" id="otherCost" value="0" min="0" oninput="calculateTotal()">
+            </div>
+          </div>
+
+          <div class="cost-total">
+            <span class="label">총 예상 비용</span>
+            <div class="value" id="totalCost">0원</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 검토/제출 탭 -->
+      <div id="preview" class="tab-content">
+        <div class="section">
+          <h3 class="section-title">신청서 미리보기</h3>
+
+          <div class="preview-section">
+            <table class="preview-table">
+              <tr>
+                <th>신청번호</th>
+                <td id="preview-requestNumber">-</td>
+                <th>기안일자</th>
+                <td id="preview-requestDate">-</td>
+              </tr>
+              <tr>
+                <th>신청자</th>
+                <td id="preview-applicant">-</td>
+                <th>기안부서</th>
+                <td id="preview-department">-</td>
+              </tr>
+              <tr>
+                <th>제목</th>
+                <td colspan="3" id="preview-title">-</td>
+              </tr>
+              <tr>
+                <th>구분</th>
+                <td id="preview-tripCategory">-</td>
+                <th>출장유형</th>
+                <td id="preview-tripType">-</td>
+              </tr>
+              <tr>
+                <th>목적지</th>
+                <td id="preview-destination">-</td>
+                <th>기간</th>
+                <td id="preview-period">-</td>
+              </tr>
+              <tr>
+                <th>출장목적</th>
+                <td colspan="3" id="preview-purpose">-</td>
+              </tr>
+              <tr>
+                <th>총 예상비용</th>
+                <td colspan="3" id="preview-totalCost">-</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 class="section-title">제출 상태</h3>
+          <div class="form-group">
+            <label>제출 상태</label>
+            <select id="status">
+              <option value="작성중">작성중 (저장만)</option>
+              <option value="신청완료">신청완료 (결재 요청)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- 하단 버튼 -->
+    <div class="form-actions">
+      <a href="../index.html" class="btn btn-secondary">취소</a>
+      <button type="button" class="btn btn-secondary" onclick="saveDraft()">임시저장</button>
+      <button type="button" class="btn btn-primary" onclick="submitForm()">제출</button>
+    </div>
+  </div>
+
+  <script src="../scripts/business-trip.js"></script>
+  <script>
+    const api = new BusinessTripAPI({ useMock: true });
+    const utils = BusinessTripUtils;
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      // 신청번호 생성
+      document.getElementById('requestNumber').value = utils.generateRequestNumber();
+
+      // 오늘 날짜
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('requestDate').value = today;
+
+      // 인력공백 체크박스 이벤트
+      document.getElementById('hasVacancy').addEventListener('change', function() {
+        document.getElementById('vacancy-note').style.display = this.checked ? 'block' : 'none';
+      });
+
+      // 날짜 변경 시 일정 자동 생성
+      document.getElementById('startDate').addEventListener('change', generateScheduleRows);
+      document.getElementById('endDate').addEventListener('change', generateScheduleRows);
+
+      // 초기 일정 행 추가
+      addScheduleRow();
+    });
+
+    // 탭 전환
+    function openTab(evt, tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      document.getElementById(tabName).classList.add('active');
+      evt.currentTarget.classList.add('active');
+
+      // 미리보기 탭이면 데이터 업데이트
+      if (tabName === 'preview') {
+        updatePreview();
+      }
+    }
+
+    // 일정 행 추가
+    function addScheduleRow(date = '', time = '00:00', location = '', content = '') {
+      const tbody = document.getElementById('schedule-body');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><input type="date" class="schedule-date" value="${date}"></td>
+        <td><input type="time" class="schedule-time" value="${time}"></td>
+        <td><input type="text" class="schedule-location" placeholder="방문처" value="${location}"></td>
+        <td><input type="text" class="schedule-content" placeholder="업무 내용" value="${content}"></td>
+        <td><button type="button" class="btn-remove-row" onclick="removeScheduleRow(this)">삭제</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    // 일정 행 삭제
+    function removeScheduleRow(btn) {
+      const row = btn.closest('tr');
+      row.remove();
+    }
+
+    // 날짜 범위로 일정 자동 생성
+    function generateScheduleRows() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      if (!startDate || !endDate) return;
+
+      const tbody = document.getElementById('schedule-body');
+
+      // 기존 행이 비어있으면 자동 생성
+      if (tbody.children.length <= 1 && !tbody.querySelector('.schedule-content')?.value) {
+        tbody.innerHTML = '';
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const dateStr = d.toISOString().split('T')[0];
+          addScheduleRow(dateStr, '00:00', '', '');
+        }
+      }
+    }
+
+    // 총 비용 계산
+    function calculateTotal() {
+      const accommodation = parseInt(document.getElementById('accommodationCost').value) || 0;
+      const transport = parseInt(document.getElementById('transportCost').value) || 0;
+      const meal = parseInt(document.getElementById('mealCost').value) || 0;
+      const other = parseInt(document.getElementById('otherCost').value) || 0;
+
+      const total = accommodation + transport + meal + other;
+      document.getElementById('totalCost').textContent = utils.formatCurrency(total);
+    }
+
+    // 미리보기 업데이트
+    function updatePreview() {
+      document.getElementById('preview-requestNumber').textContent =
+        document.getElementById('requestNumber').value || '-';
+      document.getElementById('preview-requestDate').textContent =
+        utils.formatDate(document.getElementById('requestDate').value, 'YYYY-MM-DD(ddd)');
+      document.getElementById('preview-applicant').textContent =
+        document.getElementById('applicant').value || '-';
+      document.getElementById('preview-department').textContent =
+        document.getElementById('department').value || '-';
+      document.getElementById('preview-title').textContent =
+        document.getElementById('title').value || '-';
+      document.getElementById('preview-tripCategory').textContent =
+        document.getElementById('tripCategory').value || '-';
+      document.getElementById('preview-tripType').textContent =
+        document.getElementById('tripType').value || '-';
+
+      const dest = document.getElementById('destination').value;
+      const destDetail = document.getElementById('destinationDetail').value;
+      document.getElementById('preview-destination').textContent =
+        destDetail ? `${dest} (${destDetail})` : dest || '-';
+
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      if (startDate && endDate) {
+        const days = utils.calculateDays(startDate, endDate);
+        document.getElementById('preview-period').textContent =
+          `${utils.formatDate(startDate, 'YYYY-MM-DD(ddd)')} ~ ${utils.formatDate(endDate, 'YYYY-MM-DD(ddd)')} (${days}일)`;
+      }
+
+      document.getElementById('preview-purpose').textContent =
+        document.getElementById('purpose').value || '-';
+      document.getElementById('preview-totalCost').textContent =
+        document.getElementById('totalCost').textContent;
+    }
+
+    // 폼 데이터 수집
+    function collectFormData() {
+      // 일정 데이터 수집
+      const scheduleRows = document.querySelectorAll('#schedule-body tr');
+      const schedule = [];
+      scheduleRows.forEach(row => {
+        const date = row.querySelector('.schedule-date').value;
+        const time = row.querySelector('.schedule-time').value;
+        const location = row.querySelector('.schedule-location').value;
+        const content = row.querySelector('.schedule-content').value;
+        if (date || location || content) {
+          schedule.push({ date, time, location, content });
+        }
+      });
+
+      return {
+        requestNumber: document.getElementById('requestNumber').value,
+        applicant: document.getElementById('applicant').value,
+        department: document.getElementById('department').value,
+        title: document.getElementById('title').value,
+        tripCategory: document.getElementById('tripCategory').value,
+        tripType: document.getElementById('tripType').value,
+        destination: document.getElementById('destination').value,
+        destinationDetail: document.getElementById('destinationDetail').value,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+        purpose: document.getElementById('purpose').value,
+        schedule: utils.stringifySchedule(schedule),
+        accommodationCost: parseInt(document.getElementById('accommodationCost').value) || 0,
+        transportCost: parseInt(document.getElementById('transportCost').value) || 0,
+        mealCost: parseInt(document.getElementById('mealCost').value) || 0,
+        otherCost: parseInt(document.getElementById('otherCost').value) || 0,
+        totalCost: parseInt(document.getElementById('accommodationCost').value) +
+                   parseInt(document.getElementById('transportCost').value) +
+                   parseInt(document.getElementById('mealCost').value) +
+                   parseInt(document.getElementById('otherCost').value) || 0,
+        priority: document.getElementById('priority').value,
+        hasVacancy: document.getElementById('hasVacancy').checked,
+        punchlistId: document.getElementById('punchlistId').value,
+        remarks: document.getElementById('remarks').value,
+        status: document.getElementById('status').value
+      };
+    }
+
+    // 유효성 검사
+    function validateForm() {
+      const form = document.getElementById('trip-form');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return false;
+      }
+      return true;
+    }
+
+    // 임시저장
+    async function saveDraft() {
+      const data = collectFormData();
+      data.status = '작성중';
+
+      try {
+        const result = await api.create(data);
+        if (result.success) {
+          alert('임시저장되었습니다.');
+        } else {
+          alert('저장 실패: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('Save error:', error);
+        alert('저장 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 제출
+    async function submitForm() {
+      if (!validateForm()) return;
+
+      const data = collectFormData();
+
+      try {
+        const result = await api.create(data);
+        if (result.success) {
+          alert('출장신청서가 제출되었습니다.');
+          window.location.href = '../index.html';
+        } else {
+          alert('제출 실패: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('Submit error:', error);
+        alert('제출 중 오류가 발생했습니다.');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>출장신청서 상세 - S25016</title>
+  <link rel="stylesheet" href="../../../shared/styles/variables.css">
+  <link rel="stylesheet" href="../../../shared/styles/reset.css">
+  <style>
+    :root {
+      --primary: #667eea;
+      --primary-dark: #764ba2;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --gray: #6b7280;
+      --bg: #f0f2f5;
+      --card-bg: #ffffff;
+      --warning-bg: #fff9db;
+      --warning-border: #f1c40f;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    /* 헤더 */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 24px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 1.3rem;
+    }
+
+    .header-meta {
+      text-align: right;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* 콘텐츠 */
+    .content {
+      padding: 30px;
+    }
+
+    /* 상태 뱃지 (큰) */
+    .status-badge-large {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .status-draft { background: var(--gray); }
+    .status-submitted { background: var(--info); }
+    .status-approved { background: var(--success); }
+    .status-rejected { background: var(--danger); }
+    .status-completed { background: #8b5cf6; }
+
+    /* 정보 테이블 */
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    .info-table th,
+    .info-table td {
+      border: 1px solid #ddd;
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    .info-table th {
+      background: #f8f9fa;
+      width: 25%;
+      font-weight: 600;
+      color: #555;
+    }
+
+    /* 섹션 */
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #eee;
+    }
+
+    /* 일정 테이블 */
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+      border: 1px solid #ddd;
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .schedule-table th {
+      background: #f0f0f0;
+      font-weight: 600;
+    }
+
+    .schedule-table tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    /* 비용 */
+    .cost-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+
+    .cost-item {
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .cost-item .label {
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 4px;
+    }
+
+    .cost-item .value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .cost-item.total {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    }
+
+    .cost-item.total .label,
+    .cost-item.total .value {
+      color: white;
+    }
+
+    /* 특기사항 */
+    .remarks-box {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 16px;
+      white-space: pre-wrap;
+    }
+
+    /* 인력공백 경고 */
+    .vacancy-warning {
+      background: var(--warning-bg);
+      padding: 16px;
+      border-left: 5px solid var(--warning-border);
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    .vacancy-warning strong {
+      color: var(--danger);
+    }
+
+    /* 버튼 */
+    .actions {
+      display: flex;
+      gap: 12px;
+      padding: 24px 30px;
+      background: #f8f9fa;
+      border-top: 1px solid #eee;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    /* 로딩 */
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: var(--gray);
+    }
+
+    /* 에러 */
+    .error {
+      text-align: center;
+      padding: 60px;
+      color: var(--danger);
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+      .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .content { padding: 20px; }
+      .info-table th { width: 35%; }
+      .actions { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="main-container">
+    <div class="loading">데이터 로딩중...</div>
+  </div>
+
+  <script src="../scripts/business-trip.js"></script>
+  <script>
+    const api = new BusinessTripAPI({ useMock: true });
+    const utils = BusinessTripUtils;
+
+    let tripData = null;
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', loadTrip);
+
+    // 데이터 로딩
+    async function loadTrip() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+
+      if (!id) {
+        showError('신청서 ID가 없습니다.');
+        return;
+      }
+
+      try {
+        const result = await api.getById(id);
+
+        if (result.success && result.data) {
+          tripData = result.data;
+          render();
+        } else {
+          showError('신청서를 찾을 수 없습니다.');
+        }
+      } catch (error) {
+        console.error('Load error:', error);
+        showError('데이터 로딩 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 렌더링
+    function render() {
+      const days = utils.calculateDays(tripData.startDate, tripData.endDate);
+      const startFormatted = utils.formatDate(tripData.startDate, 'YYYY-MM-DD(ddd)');
+      const endFormatted = utils.formatDate(tripData.endDate, 'YYYY-MM-DD(ddd)');
+      const period = `${startFormatted} ~ ${endFormatted} (${days}일)`;
+
+      const statusClass = getStatusClass(tripData.status);
+
+      // 일정 파싱
+      const schedule = utils.parseSchedule(tripData.schedule);
+
+      // 인력공백 경고
+      const vacancyWarning = tripData.hasVacancy ? `
+        <div class="vacancy-warning">
+          <strong>인력 공백 발생:</strong> 이 출장 기간 중 인력 공백이 발생합니다.
+        </div>
+      ` : '';
+
+      // 일정 테이블
+      const scheduleHtml = schedule.length > 0 ? `
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th>일자</th>
+              <th>시간</th>
+              <th>방문처</th>
+              <th>업무 내용</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${schedule.map(s => `
+              <tr>
+                <td>${utils.formatDate(s.date, 'MM/DD(ddd)')}</td>
+                <td>${s.time || '-'}</td>
+                <td>${escapeHtml(s.location) || '-'}</td>
+                <td>${escapeHtml(s.content) || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      ` : '<p style="color: var(--gray);">등록된 일정이 없습니다.</p>';
+
+      document.getElementById('main-container').innerHTML = `
+        <!-- 헤더 -->
+        <header class="header">
+          <div>
+            <h1>출장신청서</h1>
+          </div>
+          <div class="header-meta">
+            <div>${tripData.requestNumber || '-'}</div>
+            <div>${utils.formatDate(tripData.createdTime, 'YYYY-MM-DD')}</div>
+          </div>
+        </header>
+
+        <!-- 콘텐츠 -->
+        <div class="content">
+          <span class="status-badge-large ${statusClass}">${tripData.status}</span>
+
+          ${vacancyWarning}
+
+          <div class="section">
+            <h3 class="section-title">기본 정보</h3>
+            <table class="info-table">
+              <tr>
+                <th>제목</th>
+                <td colspan="3">${escapeHtml(tripData.title)}</td>
+              </tr>
+              <tr>
+                <th>신청자</th>
+                <td>${tripData.applicant || '-'}</td>
+                <th>기안부서</th>
+                <td>${tripData.department || '-'}</td>
+              </tr>
+              <tr>
+                <th>구분</th>
+                <td>${tripData.tripCategory || '-'}</td>
+                <th>출장유형</th>
+                <td>${tripData.tripType || '-'}</td>
+              </tr>
+              <tr>
+                <th>목적지</th>
+                <td>${tripData.destination || '-'} ${tripData.destinationDetail ? '(' + escapeHtml(tripData.destinationDetail) + ')' : ''}</td>
+                <th>기간</th>
+                <td>${period}</td>
+              </tr>
+              <tr>
+                <th>우선순위</th>
+                <td>${tripData.priority || '보통'}</td>
+                <th>펀치리스트</th>
+                <td>${tripData.punchlistId || '-'}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="section">
+            <h3 class="section-title">출장 목적</h3>
+            <div class="remarks-box">${escapeHtml(tripData.purpose) || '-'}</div>
+          </div>
+
+          <div class="section">
+            <h3 class="section-title">상세 일정</h3>
+            ${scheduleHtml}
+          </div>
+
+          <div class="section">
+            <h3 class="section-title">출장비</h3>
+            <div class="cost-summary">
+              <div class="cost-item">
+                <div class="label">숙박비</div>
+                <div class="value">${utils.formatCurrency(tripData.accommodationCost)}</div>
+              </div>
+              <div class="cost-item">
+                <div class="label">교통비</div>
+                <div class="value">${utils.formatCurrency(tripData.transportCost)}</div>
+              </div>
+              <div class="cost-item">
+                <div class="label">식대</div>
+                <div class="value">${utils.formatCurrency(tripData.mealCost)}</div>
+              </div>
+              <div class="cost-item">
+                <div class="label">기타</div>
+                <div class="value">${utils.formatCurrency(tripData.otherCost)}</div>
+              </div>
+              <div class="cost-item total">
+                <div class="label">총 예상비용</div>
+                <div class="value">${utils.formatCurrency(tripData.totalCost)}</div>
+              </div>
+            </div>
+          </div>
+
+          ${tripData.remarks ? `
+          <div class="section">
+            <h3 class="section-title">특기 사항 / 비고</h3>
+            <div class="remarks-box">${escapeHtml(tripData.remarks)}</div>
+          </div>
+          ` : ''}
+        </div>
+
+        <!-- 하단 버튼 -->
+        <div class="actions">
+          <a href="../index.html" class="btn btn-secondary">목록으로</a>
+
+          <span class="spacer"></span>
+
+          ${tripData.status === '신청완료' ? `
+            <button class="btn btn-success" onclick="approveTrip()">승인</button>
+            <button class="btn btn-danger" onclick="rejectTrip()">반려</button>
+          ` : ''}
+
+          ${tripData.status === '작성중' || tripData.status === '반려' ? `
+            <button class="btn btn-primary" onclick="editTrip()">수정</button>
+          ` : ''}
+
+          <button class="btn btn-danger" onclick="deleteTrip()">삭제</button>
+        </div>
+      `;
+    }
+
+    // 상태 클래스
+    function getStatusClass(status) {
+      const map = {
+        '작성중': 'status-draft',
+        '신청완료': 'status-submitted',
+        '승인': 'status-approved',
+        '반려': 'status-rejected',
+        '완료': 'status-completed'
+      };
+      return map[status] || 'status-draft';
+    }
+
+    // 승인
+    async function approveTrip() {
+      if (!confirm('이 출장신청서를 승인하시겠습니까?')) return;
+
+      try {
+        const result = await api.updateStatus(tripData.id, '승인');
+        if (result.success) {
+          alert('승인되었습니다.');
+          location.reload();
+        } else {
+          alert('승인 실패: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('Approve error:', error);
+        alert('승인 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 반려
+    async function rejectTrip() {
+      const reason = prompt('반려 사유를 입력하세요:');
+      if (reason === null) return;
+
+      try {
+        const result = await api.update(tripData.id, {
+          status: '반려',
+          remarks: tripData.remarks + '\n\n[반려사유] ' + reason
+        });
+        if (result.success) {
+          alert('반려되었습니다.');
+          location.reload();
+        } else {
+          alert('반려 실패: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('Reject error:', error);
+        alert('반려 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 수정 (create 페이지로 이동)
+    function editTrip() {
+      // TODO: 수정 모드 구현
+      alert('수정 기능은 추후 구현 예정입니다.');
+    }
+
+    // 삭제
+    async function deleteTrip() {
+      if (!confirm('정말 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.')) return;
+
+      try {
+        const result = await api.delete(tripData.id);
+        if (result.success) {
+          alert('삭제되었습니다.');
+          window.location.href = '../index.html';
+        } else {
+          alert('삭제 실패: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('Delete error:', error);
+        alert('삭제 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 에러 표시
+    function showError(message) {
+      document.getElementById('main-container').innerHTML = `
+        <div class="error">
+          <p>${message}</p>
+          <a href="../index.html" class="btn btn-secondary" style="margin-top: 20px;">목록으로</a>
+        </div>
+      `;
+    }
+
+    // HTML 이스케이프
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

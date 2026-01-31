@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>출장신청서 초안 작성 - S25016</title>
+  <style>
+    :root {
+      --primary: #667eea;
+      --primary-dark: #764ba2;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --gray: #6b7280;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 { font-size: 1.5rem; }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      background: white;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    /* 사이드바 */
+    .sidebar {
+      background: #f8f9fa;
+      padding: 20px;
+      border-right: 1px solid #eee;
+    }
+
+    .sidebar-section {
+      margin-bottom: 24px;
+    }
+
+    .sidebar-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .template-list {
+      list-style: none;
+    }
+
+    .template-item {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .template-item:hover {
+      border-color: var(--primary);
+      background: #f0f4ff;
+    }
+
+    .template-item.active {
+      border-color: var(--primary);
+      background: #e8efff;
+    }
+
+    .template-item .name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .template-item .desc {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    /* 메인 콘텐츠 */
+    .main-content {
+      padding: 24px;
+    }
+
+    .form-section {
+      margin-bottom: 24px;
+    }
+
+    .form-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .form-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    /* 일정 테이블 */
+    .schedule-editor {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .schedule-editor th,
+    .schedule-editor td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    .schedule-editor th {
+      background: #f0f0f0;
+      font-size: 13px;
+    }
+
+    .schedule-editor input {
+      width: 100%;
+      border: none;
+      padding: 6px;
+      font-size: 13px;
+    }
+
+    .schedule-editor input:focus {
+      background: #f0f7ff;
+      outline: none;
+    }
+
+    .btn-add-schedule {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: #f0f0f0;
+      border: 1px dashed #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    /* 액션 버튼 */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .spacer { flex: 1; }
+
+    /* 미리보기 모달 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      width: 90%;
+      max-width: 900px;
+      max-height: 90vh;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 { font-size: 16px; }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 16px 20px;
+      background: #f8f9fa;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    /* 미리보기 스타일 */
+    .preview-document {
+      font-family: 'dotum', sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .preview-document table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+
+    .preview-document th,
+    .preview-document td {
+      border: 1px solid #666;
+      padding: 8px 12px;
+    }
+
+    .preview-document th {
+      background: #eee;
+      width: 20%;
+      text-align: left;
+    }
+
+    .preview-document .doc-title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .preview-document .section-title {
+      font-weight: bold;
+      margin: 20px 0 10px;
+      color: #333;
+    }
+
+    .preview-document .schedule-table th {
+      text-align: center;
+      background: #edf2f7;
+    }
+
+    .preview-document .priority-high {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .preview-document .vacancy-alert {
+      color: #e74c3c;
+      background: #ffeaa7;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    .preview-document .special-note {
+      background: #fff9db;
+      padding: 12px;
+      border-left: 4px solid #f1c40f;
+      margin: 16px 0;
+    }
+
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid #eee;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div>
+        <h1>출장신청서 초안 작성</h1>
+        <p style="opacity:0.9;font-size:13px;margin-top:4px;">템플릿 선택 → 정보 입력 → HTML 문서 생성</p>
+      </div>
+      <a href="../index.html" class="btn btn-secondary" style="background:rgba(255,255,255,0.2);color:white;">목록으로</a>
+    </header>
+
+    <div class="main-grid">
+      <!-- 사이드바: 템플릿 선택 -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">템플릿 선택</h3>
+          <ul class="template-list" id="template-list">
+            <li class="template-item active" data-template="blank">
+              <div class="name">빈 문서</div>
+              <div class="desc">처음부터 작성</div>
+            </li>
+            <li class="template-item" data-template="samsung">
+              <div class="name">삼성중공업 시운전</div>
+              <div class="desc">거제조선소 출장</div>
+            </li>
+            <li class="template-item" data-template="meeting">
+              <div class="name">본사 회의</div>
+              <div class="desc">창원/양산 출장</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">최근 출장</h3>
+          <ul class="template-list" id="recent-list">
+            <li class="template-item" data-recent="1">
+              <div class="name">18차 연장</div>
+              <div class="desc">2026-01-26 ~ 01-31</div>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- 메인 폼 -->
+      <main class="main-content">
+        <form id="draft-form">
+          <!-- 기본 정보 -->
+          <div class="form-section">
+            <h3 class="form-section-title">기본 정보</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>품의번호</label>
+                <input type="text" id="docNumber" placeholder="자동생성">
+              </div>
+              <div class="form-group">
+                <label>기안일자</label>
+                <input type="date" id="draftDate">
+              </div>
+              <div class="form-group">
+                <label>기안부서</label>
+                <input type="text" id="department" value="개발팀">
+              </div>
+              <div class="form-group">
+                <label>기안자</label>
+                <select id="applicant">
+                  <option value="심태양">심태양</option>
+                  <option value="이마룬">이마룬</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 출장 정보 -->
+          <div class="form-section">
+            <h3 class="form-section-title">출장 정보</h3>
+            <div class="form-row">
+              <div class="form-group full">
+                <label>제목</label>
+                <input type="text" id="title" placeholder="삼성중공업 거재조선소 자동용접시스템 성능 문제 대응 및 양산 정상화 지원">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>구분</label>
+                <select id="tripCategory">
+                  <option value="국내출장">국내출장</option>
+                  <option value="해외출장">해외출장</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>출장유형</label>
+                <select id="tripType">
+                  <option value="시운전">시운전</option>
+                  <option value="회의">회의</option>
+                  <option value="교육">교육</option>
+                  <option value="점검">점검</option>
+                  <option value="기술지원">기술지원</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>출발일</label>
+                <input type="date" id="startDate">
+              </div>
+              <div class="form-group">
+                <label>복귀일</label>
+                <input type="date" id="endDate">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>목적지</label>
+                <select id="destination">
+                  <option value="거제">거제</option>
+                  <option value="창원">창원</option>
+                  <option value="울산">울산</option>
+                  <option value="부산">부산</option>
+                  <option value="서울">서울</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>목적지 상세</label>
+                <input type="text" id="destinationDetail" placeholder="삼성중공업 거제 조선소">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group full">
+                <label>출장 목적</label>
+                <textarea id="purpose" placeholder="출장 목적을 상세히 기술"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- 상세 일정 -->
+          <div class="form-section">
+            <h3 class="form-section-title">출장 일정별 업무 계획</h3>
+            <table class="schedule-editor" id="schedule-table">
+              <thead>
+                <tr>
+                  <th style="width:120px;">일자</th>
+                  <th style="width:80px;">시간</th>
+                  <th>방문처</th>
+                  <th>업무 내용</th>
+                  <th style="width:50px;"></th>
+                </tr>
+              </thead>
+              <tbody id="schedule-body">
+              </tbody>
+            </table>
+            <button type="button" class="btn-add-schedule" onclick="addScheduleRow()">+ 일정 추가</button>
+          </div>
+
+          <!-- 특기사항 -->
+          <div class="form-section">
+            <h3 class="form-section-title">특기 사항</h3>
+            <div class="form-row">
+              <div class="form-group full">
+                <label>인력 운용 / 리스크 관리</label>
+                <textarea id="remarks" rows="4" placeholder="인력 부재 대응, 주말 작업 계획 등"></textarea>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label style="display:flex;align-items:center;gap:8px;">
+                  <input type="checkbox" id="hasVacancy">
+                  인력 공백 발생
+                </label>
+              </div>
+              <div class="form-group">
+                <label>펀치리스트 ID</label>
+                <input type="text" id="punchlistId" placeholder="PL-2026-XXX">
+              </div>
+            </div>
+          </div>
+
+          <!-- 액션 버튼 -->
+          <div class="action-buttons">
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">초기화</button>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-primary" onclick="previewDocument()">미리보기</button>
+            <button type="button" class="btn btn-success" onclick="downloadHTML()">HTML 다운로드</button>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <!-- 미리보기 모달 -->
+  <div class="modal-overlay" id="preview-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>출장신청서 미리보기</h3>
+        <button class="btn-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="preview-content" class="preview-document"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">닫기</button>
+        <button class="btn btn-success" onclick="downloadHTML()">HTML 다운로드</button>
+        <button class="btn btn-primary" onclick="saveToNotion()">Notion에 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../scripts/business-trip.js"></script>
+  <script>
+    const api = new BusinessTripAPI({ useMock: true });
+    const utils = BusinessTripUtils;
+
+    // 템플릿 데이터
+    const TEMPLATES = {
+      blank: {},
+      samsung: {
+        title: '삼성중공업 거재조선소 자동용접시스템 성능 문제 대응 및 양산 정상화 지원',
+        tripCategory: '국내출장',
+        tripType: '시운전',
+        destination: '거제',
+        destinationDetail: '삼성중공업 거제 조선소',
+        purpose: '현장 안정화 및 잔여 PL 집중 조치'
+      },
+      meeting: {
+        title: '본사 협력업체 회의',
+        tripCategory: '국내출장',
+        tripType: '회의',
+        destination: '창원',
+        destinationDetail: '에스피시스템스 본사',
+        purpose: '프로젝트 진행 상황 점검 및 협의'
+      }
+    };
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      // 오늘 날짜 설정
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('draftDate').value = today;
+
+      // 품의번호 생성
+      generateDocNumber();
+
+      // 템플릿 클릭 이벤트
+      document.querySelectorAll('.template-item').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.template-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+
+          const template = item.dataset.template;
+          if (template) applyTemplate(template);
+        });
+      });
+
+      // 날짜 변경 시 일정 자동 생성
+      document.getElementById('startDate').addEventListener('change', generateSchedule);
+      document.getElementById('endDate').addEventListener('change', generateSchedule);
+
+      // 초기 일정 행 추가
+      addScheduleRow();
+    });
+
+    // 품의번호 생성
+    function generateDocNumber() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      const seq = String(Math.floor(Math.random() * 100)).padStart(3, '0');
+      document.getElementById('docNumber').value = `에스피시스템스-개발팀-${y}${m}${d}-${seq}`;
+    }
+
+    // 템플릿 적용
+    function applyTemplate(templateId) {
+      const template = TEMPLATES[templateId];
+      if (!template) return;
+
+      Object.keys(template).forEach(key => {
+        const el = document.getElementById(key);
+        if (el) el.value = template[key];
+      });
+    }
+
+    // 일정 행 추가
+    function addScheduleRow(date = '', time = '00:00', location = '', content = '') {
+      const tbody = document.getElementById('schedule-body');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><input type="date" class="sch-date" value="${date}"></td>
+        <td><input type="time" class="sch-time" value="${time}"></td>
+        <td><input type="text" class="sch-location" placeholder="방문처" value="${location}"></td>
+        <td><input type="text" class="sch-content" placeholder="업무 내용" value="${content}"></td>
+        <td><button type="button" onclick="this.closest('tr').remove()" style="background:#ef4444;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">삭제</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    // 날짜 범위로 일정 생성
+    function generateSchedule() {
+      const start = document.getElementById('startDate').value;
+      const end = document.getElementById('endDate').value;
+      if (!start || !end) return;
+
+      const tbody = document.getElementById('schedule-body');
+      // 기존 행이 하나이고 비어있으면 자동 생성
+      if (tbody.children.length <= 1 && !tbody.querySelector('.sch-content')?.value) {
+        tbody.innerHTML = '';
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        const dest = document.getElementById('destinationDetail').value || document.getElementById('destination').value;
+
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+          const dateStr = d.toISOString().split('T')[0];
+          const isFirst = d.getTime() === startDate.getTime();
+          const isLast = d.getTime() === endDate.getTime();
+          const content = isFirst ? '이동' : (isLast ? '이동' : '시운전 대응');
+          addScheduleRow(dateStr, '00:00', dest, content);
+        }
+      }
+    }
+
+    // 폼 데이터 수집
+    function collectFormData() {
+      const scheduleRows = document.querySelectorAll('#schedule-body tr');
+      const schedule = [];
+      scheduleRows.forEach(row => {
+        schedule.push({
+          date: row.querySelector('.sch-date').value,
+          time: row.querySelector('.sch-time').value,
+          location: row.querySelector('.sch-location').value,
+          content: row.querySelector('.sch-content').value
+        });
+      });
+
+      return {
+        docNumber: document.getElementById('docNumber').value,
+        draftDate: document.getElementById('draftDate').value,
+        department: document.getElementById('department').value,
+        applicant: document.getElementById('applicant').value,
+        title: document.getElementById('title').value,
+        tripCategory: document.getElementById('tripCategory').value,
+        tripType: document.getElementById('tripType').value,
+        destination: document.getElementById('destination').value,
+        destinationDetail: document.getElementById('destinationDetail').value,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+        purpose: document.getElementById('purpose').value,
+        remarks: document.getElementById('remarks').value,
+        hasVacancy: document.getElementById('hasVacancy').checked,
+        punchlistId: document.getElementById('punchlistId').value,
+        schedule
+      };
+    }
+
+    // HTML 문서 생성
+    function generateHTMLDocument(data) {
+      const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        const days = ['일', '월', '화', '수', '목', '금', '토'];
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}(${days[d.getDay()]})`;
+      };
+
+      const scheduleRows = data.schedule.map(s => `
+        <tr>
+          <td style="text-align:center;font-weight:bold;">${formatDate(s.date)}</td>
+          <td style="text-align:center;">${s.time}</td>
+          <td>${s.location}</td>
+          <td>${s.content}</td>
+        </tr>
+      `).join('');
+
+      const vacancyNote = data.hasVacancy ? `
+        <div class="special-note">
+          <strong>인력 운용 리스크:</strong> ${data.remarks || '인력 공백 발생 예정'}
+        </div>
+      ` : '';
+
+      return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>출장신청서 - ${data.title}</title>
+  <style>
+    body { font-family: 'dotum', 'Malgun Gothic', sans-serif; font-size: 12px; line-height: 1.5; margin: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    th, td { border: 1px solid #666; padding: 8px 12px; }
+    th { background: #eee; text-align: left; width: 15%; }
+    .doc-title { text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; }
+    .section-title { font-weight: bold; margin: 20px 0 10px; font-size: 14px; }
+    .schedule-table th { text-align: center; background: #edf2f7; }
+    .special-note { background: #fff9db; padding: 12px; border-left: 4px solid #f1c40f; margin: 16px 0; }
+    .special-note strong { color: #e74c3c; }
+    .vacancy-alert { color: #e74c3c; background: #ffeaa7; padding: 2px 4px; }
+  </style>
+</head>
+<body>
+  <div class="doc-title">출 장 신 청 서</div>
+
+  <table>
+    <tr><th>품의번호</th><td colspan="3">${data.docNumber}</td></tr>
+    <tr><th>기안일자</th><td>${formatDate(data.draftDate)}</td><th>기안부서</th><td>${data.department}</td></tr>
+    <tr><th>기안자</th><td colspan="3">${data.applicant}</td></tr>
+  </table>
+
+  <table>
+    <tr><th>구분</th><td>${data.tripCategory}</td><th>기간</th><td>${formatDate(data.startDate)} ~ ${formatDate(data.endDate)}</td></tr>
+    <tr><th>제목</th><td colspan="3">${data.title}</td></tr>
+  </table>
+
+  <table>
+    <tr><th>출장자</th><th>소속</th><th>직급</th><th>성명</th></tr>
+    <tr><td style="text-align:center;">1</td><td>${data.department}</td><td>부장</td><td>${data.applicant}</td></tr>
+  </table>
+
+  <div class="section-title">출장 일정별 업무 계획</div>
+  <table class="schedule-table">
+    <thead>
+      <tr><th>일자</th><th>시간</th><th>방문처</th><th>업무 내용</th></tr>
+    </thead>
+    <tbody>
+      ${scheduleRows}
+    </tbody>
+  </table>
+
+  <div class="section-title">출장 목적</div>
+  <p>${data.purpose}</p>
+
+  ${vacancyNote}
+
+  ${data.remarks ? `
+  <div class="section-title">특기 사항</div>
+  <p>${data.remarks}</p>
+  ` : ''}
+
+  ${data.punchlistId ? `<p><strong>관련 펀치리스트:</strong> ${data.punchlistId}</p>` : ''}
+
+</body>
+</html>`;
+    }
+
+    // 미리보기
+    function previewDocument() {
+      const data = collectFormData();
+      const html = generateHTMLDocument(data);
+
+      // 미리보기에 표시 (body 내용만)
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      document.getElementById('preview-content').innerHTML = doc.body.innerHTML;
+
+      document.getElementById('preview-modal').classList.add('active');
+    }
+
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('preview-modal').classList.remove('active');
+    }
+
+    // HTML 다운로드
+    function downloadHTML() {
+      const data = collectFormData();
+      const html = generateHTMLDocument(data);
+
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+
+      const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      a.href = url;
+      a.download = `${today}_출장신청서_${data.applicant}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Notion에 저장
+    async function saveToNotion() {
+      const data = collectFormData();
+
+      try {
+        const tripData = {
+          title: data.title,
+          requestNumber: utils.generateRequestNumber(),
+          applicant: data.applicant,
+          department: data.department,
+          tripType: data.tripType,
+          tripCategory: data.tripCategory,
+          destination: data.destination,
+          destinationDetail: data.destinationDetail,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          purpose: data.purpose,
+          schedule: utils.stringifySchedule(data.schedule),
+          hasVacancy: data.hasVacancy,
+          punchlistId: data.punchlistId,
+          remarks: data.remarks,
+          status: '작성중'
+        };
+
+        const result = await api.create(tripData);
+        if (result.success) {
+          alert('Notion에 저장되었습니다.');
+          closeModal();
+        } else {
+          alert('저장 실패: ' + (result.error || ''));
+        }
+      } catch (error) {
+        console.error('Save error:', error);
+        alert('저장 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 폼 초기화
+    function resetForm() {
+      if (!confirm('입력한 내용을 모두 삭제하시겠습니까?')) return;
+      document.getElementById('draft-form').reset();
+      document.getElementById('schedule-body').innerHTML = '';
+      addScheduleRow();
+      generateDocNumber();
+      document.getElementById('draftDate').value = new Date().toISOString().split('T')[0];
+    }
+  </script>
+</body>
+</html>
