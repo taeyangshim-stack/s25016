@@ -651,11 +651,11 @@
                 <div class="gantt-header-cell weekend"><div class="day">일</div><div class="date">1/25</div></div>
                 <!-- 2주차: 1/26(월)~2/1(일) -->
                 <div class="gantt-header-cell week-start"><div class="day">월</div><div class="date">1/26</div></div>
-                <div class="gantt-header-cell" style="background:rgba(59,130,246,0.3);border:2px solid #3b82f6;"><div class="day" style="color:#3b82f6;font-weight:bold;">화</div><div class="date" style="color:#3b82f6;font-weight:bold;">1/27</div><div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;">TODAY</div></div>
+                <div class="gantt-header-cell"><div class="day">화</div><div class="date">1/27</div></div>
                 <div class="gantt-header-cell"><div class="day">수</div><div class="date">1/28</div></div>
                 <div class="gantt-header-cell"><div class="day">목</div><div class="date">1/29</div></div>
                 <div class="gantt-header-cell"><div class="day">금</div><div class="date">1/30</div></div>
-                <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">1/31</div></div>
+                <div class="gantt-header-cell weekend" style="background:rgba(59,130,246,0.3);border:2px solid #3b82f6;"><div class="day" style="color:#3b82f6;font-weight:bold;">토</div><div class="date" style="color:#3b82f6;font-weight:bold;">1/31</div><div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;">TODAY</div></div>
                 <div class="gantt-header-cell weekend"><div class="day">일</div><div class="date">2/1</div></div>
                 <!-- 3주차: 2/2(월)~2/7(토) -->
                 <div class="gantt-header-cell week-start"><div class="day">월</div><div class="date">2/2</div></div>
@@ -1613,8 +1613,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 1/29 TODAY -->
-                    <div class="gantt-cell" style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(16,185,129,0.1));border:2px solid #3b82f6;">
+                    <!-- 1/29 테스트결과 -->
+                    <div class="gantt-cell" style="background:rgba(16,185,129,0.1);">
                         <!-- A라인 테스트결과 (1/29) -->
                         <div class="task-bar pending" style="font-size:0.5rem;background:#fef3c7;border-left:3px solid #f59e0b;"><span style="background:#2563eb;color:#fff;padding:1px 3px;border-radius:2px;font-size:0.5rem;">A</span> 067 피드백대기
                             <div class="task-tooltip">
@@ -1699,7 +1699,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="gantt-cell">
+                    <!-- 1/31 TODAY (토요일) -->
+                    <div class="gantt-cell" style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(16,185,129,0.1));border:2px solid #3b82f6;">
                         <div class="task-bar high">048 PlanB
                             <div class="task-tooltip">
                                 <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-048" target="_blank">PL-2025-048</a></div>
@@ -2743,9 +2744,9 @@
                     </div>
                 </div>
 
-                <div class="day-card">
-                    <div class="day-card-header w2">
-                        <div><span class="day-name">토</span> <span class="day-date">1/31</span></div>
+                <div class="day-card" style="border:2px solid #3b82f6;box-shadow:0 0 10px rgba(59,130,246,0.3);">
+                    <div class="day-card-header w2" style="background:linear-gradient(135deg,#3b82f6,#2563eb);">
+                        <div><span class="day-name">토</span> <span class="day-date">1/31</span> <span style="background:#fff;color:#3b82f6;padding:2px 6px;border-radius:4px;font-size:0.65rem;font-weight:bold;margin-left:4px;">TODAY</span></div>
                         <span class="task-count">1건</span>
                     </div>
                     <div class="day-task-list">
