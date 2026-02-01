@@ -25,7 +25,8 @@
 
         <!-- 탭 네비게이션 -->
         <div class="tab-nav">
-            <button class="tab-btn new active" onclick="showTab('daily30')">1/30 삼성검토요청 (신규)</button>
+            <button class="tab-btn new active" onclick="showTab('daily31')">1/31 완료현황 (신규)</button>
+            <button class="tab-btn" onclick="showTab('daily30')">1/30 삼성검토요청</button>
             <button class="tab-btn" onclick="showTab('daily29')">1/29 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily28')">1/28 진행현황</button>
             <button class="tab-btn" onclick="showTab('daily27')">1/27 진행현황</button>
@@ -38,8 +39,80 @@
             <button class="tab-btn" onclick="showTab('template')">메일 템플릿</button>
         </div>
 
-        <!-- 1/30 삼성검토요청 (신규) -->
-        <div id="tab-daily30" class="tab-content active">
+        <!-- 1/31 완료현황 (신규) -->
+        <div id="tab-daily31" class="tab-content active">
+            <div class="mail-container">
+                <div class="mail-header">
+                    <label>받는 사람</label>
+                    <input type="text" value="이동혁 프로" id="daily31-recipient">
+                    <label>제목</label>
+                    <input type="text" value="[S25016] 1/31(금) 진행현황 - 웜업/수동티칭 컨펌완료, 수직용접 진행중" id="daily31-subject">
+                </div>
+                <div class="mail-body" id="daily31-content">
+                    <p>이동혁 프로님,</p>
+                    <p>고생 많으십니다. SP 심태양입니다.</p>
+                    <p>1/31(금) 진행현황 공유드립니다.</p>
+
+                    <h3 style="color:#22c55e;">■ 컨펌 완료 (2건)</h3>
+                    <table>
+                        <tr><th>ID</th><th>항목</th><th>라인</th><th>상태</th></tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-191" target="_blank">PL-2026-191</a></td>
+                            <td>웜업 UI 가시성 개선</td>
+                            <td>A/B라인</td>
+                            <td style="color:#22c55e;font-weight:bold;">✅ 컨펌완료</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-173" target="_blank">PL-2026-173</a></td>
+                            <td>스프레이/토치클리닝 수동티칭</td>
+                            <td>A라인</td>
+                            <td style="color:#22c55e;font-weight:bold;">✅ 컨펌완료</td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#eab308;margin-top:20px;">■ 모션 완료 / UI 잔여 (1건)</h3>
+                    <table>
+                        <tr><th>ID</th><th>항목</th><th>라인</th><th>상태</th><th>잔여작업</th></tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-172" target="_blank">PL-2026-172</a></td>
+                            <td>노즐 클리닝/스프레이 기능</td>
+                            <td>B라인</td>
+                            <td style="color:#eab308;font-weight:bold;">🔄 모션완료</td>
+                            <td>UI 및 관제 인터페이스</td>
+                        </tr>
+                    </table>
+
+                    <h3 style="color:#3b82f6;margin-top:20px;">■ 진행중 (2건)</h3>
+                    <table>
+                        <tr><th>ID</th><th>항목</th><th>담당</th><th>상태</th></tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank">PL-2025-092</a></td>
+                            <td>A라인 수직용접 터치 옵셋</td>
+                            <td>박주한</td>
+                            <td>계속 진행중</td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-200" target="_blank">PL-2026-200</a></td>
+                            <td>수직용접 관제 명령 및 노티 연결</td>
+                            <td>박주한</td>
+                            <td>계속 진행중</td>
+                        </tr>
+                    </table>
+
+                    <h3 style="margin-top:20px;">■ 다음주 예정</h3>
+                    <ul>
+                        <li>2/3(화): X_Init 활성화 테스트 (PL-2025-100)</li>
+                        <li>2/4(수): 십자 레이저 측정 위치 이동 루틴 (PL-2025-153)</li>
+                        <li>수직용접 관련 UI/관제 인터페이스 완료 예정</li>
+                    </ul>
+
+                    <p style="margin-top:20px;">감사합니다.<br>SP 심태양 드림</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1/30 삼성검토요청 -->
+        <div id="tab-daily30" class="tab-content">
             <div class="mail-container">
                 <div class="mail-header">
                     <label>받는 사람</label>
