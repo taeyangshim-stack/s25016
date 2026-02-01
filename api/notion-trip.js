@@ -26,8 +26,20 @@ function pageToTrip(page) {
 
   const getText = (prop) => {
     if (!prop) return '';
-    if (prop.type === 'title') return prop.title?.[0]?.plain_text || '';
-    if (prop.type === 'rich_text') return prop.rich_text?.[0]?.plain_text || '';
+    if (prop.type === 'title') {
+      // 모든 title 블록 연결
+      return (prop.title || []).map(t => t.plain_text || '').join('');
+    }
+    if (prop.type === 'rich_text') {
+      // 모든 rich_text 블록 연결 (링크 포함)
+      return (prop.rich_text || []).map(t => {
+        // 링크가 있으면 마크다운 형식으로 변환
+        if (t.href) {
+          return `[${t.plain_text}](${t.href})`;
+        }
+        return t.plain_text || '';
+      }).join('');
+    }
     return '';
   };
 
