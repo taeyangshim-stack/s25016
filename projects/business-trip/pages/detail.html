@@ -366,12 +366,7 @@
         `;
       } else if (scheduleText) {
         // 텍스트 형식의 일정 (마크다운/일반 텍스트)
-        // 줄바꿈을 HTML로 변환
-        const formattedText = scheduleText
-          .replace(/\n/g, '<br>')
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
-          .replace(/- /g, '• ');  // bullet points
-        scheduleHtml = `<div class="remarks-box">${formattedText}</div>`;
+        scheduleHtml = parseMarkdownSchedule(scheduleText);
       } else {
         scheduleHtml = '<p style="color: var(--gray);">등록된 일정이 없습니다.</p>';
       }
@@ -586,6 +581,113 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+    }
+
+    // 마크다운 일정을 HTML로 변환
+    function parseMarkdownSchedule(text) {
+      if (!text) return '<p style="color: var(--gray);">등록된 일정이 없습니다.</p>';
+
+      const lines = text.split('\n').filter(line => line.trim());
+      let html = '';
+      let inTable = false;
+      let tableRows = [];
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+
+        // 마크다운 테이블 감지 (| 로 시작하고 끝나는 줄)
+        if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+          // 구분선(---|---)은 스킵
+          if (/^\|[\s\-:|]+\|$/.test(trimmed)) continue;
+
+          const cells = trimmed.split('|').filter((_, i, arr) => i > 0 && i < arr.length - 1);
+          tableRows.push(cells.map(c => c.trim()));
+          inTable = true;
+        } else {
+          // 테이블이 끝났으면 렌더링
+          if (inTable && tableRows.length > 0) {
+            html += renderScheduleTable(tableRows);
+            tableRows = [];
+            inTable = false;
+          }
+
+          // 제목 (## 또는 **제목**)
+          if (trimmed.startsWith('## ')) {
+            html += `<h4 style="margin: 20px 0 12px; color: var(--primary-dark); font-size: 15px;">${escapeHtml(trimmed.slice(3))}</h4>`;
+          } else if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+            html += `<h4 style="margin: 16px 0 10px; color: #333; font-size: 14px;">${escapeHtml(trimmed.slice(2, -2))}</h4>`;
+          } else if (trimmed) {
+            // 일반 텍스트
+            html += `<p style="margin: 8px 0; color: #555;">${escapeHtml(trimmed)}</p>`;
+          }
+        }
+      }
+
+      // 마지막 테이블 처리
+      if (tableRows.length > 0) {
+        html += renderScheduleTable(tableRows);
+      }
+
+      return html || '<p style="color: var(--gray);">등록된 일정이 없습니다.</p>';
+    }
+
+    // 일정 테이블 렌더링
+    function renderScheduleTable(rows) {
+      if (rows.length === 0) return '';
+
+      const header = rows[0];
+      const body = rows.slice(1);
+
+      // 헤더에 따른 컬럼 너비 설정
+      const colWidths = header.map(h => {
+        if (h.includes('날짜') || h.includes('일자')) return '100px';
+        if (h.includes('시간')) return '80px';
+        return 'auto';
+      });
+
+      let html = `<table class="schedule-table" style="margin-bottom: 20px;">`;
+      html += '<thead><tr>';
+      header.forEach((h, i) => {
+        html += `<th style="width: ${colWidths[i]}; white-space: nowrap;">${escapeHtml(h)}</th>`;
+      });
+      html += '</tr></thead>';
+
+      html += '<tbody>';
+      let prevDate = '';
+      body.forEach(row => {
+        html += '<tr>';
+        row.forEach((cell, i) => {
+          // 첫 번째 열(날짜)이 이전과 같으면 병합 효과
+          let style = '';
+          if (i === 0) {
+            if (cell === prevDate) {
+              style = 'color: transparent; border-top: none;';
+            } else {
+              prevDate = cell;
+              style = 'font-weight: 600; background: #f8f9fa;';
+            }
+          }
+          // 세부 항목 열은 작은 글씨
+          if (header[i] && (header[i].includes('세부') || header[i].includes('항목'))) {
+            style += 'font-size: 12px; line-height: 1.5;';
+          }
+          html += `<td style="${style}">${formatCellContent(cell)}</td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+
+      return html;
+    }
+
+    // 셀 내용 포맷팅 (PL 번호 강조 등)
+    function formatCellContent(text) {
+      if (!text) return '-';
+      return escapeHtml(text)
+        // PL 번호 강조
+        .replace(/(PL-\d{4}-\d{3})/g, '<code style="background: #e0e7ff; padding: 1px 4px; border-radius: 3px; font-size: 11px; color: #4338ca;">$1</code>')
+        // 대괄호 카테고리 강조
+        .replace(/\[([^\]]+)\]/g, '<span style="background: #fef3c7; padding: 1px 6px; border-radius: 3px; font-size: 11px; color: #92400e; font-weight: 600;">$1</span>');
     }
   </script>
 </body>
