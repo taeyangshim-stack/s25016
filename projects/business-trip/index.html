@@ -306,6 +306,36 @@
       </div>
     </div>
 
+    <!-- 출장여비 규정 -->
+    <div class="expense-rules" style="background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 16px; color: #333; margin: 0;">📋 출장여비 지급 규정</h3>
+        <span style="font-size: 12px; color: var(--gray);">효력: 2025.04.01 ~ (2025.05.14 게시)</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+        <div style="text-align: center; padding: 16px; background: #f0f9ff; border-radius: 8px;">
+          <div style="font-size: 12px; color: var(--info); font-weight: 600; margin-bottom: 8px;">평일 합계</div>
+          <div style="font-size: 24px; font-weight: 700; color: var(--info);">45,000원</div>
+          <div style="font-size: 11px; color: var(--gray); margin-top: 4px;">일비 15,000 + 식비 30,000</div>
+        </div>
+        <div style="text-align: center; padding: 16px; background: #fef3c7; border-radius: 8px;">
+          <div style="font-size: 12px; color: #d97706; font-weight: 600; margin-bottom: 8px;">휴일 합계</div>
+          <div style="font-size: 24px; font-weight: 700; color: #d97706;">50,000원</div>
+          <div style="font-size: 11px; color: var(--gray); margin-top: 4px;">일비 20,000 + 식비 30,000</div>
+        </div>
+        <div style="text-align: center; padding: 16px; background: #fce7f3; border-radius: 8px;">
+          <div style="font-size: 12px; color: #be185d; font-weight: 600; margin-bottom: 8px;">특별 지침</div>
+          <div style="font-size: 13px; color: #be185d; font-weight: 600;">공휴일/역공기 50%</div>
+          <div style="font-size: 11px; color: var(--gray); margin-top: 4px;">역공기 야간 100%</div>
+        </div>
+        <div style="text-align: center; padding: 16px; background: #ecfdf5; border-radius: 8px;">
+          <div style="font-size: 12px; color: var(--success); font-weight: 600; margin-bottom: 8px;">근거 문서</div>
+          <div style="font-size: 11px; color: #333;">SPS-WR-04</div>
+          <div style="font-size: 11px; color: var(--gray); margin-top: 4px;">인사팀 (이재찬 대리)</div>
+        </div>
+      </div>
+    </div>
+
     <!-- 필터 바 -->
     <div class="filter-bar">
       <select id="filter-status">
@@ -377,17 +407,22 @@
     // 데이터 로딩
     async function loadTrips() {
       try {
+        console.log('[DEBUG] Loading trips from:', api.baseUrl);
         const result = await api.getAll();
+        console.log('[DEBUG] API Response:', result);
+
         if (result.success) {
-          allTrips = result.data;
+          allTrips = result.data || [];
+          console.log('[DEBUG] Loaded trips:', allTrips.length, allTrips);
           updateKPIs();
           renderTable(allTrips);
         } else {
-          showError('데이터 로딩 실패');
+          console.error('[DEBUG] API returned failure:', result);
+          showError('데이터 로딩 실패: ' + (result.error || result.message || 'Unknown error'));
         }
       } catch (error) {
-        console.error('Load error:', error);
-        showError('데이터 로딩 중 오류 발생');
+        console.error('[DEBUG] Load error:', error);
+        showError('API 오류: ' + error.message);
       }
     }
 
@@ -426,10 +461,19 @@
       }
 
       tbody.innerHTML = trips.map(trip => {
-        const days = utils.calculateDays(trip.startDate, trip.endDate);
-        const startFormatted = utils.formatDate(trip.startDate, 'MM/DD(ddd)');
-        const endFormatted = utils.formatDate(trip.endDate, 'MM/DD(ddd)');
-        const period = `${startFormatted} ~ ${endFormatted} (${days}일)`;
+        let period = '-';
+        try {
+          if (trip.startDate && trip.endDate) {
+            const days = utils.calculateDays(trip.startDate, trip.endDate);
+            const startFormatted = utils.formatDate(trip.startDate, 'MM/DD(ddd)');
+            const endFormatted = utils.formatDate(trip.endDate, 'MM/DD(ddd)');
+            period = `${startFormatted} ~ ${endFormatted} (${days}일)`;
+          } else if (trip.startDate) {
+            period = utils.formatDate(trip.startDate, 'MM/DD(ddd)') + ' ~';
+          }
+        } catch (e) {
+          console.warn('Date format error for trip:', trip.id, e);
+        }
 
         const statusClass = getStatusClass(trip.status);
         const priorityClass = getPriorityClass(trip.priority);
