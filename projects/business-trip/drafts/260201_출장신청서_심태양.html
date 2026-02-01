@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>출장신청서 - 삼성중공업 거제조선소</title>
+  <style>
+    @page { size: A4; margin: 15mm; }
+    body { font-family: '맑은 고딕', 'Malgun Gothic', sans-serif; font-size: 11pt; line-height: 1.6; margin: 0; padding: 20px; }
+    .document { max-width: 210mm; margin: 0 auto; background: white; }
+    h1 { text-align: center; font-size: 22pt; margin-bottom: 30px; border-bottom: 3px double #333; padding-bottom: 10px; }
+    .header-info { display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .header-info div { font-size: 10pt; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #333; padding: 8px 12px; text-align: left; }
+    th { background: #f5f5f5; font-weight: bold; width: 120px; }
+    .section-title { background: #e8e8e8; font-weight: bold; text-align: center; font-size: 12pt; }
+    .content-cell { min-height: 60px; vertical-align: top; }
+    .work-list { margin: 0; padding-left: 20px; }
+    .work-list li { margin-bottom: 5px; }
+    .signature-area { margin-top: 40px; display: flex; justify-content: flex-end; gap: 50px; }
+    .signature-box { text-align: center; }
+    .signature-line { width: 100px; border-bottom: 1px solid #333; height: 40px; }
+    .footer { margin-top: 30px; text-align: center; font-size: 9pt; color: #666; }
+    @media print { body { padding: 0; } .document { max-width: none; } }
+  </style>
+</head>
+<body>
+  <div class="document">
+    <h1>출 장 신 청 서</h1>
+
+    <div class="header-info">
+      <div>문서번호: BT-2026-019</div>
+      <div>작성일: 2026년 02월 01일</div>
+    </div>
+
+    <table>
+      <tr>
+        <th>출장자</th>
+        <td>심태양</td>
+        <th>소속</th>
+        <td>로봇사업부 / R&D센터</td>
+      </tr>
+      <tr>
+        <th>출장지</th>
+        <td colspan="3">경상남도 거제시 장목면 거제대로 3370 삼성중공업 거제조선소</td>
+      </tr>
+      <tr>
+        <th>출장기간</th>
+        <td>2026년 02월 01일 (일) ~ 2026년 02월 07일 (토)</td>
+        <th>출장일수</th>
+        <td>7일 (이동일 포함)</td>
+      </tr>
+      <tr>
+        <th>출장목적</th>
+        <td colspan="3">삼성중공업 거제조선소 자동용접시스템 성능 문제 대응 및 양산 정상화 지원 (19차 연장)</td>
+      </tr>
+    </table>
+
+    <table>
+      <tr>
+        <td class="section-title" colspan="2">출장 업무 내용</td>
+      </tr>
+      <tr>
+        <th>전주 완료 사항</th>
+        <td class="content-cell">
+          <ul class="work-list">
+            <li><strong>[PL-2026-165]</strong> 용접 포인트의 부재 두께 반영 여부 선택 기능 추가 (긴급)</li>
+            <li><strong>[PL-2026-176]</strong> B라인 터치 끝 점 터치 성공 이후 리트라이 동작 수정</li>
+            <li><strong>[PL-2026-183]</strong> B라인 Control Off Speed Limit 설정 수정 (X1/X2축)</li>
+            <li><strong>[PL-2026-187]</strong> 토크 모니터링 화면 색상 변경</li>
+            <li><strong>[PL-2026-189]</strong> 관제 측 DB 상하한선 UI 구현</li>
+            <li><strong>[PL-2026-190]</strong> 명령 유형 별 데드라인 기능 구현</li>
+            <li><strong>[PL-2026-194]</strong> B라인 Z방향 상대이동 가동 범위 표시 수정 (긴급)</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <th>금주 진행 예정</th>
+        <td class="content-cell">
+          <ul class="work-list">
+            <li><strong>[PL-2025-111]</strong> 형상 보간 실패 에러 원인 파악 및 제거 (긴급)</li>
+            <li><strong>[PL-2025-113]</strong> Z축 과부하 에러 검증 (긴급)</li>
+            <li><strong>[PL-2026-184]</strong> Plan C 적용 후 아크에러 발생 시 동기화 에러 검증 (긴급)</li>
+            <li><strong>[PL-2026-177]</strong> 터치 에러/아크 에러/명령 취소 이후 로봇 초기화</li>
+            <li><strong>[PL-2026-186]</strong> PlanC 적용 후 손상/소실 기능 복구</li>
+            <li><strong>[PL-2026-192]</strong> 와이어 동시 피딩 기능 구현</li>
+            <li><strong>[PL-2026-193]</strong> A라인 수동 티칭 (노즐 클리너) 검증</li>
+            <li><strong>[PL-2026-198]</strong> 동일한 위치에서의 터치 에러 발생 처리</li>
+            <li><strong>[PL-2026-199]</strong> 끝점 터치 후 시작점 이동 중 에러 발생 처리 검증</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <th>주요 이슈</th>
+        <td class="content-cell">
+          <ul class="work-list">
+            <li>Plan C 적용 후 동기화 에러 발생 - 원인 분석 및 조치 필요</li>
+            <li>Z축 과부하 에러 지속 발생 - 하드웨어/소프트웨어 점검</li>
+            <li>형상 보간 실패 에러 - 용접 품질 영향, 긴급 대응 필요</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+
+    <table>
+      <tr>
+        <td class="section-title" colspan="2">출장비 내역</td>
+      </tr>
+      <tr>
+        <th>정산방식</th>
+        <td>회사규정에 따름 (식비 및 출장비 포함)</td>
+      </tr>
+    </table>
+
+    <table>
+      <tr>
+        <td class="section-title">비고</td>
+      </tr>
+      <tr>
+        <td class="content-cell" style="min-height:40px;">
+          - 2/1(일): 이동일<br>
+          - 2/2(월) ~ 2/6(금): 현장 근무<br>
+          - 2/7(토): 현장 근무 후 복귀<br>
+          - 고객사 요청에 따른 긴급 지원 출장<br>
+          - 양산 정상화를 위한 지속적 현장 지원 필요
+        </td>
+      </tr>
+    </table>
+
+    <div class="signature-area">
+      <div class="signature-box">
+        <div>신청자</div>
+        <div class="signature-line"></div>
+        <div>심태양</div>
+      </div>
+      <div class="signature-box">
+        <div>팀장</div>
+        <div class="signature-line"></div>
+        <div></div>
+      </div>
+      <div class="signature-box">
+        <div>본부장</div>
+        <div class="signature-line"></div>
+        <div></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      본 문서는 S25016 프로젝트 출장신청서 관리 시스템에서 생성되었습니다.
+    </div>
+  </div>
+</body>
+</html>
