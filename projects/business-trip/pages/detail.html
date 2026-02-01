@@ -683,7 +683,9 @@
     // 비고 포맷팅 (마크다운 링크, 제목, PL번호 지원)
     function formatRemarks(text) {
       if (!text) return '';
-      return escapeHtml(text)
+      // Notion의 {{url}} 형식 제거
+      let cleaned = text.replace(/\{\{([^}]+)\}\}/g, '$1');
+      return escapeHtml(cleaned)
         // 마크다운 링크 [text](url) → <a href="url">text</a>
         .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: #4338ca; text-decoration: underline;">$1</a>')
         // ## 제목
