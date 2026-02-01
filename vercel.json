@@ -47,6 +47,10 @@
     { "source": "/business-trip", "destination": "/projects/business-trip/index.html" },
     { "source": "/business-trip/create", "destination": "/projects/business-trip/pages/create.html" },
     { "source": "/business-trip/detail", "destination": "/projects/business-trip/pages/detail.html" },
-    { "source": "/business-trip/draft", "destination": "/projects/business-trip/pages/draft.html" }
+    { "source": "/business-trip/draft", "destination": "/projects/business-trip/pages/draft.html" },
+    { "source": "/business-trip/create-expense", "destination": "/projects/business-trip/pages/create-expense.html" },
+    { "source": "/business-trip/expense-list", "destination": "/projects/business-trip/pages/expense-list.html" },
+    { "source": "/business-trip/detail-expense", "destination": "/projects/business-trip/pages/detail-expense.html" },
+    { "source": "/business-trip/edit-expense", "destination": "/projects/business-trip/pages/edit-expense.html" }
   ]
 }
