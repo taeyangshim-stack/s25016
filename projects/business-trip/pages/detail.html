@@ -418,7 +418,7 @@
                 <th>우선순위</th>
                 <td>${tripData.priority || '보통'}</td>
                 <th>펀치리스트</th>
-                <td>${tripData.punchlistId || '-'}</td>
+                <td>${formatPunchlistIds(tripData.punchlistId)}</td>
               </tr>
             </table>
           </div>
@@ -680,12 +680,19 @@
       return html;
     }
 
-    // 셀 내용 포맷팅 (PL 번호 강조 등)
+    // 펀치리스트 ID 링크 포맷팅
+    function formatPunchlistIds(ids) {
+      if (!ids) return '-';
+      return ids.replace(/(PL-\d{4}-\d{3})/g,
+        '<a href="/punchlist/pages/detail?id=$1" target="_blank" style="background: #e0e7ff; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #4338ca; text-decoration: none; margin-right: 4px; display: inline-block; margin-bottom: 2px;" title="펀치리스트 상세보기">$1</a>');
+    }
+
+    // 셀 내용 포맷팅 (PL 번호 링크, 카테고리 강조 등)
     function formatCellContent(text) {
       if (!text) return '-';
       return escapeHtml(text)
-        // PL 번호 강조
-        .replace(/(PL-\d{4}-\d{3})/g, '<code style="background: #e0e7ff; padding: 1px 4px; border-radius: 3px; font-size: 11px; color: #4338ca;">$1</code>')
+        // PL 번호를 클릭 가능한 링크로 변환
+        .replace(/(PL-\d{4}-\d{3})/g, '<a href="/punchlist/pages/detail?id=$1" target="_blank" style="background: #e0e7ff; padding: 1px 4px; border-radius: 3px; font-size: 11px; color: #4338ca; text-decoration: none; cursor: pointer;" title="펀치리스트 상세보기">$1</a>')
         // 대괄호 카테고리 강조
         .replace(/\[([^\]]+)\]/g, '<span style="background: #fef3c7; padding: 1px 6px; border-radius: 3px; font-size: 11px; color: #92400e; font-weight: 600;">$1</span>');
     }
