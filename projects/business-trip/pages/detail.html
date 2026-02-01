@@ -462,7 +462,7 @@
           ${tripData.remarks ? `
           <div class="section">
             <h3 class="section-title">특기 사항 / 비고</h3>
-            <div class="remarks-box">${escapeHtml(tripData.remarks)}</div>
+            <div class="remarks-box">${formatRemarks(tripData.remarks)}</div>
           </div>
           ` : ''}
         </div>
@@ -678,6 +678,24 @@
       html += '</tbody></table>';
 
       return html;
+    }
+
+    // 비고 포맷팅 (마크다운 링크, 제목, PL번호 지원)
+    function formatRemarks(text) {
+      if (!text) return '';
+      return escapeHtml(text)
+        // 마크다운 링크 [text](url) → <a href="url">text</a>
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: #4338ca; text-decoration: underline;">$1</a>')
+        // ## 제목
+        .replace(/## ([^\n]+)/g, '<strong style="display: block; margin-top: 16px; margin-bottom: 8px; color: var(--primary-dark);">$1</strong>')
+        // ### 소제목
+        .replace(/### ([^\n]+)/g, '<strong style="display: block; margin-top: 12px; margin-bottom: 6px; color: #555; font-size: 13px;">$1</strong>')
+        // PL 번호 링크
+        .replace(/(PL-\d{4}-\d{3})/g, '<a href="/punchlist/pages/detail?id=$1" target="_blank" style="background: #e0e7ff; padding: 1px 4px; border-radius: 3px; font-size: 11px; color: #4338ca; text-decoration: none;">$1</a>')
+        // 줄바꿈
+        .replace(/\n/g, '<br>')
+        // 리스트 항목
+        .replace(/- /g, '• ');
     }
 
     // 펀치리스트 ID 링크 포맷팅
