@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>지출결의서 수정 | S25016</title>
+  <link rel="stylesheet" href="../../../shared/styles/variables.css">
+  <link rel="stylesheet" href="../../../shared/styles/reset.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #059669;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+    }
+
+    .btn-secondary:hover {
+      background: #f3f4f6;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #667eea;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .expense-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .expense-table th,
+    .expense-table td {
+      border: 1px solid #d1d5db;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .expense-table th {
+      background: #f3f4f6;
+      font-weight: 600;
+      color: #374151;
+      font-size: 13px;
+    }
+
+    .expense-table input {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    .expense-table input.note-input {
+      text-align: left;
+    }
+
+    .expense-table .date-col {
+      background: #fef9e7;
+      font-weight: 600;
+      width: 100px;
+    }
+
+    .expense-table .total-row {
+      background: #dbeafe;
+      font-weight: 700;
+      color: #1e40af;
+    }
+
+    .expense-table .total-row td {
+      font-size: 14px;
+      padding: 12px;
+    }
+
+    .add-row-btn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .add-row-btn:hover {
+      background: #5568d3;
+    }
+
+    .totals-display {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .total-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .total-card.grand {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      grid-column: 1 / -1;
+    }
+
+    .total-card .label {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+
+    .total-card .value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .info-box {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .info-box h4 {
+      margin: 0 0 8px 0;
+      color: #1e40af;
+      font-size: 14px;
+    }
+
+    .info-box p {
+      margin: 0;
+      color: #1e3a8a;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📋 지출결의서 수정</h1>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="window.history.back()">← 돌아가기</button>
+        <button class="btn btn-primary" onclick="saveExpense()">💾 저장</button>
+      </div>
+    </div>
+
+    <div class="content" id="content">
+      <div class="loading">로딩 중...</div>
+    </div>
+  </div>
+
+  <script src="../scripts/expense.js"></script>
+  <script src="../scripts/business-trip.js"></script>
+  <script>
+    let expenseData = null;
+    let dailyExpenses = [];
+
+    // URL에서 id 추출
+    const urlParams = new URLSearchParams(window.location.search);
+    const expenseId = urlParams.get('id');
+
+    // 페이지 초기화
+    async function init() {
+      try {
+        if (!expenseId) {
+          alert('지출결의서 ID가 없습니다.');
+          window.location.href = 'expense-list.html';
+          return;
+        }
+
+        // 기존 지출결의서 데이터 로드
+        expenseData = await getExpenseById(expenseId);
+
+        // 일별 지출 내역 파싱
+        dailyExpenses = parseExpenseDetail(expenseData.expenseDetail);
+
+        if (dailyExpenses.length === 0) {
+          dailyExpenses = [createEmptyRow()];
+        }
+
+        renderForm();
+      } catch (error) {
+        console.error('초기화 오류:', error);
+        alert('데이터 로딩 실패: ' + error.message);
+      }
+    }
+
+    // 빈 행 생성
+    function createEmptyRow() {
+      return {
+        date: new Date().toISOString().split('T')[0],
+        toll: 0,
+        fuel: 0,
+        allowance: 0,
+        meal: 0,
+        note: ''
+      };
+    }
+
+    // 폼 렌더링
+    function renderForm() {
+      const content = document.getElementById('content');
+
+      content.innerHTML = `
+        <!-- 기본 정보 -->
+        <div class="section">
+          <div class="section-title">📌 기본 정보</div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>제목 *</label>
+              <input type="text" id="title" value="${expenseData.title || ''}" required>
+            </div>
+            <div class="form-group">
+              <label>문서번호</label>
+              <input type="text" id="documentNumber" value="${expenseData.documentNumber || ''}" readonly>
+            </div>
+            <div class="form-group">
+              <label>신청번호</label>
+              <input type="text" id="requestNumber" value="${expenseData.requestNumber || ''}" readonly>
+            </div>
+            <div class="form-group">
+              <label>기안일 *</label>
+              <input type="date" id="draftDate" value="${expenseData.draftDate || ''}" required>
+            </div>
+            <div class="form-group">
+              <label>기안자 *</label>
+              <select id="drafter" required>
+                <option value="">선택</option>
+                <option value="심태양" ${expenseData.drafter === '심태양' ? 'selected' : ''}>심태양</option>
+                <option value="이광재" ${expenseData.drafter === '이광재' ? 'selected' : ''}>이광재</option>
+                <option value="김나래" ${expenseData.drafter === '김나래' ? 'selected' : ''}>김나래</option>
+                <option value="변재태" ${expenseData.drafter === '변재태' ? 'selected' : ''}>변재태</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>상태</label>
+              <select id="status">
+                <option value="작성중" ${expenseData.status === '작성중' ? 'selected' : ''}>🟡 작성중</option>
+                <option value="제출" ${expenseData.status === '제출' ? 'selected' : ''}>🔵 제출</option>
+                <option value="승인" ${expenseData.status === '승인' ? 'selected' : ''}>🟢 승인</option>
+                <option value="반려" ${expenseData.status === '반려' ? 'selected' : ''}>🔴 반려</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 유류비 계산 정보 -->
+        <div class="section">
+          <div class="section-title">⛽ 유류비 계산 정보</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>유류단가 (원/리터) *</label>
+              <input type="number" id="fuelPrice" value="${expenseData.fuelPrice || 1619.10}" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label>연비 (km/리터)</label>
+              <input type="number" id="fuelEfficiency" value="${expenseData.fuelEfficiency || 9}" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>유류단가 출처</label>
+              <input type="text" id="fuelPriceSource" value="${expenseData.fuelPriceSource || '오피넷 전국 경유 평균'}" placeholder="예: 오피넷 전국 평균">
+            </div>
+          </div>
+        </div>
+
+        <!-- 일별 지출 내역 -->
+        <div class="section">
+          <div class="section-title">💰 일별 지출 내역</div>
+          <table class="expense-table" id="expenseTable">
+            <thead>
+              <tr>
+                <th style="width: 100px;">날짜</th>
+                <th style="width: 120px;">교통비</th>
+                <th style="width: 120px;">유류비</th>
+                <th style="width: 120px;">출장비</th>
+                <th style="width: 120px;">식대</th>
+                <th>내용</th>
+                <th style="width: 50px;">삭제</th>
+              </tr>
+            </thead>
+            <tbody id="expenseTableBody">
+            </tbody>
+          </table>
+          <button class="add-row-btn" onclick="addRow()">➕ 행 추가</button>
+        </div>
+
+        <!-- 합계 -->
+        <div class="section">
+          <div class="section-title">📊 합계</div>
+          <div class="totals-display" id="totalsDisplay">
+            <div class="total-card">
+              <div class="label">총 교통비</div>
+              <div class="value" id="totalToll">0원</div>
+            </div>
+            <div class="total-card">
+              <div class="label">총 유류비</div>
+              <div class="value" id="totalFuel">0원</div>
+            </div>
+            <div class="total-card">
+              <div class="label">총 출장비</div>
+              <div class="value" id="totalAllowance">0원</div>
+            </div>
+            <div class="total-card">
+              <div class="label">총 식대</div>
+              <div class="value" id="totalMeal">0원</div>
+            </div>
+            <div class="total-card grand">
+              <div class="label">총 합계</div>
+              <div class="value" id="grandTotal">0원</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 비고 -->
+        <div class="section">
+          <div class="section-title">📝 비고</div>
+          <div class="form-group">
+            <textarea id="remarks" rows="4" placeholder="특이사항이나 참고사항을 입력하세요">${expenseData.remarks || ''}</textarea>
+          </div>
+        </div>
+      `;
+
+      renderTable();
+      calculateAndDisplayTotals();
+    }
+
+    // 테이블 렌더링
+    function renderTable() {
+      const tbody = document.getElementById('expenseTableBody');
+
+      const rows = dailyExpenses.map((row, index) => {
+        return `
+          <tr>
+            <td class="date-col">
+              <input type="date" value="${row.date}" onchange="updateRow(${index}, 'date', this.value)">
+            </td>
+            <td><input type="number" value="${row.toll}" onchange="updateRow(${index}, 'toll', this.value)" placeholder="0"></td>
+            <td><input type="number" value="${row.fuel}" onchange="updateRow(${index}, 'fuel', this.value)" placeholder="0"></td>
+            <td><input type="number" value="${row.allowance}" onchange="updateRow(${index}, 'allowance', this.value)" placeholder="0"></td>
+            <td><input type="number" value="${row.meal}" onchange="updateRow(${index}, 'meal', this.value)" placeholder="0"></td>
+            <td><input type="text" class="note-input" value="${row.note}" onchange="updateRow(${index}, 'note', this.value)" placeholder="내용 입력"></td>
+            <td><button onclick="deleteRow(${index})" style="background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">×</button></td>
+          </tr>
+        `;
+      }).join('');
+
+      // 합계 행
+      const totals = calculateTotals(dailyExpenses);
+      const totalRow = `
+        <tr class="total-row">
+          <td>합계</td>
+          <td>${formatNumber(totals.toll)}원</td>
+          <td>${formatNumber(totals.fuel)}원</td>
+          <td>${formatNumber(totals.allowance)}원</td>
+          <td>${formatNumber(totals.meal)}원</td>
+          <td colspan="2" style="text-align: right; padding-right: 20px;">총합계: <strong style="font-size: 16px;">${formatNumber(totals.grand)}원</strong></td>
+        </tr>
+      `;
+
+      tbody.innerHTML = rows + totalRow;
+    }
+
+    // 행 업데이트
+    function updateRow(index, field, value) {
+      if (field === 'toll' || field === 'fuel' || field === 'allowance' || field === 'meal') {
+        dailyExpenses[index][field] = parseFloat(value) || 0;
+      } else {
+        dailyExpenses[index][field] = value;
+      }
+
+      renderTable();
+      calculateAndDisplayTotals();
+    }
+
+    // 행 추가
+    function addRow() {
+      dailyExpenses.push(createEmptyRow());
+      renderTable();
+    }
+
+    // 행 삭제
+    function deleteRow(index) {
+      if (dailyExpenses.length <= 1) {
+        alert('최소 1개 행은 필요합니다.');
+        return;
+      }
+      dailyExpenses.splice(index, 1);
+      renderTable();
+      calculateAndDisplayTotals();
+    }
+
+    // 합계 계산 및 표시
+    function calculateAndDisplayTotals() {
+      const totals = calculateTotals(dailyExpenses);
+
+      document.getElementById('totalToll').textContent = formatNumber(totals.toll) + '원';
+      document.getElementById('totalFuel').textContent = formatNumber(totals.fuel) + '원';
+      document.getElementById('totalAllowance').textContent = formatNumber(totals.allowance) + '원';
+      document.getElementById('totalMeal').textContent = formatNumber(totals.meal) + '원';
+      document.getElementById('grandTotal').textContent = formatNumber(totals.grand) + '원';
+    }
+
+    // 저장
+    async function saveExpense() {
+      try {
+        const title = document.getElementById('title').value;
+        const draftDate = document.getElementById('draftDate').value;
+        const drafter = document.getElementById('drafter').value;
+
+        if (!title || !draftDate || !drafter) {
+          alert('필수 항목을 입력하세요.');
+          return;
+        }
+
+        const totals = calculateTotals(dailyExpenses);
+
+        const data = {
+          title,
+          tripIds: expenseData.tripIds || [],
+          documentNumber: document.getElementById('documentNumber').value,
+          requestNumber: document.getElementById('requestNumber').value,
+          draftDate,
+          drafter,
+          status: document.getElementById('status').value,
+          totalToll: totals.toll,
+          totalFuel: totals.fuel,
+          totalAllowance: totals.allowance,
+          totalMeal: totals.meal,
+          expenseDetail: createExpenseDetail(dailyExpenses),
+          fuelPrice: parseFloat(document.getElementById('fuelPrice').value) || 0,
+          fuelEfficiency: parseFloat(document.getElementById('fuelEfficiency').value) || 9,
+          fuelPriceSource: document.getElementById('fuelPriceSource').value,
+          remarks: document.getElementById('remarks').value
+        };
+
+        await updateExpense(expenseId, data);
+        alert('✅ 지출결의서가 수정되었습니다!');
+
+        window.location.href = `detail-expense.html?id=${expenseId}`;
+      } catch (error) {
+        console.error('저장 오류:', error);
+        alert('❌ 저장 실패: ' + error.message);
+      }
+    }
+
+    // 초기화 실행
+    init();
+  </script>
+</body>
+</html>
