@@ -319,8 +319,17 @@
 
       const statusClass = getStatusClass(tripData.status);
 
-      // 일정 파싱
-      const schedule = utils.parseSchedule(tripData.schedule);
+      // 일정 파싱 (JSON 또는 텍스트)
+      let schedule = [];
+      let scheduleText = '';
+      try {
+        schedule = utils.parseSchedule(tripData.schedule);
+      } catch (e) {
+        scheduleText = tripData.schedule || '';
+      }
+      if (!schedule || schedule.length === 0) {
+        scheduleText = tripData.schedule || '';
+      }
 
       // 인력공백 경고
       const vacancyWarning = tripData.hasVacancy ? `
@@ -329,29 +338,43 @@
         </div>
       ` : '';
 
-      // 일정 테이블
-      const scheduleHtml = schedule.length > 0 ? `
-        <table class="schedule-table">
-          <thead>
-            <tr>
-              <th>일자</th>
-              <th>시간</th>
-              <th>방문처</th>
-              <th>업무 내용</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${schedule.map(s => `
+      // 일정 표시 (JSON 테이블 또는 텍스트)
+      let scheduleHtml = '';
+      if (schedule.length > 0) {
+        // JSON 형식의 일정 테이블
+        scheduleHtml = `
+          <table class="schedule-table">
+            <thead>
               <tr>
-                <td>${utils.formatDate(s.date, 'MM/DD(ddd)')}</td>
-                <td>${s.time || '-'}</td>
-                <td>${escapeHtml(s.location) || '-'}</td>
-                <td>${escapeHtml(s.content) || '-'}</td>
+                <th>일자</th>
+                <th>시간</th>
+                <th>방문처</th>
+                <th>업무 내용</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      ` : '<p style="color: var(--gray);">등록된 일정이 없습니다.</p>';
+            </thead>
+            <tbody>
+              ${schedule.map(s => `
+                <tr>
+                  <td>${utils.formatDate(s.date, 'MM/DD(ddd)')}</td>
+                  <td>${s.time || '-'}</td>
+                  <td>${escapeHtml(s.location) || '-'}</td>
+                  <td>${escapeHtml(s.content) || '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } else if (scheduleText) {
+        // 텍스트 형식의 일정 (마크다운/일반 텍스트)
+        // 줄바꿈을 HTML로 변환
+        const formattedText = scheduleText
+          .replace(/\n/g, '<br>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
+          .replace(/- /g, '• ');  // bullet points
+        scheduleHtml = `<div class="remarks-box">${formattedText}</div>`;
+      } else {
+        scheduleHtml = '<p style="color: var(--gray);">등록된 일정이 없습니다.</p>';
+      }
 
       document.getElementById('main-container').innerHTML = `
         <!-- 헤더 -->
