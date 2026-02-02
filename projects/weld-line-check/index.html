@@ -241,6 +241,9 @@
         <h2>C# 알고리즘</h2>
         <div class="code-tabs">
           <div class="code-tab active" onclick="showCode('full')">전체</div>
+          <div class="code-tab" onclick="showCode('cross')">교차</div>
+          <div class="code-tab" onclick="showCode('dir')">방향</div>
+          <div class="code-tab" onclick="showCode('len')">길이</div>
           <div class="code-tab" onclick="showCode('angle')">각도</div>
           <div class="code-tab" onclick="showCode('dist')">거리</div>
         </div>
@@ -313,7 +316,106 @@
     <span class="keyword">return</span> (diff <= thresholdDeg, diff);
 }`;
 
-    const csharpCodeDist = `<span class="comment">// 점에서 선분까지 최소 거리</span>
+    const csharpCodeCross = `<span class="comment">// 교차 검사 (CCW 알고리즘)</span>
+<span class="comment">// CCW: Counter-Clockwise - 세 점의 방향 판별</span>
+
+<span class="keyword">private static int</span> <span class="method">CCW</span>(
+    <span class="keyword">double</span> ax, <span class="keyword">double</span> ay,
+    <span class="keyword">double</span> bx, <span class="keyword">double</span> by,
+    <span class="keyword">double</span> cx, <span class="keyword">double</span> cy)
+{
+    <span class="comment">// 외적(Cross Product)으로 방향 판별</span>
+    <span class="keyword">double</span> cross = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+
+    <span class="keyword">if</span> (cross > <span class="number">0</span>) <span class="keyword">return</span> <span class="number">1</span>;   <span class="comment">// 반시계 방향</span>
+    <span class="keyword">if</span> (cross < <span class="number">0</span>) <span class="keyword">return</span> <span class="number">-1</span>;  <span class="comment">// 시계 방향</span>
+    <span class="keyword">return</span> <span class="number">0</span>;                   <span class="comment">// 일직선</span>
+}
+
+<span class="keyword">public static bool</span> <span class="method">CheckCrossing</span>(
+    <span class="keyword">double</span> s1x, <span class="keyword">double</span> s1y, <span class="keyword">double</span> e1x, <span class="keyword">double</span> e1y,
+    <span class="keyword">double</span> s2x, <span class="keyword">double</span> s2y, <span class="keyword">double</span> e2x, <span class="keyword">double</span> e2y)
+{
+    <span class="comment">// 선분1 기준으로 선분2의 두 끝점 방향 확인</span>
+    <span class="keyword">int</span> d1 = CCW(s1x, s1y, e1x, e1y, s2x, s2y);
+    <span class="keyword">int</span> d2 = CCW(s1x, s1y, e1x, e1y, e2x, e2y);
+
+    <span class="comment">// 선분2 기준으로 선분1의 두 끝점 방향 확인</span>
+    <span class="keyword">int</span> d3 = CCW(s2x, s2y, e2x, e2y, s1x, s1y);
+    <span class="keyword">int</span> d4 = CCW(s2x, s2y, e2x, e2y, e1x, e1y);
+
+    <span class="comment">// 두 선분이 서로 다른 방향에 있으면 교차</span>
+    <span class="keyword">return</span> (d1 * d2 < <span class="number">0</span>) && (d3 * d4 < <span class="number">0</span>);
+}
+
+<span class="comment">// 사용 예시</span>
+<span class="keyword">bool</span> isCrossing = CheckCrossing(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y);
+<span class="keyword">bool</span> crossOK = !isCrossing;  <span class="comment">// 교차하지 않아야 Pass</span>`;
+
+    const csharpCodeDir = `<span class="comment">// 방향 검사 (내적/Dot Product)</span>
+<span class="comment">// 두 벡터의 내적이 양수면 같은 방향, 음수면 반대 방향</span>
+
+<span class="keyword">public static bool</span> <span class="method">CheckDirection</span>(
+    <span class="keyword">double</span> s1x, <span class="keyword">double</span> s1y, <span class="keyword">double</span> e1x, <span class="keyword">double</span> e1y,
+    <span class="keyword">double</span> s2x, <span class="keyword">double</span> s2y, <span class="keyword">double</span> e2x, <span class="keyword">double</span> e2y)
+{
+    <span class="comment">// 방향 벡터 계산</span>
+    <span class="keyword">double</span> v1x = e1x - s1x;  <span class="comment">// 선1의 X 방향</span>
+    <span class="keyword">double</span> v1y = e1y - s1y;  <span class="comment">// 선1의 Y 방향</span>
+    <span class="keyword">double</span> v2x = e2x - s2x;  <span class="comment">// 선2의 X 방향</span>
+    <span class="keyword">double</span> v2y = e2y - s2y;  <span class="comment">// 선2의 Y 방향</span>
+
+    <span class="comment">// 내적(Dot Product) 계산</span>
+    <span class="comment">// dot = v1·v2 = |v1||v2|cos(θ)</span>
+    <span class="keyword">double</span> dot = v1x * v2x + v1y * v2y;
+
+    <span class="comment">// dot > 0: 같은 방향 (0° ~ 90°)</span>
+    <span class="comment">// dot < 0: 반대 방향 (90° ~ 180°)</span>
+    <span class="comment">// dot = 0: 직각 (90°)</span>
+    <span class="keyword">return</span> dot > <span class="number">0</span>;
+}
+
+<span class="comment">// 사용 예시</span>
+<span class="keyword">bool</span> sameDirection = CheckDirection(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y);
+<span class="comment">// sameDirection이 true면 Pass</span>`;
+
+    const csharpCodeLen = `<span class="comment">// 길이 검사 (절대값 차이)</span>
+<span class="comment">// 두 선분의 길이 차이가 임계값 이내인지 확인</span>
+
+<span class="keyword">private static double</span> <span class="method">GetLength</span>(
+    <span class="keyword">double</span> sx, <span class="keyword">double</span> sy,
+    <span class="keyword">double</span> ex, <span class="keyword">double</span> ey)
+{
+    <span class="comment">// 유클리드 거리 공식</span>
+    <span class="keyword">double</span> dx = ex - sx;
+    <span class="keyword">double</span> dy = ey - sy;
+    <span class="keyword">return</span> Math.Sqrt(dx * dx + dy * dy);
+}
+
+<span class="keyword">public static</span> (<span class="keyword">bool</span> ok, <span class="keyword">double</span> diff, <span class="keyword">double</span> len1, <span class="keyword">double</span> len2) <span class="method">CheckLength</span>(
+    <span class="keyword">double</span> s1x, <span class="keyword">double</span> s1y, <span class="keyword">double</span> e1x, <span class="keyword">double</span> e1y,
+    <span class="keyword">double</span> s2x, <span class="keyword">double</span> s2y, <span class="keyword">double</span> e2x, <span class="keyword">double</span> e2y,
+    <span class="keyword">double</span> threshold = <span class="number">20</span>)  <span class="comment">// 기본값 20mm</span>
+{
+    <span class="comment">// 각 선분의 길이 계산</span>
+    <span class="keyword">double</span> len1 = GetLength(s1x, s1y, e1x, e1y);
+    <span class="keyword">double</span> len2 = GetLength(s2x, s2y, e2x, e2y);
+
+    <span class="comment">// 절대값 차이</span>
+    <span class="keyword">double</span> diff = Math.Abs(len1 - len2);
+
+    <span class="comment">// 차이가 임계값 이하면 Pass</span>
+    <span class="keyword">return</span> (diff <= threshold, diff, len1, len2);
+}
+
+<span class="comment">// 사용 예시</span>
+<span class="keyword">var</span> result = CheckLength(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, <span class="number">20</span>);
+<span class="comment">// result.ok가 true면 Pass</span>
+<span class="comment">// result.diff: 길이 차이 (mm)</span>`;
+
+    const csharpCodeDist = `<span class="comment">// 거리 검사 (점-선분 최소 수직거리)</span>
+<span class="comment">// 선분1의 중점에서 선분2까지의 최소 거리 계산</span>
+
 <span class="keyword">public static double</span> <span class="method">PointToSegmentDistance</span>(
     <span class="keyword">double</span> px, <span class="keyword">double</span> py,
     <span class="keyword">double</span> ax, <span class="keyword">double</span> ay,
@@ -334,12 +436,14 @@
     <span class="keyword">return</span> Math.Sqrt((px-projX)*(px-projX) + (py-projY)*(py-projY));
 }
 
-<span class="comment">// 거리 검사</span>
-<span class="keyword">public static</span> (<span class="keyword">bool</span> ok, <span class="keyword">double</span> dist) <span class="method">CheckDistance</span>(..., <span class="keyword">double</span> maxDist)
+<span class="keyword">public static</span> (<span class="keyword">bool</span> ok, <span class="keyword">double</span> dist) <span class="method">CheckDistance</span>(
+    <span class="keyword">double</span> s1x, <span class="keyword">double</span> s1y, <span class="keyword">double</span> e1x, <span class="keyword">double</span> e1y,
+    <span class="keyword">double</span> s2x, <span class="keyword">double</span> s2y, <span class="keyword">double</span> e2x, <span class="keyword">double</span> e2y,
+    <span class="keyword">double</span> maxDist = <span class="number">20</span>)
 {
     <span class="comment">// 선분1 중점에서 선분2까지 거리</span>
     <span class="keyword">double</span> mid1x = (s1x + e1x) / <span class="number">2</span>, mid1y = (s1y + e1y) / <span class="number">2</span>;
-    <span class="keyword">double</span> dist = <span class="method">PointToSegmentDistance</span>(mid1x, mid1y, s2x, s2y, e2x, e2y);
+    <span class="keyword">double</span> dist = PointToSegmentDistance(mid1x, mid1y, s2x, s2y, e2x, e2y);
     <span class="keyword">return</span> (dist <= maxDist, dist);
 }`;
 
@@ -615,7 +719,14 @@
     function showCode(type) {
       document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
       event.target.classList.add('active');
-      const codes = { full: csharpCodeFull, angle: csharpCodeAngle, dist: csharpCodeDist };
+      const codes = {
+        full: csharpCodeFull,
+        cross: csharpCodeCross,
+        dir: csharpCodeDir,
+        len: csharpCodeLen,
+        angle: csharpCodeAngle,
+        dist: csharpCodeDist
+      };
       document.getElementById('code-content').innerHTML = codes[type];
     }
 
