@@ -257,6 +257,35 @@
             content: '✓ ';
         }
 
+        /* 과거 완료 항목 - 고스트 처리 (2/2 이전) */
+        .task-bar.completed-past {
+            background: rgba(5, 150, 105, 0.35) !important;
+            color: rgba(255, 255, 255, 0.7);
+            opacity: 0.6;
+            filter: grayscale(30%);
+        }
+        .task-bar.completed-past::before {
+            content: '✓ ';
+            opacity: 0.7;
+        }
+        .task-bar.completed-past:hover {
+            opacity: 1;
+            filter: grayscale(0%);
+        }
+
+        /* 과거 날짜 셀 전체 흐리게 (1주차, 2주차 완료분) */
+        .gantt-cell.past-completed {
+            background: rgba(240, 253, 244, 0.5) !important;
+        }
+        .gantt-cell.past-completed .task-bar.completed {
+            background: rgba(5, 150, 105, 0.4) !important;
+            opacity: 0.65;
+        }
+        .gantt-cell.past-completed .task-bar.completed:hover {
+            opacity: 1;
+            background: #059669 !important;
+        }
+
         /* 지연 항목 - 빗금 패턴 + 점선 테두리 */
         .task-bar.delayed {
             background: repeating-linear-gradient(
@@ -1732,12 +1761,41 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 1/31 (토요일) -->
-                    <div class="gantt-cell">
-                        <div class="task-bar high">048 PlanB
+                    <!-- 1/31 (토요일) - 완료 항목 다수 -->
+                    <div class="gantt-cell" style="background:rgba(16,185,129,0.15);">
+                        <div class="task-bar completed" style="font-size:0.55rem;">191 웜업✓
                             <div class="task-tooltip">
-                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-048" target="_blank">PL-2025-048</a></div>
-                                <div>Plan B 로봇 재구성</div>
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-191" target="_blank">PL-2026-191</a></div>
+                                <div>웜업 UI 가시성 개선</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✅ A/B라인 컨펌완료</div>
+                            </div>
+                        </div>
+                        <div class="task-bar completed" style="font-size:0.55rem;">173 티칭✓
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-173" target="_blank">PL-2026-173</a></div>
+                                <div>노즐 클리닝/스프레이 수동 티칭</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> ✅ A라인 스프레이/토치클리닝 컨펌완료</div>
+                            </div>
+                        </div>
+                        <div class="task-bar verify" style="font-size:0.55rem;">172 B모션
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-172" target="_blank">PL-2026-172</a></div>
+                                <div>노즐 클리닝/스프레이 기능</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> 🔧 B라인 모션완료 (UI/관제 잔여)</div>
+                            </div>
+                        </div>
+                        <div class="task-bar high" style="font-size:0.55rem;">092 수직용접
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank">PL-2025-092</a></div>
+                                <div>A라인 수직용접 터치 옵셋</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> 🔧 계속 진행중</div>
+                            </div>
+                        </div>
+                        <div class="task-bar high" style="font-size:0.55rem;">200 관제연결
+                            <div class="task-tooltip">
+                                <div class="tt-title"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-200" target="_blank">PL-2026-200</a></div>
+                                <div>수직용접 관제 명령 및 노티 연결</div>
+                                <div class="tt-row"><span class="tt-label">상태:</span> 🔧 계속 진행중</div>
                             </div>
                         </div>
                     </div>
@@ -2830,12 +2888,32 @@
                 <div class="day-card" style="border:2px solid #3b82f6;box-shadow:0 0 10px rgba(59,130,246,0.3);">
                     <div class="day-card-header w3" style="background:linear-gradient(135deg,#3b82f6,#2563eb);">
                         <div><span class="day-name" style="color:#fff;">월</span> <span class="day-date" style="color:#fff;">2/2</span> <span style="background:#fff;color:#3b82f6;padding:2px 6px;border-radius:4px;font-size:0.65rem;font-weight:bold;margin-left:4px;">TODAY</span></div>
-                        <span class="task-count" style="background:#fff;color:#3b82f6;">점검</span>
+                        <span class="task-count" style="background:#fff;color:#3b82f6;">5건</span>
                     </div>
                     <div class="day-task-list">
+                        <div class="day-task-item verify" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-096" target="_blank">PL-2025-096</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>🔧 비정상 용접선 정보 필터링</div>
+                        </div>
+                        <div class="day-task-item verify" style="background:rgba(59,130,246,0.1);border-left:3px solid #3b82f6;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-100" target="_blank">PL-2025-100</a></span>
+                            <span class="task-owner">최광년</span>
+                            <div>🔧 터치 모션 파라미터 X_init</div>
+                        </div>
+                        <div class="day-task-item high" style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2025-092" target="_blank">PL-2025-092</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>🔧 A라인 수직용접 터치 옵셋 (계속)</div>
+                        </div>
+                        <div class="day-task-item high" style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;">
+                            <span class="task-id"><a href="https://s2501602.vercel.app/punchlist/pages/detail.html?id=PL-2026-200" target="_blank">PL-2026-200</a></span>
+                            <span class="task-owner">박주한</span>
+                            <div>🔧 수직용접 관제 명령 (계속)</div>
+                        </div>
                         <div class="day-task-item normal">
                             <span class="task-owner">전체</span>
-                            <div>2주차 완료 점검 / 3주차 시작</div>
+                            <div>📋 2주차 완료 점검 / 3주차 시작</div>
                         </div>
                     </div>
                 </div>
@@ -3238,6 +3316,35 @@
                 }
             }
         });
+
+        // 과거 완료 항목 고스트 처리 (오늘 날짜 기준)
+        (function applyPastCompletedGhost() {
+            // 오늘 날짜: 2/2 (월) = 컬럼 인덱스 15 (0-based from 담당자 컬럼)
+            // 날짜 매핑: 1/19=1, 1/20=2, ... 1/27=9, 1/28=10, 1/29=11, 1/30=12, 1/31=13, 2/1=14, 2/2=15
+            const todayColumnIndex = 15; // 2/2 (월)
+
+            // 모든 owner-row 내의 셀들을 순회
+            document.querySelectorAll('.owner-row').forEach(row => {
+                const cells = row.querySelectorAll('.gantt-cell');
+                cells.forEach((cell, idx) => {
+                    // 오늘 이전 셀의 완료 항목만 고스트 처리
+                    if (idx < todayColumnIndex) {
+                        cell.querySelectorAll('.task-bar.completed').forEach(bar => {
+                            if (!bar.classList.contains('completed-past')) {
+                                bar.classList.add('completed-past');
+                            }
+                        });
+                        // 완료 배경색 셀도 흐리게
+                        if (cell.style.background === 'rgb(236, 253, 245)' ||
+                            cell.style.background === '#ecfdf5') {
+                            cell.classList.add('past-completed');
+                        }
+                    }
+                });
+            });
+
+            console.log('✓ 과거 완료 항목 고스트 처리 완료');
+        })();
     </script>
 </body>
 </html>
