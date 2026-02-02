@@ -147,7 +147,7 @@
 <body>
   <header>
     <h1>용접선 건전성 검증</h1>
-    <div class="subtitle">교차 + 방향 + 길이 + 각도 + 거리 검사 (5항목)</div>
+    <div class="subtitle">교차 + 방향 + 길이 + 각도 + 거리 + 시작점 + 끝점 검사 (7항목)</div>
   </header>
 
   <main>
@@ -195,6 +195,7 @@
           <div class="setting-row">길이 오차 <input type="number" id="lenThreshold" value="20" min="0">mm</div>
           <div class="setting-row">각도 차이 <input type="number" id="angleThreshold" value="5" min="0">°</div>
           <div class="setting-row">최대 거리 <input type="number" id="distThreshold" value="20" min="0">mm</div>
+          <div class="setting-row">점 변위 <input type="number" id="offsetThreshold" value="20" min="0">mm</div>
         </div>
         <div class="btn-group">
           <button onclick="loadSample('cross')">교차</button>
@@ -202,6 +203,8 @@
           <button onclick="loadSample('len')">길이</button>
           <button onclick="loadSample('angle')">각도</button>
           <button onclick="loadSample('dist')">거리</button>
+          <button onclick="loadSample('startOff')">시작점</button>
+          <button onclick="loadSample('endOff')">끝점</button>
           <button onclick="loadSample('ok')">정상</button>
           <button class="primary" onclick="runValidation()">검사</button>
         </div>
@@ -210,12 +213,14 @@
 
     <div class="main-area">
       <div class="result-panel panel">
-        <h2>검사 결과 (5항목)</h2>
+        <h2>검사 결과 (7항목)</h2>
         <div id="crossResult" class="result-card"><h3>✖ 교차</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
         <div id="dirResult" class="result-card"><h3>➡ 방향</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
         <div id="lenResult" class="result-card"><h3>📏 길이</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
         <div id="angleResult" class="result-card"><h3>📐 각도</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
         <div id="distResult" class="result-card"><h3>↔ 거리</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
+        <div id="startOffResult" class="result-card"><h3>🎯 시작점</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
+        <div id="endOffResult" class="result-card"><h3>🏁 끝점</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
         <div id="totalResult" class="total-result waiting">
           <div class="total-icon">⏳</div>
           <div class="total-text">대기 중</div>
@@ -246,6 +251,8 @@
           <div class="code-tab" onclick="showCode('len')">길이</div>
           <div class="code-tab" onclick="showCode('angle')">각도</div>
           <div class="code-tab" onclick="showCode('dist')">거리</div>
+          <div class="code-tab" onclick="showCode('startOff')">시작점</div>
+          <div class="code-tab" onclick="showCode('endOff')">끝점</div>
         </div>
       </div>
       <pre><code id="code-content"></code></pre>
@@ -277,12 +284,29 @@
     <span class="comment">// 5. 거리 검사 (점-선분 최소거리)</span>
     <span class="keyword">public static</span> (<span class="keyword">bool</span>, <span class="keyword">double</span>) <span class="method">CheckDistance</span>(..., <span class="keyword">double</span> maxDist)
     {
-        <span class="comment">// 선분1의 중점에서 선분2까지의 수직거리 계산</span>
         <span class="keyword">double</span> dist = <span class="method">PointToSegmentDistance</span>(mid1, s2, e2);
         <span class="keyword">return</span> (dist <= maxDist, dist);
     }
 
-    <span class="comment">// 종합 검증</span>
+    <span class="comment">// 6. 시작점 변위 검사</span>
+    <span class="keyword">public static</span> (<span class="keyword">bool</span>, <span class="keyword">double</span>) <span class="method">CheckStartOffset</span>(
+        <span class="keyword">double</span> s1x, <span class="keyword">double</span> s1y, <span class="keyword">double</span> s2x, <span class="keyword">double</span> s2y,
+        <span class="keyword">double</span> threshold = <span class="number">20</span>)
+    {
+        <span class="keyword">double</span> dist = Math.Sqrt((s2x-s1x)*(s2x-s1x) + (s2y-s1y)*(s2y-s1y));
+        <span class="keyword">return</span> (dist <= threshold, dist);
+    }
+
+    <span class="comment">// 7. 끝점 변위 검사</span>
+    <span class="keyword">public static</span> (<span class="keyword">bool</span>, <span class="keyword">double</span>) <span class="method">CheckEndOffset</span>(
+        <span class="keyword">double</span> e1x, <span class="keyword">double</span> e1y, <span class="keyword">double</span> e2x, <span class="keyword">double</span> e2y,
+        <span class="keyword">double</span> threshold = <span class="number">20</span>)
+    {
+        <span class="keyword">double</span> dist = Math.Sqrt((e2x-e1x)*(e2x-e1x) + (e2y-e1y)*(e2y-e1y));
+        <span class="keyword">return</span> (dist <= threshold, dist);
+    }
+
+    <span class="comment">// 종합 검증 (7항목)</span>
     <span class="keyword">public static</span> ValidationResult <span class="method">Validate</span>(...)
     {
         <span class="keyword">return new</span> ValidationResult {
@@ -290,7 +314,9 @@
             DirOK = CheckDirection(...),
             LenOK = CheckLength(...),
             AngleOK = CheckAngle(...),
-            DistOK = CheckDistance(...)
+            DistOK = CheckDistance(...),
+            StartOffOK = CheckStartOffset(...),
+            EndOffOK = CheckEndOffset(...)
         };
     }
 }`;
@@ -447,6 +473,52 @@
     <span class="keyword">return</span> (dist <= maxDist, dist);
 }`;
 
+    const csharpCodeStartOff = `<span class="comment">// 시작점 변위 검사</span>
+<span class="comment">// 두 선분의 시작점 간 거리가 임계값 이내인지 확인</span>
+<span class="comment">// 목적: 평행하게 이동된(offset) 선분 검출</span>
+
+<span class="keyword">public static</span> (<span class="keyword">bool</span> ok, <span class="keyword">double</span> dist) <span class="method">CheckStartOffset</span>(
+    <span class="keyword">double</span> s1x, <span class="keyword">double</span> s1y,
+    <span class="keyword">double</span> s2x, <span class="keyword">double</span> s2y,
+    <span class="keyword">double</span> threshold = <span class="number">20</span>)
+{
+    <span class="comment">// 두 시작점 간 유클리드 거리</span>
+    <span class="keyword">double</span> dx = s2x - s1x;
+    <span class="keyword">double</span> dy = s2y - s1y;
+    <span class="keyword">double</span> dist = Math.Sqrt(dx * dx + dy * dy);
+
+    <span class="comment">// 거리가 임계값 이하면 Pass</span>
+    <span class="keyword">return</span> (dist <= threshold, dist);
+}
+
+<span class="comment">// 사용 예시</span>
+<span class="keyword">var</span> result = CheckStartOffset(s1x, s1y, s2x, s2y, <span class="number">20</span>);
+<span class="comment">// result.ok가 true면 Pass</span>
+<span class="comment">// result.dist: 시작점 간 거리 (mm)</span>`;
+
+    const csharpCodeEndOff = `<span class="comment">// 끝점 변위 검사</span>
+<span class="comment">// 두 선분의 끝점 간 거리가 임계값 이내인지 확인</span>
+<span class="comment">// 목적: 평행하게 이동된(offset) 선분 검출</span>
+
+<span class="keyword">public static</span> (<span class="keyword">bool</span> ok, <span class="keyword">double</span> dist) <span class="method">CheckEndOffset</span>(
+    <span class="keyword">double</span> e1x, <span class="keyword">double</span> e1y,
+    <span class="keyword">double</span> e2x, <span class="keyword">double</span> e2y,
+    <span class="keyword">double</span> threshold = <span class="number">20</span>)
+{
+    <span class="comment">// 두 끝점 간 유클리드 거리</span>
+    <span class="keyword">double</span> dx = e2x - e1x;
+    <span class="keyword">double</span> dy = e2y - e1y;
+    <span class="keyword">double</span> dist = Math.Sqrt(dx * dx + dy * dy);
+
+    <span class="comment">// 거리가 임계값 이하면 Pass</span>
+    <span class="keyword">return</span> (dist <= threshold, dist);
+}
+
+<span class="comment">// 사용 예시</span>
+<span class="keyword">var</span> result = CheckEndOffset(e1x, e1y, e2x, e2y, <span class="number">20</span>);
+<span class="comment">// result.ok가 true면 Pass</span>
+<span class="comment">// result.dist: 끝점 간 거리 (mm)</span>`;
+
     // === Algorithms ===
     function ccw(ax, ay, bx, by, cx, cy) {
       return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
@@ -499,6 +571,18 @@
       return { ok: dist <= maxDist, dist, mid1x, mid1y };
     }
 
+    function checkStartOffset(s1x, s1y, s2x, s2y, threshold) {
+      const dx = s2x - s1x, dy = s2y - s1y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      return { ok: dist <= threshold, dist };
+    }
+
+    function checkEndOffset(e1x, e1y, e2x, e2y, threshold) {
+      const dx = e2x - e1x, dy = e2y - e1y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      return { ok: dist <= threshold, dist };
+    }
+
     // === UI ===
     function getInputValues() {
       const get = id => parseFloat(document.getElementById(id).value) || 0;
@@ -509,7 +593,8 @@
         e2x: get('e2x'), e2y: get('e2y'), e2z: get('e2z'),
         lenThreshold: get('lenThreshold'),
         angleThreshold: get('angleThreshold'),
-        distThreshold: get('distThreshold')
+        distThreshold: get('distThreshold'),
+        offsetThreshold: get('offsetThreshold')
       };
     }
 
@@ -527,6 +612,8 @@
       len: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:0,s2y:12,e2x:2950,e2y:12 },          // 길이 차이 50mm
       angle: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:0,s2y:12,e2x:3000,e2y:312 },       // 각도 차이 ~5.7°
       dist: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:0,s2y:50,e2x:3000,e2y:50 },         // 거리 50mm (초과)
+      startOff: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:70,s2y:0,e2x:3070,e2y:0 },     // 시작점 70mm 변위 (평행 이동)
+      endOff: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:0,s2y:0,e2x:2930,e2y:0 },         // 끝점 70mm 변위
       ok: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:0,s2y:12,e2x:3000,e2y:12 }            // 정상 (12mm 간격)
     };
 
@@ -558,15 +645,20 @@
       const len = checkLength(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.lenThreshold);
       const angle = checkAngle(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.angleThreshold);
       const dist = checkDistance(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.distThreshold);
+      const startOff = checkStartOffset(v.s1x, v.s1y, v.s2x, v.s2y, v.offsetThreshold);
+      const endOff = checkEndOffset(v.e1x, v.e1y, v.e2x, v.e2y, v.offsetThreshold);
 
       const crossOK = !cross, dirOK = dir, lenOK = len.ok, angleOK = angle.ok, distOK = dist.ok;
-      const allOK = crossOK && dirOK && lenOK && angleOK && distOK;
+      const startOffOK = startOff.ok, endOffOK = endOff.ok;
+      const allOK = crossOK && dirOK && lenOK && angleOK && distOK && startOffOK && endOffOK;
 
       updateResult('crossResult', crossOK, crossOK ? 'PASS' : 'FAIL', crossOK ? '교차 없음' : '교차 발생!');
       updateResult('dirResult', dirOK, dirOK ? 'PASS' : 'FAIL', dirOK ? '같은 방향' : '방향 역전!');
       updateResult('lenResult', lenOK, lenOK ? 'PASS' : 'FAIL', `차이 ${len.diff.toFixed(1)}mm (≤${v.lenThreshold}mm)`);
       updateResult('angleResult', angleOK, angleOK ? 'PASS' : 'FAIL', `차이 ${angle.diff.toFixed(1)}° (≤${v.angleThreshold}°)`);
       updateResult('distResult', distOK, distOK ? 'PASS' : 'FAIL', `거리 ${dist.dist.toFixed(1)}mm (≤${v.distThreshold}mm)`);
+      updateResult('startOffResult', startOffOK, startOffOK ? 'PASS' : 'FAIL', `변위 ${startOff.dist.toFixed(1)}mm (≤${v.offsetThreshold}mm)`);
+      updateResult('endOffResult', endOffOK, endOffOK ? 'PASS' : 'FAIL', `변위 ${endOff.dist.toFixed(1)}mm (≤${v.offsetThreshold}mm)`);
 
       const fails = [];
       if (!crossOK) fails.push('교차');
@@ -574,13 +666,15 @@
       if (!lenOK) fails.push('길이');
       if (!angleOK) fails.push('각도');
       if (!distOK) fails.push('거리');
+      if (!startOffOK) fails.push('시작점');
+      if (!endOffOK) fails.push('끝점');
 
       const total = document.getElementById('totalResult');
       total.className = `total-result ${allOK ? 'pass' : 'fail'}`;
       total.innerHTML = `
         <div class="total-icon">${allOK ? '✅' : '❌'}</div>
         <div class="total-text">${allOK ? '종합 PASS' : '종합 FAIL'}</div>
-        <div class="total-detail">${allOK ? '5개 항목 모두 통과' : fails.join('+') + ' 불합격'}</div>
+        <div class="total-detail">${allOK ? '7개 항목 모두 통과' : fails.join('+') + ' 불합격'}</div>
       `;
 
       document.getElementById('info1').textContent = `L=${len.len1.toFixed(1)} θ=${angle.angle1.toFixed(1)}°`;
@@ -588,7 +682,7 @@
       document.getElementById('distInfo').style.display = 'flex';
       document.getElementById('distVal').textContent = dist.dist.toFixed(1);
 
-      drawCanvas(v, {cross, dir, len, angle, dist});
+      drawCanvas(v, {cross, dir, len, angle, dist, startOff, endOff});
     }
 
     function drawCanvas(v, results) {
@@ -709,7 +803,9 @@
       if (!results.dir) { ctx.fillStyle = '#e74c3c'; ctx.fillText('⚠ 방향 역전', P, wy); wy += 16; }
       if (!results.len.ok) { ctx.fillStyle = '#e67e22'; ctx.fillText(`⚠ 길이 차이 ${results.len.diff.toFixed(1)}mm`, P, wy); wy += 16; }
       if (!results.angle.ok) { ctx.fillStyle = '#8e44ad'; ctx.fillText(`⚠ 각도 차이 ${results.angle.diff.toFixed(1)}°`, P, wy); wy += 16; }
-      if (!results.dist.ok) { ctx.fillStyle = '#9b59b6'; ctx.fillText(`⚠ 거리 ${results.dist.dist.toFixed(1)}mm`, P, wy); }
+      if (!results.dist.ok) { ctx.fillStyle = '#9b59b6'; ctx.fillText(`⚠ 거리 ${results.dist.dist.toFixed(1)}mm`, P, wy); wy += 16; }
+      if (!results.startOff.ok) { ctx.fillStyle = '#1abc9c'; ctx.fillText(`⚠ 시작점 변위 ${results.startOff.dist.toFixed(1)}mm`, P, wy); wy += 16; }
+      if (!results.endOff.ok) { ctx.fillStyle = '#f39c12'; ctx.fillText(`⚠ 끝점 변위 ${results.endOff.dist.toFixed(1)}mm`, P, wy); }
 
       ctx.fillStyle = '#7f8c8d'; ctx.font = 'bold 11px system-ui';
       ctx.fillText('X', W - P + 10, toY(0) - 5);
@@ -725,7 +821,9 @@
         dir: csharpCodeDir,
         len: csharpCodeLen,
         angle: csharpCodeAngle,
-        dist: csharpCodeDist
+        dist: csharpCodeDist,
+        startOff: csharpCodeStartOff,
+        endOff: csharpCodeEndOff
       };
       document.getElementById('code-content').innerHTML = codes[type];
     }
