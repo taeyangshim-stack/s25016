@@ -1121,9 +1121,19 @@
                 </div>
                 <div class="table-actions">
                     <div class="view-toggle" role="group" aria-label="보기 모드 선택">
-                        <button type="button" class="view-btn active" data-view="matrix" onclick="switchView('matrix')">매트릭스</button>
+                        <button type="button" class="view-btn" data-view="matrix" onclick="switchView('matrix')">매트릭스</button>
                         <button type="button" class="view-btn" data-view="card" onclick="switchView('card')">카드형</button>
-                        <button type="button" class="view-btn" data-view="table" onclick="switchView('table')">테이블형</button>
+                        <button type="button" class="view-btn active" data-view="table" onclick="switchView('table')">테이블형</button>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="itemsPerPageSelect" style="font-size: var(--font-sm); color: var(--color-gray-600);">표시:</label>
+                        <select id="itemsPerPageSelect" onchange="changeItemsPerPage(this.value)" style="padding: 4px 8px; border: 1px solid var(--color-gray-300); border-radius: var(--border-radius-base); font-size: var(--font-sm);">
+                            <option value="10">10개</option>
+                            <option value="20" selected>20개</option>
+                            <option value="50">50개</option>
+                            <option value="100">100개</option>
+                            <option value="all">전체</option>
+                        </select>
                     </div>
                     <button class="btn btn-outline btn-sm" onclick="exportToCSV()">📥 CSV 내보내기</button>
                 </div>
@@ -1180,11 +1190,11 @@
         let allIssues = [];
         let filteredIssues = [];
         let currentPage = 1;
-        const itemsPerPage = 20;
+        let itemsPerPage = 20;
         let sortColumn = 'id';
         let sortDirection = 'desc';
         let categoryConfig = null;
-        let currentView = 'matrix';
+        let currentView = 'table';
         const MATRIX_MAX_ITEMS = 4;
         const DOMAIN_ORDER = ['기계', '전기', '제어'];
         const STATS_STORAGE_KEY = 'punchlist_stats_snapshot';
@@ -1929,6 +1939,17 @@
                 updatePagination();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
+        }
+
+        function changeItemsPerPage(value) {
+            if (value === 'all') {
+                itemsPerPage = filteredIssues.length || 9999;
+            } else {
+                itemsPerPage = parseInt(value, 10);
+            }
+            currentPage = 1;
+            renderTable();
+            updatePagination();
         }
 
         // CSV 내보내기
