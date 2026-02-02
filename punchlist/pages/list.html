@@ -1201,13 +1201,92 @@
         const MATRIX_MAX_ITEMS = 4;
         const DOMAIN_ORDER = ['기계', '전기', '제어'];
         const STATS_STORAGE_KEY = 'punchlist_stats_snapshot';
+        const USER_SETTINGS_KEY = 'punchlist_user_settings';
         let statsSnapshotCache = null;
+
+        // 사용자 설정 저장
+        function saveUserSettings() {
+            const excludeSelect = document.getElementById('excludeSortValue');
+            const excludeValues = Array.from(excludeSelect.selectedOptions).map(opt => opt.value);
+
+            const settings = {
+                currentView,
+                itemsPerPage,
+                excludeColumn: document.getElementById('excludeSortColumn').value,
+                excludeValues
+            };
+
+            try {
+                localStorage.setItem(USER_SETTINGS_KEY, JSON.stringify(settings));
+            } catch (error) {
+                console.warn('사용자 설정 저장 실패:', error);
+            }
+        }
+
+        // 사용자 설정 불러오기
+        function loadUserSettings() {
+            try {
+                const raw = localStorage.getItem(USER_SETTINGS_KEY);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (error) {
+                console.warn('사용자 설정 로드 실패:', error);
+                return null;
+            }
+        }
+
+        // 사용자 설정 적용
+        function applyUserSettings() {
+            const settings = loadUserSettings();
+            if (!settings) return;
+
+            // 뷰 모드 적용
+            if (settings.currentView) {
+                currentView = settings.currentView;
+            }
+
+            // 표시 개수 적용
+            if (settings.itemsPerPage) {
+                itemsPerPage = settings.itemsPerPage;
+                const itemsSelect = document.getElementById('itemsPerPageSelect');
+                if (itemsSelect) {
+                    const value = settings.itemsPerPage === 9999 ? 'all' : settings.itemsPerPage.toString();
+                    itemsSelect.value = value;
+                }
+            }
+
+            // 숨김 필터 적용 (이슈 로드 후 적용)
+            return settings;
+        }
+
+        // 숨김 필터 설정 적용 (이슈 로드 후 호출)
+        function applyExcludeSettings(settings) {
+            if (!settings || !settings.excludeColumn) return;
+
+            const columnSelect = document.getElementById('excludeSortColumn');
+            columnSelect.value = settings.excludeColumn;
+            updateExcludeValueOptions();
+
+            if (settings.excludeValues && settings.excludeValues.length > 0) {
+                const valueSelect = document.getElementById('excludeSortValue');
+                Array.from(valueSelect.options).forEach(opt => {
+                    opt.selected = settings.excludeValues.includes(opt.value);
+                });
+            }
+        }
 
         // 페이지 로드
         document.addEventListener('DOMContentLoaded', async () => {
+            const savedSettings = applyUserSettings();
             await initFilters();
             updateViewToggle();
             await loadIssues();
+
+            // 숨김 필터 설정 적용 (이슈 로드 후)
+            if (savedSettings) {
+                applyExcludeSettings(savedSettings);
+                applyFilters();
+            }
         });
 
         function updateViewToggle() {
@@ -1241,6 +1320,7 @@
             if (currentView === view) return;
             currentView = view;
             renderTable();
+            saveUserSettings();
         }
 
         function handleOverdueCardClick(event) {
@@ -1490,6 +1570,7 @@
             renderTable();
             updatePagination();
             updateStats(allIssues);
+            saveUserSettings();
         }
 
         // 필터 초기화
@@ -1743,7 +1824,7 @@
                 const scheduleClass = isOverdue ? 'schedule-overdue' : 'schedule-date';
 
                 const tableRow = `
-                    <tr${rowClassAttr}>
+                    <tr${rowClassAttr} onclick="window.open('detail.html?id=${issue.id}', '_blank')" style="cursor: pointer;" title="클릭하여 상세 보기">
                         <td class="priority-cell">
                             <div class="priority-indicator">
                                 <span class="priority-icon">${priorityIcon}</span>
@@ -1998,6 +2079,7 @@
             currentPage = 1;
             renderTable();
             updatePagination();
+            saveUserSettings();
         }
 
         // CSV 내보내기
