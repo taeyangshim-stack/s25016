@@ -1095,8 +1095,8 @@
 
             <div class="filter-row" style="margin-top: var(--space-4); border-top: 1px solid var(--color-gray-200); padding-top: var(--space-4);">
                 <div class="filter-group">
-                    <label>정렬 시 제외할 항목 (열)</label>
-                    <select id="excludeSortColumn" onchange="updateExcludeValueOptions()">
+                    <label>목록에서 숨길 항목 (열)</label>
+                    <select id="excludeSortColumn" onchange="updateExcludeValueOptions(); applyFilters();">
                         <option value="">선택 안함</option>
                         <option value="status">상태</option>
                         <option value="priority">우선순위</option>
@@ -1104,11 +1104,14 @@
                         <option value="line_classification">라인 분류</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <label>정렬 시 제외할 항목 (값)</label>
-                    <select id="excludeSortValue">
-                        <option value="">선택 안함</option>
+                <div class="filter-group" style="min-width: 200px;">
+                    <label>숨길 값 (Ctrl+클릭으로 다중선택)</label>
+                    <select id="excludeSortValue" multiple size="4" onchange="applyFilters();" style="min-height: 80px;">
                     </select>
+                </div>
+                <div class="filter-group" id="excludeSelectedDisplay" style="display: none;">
+                    <label>선택된 숨김 항목</label>
+                    <div id="excludeSelectedTags" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
                 </div>
             </div>
         </div>
@@ -1205,9 +1208,6 @@
             await initFilters();
             updateViewToggle();
             await loadIssues();
-            
-            document.getElementById('excludeSortColumn').addEventListener('change', applyFilters);
-            document.getElementById('excludeSortValue').addEventListener('change', applyFilters);
         });
 
         function updateViewToggle() {
@@ -1335,7 +1335,7 @@
                 const priorityIcon = priorityIcons[issue.priority] || '📌';
 
                 return `
-                    <div class="matrix-issue" onclick="window.location.href='detail.html?id=${issue.id}'">
+                    <div class="matrix-issue" onclick="window.open('detail.html?id=${issue.id}', '_blank')">
                         <div class="matrix-issue-header">
                             <span class="matrix-issue-id">${issue.id}</span>
                             ${statusBadge}
@@ -1475,6 +1475,16 @@
             };
 
             filteredIssues = PunchListAPI.filterIssues(allIssues, filters);
+
+            // 숨김 필터 적용 (다중 선택 지원)
+            const excludeColumn = document.getElementById('excludeSortColumn').value;
+            const excludeSelect = document.getElementById('excludeSortValue');
+            const excludeValues = Array.from(excludeSelect.selectedOptions).map(opt => opt.value);
+            if (excludeColumn && excludeValues.length > 0) {
+                filteredIssues = filteredIssues.filter(issue => !excludeValues.includes(issue[excludeColumn]));
+            }
+            updateExcludeSelectedDisplay(excludeValues);
+
             sortIssues();
             currentPage = 1;
             renderTable();
@@ -1492,7 +1502,12 @@
             document.getElementById('filterLine').value = '';
             document.getElementById('searchInput').value = '';
             document.getElementById('excludeSortColumn').value = '';
-            document.getElementById('excludeSortValue').value = '';
+
+            // 다중 선택 초기화
+            const excludeValueSelect = document.getElementById('excludeSortValue');
+            excludeValueSelect.innerHTML = '';
+            Array.from(excludeValueSelect.options).forEach(opt => opt.selected = false);
+            updateExcludeSelectedDisplay([]);
 
             document.getElementById('filterSubcategory').innerHTML = '<option value="">전체</option>';
 
@@ -1589,9 +1604,12 @@
         function updateExcludeValueOptions() {
             const column = document.getElementById('excludeSortColumn').value;
             const valueSelect = document.getElementById('excludeSortValue');
-            valueSelect.innerHTML = '<option value="">선택 안함</option>';
+            valueSelect.innerHTML = '';
 
-            if (!column) return;
+            if (!column) {
+                updateExcludeSelectedDisplay([]);
+                return;
+            }
 
             let options = [];
             switch (column) {
@@ -1615,6 +1633,36 @@
                 option.textContent = opt;
                 valueSelect.appendChild(option);
             });
+            updateExcludeSelectedDisplay([]);
+        }
+
+        function updateExcludeSelectedDisplay(selectedValues) {
+            const displayContainer = document.getElementById('excludeSelectedDisplay');
+            const tagsContainer = document.getElementById('excludeSelectedTags');
+
+            if (!selectedValues || selectedValues.length === 0) {
+                displayContainer.style.display = 'none';
+                tagsContainer.innerHTML = '';
+                return;
+            }
+
+            displayContainer.style.display = 'block';
+            tagsContainer.innerHTML = selectedValues.map(val =>
+                `<span style="background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;">
+                    🚫 ${val}
+                    <button type="button" onclick="removeExcludeValue('${val}')" style="background: none; border: none; cursor: pointer; padding: 0; font-size: 14px; line-height: 1;">×</button>
+                </span>`
+            ).join('');
+        }
+
+        function removeExcludeValue(value) {
+            const valueSelect = document.getElementById('excludeSortValue');
+            Array.from(valueSelect.options).forEach(opt => {
+                if (opt.value === value) {
+                    opt.selected = false;
+                }
+            });
+            applyFilters();
         }
 
         // 테이블/카드/매트릭스 렌더링
@@ -1731,7 +1779,7 @@
                             ${recentIndicator}
                         </td>
                         <td class="action-cell">
-                            <button class="action-btn" onclick="event.stopPropagation(); window.location.href='detail.html?id=${issue.id}'">
+                            <button class="action-btn" onclick="event.stopPropagation(); window.open('detail.html?id=${issue.id}', '_blank')">
                                 상세
                             </button>
                         </td>
@@ -1782,7 +1830,7 @@
                                 최근 변경: ${updatedLabel} ${recentIndicator}
                             </span>
                             <div class="card-actions">
-                                <button class="action-btn" onclick="event.stopPropagation(); window.location.href='detail.html?id=${issue.id}'">
+                                <button class="action-btn" onclick="event.stopPropagation(); window.open('detail.html?id=${issue.id}', '_blank')">
                                     상세
                                 </button>
                             </div>
