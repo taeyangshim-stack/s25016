@@ -51,6 +51,7 @@
     { "source": "/business-trip/create-expense", "destination": "/projects/business-trip/pages/create-expense.html" },
     { "source": "/business-trip/expense-list", "destination": "/projects/business-trip/pages/expense-list.html" },
     { "source": "/business-trip/detail-expense", "destination": "/projects/business-trip/pages/detail-expense.html" },
-    { "source": "/business-trip/edit-expense", "destination": "/projects/business-trip/pages/edit-expense.html" }
+    { "source": "/business-trip/edit-expense", "destination": "/projects/business-trip/pages/edit-expense.html" },
+    { "source": "/weld-line-check", "destination": "/projects/weld-line-check/index.html" }
   ]
 }

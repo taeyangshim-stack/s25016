@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>용접선 교차 검증 - Weld Line Cross Check</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a23;
+      --border: #23283a;
+      --text: #e6e8ee;
+      --muted: #a8b0bf;
+      --accent: #4fc3f7;
+      --line1: #ff6b6b;
+      --line2: #4ecdc4;
+      --pass: #2ecc71;
+      --fail: #e74c3c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.6 system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif;
+    }
+    header {
+      padding: 24px 20px;
+      background: linear-gradient(180deg, #151826, #121520);
+      border-bottom: 1px solid var(--border);
+    }
+    h1 { margin: 0 0 6px; font-size: 20px; }
+    .subtitle { color: var(--muted); font-size: 13px; }
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .panel h2 {
+      margin: 0 0 16px;
+      font-size: 16px;
+      color: var(--accent);
+    }
+    .input-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .point-input {
+      background: #111521;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .point-input h4 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .point-input h4 .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .line1 .dot { background: var(--line1); }
+    .line2 .dot { background: var(--line2); }
+    .coords {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .coords label {
+      display: flex;
+      flex-direction: column;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .coords input {
+      margin-top: 4px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      text-align: center;
+    }
+    .coords input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    button {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #111521;
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: #1a1e2e;
+      border-color: var(--accent);
+    }
+    button.primary {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    button.primary:hover {
+      background: #3daee0;
+    }
+    /* Result */
+    .result-box {
+      text-align: center;
+      padding: 24px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .result-box.pass {
+      background: rgba(46, 204, 113, 0.15);
+      border: 2px solid var(--pass);
+    }
+    .result-box.fail {
+      background: rgba(231, 76, 60, 0.15);
+      border: 2px solid var(--fail);
+    }
+    .result-box.waiting {
+      background: rgba(79, 195, 247, 0.1);
+      border: 2px dashed var(--border);
+    }
+    .result-icon {
+      font-size: 48px;
+      margin-bottom: 8px;
+    }
+    .result-text {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .result-box.pass .result-text { color: var(--pass); }
+    .result-box.fail .result-text { color: var(--fail); }
+    .result-box.waiting .result-text { color: var(--muted); }
+    .result-detail {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    /* Canvas */
+    .canvas-container {
+      background: #0a0c10;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 400px;
+    }
+    .canvas-legend {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(23, 26, 35, 0.9);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0;
+    }
+    .legend-dot {
+      width: 20px;
+      height: 3px;
+      border-radius: 2px;
+    }
+    /* Code Panel */
+    .code-panel {
+      margin-top: 20px;
+    }
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .code-header h2 {
+      margin: 0;
+    }
+    .code-tabs {
+      display: flex;
+      gap: 4px;
+    }
+    .code-tab {
+      padding: 6px 12px;
+      background: #111521;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .code-tab.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    pre {
+      background: #0a0c10;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0;
+    }
+    code {
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    }
+    .keyword { color: #c792ea; }
+    .type { color: #82aaff; }
+    .string { color: #c3e88d; }
+    .number { color: #f78c6c; }
+    .comment { color: #546e7a; }
+    .method { color: #ffcb6b; }
+    footer {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 20px 40px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>용접선 교차 검증</h1>
+    <div class="subtitle">Weld Line Cross Check · XY 평면 투영 기반 선분 교차 검사</div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- 입력 패널 -->
+      <div class="panel">
+        <h2>좌표 입력</h2>
+        <p style="color: var(--muted); font-size: 13px; margin: 0 0 16px;">
+          3D 좌표를 입력하면 XY 평면에 투영하여 교차 여부를 검사합니다.
+        </p>
+
+        <div class="input-group">
+          <div class="point-input line1">
+            <h4><span class="dot"></span>용접선 1 - 시작점</h4>
+            <div class="coords">
+              <label>X <input type="number" id="s1x" value="0" step="0.1"></label>
+              <label>Y <input type="number" id="s1y" value="0" step="0.1"></label>
+              <label>Z <input type="number" id="s1z" value="0" step="0.1"></label>
+            </div>
+          </div>
+          <div class="point-input line1">
+            <h4><span class="dot"></span>용접선 1 - 끝점</h4>
+            <div class="coords">
+              <label>X <input type="number" id="e1x" value="100" step="0.1"></label>
+              <label>Y <input type="number" id="e1y" value="100" step="0.1"></label>
+              <label>Z <input type="number" id="e1z" value="0" step="0.1"></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <div class="point-input line2">
+            <h4><span class="dot"></span>용접선 2 - 시작점</h4>
+            <div class="coords">
+              <label>X <input type="number" id="s2x" value="0" step="0.1"></label>
+              <label>Y <input type="number" id="s2y" value="100" step="0.1"></label>
+              <label>Z <input type="number" id="s2z" value="0" step="0.1"></label>
+            </div>
+          </div>
+          <div class="point-input line2">
+            <h4><span class="dot"></span>용접선 2 - 끝점</h4>
+            <div class="coords">
+              <label>X <input type="number" id="e2x" value="100" step="0.1"></label>
+              <label>Y <input type="number" id="e2y" value="0" step="0.1"></label>
+              <label>Z <input type="number" id="e2z" value="0" step="0.1"></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button onclick="loadSample1()">샘플 1 (교차)</button>
+          <button onclick="loadSample2()">샘플 2 (비교차)</button>
+          <button class="primary" onclick="checkIntersection()">검사 실행</button>
+        </div>
+      </div>
+
+      <!-- 결과 패널 -->
+      <div class="panel">
+        <h2>검사 결과</h2>
+        <div id="result" class="result-box waiting">
+          <div class="result-icon">⏳</div>
+          <div class="result-text">대기 중</div>
+          <div class="result-detail">좌표를 입력하고 검사를 실행하세요</div>
+        </div>
+
+        <div class="canvas-container">
+          <canvas id="canvas"></canvas>
+          <div class="canvas-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--line1);"></div>
+              <span>용접선 1</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--line2);"></div>
+              <span>용접선 2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- C# 코드 패널 -->
+    <div class="panel code-panel">
+      <div class="code-header">
+        <h2>C# 교차 검증 알고리즘</h2>
+        <div class="code-tabs">
+          <div class="code-tab active" onclick="showCode('full')">전체 코드</div>
+          <div class="code-tab" onclick="showCode('core')">핵심 로직</div>
+        </div>
+      </div>
+      <pre id="code-display"><code id="code-content"></code></pre>
+    </div>
+  </main>
+
+  <footer>
+    용접선 교차 검증 대시보드 · XY 평면 투영 기반 2D 선분 교차 알고리즘 적용
+  </footer>
+
+  <script>
+    // ============================================
+    // C# Code Strings
+    // ============================================
+    const csharpCodeFull = `<span class="keyword">using</span> System;
+
+<span class="keyword">namespace</span> WeldLineCheck
+{
+    <span class="comment">/// &lt;summary&gt;
+    /// 3D 좌표를 XY 평면에 투영하여 선분 교차 여부를 검사하는 클래스
+    /// &lt;/summary&gt;</span>
+    <span class="keyword">public class</span> <span class="type">WeldLineCrossChecker</span>
+    {
+        <span class="comment">// 2D 점 구조체 (XY 평면 투영용)</span>
+        <span class="keyword">public struct</span> <span class="type">Point2D</span>
+        {
+            <span class="keyword">public double</span> X;
+            <span class="keyword">public double</span> Y;
+
+            <span class="keyword">public</span> <span class="method">Point2D</span>(<span class="keyword">double</span> x, <span class="keyword">double</span> y)
+            {
+                X = x;
+                Y = y;
+            }
+        }
+
+        <span class="comment">// 3D 점을 XY 평면에 투영 (Z 좌표 무시)</span>
+        <span class="keyword">public static</span> <span class="type">Point2D</span> <span class="method">ProjectToXY</span>(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> z)
+        {
+            <span class="keyword">return new</span> <span class="type">Point2D</span>(x, y);
+        }
+
+        <span class="comment">/// &lt;summary&gt;
+        /// CCW (Counter-Clockwise) 방향 판별
+        /// 세 점의 방향 관계를 반환: 양수=반시계, 음수=시계, 0=일직선
+        /// &lt;/summary&gt;</span>
+        <span class="keyword">private static double</span> <span class="method">CCW</span>(<span class="type">Point2D</span> a, <span class="type">Point2D</span> b, <span class="type">Point2D</span> c)
+        {
+            <span class="keyword">return</span> (b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X);
+        }
+
+        <span class="comment">/// &lt;summary&gt;
+        /// 두 선분의 교차 여부 판별 (XY 평면)
+        /// 선분 1: p1 → p2
+        /// 선분 2: p3 → p4
+        /// &lt;/summary&gt;</span>
+        <span class="keyword">public static bool</span> <span class="method">DoLinesIntersect</span>(
+            <span class="type">Point2D</span> p1, <span class="type">Point2D</span> p2,
+            <span class="type">Point2D</span> p3, <span class="type">Point2D</span> p4)
+        {
+            <span class="keyword">double</span> d1 = <span class="method">CCW</span>(p3, p4, p1);
+            <span class="keyword">double</span> d2 = <span class="method">CCW</span>(p3, p4, p2);
+            <span class="keyword">double</span> d3 = <span class="method">CCW</span>(p1, p2, p3);
+            <span class="keyword">double</span> d4 = <span class="method">CCW</span>(p1, p2, p4);
+
+            <span class="comment">// 서로 다른 방향에 있으면 교차</span>
+            <span class="keyword">if</span> (((d1 > <span class="number">0</span> && d2 < <span class="number">0</span>) || (d1 < <span class="number">0</span> && d2 > <span class="number">0</span>)) &&
+                ((d3 > <span class="number">0</span> && d4 < <span class="number">0</span>) || (d3 < <span class="number">0</span> && d4 > <span class="number">0</span>)))
+            {
+                <span class="keyword">return true</span>;
+            }
+
+            <span class="comment">// 경계 케이스: 점이 선분 위에 있는 경우</span>
+            <span class="keyword">if</span> (d1 == <span class="number">0</span> && <span class="method">OnSegment</span>(p3, p1, p4)) <span class="keyword">return true</span>;
+            <span class="keyword">if</span> (d2 == <span class="number">0</span> && <span class="method">OnSegment</span>(p3, p2, p4)) <span class="keyword">return true</span>;
+            <span class="keyword">if</span> (d3 == <span class="number">0</span> && <span class="method">OnSegment</span>(p1, p3, p2)) <span class="keyword">return true</span>;
+            <span class="keyword">if</span> (d4 == <span class="number">0</span> && <span class="method">OnSegment</span>(p1, p4, p2)) <span class="keyword">return true</span>;
+
+            <span class="keyword">return false</span>;
+        }
+
+        <span class="comment">// 점 q가 선분 pr 위에 있는지 확인</span>
+        <span class="keyword">private static bool</span> <span class="method">OnSegment</span>(<span class="type">Point2D</span> p, <span class="type">Point2D</span> q, <span class="type">Point2D</span> r)
+        {
+            <span class="keyword">return</span> q.X <= Math.Max(p.X, r.X) && q.X >= Math.Min(p.X, r.X) &&
+                   q.Y <= Math.Max(p.Y, r.Y) && q.Y >= Math.Min(p.Y, r.Y);
+        }
+
+        <span class="comment">/// &lt;summary&gt;
+        /// 메인 검사 함수: 3D 좌표 입력 → XY 투영 → 교차 검사
+        /// &lt;/summary&gt;</span>
+        <span class="keyword">public static bool</span> <span class="method">CheckWeldLineCross</span>(
+            <span class="keyword">double</span> s1x, <span class="keyword">double</span> s1y, <span class="keyword">double</span> s1z,  <span class="comment">// 용접선 1 시작점</span>
+            <span class="keyword">double</span> e1x, <span class="keyword">double</span> e1y, <span class="keyword">double</span> e1z,  <span class="comment">// 용접선 1 끝점</span>
+            <span class="keyword">double</span> s2x, <span class="keyword">double</span> s2y, <span class="keyword">double</span> s2z,  <span class="comment">// 용접선 2 시작점</span>
+            <span class="keyword">double</span> e2x, <span class="keyword">double</span> e2y, <span class="keyword">double</span> e2z)  <span class="comment">// 용접선 2 끝점</span>
+        {
+            <span class="comment">// XY 평면에 투영</span>
+            <span class="type">Point2D</span> start1 = <span class="method">ProjectToXY</span>(s1x, s1y, s1z);
+            <span class="type">Point2D</span> end1   = <span class="method">ProjectToXY</span>(e1x, e1y, e1z);
+            <span class="type">Point2D</span> start2 = <span class="method">ProjectToXY</span>(s2x, s2y, s2z);
+            <span class="type">Point2D</span> end2   = <span class="method">ProjectToXY</span>(e2x, e2y, e2z);
+
+            <span class="comment">// 교차 검사</span>
+            <span class="keyword">return</span> <span class="method">DoLinesIntersect</span>(start1, end1, start2, end2);
+        }
+    }
+}`;
+
+    const csharpCodeCore = `<span class="comment">/// CCW (Counter-Clockwise) 방향 판별</span>
+<span class="keyword">private static double</span> <span class="method">CCW</span>(<span class="type">Point2D</span> a, <span class="type">Point2D</span> b, <span class="type">Point2D</span> c)
+{
+    <span class="keyword">return</span> (b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X);
+}
+
+<span class="comment">/// 두 선분의 교차 여부 판별</span>
+<span class="keyword">public static bool</span> <span class="method">DoLinesIntersect</span>(
+    <span class="type">Point2D</span> p1, <span class="type">Point2D</span> p2,
+    <span class="type">Point2D</span> p3, <span class="type">Point2D</span> p4)
+{
+    <span class="keyword">double</span> d1 = <span class="method">CCW</span>(p3, p4, p1);
+    <span class="keyword">double</span> d2 = <span class="method">CCW</span>(p3, p4, p2);
+    <span class="keyword">double</span> d3 = <span class="method">CCW</span>(p1, p2, p3);
+    <span class="keyword">double</span> d4 = <span class="method">CCW</span>(p1, p2, p4);
+
+    <span class="comment">// 서로 다른 방향에 있으면 교차</span>
+    <span class="keyword">if</span> (((d1 > <span class="number">0</span> && d2 < <span class="number">0</span>) || (d1 < <span class="number">0</span> && d2 > <span class="number">0</span>)) &&
+        ((d3 > <span class="number">0</span> && d4 < <span class="number">0</span>) || (d3 < <span class="number">0</span> && d4 > <span class="number">0</span>)))
+    {
+        <span class="keyword">return true</span>;
+    }
+
+    <span class="keyword">return false</span>;
+}`;
+
+    // ============================================
+    // JavaScript Implementation (same algorithm)
+    // ============================================
+
+    function ccw(ax, ay, bx, by, cx, cy) {
+      return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+    }
+
+    function onSegment(px, py, qx, qy, rx, ry) {
+      return qx <= Math.max(px, rx) && qx >= Math.min(px, rx) &&
+             qy <= Math.max(py, ry) && qy >= Math.min(py, ry);
+    }
+
+    function doLinesIntersect(p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) {
+      const d1 = ccw(p3x, p3y, p4x, p4y, p1x, p1y);
+      const d2 = ccw(p3x, p3y, p4x, p4y, p2x, p2y);
+      const d3 = ccw(p1x, p1y, p2x, p2y, p3x, p3y);
+      const d4 = ccw(p1x, p1y, p2x, p2y, p4x, p4y);
+
+      if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
+          ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) {
+        return true;
+      }
+
+      if (d1 === 0 && onSegment(p3x, p3y, p1x, p1y, p4x, p4y)) return true;
+      if (d2 === 0 && onSegment(p3x, p3y, p2x, p2y, p4x, p4y)) return true;
+      if (d3 === 0 && onSegment(p1x, p1y, p3x, p3y, p2x, p2y)) return true;
+      if (d4 === 0 && onSegment(p1x, p1y, p4x, p4y, p2x, p2y)) return true;
+
+      return false;
+    }
+
+    // ============================================
+    // UI Functions
+    // ============================================
+
+    function getInputValues() {
+      return {
+        s1x: parseFloat(document.getElementById('s1x').value) || 0,
+        s1y: parseFloat(document.getElementById('s1y').value) || 0,
+        s1z: parseFloat(document.getElementById('s1z').value) || 0,
+        e1x: parseFloat(document.getElementById('e1x').value) || 0,
+        e1y: parseFloat(document.getElementById('e1y').value) || 0,
+        e1z: parseFloat(document.getElementById('e1z').value) || 0,
+        s2x: parseFloat(document.getElementById('s2x').value) || 0,
+        s2y: parseFloat(document.getElementById('s2y').value) || 0,
+        s2z: parseFloat(document.getElementById('s2z').value) || 0,
+        e2x: parseFloat(document.getElementById('e2x').value) || 0,
+        e2y: parseFloat(document.getElementById('e2y').value) || 0,
+        e2z: parseFloat(document.getElementById('e2z').value) || 0
+      };
+    }
+
+    function setInputValues(vals) {
+      for (const [key, val] of Object.entries(vals)) {
+        document.getElementById(key).value = val;
+      }
+    }
+
+    function loadSample1() {
+      // 교차하는 X 모양
+      setInputValues({
+        s1x: 0, s1y: 0, s1z: 0,
+        e1x: 100, e1y: 100, e1z: 0,
+        s2x: 0, s2y: 100, s2z: 0,
+        e2x: 100, e2y: 0, e2z: 0
+      });
+      checkIntersection();
+    }
+
+    function loadSample2() {
+      // 평행하여 교차하지 않음
+      setInputValues({
+        s1x: 0, s1y: 0, s1z: 0,
+        e1x: 100, e1y: 0, e1z: 0,
+        s2x: 0, s2y: 50, s2z: 0,
+        e2x: 100, e2y: 50, e2z: 0
+      });
+      checkIntersection();
+    }
+
+    function checkIntersection() {
+      const v = getInputValues();
+
+      // XY 평면 투영 (Z 무시)
+      const intersects = doLinesIntersect(
+        v.s1x, v.s1y, v.e1x, v.e1y,
+        v.s2x, v.s2y, v.e2x, v.e2y
+      );
+
+      const resultBox = document.getElementById('result');
+
+      if (intersects) {
+        resultBox.className = 'result-box fail';
+        resultBox.innerHTML = `
+          <div class="result-icon">❌</div>
+          <div class="result-text">FAIL - 교차 발생</div>
+          <div class="result-detail">두 용접선이 XY 평면에서 교차합니다.</div>
+        `;
+      } else {
+        resultBox.className = 'result-box pass';
+        resultBox.innerHTML = `
+          <div class="result-icon">✅</div>
+          <div class="result-text">PASS - 교차 없음</div>
+          <div class="result-detail">두 용접선은 XY 평면에서 교차하지 않습니다.</div>
+        `;
+      }
+
+      drawCanvas(v, intersects);
+    }
+
+    function drawCanvas(v, intersects) {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      // High DPI support
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * 2;
+      canvas.height = rect.height * 2;
+      ctx.scale(2, 2);
+
+      const width = rect.width;
+      const height = rect.height;
+      const padding = 50;
+
+      // Clear
+      ctx.fillStyle = '#0a0c10';
+      ctx.fillRect(0, 0, width, height);
+
+      // Calculate bounds
+      const allX = [v.s1x, v.e1x, v.s2x, v.e2x];
+      const allY = [v.s1y, v.e1y, v.s2y, v.e2y];
+      let minX = Math.min(...allX);
+      let maxX = Math.max(...allX);
+      let minY = Math.min(...allY);
+      let maxY = Math.max(...allY);
+
+      // Add margin
+      const rangeX = maxX - minX || 100;
+      const rangeY = maxY - minY || 100;
+      minX -= rangeX * 0.1;
+      maxX += rangeX * 0.1;
+      minY -= rangeY * 0.1;
+      maxY += rangeY * 0.1;
+
+      // Transform functions
+      const scaleX = (width - 2 * padding) / (maxX - minX);
+      const scaleY = (height - 2 * padding) / (maxY - minY);
+      const scale = Math.min(scaleX, scaleY);
+
+      const toCanvasX = (x) => padding + (x - minX) * scale;
+      const toCanvasY = (y) => height - padding - (y - minY) * scale;
+
+      // Draw grid
+      ctx.strokeStyle = '#1a1e29';
+      ctx.lineWidth = 1;
+      const gridStep = Math.pow(10, Math.floor(Math.log10(Math.max(rangeX, rangeY) / 5)));
+
+      for (let x = Math.ceil(minX / gridStep) * gridStep; x <= maxX; x += gridStep) {
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(x), padding);
+        ctx.lineTo(toCanvasX(x), height - padding);
+        ctx.stroke();
+      }
+      for (let y = Math.ceil(minY / gridStep) * gridStep; y <= maxY; y += gridStep) {
+        ctx.beginPath();
+        ctx.moveTo(padding, toCanvasY(y));
+        ctx.lineTo(width - padding, toCanvasY(y));
+        ctx.stroke();
+      }
+
+      // Draw axes
+      ctx.strokeStyle = '#23283a';
+      ctx.lineWidth = 2;
+
+      // X axis
+      if (minY <= 0 && maxY >= 0) {
+        ctx.beginPath();
+        ctx.moveTo(padding, toCanvasY(0));
+        ctx.lineTo(width - padding, toCanvasY(0));
+        ctx.stroke();
+      }
+
+      // Y axis
+      if (minX <= 0 && maxX >= 0) {
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(0), padding);
+        ctx.lineTo(toCanvasX(0), height - padding);
+        ctx.stroke();
+      }
+
+      // Draw Line 1
+      ctx.strokeStyle = '#ff6b6b';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(toCanvasX(v.s1x), toCanvasY(v.s1y));
+      ctx.lineTo(toCanvasX(v.e1x), toCanvasY(v.e1y));
+      ctx.stroke();
+
+      // Draw Line 2
+      ctx.strokeStyle = '#4ecdc4';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(toCanvasX(v.s2x), toCanvasY(v.s2y));
+      ctx.lineTo(toCanvasX(v.e2x), toCanvasY(v.e2y));
+      ctx.stroke();
+
+      // Draw points
+      const drawPoint = (x, y, color, label) => {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(toCanvasX(x), toCanvasY(y), 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#e6e8ee';
+        ctx.font = '11px system-ui';
+        ctx.fillText(label, toCanvasX(x) + 10, toCanvasY(y) - 10);
+      };
+
+      drawPoint(v.s1x, v.s1y, '#ff6b6b', `S1(${v.s1x}, ${v.s1y})`);
+      drawPoint(v.e1x, v.e1y, '#ff6b6b', `E1(${v.e1x}, ${v.e1y})`);
+      drawPoint(v.s2x, v.s2y, '#4ecdc4', `S2(${v.s2x}, ${v.s2y})`);
+      drawPoint(v.e2x, v.e2y, '#4ecdc4', `E2(${v.e2x}, ${v.e2y})`);
+
+      // Draw intersection point if exists
+      if (intersects) {
+        // Calculate intersection point
+        const denom = (v.s1x - v.e1x) * (v.s2y - v.e2y) - (v.s1y - v.e1y) * (v.s2x - v.e2x);
+        if (Math.abs(denom) > 0.0001) {
+          const t = ((v.s1x - v.s2x) * (v.s2y - v.e2y) - (v.s1y - v.s2y) * (v.s2x - v.e2x)) / denom;
+          const ix = v.s1x + t * (v.e1x - v.s1x);
+          const iy = v.s1y + t * (v.e1y - v.s1y);
+
+          // Draw intersection marker
+          ctx.strokeStyle = '#e74c3c';
+          ctx.lineWidth = 2;
+          const size = 12;
+          ctx.beginPath();
+          ctx.moveTo(toCanvasX(ix) - size, toCanvasY(iy) - size);
+          ctx.lineTo(toCanvasX(ix) + size, toCanvasY(iy) + size);
+          ctx.moveTo(toCanvasX(ix) + size, toCanvasY(iy) - size);
+          ctx.lineTo(toCanvasX(ix) - size, toCanvasY(iy) + size);
+          ctx.stroke();
+
+          ctx.fillStyle = '#e74c3c';
+          ctx.font = 'bold 12px system-ui';
+          ctx.fillText(`교차점(${ix.toFixed(1)}, ${iy.toFixed(1)})`, toCanvasX(ix) + 15, toCanvasY(iy));
+        }
+      }
+
+      // Axis labels
+      ctx.fillStyle = '#a8b0bf';
+      ctx.font = '12px system-ui';
+      ctx.fillText('X', width - 30, toCanvasY(0) - 10);
+      ctx.fillText('Y', toCanvasX(0) + 10, 30);
+    }
+
+    function showCode(type) {
+      const tabs = document.querySelectorAll('.code-tab');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const codeContent = document.getElementById('code-content');
+      codeContent.innerHTML = type === 'full' ? csharpCodeFull : csharpCodeCore;
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      showCode('full');
+      drawCanvas(getInputValues(), false);
+    });
+  </script>
+</body>
+</html>
