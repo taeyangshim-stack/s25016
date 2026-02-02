@@ -16,283 +16,127 @@
       --line2: #27ae60;
       --pass: #27ae60;
       --fail: #e74c3c;
-      --warn: #f39c12;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       background: var(--bg);
       color: var(--text);
-      font: 14px/1.6 system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif;
+      font: 13px/1.5 system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans KR', sans-serif;
     }
     header {
-      padding: 20px 24px;
+      padding: 16px 20px;
       background: #fff;
       border-bottom: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    h1 { margin: 0 0 4px; font-size: 20px; color: #2c3e50; }
-    .subtitle { color: var(--muted); font-size: 13px; }
-    main {
-      padding: 20px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+    h1 { margin: 0 0 2px; font-size: 18px; }
+    .subtitle { color: var(--muted); font-size: 12px; }
+    main { padding: 16px; max-width: 1600px; margin: 0 auto; }
     .panel {
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    .panel h2 {
-      margin: 0 0 16px;
-      font-size: 15px;
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    /* 입력 섹션 */
-    .input-section {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      align-items: flex-end;
-    }
-    .line-group {
-      display: flex;
-      gap: 16px;
-      padding: 16px;
-      background: #fafbfc;
-      border: 1px solid var(--border);
       border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
     }
-    .line-group.line1 { border-left: 4px solid var(--line1); }
-    .line-group.line2 { border-left: 4px solid var(--line2); }
-    .point-box h4 {
-      margin: 0 0 10px;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-    }
-    .coords-row {
-      display: flex;
-      gap: 8px;
-    }
-    .coord-input {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .coord-input span {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 4px;
-      font-weight: 500;
-    }
-    .coord-input input {
-      width: 80px;
-      padding: 10px 8px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: #fff;
-      color: var(--text);
-      font-size: 14px;
-      text-align: center;
-    }
-    .coord-input input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-    }
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      margin-left: auto;
-    }
-    button {
-      padding: 12px 20px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #fff;
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    button:hover {
-      background: #f8f9fa;
-      border-color: var(--accent);
-    }
-    button.primary {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-      font-weight: 600;
-    }
-    button.primary:hover {
-      background: #2980b9;
-    }
+    .panel h2 { margin: 0 0 12px; font-size: 14px; color: var(--accent); font-weight: 600; }
 
-    /* 메인 영역 */
-    .main-area {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 20px;
-      min-height: 500px;
+    /* 입력 */
+    .input-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+    .line-group {
+      display: flex; gap: 12px; padding: 12px;
+      background: #fafbfc; border: 1px solid var(--border); border-radius: 8px;
     }
-    @media (max-width: 1000px) {
+    .line-group.line1 { border-left: 3px solid var(--line1); }
+    .line-group.line2 { border-left: 3px solid var(--line2); }
+    .point-box h4 { margin: 0 0 6px; font-size: 11px; color: var(--muted); }
+    .coords-row { display: flex; gap: 4px; }
+    .coord-input { display: flex; flex-direction: column; align-items: center; }
+    .coord-input span { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+    .coord-input input {
+      width: 60px; padding: 6px 4px; border: 1px solid var(--border);
+      border-radius: 4px; background: #fff; font-size: 12px; text-align: center;
+    }
+    .coord-input input:focus { outline: none; border-color: var(--accent); }
+
+    /* 설정 */
+    .settings-box {
+      display: flex; flex-direction: column; gap: 6px; padding: 10px 12px;
+      background: #f0f4f8; border: 1px solid var(--border); border-radius: 8px;
+    }
+    .settings-box h4 { margin: 0 0 4px; font-size: 11px; color: var(--muted); }
+    .setting-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text); }
+    .setting-row input { width: 50px; padding: 4px; border: 1px solid var(--border); border-radius: 3px; text-align: center; font-size: 11px; }
+
+    .btn-group { display: flex; gap: 6px; margin-left: auto; }
+    button {
+      padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+      background: #fff; font-size: 11px; cursor: pointer; white-space: nowrap;
+    }
+    button:hover { background: #f8f9fa; border-color: var(--accent); }
+    button.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+
+    /* 메인 */
+    .main-area { display: grid; grid-template-columns: 320px 1fr; gap: 16px; min-height: 480px; }
+    @media (max-width: 1100px) {
       .main-area { grid-template-columns: 1fr; }
-      .input-section { flex-direction: column; }
-      .btn-group { margin-left: 0; margin-top: 16px; width: 100%; }
-      .btn-group button { flex: 1; }
+      .input-row { flex-direction: column; }
+      .btn-group { margin-left: 0; margin-top: 12px; width: 100%; }
     }
 
     /* 결과 */
-    .result-panel { display: flex; flex-direction: column; gap: 16px; }
+    .result-panel { display: flex; flex-direction: column; gap: 8px; }
     .result-card {
-      padding: 16px;
-      border-radius: 10px;
-      border: 2px solid var(--border);
-      background: #fafbfc;
+      padding: 10px 12px; border-radius: 8px;
+      border: 2px solid var(--border); background: #fafbfc;
     }
-    .result-card.pass {
-      background: linear-gradient(135deg, #d4efdf 0%, #a9dfbf 100%);
-      border-color: var(--pass);
-    }
-    .result-card.fail {
-      background: linear-gradient(135deg, #fadbd8 0%, #f5b7b1 100%);
-      border-color: var(--fail);
-    }
-    .result-card.waiting {
-      background: #f8f9fa;
-      border: 2px dashed var(--border);
-    }
-    .result-card h3 {
-      margin: 0 0 8px;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .result-card h3 .icon { font-size: 16px; }
-    .result-status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .result-icon { font-size: 32px; }
-    .result-text { font-size: 20px; font-weight: 700; }
+    .result-card.pass { background: linear-gradient(135deg, #d4efdf, #a9dfbf); border-color: var(--pass); }
+    .result-card.fail { background: linear-gradient(135deg, #fadbd8, #f5b7b1); border-color: var(--fail); }
+    .result-card h3 { margin: 0 0 4px; font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+    .result-status { display: flex; align-items: center; gap: 8px; }
+    .result-icon { font-size: 22px; }
+    .result-text { font-size: 15px; font-weight: 700; }
     .result-card.pass .result-text { color: var(--pass); }
     .result-card.fail .result-text { color: var(--fail); }
-    .result-card.waiting .result-text { color: var(--muted); font-size: 16px; }
-    .result-detail { margin-top: 6px; font-size: 12px; color: var(--muted); }
+    .result-detail { font-size: 10px; color: var(--muted); margin-top: 2px; }
 
-    /* 종합 결과 */
-    .total-result {
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      margin-top: auto;
-    }
-    .total-result.pass {
-      background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-      color: #fff;
-    }
-    .total-result.fail {
-      background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
-      color: #fff;
-    }
-    .total-result.waiting {
-      background: #ecf0f1;
-      color: var(--muted);
-    }
-    .total-result .total-icon { font-size: 40px; margin-bottom: 8px; }
-    .total-result .total-text { font-size: 24px; font-weight: 700; }
-    .total-result .total-detail { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+    .total-result { padding: 14px; border-radius: 10px; text-align: center; margin-top: auto; }
+    .total-result.pass { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff; }
+    .total-result.fail { background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fff; }
+    .total-result.waiting { background: #ecf0f1; color: var(--muted); }
+    .total-result .total-icon { font-size: 32px; margin-bottom: 4px; }
+    .total-result .total-text { font-size: 20px; font-weight: 700; }
+    .total-result .total-detail { font-size: 11px; opacity: 0.9; margin-top: 2px; }
 
     /* 그래프 */
     .graph-panel { display: flex; flex-direction: column; }
     .canvas-wrap {
-      flex: 1;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      position: relative;
-      min-height: 450px;
+      flex: 1; background: #fff; border: 1px solid var(--border);
+      border-radius: 8px; position: relative; min-height: 420px;
     }
-    canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-    }
+    canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     .legend {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: rgba(255,255,255,0.95);
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(255,255,255,0.95); padding: 8px 12px;
+      border-radius: 6px; font-size: 11px; border: 1px solid var(--border);
     }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 6px 0;
-    }
-    .legend-line {
-      width: 24px;
-      height: 4px;
-      border-radius: 2px;
-    }
-    .legend-arrow {
-      font-size: 16px;
-    }
+    .legend-item { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+    .legend-line { width: 16px; height: 3px; border-radius: 2px; }
+    .legend-val { font-size: 10px; color: var(--muted); }
 
     /* 코드 */
-    .code-section { margin-top: 20px; }
-    .code-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .code-tabs { display: flex; gap: 6px; }
+    .code-section { margin-top: 16px; }
+    .code-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .code-tabs { display: flex; gap: 4px; }
     .code-tab {
-      padding: 6px 14px;
-      background: #f8f9fa;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 500;
+      padding: 4px 10px; background: #f8f9fa; border: 1px solid var(--border);
+      border-radius: 4px; color: var(--muted); cursor: pointer; font-size: 10px;
     }
-    .code-tab.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
+    .code-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     pre {
-      background: #f8f9fa;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
-      overflow-x: auto;
-      font-size: 13px;
-      line-height: 1.6;
-      margin: 0;
-      max-height: 350px;
+      background: #f8f9fa; border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px; overflow-x: auto; font-size: 11px; line-height: 1.5; margin: 0; max-height: 250px;
     }
-    code { font-family: 'Consolas', 'Monaco', monospace; }
     .keyword { color: #8e44ad; }
     .type { color: #2980b9; }
     .number { color: #e67e22; }
@@ -303,17 +147,16 @@
 <body>
   <header>
     <h1>용접선 건전성 검증</h1>
-    <div class="subtitle">Weld Line Validation · 교차 검사 + 방향 일관성 검사</div>
+    <div class="subtitle">교차 + 방향 + 길이 + 각도 + 거리 검사 (5항목)</div>
   </header>
 
   <main>
-    <!-- 입력 섹션 -->
     <div class="panel">
-      <h2>좌표 입력 (3D → XY 평면 투영)</h2>
-      <div class="input-section">
+      <h2>좌표 입력 & 검사 설정</h2>
+      <div class="input-row">
         <div class="line-group line1">
           <div class="point-box">
-            <h4>용접선 1 - 시작점</h4>
+            <h4>선1 시작</h4>
             <div class="coords-row">
               <div class="coord-input"><span>X</span><input type="number" id="s1x" value="0"></div>
               <div class="coord-input"><span>Y</span><input type="number" id="s1y" value="0"></div>
@@ -321,9 +164,9 @@
             </div>
           </div>
           <div class="point-box">
-            <h4>용접선 1 - 끝점</h4>
+            <h4>선1 끝</h4>
             <div class="coords-row">
-              <div class="coord-input"><span>X</span><input type="number" id="e1x" value="100"></div>
+              <div class="coord-input"><span>X</span><input type="number" id="e1x" value="3000"></div>
               <div class="coord-input"><span>Y</span><input type="number" id="e1y" value="0"></div>
               <div class="coord-input"><span>Z</span><input type="number" id="e1z" value="0"></div>
             </div>
@@ -331,96 +174,75 @@
         </div>
         <div class="line-group line2">
           <div class="point-box">
-            <h4>용접선 2 - 시작점</h4>
+            <h4>선2 시작</h4>
             <div class="coords-row">
               <div class="coord-input"><span>X</span><input type="number" id="s2x" value="0"></div>
-              <div class="coord-input"><span>Y</span><input type="number" id="s2y" value="50"></div>
+              <div class="coord-input"><span>Y</span><input type="number" id="s2y" value="12"></div>
               <div class="coord-input"><span>Z</span><input type="number" id="s2z" value="0"></div>
             </div>
           </div>
           <div class="point-box">
-            <h4>용접선 2 - 끝점</h4>
+            <h4>선2 끝</h4>
             <div class="coords-row">
-              <div class="coord-input"><span>X</span><input type="number" id="e2x" value="100"></div>
-              <div class="coord-input"><span>Y</span><input type="number" id="e2y" value="50"></div>
+              <div class="coord-input"><span>X</span><input type="number" id="e2x" value="3000"></div>
+              <div class="coord-input"><span>Y</span><input type="number" id="e2y" value="12"></div>
               <div class="coord-input"><span>Z</span><input type="number" id="e2z" value="0"></div>
             </div>
           </div>
         </div>
+        <div class="settings-box">
+          <h4>검사 임계값</h4>
+          <div class="setting-row">길이 오차 <input type="number" id="lenThreshold" value="20" min="0">mm</div>
+          <div class="setting-row">각도 차이 <input type="number" id="angleThreshold" value="5" min="0">°</div>
+          <div class="setting-row">최대 거리 <input type="number" id="distThreshold" value="20" min="0">mm</div>
+        </div>
         <div class="btn-group">
-          <button onclick="loadSample1()">샘플1 (교차)</button>
-          <button onclick="loadSample2()">샘플2 (방향역전)</button>
-          <button onclick="loadSample3()">샘플3 (정상)</button>
-          <button class="primary" onclick="runValidation()">검사 실행</button>
+          <button onclick="loadSample('cross')">교차</button>
+          <button onclick="loadSample('dir')">방향</button>
+          <button onclick="loadSample('len')">길이</button>
+          <button onclick="loadSample('angle')">각도</button>
+          <button onclick="loadSample('dist')">거리</button>
+          <button onclick="loadSample('ok')">정상</button>
+          <button class="primary" onclick="runValidation()">검사</button>
         </div>
       </div>
     </div>
 
-    <!-- 메인 영역 -->
     <div class="main-area">
       <div class="result-panel panel">
-        <h2>검사 결과</h2>
-
-        <!-- 교차 검사 -->
-        <div id="crossResult" class="result-card waiting">
-          <h3><span class="icon">✖</span> 교차 검사</h3>
-          <div class="result-status">
-            <div class="result-icon">⏳</div>
-            <div>
-              <div class="result-text">대기</div>
-              <div class="result-detail">두 선분의 교차 여부</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 방향 검사 -->
-        <div id="dirResult" class="result-card waiting">
-          <h3><span class="icon">➡</span> 방향 일관성 검사</h3>
-          <div class="result-status">
-            <div class="result-icon">⏳</div>
-            <div>
-              <div class="result-text">대기</div>
-              <div class="result-detail">두 선분의 진행 방향</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 종합 결과 -->
+        <h2>검사 결과 (5항목)</h2>
+        <div id="crossResult" class="result-card"><h3>✖ 교차</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
+        <div id="dirResult" class="result-card"><h3>➡ 방향</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
+        <div id="lenResult" class="result-card"><h3>📏 길이</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
+        <div id="angleResult" class="result-card"><h3>📐 각도</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
+        <div id="distResult" class="result-card"><h3>↔ 거리</h3><div class="result-status"><span class="result-icon">⏳</span><span class="result-text">대기</span></div></div>
         <div id="totalResult" class="total-result waiting">
           <div class="total-icon">⏳</div>
           <div class="total-text">대기 중</div>
-          <div class="total-detail">검사 실행 버튼을 클릭하세요</div>
+          <div class="total-detail">검사 버튼 클릭</div>
         </div>
       </div>
 
       <div class="graph-panel panel">
-        <h2>XY 평면 투영 그래프</h2>
+        <h2>XY 평면 그래프</h2>
         <div class="canvas-wrap">
           <canvas id="canvas"></canvas>
           <div class="legend">
-            <div class="legend-item">
-              <div class="legend-line" style="background: var(--line1);"></div>
-              <span>용접선 1</span>
-              <span class="legend-arrow" id="arrow1">→</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-line" style="background: var(--line2);"></div>
-              <span>용접선 2</span>
-              <span class="legend-arrow" id="arrow2">→</span>
-            </div>
+            <div class="legend-item"><div class="legend-line" style="background:var(--line1)"></div>선1 <span class="legend-val" id="info1"></span></div>
+            <div class="legend-item"><div class="legend-line" style="background:var(--line2)"></div>선2 <span class="legend-val" id="info2"></span></div>
+            <div class="legend-item" id="distInfo" style="display:none"><div class="legend-line" style="background:#9b59b6"></div>거리 <span class="legend-val" id="distVal"></span></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- C# 코드 -->
     <div class="panel code-section">
       <div class="code-header">
-        <h2>C# 검증 알고리즘</h2>
+        <h2>C# 알고리즘</h2>
         <div class="code-tabs">
           <div class="code-tab active" onclick="showCode('full')">전체</div>
-          <div class="code-tab" onclick="showCode('cross')">교차 검사</div>
-          <div class="code-tab" onclick="showCode('dir')">방향 검사</div>
+          <div class="code-tab" onclick="showCode('angle')">각도</div>
+          <div class="code-tab" onclick="showCode('dist')">거리</div>
         </div>
       </div>
       <pre><code id="code-content"></code></pre>
@@ -428,121 +250,97 @@
   </main>
 
   <script>
-    // C# Code
-    const csharpCodeFull = `<span class="keyword">using</span> System;
-
-<span class="keyword">namespace</span> WeldLineValidation
+    const csharpCodeFull = `<span class="keyword">public class</span> <span class="type">WeldLineValidator</span>
 {
-    <span class="keyword">public class</span> <span class="type">WeldLineValidator</span>
+    <span class="comment">// 1. 교차 검사 (CCW)</span>
+    <span class="keyword">public static bool</span> <span class="method">CheckCrossing</span>(...) { <span class="comment">/* CCW 알고리즘 */</span> }
+
+    <span class="comment">// 2. 방향 검사 (내적)</span>
+    <span class="keyword">public static bool</span> <span class="method">CheckDirection</span>(...) { <span class="keyword">return</span> dot > <span class="number">0</span>; }
+
+    <span class="comment">// 3. 길이 검사 (절대값 차이, mm)</span>
+    <span class="keyword">public static bool</span> <span class="method">CheckLength</span>(..., <span class="keyword">double</span> threshold) { <span class="keyword">return</span> diff <= threshold; }
+
+    <span class="comment">// 4. 각도 검사</span>
+    <span class="keyword">public static</span> (<span class="keyword">bool</span>, <span class="keyword">double</span>) <span class="method">CheckAngle</span>(..., <span class="keyword">double</span> thresholdDeg)
     {
-        <span class="keyword">public struct</span> <span class="type">Point2D</span>
-        {
-            <span class="keyword">public double</span> X, Y;
-            <span class="keyword">public</span> <span class="method">Point2D</span>(<span class="keyword">double</span> x, <span class="keyword">double</span> y) { X = x; Y = y; }
-        }
+        <span class="keyword">double</span> angle1 = Math.Atan2(v1y, v1x) * <span class="number">180</span> / Math.PI;
+        <span class="keyword">double</span> angle2 = Math.Atan2(v2y, v2x) * <span class="number">180</span> / Math.PI;
+        <span class="keyword">double</span> diff = Math.Abs(angle1 - angle2);
+        <span class="keyword">if</span> (diff > <span class="number">180</span>) diff = <span class="number">360</span> - diff;
+        <span class="keyword">return</span> (diff <= thresholdDeg, diff);
+    }
 
-        <span class="keyword">public struct</span> <span class="type">Vector2D</span>
-        {
-            <span class="keyword">public double</span> X, Y;
-            <span class="keyword">public</span> <span class="method">Vector2D</span>(<span class="keyword">double</span> x, <span class="keyword">double</span> y) { X = x; Y = y; }
+    <span class="comment">// 5. 거리 검사 (점-선분 최소거리)</span>
+    <span class="keyword">public static</span> (<span class="keyword">bool</span>, <span class="keyword">double</span>) <span class="method">CheckDistance</span>(..., <span class="keyword">double</span> maxDist)
+    {
+        <span class="comment">// 선분1의 중점에서 선분2까지의 수직거리 계산</span>
+        <span class="keyword">double</span> dist = <span class="method">PointToSegmentDistance</span>(mid1, s2, e2);
+        <span class="keyword">return</span> (dist <= maxDist, dist);
+    }
 
-            <span class="comment">// 내적 (Dot Product)</span>
-            <span class="keyword">public double</span> <span class="method">Dot</span>(<span class="type">Vector2D</span> other)
-                => X * other.X + Y * other.Y;
-        }
-
-        <span class="comment">// 3D → XY 평면 투영</span>
-        <span class="keyword">public static</span> <span class="type">Point2D</span> <span class="method">ProjectToXY</span>(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> z)
-            => <span class="keyword">new</span> <span class="type">Point2D</span>(x, y);
-
-        <span class="comment">// 방향 벡터 계산</span>
-        <span class="keyword">public static</span> <span class="type">Vector2D</span> <span class="method">GetDirection</span>(<span class="type">Point2D</span> start, <span class="type">Point2D</span> end)
-            => <span class="keyword">new</span> <span class="type">Vector2D</span>(end.X - start.X, end.Y - start.Y);
-
-        <span class="comment">// ========== 교차 검사 ==========</span>
-        <span class="keyword">private static double</span> <span class="method">CCW</span>(<span class="type">Point2D</span> a, <span class="type">Point2D</span> b, <span class="type">Point2D</span> c)
-            => (b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X);
-
-        <span class="keyword">public static bool</span> <span class="method">CheckCrossing</span>(<span class="type">Point2D</span> p1, <span class="type">Point2D</span> p2, <span class="type">Point2D</span> p3, <span class="type">Point2D</span> p4)
-        {
-            <span class="keyword">double</span> d1 = <span class="method">CCW</span>(p3, p4, p1), d2 = <span class="method">CCW</span>(p3, p4, p2);
-            <span class="keyword">double</span> d3 = <span class="method">CCW</span>(p1, p2, p3), d4 = <span class="method">CCW</span>(p1, p2, p4);
-            <span class="keyword">return</span> ((d1 > <span class="number">0</span> && d2 < <span class="number">0</span>) || (d1 < <span class="number">0</span> && d2 > <span class="number">0</span>)) &&
-                   ((d3 > <span class="number">0</span> && d4 < <span class="number">0</span>) || (d3 < <span class="number">0</span> && d4 > <span class="number">0</span>));
-        }
-
-        <span class="comment">// ========== 방향 일관성 검사 ==========</span>
-        <span class="keyword">public static bool</span> <span class="method">CheckDirectionConsistency</span>(<span class="type">Point2D</span> s1, <span class="type">Point2D</span> e1, <span class="type">Point2D</span> s2, <span class="type">Point2D</span> e2)
-        {
-            <span class="type">Vector2D</span> v1 = <span class="method">GetDirection</span>(s1, e1);
-            <span class="type">Vector2D</span> v2 = <span class="method">GetDirection</span>(s2, e2);
-
-            <span class="comment">// 내적 > 0 이면 같은 방향</span>
-            <span class="keyword">double</span> dot = v1.<span class="method">Dot</span>(v2);
-            <span class="keyword">return</span> dot > <span class="number">0</span>;
-        }
-
-        <span class="comment">// ========== 종합 검증 ==========</span>
-        <span class="keyword">public static</span> (<span class="keyword">bool</span> crossOK, <span class="keyword">bool</span> dirOK) <span class="method">Validate</span>(
-            <span class="keyword">double</span> s1x, <span class="keyword">double</span> s1y, <span class="keyword">double</span> s1z,
-            <span class="keyword">double</span> e1x, <span class="keyword">double</span> e1y, <span class="keyword">double</span> e1z,
-            <span class="keyword">double</span> s2x, <span class="keyword">double</span> s2y, <span class="keyword">double</span> s2z,
-            <span class="keyword">double</span> e2x, <span class="keyword">double</span> e2y, <span class="keyword">double</span> e2z)
-        {
-            <span class="keyword">var</span> start1 = <span class="method">ProjectToXY</span>(s1x, s1y, s1z);
-            <span class="keyword">var</span> end1   = <span class="method">ProjectToXY</span>(e1x, e1y, e1z);
-            <span class="keyword">var</span> start2 = <span class="method">ProjectToXY</span>(s2x, s2y, s2z);
-            <span class="keyword">var</span> end2   = <span class="method">ProjectToXY</span>(e2x, e2y, e2z);
-
-            <span class="keyword">bool</span> noCross = !<span class="method">CheckCrossing</span>(start1, end1, start2, end2);
-            <span class="keyword">bool</span> sameDir = <span class="method">CheckDirectionConsistency</span>(start1, end1, start2, end2);
-
-            <span class="keyword">return</span> (noCross, sameDir);
-        }
+    <span class="comment">// 종합 검증</span>
+    <span class="keyword">public static</span> ValidationResult <span class="method">Validate</span>(...)
+    {
+        <span class="keyword">return new</span> ValidationResult {
+            CrossOK = !CheckCrossing(...),
+            DirOK = CheckDirection(...),
+            LenOK = CheckLength(...),
+            AngleOK = CheckAngle(...),
+            DistOK = CheckDistance(...)
+        };
     }
 }`;
 
-    const csharpCodeCross = `<span class="comment">// CCW (Counter-Clockwise) 방향 판별</span>
-<span class="keyword">private static double</span> <span class="method">CCW</span>(<span class="type">Point2D</span> a, <span class="type">Point2D</span> b, <span class="type">Point2D</span> c)
-    => (b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X);
-
-<span class="comment">// 선분 교차 검사</span>
-<span class="keyword">public static bool</span> <span class="method">CheckCrossing</span>(<span class="type">Point2D</span> p1, <span class="type">Point2D</span> p2, <span class="type">Point2D</span> p3, <span class="type">Point2D</span> p4)
+    const csharpCodeAngle = `<span class="comment">// 각도 차이 검사</span>
+<span class="keyword">public static</span> (<span class="keyword">bool</span> ok, <span class="keyword">double</span> diff) <span class="method">CheckAngle</span>(
+    <span class="keyword">double</span> s1x, <span class="keyword">double</span> s1y, <span class="keyword">double</span> e1x, <span class="keyword">double</span> e1y,
+    <span class="keyword">double</span> s2x, <span class="keyword">double</span> s2y, <span class="keyword">double</span> e2x, <span class="keyword">double</span> e2y,
+    <span class="keyword">double</span> thresholdDeg = <span class="number">10</span>)
 {
-    <span class="keyword">double</span> d1 = <span class="method">CCW</span>(p3, p4, p1);
-    <span class="keyword">double</span> d2 = <span class="method">CCW</span>(p3, p4, p2);
-    <span class="keyword">double</span> d3 = <span class="method">CCW</span>(p1, p2, p3);
-    <span class="keyword">double</span> d4 = <span class="method">CCW</span>(p1, p2, p4);
+    <span class="comment">// 방향 벡터</span>
+    <span class="keyword">double</span> v1x = e1x - s1x, v1y = e1y - s1y;
+    <span class="keyword">double</span> v2x = e2x - s2x, v2y = e2y - s2y;
 
-    <span class="comment">// 서로 다른 방향에 있으면 교차</span>
-    <span class="keyword">return</span> ((d1 > <span class="number">0</span> && d2 < <span class="number">0</span>) || (d1 < <span class="number">0</span> && d2 > <span class="number">0</span>)) &&
-           ((d3 > <span class="number">0</span> && d4 < <span class="number">0</span>) || (d3 < <span class="number">0</span> && d4 > <span class="number">0</span>));
+    <span class="comment">// 각도 계산 (라디안 → 도)</span>
+    <span class="keyword">double</span> angle1 = Math.Atan2(v1y, v1x) * <span class="number">180</span> / Math.PI;
+    <span class="keyword">double</span> angle2 = Math.Atan2(v2y, v2x) * <span class="number">180</span> / Math.PI;
+
+    <span class="comment">// 각도 차이 (0~180도 범위)</span>
+    <span class="keyword">double</span> diff = Math.Abs(angle1 - angle2);
+    <span class="keyword">if</span> (diff > <span class="number">180</span>) diff = <span class="number">360</span> - diff;
+
+    <span class="keyword">return</span> (diff <= thresholdDeg, diff);
 }`;
 
-    const csharpCodeDir = `<span class="comment">// 방향 벡터 구조체</span>
-<span class="keyword">public struct</span> <span class="type">Vector2D</span>
+    const csharpCodeDist = `<span class="comment">// 점에서 선분까지 최소 거리</span>
+<span class="keyword">public static double</span> <span class="method">PointToSegmentDistance</span>(
+    <span class="keyword">double</span> px, <span class="keyword">double</span> py,
+    <span class="keyword">double</span> ax, <span class="keyword">double</span> ay,
+    <span class="keyword">double</span> bx, <span class="keyword">double</span> by)
 {
-    <span class="keyword">public double</span> X, Y;
+    <span class="keyword">double</span> dx = bx - ax, dy = by - ay;
+    <span class="keyword">double</span> lenSq = dx * dx + dy * dy;
 
-    <span class="comment">// 내적 (Dot Product)</span>
-    <span class="keyword">public double</span> <span class="method">Dot</span>(<span class="type">Vector2D</span> other)
-        => X * other.X + Y * other.Y;
+    <span class="keyword">if</span> (lenSq == <span class="number">0</span>) <span class="keyword">return</span> Math.Sqrt((px-ax)*(px-ax) + (py-ay)*(py-ay));
+
+    <span class="comment">// 투영 계수 t (0~1 범위로 클램프)</span>
+    <span class="keyword">double</span> t = Math.Max(<span class="number">0</span>, Math.Min(<span class="number">1</span>, ((px-ax)*dx + (py-ay)*dy) / lenSq));
+
+    <span class="comment">// 선분 위 가장 가까운 점</span>
+    <span class="keyword">double</span> projX = ax + t * dx;
+    <span class="keyword">double</span> projY = ay + t * dy;
+
+    <span class="keyword">return</span> Math.Sqrt((px-projX)*(px-projX) + (py-projY)*(py-projY));
 }
 
-<span class="comment">// 방향 벡터 계산</span>
-<span class="keyword">public static</span> <span class="type">Vector2D</span> <span class="method">GetDirection</span>(<span class="type">Point2D</span> start, <span class="type">Point2D</span> end)
-    => <span class="keyword">new</span> <span class="type">Vector2D</span>(end.X - start.X, end.Y - start.Y);
-
-<span class="comment">// 방향 일관성 검사 (내적 기반)</span>
-<span class="keyword">public static bool</span> <span class="method">CheckDirectionConsistency</span>(<span class="type">Point2D</span> s1, <span class="type">Point2D</span> e1, <span class="type">Point2D</span> s2, <span class="type">Point2D</span> e2)
+<span class="comment">// 거리 검사</span>
+<span class="keyword">public static</span> (<span class="keyword">bool</span> ok, <span class="keyword">double</span> dist) <span class="method">CheckDistance</span>(..., <span class="keyword">double</span> maxDist)
 {
-    <span class="type">Vector2D</span> v1 = <span class="method">GetDirection</span>(s1, e1);  <span class="comment">// 선분1 방향 벡터</span>
-    <span class="type">Vector2D</span> v2 = <span class="method">GetDirection</span>(s2, e2);  <span class="comment">// 선분2 방향 벡터</span>
-
-    <span class="comment">// 내적 > 0 이면 같은 방향 (0~90도)</span>
-    <span class="comment">// 내적 < 0 이면 반대 방향 (90~180도)</span>
-    <span class="keyword">double</span> dot = v1.<span class="method">Dot</span>(v2);
-    <span class="keyword">return</span> dot > <span class="number">0</span>;
+    <span class="comment">// 선분1 중점에서 선분2까지 거리</span>
+    <span class="keyword">double</span> mid1x = (s1x + e1x) / <span class="number">2</span>, mid1y = (s1y + e1y) / <span class="number">2</span>;
+    <span class="keyword">double</span> dist = <span class="method">PointToSegmentDistance</span>(mid1x, mid1y, s2x, s2y, e2x, e2y);
+    <span class="keyword">return</span> (dist <= maxDist, dist);
 }`;
 
     // === Algorithms ===
@@ -555,333 +353,278 @@
       const d2 = ccw(s2x, s2y, e2x, e2y, e1x, e1y);
       const d3 = ccw(s1x, s1y, e1x, e1y, s2x, s2y);
       const d4 = ccw(s1x, s1y, e1x, e1y, e2x, e2y);
-      return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
-             ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+      return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
     }
 
-    function checkDirectionConsistency(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y) {
-      const v1x = e1x - s1x, v1y = e1y - s1y;
-      const v2x = e2x - s2x, v2y = e2y - s2y;
-      const dot = v1x * v2x + v1y * v2y;
+    function checkDirection(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y) {
+      const dot = (e1x - s1x) * (e2x - s2x) + (e1y - s1y) * (e2y - s2y);
       return dot > 0;
+    }
+
+    function getLength(sx, sy, ex, ey) {
+      return Math.sqrt((ex - sx) ** 2 + (ey - sy) ** 2);
+    }
+
+    function checkLength(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, threshold) {
+      const len1 = getLength(s1x, s1y, e1x, e1y);
+      const len2 = getLength(s2x, s2y, e2x, e2y);
+      const diff = Math.abs(len1 - len2);  // 절대값 차이 (mm)
+      return { ok: diff <= threshold, diff, len1, len2 };
+    }
+
+    function checkAngle(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, threshold) {
+      const angle1 = Math.atan2(e1y - s1y, e1x - s1x) * 180 / Math.PI;
+      const angle2 = Math.atan2(e2y - s2y, e2x - s2x) * 180 / Math.PI;
+      let diff = Math.abs(angle1 - angle2);
+      if (diff > 180) diff = 360 - diff;
+      return { ok: diff <= threshold, diff, angle1, angle2 };
+    }
+
+    function pointToSegmentDist(px, py, ax, ay, bx, by) {
+      const dx = bx - ax, dy = by - ay;
+      const lenSq = dx * dx + dy * dy;
+      if (lenSq === 0) return Math.sqrt((px - ax) ** 2 + (py - ay) ** 2);
+      const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lenSq));
+      const projX = ax + t * dx, projY = ay + t * dy;
+      return Math.sqrt((px - projX) ** 2 + (py - projY) ** 2);
+    }
+
+    function checkDistance(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, maxDist) {
+      const mid1x = (s1x + e1x) / 2, mid1y = (s1y + e1y) / 2;
+      const dist = pointToSegmentDist(mid1x, mid1y, s2x, s2y, e2x, e2y);
+      return { ok: dist <= maxDist, dist, mid1x, mid1y };
     }
 
     // === UI ===
     function getInputValues() {
+      const get = id => parseFloat(document.getElementById(id).value) || 0;
       return {
-        s1x: parseFloat(document.getElementById('s1x').value) || 0,
-        s1y: parseFloat(document.getElementById('s1y').value) || 0,
-        s1z: parseFloat(document.getElementById('s1z').value) || 0,
-        e1x: parseFloat(document.getElementById('e1x').value) || 0,
-        e1y: parseFloat(document.getElementById('e1y').value) || 0,
-        e1z: parseFloat(document.getElementById('e1z').value) || 0,
-        s2x: parseFloat(document.getElementById('s2x').value) || 0,
-        s2y: parseFloat(document.getElementById('s2y').value) || 0,
-        s2z: parseFloat(document.getElementById('s2z').value) || 0,
-        e2x: parseFloat(document.getElementById('e2x').value) || 0,
-        e2y: parseFloat(document.getElementById('e2y').value) || 0,
-        e2z: parseFloat(document.getElementById('e2z').value) || 0
+        s1x: get('s1x'), s1y: get('s1y'), s1z: get('s1z'),
+        e1x: get('e1x'), e1y: get('e1y'), e1z: get('e1z'),
+        s2x: get('s2x'), s2y: get('s2y'), s2z: get('s2z'),
+        e2x: get('e2x'), e2y: get('e2y'), e2z: get('e2z'),
+        lenThreshold: get('lenThreshold'),
+        angleThreshold: get('angleThreshold'),
+        distThreshold: get('distThreshold')
       };
     }
 
     function setInputValues(vals) {
-      for (const [key, val] of Object.entries(vals)) {
-        document.getElementById(key).value = val;
+      for (const [k, v] of Object.entries(vals)) {
+        const el = document.getElementById(k);
+        if (el) el.value = v;
       }
     }
 
-    function loadSample1() {
-      // 교차하는 X자
-      setInputValues({
-        s1x: 0, s1y: 0, s1z: 0,
-        e1x: 100, e1y: 100, e1z: 0,
-        s2x: 0, s2y: 100, s2z: 0,
-        e2x: 100, e2y: 0, e2z: 0
-      });
+    // 실제 용접 환경 기반 샘플 (3000mm 라인, 12mm 간격)
+    const samples = {
+      cross: { s1x:0,s1y:0,e1x:3000,e1y:3000, s2x:0,s2y:3000,e2x:3000,e2y:0 },   // 교차
+      dir: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:3000,s2y:12,e2x:0,e2y:12 },          // 방향 역전
+      len: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:0,s2y:12,e2x:2950,e2y:12 },          // 길이 차이 50mm
+      angle: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:0,s2y:12,e2x:3000,e2y:312 },       // 각도 차이 ~5.7°
+      dist: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:0,s2y:50,e2x:3000,e2y:50 },         // 거리 50mm (초과)
+      ok: { s1x:0,s1y:0,e1x:3000,e1y:0, s2x:0,s2y:12,e2x:3000,e2y:12 }            // 정상 (12mm 간격)
+    };
+
+    function loadSample(type) {
+      setInputValues({...samples[type], s1z:0, e1z:0, s2z:0, e2z:0});
       runValidation();
     }
 
-    function loadSample2() {
-      // 방향 역전 (평행하지만 반대 방향)
-      setInputValues({
-        s1x: 0, s1y: 0, s1z: 0,
-        e1x: 100, e1y: 0, e1z: 0,
-        s2x: 100, s2y: 50, s2z: 0,
-        e2x: 0, e2y: 50, e2z: 0
-      });
-      runValidation();
-    }
-
-    function loadSample3() {
-      // 정상 (같은 방향, 교차 없음)
-      setInputValues({
-        s1x: 0, s1y: 0, s1z: 0,
-        e1x: 100, e1y: 0, e1z: 0,
-        s2x: 0, s2y: 50, s2z: 0,
-        e2x: 100, e2y: 50, e2z: 0
-      });
-      runValidation();
+    function updateResult(id, ok, text, detail) {
+      const el = document.getElementById(id);
+      el.className = `result-card ${ok ? 'pass' : 'fail'}`;
+      el.querySelector('.result-icon').textContent = ok ? '✅' : '❌';
+      el.querySelector('.result-text').textContent = text;
+      const detailEl = el.querySelector('.result-detail');
+      if (detailEl) detailEl.textContent = detail;
+      else {
+        const d = document.createElement('div');
+        d.className = 'result-detail';
+        d.textContent = detail;
+        el.querySelector('.result-status').appendChild(d);
+      }
     }
 
     function runValidation() {
       const v = getInputValues();
 
-      const isCrossing = checkCrossing(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y);
-      const isSameDir = checkDirectionConsistency(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y);
+      const cross = checkCrossing(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y);
+      const dir = checkDirection(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y);
+      const len = checkLength(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.lenThreshold);
+      const angle = checkAngle(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.angleThreshold);
+      const dist = checkDistance(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.distThreshold);
 
-      const crossOK = !isCrossing;
-      const dirOK = isSameDir;
-      const allOK = crossOK && dirOK;
+      const crossOK = !cross, dirOK = dir, lenOK = len.ok, angleOK = angle.ok, distOK = dist.ok;
+      const allOK = crossOK && dirOK && lenOK && angleOK && distOK;
 
-      // 교차 검사 결과
-      const crossResult = document.getElementById('crossResult');
-      crossResult.className = `result-card ${crossOK ? 'pass' : 'fail'}`;
-      crossResult.innerHTML = `
-        <h3><span class="icon">✖</span> 교차 검사</h3>
-        <div class="result-status">
-          <div class="result-icon">${crossOK ? '✅' : '❌'}</div>
-          <div>
-            <div class="result-text">${crossOK ? 'PASS' : 'FAIL'}</div>
-            <div class="result-detail">${crossOK ? '교차 없음' : '교차 발생!'}</div>
-          </div>
-        </div>
-      `;
+      updateResult('crossResult', crossOK, crossOK ? 'PASS' : 'FAIL', crossOK ? '교차 없음' : '교차 발생!');
+      updateResult('dirResult', dirOK, dirOK ? 'PASS' : 'FAIL', dirOK ? '같은 방향' : '방향 역전!');
+      updateResult('lenResult', lenOK, lenOK ? 'PASS' : 'FAIL', `차이 ${len.diff.toFixed(1)}mm (≤${v.lenThreshold}mm)`);
+      updateResult('angleResult', angleOK, angleOK ? 'PASS' : 'FAIL', `차이 ${angle.diff.toFixed(1)}° (≤${v.angleThreshold}°)`);
+      updateResult('distResult', distOK, distOK ? 'PASS' : 'FAIL', `거리 ${dist.dist.toFixed(1)}mm (≤${v.distThreshold}mm)`);
 
-      // 방향 검사 결과
-      const dirResult = document.getElementById('dirResult');
-      dirResult.className = `result-card ${dirOK ? 'pass' : 'fail'}`;
-      dirResult.innerHTML = `
-        <h3><span class="icon">➡</span> 방향 일관성 검사</h3>
-        <div class="result-status">
-          <div class="result-icon">${dirOK ? '✅' : '❌'}</div>
-          <div>
-            <div class="result-text">${dirOK ? 'PASS' : 'FAIL'}</div>
-            <div class="result-detail">${dirOK ? '같은 방향' : '방향 역전!'}</div>
-          </div>
-        </div>
-      `;
+      const fails = [];
+      if (!crossOK) fails.push('교차');
+      if (!dirOK) fails.push('방향');
+      if (!lenOK) fails.push('길이');
+      if (!angleOK) fails.push('각도');
+      if (!distOK) fails.push('거리');
 
-      // 종합 결과
-      const totalResult = document.getElementById('totalResult');
-      totalResult.className = `total-result ${allOK ? 'pass' : 'fail'}`;
-      totalResult.innerHTML = `
+      const total = document.getElementById('totalResult');
+      total.className = `total-result ${allOK ? 'pass' : 'fail'}`;
+      total.innerHTML = `
         <div class="total-icon">${allOK ? '✅' : '❌'}</div>
         <div class="total-text">${allOK ? '종합 PASS' : '종합 FAIL'}</div>
-        <div class="total-detail">${allOK ? '모든 검사 통과' : (crossOK ? '방향 불일치' : (dirOK ? '선분 교차' : '교차 + 방향 불일치'))}</div>
+        <div class="total-detail">${allOK ? '5개 항목 모두 통과' : fails.join('+') + ' 불합격'}</div>
       `;
 
-      drawCanvas(v, isCrossing, isSameDir);
+      document.getElementById('info1').textContent = `L=${len.len1.toFixed(1)} θ=${angle.angle1.toFixed(1)}°`;
+      document.getElementById('info2').textContent = `L=${len.len2.toFixed(1)} θ=${angle.angle2.toFixed(1)}°`;
+      document.getElementById('distInfo').style.display = 'flex';
+      document.getElementById('distVal').textContent = dist.dist.toFixed(1);
+
+      drawCanvas(v, {cross, dir, len, angle, dist});
     }
 
-    function drawCanvas(v, isCrossing, isSameDir) {
+    function drawCanvas(v, results) {
       const canvas = document.getElementById('canvas');
       const wrap = canvas.parentElement;
       const rect = wrap.getBoundingClientRect();
-
       const dpr = window.devicePixelRatio || 1;
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
-
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
+      const W = rect.width, H = rect.height, P = 60;
 
-      const width = rect.width;
-      const height = rect.height;
-      const padding = 70;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, W, H);
 
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, width, height);
-
-      // Bounds
       const allX = [v.s1x, v.e1x, v.s2x, v.e2x];
       const allY = [v.s1y, v.e1y, v.s2y, v.e2y];
       let minX = Math.min(...allX), maxX = Math.max(...allX);
       let minY = Math.min(...allY), maxY = Math.max(...allY);
+      const rX = (maxX - minX) || 100, rY = (maxY - minY) || 100;
+      minX -= rX * 0.12; maxX += rX * 0.12;
+      minY -= rY * 0.12; maxY += rY * 0.12;
 
-      const rangeX = (maxX - minX) || 100;
-      const rangeY = (maxY - minY) || 100;
-      minX -= rangeX * 0.15; maxX += rangeX * 0.15;
-      minY -= rangeY * 0.15; maxY += rangeY * 0.15;
-
-      const scaleX = (width - 2 * padding) / (maxX - minX);
-      const scaleY = (height - 2 * padding) / (maxY - minY);
-      const scale = Math.min(scaleX, scaleY);
-
-      const offsetX = (width - (maxX - minX) * scale) / 2;
-      const offsetY = (height - (maxY - minY) * scale) / 2;
-
-      const toX = (x) => offsetX + (x - minX) * scale;
-      const toY = (y) => height - offsetY - (y - minY) * scale;
+      const scale = Math.min((W - 2*P) / (maxX - minX), (H - 2*P) / (maxY - minY));
+      const oX = (W - (maxX - minX) * scale) / 2;
+      const oY = (H - (maxY - minY) * scale) / 2;
+      const toX = x => oX + (x - minX) * scale;
+      const toY = y => H - oY - (y - minY) * scale;
 
       // Grid
-      ctx.strokeStyle = '#e8ecef';
-      ctx.lineWidth = 1;
-      const gridStep = Math.pow(10, Math.floor(Math.log10(Math.max(rangeX, rangeY) / 4)));
-
-      ctx.font = '12px system-ui';
-      ctx.fillStyle = '#95a5a6';
-
-      for (let x = Math.ceil(minX / gridStep) * gridStep; x <= maxX; x += gridStep) {
-        ctx.beginPath();
-        ctx.moveTo(toX(x), padding - 20);
-        ctx.lineTo(toX(x), height - padding + 20);
-        ctx.stroke();
-        ctx.fillText(x.toFixed(0), toX(x) - 12, height - padding + 38);
+      ctx.strokeStyle = '#e8ecef'; ctx.lineWidth = 1;
+      const step = Math.pow(10, Math.floor(Math.log10(Math.max(rX, rY) / 4)));
+      ctx.font = '10px system-ui'; ctx.fillStyle = '#95a5a6';
+      for (let x = Math.ceil(minX/step)*step; x <= maxX; x += step) {
+        ctx.beginPath(); ctx.moveTo(toX(x), P-15); ctx.lineTo(toX(x), H-P+15); ctx.stroke();
+        ctx.fillText(x.toFixed(0), toX(x)-8, H-P+28);
       }
-      for (let y = Math.ceil(minY / gridStep) * gridStep; y <= maxY; y += gridStep) {
-        ctx.beginPath();
-        ctx.moveTo(padding - 20, toY(y));
-        ctx.lineTo(width - padding + 20, toY(y));
-        ctx.stroke();
-        ctx.fillText(y.toFixed(0), padding - 45, toY(y) + 5);
+      for (let y = Math.ceil(minY/step)*step; y <= maxY; y += step) {
+        ctx.beginPath(); ctx.moveTo(P-15, toY(y)); ctx.lineTo(W-P+15, toY(y)); ctx.stroke();
+        ctx.fillText(y.toFixed(0), P-35, toY(y)+3);
       }
 
       // Axes
-      ctx.strokeStyle = '#bdc3c7';
-      ctx.lineWidth = 2;
-      if (minY <= 0 && maxY >= 0) {
-        ctx.beginPath();
-        ctx.moveTo(padding - 20, toY(0));
-        ctx.lineTo(width - padding + 20, toY(0));
-        ctx.stroke();
-      }
-      if (minX <= 0 && maxX >= 0) {
-        ctx.beginPath();
-        ctx.moveTo(toX(0), padding - 20);
-        ctx.lineTo(toX(0), height - padding + 20);
-        ctx.stroke();
-      }
+      ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 1.5;
+      if (minY <= 0 && maxY >= 0) { ctx.beginPath(); ctx.moveTo(P-15, toY(0)); ctx.lineTo(W-P+15, toY(0)); ctx.stroke(); }
+      if (minX <= 0 && maxX >= 0) { ctx.beginPath(); ctx.moveTo(toX(0), P-15); ctx.lineTo(toX(0), H-P+15); ctx.stroke(); }
 
-      // Draw arrow function
-      function drawArrow(fromX, fromY, toX_, toY_, color) {
-        const headLen = 15;
-        const dx = toX_ - fromX;
-        const dy = toY_ - fromY;
-        const angle = Math.atan2(dy, dx);
-
-        ctx.strokeStyle = color;
-        ctx.fillStyle = color;
-        ctx.lineWidth = 5;
-        ctx.lineCap = 'round';
-
-        // Line
-        ctx.beginPath();
-        ctx.moveTo(fromX, fromY);
-        ctx.lineTo(toX_, toY_);
-        ctx.stroke();
-
-        // Arrow head
-        ctx.beginPath();
-        ctx.moveTo(toX_, toY_);
-        ctx.lineTo(toX_ - headLen * Math.cos(angle - Math.PI / 6), toY_ - headLen * Math.sin(angle - Math.PI / 6));
-        ctx.lineTo(toX_ - headLen * Math.cos(angle + Math.PI / 6), toY_ - headLen * Math.sin(angle + Math.PI / 6));
-        ctx.closePath();
-        ctx.fill();
+      // Distance line
+      if (results.dist) {
+        const {mid1x, mid1y, dist} = results.dist;
+        const mid2x = (v.s2x + v.e2x) / 2, mid2y = (v.s2y + v.e2y) / 2;
+        ctx.strokeStyle = '#9b59b6'; ctx.lineWidth = 2; ctx.setLineDash([5,5]);
+        ctx.beginPath(); ctx.moveTo(toX(mid1x), toY(mid1y)); ctx.lineTo(toX(mid2x), toY(mid2y)); ctx.stroke();
+        ctx.setLineDash([]);
+        const mx = (toX(mid1x) + toX(mid2x)) / 2, my = (toY(mid1y) + toY(mid2y)) / 2;
+        ctx.fillStyle = '#9b59b6'; ctx.font = 'bold 10px system-ui';
+        ctx.fillText(`${dist.toFixed(1)}`, mx + 5, my - 5);
       }
 
-      // Line 1 with arrow
+      // Arrow function
+      const drawArrow = (fx, fy, tx, ty, color) => {
+        const angle = Math.atan2(ty - fy, tx - fx);
+        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 4; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(tx, ty); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(tx, ty);
+        ctx.lineTo(tx - 12*Math.cos(angle - Math.PI/6), ty - 12*Math.sin(angle - Math.PI/6));
+        ctx.lineTo(tx - 12*Math.cos(angle + Math.PI/6), ty - 12*Math.sin(angle + Math.PI/6));
+        ctx.closePath(); ctx.fill();
+      };
+
       drawArrow(toX(v.s1x), toY(v.s1y), toX(v.e1x), toY(v.e1y), '#e74c3c');
-
-      // Line 2 with arrow
       drawArrow(toX(v.s2x), toY(v.s2y), toX(v.e2x), toY(v.e2y), '#27ae60');
 
       // Points
-      const drawPoint = (x, y, color, label) => {
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(toX(x), toY(y), 10, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(toX(x), toY(y), 8, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.font = 'bold 12px system-ui';
-        const tw = ctx.measureText(label).width;
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.fillRect(toX(x) + 12, toY(y) - 22, tw + 10, 20);
-        ctx.fillStyle = '#2c3e50';
-        ctx.fillText(label, toX(x) + 17, toY(y) - 7);
+      const drawPt = (x, y, color, label) => {
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(toX(x), toY(y), 7, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = color; ctx.beginPath(); ctx.arc(toX(x), toY(y), 5, 0, Math.PI*2); ctx.fill();
+        ctx.font = 'bold 10px system-ui'; ctx.fillStyle = '#2c3e50';
+        ctx.fillText(label, toX(x) + 8, toY(y) - 8);
       };
 
-      drawPoint(v.s1x, v.s1y, '#e74c3c', `S1(${v.s1x}, ${v.s1y})`);
-      drawPoint(v.e1x, v.e1y, '#e74c3c', `E1(${v.e1x}, ${v.e1y})`);
-      drawPoint(v.s2x, v.s2y, '#27ae60', `S2(${v.s2x}, ${v.s2y})`);
-      drawPoint(v.e2x, v.e2y, '#27ae60', `E2(${v.e2x}, ${v.e2y})`);
+      drawPt(v.s1x, v.s1y, '#e74c3c', 'S1');
+      drawPt(v.e1x, v.e1y, '#e74c3c', 'E1');
+      drawPt(v.s2x, v.s2y, '#27ae60', 'S2');
+      drawPt(v.e2x, v.e2y, '#27ae60', 'E2');
 
-      // Crossing point
-      if (isCrossing) {
+      // Cross point
+      if (results.cross) {
         const denom = (v.s1x - v.e1x) * (v.s2y - v.e2y) - (v.s1y - v.e1y) * (v.s2x - v.e2x);
         if (Math.abs(denom) > 0.0001) {
           const t = ((v.s1x - v.s2x) * (v.s2y - v.e2y) - (v.s1y - v.s2y) * (v.s2x - v.e2x)) / denom;
-          const ix = v.s1x + t * (v.e1x - v.s1x);
-          const iy = v.s1y + t * (v.e1y - v.s1y);
-
-          ctx.strokeStyle = '#c0392b';
-          ctx.lineWidth = 4;
-          const size = 18;
-          ctx.beginPath();
-          ctx.moveTo(toX(ix) - size, toY(iy) - size);
-          ctx.lineTo(toX(ix) + size, toY(iy) + size);
-          ctx.moveTo(toX(ix) + size, toY(iy) - size);
-          ctx.lineTo(toX(ix) - size, toY(iy) + size);
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.arc(toX(ix), toY(iy), size + 6, 0, Math.PI * 2);
-          ctx.stroke();
-
-          const label = `교차점 (${ix.toFixed(1)}, ${iy.toFixed(1)})`;
-          ctx.font = 'bold 14px system-ui';
-          const tw = ctx.measureText(label).width;
-          ctx.fillStyle = '#c0392b';
-          ctx.fillRect(toX(ix) + 30, toY(iy) - 28, tw + 20, 32);
-          ctx.fillStyle = '#fff';
-          ctx.fillText(label, toX(ix) + 40, toY(iy) - 6);
+          const ix = v.s1x + t * (v.e1x - v.s1x), iy = v.s1y + t * (v.e1y - v.s1y);
+          ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 3;
+          const s = 14;
+          ctx.beginPath(); ctx.moveTo(toX(ix)-s, toY(iy)-s); ctx.lineTo(toX(ix)+s, toY(iy)+s); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(toX(ix)+s, toY(iy)-s); ctx.lineTo(toX(ix)-s, toY(iy)+s); ctx.stroke();
+          ctx.beginPath(); ctx.arc(toX(ix), toY(iy), s+4, 0, Math.PI*2); ctx.stroke();
         }
       }
 
-      // Direction warning
-      if (!isSameDir) {
-        ctx.font = 'bold 16px system-ui';
-        ctx.fillStyle = '#e74c3c';
-        ctx.fillText('⚠ 방향 역전 감지', padding, padding - 30);
-      }
+      // Length labels
+      const drawLen = (sx, sy, ex, ey, len, color) => {
+        const mx = (toX(sx) + toX(ex)) / 2, my = (toY(sy) + toY(ey)) / 2;
+        ctx.fillStyle = color; ctx.font = 'bold 10px system-ui';
+        const tw = ctx.measureText(`L=${len.toFixed(1)}`).width;
+        ctx.fillRect(mx - tw/2 - 3, my - 7, tw + 6, 14);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(`L=${len.toFixed(1)}`, mx - tw/2, my + 3);
+      };
 
-      // Axis labels
-      ctx.fillStyle = '#7f8c8d';
-      ctx.font = 'bold 14px system-ui';
-      ctx.fillText('X', width - padding + 15, toY(0) - 8);
-      ctx.fillText('Y', toX(0) + 10, padding - 25);
+      drawLen(v.s1x, v.s1y, v.e1x, v.e1y, results.len.len1, '#e74c3c');
+      drawLen(v.s2x, v.s2y, v.e2x, v.e2y, results.len.len2, '#27ae60');
 
-      // Update legend arrows
-      const dx1 = v.e1x - v.s1x, dy1 = v.e1y - v.s1y;
-      const dx2 = v.e2x - v.s2x, dy2 = v.e2y - v.s2y;
-      document.getElementById('arrow1').textContent = dx1 >= 0 ? '→' : '←';
-      document.getElementById('arrow2').textContent = dx2 >= 0 ? '→' : '←';
+      // Warnings
+      let wy = P - 30;
+      ctx.font = 'bold 12px system-ui';
+      if (!results.dir) { ctx.fillStyle = '#e74c3c'; ctx.fillText('⚠ 방향 역전', P, wy); wy += 16; }
+      if (!results.len.ok) { ctx.fillStyle = '#e67e22'; ctx.fillText(`⚠ 길이 차이 ${results.len.diff.toFixed(1)}mm`, P, wy); wy += 16; }
+      if (!results.angle.ok) { ctx.fillStyle = '#8e44ad'; ctx.fillText(`⚠ 각도 차이 ${results.angle.diff.toFixed(1)}°`, P, wy); wy += 16; }
+      if (!results.dist.ok) { ctx.fillStyle = '#9b59b6'; ctx.fillText(`⚠ 거리 ${results.dist.dist.toFixed(1)}mm`, P, wy); }
+
+      ctx.fillStyle = '#7f8c8d'; ctx.font = 'bold 11px system-ui';
+      ctx.fillText('X', W - P + 10, toY(0) - 5);
+      ctx.fillText('Y', toX(0) + 6, P - 18);
     }
 
     function showCode(type) {
       document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
       event.target.classList.add('active');
-      const codes = { full: csharpCodeFull, cross: csharpCodeCross, dir: csharpCodeDir };
+      const codes = { full: csharpCodeFull, angle: csharpCodeAngle, dist: csharpCodeDist };
       document.getElementById('code-content').innerHTML = codes[type];
     }
 
-    // Init
     document.addEventListener('DOMContentLoaded', () => {
       showCode('full');
-      const v = getInputValues();
-      drawCanvas(v, false, true);
+      runValidation();
     });
 
-    window.addEventListener('resize', () => {
-      const v = getInputValues();
-      const isCrossing = checkCrossing(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y);
-      const isSameDir = checkDirectionConsistency(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y);
-      drawCanvas(v, isCrossing, isSameDir);
-    });
+    window.addEventListener('resize', runValidation);
   </script>
 </body>
 </html>
