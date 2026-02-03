@@ -1005,6 +1005,20 @@
                 font-size: 0.8em;
                 margin-bottom: 25px;
             }
+
+            /* 페이지 배치 제어 */
+            #section-overview {
+                page-break-after: always;
+            }
+            #section-order {
+                page-break-before: always;
+            }
+            #section-scope {
+                page-break-inside: avoid;
+            }
+            #section-materials {
+                page-break-before: always;
+            }
         }
     </style>
 </head>
@@ -1023,7 +1037,7 @@
 
         <div class="content">
             <!-- 1. 프로젝트 개요 -->
-            <div class="section">
+            <div class="section" id="section-overview">
                 <h2 class="section-title">1. 프로젝트 개요</h2>
                 <div class="info-grid">
                     <div class="info-card">
@@ -1056,7 +1070,7 @@
             </div>
 
             <!-- 2. 발주 내역 -->
-            <div class="section">
+            <div class="section" id="section-order">
                 <h2 class="section-title">2. 발주 내역</h2>
                 <table>
                     <thead>
@@ -1095,7 +1109,7 @@
             </div>
 
             <!-- 3. 작업 범위 -->
-            <div class="section">
+            <div class="section" id="section-scope">
                 <h2 class="section-title">3. 작업 범위</h2>
                 <table>
                     <thead>
@@ -1150,7 +1164,7 @@
             </div>
 
             <!-- 4. 장비 및 자재 -->
-            <div class="section">
+            <div class="section" id="section-materials">
                 <h2 class="section-title">4. 장비 및 자재 목록</h2>
                 <table>
                     <thead>
