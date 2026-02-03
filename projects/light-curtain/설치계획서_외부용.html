@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>라이트커튼 설치계획서 (외부용) - 거제조선소</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #e2e8f0;
+            color: #333;
+            font-size: 12px;
+        }
+
+        /* A4 가로 페이지 기본 설정 */
+        .document {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .page {
+            width: 297mm;
+            height: 210mm;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 12mm 15mm;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 페이지 헤더 (표지용) */
+        .page-header {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+            padding: 20px 25px;
+            text-align: center;
+            margin: -12mm -15mm 15px -15mm;
+            width: calc(100% + 30mm);
+        }
+
+        .page-header .company {
+            font-size: 1em;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .page-header h1 {
+            font-size: 2.2em;
+            margin-bottom: 5px;
+        }
+
+        .page-header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .page-header .doc-info {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 0.9em;
+        }
+
+        .page-header .doc-info span {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 12px;
+            border-radius: 15px;
+        }
+
+        /* 섹션 */
+        .section {
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            color: #2d3748;
+            border-left: 4px solid #4299e1;
+            padding-left: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* 정보 그리드 */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .info-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-card h4 {
+            color: #4a5568;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .info-card p {
+            font-size: 1.15em;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .info-card .detail {
+            font-size: 0.85em;
+            color: #718096;
+            margin-top: 3px;
+        }
+
+        /* 테이블 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        th, td {
+            padding: 6px 10px;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #edf2f7;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        /* 뱃지 */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .badge-primary { background: #bee3f8; color: #2b6cb0; }
+        .badge-success { background: #c6f6d5; color: #276749; }
+        .badge-warning { background: #fefcbf; color: #975a16; }
+
+        /* 이미지 */
+        .image-container {
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .image-container .caption {
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .image-card {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .image-card h4 {
+            font-size: 0.9em;
+            color: #2d3748;
+            margin-bottom: 8px;
+            padding: 5px;
+            background: #edf2f7;
+            border-radius: 4px;
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        /* 2단 레이아웃 */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* 간트차트 */
+        .gantt-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8em;
+        }
+
+        .gantt-table th, .gantt-table td {
+            border: 1px solid #e2e8f0;
+            padding: 3px 4px;
+            text-align: center;
+        }
+
+        .gantt-table th {
+            background: #2d3748;
+            color: white;
+            font-weight: 600;
+        }
+
+        .gantt-table th.time-header {
+            background: #4a5568;
+        }
+
+        .gantt-table .task-name {
+            text-align: left;
+            font-weight: 500;
+            min-width: 140px;
+            background: #f7fafc;
+            font-size: 1em;
+        }
+
+        .gantt-table .task-team {
+            min-width: 45px;
+            background: #f7fafc;
+            font-size: 1em;
+        }
+
+        .gantt-bar {
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .gantt-bar-mechanical { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+        .gantt-bar-electrical { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
+        .gantt-bar-both { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); }
+        .gantt-bar-prep { background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); }
+
+        .gantt-legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 0.8em;
+        }
+
+        .gantt-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .gantt-legend-color {
+            width: 16px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        /* 체크리스트 */
+        .checklist {
+            list-style: none;
+            columns: 2;
+            column-gap: 20px;
+        }
+
+        .checklist li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.95em;
+        }
+
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            color: #4299e1;
+        }
+
+        /* 비용 요약 */
+        .cost-summary {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .cost-summary .amount {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .cost-summary .note {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        /* 안전 관리 */
+        .compliance-box {
+            background: #fffaf0;
+            border: 1px solid #ed8936;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .compliance-box h4 {
+            color: #c05621;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+
+        .compliance-box ol {
+            padding-left: 18px;
+            font-size: 0.9em;
+        }
+
+        .compliance-box li {
+            padding: 3px 0;
+            line-height: 1.4;
+        }
+
+        .compliance-box .note {
+            background: #feebc8;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-top: 3px;
+        }
+
+        .safety-box {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .safety-box h4 {
+            color: #c53030;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .visitor-info-table th, .visitor-info-table td {
+            padding: 5px 8px;
+            font-size: 0.9em;
+        }
+
+        .visitor-info-table th {
+            background: #f7fafc;
+            width: 25%;
+        }
+
+        .emergency-number {
+            background: #c53030;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.95em;
+        }
+
+        /* 위험성평가 */
+        .risk-assessment {
+            border: 1px solid #2d3748;
+            border-radius: 6px;
+            overflow: hidden;
+            font-size: 0.85em;
+        }
+
+        .risk-assessment-header {
+            background: #2d3748;
+            color: white;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .risk-assessment-header h3 {
+            font-size: 1em;
+            margin: 0;
+        }
+
+        .risk-info-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9em;
+        }
+
+        .risk-info-cell {
+            padding: 6px 10px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .risk-info-cell:last-child {
+            border-right: none;
+        }
+
+        .risk-info-cell label {
+            font-size: 0.8em;
+            color: #718096;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .risk-section-title {
+            background: #4a5568;
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .risk-category {
+            background: #edf2f7;
+            padding: 4px 10px;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85em;
+        }
+
+        .risk-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 60px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.8em;
+        }
+
+        .risk-question {
+            padding: 5px 8px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .risk-options {
+            display: flex;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .risk-option {
+            flex: 1;
+            padding: 5px;
+            text-align: center;
+            font-size: 0.85em;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .risk-option:last-child {
+            border-right: none;
+        }
+
+        .risk-option input[type="checkbox"] {
+            width: 12px;
+            height: 12px;
+        }
+
+        .risk-checkbox {
+            padding: 5px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .risk-checkbox input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+        }
+
+        .site-risk-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        .site-risk-table th {
+            background: #4a5568;
+            color: white;
+            padding: 5px 4px;
+            text-align: center;
+            border: 1px solid #2d3748;
+        }
+
+        .site-risk-table td {
+            padding: 4px 5px;
+            border: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .site-risk-table .category-cell {
+            background: #edf2f7;
+            font-weight: 600;
+            text-align: center;
+            width: 45px;
+        }
+
+        .site-risk-table .check-cell {
+            text-align: center;
+            width: 30px;
+        }
+
+        .site-risk-table .check-cell input[type="checkbox"] {
+            width: 12px;
+            height: 12px;
+        }
+
+        .site-risk-table .improvement-cell {
+            width: 100px;
+            font-size: 0.9em;
+        }
+
+        .site-risk-table .manager-cell {
+            width: 45px;
+            text-align: center;
+        }
+
+        .highlight-yellow {
+            background: #fefcbf;
+        }
+
+        .highlight-red {
+            background: #fed7d7;
+            color: #c53030;
+            font-weight: 600;
+        }
+
+        /* 푸터 */
+        .page-footer {
+            position: absolute;
+            bottom: 8mm;
+            left: 15mm;
+            right: 15mm;
+            text-align: center;
+            font-size: 0.8em;
+            color: #718096;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 5px;
+        }
+
+        /* 인쇄 스타일 */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .document {
+                padding: 0;
+                gap: 0;
+            }
+
+            .page {
+                box-shadow: none;
+                margin: 0;
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+
+            .page:last-child {
+                page-break-after: auto;
+            }
+        }
+
+        /* 스크롤 힌트 */
+        @media screen {
+            .page {
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="document">
+        <!-- 페이지 1: 표지 + 프로젝트 개요 -->
+        <div class="page">
+            <div class="page-header">
+                <p class="company">(주)에스피시스템스</p>
+                <h1>라이트커튼 설치계획서</h1>
+                <p class="subtitle">거제조선소 4개소 설치공사</p>
+                <div class="doc-info">
+                    <span>문서번호: LC-2025-001</span>
+                    <span>작성일: 2025-02-03</span>
+                    <span>버전: 1.0</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">1. 프로젝트 개요</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>프로젝트번호</h4>
+                        <p>S25016</p>
+                        <div class="detail">삼성중공업)소조립 B라인 용접시스템</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>설치 현장</h4>
+                        <p>거제조선소 34bay 5line</p>
+                        <div class="detail">a/b 물류 투입 배출 위치</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>설치 수량</h4>
+                        <p>4 SET</p>
+                        <div class="detail">라이트커튼 시스템</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>예상 공기</h4>
+                        <p>2일</p>
+                        <div class="detail">2025년 2월 중 예정</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="image-container" style="height: 95mm;">
+                <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1770099779/s25016/punchlist/ku3d91v6x3citay6czfhztjjz.png" alt="설치개요" style="max-height: 90mm;">
+                <p class="caption">그림 1. 라이트커튼 설치개요</p>
+            </div>
+
+            <div class="page-footer">
+                본 설치계획서는 사전 협의 내용을 기반으로 작성되었으며, 현장 상황에 따라 변경될 수 있습니다. | 문의: 이상주 대리 (010-2604-9957)
+            </div>
+        </div>
+
+        <!-- 페이지 2: 발주 내역 + 작업 범위 -->
+        <div class="page">
+            <div class="two-column">
+                <div>
+                    <div class="section">
+                        <h2 class="section-title">2. 발주 내역</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>항목</th>
+                                    <th>내용</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>발주번호</td><td>PO2602030001</td></tr>
+                                <tr><td>발주품명</td><td>라이트커튼 케이블</td></tr>
+                                <tr><td>공급업체</td><td>(주)피에프에이</td></tr>
+                                <tr><td>구매담당</td><td>구매팀 / 이찬희</td></tr>
+                                <tr><td>PM담당</td><td>PM사업부4팀 / 정예희</td></tr>
+                                <tr><td>발주일</td><td>2025-02-03</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="section" style="margin-top: 15px;">
+                        <h2 class="section-title">3. 작업 범위</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>구분</th>
+                                    <th>라인</th>
+                                    <th>작업 내용</th>
+                                    <th>비고</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="2"><span class="badge badge-primary">장비</span></td>
+                                    <td>A</td>
+                                    <td>라이트커튼 2SET 설치</td>
+                                    <td rowspan="2">브라켓 및 잡자재 포함</td>
+                                </tr>
+                                <tr>
+                                    <td>B</td>
+                                    <td>라이트커튼 2SET 설치</td>
+                                </tr>
+                                <tr style="background: #fffaf0;">
+                                    <td rowspan="3"><span class="badge badge-warning">전기<br>(A라인)</span></td>
+                                    <td rowspan="3">A</td>
+                                    <td>① OP룸 상단부 단자대 박스 교체</td>
+                                    <td rowspan="3">기존 설비 연동</td>
+                                </tr>
+                                <tr style="background: #fffaf0;">
+                                    <td>② OP룸 스위치 박스 내부 램프 스위치 결선 변경</td>
+                                </tr>
+                                <tr style="background: #fffaf0;">
+                                    <td>③ 라이트커튼 결선</td>
+                                </tr>
+                                <tr style="background: #fff5f5;">
+                                    <td rowspan="2"><span class="badge badge-warning">전기<br>(B라인)</span></td>
+                                    <td rowspan="2">B</td>
+                                    <td>① OP룸 스위치 박스 내부 램프 스위치 결선 변경</td>
+                                    <td rowspan="2">기존 설비 연동</td>
+                                </tr>
+                                <tr style="background: #fff5f5;">
+                                    <td>② 라이트커튼 결선</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2"><span class="badge badge-success">기계</span></td>
+                                    <td>A/B</td>
+                                    <td>바닥 시공</td>
+                                    <td>센서 설치 위한 기초 작업</td>
+                                </tr>
+                                <tr>
+                                    <td>A/B</td>
+                                    <td>정반 개조</td>
+                                    <td>라이트커튼 설치 영역 확보</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="margin-top: 8px; font-size: 0.85em; color: #718096;">※ 램프 스위치 결선 변경: 라이트커튼 → PLC 출력으로 변경</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section">
+                        <h2 class="section-title" style="font-size: 1.1em;">작업 상세 도면</h2>
+                        <div class="image-grid" style="grid-template-columns: 1fr;">
+                            <div class="image-card">
+                                <h4>바닥 시공</h4>
+                                <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1770099796/s25016/punchlist/b99b395qndporv6htwe22brqs.png" alt="바닥시공" style="height: 55mm; max-height: 55mm;">
+                            </div>
+                            <div class="image-card">
+                                <h4>수광부 (정반 개조)</h4>
+                                <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1770099804/s25016/punchlist/icwce6pgzmeqqeofa067i6w6j.png" alt="수광부 정반개조" style="height: 55mm; max-height: 55mm;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-footer">페이지 2 / 8</div>
+        </div>
+
+        <!-- 페이지 3: 장비/자재 + 투입인력 -->
+        <div class="page">
+            <div class="two-column">
+                <div>
+                    <div class="section">
+                        <h2 class="section-title">4. 장비 및 자재 목록</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>품명</th>
+                                    <th>규격</th>
+                                    <th>수량</th>
+                                    <th>비고</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>라이트커튼</td><td>SLC-0918NUI-Y</td><td>4 SET</td><td>(주)피에프에이</td></tr>
+                                <tr><td>2</td><td>라이트커튼 케이블</td><td>SD-8I20(G)</td><td>4 EA</td><td>(주)피에프에이</td></tr>
+                                <tr><td>3</td><td>라이트커튼 케이블</td><td>SD-8I20</td><td>4 EA</td><td>(주)피에프에이</td></tr>
+                                <tr><td>4</td><td>설치 브라켓</td><td>전용 브라켓</td><td>8 EA</td><td>송신기/수신기 각 1개</td></tr>
+                                <tr><td>5</td><td>전기 박스</td><td>-</td><td>4 EA</td><td>기존 박스 교체</td></tr>
+                                <tr><td>6</td><td>잡자재</td><td>-</td><td>1 LOT</td><td>볼트, 너트, 앵커 등</td></tr>
+                            </tbody>
+                        </table>
+
+                        <div style="margin-top: 12px; padding: 10px; background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px;">
+                            <h4 style="color: #276749; margin-bottom: 8px; font-size: 0.95em;">전원 및 설치 사양</h4>
+                            <table style="font-size: 0.9em;">
+                                <tr><th>항목</th><th>사양</th><th>비고</th></tr>
+                                <tr><td>입력 전압</td><td>DC 24V</td><td>±10%</td></tr>
+                                <tr><td>소비 전력</td><td>약 5W 이하</td><td>송신기+수신기</td></tr>
+                                <tr><td>보호 등급</td><td>IP65</td><td>방진/방수</td></tr>
+                                <tr><td>사용 온도</td><td>-10℃ ~ +55℃</td><td>결로 없을 것</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section">
+                        <h2 class="section-title">5. 투입 인력 계획</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>직종</th>
+                                    <th>인원</th>
+                                    <th>투입 기간</th>
+                                    <th>주요 업무</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>전기 기술자</td>
+                                    <td>2명</td>
+                                    <td>2일</td>
+                                    <td>배선 공사, 박스 교체, 결선 작업</td>
+                                </tr>
+                                <tr>
+                                    <td>기계 기술자</td>
+                                    <td>2명</td>
+                                    <td>2일</td>
+                                    <td>바닥 시공, 정반 개조, 브라켓 설치</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="margin-top: 10px; color: #718096; font-size: 0.9em;">
+                            <strong>총 투입 인력:</strong> 4명 × 2일 = 8 M/D
+                        </p>
+                    </div>
+
+                    <div class="section" style="margin-top: 15px;">
+                        <h2 class="section-title">9. 검수 체크리스트</h2>
+                        <ul class="checklist">
+                            <li>라이트커튼 4개소 정상 설치 확인</li>
+                            <li>송신기-수신기 정렬 상태 확인</li>
+                            <li>배선 및 결선 상태 확인</li>
+                            <li>전원 공급 정상 여부 확인</li>
+                            <li>라이트커튼 동작 테스트</li>
+                            <li>안전 시스템 연동 확인</li>
+                            <li>현장 정리 정돈 상태 확인</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-footer">페이지 3 / 8</div>
+        </div>
+
+        <!-- 페이지 4: 공사 일정 (간트차트) -->
+        <div class="page">
+            <div class="section">
+                <h2 class="section-title">6. 공사 일정 (간트차트)</h2>
+                <p style="color: #718096; margin-bottom: 10px; font-size: 0.9em;">※ 발주일 기준 10일 소요 (현장 작업 2일)</p>
+
+                <table class="gantt-table">
+                    <thead>
+                        <tr>
+                            <th>작업 항목</th>
+                            <th>담당</th>
+                            <th class="time-header">D+1</th>
+                            <th class="time-header">D+2</th>
+                            <th class="time-header">D+3</th>
+                            <th class="time-header">D+4</th>
+                            <th class="time-header">D+5</th>
+                            <th class="time-header">D+6</th>
+                            <th class="time-header">D+7</th>
+                            <th class="time-header">D+8</th>
+                            <th class="time-header">D+9</th>
+                            <th class="time-header">D+10</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #faf5ff;"><td colspan="12" style="font-weight: 600; color: #805ad5; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 사전 준비</td></tr>
+                        <tr><td class="task-name">현장 사전 답사</td><td class="task-team">PM</td><td><div class="gantt-bar gantt-bar-prep"></div></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td class="task-name">설계 및 배선도 작성</td><td class="task-team">설계</td><td></td><td><div class="gantt-bar gantt-bar-prep"></div></td><td><div class="gantt-bar gantt-bar-prep"></div></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td class="task-name">설계 검토 및 확정</td><td class="task-team">PM</td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-prep"></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+                        <tr style="background: #ebf8ff;"><td colspan="12" style="font-weight: 600; color: #3182ce; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 자재 조달</td></tr>
+                        <tr><td class="task-name">자재 발주 확인</td><td class="task-team">구매팀</td><td><div class="gantt-bar gantt-bar-both"></div></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td class="task-name">자재 입고 대기</td><td class="task-team">구매팀</td><td></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td></td><td></td><td></td></tr>
+                        <tr><td class="task-name">현장 자재 반입</td><td class="task-team">전체</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-both"></div></td><td></td><td></td></tr>
+
+                        <tr style="background: #f0fff4;"><td colspan="12" style="font-weight: 600; color: #38a169; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 기계 작업 (D+9)</td></tr>
+                        <tr><td class="task-name">바닥 시공</td><td class="task-team">기계</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-mechanical"></div></td><td></td></tr>
+                        <tr><td class="task-name">정반 개조</td><td class="task-team">기계</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-mechanical"></div></td><td></td></tr>
+                        <tr><td class="task-name">브라켓 설치 (4개소)</td><td class="task-team">기계</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-mechanical"></div></td><td></td></tr>
+
+                        <tr style="background: #fffaf0;"><td colspan="12" style="font-weight: 600; color: #dd6b20; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 전기 A라인 (D+10)</td></tr>
+                        <tr><td class="task-name">[A] OP룸 상단부 단자대 박스 교체</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+                        <tr><td class="task-name">[A] OP룸 스위치 박스 램프 결선 변경</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+                        <tr><td class="task-name">[A] 라이트커튼 결선</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+
+                        <tr style="background: #fff5f5;"><td colspan="12" style="font-weight: 600; color: #c53030; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 전기 B라인 (D+10)</td></tr>
+                        <tr><td class="task-name">[B] OP룸 스위치 박스 램프 결선 변경</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+                        <tr><td class="task-name">[B] 라이트커튼 결선</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+
+                        <tr style="background: #fffaf0;"><td colspan="12" style="font-weight: 600; color: #dd6b20; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 전기 공통 (D+10)</td></tr>
+                        <tr><td class="task-name">안전 릴레이 연결</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+                        <tr><td class="task-name">PLC/제어반 연동 확인</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+                        <tr><td class="task-name">전원 인가 및 동작 테스트</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+
+                        <tr style="background: #ebf8ff;"><td colspan="12" style="font-weight: 600; color: #3182ce; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 완료</td></tr>
+                        <tr><td class="task-name">시운전 및 검수</td><td class="task-team">전체</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-both"></div></td></tr>
+                        <tr><td class="task-name">현장 정리 및 인수인계</td><td class="task-team">전체</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-both"></div></td></tr>
+                    </tbody>
+                </table>
+
+                <div class="gantt-legend">
+                    <div class="gantt-legend-item"><div class="gantt-legend-color" style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);"></div><span>사전 준비/설계</span></div>
+                    <div class="gantt-legend-item"><div class="gantt-legend-color" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);"></div><span>기계 작업</span></div>
+                    <div class="gantt-legend-item"><div class="gantt-legend-color" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);"></div><span>전기 작업</span></div>
+                    <div class="gantt-legend-item"><div class="gantt-legend-color" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);"></div><span>자재/합동 작업</span></div>
+                </div>
+
+                <div style="margin-top: 8px; padding: 6px 8px; background: #f7fafc; border-radius: 4px; border-left: 3px solid #4299e1;">
+                    <p style="font-weight: 600; margin-bottom: 4px; font-size: 0.85em;">일정 요약</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px; font-size: 0.75em; color: #4a5568;">
+                        <div>• <strong>D+1:</strong> 사전답사/발주확인</div>
+                        <div>• <strong>D+2~3:</strong> 설계/배선도</div>
+                        <div>• <strong>D+4:</strong> 설계 검토</div>
+                        <div>• <strong>D+2~7:</strong> 자재 입고 대기</div>
+                        <div>• <strong>D+8:</strong> 자재 반입</div>
+                        <div>• <strong>D+9:</strong> 기계 작업</div>
+                        <div style="grid-column: span 3;">• <strong>D+10:</strong> A라인(단자대→램프→커튼) / B라인(램프→커튼) / 공통(릴레이/PLC/테스트/검수)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-footer">페이지 4 / 8</div>
+        </div>
+
+        <!-- 페이지 5: 안전 관리 계획 -->
+        <div class="page">
+            <div class="section">
+                <h2 class="section-title">7. 안전 관리 계획</h2>
+
+                <table class="visitor-info-table" style="margin-bottom: 12px;">
+                    <tr>
+                        <th>방문업체</th>
+                        <td></td>
+                        <th>방문일정</th>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>방문자</th>
+                        <td colspan="3"></td>
+                    </tr>
+                </table>
+
+                <div class="two-column" style="gap: 15px;">
+                    <div>
+                        <div class="compliance-box">
+                            <h4>📋 임시 출입자 준수사항</h4>
+                            <ol>
+                                <li>방문업체는 <strong>2인 이상</strong> 방문하여 작업을 수행하는 경우, 방문자 중 1명을 <strong>작업책임자</strong>로 지정한다.</li>
+                                <li>방문업체는 2인 이상(작업책임자 포함) 방문하여 <strong>4대 유형의 작업</strong>을 수행하는 경우, <strong>무전기(생활무전기)</strong>를 필히 준비한다.
+                                    <div class="note">※ 4대 작업: ①크레인 정비/사용, ②시운전, ③테스트(압력,하중 등), ④16톤 이상 지게차 작업</div>
+                                </li>
+                                <li>방문업체는 내방 전 <strong>작업 위험성평가</strong>를 작성하고, 현장에서 삼성중공업 생산부서(협력사)가 참여하여 그 위험성평가를 토대로 작업방법 검토 및 안전조치를 실시한다.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="safety-box">
+                            <h4>⚠️ 사전 점검 항목</h4>
+                            <table style="font-size: 0.85em;">
+                                <tr><th style="width: 8%;">No.</th><th>점검 항목</th><th style="width: 12%;">확인</th></tr>
+                                <tr><td>1</td><td><strong>작업 책임자 선정</strong> 또는 삼성중공업 현장 담당자 정보 확인</td><td style="text-align: center;">☐</td></tr>
+                                <tr><td>2</td><td>작업 책임자 포함 2인 이상 방문하여 <strong>4대 유형의 작업 수행 시 무전기 준비</strong></td><td style="text-align: center;">☐</td></tr>
+                                <tr><td>3</td><td>내방 신청 시스템의 <strong>작업 위험성평가</strong> 작성</td><td style="text-align: center;">☐</td></tr>
+                                <tr><td>4</td><td><strong>삼성중공업 방문 신청</strong> 및 개인 안전교육 이수</td><td style="text-align: center;">☐</td></tr>
+                                <tr><td>5</td><td><strong>안전보호구 준비</strong> (안전모, 안전화, 보안경, 안전벨트, 장갑)</td><td style="text-align: center;">☐</td></tr>
+                                <tr><td>6</td><td>작업에 필요한 <strong>작업 공구(장비)</strong> 준비</td><td style="text-align: center;">☐</td></tr>
+                                <tr><td>7</td><td>삼성중공업 내 <strong>사고 발생 시 신고 전화번호</strong> 숙지</td><td style="text-align: center;">☐</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="emergency-number" style="margin-top: 12px;">
+                    비상시 연락처 (안전환경팀): <strong>055-630-3119</strong>
+                </div>
+
+                <div style="margin-top: 12px; padding: 12px; background: #f7fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <p style="margin-bottom: 10px; font-size: 0.9em;">본인은 위 준수사항을 숙지하고 사전 점검을 실시하여 이상이 없음을 확인합니다.</p>
+                    <table class="visitor-info-table">
+                        <tr>
+                            <th style="width: 15%;">직 책</th>
+                            <td style="width: 35%;"></td>
+                            <th style="width: 15%;">서 명</th>
+                            <td style="width: 35%;">(인)</td>
+                        </tr>
+                    </table>
+                    <p style="font-size: 0.75em; color: #718096; margin-top: 8px;">※ 작성된 문서는 요청부서에서 최소 3개월 동안 보관 할 것.</p>
+                </div>
+            </div>
+
+            <div class="page-footer">페이지 5 / 8</div>
+        </div>
+
+        <!-- 페이지 6: 위험성평가 (1) - 사전 위험성평가 -->
+        <div class="page">
+            <div class="section">
+                <h2 class="section-title">8. 임시출입 작업 위험성평가 (체크리스트)</h2>
+                <p style="text-align: right; color: #718096; font-size: 0.8em; margin-bottom: 8px;">※ 보존 년한: 3년(요청부서 보관)</p>
+
+                <div class="risk-assessment">
+                    <div class="risk-info-row">
+                        <div class="risk-info-cell">
+                            <label>작업명</label>
+                            <div style="border-bottom: 1px solid #e2e8f0; padding: 3px 0;">라이트커튼 4개소 설치공사</div>
+                        </div>
+                        <div class="risk-info-cell">
+                            <label>작업일시</label>
+                            <div style="border-bottom: 1px solid #e2e8f0; padding: 3px 0;">2025년 2월</div>
+                        </div>
+                        <div class="risk-info-cell">
+                            <label>작업장소</label>
+                            <div style="border-bottom: 1px solid #e2e8f0; padding: 3px 0;">거제조선소 34bay 5line</div>
+                        </div>
+                        <div class="risk-info-cell">
+                            <label>업체명</label>
+                            <div style="border-bottom: 1px solid #e2e8f0; padding: 3px 0;"></div>
+                        </div>
+                    </div>
+
+                    <div class="risk-info-row" style="background: #f7fafc;">
+                        <div class="risk-info-cell" style="grid-column: span 2;">
+                            <label>작업 요청부서 서명</label>
+                            <div style="height: 25px; border-bottom: 1px solid #e2e8f0;"></div>
+                        </div>
+                        <div class="risk-info-cell">
+                            <label>임시출입 작업자 서명</label>
+                            <div style="height: 25px; border-bottom: 1px solid #e2e8f0;"></div>
+                        </div>
+                        <div class="risk-info-cell">
+                            <label>작업책임자/현장담당자 서명</label>
+                            <div style="font-size: 0.75em; color: #718096;">2인 이상: 출입업체 작업책임자<br>1인 단독: 요청부서 현장담당자</div>
+                        </div>
+                    </div>
+
+                    <div class="risk-section-title">◎ 출입 전 사전 위험성평가</div>
+
+                    <div class="risk-category">1. 작업 이해도 및 준비 상태</div>
+                    <div class="risk-item"><div class="risk-question">• 작업 내용과 절차를 명확히 이해하고 있습니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 정확히 알고 있다.</div><div class="risk-option"><input type="checkbox"> 작업 내용을 정확히 모른다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+                    <div class="risk-item"><div class="risk-question">• 처음 수행하는 작업입니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 처음 수행하는 작업이다.</div><div class="risk-option"><input type="checkbox"> 해당 작업에 대한 경험이 있다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+                    <div class="risk-item"><div class="risk-question">• 사전에 해당 작업에 대한 교육을 받았습니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 충분한 교육을 받았다.</div><div class="risk-option"><input type="checkbox"> 교육을 받지 못했다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+
+                    <div class="risk-category">2. 작업 환경 인지 여부</div>
+                    <div class="risk-item"><div class="risk-question">• 작업 장소를 명확히 알고 있습니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 장소 및 이동 방법을 알고있다.</div><div class="risk-option"><input type="checkbox"> 장소 또는 이동 방법을 잘 모른다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+                    <div class="risk-item"><div class="risk-question">• 작업 장소는 밀폐구역 입니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 밀폐구역이다.</div><div class="risk-option"><input type="checkbox"> 밀폐구역이 아니다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+                    <div class="risk-item"><div class="risk-question">• 작업 장소는 고소작업 입니까? (높이 2미터 이상)</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 2m 이상 고소작업이 있다.</div><div class="risk-option"><input type="checkbox"> 고소작업이 아니다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+
+                    <div class="risk-category">3. 작업 도구의 적합성</div>
+                    <div class="risk-item"><div class="risk-question">• 작업에 필요한 전기기계/기구가 있습니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 전기를 사용하는 장비/공구가 있다.</div><div class="risk-option"><input type="checkbox"> 전기를 사용하는 장비/공구가 없다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+                    <div class="risk-item"><div class="risk-question">• 전기기계/기구의 절연 상태 및 접지는 점검되었습니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 절연 및 접지 점검 완료.</div><div class="risk-option"><input type="checkbox"> 절연이나 접지가 뭔지 모르겠다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+                    <div class="risk-item"><div class="risk-question">• 사용하는 공구는 점검 되었습니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 공구를 점검하여 사용 가능.</div><div class="risk-option"><input type="checkbox"> 별도의 점검을 하지 않았다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+
+                    <div class="risk-category">4. PPE 및 안전장비 착용 여부</div>
+                    <div class="risk-item"><div class="risk-question">• 안전모, 안전화, 보안경, 그네식 안전벨트, 장갑은 삼성중공업의 기본 보호구 입니다.</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 전부 보유하고 있다.</div><div class="risk-option"><input type="checkbox"> 일부 준비가 안되었다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+                    <div class="risk-item"><div class="risk-question">• 그 외 작업에 필요한 추가 보호구를 갖추고 있습니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 추가 보호구가 준비되었다.</div><div class="risk-option"><input type="checkbox"> 별도 필요한 보호구가 없다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+
+                    <div class="risk-category">5. 신호체계</div>
+                    <div class="risk-item"><div class="risk-question">• 작업 중 상호 간 신호가 필요한 작업이 있습니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 신호가 필요한 작업이 있다.</div><div class="risk-option"><input type="checkbox"> 신호가 필요 없는 작업이다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+                    <div class="risk-item"><div class="risk-question">• 2인 이상 방문하여 4대 유형의 작업을 수행하는 경우, 무전기를 준비해야 하는 것을 알고 있습니까?</div><div class="risk-options"><div class="risk-option"><input type="checkbox"> 무전기가 준비되어 있다.</div><div class="risk-option"><input type="checkbox"> 무전기가 없다.</div></div><div class="risk-checkbox"><input type="checkbox"></div></div>
+                    <div style="background: #fefcbf; padding: 6px 10px; font-size: 0.8em;">※ 4대 작업 유형: 크레인 설치/해체 및 수리 또는 사용 작업, 시운전 작업, 테스트 작업(압력, 하중 테스트 등), 16톤 이상 대형 지게차 작업</div>
+                </div>
+            </div>
+
+            <div class="page-footer">페이지 6 / 8</div>
+        </div>
+
+        <!-- 페이지 7: 위험성평가 (2) - 현장 위험성평가 상반부 -->
+        <div class="page">
+            <div class="section">
+                <h2 class="section-title">8. 임시출입 작업 위험성평가 (계속)</h2>
+
+                <div class="risk-assessment">
+                    <div class="risk-section-title">◎ 출입 후 현장 위험성평가</div>
+
+                    <table class="site-risk-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="width: 50px;"></th>
+                                <th rowspan="2">유해/위험요인 파악 (체크리스트 항목)</th>
+                                <th colspan="3">위험성 확인 결과</th>
+                                <th rowspan="2" style="width: 100px;">개선 대책</th>
+                                <th rowspan="2" style="width: 50px;">개선<br>담당자</th>
+                            </tr>
+                            <tr>
+                                <th style="width: 35px;">적정</th>
+                                <th style="width: 35px;">보완</th>
+                                <th style="width: 35px;">해당<br>없음</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="category-cell" rowspan="2">작업장<br>관리</td><td>안전통로는 확보되었는가? (전도, 붕괴, 낙하물 여부)</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>조명 및 환기 관리는 적절한가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell" rowspan="2">안전<br>시설물</td><td>작업장 내 개구부는 확인하고 조치가 되었는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>족장, 안전난간 등 시설물이 적절하게 설치되었는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell" rowspan="2">작업<br>허가서</td><td>작업허가서 발급 대상 작업인가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>적합한 작업허가서가 발급되었는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell" rowspan="4">밀폐<br>구역</td><td>밀폐구역에 해당되는가? (사람이 상시 출입하지 않는 구역)</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>밀폐구역의 가스 측정 기준을 알고 있는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell">※ 가스측정교육 이수자 외 작업 금지</td><td class="manager-cell"></td></tr>
+                            <tr><td>산소농도 측정기는 보유하고 있는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>감시자는 배치 하였는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell">※ 감시자 교육 이수자가 없을 시 작업 금지</td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell" rowspan="6">고소<br>작업</td><td>환기가 미흡한 경우 환기를 위한 장치는 설치되어 있는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>추락위험구간 내 생명줄/안전블록은 설치 되었는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td class="highlight-red">족장 난간이 없는 경우 임시출입자의 생명줄 설치 금지</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell">※ 족장 난간이 없는 경우 임시출입자 작업 금지</td><td class="manager-cell"></td></tr>
+                            <tr><td class="highlight-red">적절한 작업발판이 설치되어 있는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell">※ 족장 난간이 없는 경우 임시출입자 작업 금지</td><td class="manager-cell"></td></tr>
+                            <tr><td>안전벨트를 체결할 수 있도록 되어 있는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td class="highlight-red">무자격자는 고소작업용 장비 사용 금지</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell">※ 임시출입자의 사내 고소작업용 장비 사용 금지</td><td class="manager-cell"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="page-footer">페이지 7 / 8</div>
+        </div>
+
+        <!-- 페이지 8: 위험성평가 (3) - 현장 위험성평가 하반부 -->
+        <div class="page">
+            <div class="section">
+                <h2 class="section-title">8. 임시출입 작업 위험성평가 (계속)</h2>
+
+                <div class="risk-assessment">
+                    <table class="site-risk-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="width: 50px;"></th>
+                                <th rowspan="2">유해/위험요인 파악 (체크리스트 항목)</th>
+                                <th colspan="3">위험성 확인 결과</th>
+                                <th rowspan="2" style="width: 100px;">개선 대책</th>
+                                <th rowspan="2" style="width: 50px;">개선<br>담당자</th>
+                            </tr>
+                            <tr>
+                                <th style="width: 35px;">적정</th>
+                                <th style="width: 35px;">보완</th>
+                                <th style="width: 35px;">해당<br>없음</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="category-cell" rowspan="2">화재<br>폭발</td><td>불티 비산방지조치는 되었는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>화기작업 시 주변/하부/이면의 가연물은 확인 하였는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell" rowspan="2">화학<br>물질</td><td>화학물질의 사용이 있는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>MSDS 는 보유하고 게시되어 있는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell" rowspan="3">설비</td><td class="highlight-yellow">반드시 전원 차단 후 장비 점검 ※ 끼임 사고 주의</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td class="highlight-yellow">활선, 정전 작업의 경우 필히 LOTO 실시</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td class="highlight-yellow">무자격자는 신호수 역할 금지</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell" rowspan="2">운반</td><td>중량물 하부 및 운반경로의 출입통제를 실시 하는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>무자격자는 중장비 운전 금지</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell">중장비</td><td class="highlight-yellow">중장비 사용 시 유도자 필히 배치 ※ 부딪힘 사고 주의</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell" rowspan="2">기계</td><td>움직이는 기계, 장비에 끼임 위험은 확인 하였는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td>전기 충전 또는 전기 작업 시 감전의 위험은 없는가?</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+
+                            <tr><td class="category-cell" rowspan="3">기타</td><td></td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td></td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                            <tr><td></td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="check-cell">☐</td><td class="improvement-cell"></td><td class="manager-cell"></td></tr>
+                        </tbody>
+                    </table>
+
+                    <p style="padding: 8px 12px; font-size: 0.8em; color: #c53030; background: #fff5f5; border-radius: 0 0 6px 6px;">
+                        *현장 위험성평가 시 체크리스트에 없는 항목은 위험요인 및 개선대책을 기타 란에 수기 작성
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px; padding: 15px; background: #f7fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <p style="text-align: center; font-size: 0.9em; margin-bottom: 15px;">본 위험성평가를 검토하고 안전조치 사항을 확인하였습니다.</p>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div style="text-align: center; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px;">
+                            <p style="color: #718096; font-size: 0.85em; margin-bottom: 20px;">작 성</p>
+                            <div style="border-top: 1px solid #2d3748; padding-top: 8px; font-size: 0.8em; color: #a0aec0;">(서명)</div>
+                        </div>
+                        <div style="text-align: center; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px;">
+                            <p style="color: #718096; font-size: 0.85em; margin-bottom: 20px;">검 토</p>
+                            <div style="border-top: 1px solid #2d3748; padding-top: 8px; font-size: 0.8em; color: #a0aec0;">(서명)</div>
+                        </div>
+                        <div style="text-align: center; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px;">
+                            <p style="color: #718096; font-size: 0.85em; margin-bottom: 20px;">승 인</p>
+                            <div style="border-top: 1px solid #2d3748; padding-top: 8px; font-size: 0.8em; color: #a0aec0;">(서명)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-footer">페이지 8 / 8</div>
+        </div>
+    </div>
+</body>
+</html>
