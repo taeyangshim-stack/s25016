@@ -3381,6 +3381,7 @@ ENDPROC
 ! ----------------------------------------
 ! Complete test of edge input to gantry positioning
 PROC TestEdgeToWeld()
+	VAR jointtarget actual_jt;
 	TPWrite "========================================";
 	TPWrite "[TEST] Edge to Weld Position Test v2.0.0";
 	TPWrite "========================================";
@@ -3409,7 +3410,6 @@ PROC TestEdgeToWeld()
 	MoveGantryToWeldPosition;
 
 	! Step 5: Verify final position
-	VAR jointtarget actual_jt;
 	actual_jt := CJointT();
 	TPWrite "----------------------------------------";
 	TPWrite "[VERIFY] Actual Gantry Position:";
@@ -3473,6 +3473,8 @@ ENDPROC
 PROC CommandLoop()
 	VAR string sDate;
 	VAR string sTime;
+	VAR jointtarget abs_jt;
+	VAR jointtarget inc_jt;
 
 	TPWrite "========================================";
 	TPWrite "[CMD] Entering Command Loop (v2.1.0)";
@@ -3496,8 +3498,6 @@ PROC CommandLoop()
 
 		! Process command
 		TEST nCmdInput
-
-		! Movement Commands (100 series)
 		CASE CMD_MOVE_TO_WORLDHOME:
 			rCheckCmdMatch CMD_MOVE_TO_WORLDHOME;
 			TPWrite "[CMD] Move to World Home";
@@ -3510,8 +3510,6 @@ PROC CommandLoop()
 			       + " Y=" + NumToStr(extGantryPos.eax_b, 1)
 			       + " Z=" + NumToStr(extGantryPos.eax_c, 1)
 			       + " R=" + NumToStr(extGantryPos.eax_d, 1);
-			! Move gantry to absolute position
-			VAR jointtarget abs_jt;
 			abs_jt := CJointT();
 			abs_jt.extax.eax_a := extGantryPos.eax_a;
 			abs_jt.extax.eax_b := extGantryPos.eax_b;
@@ -3528,8 +3526,6 @@ PROC CommandLoop()
 			       + " Y=" + NumToStr(extGantryPos.eax_b, 1)
 			       + " Z=" + NumToStr(extGantryPos.eax_c, 1)
 			       + " R=" + NumToStr(extGantryPos.eax_d, 1);
-			! Move gantry incrementally
-			VAR jointtarget inc_jt;
 			inc_jt := CJointT();
 			inc_jt.extax.eax_a := inc_jt.extax.eax_a + extGantryPos.eax_a;
 			inc_jt.extax.eax_b := inc_jt.extax.eax_b + extGantryPos.eax_b;
@@ -3539,7 +3535,6 @@ PROC CommandLoop()
 			MoveAbsJ inc_jt, v500, fine, tool0;
 			UpdateGantryWobj;
 
-		! Welding Commands (200 series)
 		CASE CMD_WELD:
 			rCheckCmdMatch CMD_WELD;
 			TPWrite "[CMD] Weld (motion + arc)";
@@ -3556,13 +3551,9 @@ PROC CommandLoop()
 			TPWrite "[CMD] Edge-based Weld";
 			TestEdgeToWeld;
 
-		! Wire Commands (500 series)
 		CASE CMD_WIRE_CUT:
 			rCheckCmdMatch CMD_WIRE_CUT;
 			TPWrite "[CMD] Wire Cut (both robots)";
-			! TODO: Implement wire cut
-
-		! Test Commands (900 series)
 		CASE CMD_TEST_MENU:
 			rCheckCmdMatch CMD_TEST_MENU;
 			TPWrite "[CMD] Test Menu";

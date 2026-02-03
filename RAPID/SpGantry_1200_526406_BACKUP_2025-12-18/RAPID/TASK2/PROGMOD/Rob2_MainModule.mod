@@ -3251,15 +3251,11 @@ PROC Robot2_CommandLoop()
 
 		TPWrite "[R2_CMD] Command received: " + NumToStr(nCmdInput, 0);
 
-		! Process Robot2-specific commands
 		TEST nCmdInput
-
-		! Movement Commands (100 series)
 		CASE CMD_MOVE_TO_WORLDHOME:
 			TPWrite "[R2_CMD] Move to World Home";
 			SetRobot2InitialPosition;
 
-		! Welding Commands (200 series)
 		CASE CMD_WELD, CMD_WELD_MOTION:
 			TPWrite "[R2_CMD] Weld Sequence";
 			Robot2_WeldSequence;
@@ -3268,7 +3264,6 @@ PROC Robot2_CommandLoop()
 			TPWrite "[R2_CMD] Edge-based Weld";
 			Robot2_EdgeWeldSequence;
 
-		! Wire Commands (500 series)
 		CASE CMD_ROB2_WIRE_CUT:
 			TPWrite "[R2_CMD] Robot2 Wire Cut";
 			! TODO: Implement wire cut

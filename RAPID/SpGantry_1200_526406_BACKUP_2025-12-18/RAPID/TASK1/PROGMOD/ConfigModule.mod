@@ -291,7 +291,7 @@ PERS num WELD_SPEED := 100;
 ! edgeEnd{2}: Robot2 side weld end
 !
 ! These are mapped from WELD_R1/R2_START/END for compatibility
-! Edge Start Points (두 로봇의 시작점)
+! Edge Start Points - Robot1/Robot2 start positions
 PERS num EDGE_START1_X := 5000;    ! Robot1 side (= WELD_R1_START_X)
 PERS num EDGE_START1_Y := 5100;    ! Robot1 side (= WELD_R1_START_Y)
 PERS num EDGE_START1_Z := 500;     ! Robot1 side (= WELD_R1_START_Z)
@@ -299,7 +299,7 @@ PERS num EDGE_START2_X := 5000;    ! Robot2 side (= WELD_R2_START_X)
 PERS num EDGE_START2_Y := 4900;    ! Robot2 side (= WELD_R2_START_Y)
 PERS num EDGE_START2_Z := 500;     ! Robot2 side (= WELD_R2_START_Z)
 
-! Edge End Points (두 로봇의 끝점)
+! Edge End Points - Robot1/Robot2 end positions
 PERS num EDGE_END1_X := 5500;      ! Robot1 side (= WELD_R1_END_X)
 PERS num EDGE_END1_Y := 5100;      ! Robot1 side (= WELD_R1_END_Y)
 PERS num EDGE_END1_Z := 500;       ! Robot1 side (= WELD_R1_END_Z)
