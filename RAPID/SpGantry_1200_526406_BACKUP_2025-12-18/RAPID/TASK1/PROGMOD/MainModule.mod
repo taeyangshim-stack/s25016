@@ -492,8 +492,6 @@ PERS num debug_r2_floor_y_offset := 0;
 
 	! TASK2 sync flags for weld sequence
 	PERS bool t2_weld_ready := FALSE;
-	PERS bool t1_weld_start := FALSE;
-	PERS bool t1_weld_done := FALSE;
 
 	PROC main()
 		VAR iodev main_logfile;
