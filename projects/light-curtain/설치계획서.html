@@ -222,12 +222,12 @@
         .gantt-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.95em;
+            font-size: 0.8em;
         }
 
         .gantt-table th, .gantt-table td {
             border: 1px solid #e2e8f0;
-            padding: 6px 5px;
+            padding: 3px 4px;
             text-align: center;
         }
 
@@ -244,20 +244,20 @@
         .gantt-table .task-name {
             text-align: left;
             font-weight: 500;
-            min-width: 160px;
+            min-width: 140px;
             background: #f7fafc;
             font-size: 1em;
         }
 
         .gantt-table .task-team {
-            min-width: 55px;
+            min-width: 45px;
             background: #f7fafc;
             font-size: 1em;
         }
 
         .gantt-bar {
-            height: 18px;
-            border-radius: 3px;
+            height: 12px;
+            border-radius: 2px;
         }
 
         .gantt-bar-mechanical { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
@@ -887,36 +887,36 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr style="background: #faf5ff;"><td colspan="12" style="font-weight: 600; color: #805ad5; text-align: left; padding: 5px 10px;">▸ 사전 준비 단계</td></tr>
+                        <tr style="background: #faf5ff;"><td colspan="12" style="font-weight: 600; color: #805ad5; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 사전 준비</td></tr>
                         <tr><td class="task-name">현장 사전 답사</td><td class="task-team">PM</td><td><div class="gantt-bar gantt-bar-prep"></div></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                         <tr><td class="task-name">설계 및 배선도 작성</td><td class="task-team">설계</td><td></td><td><div class="gantt-bar gantt-bar-prep"></div></td><td><div class="gantt-bar gantt-bar-prep"></div></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                         <tr><td class="task-name">설계 검토 및 확정</td><td class="task-team">PM</td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-prep"></div></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 
-                        <tr style="background: #ebf8ff;"><td colspan="12" style="font-weight: 600; color: #3182ce; text-align: left; padding: 5px 10px;">▸ 자재 조달 단계</td></tr>
+                        <tr style="background: #ebf8ff;"><td colspan="12" style="font-weight: 600; color: #3182ce; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 자재 조달</td></tr>
                         <tr><td class="task-name">자재 발주 확인</td><td class="task-team">구매팀</td><td><div class="gantt-bar gantt-bar-both"></div></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                         <tr><td class="task-name">자재 입고 대기</td><td class="task-team">구매팀</td><td></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td><div class="gantt-bar gantt-bar-both"></div></td><td></td><td></td><td></td></tr>
                         <tr><td class="task-name">현장 자재 반입</td><td class="task-team">전체</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-both"></div></td><td></td><td></td></tr>
 
-                        <tr style="background: #f0fff4;"><td colspan="12" style="font-weight: 600; color: #38a169; text-align: left; padding: 5px 10px;">▸ 기계 작업 (D+9)</td></tr>
+                        <tr style="background: #f0fff4;"><td colspan="12" style="font-weight: 600; color: #38a169; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 기계 작업 (D+9)</td></tr>
                         <tr><td class="task-name">바닥 시공</td><td class="task-team">기계</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-mechanical"></div></td><td></td></tr>
                         <tr><td class="task-name">정반 개조</td><td class="task-team">기계</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-mechanical"></div></td><td></td></tr>
                         <tr><td class="task-name">브라켓 설치 (4개소)</td><td class="task-team">기계</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-mechanical"></div></td><td></td></tr>
 
-                        <tr style="background: #fffaf0;"><td colspan="12" style="font-weight: 600; color: #dd6b20; text-align: left; padding: 5px 10px;">▸ 전기 작업 - A라인 (D+10)</td></tr>
+                        <tr style="background: #fffaf0;"><td colspan="12" style="font-weight: 600; color: #dd6b20; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 전기 A라인 (D+10)</td></tr>
                         <tr><td class="task-name">[A] OP룸 상단부 단자대 박스 교체</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
                         <tr><td class="task-name">[A] OP룸 스위치 박스 램프 결선 변경</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
                         <tr><td class="task-name">[A] 라이트커튼 결선</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
 
-                        <tr style="background: #fff5f5;"><td colspan="12" style="font-weight: 600; color: #c53030; text-align: left; padding: 5px 10px;">▸ 전기 작업 - B라인 (D+10)</td></tr>
+                        <tr style="background: #fff5f5;"><td colspan="12" style="font-weight: 600; color: #c53030; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 전기 B라인 (D+10)</td></tr>
                         <tr><td class="task-name">[B] OP룸 스위치 박스 램프 결선 변경</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
                         <tr><td class="task-name">[B] 라이트커튼 결선</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
 
-                        <tr style="background: #fffaf0;"><td colspan="12" style="font-weight: 600; color: #dd6b20; text-align: left; padding: 5px 10px;">▸ 전기 공통 작업 (D+10)</td></tr>
+                        <tr style="background: #fffaf0;"><td colspan="12" style="font-weight: 600; color: #dd6b20; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 전기 공통 (D+10)</td></tr>
                         <tr><td class="task-name">안전 릴레이 연결</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
                         <tr><td class="task-name">PLC/제어반 연동 확인</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
                         <tr><td class="task-name">전원 인가 및 동작 테스트</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
 
-                        <tr style="background: #ebf8ff;"><td colspan="12" style="font-weight: 600; color: #3182ce; text-align: left; padding: 5px 10px;">▸ 완료</td></tr>
+                        <tr style="background: #ebf8ff;"><td colspan="12" style="font-weight: 600; color: #3182ce; text-align: left; padding: 2px 8px; font-size: 0.95em;">▸ 완료</td></tr>
                         <tr><td class="task-name">시운전 및 검수</td><td class="task-team">전체</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-both"></div></td></tr>
                         <tr><td class="task-name">현장 정리 및 인수인계</td><td class="task-team">전체</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-both"></div></td></tr>
                     </tbody>
@@ -929,17 +929,16 @@
                     <div class="gantt-legend-item"><div class="gantt-legend-color" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);"></div><span>자재/합동 작업</span></div>
                 </div>
 
-                <div style="margin-top: 12px; padding: 10px; background: #f7fafc; border-radius: 6px; border-left: 3px solid #4299e1;">
-                    <p style="font-weight: 600; margin-bottom: 6px; font-size: 0.95em;">일정 요약</p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.85em; color: #4a5568;">
-                        <div>• <strong>D+1:</strong> 현장 사전 답사, 자재 발주 확인</div>
-                        <div>• <strong>D+2~D+3:</strong> 설계 및 배선도 작성</div>
-                        <div>• <strong>D+4:</strong> 설계 검토 및 확정</div>
-                        <div>• <strong>D+2~D+7:</strong> 자재 입고 대기</div>
-                        <div>• <strong>D+8:</strong> 현장 자재 반입</div>
-                        <div>• <strong>D+9:</strong> 기계 작업 (바닥시공, 정반개조, 브라켓)</div>
-                        <div>• <strong>D+10 A라인:</strong> 단자대박스교체 → 램프결선변경 → 라이트커튼결선</div>
-                        <div>• <strong>D+10 B라인:</strong> 램프결선변경 → 라이트커튼결선 → 공통(릴레이/PLC/테스트)</div>
+                <div style="margin-top: 8px; padding: 6px 8px; background: #f7fafc; border-radius: 4px; border-left: 3px solid #4299e1;">
+                    <p style="font-weight: 600; margin-bottom: 4px; font-size: 0.85em;">일정 요약</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px; font-size: 0.75em; color: #4a5568;">
+                        <div>• <strong>D+1:</strong> 사전답사/발주확인</div>
+                        <div>• <strong>D+2~3:</strong> 설계/배선도</div>
+                        <div>• <strong>D+4:</strong> 설계 검토</div>
+                        <div>• <strong>D+2~7:</strong> 자재 입고 대기</div>
+                        <div>• <strong>D+8:</strong> 자재 반입</div>
+                        <div>• <strong>D+9:</strong> 기계 작업</div>
+                        <div style="grid-column: span 3;">• <strong>D+10:</strong> A라인(단자대→램프→커튼) / B라인(램프→커튼) / 공통(릴레이/PLC/테스트/검수)</div>
                     </div>
                 </div>
             </div>
