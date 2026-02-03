@@ -746,97 +746,264 @@
             body {
                 background: white;
                 padding: 0;
-                font-size: 11px;
+                font-size: 10px;
             }
             .container {
                 box-shadow: none;
                 max-width: 100%;
             }
             .content {
-                padding: 20px;
+                padding: 15px 20px;
             }
             .header {
-                padding: 20px;
+                padding: 15px 20px;
             }
             .header h1 {
-                font-size: 1.8em;
+                font-size: 1.5em;
+                margin-bottom: 5px;
+            }
+            .header .subtitle {
+                font-size: 1em;
+                margin-bottom: 8px;
+            }
+            .header .doc-info {
+                gap: 20px;
+                margin-top: 10px;
+                font-size: 0.85em;
             }
             .section {
-                margin-bottom: 25px;
-                page-break-inside: avoid;
+                margin-bottom: 15px;
             }
             .section-title {
-                font-size: 1.2em;
+                font-size: 1.1em;
+                margin-bottom: 10px;
+                padding-left: 10px;
+            }
+
+            /* 정보 카드 */
+            .info-grid {
+                gap: 10px;
+            }
+            .info-card {
+                padding: 10px;
+            }
+            .info-card h4 {
+                font-size: 0.8em;
+                margin-bottom: 5px;
+            }
+            .info-card p {
+                font-size: 1em;
+            }
+            .info-card .detail {
+                font-size: 0.8em;
+            }
+
+            /* 테이블 일반 */
+            table {
+                margin-top: 8px;
+            }
+            th, td {
+                padding: 5px 8px;
+                font-size: 9px;
             }
 
             /* 간트차트 PDF 최적화 */
             .gantt-container {
                 overflow: visible;
+                margin-top: 10px;
             }
             .gantt-table {
                 min-width: auto;
                 width: 100%;
-                font-size: 9px;
+                font-size: 8px;
             }
             .gantt-table th, .gantt-table td {
-                padding: 4px 2px;
+                padding: 3px 2px;
             }
             .gantt-table .task-name {
-                min-width: 120px;
-                font-size: 8px;
+                min-width: 90px;
+                font-size: 7px;
             }
             .gantt-table .task-team {
-                min-width: 40px;
-                font-size: 8px;
+                min-width: 30px;
+                font-size: 7px;
             }
             .gantt-bar {
-                height: 16px;
+                height: 12px;
+            }
+            .gantt-legend {
+                margin-top: 8px;
+                gap: 12px;
+            }
+            .gantt-legend-item {
+                font-size: 7px;
+            }
+            .gantt-legend-color {
+                width: 14px;
+                height: 8px;
             }
 
             /* 위험성평가 테이블 최적화 */
             .risk-assessment {
-                page-break-before: always;
+                margin-top: 10px;
+            }
+            .risk-assessment-header {
+                padding: 8px 12px;
+            }
+            .risk-assessment-header h3 {
+                font-size: 1em;
             }
             .site-risk-table {
-                font-size: 8px;
+                font-size: 7px;
             }
             .site-risk-table th, .site-risk-table td {
-                padding: 4px 3px;
+                padding: 3px 2px;
             }
             .site-risk-table .improvement-cell {
-                width: 120px;
+                width: 90px;
             }
             .site-risk-table .manager-cell {
-                width: 50px;
+                width: 40px;
             }
             .site-risk-table .check-cell {
-                width: 30px;
+                width: 22px;
             }
-
-            /* 페이지 나눔 제어 */
-            .info-grid {
-                page-break-inside: avoid;
+            .risk-info-row {
+                font-size: 8px;
             }
-            .image-section {
-                page-break-inside: avoid;
+            .risk-info-cell {
+                padding: 5px 8px;
             }
-            .compliance-box {
-                page-break-inside: avoid;
+            .risk-category {
+                padding: 4px 8px;
+                font-size: 8px;
             }
-            .safety-box {
-                page-break-inside: avoid;
+            .risk-item {
+                font-size: 7px;
             }
-            table {
-                page-break-inside: avoid;
+            .risk-question {
+                padding: 4px 8px;
+            }
+            .risk-option {
+                padding: 4px;
+                font-size: 6.5px;
+            }
+            .risk-section-title {
+                padding: 6px 10px;
+                font-size: 9px;
             }
 
             /* 이미지 크기 조정 */
+            .image-section {
+                padding: 12px;
+                margin-top: 12px;
+            }
+            .image-section-title {
+                font-size: 0.95em;
+                margin-bottom: 12px;
+            }
+            .image-grid {
+                gap: 12px;
+            }
+            .image-card {
+                padding: 8px;
+            }
+            .image-card h4 {
+                font-size: 0.85em;
+                padding: 5px;
+                margin-bottom: 8px;
+            }
             .image-card img {
-                max-height: 150px;
+                max-height: 100px;
                 object-fit: contain;
             }
+            .image-container {
+                margin: 12px 0;
+            }
             .image-container img {
-                max-height: 300px;
+                max-height: 180px;
+            }
+            .image-container .caption {
+                font-size: 0.85em;
+                margin-top: 8px;
+            }
+
+            /* 안전 관리 섹션 */
+            .compliance-box {
+                padding: 12px;
+                margin-top: 10px;
+            }
+            .compliance-box h4 {
+                font-size: 1em;
+                margin-bottom: 10px;
+            }
+            .compliance-box ol {
+                padding-left: 15px;
+                margin-bottom: 12px;
+            }
+            .compliance-box li {
+                padding: 5px 0;
+                font-size: 9px;
+            }
+            .compliance-box .note {
+                padding: 6px 10px;
+                font-size: 8px;
+            }
+            .safety-box {
+                padding: 10px;
+                margin-top: 10px;
+            }
+            .safety-box h4 {
+                font-size: 0.95em;
+                margin-bottom: 10px;
+            }
+            .checklist-table th, .checklist-table td {
+                padding: 5px 6px;
+                font-size: 8px;
+            }
+            .visitor-info-table th, .visitor-info-table td {
+                padding: 6px 8px;
+                font-size: 9px;
+            }
+            .emergency-number {
+                padding: 10px 15px;
+                font-size: 0.95em;
+                margin-top: 10px;
+            }
+
+            /* 견적/검수 섹션 */
+            .cost-summary {
+                padding: 15px;
+            }
+            .cost-summary .amount {
+                font-size: 1.8em;
+            }
+            .cost-summary .note {
+                font-size: 0.8em;
+            }
+            .checklist li {
+                padding: 5px 0;
+                padding-left: 22px;
+                font-size: 9px;
+            }
+
+            /* 푸터 */
+            .footer {
+                padding: 10px 20px;
+                font-size: 8px;
+            }
+
+            /* 서명 영역 */
+            .signature-area {
+                gap: 12px;
+                margin-top: 15px;
+            }
+            .signature-box {
+                padding: 12px;
+            }
+            .signature-box h5 {
+                font-size: 0.8em;
+                margin-bottom: 25px;
             }
         }
     </style>
