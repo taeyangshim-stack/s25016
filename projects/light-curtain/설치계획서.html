@@ -16,7 +16,7 @@
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #e2e8f0;
             color: #333;
-            font-size: 10px;
+            font-size: 11px;
         }
 
         /* A4 가로 페이지 기본 설정 */
@@ -222,12 +222,12 @@
         .gantt-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8em;
+            font-size: 0.9em;
         }
 
         .gantt-table th, .gantt-table td {
             border: 1px solid #e2e8f0;
-            padding: 4px 3px;
+            padding: 5px 4px;
             text-align: center;
         }
 
@@ -244,19 +244,19 @@
         .gantt-table .task-name {
             text-align: left;
             font-weight: 500;
-            min-width: 130px;
+            min-width: 150px;
             background: #f7fafc;
-            font-size: 0.85em;
+            font-size: 0.95em;
         }
 
         .gantt-table .task-team {
-            min-width: 45px;
+            min-width: 50px;
             background: #f7fafc;
-            font-size: 0.85em;
+            font-size: 0.95em;
         }
 
         .gantt-bar {
-            height: 14px;
+            height: 16px;
             border-radius: 3px;
         }
 
@@ -505,7 +505,7 @@
         .site-risk-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.75em;
+            font-size: 0.85em;
         }
 
         .site-risk-table th {
@@ -684,33 +684,57 @@
                             <thead>
                                 <tr>
                                     <th>구분</th>
+                                    <th>라인</th>
                                     <th>작업 내용</th>
                                     <th>비고</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><span class="badge badge-primary">장비</span></td>
-                                    <td>라이트커튼 4SET 설치</td>
-                                    <td>브라켓 및 잡자재 포함</td>
+                                    <td rowspan="2"><span class="badge badge-primary">장비</span></td>
+                                    <td>A</td>
+                                    <td>라이트커튼 2SET 설치</td>
+                                    <td rowspan="2">브라켓 및 잡자재 포함</td>
                                 </tr>
                                 <tr>
-                                    <td><span class="badge badge-warning">전기</span></td>
-                                    <td>배선 공사 및 박스 교체</td>
-                                    <td>기존 설비 연동</td>
+                                    <td>B</td>
+                                    <td>라이트커튼 2SET 설치</td>
+                                </tr>
+                                <tr style="background: #fffaf0;">
+                                    <td rowspan="3"><span class="badge badge-warning">전기<br>(A라인)</span></td>
+                                    <td rowspan="3">A</td>
+                                    <td>① OP룸 상단부 단자대 박스 교체</td>
+                                    <td rowspan="3">기존 설비 연동</td>
+                                </tr>
+                                <tr style="background: #fffaf0;">
+                                    <td>② OP룸 스위치 박스 내부 램프 스위치 결선 변경</td>
+                                </tr>
+                                <tr style="background: #fffaf0;">
+                                    <td>③ 라이트커튼 결선</td>
+                                </tr>
+                                <tr style="background: #fff5f5;">
+                                    <td rowspan="2"><span class="badge badge-warning">전기<br>(B라인)</span></td>
+                                    <td rowspan="2">B</td>
+                                    <td>① OP룸 스위치 박스 내부 램프 스위치 결선 변경</td>
+                                    <td rowspan="2">기존 설비 연동</td>
+                                </tr>
+                                <tr style="background: #fff5f5;">
+                                    <td>② 라이트커튼 결선</td>
                                 </tr>
                                 <tr>
-                                    <td><span class="badge badge-success">기계</span></td>
+                                    <td rowspan="2"><span class="badge badge-success">기계</span></td>
+                                    <td>A/B</td>
                                     <td>바닥 시공</td>
                                     <td>센서 설치 위한 기초 작업</td>
                                 </tr>
                                 <tr>
-                                    <td><span class="badge badge-success">기계</span></td>
+                                    <td>A/B</td>
                                     <td>정반 개조</td>
                                     <td>라이트커튼 설치 영역 확보</td>
                                 </tr>
                             </tbody>
                         </table>
+                        <p style="margin-top: 8px; font-size: 0.85em; color: #718096;">※ 램프 스위치 결선 변경: 라이트커튼 → PLC 출력으로 변경</p>
                     </div>
                 </div>
 
@@ -878,12 +902,16 @@
                         <tr><td class="task-name">정반 개조</td><td class="task-team">기계</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-mechanical"></div></td><td></td></tr>
                         <tr><td class="task-name">브라켓 설치 (4개소)</td><td class="task-team">기계</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-mechanical"></div></td><td></td></tr>
 
-                        <tr style="background: #fffaf0;"><td colspan="12" style="font-weight: 600; color: #dd6b20; text-align: left; padding: 5px 10px;">▸ 전기 작업 (D+10)</td></tr>
-                        <tr><td class="task-name">케이블 트레이/배관 경로 확인</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
-                        <tr><td class="task-name">전기 박스 설치/교체</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
-                        <tr><td class="task-name">케이블 포설</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
-                        <tr><td class="task-name">라이트커튼 본체 설치</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
-                        <tr><td class="task-name">라이트커튼 결선</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+                        <tr style="background: #fffaf0;"><td colspan="12" style="font-weight: 600; color: #dd6b20; text-align: left; padding: 5px 10px;">▸ 전기 작업 - A라인 (D+10)</td></tr>
+                        <tr><td class="task-name">[A] OP룸 상단부 단자대 박스 교체</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+                        <tr><td class="task-name">[A] OP룸 스위치 박스 램프 결선 변경</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+                        <tr><td class="task-name">[A] 라이트커튼 결선</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+
+                        <tr style="background: #fff5f5;"><td colspan="12" style="font-weight: 600; color: #c53030; text-align: left; padding: 5px 10px;">▸ 전기 작업 - B라인 (D+10)</td></tr>
+                        <tr><td class="task-name">[B] OP룸 스위치 박스 램프 결선 변경</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+                        <tr><td class="task-name">[B] 라이트커튼 결선</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
+
+                        <tr style="background: #fffaf0;"><td colspan="12" style="font-weight: 600; color: #dd6b20; text-align: left; padding: 5px 10px;">▸ 전기 공통 작업 (D+10)</td></tr>
                         <tr><td class="task-name">안전 릴레이 연결</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
                         <tr><td class="task-name">PLC/제어반 연동 확인</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
                         <tr><td class="task-name">전원 인가 및 동작 테스트</td><td class="task-team">전기</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><div class="gantt-bar gantt-bar-electrical"></div></td></tr>
@@ -910,7 +938,8 @@
                         <div>• <strong>D+2~D+7:</strong> 자재 입고 대기</div>
                         <div>• <strong>D+8:</strong> 현장 자재 반입</div>
                         <div>• <strong>D+9:</strong> 기계 작업 (바닥시공, 정반개조, 브라켓)</div>
-                        <div style="grid-column: span 2;">• <strong>D+10:</strong> 전기 작업 (배관확인 → 박스설치 → 케이블포설 → 본체설치 → 결선 → 릴레이연결 → PLC연동 → 테스트 → 검수)</div>
+                        <div>• <strong>D+10 A라인:</strong> 단자대박스교체 → 램프결선변경 → 라이트커튼결선</div>
+                        <div>• <strong>D+10 B라인:</strong> 램프결선변경 → 라이트커튼결선 → 공통(릴레이/PLC/테스트)</div>
                     </div>
                 </div>
             </div>
