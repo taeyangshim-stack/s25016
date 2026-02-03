@@ -3375,6 +3375,18 @@ PROC MoveGantryToWeldPosition()
 ENDPROC
 
 ! ----------------------------------------
+! Test: Weld Sequence (stub)
+! ----------------------------------------
+! Placeholder for weld sequence testing
+! TODO: Implement actual weld sequence with arc control
+PROC TestWeldSequence()
+	TPWrite "========================================";
+	TPWrite "[TEST] Weld Sequence (stub)";
+	TPWrite "[TEST] Not implemented yet";
+	TPWrite "========================================";
+ENDPROC
+
+! ----------------------------------------
 ! Test: Edge to Weld Position
 ! ----------------------------------------
 ! Complete test of edge input to gantry positioning
