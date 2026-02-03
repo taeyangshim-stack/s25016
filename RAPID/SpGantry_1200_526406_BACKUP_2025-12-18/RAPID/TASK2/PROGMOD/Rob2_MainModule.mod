@@ -322,6 +322,18 @@ PERS bool mode2_r2_initial_offset_done;
 ! v1.9.17: Shared test_mode from TASK1
 PERS num shared_test_mode;
 
+! v2.1.0: Command Interface Variables (shared with TASK1 ConfigModule)
+PERS num nCmdInput;
+PERS num nCmdOutput;
+PERS num nCmdMatch;
+
+! v2.1.0: Command Constants (must match TASK1 ConfigModule)
+CONST num CMD_MOVE_TO_WORLDHOME := 101;
+CONST num CMD_WELD := 200;
+CONST num CMD_WELD_MOTION := 201;
+CONST num CMD_EDGE_WELD := 210;
+CONST num CMD_ROB2_WIRE_CUT := 512;
+
 ! v1.8.70: Store Robot2 offset joints (like robot1_offset_joints in TASK1)
 ! Initial call: MoveJ then save joints
 ! Reposition call: Skip MoveJ (joints already at offset, gantry moved)

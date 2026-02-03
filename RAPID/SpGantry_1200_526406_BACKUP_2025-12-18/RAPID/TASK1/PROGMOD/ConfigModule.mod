@@ -328,7 +328,7 @@ PERS num LIMIT_R_NEG := -90;
 PERS num LIMIT_R_POS := 90;
 
 ! Robot Height Parameters
-PERS num ROB_WELD_SPACE_HEIGHT := 1620;  ! 로봇 용접 작업 높이 (R-center 기준)
+PERS num ROB_WELD_SPACE_HEIGHT := 1620;  ! Robot weld space height (R-center)
 
 ! ========================================
 ! Command Interface (v2.1.0 - PlanA Style)
