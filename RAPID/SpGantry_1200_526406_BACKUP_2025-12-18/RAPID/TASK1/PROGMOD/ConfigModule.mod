@@ -312,9 +312,9 @@ PERS num EDGE_END2_Z := 500;       ! Robot2 side (= WELD_R2_END_Z)
 ! ========================================
 ! From PlanA Head_Data.mod
 ! HOME position: Physical origin [0,0,0,0] = Floor [9500, 5300, 2100, 0]
-PERS num HOME_GANTRY_X := -9500;   ! Physical X at HOME
-PERS num HOME_GANTRY_Y := 5300;    ! Physical Y at HOME
-PERS num HOME_GANTRY_Z := 2100;    ! Physical Z at HOME
+PERS num HOME_GANTRY_X := 0;       ! Physical X at HOME (Floor 9500 = Physical 0)
+PERS num HOME_GANTRY_Y := 0;       ! Physical Y at HOME (Floor 5300 = Physical 0)
+PERS num HOME_GANTRY_Z := 0;       ! Physical Z at HOME (Floor 2100 = Physical 0)
 PERS num HOME_GANTRY_R := 0;       ! Physical R at HOME (degrees)
 
 ! Physical axis limits (mm, degrees)

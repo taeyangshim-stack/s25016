@@ -3,6 +3,13 @@ MODULE MainModule
 	! TASK1 (Robot1) - MainModule
 	! Version History
 	!========================================
+	! v2.1.1 (2026-02-04)
+	!   - Fixed linked motor handling (Error 50246)
+	!   - Added CheckLinkedMotorSync() procedure
+	!   - X1/X2 max_offset=2mm (MOC.cfg LINKED_M_PROCESS)
+	!   - Cannot sync from RAPID - must restart controller
+	!   - TestEdgeToWeld v2.0.1: Added Step 0 sync check
+	!
 	! v2.1.0 (2026-02-03)
 	!   - Added PlanA-style command interface
 	!   - nCmdInput/nCmdOutput/nCmdMatch variables in ConfigModule
@@ -2567,58 +2574,86 @@ PROC TestMenu()
 		! Display menu
 		TPErase;
 		TPWrite "========================================";
-		TPWrite "  S25016 SpGantry Test Menu (v1.9.2)";
+		TPWrite "  S25016 SpGantry Test Menu (v2.1.1)";
 		TPWrite "========================================";
 		TPWrite "";
-		TPWrite "Select test to run:";
+		TPWrite "  1. Check Linked Motor Sync (X1/X2)";
+		TPWrite "  2. Test Edge to Weld Position";
+		TPWrite "  3. Test Gantry Floor Coordinates";
+		TPWrite "  4. Test Gantry Mode2 (TCP)";
+		TPWrite "  5. Execute Weld Sequence";
+		TPWrite "  6. View Config";
+		TPWrite "  7. View Results";
+		TPWrite "  0. Exit";
 		TPWrite "";
+		TPWrite "----------------------------------------";
 
-		! Function key menu
-		TPReadFK menu_sel, "Test Menu", "Mode2", "Weld", "Results", "Config", "Exit";
+		! Numeric selection
+		TPReadNum menu_sel, "Select (0-7): ";
 
 		TEST menu_sel
 		CASE 1:
-			! Mode2 TCP Tracking Test
 			TPErase;
-			TPWrite "[Menu] Starting Mode2 TCP Test...";
-			TestGantryMode2;
+			TPWrite "[Menu] Checking Linked Motor Sync...";
+			CheckLinkedMotorSync;
 			TPWrite "";
-			TPWrite "Mode2 Test Complete. Press any key...";
+			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
 		CASE 2:
-			! Weld Sequence Test
 			TPErase;
-			TPWrite "[Menu] Starting Weld Sequence...";
-			ExecuteWeldSequence;
+			TPWrite "[Menu] Starting Edge to Weld Test...";
+			TestEdgeToWeld;
 			TPWrite "";
-			TPWrite "Weld Sequence Complete. Press any key...";
+			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
 		CASE 3:
-			! View Last Results
 			TPErase;
-			ViewLastResults;
+			TPWrite "[Menu] Starting Floor Coordinate Test...";
+			TestGantryFloorCoordinates;
 			TPWrite "";
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
 		CASE 4:
-			! View/Edit Config
+			TPErase;
+			TPWrite "[Menu] Starting Mode2 TCP Test...";
+			TestGantryMode2;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 5:
+			TPErase;
+			TPWrite "[Menu] Starting Weld Sequence...";
+			ExecuteWeldSequence;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 6:
 			TPErase;
 			ViewCurrentConfig;
 			TPWrite "";
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
-		CASE 5:
-			! Exit
+		CASE 7:
+			TPErase;
+			ViewLastResults;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 0:
 			TPErase;
 			TPWrite "[Menu] Exiting Test Menu...";
 			menu_loop := FALSE;
 
 		DEFAULT:
-			TPWrite "[Menu] Invalid selection";
+			TPWrite "[Menu] Invalid selection (0-7)";
+			WaitTime 1;
 		ENDTEST
 	ENDWHILE
 
@@ -3329,6 +3364,21 @@ PROC MoveGantryToWeldPosition()
 	current_jt := CJointT();
 	target_jt := current_jt;
 
+	! Debug: Show current X1/X2 position
+	TPWrite "[DEBUG] Current X1=" + NumToStr(current_jt.extax.eax_a,1)
+	       + " X2=" + NumToStr(current_jt.extax.eax_f,1)
+	       + " diff=" + NumToStr(current_jt.extax.eax_a - current_jt.extax.eax_f,1);
+
+	! Check linked motor sync (max_offset = 2mm in MOC.cfg)
+	! X1 and X2 MUST move together - cannot sync independently
+	IF Abs(current_jt.extax.eax_a - current_jt.extax.eax_f) > 2 THEN
+		TPWrite "[ERROR] X1/X2 not synced (diff > 2mm)!";
+		TPWrite "[ERROR] Linked motor requires X1=X2 (max offset: 2mm)";
+		TPWrite "[ERROR] Please restart controller or manually jog to sync";
+		TPWrite "[ERROR] Current diff: " + NumToStr(Abs(current_jt.extax.eax_a - current_jt.extax.eax_f),1) + "mm";
+		Stop;
+	ENDIF
+
 	! Convert Floor center start to Physical coordinates
 	gantry_physical := FloorToPhysical(posStart);
 
@@ -3365,13 +3415,52 @@ PROC MoveGantryToWeldPosition()
 	TPWrite "  Z=" + NumToStr(gantry_physical.z,1) + " mm";
 	TPWrite "  R=" + NumToStr(target_r,1) + " deg";
 
+	! Debug: Show target extax values
+	TPWrite "[DEBUG] Target eax_a=" + NumToStr(target_jt.extax.eax_a,1)
+	       + " eax_f=" + NumToStr(target_jt.extax.eax_f,1);
+
 	! Move gantry
+	TPWrite "[DEBUG] Calling MoveAbsJ...";
 	MoveAbsJ target_jt, v500, fine, tool0;
 
 	! Update WobjGantry after movement
 	UpdateGantryWobj;
 
 	TPWrite "[WELD] Gantry at weld position";
+ENDPROC
+
+! ----------------------------------------
+! CheckLinkedMotorSync: Verify X1/X2 are synchronized
+! ----------------------------------------
+! Linked motor configuration (MOC.cfg):
+!   - ELM_X is follower to M1DM3 (max_offset = 2mm)
+!   - X1 (eax_a) and X2 (eax_f) must move together
+!   - Cannot be synced from RAPID - must restart controller
+PROC CheckLinkedMotorSync()
+	VAR jointtarget jt;
+	VAR num diff;
+
+	jt := CJointT();
+	diff := Abs(jt.extax.eax_a - jt.extax.eax_f);
+
+	TPWrite "----------------------------------------";
+	TPWrite "[LINKED MOTOR] Status Check";
+	TPWrite "  X1 (Master): " + NumToStr(jt.extax.eax_a,1) + " mm";
+	TPWrite "  X2 (Follower): " + NumToStr(jt.extax.eax_f,1) + " mm";
+	TPWrite "  Difference: " + NumToStr(diff,1) + " mm";
+	TPWrite "  Max Allowed: 2 mm (MOC.cfg LINKED_M_PROCESS)";
+
+	IF diff > 2 THEN
+		TPWrite "[LINKED MOTOR] ERROR: Out of sync!";
+		TPWrite "[LINKED MOTOR] Solution: Restart controller in RobotStudio";
+		TPWrite "  1. Controller menu > Stop";
+		TPWrite "  2. Controller menu > Restart";
+		TPWrite "----------------------------------------";
+		Stop;
+	ELSE
+		TPWrite "[LINKED MOTOR] OK - In sync";
+		TPWrite "----------------------------------------";
+	ENDIF
 ENDPROC
 
 ! ----------------------------------------
@@ -3393,8 +3482,12 @@ ENDPROC
 PROC TestEdgeToWeld()
 	VAR jointtarget actual_jt;
 	TPWrite "========================================";
-	TPWrite "[TEST] Edge to Weld Position Test v2.0.0";
+	TPWrite "[TEST] Edge to Weld Position Test v2.0.1";
 	TPWrite "========================================";
+
+	! Step 0: Check linked motor sync (X1/X2)
+	TPWrite "[TEST] Step 0: Check linked motor sync...";
+	CheckLinkedMotorSync;
 
 	! Step 1: Calculate center from edges
 	TPWrite "[TEST] Step 1: Calculate center line...";
