@@ -3,6 +3,12 @@ MODULE Rob2_MainModule
 	! TASK2 (Robot2) - Rob2_MainModule
 	! Version History
 	!========================================
+	! v2.1.0 (2026-02-03)
+	!   - Added PlanA-style command monitoring loop
+	!   - Robot2_CommandLoop() monitors nCmdInput from ConfigModule
+	!   - TEST_MODE=10 enters real-time command monitoring
+	!   - Responds to CMD_WELD, CMD_EDGE_WELD, CMD_ROB2_WIRE_CUT
+	!
 	! v1.0.0 (2025-12-17)
 	!   - Initial gantry position sharing system
 	!   - Added shared_gantry_pos and related variables
@@ -352,6 +358,11 @@ VAR robjoint robot2_offset_joints;
     PERS bool t2_weld_ready;    ! Robot2 ready signal (set by TASK2)
     PERS bool t1_weld_start;    ! TASK1 weld start signal (read by TASK2)
     PERS bool t1_weld_done;     ! TASK1 weld done signal (read by TASK2)
+
+    ! Edge-based Weld Sequence Sync Variables (v2.0.0)
+    ! From TASK1 MainModule
+    PERS bool t1_weld_position_ready;  ! TASK1 gantry+Robot1 positioned
+    PERS bool shared_bRobSwap;         ! Robot swap flag from TASK1
 
     ! Weld WObj for Robot2 (v1.9.0)
     ! Created by TASK1, referenced by TASK2
@@ -794,6 +805,12 @@ VAR robjoint robot2_offset_joints;
             TPWrite "TASK2: Weld Sequence mode";
             Robot2_WeldSequence;
             Write main_logfile, "Weld Sequence completed";
+        ELSEIF test_mode = 10 THEN
+            ! v2.1.0: PlanA-style Command Loop
+            Write main_logfile, "Command Loop mode (test_mode=10)";
+            TPWrite "TASK2: Command Loop mode (PlanA Style)";
+            Robot2_CommandLoop;
+            Write main_logfile, "Command Loop exited";
         ENDIF
 
         WaitTime 1.0;
@@ -3143,6 +3160,131 @@ PROC Robot2_WeldSequence()
 	TPWrite "========================================";
 	TPWrite "[R2_WELD] Robot2 Weld Sequence Complete!";
 	TPWrite "========================================";
+ENDPROC
+
+! ========================================
+! Edge-based Weld Sequence (v2.0.0)
+! ========================================
+! Ported from PlanA - waits for TASK1 to position gantry,
+! then moves Robot2 to weld position considering bRobSwap
+
+! ----------------------------------------
+! Robot2 Edge-based Weld Sequence
+! ----------------------------------------
+! Waits for t1_weld_position_ready, then positions Robot2
+PROC Robot2_EdgeWeldSequence()
+	VAR num wait_count := 0;
+	VAR num max_wait := 200;  ! 20 seconds timeout
+
+	TPWrite "========================================";
+	TPWrite "[R2_EDGE] v2.0.0 Robot2 Edge Weld Sequence";
+	TPWrite "========================================";
+
+	! Reset flags
+	t2_weld_ready := FALSE;
+
+	! Step 1: Wait for TASK1 to position gantry + Robot1
+	TPWrite "[R2_EDGE] Waiting for TASK1 gantry positioning...";
+	WHILE NOT t1_weld_position_ready DO
+		WaitTime 0.1;
+		wait_count := wait_count + 1;
+		IF wait_count > max_wait THEN
+			TPWrite "[R2_EDGE] ERROR: Timeout waiting for TASK1";
+			RETURN;
+		ENDIF
+	ENDWHILE
+	TPWrite "[R2_EDGE] TASK1 gantry positioned";
+
+	! Step 2: Check bRobSwap flag
+	TPWrite "[R2_EDGE] bRobSwap = " + ValToStr(shared_bRobSwap);
+
+	! Step 3: Move Robot2 to weld position
+	TPWrite "[R2_EDGE] Moving Robot2 to weld position...";
+	IF shared_bRobSwap = TRUE THEN
+		TPWrite "[R2_EDGE] Using SWAPPED position (bRobSwap=TRUE)";
+		! When swapped, Robot2 takes Robot1's original position
+		! TODO: Implement swapped position logic
+	ELSE
+		TPWrite "[R2_EDGE] Using NORMAL position (bRobSwap=FALSE)";
+		! Normal position - Robot2 on its designated side
+		! Use existing Robot2_WeldReady logic
+		Robot2_WeldReady;
+	ENDIF
+
+	! Step 4: Signal ready
+	t2_weld_ready := TRUE;
+	TPWrite "[R2_EDGE] Robot2 at weld position, signaling ready";
+
+	! Step 5: Wait for weld to complete
+	TPWrite "[R2_EDGE] Waiting for weld completion...";
+	WHILE NOT t1_weld_done DO
+		WaitTime 0.1;
+	ENDWHILE
+
+	TPWrite "========================================";
+	TPWrite "[R2_EDGE] Robot2 Edge Weld Sequence Complete!";
+	TPWrite "========================================";
+ENDPROC
+
+! ========================================
+! Command Loop (v2.1.0 - PlanA Style)
+! ========================================
+! Robot2 command monitoring loop
+! Responds to nCmdInput changes from upper system
+
+! ----------------------------------------
+! Robot2_CommandLoop: Command monitoring loop
+! ----------------------------------------
+! Monitors nCmdInput and executes Robot2-specific actions
+PROC Robot2_CommandLoop()
+	VAR num last_cmd := 0;
+
+	TPWrite "========================================";
+	TPWrite "[R2_CMD] Entering Command Loop (v2.1.0)";
+	TPWrite "[R2_CMD] Monitoring nCmdInput...";
+	TPWrite "========================================";
+
+	WHILE TRUE DO
+		! Wait for new command from upper system
+		WaitUntil nCmdInput <> 0 AND nCmdInput <> last_cmd;
+		last_cmd := nCmdInput;
+
+		TPWrite "[R2_CMD] Command received: " + NumToStr(nCmdInput, 0);
+
+		! Process Robot2-specific commands
+		TEST nCmdInput
+
+		! Movement Commands (100 series)
+		CASE CMD_MOVE_TO_WORLDHOME:
+			TPWrite "[R2_CMD] Move to World Home";
+			SetRobot2InitialPosition;
+
+		! Welding Commands (200 series)
+		CASE CMD_WELD, CMD_WELD_MOTION:
+			TPWrite "[R2_CMD] Weld Sequence";
+			Robot2_WeldSequence;
+
+		CASE CMD_EDGE_WELD:
+			TPWrite "[R2_CMD] Edge-based Weld";
+			Robot2_EdgeWeldSequence;
+
+		! Wire Commands (500 series)
+		CASE CMD_ROB2_WIRE_CUT:
+			TPWrite "[R2_CMD] Robot2 Wire Cut";
+			! TODO: Implement wire cut
+
+		DEFAULT:
+			! Non-Robot2 specific commands - just wait
+			TPWrite "[R2_CMD] Waiting (cmd=" + NumToStr(nCmdInput, 0) + ")";
+
+		ENDTEST
+
+		! Wait for command to be cleared
+		WaitUntil nCmdInput = 0;
+		last_cmd := 0;
+
+		TPWrite "[R2_CMD] Ready for next command";
+	ENDWHILE
 ENDPROC
 
 ENDMODULE

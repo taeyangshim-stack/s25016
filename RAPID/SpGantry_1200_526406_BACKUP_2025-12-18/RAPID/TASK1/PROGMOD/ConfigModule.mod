@@ -2,12 +2,176 @@ MODULE ConfigModule
 ! ========================================
 ! S25016 SpGantry Configuration Module
 ! ========================================
-! Version: v1.9.1
-! Date: 2026-01-17
+! Version: v2.2.0
+! Date: 2026-02-03
 ! Purpose: Centralized configuration using PERS variables
 ! v1.9.0: Added weld sequence configuration
 ! v1.9.1: Fixed R-axis (X+=0°), added WObj positions, 45° torch
+! v2.0.0: Added Edge points and Home/Limit configuration
+! v2.1.0: Added PlanA-style command interface (nCmdInput/nCmdOutput)
+! v2.2.0: Added PlanA data structures (edgedata, targetdata, corrorder)
 ! ========================================
+
+! ========================================
+! Data Type Definitions (v2.2.0 - PlanA Style)
+! ========================================
+! Edge Point Data Structure
+! Contains position, geometry, and material information for weld edges
+RECORD edgedata
+    pos EdgePos;           ! X, Y, Z coordinates (Floor)
+    num Height;            ! Part edge height (mm)
+    num Breadth;           ! Part edge width (mm)
+    num HoleSize;          ! Reference hole diameter (mm)
+    num Thickness;         ! Material thickness (mm)
+    num AngleHeight;       ! Angle measurement point height (mm)
+    num AngleWidth;        ! Angle measurement point width (mm)
+ENDRECORD
+
+! Weld Target Data Structure (per step)
+! Contains position and welding parameters for each motion step
+RECORD targetdata
+    robtarget position;    ! TCP position and orientation
+    num cpm;               ! Arc current mode/preset
+    num schedule;          ! Weld schedule number
+    num voltage;           ! Arc voltage (V)
+    num wfs;               ! Wire feed speed (m/min)
+    num Current;           ! Weld current (A)
+    num WeaveShape;        ! Weave pattern shape (0-5)
+    num WeaveType;         ! Weave type (1-5)
+    num WeaveLength;       ! Weave cycle length (mm)
+    num WeaveWidth;        ! Weave width (mm)
+    num WeaveDwellLeft;    ! Dwell time left side (s)
+    num WeaveDwellRight;   ! Dwell time right side (s)
+    num TrackType;         ! Seam tracking type (0-3)
+    num TrackGainY;        ! Tracking Y gain
+    num TrackGainZ;        ! Tracking Z gain
+ENDRECORD
+
+! Correction Order Data Structure
+! Contains offset and penetration parameters for weld correction
+RECORD corrorder
+    num X_StartOffset;     ! X offset before arc start (mm)
+    num X_Depth;           ! X penetration depth (mm)
+    num X_ReturnLength;    ! X return distance (mm)
+    num Y_StartOffset;     ! Y offset (mm)
+    num Y_Depth;           ! Y penetration depth (mm)
+    num Y_ReturnLength;    ! Y return distance (mm)
+    num Z_StartOffset;     ! Z offset (mm)
+    num Z_Depth;           ! Z penetration depth (mm)
+    num Z_ReturnLength;    ! Z return distance (mm)
+    num RY_Torch;          ! Torch angle RY (deg)
+ENDRECORD
+
+! ========================================
+! Edge Data Arrays (v2.2.0)
+! ========================================
+! Edge points from upper system (2 robots)
+! edgeStart{1} = Robot1 side, edgeStart{2} = Robot2 side
+PERS edgedata edgeStart{2} := [
+    [[5000, 5100, 500], 50, 50, 50, 12, 0, 0],
+    [[5000, 4900, 500], 50, 50, 50, 12, 0, 0]
+];
+PERS edgedata edgeEnd{2} := [
+    [[5500, 5100, 500], 50, 50, 50, 12, 0, 0],
+    [[5500, 4900, 500], 50, 50, 50, 12, 0, 0]
+];
+
+! ========================================
+! Part Height Data (v2.2.0)
+! ========================================
+! Maximum part heights for Z-position optimization
+! {1}=move phase, {2}=enter phase, {3}=exit phase
+PERS num nMaxPartHeightNearArray{3} := [300, 300, 300];
+PERS num nTempAdjustGantryZ := 0;  ! Temporary Z adjustment (mm)
+
+! ========================================
+! Error Status Flags (v2.2.0)
+! ========================================
+! PERS variables to replace I/O signals (for simulation)
+PERS bool bEntryR1Error := FALSE;   ! Robot1 entry point error
+PERS bool bTouchR1Error := FALSE;   ! Robot1 touch sensing error
+PERS bool bArcR1Error := FALSE;     ! Robot1 arc/welding error
+PERS bool bEntryR2Error := FALSE;   ! Robot2 entry point error
+PERS bool bTouchR2Error := FALSE;   ! Robot2 touch sensing error
+PERS bool bArcR2Error := FALSE;     ! Robot2 arc/welding error
+
+! ========================================
+! Weld Step Data (v2.2.0)
+! ========================================
+! Number of weld steps (max 40)
+PERS num nWeldStepCount := 2;
+
+! Motion control parameters
+PERS num nMotionStep := 5;              ! Current motion step index
+PERS num nMotionTotalStep{2} := [2, 2]; ! Total steps per robot
+PERS num nMotionStepCount{2} := [4, 4]; ! Step counter per robot
+PERS num nRunningStep{2} := [4, 4];     ! Current running step
+
+! Weld enable flags
+PERS bool bEnableWeldSkip := FALSE;         ! Skip motion segments
+PERS bool bEnableStartEndPointCorr := FALSE; ! Enable start/end correction
+PERS bool bEnableManualMacro := FALSE;       ! Enable manual macro
+
+! Macro configuration
+PERS string stMacro{2} := ["244", "244"];  ! Macro codes [R1, R2]
+
+! ========================================
+! Correction Data (v2.2.0)
+! ========================================
+! Start/End point corrections (10 types)
+PERS corrorder corrStart{10} := [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
+PERS corrorder corrEnd{10} := [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
+
+! Correction success flag
+PERS bool bCorrectionOk := FALSE;
+
+! ========================================
+! Cycle Time Data (v2.2.0)
+! ========================================
+PERS num nclockWeldTime{2} := [0, 0];  ! Weld time per robot (seconds)
+PERS num nclockCycleTime := 0;          ! Total cycle time (seconds)
+
+! ========================================
+! Calibration Data (v2.2.0)
+! ========================================
+! Home position adjustments
+PERS num nHomeAdjustX := 0;  ! Calibration X offset
+PERS num nHomeAdjustY := 0;  ! Calibration Y offset
+PERS num nHomeAdjustZ := 0;  ! Calibration Z offset
+PERS num nHomeAdjustR := 0;  ! Calibration R offset
+
+! Reference hole inspection
+PERS num nRefHoleX{2} := [0, 0];       ! Reference hole X position
+PERS num nInspectHoleX{2} := [0, 0];   ! Measured hole X position
+PERS num nDiffHoleX := 0;              ! Hole position X error
+PERS num nDiffHoleXskew := 0;          ! Hole skew error
+
+! Gantry calibration errors
+PERS num nDiffGantryX := 0;  ! Gantry X calibration error
+PERS num nDiffGantryY := 0;  ! Gantry Y calibration error
+PERS num nDiffGantryZ := 0;  ! Gantry Z calibration error
 
 ! ========================================
 ! Mode2 Test Configuration
@@ -116,6 +280,118 @@ PERS num WELD_R2_ORIENT_Q4 := 0;
 
 ! Weld Speed (mm/s)
 PERS num WELD_SPEED := 100;
+
+! ========================================
+! Edge Points from Upper System (v2.0.0)
+! ========================================
+! Upper system provides 4 edge points (Floor coordinates, mm)
+! edgeStart{1}: Robot1 side weld start
+! edgeStart{2}: Robot2 side weld start
+! edgeEnd{1}: Robot1 side weld end
+! edgeEnd{2}: Robot2 side weld end
+!
+! These are mapped from WELD_R1/R2_START/END for compatibility
+! Edge Start Points (두 로봇의 시작점)
+PERS num EDGE_START1_X := 5000;    ! Robot1 side (= WELD_R1_START_X)
+PERS num EDGE_START1_Y := 5100;    ! Robot1 side (= WELD_R1_START_Y)
+PERS num EDGE_START1_Z := 500;     ! Robot1 side (= WELD_R1_START_Z)
+PERS num EDGE_START2_X := 5000;    ! Robot2 side (= WELD_R2_START_X)
+PERS num EDGE_START2_Y := 4900;    ! Robot2 side (= WELD_R2_START_Y)
+PERS num EDGE_START2_Z := 500;     ! Robot2 side (= WELD_R2_START_Z)
+
+! Edge End Points (두 로봇의 끝점)
+PERS num EDGE_END1_X := 5500;      ! Robot1 side (= WELD_R1_END_X)
+PERS num EDGE_END1_Y := 5100;      ! Robot1 side (= WELD_R1_END_Y)
+PERS num EDGE_END1_Z := 500;       ! Robot1 side (= WELD_R1_END_Z)
+PERS num EDGE_END2_X := 5500;      ! Robot2 side (= WELD_R2_END_X)
+PERS num EDGE_END2_Y := 4900;      ! Robot2 side (= WELD_R2_END_Y)
+PERS num EDGE_END2_Z := 500;       ! Robot2 side (= WELD_R2_END_Z)
+
+! ========================================
+! Gantry Home/Limit Configuration (v2.0.0)
+! ========================================
+! From PlanA Head_Data.mod
+! HOME position: Physical origin [0,0,0,0] = Floor [9500, 5300, 2100, 0]
+PERS num HOME_GANTRY_X := -9500;   ! Physical X at HOME
+PERS num HOME_GANTRY_Y := 5300;    ! Physical Y at HOME
+PERS num HOME_GANTRY_Z := 2100;    ! Physical Z at HOME
+PERS num HOME_GANTRY_R := 0;       ! Physical R at HOME (degrees)
+
+! Physical axis limits (mm, degrees)
+PERS num LIMIT_X_NEG := -9500;
+PERS num LIMIT_X_POS := 12300;
+PERS num LIMIT_Y_NEG := 0;
+PERS num LIMIT_Y_POS := 5300;
+PERS num LIMIT_Z_NEG := 0;
+PERS num LIMIT_Z_POS := 2100;
+PERS num LIMIT_R_NEG := -90;
+PERS num LIMIT_R_POS := 90;
+
+! Robot Height Parameters
+PERS num ROB_WELD_SPACE_HEIGHT := 1620;  ! 로봇 용접 작업 높이 (R-center 기준)
+
+! ========================================
+! Command Interface (v2.1.0 - PlanA Style)
+! ========================================
+! Real-time command interface for upper system (PC SDK)
+! nCmdInput: Upper system sets command ID
+! nCmdOutput: Robot acknowledges (echoes command ID)
+! nCmdMatch: 1=matched, -1=mismatch, 0=waiting
+
+! Command Variables (PERS for cross-task access)
+PERS num nCmdInput := 0;
+PERS num nCmdOutput := 0;
+PERS num nCmdMatch := 0;
+
+! Command Constants - Movement (100 series)
+CONST num CMD_MOVE_TO_WORLDHOME := 101;
+CONST num CMD_MOVE_TO_MEASUREMENTHOME := 102;
+CONST num CMD_MOVE_TO_TEACHING_R1 := 105;
+CONST num CMD_MOVE_TO_TEACHING_R2 := 106;
+CONST num CMD_MOVE_ABS_GANTRY := 108;
+CONST num CMD_MOVE_INC_GANTRY := 109;
+CONST num CMD_MOVE_TO_ZHOME := 110;
+CONST num CMD_MOVE_TO_WARMUP := 112;
+
+! Command Constants - Welding (200 series)
+CONST num CMD_WELD := 200;
+CONST num CMD_WELD_MOTION := 201;
+CONST num CMD_WELD_CORR := 202;
+CONST num CMD_WELD_MOTION_CORR := 203;
+CONST num CMD_WELD_MM := 204;
+CONST num CMD_WELD_MOTION_MM := 205;
+CONST num CMD_WELD_CORR_MM := 206;
+CONST num CMD_WELD_MOTION_CORR_MM := 207;
+CONST num CMD_EDGE_WELD := 210;      ! Edge-based weld (v2.0.0)
+
+! Command Constants - Camera (300 series)
+CONST num CMD_CAMERA_DOOR_OPEN := 301;
+CONST num CMD_CAMERA_DOOR_CLOSE := 302;
+CONST num CMD_CAMERA_BLOW_ON := 303;
+CONST num CMD_CAMERA_BLOW_OFF := 304;
+
+! Command Constants - Wire (500 series)
+CONST num CMD_WIRE_CUT := 501;
+CONST num CMD_WIRE_CLEAN := 502;
+CONST num CMD_ROB1_WIRE_CUT := 511;
+CONST num CMD_ROB2_WIRE_CUT := 512;
+
+! Command Constants - Inspection (600 series)
+CONST num CMD_HOLE_CHECK := 601;
+CONST num CMD_LDS_CHECK := 602;
+
+! Command Constants - Test/Debug (900 series)
+CONST num CMD_TEST_MENU := 900;
+CONST num CMD_TEST_SINGLE := 901;
+CONST num CMD_TEST_ROTATION := 902;
+CONST num CMD_TEST_MODE2 := 903;
+
+! Gantry Position for CMD_MOVE_ABS/INC_GANTRY
+PERS extjoint extGantryPos := [0, 0, 0, 0, 0, 0];
+
+! Motion Status Signals (PERS for simulation without I/O)
+PERS bool bMotionWorking := FALSE;
+PERS bool bMotionFinish := TRUE;
 
 ! ========================================
 ! Configuration Notes

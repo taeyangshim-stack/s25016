@@ -3,6 +3,14 @@ MODULE MainModule
 	! TASK1 (Robot1) - MainModule
 	! Version History
 	!========================================
+	! v2.1.0 (2026-02-03)
+	!   - Added PlanA-style command interface
+	!   - nCmdInput/nCmdOutput/nCmdMatch variables in ConfigModule
+	!   - CMD_* constants for all commands
+	!   - rInit(), rCheckCmdMatch(), CommandLoop() procedures
+	!   - TEST_MODE=10 enters real-time command loop
+	!   - Upper system controls via nCmdInput variable
+	!
 	! v1.0.0 (2025-12-17)
 	!   - Initial gantry position sharing system
 	!   - Added shared_gantry_pos and related variables
@@ -465,6 +473,23 @@ PERS num debug_r2_floor_y_offset := 0;
 	VAR num weld_center_angle;    ! R-axis angle (degrees)
 	VAR num weld_length;          ! Weld line length (mm)
 
+	! ========================================
+	! Edge-based Weld Variables (v2.0.0)
+	! ========================================
+	! PlanA compatible naming for center line
+	VAR pos posStart;             ! Center line start (avg of edgeStart{1,2})
+	VAR pos posEnd;               ! Center line end (avg of edgeEnd{1,2})
+	VAR num nAngleRzStore;        ! R-axis angle (degrees) - PlanA naming
+	PERS bool bRobSwap := FALSE;  ! TRUE when |R| > 90 degrees
+	VAR num nLengthWeldLine;      ! Weld line length (mm) - PlanA naming
+	VAR num nOffsetLengthBuffer;  ! Robot offset from weld line
+
+	! TASK2 sync flags for edge-based weld sequence (v2.0.0)
+	PERS bool t1_weld_position_ready := FALSE;  ! Gantry + Robot1 positioned
+	PERS bool t1_weld_start := FALSE;           ! Start welding signal
+	PERS bool t1_weld_done := FALSE;            ! Welding complete
+	PERS bool shared_bRobSwap := FALSE;         ! Share bRobSwap with TASK2
+
 	! TASK2 sync flags for weld sequence
 	PERS bool t2_weld_ready := FALSE;
 	PERS bool t1_weld_start := FALSE;
@@ -559,10 +584,16 @@ PERS num debug_r2_floor_y_offset := 0;
 			TPWrite "MAIN: Starting Test Menu";
 			Write main_logfile, "Step2 mode=9 type=TestMenu";
 			TestMenu;
+		ELSEIF test_mode = 10 THEN
+			! PlanA-style Command Loop (v2.1.0)
+			TPWrite "MAIN: Starting Command Loop (PlanA Style)";
+			Write main_logfile, "Step2 mode=10 type=CommandLoop";
+			rInit;
+			CommandLoop;
 		ELSE
 			TPWrite "ERROR: Invalid TEST_MODE=" + NumToStr(test_mode,0);
 			Write main_logfile, "ERROR: Invalid TEST_MODE=" + NumToStr(test_mode,0);
-			TPWrite "Valid: 0=Single, 1=R-axis, 2=Mode2, 3=Weld, 9=Menu";
+			TPWrite "Valid: 0=Single, 1=R-axis, 2=Mode2, 3=Weld, 9=Menu, 10=CmdLoop";
 		ENDIF
 
 		TPWrite "MAIN: Test completed";
@@ -3159,6 +3190,415 @@ PROC ReturnGantryToHome()
 	MoveAbsJ home_jt, v500, fine, tool0;
 
 	TPWrite "[WELD] Gantry at HOME [0,0,0,0]";
+ENDPROC
+
+! ========================================
+! Edge-based Weld Sequence Functions (v2.0.0)
+! ========================================
+! Ported from PlanA Head_MoveControl.mod
+! Calculates center line from 4 edge points and determines R-axis angle
+
+! ----------------------------------------
+! Calculate Center Line from Edge Points
+! ----------------------------------------
+! Reads EDGE_START1/2, EDGE_END1/2 from ConfigModule
+! Calculates posStart, posEnd as averages
+PROC CalcCenterFromEdges()
+	TPWrite "[EDGE] Calculating center line from edges...";
+
+	! Calculate center line start (average of edgeStart{1} and edgeStart{2})
+	posStart.x := (EDGE_START1_X + EDGE_START2_X) / 2;
+	posStart.y := (EDGE_START1_Y + EDGE_START2_Y) / 2;
+	posStart.z := (EDGE_START1_Z + EDGE_START2_Z) / 2;
+
+	! Calculate center line end (average of edgeEnd{1} and edgeEnd{2})
+	posEnd.x := (EDGE_END1_X + EDGE_END2_X) / 2;
+	posEnd.y := (EDGE_END1_Y + EDGE_END2_Y) / 2;
+	posEnd.z := (EDGE_END1_Z + EDGE_END2_Z) / 2;
+
+	TPWrite "[EDGE] Edge Start 1: [" + NumToStr(EDGE_START1_X,0) + ","
+	        + NumToStr(EDGE_START1_Y,0) + "," + NumToStr(EDGE_START1_Z,0) + "]";
+	TPWrite "[EDGE] Edge Start 2: [" + NumToStr(EDGE_START2_X,0) + ","
+	        + NumToStr(EDGE_START2_Y,0) + "," + NumToStr(EDGE_START2_Z,0) + "]";
+	TPWrite "[EDGE] Edge End 1: [" + NumToStr(EDGE_END1_X,0) + ","
+	        + NumToStr(EDGE_END1_Y,0) + "," + NumToStr(EDGE_END1_Z,0) + "]";
+	TPWrite "[EDGE] Edge End 2: [" + NumToStr(EDGE_END2_X,0) + ","
+	        + NumToStr(EDGE_END2_Y,0) + "," + NumToStr(EDGE_END2_Z,0) + "]";
+	TPWrite "[EDGE] Center Start: [" + NumToStr(posStart.x,1) + ","
+	        + NumToStr(posStart.y,1) + "," + NumToStr(posStart.z,1) + "]";
+	TPWrite "[EDGE] Center End: [" + NumToStr(posEnd.x,1) + ","
+	        + NumToStr(posEnd.y,1) + "," + NumToStr(posEnd.z,1) + "]";
+ENDPROC
+
+! ----------------------------------------
+! Define Weld Line (R-axis Calculation)
+! ----------------------------------------
+! Ported from PlanA rDefineWobjWeldLine
+! Calculates R-axis angle and determines bRobSwap
+PROC DefineWeldLine()
+	VAR num dx;
+	VAR num dy;
+	VAR num dz;
+
+	TPWrite "[WELD] Defining weld line...";
+
+	! Calculate direction vector
+	dx := posEnd.x - posStart.x;
+	dy := posEnd.y - posStart.y;
+	dz := posEnd.z - posStart.z;
+
+	! Calculate weld line length
+	nLengthWeldLine := Sqrt(dx*dx + dy*dy + dz*dz);
+
+	! Calculate R-axis angle (ATan2 gives angle from X+ axis in degrees)
+	! Floor coordinate: X+ = gantry forward, Y+ = left
+	nAngleRzStore := ATan2(dy, dx);
+
+	! Determine robot swap (PlanA logic)
+	! If R-axis angle is outside -90 to +90 range, swap robots
+	IF (nAngleRzStore < -90 OR nAngleRzStore >= 90) THEN
+		bRobSwap := TRUE;
+		shared_bRobSwap := TRUE;
+		TPWrite "[WELD] bRobSwap = TRUE (R=" + NumToStr(nAngleRzStore,1) + " deg)";
+	ELSE
+		bRobSwap := FALSE;
+		shared_bRobSwap := FALSE;
+		TPWrite "[WELD] bRobSwap = FALSE (R=" + NumToStr(nAngleRzStore,1) + " deg)";
+	ENDIF
+
+	! Calculate robot offset length
+	IF nLengthWeldLine < 20 THEN
+		nOffsetLengthBuffer := 10;
+	ELSE
+		nOffsetLengthBuffer := 10;  ! Default offset for now
+	ENDIF
+
+	TPWrite "[WELD] R-axis angle: " + NumToStr(nAngleRzStore, 2) + " deg";
+	TPWrite "[WELD] Weld length: " + NumToStr(nLengthWeldLine, 1) + " mm";
+ENDPROC
+
+! ----------------------------------------
+! Floor to Physical Coordinate Conversion
+! ----------------------------------------
+! Ported from PlanA fnCoordToJoint
+! Converts Floor coordinates to Physical gantry coordinates
+FUNC pos FloorToPhysical(pos floor_pos)
+	VAR pos physical;
+
+	! PlanA conversion formula:
+	! Physical = HOME +/- (Floor - FloorHome)
+	! FloorHome = [9500, 5300, 2100]
+	physical.x := HOME_GANTRY_X + (floor_pos.x - 9500);   ! X: addition
+	physical.y := HOME_GANTRY_Y - (floor_pos.y - 5300);   ! Y: subtraction (inverted)
+	physical.z := HOME_GANTRY_Z - (floor_pos.z - 2100);   ! Z: subtraction (inverted)
+
+	! Apply limits
+	IF physical.x < LIMIT_X_NEG THEN
+		physical.x := LIMIT_X_NEG;
+	ENDIF
+	IF physical.x > LIMIT_X_POS THEN
+		physical.x := LIMIT_X_POS;
+	ENDIF
+	IF physical.y < LIMIT_Y_NEG THEN
+		physical.y := LIMIT_Y_NEG;
+	ENDIF
+	IF physical.y > LIMIT_Y_POS THEN
+		physical.y := LIMIT_Y_POS;
+	ENDIF
+	IF physical.z < LIMIT_Z_NEG THEN
+		physical.z := LIMIT_Z_NEG;
+	ENDIF
+	IF physical.z > LIMIT_Z_POS THEN
+		physical.z := LIMIT_Z_POS;
+	ENDIF
+
+	RETURN physical;
+ENDFUNC
+
+! ----------------------------------------
+! Move Gantry to Weld Position
+! ----------------------------------------
+! Uses calculated posStart and nAngleRzStore to position gantry
+PROC MoveGantryToWeldPosition()
+	VAR jointtarget current_jt;
+	VAR jointtarget target_jt;
+	VAR pos gantry_physical;
+	VAR num target_r;
+
+	TPWrite "[WELD] Moving gantry to weld position...";
+
+	! Get current position
+	current_jt := CJointT();
+	target_jt := current_jt;
+
+	! Convert Floor center start to Physical coordinates
+	gantry_physical := FloorToPhysical(posStart);
+
+	! Calculate R-axis (PlanA: R = HOME_R - nAngleRzStore)
+	target_r := HOME_GANTRY_R - nAngleRzStore;
+
+	! Apply R limits
+	IF target_r < LIMIT_R_NEG THEN
+		target_r := LIMIT_R_NEG;
+		TPWrite "[WARN] R limited to " + NumToStr(LIMIT_R_NEG,0) + " deg";
+	ENDIF
+	IF target_r > LIMIT_R_POS THEN
+		target_r := LIMIT_R_POS;
+		TPWrite "[WARN] R limited to " + NumToStr(LIMIT_R_POS,0) + " deg";
+	ENDIF
+
+	! Adjust Z for TCP offset (gantry Z is above weld line)
+	! Z needs to account for robot reach (TCP_Z_OFFSET)
+	gantry_physical.z := gantry_physical.z + WELD_R1_TCP_Z_OFFSET;
+	IF gantry_physical.z > LIMIT_Z_POS THEN
+		gantry_physical.z := LIMIT_Z_POS;
+	ENDIF
+
+	! Set gantry target
+	target_jt.extax.eax_a := gantry_physical.x;  ! X1
+	target_jt.extax.eax_b := gantry_physical.y;  ! Y
+	target_jt.extax.eax_c := gantry_physical.z;  ! Z
+	target_jt.extax.eax_d := target_r;            ! R
+	target_jt.extax.eax_f := gantry_physical.x;  ! X2 = X1 (linked motor)
+
+	TPWrite "[WELD] Gantry target (Physical):";
+	TPWrite "  X1=" + NumToStr(gantry_physical.x,1) + " mm";
+	TPWrite "  Y=" + NumToStr(gantry_physical.y,1) + " mm";
+	TPWrite "  Z=" + NumToStr(gantry_physical.z,1) + " mm";
+	TPWrite "  R=" + NumToStr(target_r,1) + " deg";
+
+	! Move gantry
+	MoveAbsJ target_jt, v500, fine, tool0;
+
+	! Update WobjGantry after movement
+	UpdateGantryWobj;
+
+	TPWrite "[WELD] Gantry at weld position";
+ENDPROC
+
+! ----------------------------------------
+! Test: Edge to Weld Position
+! ----------------------------------------
+! Complete test of edge input to gantry positioning
+PROC TestEdgeToWeld()
+	TPWrite "========================================";
+	TPWrite "[TEST] Edge to Weld Position Test v2.0.0";
+	TPWrite "========================================";
+
+	! Step 1: Calculate center from edges
+	TPWrite "[TEST] Step 1: Calculate center line...";
+	CalcCenterFromEdges;
+
+	! Step 2: Define weld line (R-axis calculation)
+	TPWrite "[TEST] Step 2: Define weld line (R-axis)...";
+	DefineWeldLine;
+
+	! Step 3: Display calculated results
+	TPWrite "----------------------------------------";
+	TPWrite "[RESULT] Center Start: [" + NumToStr(posStart.x,1) + ","
+	        + NumToStr(posStart.y,1) + "," + NumToStr(posStart.z,1) + "]";
+	TPWrite "[RESULT] Center End: [" + NumToStr(posEnd.x,1) + ","
+	        + NumToStr(posEnd.y,1) + "," + NumToStr(posEnd.z,1) + "]";
+	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,2) + " deg";
+	TPWrite "[RESULT] bRobSwap: " + ValToStr(bRobSwap);
+	TPWrite "[RESULT] Weld Length: " + NumToStr(nLengthWeldLine,1) + " mm";
+	TPWrite "----------------------------------------";
+
+	! Step 4: Move gantry to weld position
+	TPWrite "[TEST] Step 4: Move gantry to weld position...";
+	MoveGantryToWeldPosition;
+
+	! Step 5: Verify final position
+	VAR jointtarget actual_jt;
+	actual_jt := CJointT();
+	TPWrite "----------------------------------------";
+	TPWrite "[VERIFY] Actual Gantry Position:";
+	TPWrite "  X1=" + NumToStr(actual_jt.extax.eax_a,1) + " mm";
+	TPWrite "  Y=" + NumToStr(actual_jt.extax.eax_b,1) + " mm";
+	TPWrite "  Z=" + NumToStr(actual_jt.extax.eax_c,1) + " mm";
+	TPWrite "  R=" + NumToStr(actual_jt.extax.eax_d,1) + " deg";
+	TPWrite "  X2=" + NumToStr(actual_jt.extax.eax_f,1) + " mm";
+	TPWrite "========================================";
+	TPWrite "[TEST] Edge to Weld Position Test Complete";
+	TPWrite "========================================";
+ENDPROC
+
+! ========================================
+! Command Interface (v2.1.0 - PlanA Style)
+! ========================================
+
+! ----------------------------------------
+! rInit: Initialize command interface
+! ----------------------------------------
+PROC rInit()
+	! Reset command interface
+	nCmdInput := 0;
+	nCmdOutput := 0;
+	nCmdMatch := 0;
+
+	! Reset motion status
+	bMotionWorking := FALSE;
+	bMotionFinish := TRUE;
+
+	! Reset weld flags
+	bRobSwap := FALSE;
+	t1_weld_position_ready := FALSE;
+	t1_weld_start := FALSE;
+	t1_weld_done := FALSE;
+	shared_bRobSwap := FALSE;
+
+	TPWrite "[INIT] Command interface ready";
+ENDPROC
+
+! ----------------------------------------
+! rCheckCmdMatch: Verify command acknowledgement
+! ----------------------------------------
+! Called after setting nCmdOutput to verify upper system received
+PROC rCheckCmdMatch(num CMD)
+	nCmdOutput := CMD;
+	WaitUntil nCmdMatch = 1 OR nCmdMatch = -1;
+	WHILE nCmdMatch <> 1 DO
+		IF nCmdMatch = -1 THEN
+			TPWrite "[ERROR] Command mismatch: " + NumToStr(CMD, 0);
+			Stop;
+		ENDIF
+	ENDWHILE
+	nCmdMatch := 0;
+ENDPROC
+
+! ----------------------------------------
+! CommandLoop: Main command processing loop
+! ----------------------------------------
+! Call this from main() to enter PlanA-style command mode
+PROC CommandLoop()
+	VAR string sDate;
+	VAR string sTime;
+
+	TPWrite "========================================";
+	TPWrite "[CMD] Entering Command Loop (v2.1.0)";
+	TPWrite "[CMD] Waiting for nCmdInput...";
+	TPWrite "========================================";
+
+	WHILE TRUE DO
+		! Wait for command from upper system
+		WaitUntil nCmdInput <> 0;
+
+		! Set motion status
+		bMotionWorking := TRUE;
+		bMotionFinish := FALSE;
+
+		! Log timestamp and command
+		sDate := CDate();
+		sTime := CTime();
+		sDate := StrPart(sDate, 3, 2) + StrPart(sDate, 6, 2) + StrPart(sDate, 9, 2);
+		sTime := StrPart(sTime, 1, 2) + StrPart(sTime, 4, 2) + StrPart(sTime, 7, 2);
+		TPWrite "[CMD] " + sDate + " " + sTime + " | Command: " + NumToStr(nCmdInput, 0);
+
+		! Process command
+		TEST nCmdInput
+
+		! Movement Commands (100 series)
+		CASE CMD_MOVE_TO_WORLDHOME:
+			rCheckCmdMatch CMD_MOVE_TO_WORLDHOME;
+			TPWrite "[CMD] Move to World Home";
+			SetRobot1InitialPosition;
+
+		CASE CMD_MOVE_ABS_GANTRY:
+			rCheckCmdMatch CMD_MOVE_ABS_GANTRY;
+			TPWrite "[CMD] Move Gantry Absolute";
+			TPWrite "  Target: X=" + NumToStr(extGantryPos.eax_a, 1)
+			       + " Y=" + NumToStr(extGantryPos.eax_b, 1)
+			       + " Z=" + NumToStr(extGantryPos.eax_c, 1)
+			       + " R=" + NumToStr(extGantryPos.eax_d, 1);
+			! Move gantry to absolute position
+			VAR jointtarget abs_jt;
+			abs_jt := CJointT();
+			abs_jt.extax.eax_a := extGantryPos.eax_a;
+			abs_jt.extax.eax_b := extGantryPos.eax_b;
+			abs_jt.extax.eax_c := extGantryPos.eax_c;
+			abs_jt.extax.eax_d := extGantryPos.eax_d;
+			abs_jt.extax.eax_f := extGantryPos.eax_a;  ! X2 sync
+			MoveAbsJ abs_jt, v500, fine, tool0;
+			UpdateGantryWobj;
+
+		CASE CMD_MOVE_INC_GANTRY:
+			rCheckCmdMatch CMD_MOVE_INC_GANTRY;
+			TPWrite "[CMD] Move Gantry Incremental";
+			TPWrite "  Delta: X=" + NumToStr(extGantryPos.eax_a, 1)
+			       + " Y=" + NumToStr(extGantryPos.eax_b, 1)
+			       + " Z=" + NumToStr(extGantryPos.eax_c, 1)
+			       + " R=" + NumToStr(extGantryPos.eax_d, 1);
+			! Move gantry incrementally
+			VAR jointtarget inc_jt;
+			inc_jt := CJointT();
+			inc_jt.extax.eax_a := inc_jt.extax.eax_a + extGantryPos.eax_a;
+			inc_jt.extax.eax_b := inc_jt.extax.eax_b + extGantryPos.eax_b;
+			inc_jt.extax.eax_c := inc_jt.extax.eax_c + extGantryPos.eax_c;
+			inc_jt.extax.eax_d := inc_jt.extax.eax_d + extGantryPos.eax_d;
+			inc_jt.extax.eax_f := inc_jt.extax.eax_a;  ! X2 sync
+			MoveAbsJ inc_jt, v500, fine, tool0;
+			UpdateGantryWobj;
+
+		! Welding Commands (200 series)
+		CASE CMD_WELD:
+			rCheckCmdMatch CMD_WELD;
+			TPWrite "[CMD] Weld (motion + arc)";
+			! TODO: Implement full weld with arc
+			TestWeldSequence;
+
+		CASE CMD_WELD_MOTION:
+			rCheckCmdMatch CMD_WELD_MOTION;
+			TPWrite "[CMD] Weld Motion Only (no arc)";
+			TestWeldSequence;
+
+		CASE CMD_EDGE_WELD:
+			rCheckCmdMatch CMD_EDGE_WELD;
+			TPWrite "[CMD] Edge-based Weld";
+			TestEdgeToWeld;
+
+		! Wire Commands (500 series)
+		CASE CMD_WIRE_CUT:
+			rCheckCmdMatch CMD_WIRE_CUT;
+			TPWrite "[CMD] Wire Cut (both robots)";
+			! TODO: Implement wire cut
+
+		! Test Commands (900 series)
+		CASE CMD_TEST_MENU:
+			rCheckCmdMatch CMD_TEST_MENU;
+			TPWrite "[CMD] Test Menu";
+			TestMenu;
+
+		CASE CMD_TEST_SINGLE:
+			rCheckCmdMatch CMD_TEST_SINGLE;
+			TPWrite "[CMD] Test Single Position";
+			TestGantryFloorCoordinates;
+
+		CASE CMD_TEST_ROTATION:
+			rCheckCmdMatch CMD_TEST_ROTATION;
+			TPWrite "[CMD] Test R-axis Rotation";
+			TestGantryRotation;
+
+		CASE CMD_TEST_MODE2:
+			rCheckCmdMatch CMD_TEST_MODE2;
+			TPWrite "[CMD] Test Mode2";
+			TestGantryMode2;
+
+		DEFAULT:
+			TPWrite "[ERROR] Unknown command: " + NumToStr(nCmdInput, 0);
+			rCheckCmdMatch 999;
+
+		ENDTEST
+
+		! Reset motion status
+		bMotionWorking := FALSE;
+		bMotionFinish := TRUE;
+
+		! Clear command output and wait for input reset
+		nCmdOutput := 0;
+		WaitUntil nCmdInput = 0;
+
+		TPWrite "[CMD] Ready for next command";
+	ENDWHILE
 ENDPROC
 
 ENDMODULE
