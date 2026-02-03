@@ -53,6 +53,6 @@
     { "source": "/business-trip/detail-expense", "destination": "/projects/business-trip/pages/detail-expense.html" },
     { "source": "/business-trip/edit-expense", "destination": "/projects/business-trip/pages/edit-expense.html" },
     { "source": "/weld-line-check", "destination": "/projects/weld-line-check/index.html" },
-    { "source": "/light-curtain", "destination": "/projects/light-curtain/설치계획서.html" }
+    { "source": "/light-curtain", "destination": "/projects/light-curtain/%EC%84%A4%EC%B9%98%EA%B3%84%ED%9A%8D%EC%84%9C.html" }
   ]
 }
