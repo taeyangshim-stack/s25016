@@ -746,9 +746,97 @@
             body {
                 background: white;
                 padding: 0;
+                font-size: 11px;
             }
             .container {
                 box-shadow: none;
+                max-width: 100%;
+            }
+            .content {
+                padding: 20px;
+            }
+            .header {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .section {
+                margin-bottom: 25px;
+                page-break-inside: avoid;
+            }
+            .section-title {
+                font-size: 1.2em;
+            }
+
+            /* 간트차트 PDF 최적화 */
+            .gantt-container {
+                overflow: visible;
+            }
+            .gantt-table {
+                min-width: auto;
+                width: 100%;
+                font-size: 9px;
+            }
+            .gantt-table th, .gantt-table td {
+                padding: 4px 2px;
+            }
+            .gantt-table .task-name {
+                min-width: 120px;
+                font-size: 8px;
+            }
+            .gantt-table .task-team {
+                min-width: 40px;
+                font-size: 8px;
+            }
+            .gantt-bar {
+                height: 16px;
+            }
+
+            /* 위험성평가 테이블 최적화 */
+            .risk-assessment {
+                page-break-before: always;
+            }
+            .site-risk-table {
+                font-size: 8px;
+            }
+            .site-risk-table th, .site-risk-table td {
+                padding: 4px 3px;
+            }
+            .site-risk-table .improvement-cell {
+                width: 120px;
+            }
+            .site-risk-table .manager-cell {
+                width: 50px;
+            }
+            .site-risk-table .check-cell {
+                width: 30px;
+            }
+
+            /* 페이지 나눔 제어 */
+            .info-grid {
+                page-break-inside: avoid;
+            }
+            .image-section {
+                page-break-inside: avoid;
+            }
+            .compliance-box {
+                page-break-inside: avoid;
+            }
+            .safety-box {
+                page-break-inside: avoid;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+
+            /* 이미지 크기 조정 */
+            .image-card img {
+                max-height: 150px;
+                object-fit: contain;
+            }
+            .image-container img {
+                max-height: 300px;
             }
         }
     </style>
