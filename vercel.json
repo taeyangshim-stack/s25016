@@ -56,6 +56,7 @@
     { "source": "/light-curtain", "destination": "/projects/light-curtain/%EC%84%A4%EC%B9%98%EA%B3%84%ED%9A%8D%EC%84%9C.html" },
     { "source": "/light-curtain/pdf", "destination": "/projects/light-curtain/%EC%84%A4%EC%B9%98%EA%B3%84%ED%9A%8D%EC%84%9C.pdf" },
     { "source": "/light-curtain/external", "destination": "/projects/light-curtain/%EC%84%A4%EC%B9%98%EA%B3%84%ED%9A%8D%EC%84%9C_%EC%99%B8%EB%B6%80%EC%9A%A9.html" },
-    { "source": "/light-curtain/external/pdf", "destination": "/projects/light-curtain/installation_plan_external.pdf" }
+    { "source": "/light-curtain/external/pdf", "destination": "/projects/light-curtain/installation_plan_external.pdf" },
+    { "source": "/lc-ext", "destination": "/projects/light-curtain/lc_ext_v2.pdf" }
   ]
 }
