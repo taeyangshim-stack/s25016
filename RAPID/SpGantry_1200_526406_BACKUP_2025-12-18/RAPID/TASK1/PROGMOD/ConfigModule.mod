@@ -227,8 +227,8 @@ PERS num MODE2_POS_R{10} := [0, 45, -45, 90, -90, 30, -30, 60, -60, 15];
 ! Used to calculate gantry Z from Floor weld Z
 ! Gantry_Z = 2100 - Floor_Z - TCP_OFFSET
 ! v1.9.6: Changed from 1600 to 1000 (actual robot reach based on Mode2 test)
-PERS num WELD_R1_TCP_Z_OFFSET := 1000;  ! Robot1 tWeld1: actual reach below R-center
-PERS num WELD_R2_TCP_Z_OFFSET := 1000;  ! Robot2 tWeld2: actual reach below R-center
+PERS num WELD_R1_TCP_Z_OFFSET := 500;   ! Robot1 (TEST: 1000->500 for Z limit)
+PERS num WELD_R2_TCP_Z_OFFSET := 500;   ! Robot2 (TEST: 1000->500 for Z limit)
 
 ! Robot1 Weld Line (Floor TCP coordinates, mm)
 ! Floor Z = (2100 - Gantry_Z) - TCP_OFFSET
@@ -294,18 +294,18 @@ PERS num WELD_SPEED := 100;
 ! Edge Start Points - Robot1/Robot2 start positions
 PERS num EDGE_START1_X := 5000;    ! Robot1 side (= WELD_R1_START_X)
 PERS num EDGE_START1_Y := 5100;    ! Robot1 side (= WELD_R1_START_Y)
-PERS num EDGE_START1_Z := 500;     ! Robot1 side (= WELD_R1_START_Z)
+PERS num EDGE_START1_Z := 1200;    ! Robot1 side (valid range: 600-1600)
 PERS num EDGE_START2_X := 5000;    ! Robot2 side (= WELD_R2_START_X)
 PERS num EDGE_START2_Y := 4900;    ! Robot2 side (= WELD_R2_START_Y)
-PERS num EDGE_START2_Z := 500;     ! Robot2 side (= WELD_R2_START_Z)
+PERS num EDGE_START2_Z := 1200;    ! Robot2 side (valid range: 600-1600)
 
 ! Edge End Points - Robot1/Robot2 end positions
 PERS num EDGE_END1_X := 5500;      ! Robot1 side (= WELD_R1_END_X)
 PERS num EDGE_END1_Y := 5100;      ! Robot1 side (= WELD_R1_END_Y)
-PERS num EDGE_END1_Z := 500;       ! Robot1 side (= WELD_R1_END_Z)
+PERS num EDGE_END1_Z := 1200;      ! Robot1 side (valid range: 600-1600)
 PERS num EDGE_END2_X := 5500;      ! Robot2 side (= WELD_R2_END_X)
 PERS num EDGE_END2_Y := 4900;      ! Robot2 side (= WELD_R2_END_Y)
-PERS num EDGE_END2_Z := 500;       ! Robot2 side (= WELD_R2_END_Z)
+PERS num EDGE_END2_Z := 1200;      ! Robot2 side (valid range: 600-1600)
 
 ! ========================================
 ! Gantry Home/Limit Configuration (v2.0.0)
@@ -323,7 +323,7 @@ PERS num LIMIT_X_POS := 12300;
 PERS num LIMIT_Y_NEG := 0;
 PERS num LIMIT_Y_POS := 5300;
 PERS num LIMIT_Z_NEG := 0;
-PERS num LIMIT_Z_POS := 2100;
+PERS num LIMIT_Z_POS := 1000;  ! MOC.cfg M3DM3 limit: 1050mm
 PERS num LIMIT_R_NEG := -90;
 PERS num LIMIT_R_POS := 90;
 

@@ -2574,13 +2574,13 @@ PROC TestMenu()
 		! Display menu
 		TPErase;
 		TPWrite "========================================";
-		TPWrite "  S25016 SpGantry Test Menu (v2.1.1)";
+		TPWrite "  S25016 SpGantry Test Menu (v2.1.2)";
 		TPWrite "========================================";
 		TPWrite "";
 		TPWrite "  1. Check Linked Motor Sync (X1/X2)";
-		TPWrite "  2. Test Edge to Weld Position";
-		TPWrite "  3. Test Gantry Floor Coordinates";
-		TPWrite "  4. Test Gantry Mode2 (TCP)";
+		TPWrite "  2. Edge to Weld (CALC ONLY, no move)";
+		TPWrite "  3. Edge to Weld (with gantry move)";
+		TPWrite "  4. Test Gantry Floor Coordinates";
 		TPWrite "  5. Execute Weld Sequence";
 		TPWrite "  6. View Config";
 		TPWrite "  7. View Results";
@@ -2602,24 +2602,24 @@ PROC TestMenu()
 
 		CASE 2:
 			TPErase;
-			TPWrite "[Menu] Starting Edge to Weld Test...";
-			TestEdgeToWeld;
+			TPWrite "[Menu] Edge to Weld CALC ONLY...";
+			TestEdgeToWeldCalcOnly;
 			TPWrite "";
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
 		CASE 3:
 			TPErase;
-			TPWrite "[Menu] Starting Floor Coordinate Test...";
-			TestGantryFloorCoordinates;
+			TPWrite "[Menu] Edge to Weld with Movement...";
+			TestEdgeToWeld;
 			TPWrite "";
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
 		CASE 4:
 			TPErase;
-			TPWrite "[Menu] Starting Mode2 TCP Test...";
-			TestGantryMode2;
+			TPWrite "[Menu] Starting Floor Coordinate Test...";
+			TestGantryFloorCoordinates;
 			TPWrite "";
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
@@ -3356,7 +3356,11 @@ PROC MoveGantryToWeldPosition()
 	VAR jointtarget current_jt;
 	VAR jointtarget target_jt;
 	VAR pos gantry_physical;
+	VAR pos gantry_floor;
 	VAR num target_r;
+	VAR num offset_floor_x;
+	VAR num offset_floor_y;
+	VAR num angle_rad;
 
 	TPWrite "[WELD] Moving gantry to weld position...";
 
@@ -3379,25 +3383,46 @@ PROC MoveGantryToWeldPosition()
 		Stop;
 	ENDIF
 
-	! Convert Floor center start to Physical coordinates
-	gantry_physical := FloorToPhysical(posStart);
-
-	! Calculate R-axis (PlanA: R = HOME_R - nAngleRzStore)
+	! Calculate R-axis first (needed for X/Y offset rotation)
 	target_r := HOME_GANTRY_R - nAngleRzStore;
 
-	! Apply R limits
+	! Apply R limits first (needed for offset calculation)
 	IF target_r < LIMIT_R_NEG THEN
 		target_r := LIMIT_R_NEG;
-		TPWrite "[WARN] R limited to " + NumToStr(LIMIT_R_NEG,0) + " deg";
 	ENDIF
 	IF target_r > LIMIT_R_POS THEN
 		target_r := LIMIT_R_POS;
-		TPWrite "[WARN] R limited to " + NumToStr(LIMIT_R_POS,0) + " deg";
 	ENDIF
 
-	! Adjust Z for TCP offset (gantry Z is above weld line)
-	! Z needs to account for robot reach (TCP_Z_OFFSET)
-	gantry_physical.z := gantry_physical.z + WELD_R1_TCP_Z_OFFSET;
+	! Calculate TCP X/Y offsets rotated by gantry R-axis angle
+	! TCP offset is relative to robot base which rotates with gantry R-axis
+	! offset_floor = rotation_matrix(target_r) * tcp_offset
+	! NOTE: Use target_r (actual gantry rotation), NOT nAngleRzStore (weld line angle)
+	angle_rad := target_r * 3.14159265 / 180;
+	offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(angle_rad) - MODE2_TCP_OFFSET_R1_Y * Sin(angle_rad);
+	offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(angle_rad) + MODE2_TCP_OFFSET_R1_Y * Cos(angle_rad);
+
+	! Calculate gantry Floor position (gantry = weld_center - tcp_offset)
+	! Gantry must be offset so that TCP reaches the weld center
+	gantry_floor := posStart;
+	gantry_floor.x := gantry_floor.x - offset_floor_x;
+	gantry_floor.y := gantry_floor.y - offset_floor_y;
+
+	TPWrite "[WELD] TCP X/Y offset (Floor): [" + NumToStr(offset_floor_x,1) + ", " + NumToStr(offset_floor_y,1) + "]";
+
+	! Convert gantry Floor position to Physical coordinates
+	gantry_physical := FloorToPhysical(gantry_floor);
+
+	! NOTE: R limits already applied above (before offset calculation)
+
+	! Adjust Z for TCP offset (gantry must be ABOVE weld so TCP can reach down)
+	! Robot hangs upside down: TCP is below gantry R-center
+	! Gantry Floor Z = Weld Floor Z + TCP_OFFSET
+	! In Physical: subtract offset (Physical Z inversely related to Floor Z)
+	gantry_physical.z := gantry_physical.z - WELD_R1_TCP_Z_OFFSET;
+	IF gantry_physical.z < LIMIT_Z_NEG THEN
+		gantry_physical.z := LIMIT_Z_NEG;
+	ENDIF
 	IF gantry_physical.z > LIMIT_Z_POS THEN
 		gantry_physical.z := LIMIT_Z_POS;
 	ENDIF
@@ -3472,6 +3497,176 @@ PROC TestWeldSequence()
 	TPWrite "========================================";
 	TPWrite "[TEST] Weld Sequence (stub)";
 	TPWrite "[TEST] Not implemented yet";
+	TPWrite "========================================";
+ENDPROC
+
+! ----------------------------------------
+! Test: Edge to Weld Calculation Only (No Movement)
+! ----------------------------------------
+! Verifies calculation logic without MoveAbsJ
+! Output: HOME:/edge_to_weld_calc.txt
+PROC TestEdgeToWeldCalcOnly()
+	VAR pos gantry_physical;
+	VAR pos gantry_physical_raw;
+	VAR pos gantry_floor;
+	VAR num target_r;
+	VAR iodev logfile;
+	VAR num offset_floor_x;
+	VAR num offset_floor_y;
+	VAR num angle_rad;
+
+	TPWrite "========================================";
+	TPWrite "[TEST] Edge to Weld CALC ONLY v1.2";
+	TPWrite "[TEST] + X/Y TCP Offset Support";
+	TPWrite "[TEST] Log: HOME:/edge_to_weld_calc.txt";
+	TPWrite "========================================";
+
+	! Open log file
+	Open "HOME:/edge_to_weld_calc.txt", logfile \Write;
+	Write logfile, "========================================";
+	Write logfile, "Edge to Weld Calculation Log";
+	Write logfile, "Date: " + CDate() + " Time: " + CTime();
+	Write logfile, "========================================";
+	Write logfile, "";
+
+	! Step 1: Calculate center from edges
+	TPWrite "[CALC] Step 1: Calculate center line...";
+	Write logfile, "[STEP 1] Calculate center from edges";
+	CalcCenterFromEdges;
+
+	! Step 2: Define weld line (R-axis calculation)
+	TPWrite "[CALC] Step 2: Define weld line (R-axis)...";
+	Write logfile, "[STEP 2] Define weld line (R-axis)";
+	DefineWeldLine;
+
+	! Step 3: Calculate gantry target (no movement)
+	Write logfile, "[STEP 3] Calculate gantry physical target";
+	Write logfile, "";
+
+	! Log input parameters
+	Write logfile, "--- INPUT: Edge Points (Floor) ---";
+	Write logfile, "EDGE_START1: [" + NumToStr(EDGE_START1_X,1) + ", " + NumToStr(EDGE_START1_Y,1) + ", " + NumToStr(EDGE_START1_Z,1) + "]";
+	Write logfile, "EDGE_START2: [" + NumToStr(EDGE_START2_X,1) + ", " + NumToStr(EDGE_START2_Y,1) + ", " + NumToStr(EDGE_START2_Z,1) + "]";
+	Write logfile, "EDGE_END1:   [" + NumToStr(EDGE_END1_X,1) + ", " + NumToStr(EDGE_END1_Y,1) + ", " + NumToStr(EDGE_END1_Z,1) + "]";
+	Write logfile, "EDGE_END2:   [" + NumToStr(EDGE_END2_X,1) + ", " + NumToStr(EDGE_END2_Y,1) + ", " + NumToStr(EDGE_END2_Z,1) + "]";
+	Write logfile, "";
+
+	! Log calculation results
+	Write logfile, "--- RESULT: Center Line (Floor) ---";
+	Write logfile, "posStart: [" + NumToStr(posStart.x,1) + ", " + NumToStr(posStart.y,1) + ", " + NumToStr(posStart.z,1) + "]";
+	Write logfile, "posEnd:   [" + NumToStr(posEnd.x,1) + ", " + NumToStr(posEnd.y,1) + ", " + NumToStr(posEnd.z,1) + "]";
+	Write logfile, "nAngleRzStore: " + NumToStr(nAngleRzStore,2) + " deg";
+	Write logfile, "bRobSwap: " + ValToStr(bRobSwap);
+	Write logfile, "nLengthWeldLine: " + NumToStr(nLengthWeldLine,1) + " mm";
+	Write logfile, "";
+
+	! Calculate R-axis first (needed for X/Y offset rotation)
+	target_r := HOME_GANTRY_R - nAngleRzStore;
+	IF target_r < LIMIT_R_NEG THEN target_r := LIMIT_R_NEG; ENDIF
+	IF target_r > LIMIT_R_POS THEN target_r := LIMIT_R_POS; ENDIF
+
+	! Calculate X/Y TCP offsets rotated by gantry R-axis angle
+	Write logfile, "--- X/Y TCP Offset Calculation ---";
+	Write logfile, "MODE2_TCP_OFFSET_R1_X: " + NumToStr(MODE2_TCP_OFFSET_R1_X,1) + " mm";
+	Write logfile, "MODE2_TCP_OFFSET_R1_Y: " + NumToStr(MODE2_TCP_OFFSET_R1_Y,1) + " mm";
+	Write logfile, "nAngleRzStore (weld line): " + NumToStr(nAngleRzStore,2) + " deg";
+	Write logfile, "target_r (gantry R): " + NumToStr(target_r,1) + " deg";
+	Write logfile, "NOTE: Use target_r for rotation (actual gantry angle)";
+	angle_rad := target_r * 3.14159265 / 180;
+	offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(angle_rad) - MODE2_TCP_OFFSET_R1_Y * Sin(angle_rad);
+	offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(angle_rad) + MODE2_TCP_OFFSET_R1_Y * Cos(angle_rad);
+	Write logfile, "Rotated TCP offset (Floor):";
+	Write logfile, "  offset_floor_x: " + NumToStr(offset_floor_x,1) + " mm";
+	Write logfile, "  offset_floor_y: " + NumToStr(offset_floor_y,1) + " mm";
+	Write logfile, "";
+
+	! Calculate gantry Floor position (gantry = weld_center - tcp_offset)
+	Write logfile, "--- Gantry Floor Position (with X/Y offset) ---";
+	Write logfile, "posStart (weld center): [" + NumToStr(posStart.x,1) + ", " + NumToStr(posStart.y,1) + ", " + NumToStr(posStart.z,1) + "]";
+	gantry_floor := posStart;
+	gantry_floor.x := gantry_floor.x - offset_floor_x;
+	gantry_floor.y := gantry_floor.y - offset_floor_y;
+	Write logfile, "gantry_floor (after X/Y offset): [" + NumToStr(gantry_floor.x,1) + ", " + NumToStr(gantry_floor.y,1) + ", " + NumToStr(gantry_floor.z,1) + "]";
+	Write logfile, "";
+
+	! Calculate FloorToPhysical (raw, before Z offset)
+	gantry_physical_raw := FloorToPhysical(gantry_floor);
+	Write logfile, "--- FloorToPhysical Conversion ---";
+	Write logfile, "Formula: Physical = HOME + (Floor - FloorHome)";
+	Write logfile, "  FloorHome = [9500, 5300, 2100]";
+	Write logfile, "  HOME_GANTRY = [" + NumToStr(HOME_GANTRY_X,1) + ", " + NumToStr(HOME_GANTRY_Y,1) + ", " + NumToStr(HOME_GANTRY_Z,1) + "]";
+	Write logfile, "";
+	Write logfile, "gantry_floor: [" + NumToStr(gantry_floor.x,1) + ", " + NumToStr(gantry_floor.y,1) + ", " + NumToStr(gantry_floor.z,1) + "]";
+	Write logfile, "gantry_physical_raw: [" + NumToStr(gantry_physical_raw.x,1) + ", " + NumToStr(gantry_physical_raw.y,1) + ", " + NumToStr(gantry_physical_raw.z,1) + "]";
+	Write logfile, "";
+
+	! Apply Z offset (SUBTRACT because Physical Z is inverse of Floor Z)
+	! Gantry must be ABOVE weld so TCP can reach down
+	gantry_physical := gantry_physical_raw;
+	Write logfile, "--- Z Offset Calculation (CORRECTED) ---";
+	Write logfile, "WELD_R1_TCP_Z_OFFSET: " + NumToStr(WELD_R1_TCP_Z_OFFSET,1) + " mm";
+	Write logfile, "gantry_physical.z (before): " + NumToStr(gantry_physical.z,1) + " mm";
+	Write logfile, "Formula: Gantry_Z = Raw_Z - TCP_OFFSET (subtract!)";
+	gantry_physical.z := gantry_physical.z - WELD_R1_TCP_Z_OFFSET;
+	Write logfile, "gantry_physical.z (after offset): " + NumToStr(gantry_physical.z,1) + " mm";
+	Write logfile, "LIMIT_Z: [" + NumToStr(LIMIT_Z_NEG,1) + ", " + NumToStr(LIMIT_Z_POS,1) + "] mm";
+	IF gantry_physical.z < LIMIT_Z_NEG THEN
+		gantry_physical.z := LIMIT_Z_NEG;
+		Write logfile, "gantry_physical.z (limited to min): " + NumToStr(gantry_physical.z,1) + " mm";
+	ENDIF
+	IF gantry_physical.z > LIMIT_Z_POS THEN
+		gantry_physical.z := LIMIT_Z_POS;
+		Write logfile, "gantry_physical.z (limited to max): " + NumToStr(gantry_physical.z,1) + " mm";
+	ENDIF
+	Write logfile, "";
+
+	! Log R-axis (already calculated above for X/Y offset rotation)
+	Write logfile, "--- R-axis Summary ---";
+	Write logfile, "HOME_GANTRY_R: " + NumToStr(HOME_GANTRY_R,1) + " deg";
+	Write logfile, "nAngleRzStore: " + NumToStr(nAngleRzStore,2) + " deg";
+	Write logfile, "target_r (final, with limits): " + NumToStr(target_r,1) + " deg";
+	Write logfile, "LIMIT_R: [" + NumToStr(LIMIT_R_NEG,1) + ", " + NumToStr(LIMIT_R_POS,1) + "] deg";
+	Write logfile, "";
+
+	! Final target summary
+	Write logfile, "========================================";
+	Write logfile, "FINAL GANTRY TARGET (Physical)";
+	Write logfile, "========================================";
+	Write logfile, "X1 (eax_a): " + NumToStr(gantry_physical.x,1) + " mm";
+	Write logfile, "Y  (eax_b): " + NumToStr(gantry_physical.y,1) + " mm";
+	Write logfile, "Z  (eax_c): " + NumToStr(gantry_physical.z,1) + " mm";
+	Write logfile, "R  (eax_d): " + NumToStr(target_r,1) + " deg";
+	Write logfile, "X2 (eax_f): " + NumToStr(gantry_physical.x,1) + " mm (=X1, linked)";
+	Write logfile, "========================================";
+	Write logfile, "";
+
+	! Close log file
+	Close logfile;
+
+	! Display results on TP
+	TPWrite "----------------------------------------";
+	TPWrite "[INPUT] Edge Points (Floor):";
+	TPWrite "  Start1: [" + NumToStr(EDGE_START1_X,0) + "," + NumToStr(EDGE_START1_Y,0) + "," + NumToStr(EDGE_START1_Z,0) + "]";
+	TPWrite "  Start2: [" + NumToStr(EDGE_START2_X,0) + "," + NumToStr(EDGE_START2_Y,0) + "," + NumToStr(EDGE_START2_Z,0) + "]";
+	TPWrite "  End1: [" + NumToStr(EDGE_END1_X,0) + "," + NumToStr(EDGE_END1_Y,0) + "," + NumToStr(EDGE_END1_Z,0) + "]";
+	TPWrite "  End2: [" + NumToStr(EDGE_END2_X,0) + "," + NumToStr(EDGE_END2_Y,0) + "," + NumToStr(EDGE_END2_Z,0) + "]";
+	TPWrite "----------------------------------------";
+	TPWrite "[RESULT] Center (Floor):";
+	TPWrite "  Start: [" + NumToStr(posStart.x,1) + "," + NumToStr(posStart.y,1) + "," + NumToStr(posStart.z,1) + "]";
+	TPWrite "  End: [" + NumToStr(posEnd.x,1) + "," + NumToStr(posEnd.y,1) + "," + NumToStr(posEnd.z,1) + "]";
+	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,2) + " deg";
+	TPWrite "[RESULT] bRobSwap: " + ValToStr(bRobSwap);
+	TPWrite "[RESULT] Weld Length: " + NumToStr(nLengthWeldLine,1) + " mm";
+	TPWrite "----------------------------------------";
+	TPWrite "[OFFSET] TCP X/Y (rotated to Floor):";
+	TPWrite "  X: " + NumToStr(offset_floor_x,1) + " mm, Y: " + NumToStr(offset_floor_y,1) + " mm";
+	TPWrite "[TARGET] Gantry Physical (with offsets):";
+	TPWrite "  X: " + NumToStr(gantry_physical.x,1) + " mm";
+	TPWrite "  Y: " + NumToStr(gantry_physical.y,1) + " mm";
+	TPWrite "  Z: " + NumToStr(gantry_physical.z,1) + " mm (limit:" + NumToStr(LIMIT_Z_POS,0) + ")";
+	TPWrite "  R: " + NumToStr(target_r,1) + " deg";
+	TPWrite "========================================";
+	TPWrite "[TEST] Log saved: HOME:/edge_to_weld_calc.txt";
 	TPWrite "========================================";
 ENDPROC
 

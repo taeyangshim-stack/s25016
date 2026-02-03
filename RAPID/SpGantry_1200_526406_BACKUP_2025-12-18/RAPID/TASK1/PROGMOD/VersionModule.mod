@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.22";
+CONST string TASK1_VERSION := "v1.9.23";
 CONST string TASK2_VERSION := "v1.9.22";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
@@ -22,8 +22,8 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-01-18";
-CONST string BUILD_TIME := "09:30:00";
+CONST string BUILD_DATE := "2026-02-04";
+CONST string BUILD_TIME := "12:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -39,11 +39,18 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.22";  ! Corrected WobjGantry coords from jog data
+CONST string WELD_SEQUENCE_VERSION := "v1.9.23";  ! X/Y TCP offset support in Edge-to-Weld
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.23 (2026-02-04)
+!   - FEAT: X/Y TCP offset support in MoveGantryToWeldPosition
+!   - Offset rotation by R-axis angle: offset_floor = Rot(R) * tcp_offset
+!   - MODE2_TCP_OFFSET_R1_X/Y now applied (was only Z)
+!   - TestEdgeToWeldCalcOnly updated to v1.2 with X/Y offset logging
+!   - Formula: gantry_floor = weld_center - rotated_tcp_offset
+!
 ! v1.9.22 (2026-01-18)
 !   - FIX: Corrected WobjGantry coords from user jog data
 !   - User jog at X=-4500: wobj0 Y=110.59, Z=2026.89
