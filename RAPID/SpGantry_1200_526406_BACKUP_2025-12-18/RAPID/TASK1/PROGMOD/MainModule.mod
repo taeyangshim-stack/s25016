@@ -2583,7 +2583,7 @@ PROC TestMenu()
 		! Display menu
 		TPErase;
 		TPWrite "========================================";
-		TPWrite "  S25016 SpGantry Test Menu (v2.5.0)";
+		TPWrite "  S25016 SpGantry Test Menu (v2.6.0)";
 		TPWrite "========================================";
 		TPWrite "";
 		TPWrite "  1. Sync X1/X2 (Check + Auto-fix)";
@@ -2594,14 +2594,15 @@ PROC TestMenu()
 		TPWrite "  6. View Config";
 		TPWrite "  7. View Results";
 		TPWrite "  8. Multi-Angle Test (0/45/90/-45 deg)";
-		TPWrite "  9. Edge to Weld + Robot Move";
+		TPWrite "  9. Edge to Weld + Robot1 Move";
 		TPWrite " 10. Multi-Position Test (5 locations)";
+		TPWrite " 11. Full Weld Seq (Gantry+R1+R2 sync)";
 		TPWrite "  0. Exit";
 		TPWrite "";
 		TPWrite "----------------------------------------";
 
 		! Numeric selection
-		TPReadNum menu_sel, "Select (0-10): ";
+		TPReadNum menu_sel, "Select (0-11): ";
 
 		TEST menu_sel
 		CASE 1:
@@ -2682,13 +2683,22 @@ PROC TestMenu()
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
+		CASE 11:
+			TPErase;
+			TPWrite "[Menu] Full Weld Sequence (Gantry+R1+R2)...";
+			TPWrite "NOTE: TASK2 must be in Weld mode";
+			TestFullWeldSequence;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
 		CASE 0:
 			TPErase;
 			TPWrite "[Menu] Exiting Test Menu...";
 			menu_loop := FALSE;
 
 		DEFAULT:
-			TPWrite "[Menu] Invalid selection (0-10)";
+			TPWrite "[Menu] Invalid selection (0-11)";
 			WaitTime 1;
 		ENDTEST
 	ENDWHILE
@@ -4349,6 +4359,114 @@ PROC TestEdgeToWeldWithRobot()
 
 	TPWrite "========================================";
 	TPWrite "[TEST] Edge to Weld + Robot Complete";
+	TPWrite "========================================";
+ENDPROC
+
+! ----------------------------------------
+! Test Full Weld Sequence with Robot2 Sync (v1.9.34)
+! ----------------------------------------
+! Complete weld sequence: Gantry + Robot1 + Robot2 synchronization
+! Requires: TASK2 in mode 3 (Weld Sequence) or mode 9 (Test Menu with /sync)
+PROC TestFullWeldSequence()
+	VAR jointtarget actual_jt;
+	VAR robtarget actual_tcp;
+	VAR num wait_count;
+	VAR num max_wait := 300;  ! 30 seconds timeout (Robot2_WeldReady may take time)
+	VAR iodev logfile;
+
+	TPWrite "========================================";
+	TPWrite "[FULL] Full Weld Sequence v1.9.35";
+	TPWrite "========================================";
+
+	! Open log file
+	Open "HOME:/full_weld_sequence.txt", logfile \Write;
+	Write logfile, "Full Weld Sequence Log (v1.9.35) - " + CDate() + " " + CTime();
+	Write logfile, "";
+
+	! Step 0: Reset sync flags
+	TPWrite "[FULL] Step 0: Reset sync flags";
+	t1_weld_position_ready := FALSE;
+	t1_weld_start := FALSE;
+	t1_weld_done := FALSE;
+	t2_weld_ready := FALSE;
+	shared_bRobSwap := bRobSwap;
+	Write logfile, "Sync flags reset, shared_bRobSwap=" + ValToStr(shared_bRobSwap);
+
+	! Step 1: Check linked motor sync
+	TPWrite "[FULL] Step 1: Check linked motor sync...";
+	CheckLinkedMotorSync;
+	Write logfile, "Step 1: Linked motor sync OK";
+
+	! Step 2-3: Calculate weld position
+	TPWrite "[FULL] Step 2-3: Calculate weld position...";
+	CalcCenterFromEdges;
+	DefineWeldLine;
+	Write logfile, "Step 2-3: Weld Start=[" + NumToStr(posStart.x,1) + "," + NumToStr(posStart.y,1) + "," + NumToStr(posStart.z,1) + "]";
+	Write logfile, "         R-axis=" + NumToStr(nAngleRzStore,1) + " deg, bRobSwap=" + ValToStr(bRobSwap);
+
+	TPWrite "[RESULT] Weld Start: [" + NumToStr(posStart.x,1) + "," + NumToStr(posStart.y,1) + "]";
+	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,1) + " deg, bRobSwap=" + ValToStr(bRobSwap);
+
+	! Step 4: Move gantry
+	TPWrite "[FULL] Step 4: Move gantry...";
+	MoveGantryToWeldPosition;
+	actual_jt := CJointT();
+	Write logfile, "Step 4: Gantry X=" + NumToStr(actual_jt.extax.eax_a,1) + " Y=" + NumToStr(actual_jt.extax.eax_b,1)
+		+ " Z=" + NumToStr(actual_jt.extax.eax_c,1) + " R=" + NumToStr(actual_jt.extax.eax_d,1);
+
+	! Step 5: Move Robot1
+	TPWrite "[FULL] Step 5: Move Robot1 TCP...";
+	MoveRobotToWeldPosition;
+	UpdateGantryWobj;
+	actual_tcp := CRobT(\Tool:=tool0\WObj:=WobjGantry);
+	Write logfile, "Step 5: Robot1 TCP=[" + NumToStr(actual_tcp.trans.x,1) + "," + NumToStr(actual_tcp.trans.y,1) + "," + NumToStr(actual_tcp.trans.z,1) + "]";
+
+	! Step 6: Signal TASK2 (Robot2)
+	TPWrite "[FULL] Step 6: Signal TASK2 (t1_weld_position_ready)...";
+	t1_weld_position_ready := TRUE;
+	Write logfile, "Step 6: t1_weld_position_ready=TRUE";
+
+	! Step 7: Wait for Robot2 ready
+	TPWrite "[FULL] Step 7: Waiting for Robot2 (t2_weld_ready)...";
+	wait_count := 0;
+	WHILE NOT t2_weld_ready DO
+		WaitTime 0.1;
+		wait_count := wait_count + 1;
+		IF wait_count > max_wait THEN
+			TPWrite "[FULL] WARNING: Robot2 timeout (continue anyway)";
+			Write logfile, "Step 7: Robot2 timeout after " + NumToStr(wait_count * 0.1, 1) + "s";
+			GOTO skip_r2_wait;
+		ENDIF
+	ENDWHILE
+	TPWrite "[FULL] Robot2 ready!";
+	Write logfile, "Step 7: Robot2 ready after " + NumToStr(wait_count * 0.1, 1) + "s";
+
+skip_r2_wait:
+	! Step 8: Weld start (placeholder)
+	TPWrite "[FULL] Step 8: Weld position reached (both robots)";
+	Write logfile, "Step 8: Weld position reached";
+	Write logfile, "        (Weld start/end not implemented yet)";
+
+	! Step 9: Signal weld done
+	TPWrite "[FULL] Step 9: Signal weld done...";
+	t1_weld_done := TRUE;
+	WaitTime 1.0;  ! Let TASK2 process the signal
+	Write logfile, "Step 9: t1_weld_done=TRUE";
+
+	! Step 10: Reset flags and return
+	TPWrite "[FULL] Step 10: Reset and return home...";
+	t1_weld_position_ready := FALSE;
+	t1_weld_done := FALSE;
+	ReturnGantryToHome;
+	Write logfile, "Step 10: Flags reset, returned home";
+
+	! Close log
+	Write logfile, "";
+	Write logfile, "Full Weld Sequence completed at " + CTime();
+	Close logfile;
+
+	TPWrite "========================================";
+	TPWrite "[FULL] Full Weld Sequence Complete!";
 	TPWrite "========================================";
 ENDPROC
 

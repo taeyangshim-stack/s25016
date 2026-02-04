@@ -817,6 +817,28 @@ VAR robjoint robot2_offset_joints;
             TPWrite "TASK2: Weld Sequence mode";
             Robot2_WeldSequence;
             Write main_logfile, "Weld Sequence completed";
+        ELSEIF test_mode = 9 THEN
+            ! v1.9.24: TestMenu mode - Monitor for Full Weld Sequence sync
+            Write main_logfile, "TestMenu mode (test_mode=9) - Sync monitor enabled";
+            TPWrite "TASK2: TestMenu mode - Weld sync monitoring";
+            ! Monitor for weld sync signal from TASK1's TestFullWeldSequence (menu 11)
+            WHILE TRUE DO
+                IF t1_weld_position_ready = TRUE THEN
+                    Write main_logfile, "Weld sync detected, running Robot2_EdgeWeldSequence";
+                    TPWrite "TASK2: Weld sync detected, positioning Robot2...";
+                    Robot2_EdgeWeldSequence;
+                    Write main_logfile, "Robot2_EdgeWeldSequence completed";
+                    TPWrite "TASK2: Sequence complete";
+                    ! Wait for TASK1 to reset flag before next cycle
+                    TPWrite "TASK2: Waiting for flag reset...";
+                    WHILE t1_weld_position_ready = TRUE DO
+                        WaitTime 0.1;
+                    ENDWHILE
+                    TPWrite "TASK2: Flag reset, ready for next cycle";
+                    Write main_logfile, "Flag reset detected, resuming monitor";
+                ENDIF
+                WaitTime 0.2;
+            ENDWHILE
         ELSEIF test_mode = 10 THEN
             ! v2.1.0: PlanA-style Command Loop
             Write main_logfile, "Command Loop mode (test_mode=10)";
@@ -3187,6 +3209,8 @@ ENDPROC
 PROC Robot2_EdgeWeldSequence()
 	VAR num wait_count := 0;
 	VAR num max_wait := 200;  ! 20 seconds timeout
+	VAR robtarget weld_target;
+	VAR jointtarget safe_jt;
 
 	TPWrite "========================================";
 	TPWrite "[R2_EDGE] v2.0.0 Robot2 Edge Weld Sequence";
@@ -3210,7 +3234,7 @@ PROC Robot2_EdgeWeldSequence()
 	! Step 2: Check bRobSwap flag
 	TPWrite "[R2_EDGE] bRobSwap = " + ValToStr(shared_bRobSwap);
 
-	! Step 3: Move Robot2 to weld position
+	! Step 3: Move Robot2 to weld position (v1.9.25 - direct move, no t1_weld_start wait)
 	TPWrite "[R2_EDGE] Moving Robot2 to weld position...";
 	IF shared_bRobSwap = TRUE THEN
 		TPWrite "[R2_EDGE] Using SWAPPED position (bRobSwap=TRUE)";
@@ -3218,9 +3242,44 @@ PROC Robot2_EdgeWeldSequence()
 		! TODO: Implement swapped position logic
 	ELSE
 		TPWrite "[R2_EDGE] Using NORMAL position (bRobSwap=FALSE)";
-		! Normal position - Robot2 on its designated side
-		! Use existing Robot2_WeldReady logic
-		Robot2_WeldReady;
+
+		! Step 3a: Move to safe JOINT position first
+		safe_jt := CJointT();
+		safe_jt.robax.rax_1 := 0;
+		safe_jt.robax.rax_2 := -10;
+		safe_jt.robax.rax_3 := -50;
+		safe_jt.robax.rax_4 := 0;
+		safe_jt.robax.rax_5 := -30;
+		safe_jt.robax.rax_6 := 0;
+		safe_jt.extax.eax_a := 9E9;
+		safe_jt.extax.eax_b := 9E9;
+		safe_jt.extax.eax_c := 9E9;
+		safe_jt.extax.eax_d := 9E9;
+		safe_jt.extax.eax_e := 9E9;
+		safe_jt.extax.eax_f := 9E9;
+		TPWrite "[R2_EDGE] Step3a: MoveAbsJ to safe joints";
+		MoveAbsJ safe_jt, v100, fine, tool0;
+
+		! Step 3b: Move to wobj0 target position
+		weld_target.trans.x := 0;
+		weld_target.trans.y := 118;
+		weld_target.trans.z := -1300;
+		weld_target.rot.q1 := WELD_R2_ORIENT_Q1;
+		weld_target.rot.q2 := WELD_R2_ORIENT_Q2;
+		weld_target.rot.q3 := WELD_R2_ORIENT_Q3;
+		weld_target.rot.q4 := WELD_R2_ORIENT_Q4;
+		weld_target.robconf.cf1 := 0;
+		weld_target.robconf.cf4 := 0;
+		weld_target.robconf.cf6 := 0;
+		weld_target.robconf.cfx := 0;
+		weld_target.extax.eax_a := 9E9;
+		weld_target.extax.eax_b := 9E9;
+		weld_target.extax.eax_c := 9E9;
+		weld_target.extax.eax_d := 9E9;
+		weld_target.extax.eax_e := 9E9;
+		weld_target.extax.eax_f := 9E9;
+		TPWrite "[R2_EDGE] Step3b: MoveJ to wobj0 [0, 118, -1300]";
+		MoveJ weld_target, v100, fine, tool0\WObj:=wobj0;
 	ENDIF
 
 	! Step 4: Signal ready

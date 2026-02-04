@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.33";
-CONST string TASK2_VERSION := "v1.9.22";
+CONST string TASK1_VERSION := "v1.9.35";
+CONST string TASK2_VERSION := "v1.9.25";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -39,11 +39,42 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.33";  ! Z offset order fix
+CONST string WELD_SEQUENCE_VERSION := "v1.9.35";  ! Increased R2 wait timeout
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.35 (2026-02-04)
+!   - FIX: Robot2 wait timeout increased from 10s to 30s
+!   - Robot2_WeldReady execution time may exceed 10 seconds
+!   - Prevents premature timeout during weld sequence sync
+!
+! TASK2 v1.9.25 (2026-02-04)
+!   - FIX: Robot2_EdgeWeldSequence now moves directly (no t1_weld_start wait)
+!   - Robot2_WeldReady was waiting for t1_weld_start which TASK1 never sets
+!   - Direct move: MoveAbsJ safe joints, then MoveJ wobj0 [0,118,-1300]
+!   - Eliminates deadlock between TASK1 and TASK2
+!
+! TASK2 v1.9.24 (2026-02-04)
+!   - FIX: Wait for flag reset after EdgeWeldSequence completes
+!   - Prevents duplicate Robot2_EdgeWeldSequence calls
+!   - Waits for t1_weld_position_ready=FALSE before resuming monitor
+!
+! TASK2 v1.9.23 (2026-02-04)
+!   - FEAT: TestMenu mode (mode=9) now monitors weld sync signals
+!   - When t1_weld_position_ready=TRUE, runs Robot2_EdgeWeldSequence
+!   - Enables TestFullWeldSequence (menu 11) to work without config change
+!   - Continuous monitoring loop with 200ms interval
+!
+! v1.9.34 (2026-02-04)
+!   - FEAT: TestFullWeldSequence - Complete weld with Robot2 sync
+!   - TASK1 signals t1_weld_position_ready after Gantry+Robot1 move
+!   - TASK1 waits for t2_weld_ready from Robot2 (TASK2)
+!   - TASK1 signals t1_weld_done after weld complete
+!   - shared_bRobSwap passed to TASK2 for position adjustment
+!   - TestMenu updated to v2.6.0 (option 11 added)
+!   - Logs to HOME:/full_weld_sequence.txt
+!
 ! v1.9.33 (2026-02-04)
 !   - FIX: MoveGantryToWeldPosition - Z offset order bug
 !   - TCP Z offset now applied in Floor coords BEFORE FloorToPhysical
