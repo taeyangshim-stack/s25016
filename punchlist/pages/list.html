@@ -754,19 +754,26 @@
             color: #6b7280;
         }
 
-        /* ID/제목 컬럼 - 2줄 레이아웃 */
-        .issue-cell {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding: 12px 16px !important;
+        /* ID 컬럼 */
+        .issue-id-cell {
+            padding: 12px 8px !important;
+            vertical-align: middle;
         }
 
         .issue-id {
             font-family: 'Consolas', monospace;
-            font-size: 11px;
-            color: #6b7280;
+            font-size: 12px;
+            color: #374151;
             font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* 제목 컬럼 */
+        .issue-title-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 12px 16px !important;
         }
 
         .issue-title {
@@ -1157,7 +1164,8 @@
                     <thead>
                         <tr>
                             <th onclick="sortBy('priority')" style="width: 80px; text-align: center;">우선순위 <span class="sort-icon">↕️</span></th>
-                            <th onclick="sortBy('title')" style="min-width: 280px;">ID · 제목 <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('id')" style="width: 120px;">ID <span class="sort-icon">↕️</span></th>
+                            <th onclick="sortBy('title')" style="min-width: 200px;">제목 <span class="sort-icon">↕️</span></th>
                             <th onclick="sortBy('line_classification')" style="width: 140px;">라인 · 분류 <span class="sort-icon">↕️</span></th>
                             <th onclick="sortBy('status')" style="width: 100px;">상태 <span class="sort-icon">↕️</span></th>
                             <th onclick="sortBy('owner')" style="width: 100px;">담당자 <span class="sort-icon">↕️</span></th>
@@ -1168,7 +1176,7 @@
                     </thead>
                     <tbody id="issueTableBody">
                         <tr>
-                            <td colspan="8" class="loading">
+                            <td colspan="9" class="loading">
                                 ⏳ 데이터를 불러오는 중...
                             </td>
                         </tr>
@@ -1768,7 +1776,7 @@
 
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" class="empty-state">
+                        <td colspan="9" class="empty-state">
                             <div class="empty-state-icon">📭</div>
                             <p>검색 결과가 없습니다.</p>
                         </td>
@@ -1831,8 +1839,10 @@
                                 <span class="priority-text">${issue.priority}</span>
                             </div>
                         </td>
-                        <td class="issue-cell">
-                            <div class="issue-id">${issue.id}</div>
+                        <td class="issue-id-cell">
+                            <span class="issue-id">${issue.id}</span>
+                        </td>
+                        <td class="issue-title-cell">
                             <div class="issue-title">${issue.title}</div>
                             <div class="issue-tags">
                                 ${issue.category ? `<span class="tag">${issue.category}</span>` : ''}
