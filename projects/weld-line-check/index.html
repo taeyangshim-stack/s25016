@@ -215,6 +215,111 @@
     .batch-summary.has-fail { background: linear-gradient(135deg, #fadbd8, #f5b7b1); color: var(--fail); }
     .clickable-row { cursor: pointer; }
     .clickable-row:hover { background: #e3f2fd !important; }
+
+    /* 좌표 표시 */
+    .coord-cell {
+      font-family: 'Consolas', monospace;
+      font-size: 9px;
+      color: #64748b;
+      white-space: nowrap;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .coord-cell .line-label {
+      font-weight: 600;
+      color: #374151;
+    }
+    .coord-cell .line1-label { color: var(--line1); }
+    .coord-cell .line2-label { color: var(--line2); }
+
+    /* FAIL 강조 */
+    .batch-table .fail-highlight {
+      background: #fee2e2 !important;
+      animation: pulse-fail 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-fail {
+      0%, 100% { background: #fee2e2; }
+      50% { background: #fecaca; }
+    }
+    .batch-table .fail-cell {
+      color: var(--fail);
+      font-weight: 700;
+      background: #fef2f2;
+      position: relative;
+    }
+    .batch-table .fail-cell::after {
+      content: '⚠';
+      margin-left: 3px;
+      font-size: 10px;
+    }
+
+    /* 수학적 설명 섹션 */
+    .math-section {
+      margin-top: 16px;
+      display: none;
+    }
+    .math-section.visible { display: block; }
+    .math-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .math-tab {
+      padding: 6px 12px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .math-tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .math-content {
+      background: #fafbfc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .math-content h3 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--accent);
+    }
+    .math-formula {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'Times New Roman', serif;
+      font-size: 14px;
+      margin: 10px 0;
+      text-align: center;
+    }
+    .math-formula .var { font-style: italic; color: #2563eb; }
+    .math-formula .func { color: #7c3aed; }
+    .math-desc {
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+    .math-desc ul { margin: 8px 0; padding-left: 20px; }
+    .math-desc li { margin: 4px 0; }
+    .math-condition {
+      background: #ecfdf5;
+      border-left: 3px solid var(--pass);
+      padding: 8px 12px;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+    .math-condition.fail-cond {
+      background: #fef2f2;
+      border-color: var(--fail);
+    }
   </style>
 </head>
 <body>
@@ -224,6 +329,7 @@
     <div style="margin-top: 8px;">
       <button onclick="toggleMode('manual')" id="modeManual" class="mode-btn active">수동 입력</button>
       <button onclick="toggleMode('batch')" id="modeBatch" class="mode-btn">로그 일괄 검사</button>
+      <button onclick="toggleMode('math')" id="modeMath" class="mode-btn">수학적 설명</button>
     </div>
   </header>
 
@@ -250,6 +356,21 @@
         <span class="parse-info" id="parseInfo"></span>
       </div>
       <div id="batchResults" class="batch-results"></div>
+    </div>
+
+    <!-- 수학적 설명 섹션 -->
+    <div id="mathSection" class="panel math-section">
+      <h2>검사 방법 수학적 설명</h2>
+      <div class="math-tabs">
+        <div class="math-tab active" onclick="showMathTab('cross')">1. 교차 검사</div>
+        <div class="math-tab" onclick="showMathTab('dir')">2. 방향 검사</div>
+        <div class="math-tab" onclick="showMathTab('len')">3. 길이 검사</div>
+        <div class="math-tab" onclick="showMathTab('angle')">4. 각도 검사</div>
+        <div class="math-tab" onclick="showMathTab('dist')">5. 거리 검사</div>
+        <div class="math-tab" onclick="showMathTab('startOff')">6. 시작점 검사</div>
+        <div class="math-tab" onclick="showMathTab('endOff')">7. 끝점 검사</div>
+      </div>
+      <div id="mathContent" class="math-content"></div>
     </div>
 
     <!-- 수동 입력 섹션 -->
@@ -942,24 +1063,36 @@
       const manual = document.getElementById('manualSection');
       const mainArea = document.querySelector('.main-area');
       const batch = document.getElementById('batchSection');
+      const math = document.getElementById('mathSection');
       const codeSection = document.querySelector('.code-section');
       const btnManual = document.getElementById('modeManual');
       const btnBatch = document.getElementById('modeBatch');
+      const btnMath = document.getElementById('modeMath');
+
+      // 모든 버튼 비활성화
+      btnManual.classList.remove('active');
+      btnBatch.classList.remove('active');
+      btnMath.classList.remove('active');
+
+      // 모든 섹션 숨기기
+      manual.style.display = 'none';
+      mainArea.style.display = 'none';
+      codeSection.style.display = 'none';
+      batch.classList.remove('visible');
+      math.classList.remove('visible');
 
       if (mode === 'batch') {
-        manual.style.display = 'none';
-        mainArea.style.display = 'none';
-        codeSection.style.display = 'none';
         batch.classList.add('visible');
-        btnManual.classList.remove('active');
         btnBatch.classList.add('active');
+      } else if (mode === 'math') {
+        math.classList.add('visible');
+        btnMath.classList.add('active');
+        showMathTab('cross'); // 기본 탭
       } else {
         manual.style.display = 'block';
         mainArea.style.display = 'grid';
         codeSection.style.display = 'block';
-        batch.classList.remove('visible');
         btnManual.classList.add('active');
-        btnBatch.classList.remove('active');
       }
     }
 
@@ -1075,15 +1208,16 @@
           <thead>
             <tr>
               <th>#</th>
-              <th>WeldLine ID</th>
-              <th>Gantry</th>
+              <th>ID</th>
+              <th>선1 좌표 (S→E)</th>
+              <th>선2 좌표 (S→E)</th>
               <th>교차</th>
               <th>방향</th>
-              <th>길이 (mm)</th>
-              <th>각도 (°)</th>
-              <th>거리 (mm)</th>
-              <th>시작점 (mm)</th>
-              <th>끝점 (mm)</th>
+              <th>길이차</th>
+              <th>각도차</th>
+              <th>거리</th>
+              <th>시작점</th>
+              <th>끝점</th>
               <th>결과</th>
             </tr>
           </thead>
@@ -1091,25 +1225,62 @@
       `;
 
       results.forEach((r, idx) => {
-        const rowClass = r.allOK ? 'row-pass' : 'row-fail';
+        const rowClass = r.allOK ? 'row-pass' : 'row-fail fail-highlight';
+        const failItems = [];
+        if (!r.crossOK) failItems.push('교차');
+        if (!r.dirOK) failItems.push('방향');
+        if (!r.lenOK) failItems.push('길이');
+        if (!r.angleOK) failItems.push('각도');
+        if (!r.distOK) failItems.push('거리');
+        if (!r.startOffOK) failItems.push('시작점');
+        if (!r.endOffOK) failItems.push('끝점');
+
         html += `
-          <tr class="${rowClass} clickable-row" onclick="loadWeldLine(${idx})" title="클릭하여 상세 보기">
+          <tr class="${rowClass} clickable-row" onclick="loadWeldLine(${idx})" title="클릭하여 상세 보기${failItems.length ? ' | FAIL: ' + failItems.join(', ') : ''}">
             <td>${idx + 1}</td>
-            <td><strong>${r.weldLineId}</strong></td>
-            <td>G${r.gantryId}</td>
-            <td class="${r.crossOK ? 'pass' : 'fail'}">${r.crossOK ? '✓' : '✗'}</td>
-            <td class="${r.dirOK ? 'pass' : 'fail'}">${r.dirOK ? '✓' : '✗'}</td>
-            <td class="${r.lenOK ? 'pass' : 'fail'}">${r.lenDiff.toFixed(1)}</td>
-            <td class="${r.angleOK ? 'pass' : 'fail'}">${r.angleDiff.toFixed(2)}</td>
-            <td class="${r.distOK ? 'pass' : 'fail'}">${r.distVal.toFixed(1)}</td>
-            <td class="${r.startOffOK ? 'pass' : 'fail'}">${r.startOffDist.toFixed(1)}</td>
-            <td class="${r.endOffOK ? 'pass' : 'fail'}">${r.endOffDist.toFixed(1)}</td>
-            <td class="${r.allOK ? 'pass' : 'fail'}"><strong>${r.allOK ? 'PASS' : 'FAIL'}</strong></td>
+            <td><strong>W${r.weldLineId}</strong><br><small style="color:#64748b">G${r.gantryId}</small></td>
+            <td class="coord-cell">
+              <span class="line-label line1-label">S:</span> (${r.coords.s1x.toFixed(0)}, ${r.coords.s1y.toFixed(0)})<br>
+              <span class="line-label line1-label">E:</span> (${r.coords.e1x.toFixed(0)}, ${r.coords.e1y.toFixed(0)})
+            </td>
+            <td class="coord-cell">
+              <span class="line-label line2-label">S:</span> (${r.coords.s2x.toFixed(0)}, ${r.coords.s2y.toFixed(0)})<br>
+              <span class="line-label line2-label">E:</span> (${r.coords.e2x.toFixed(0)}, ${r.coords.e2y.toFixed(0)})
+            </td>
+            <td class="${r.crossOK ? 'pass' : 'fail-cell'}">${r.crossOK ? '✓' : '✗'}</td>
+            <td class="${r.dirOK ? 'pass' : 'fail-cell'}">${r.dirOK ? '✓' : '✗'}</td>
+            <td class="${r.lenOK ? 'pass' : 'fail-cell'}">${r.lenDiff.toFixed(1)}</td>
+            <td class="${r.angleOK ? 'pass' : 'fail-cell'}">${r.angleDiff.toFixed(2)}°</td>
+            <td class="${r.distOK ? 'pass' : 'fail-cell'}">${r.distVal.toFixed(1)}</td>
+            <td class="${r.startOffOK ? 'pass' : 'fail-cell'}">${r.startOffDist.toFixed(1)}</td>
+            <td class="${r.endOffOK ? 'pass' : 'fail-cell'}">${r.endOffDist.toFixed(1)}</td>
+            <td class="${r.allOK ? 'pass' : 'fail'}"><strong>${r.allOK ? '✅PASS' : '❌FAIL'}</strong></td>
           </tr>
         `;
       });
 
       html += `</tbody></table>`;
+
+      // 실패 항목 상세 요약
+      if (failCount > 0) {
+        const failDetails = results.filter(r => !r.allOK).map(r => {
+          const items = [];
+          if (!r.crossOK) items.push('교차');
+          if (!r.dirOK) items.push('방향');
+          if (!r.lenOK) items.push(`길이(${r.lenDiff.toFixed(1)}mm)`);
+          if (!r.angleOK) items.push(`각도(${r.angleDiff.toFixed(1)}°)`);
+          if (!r.distOK) items.push(`거리(${r.distVal.toFixed(1)}mm)`);
+          if (!r.startOffOK) items.push(`시작점(${r.startOffDist.toFixed(1)}mm)`);
+          if (!r.endOffOK) items.push(`끝점(${r.endOffDist.toFixed(1)}mm)`);
+          return `W${r.weldLineId}: ${items.join(', ')}`;
+        });
+        html += `
+          <div style="margin-top: 12px; padding: 10px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; font-size: 11px;">
+            <strong style="color: var(--fail);">⚠ 불합격 상세:</strong>
+            <ul style="margin: 6px 0 0 16px; padding: 0;">${failDetails.map(d => `<li>${d}</li>`).join('')}</ul>
+          </div>
+        `;
+      }
 
       html += `
         <div class="batch-summary ${failCount === 0 ? 'all-pass' : 'has-fail'}">
@@ -1157,6 +1328,186 @@
       document.getElementById('logInput').value = '';
       document.getElementById('batchResults').innerHTML = '';
       document.getElementById('parseInfo').textContent = '';
+    }
+
+    // === 수학적 설명 ===
+    const mathExplanations = {
+      cross: {
+        title: '1. 교차 검사 (CCW Algorithm)',
+        content: `
+          <h3>CCW (Counter-Clockwise) 알고리즘</h3>
+          <p class="math-desc">세 점 A, B, C가 주어졌을 때, 이들의 방향(시계/반시계)을 외적(Cross Product)으로 판별합니다.</p>
+          <div class="math-formula">
+            <span class="func">CCW</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">C</span>) = (<span class="var">B<sub>x</sub></span> - <span class="var">A<sub>x</sub></span>) × (<span class="var">C<sub>y</sub></span> - <span class="var">A<sub>y</sub></span>) - (<span class="var">B<sub>y</sub></span> - <span class="var">A<sub>y</sub></span>) × (<span class="var">C<sub>x</sub></span> - <span class="var">A<sub>x</sub></span>)
+          </div>
+          <div class="math-desc">
+            <strong>결과 해석:</strong>
+            <ul>
+              <li><strong>CCW > 0</strong>: 반시계 방향 (왼쪽)</li>
+              <li><strong>CCW < 0</strong>: 시계 방향 (오른쪽)</li>
+              <li><strong>CCW = 0</strong>: 일직선 (collinear)</li>
+            </ul>
+          </div>
+          <div class="math-formula">
+            <strong>교차 조건:</strong> (<span class="func">CCW</span>(S1,E1,S2) × <span class="func">CCW</span>(S1,E1,E2) < 0) AND (<span class="func">CCW</span>(S2,E2,S1) × <span class="func">CCW</span>(S2,E2,E1) < 0)
+          </div>
+          <div class="math-condition">
+            <strong>PASS 조건:</strong> 두 선분이 교차하지 않음 (isCrossing = false)
+          </div>
+          <div class="math-condition fail-cond">
+            <strong>FAIL 조건:</strong> 두 선분이 교차함 → 용접선이 서로 겹침
+          </div>
+        `
+      },
+      dir: {
+        title: '2. 방향 검사 (Dot Product)',
+        content: `
+          <h3>내적 (Dot Product) 기반 방향 판별</h3>
+          <p class="math-desc">두 벡터의 내적 부호로 같은 방향인지 판별합니다.</p>
+          <div class="math-formula">
+            <span class="var">v⃗₁</span> = (<span class="var">E1<sub>x</sub></span> - <span class="var">S1<sub>x</sub></span>, <span class="var">E1<sub>y</sub></span> - <span class="var">S1<sub>y</sub></span>)<br><br>
+            <span class="var">v⃗₂</span> = (<span class="var">E2<sub>x</sub></span> - <span class="var">S2<sub>x</sub></span>, <span class="var">E2<sub>y</sub></span> - <span class="var">S2<sub>y</sub></span>)
+          </div>
+          <div class="math-formula">
+            <span class="var">dot</span> = <span class="var">v⃗₁</span> · <span class="var">v⃗₂</span> = <span class="var">v1<sub>x</sub></span> × <span class="var">v2<sub>x</sub></span> + <span class="var">v1<sub>y</sub></span> × <span class="var">v2<sub>y</sub></span> = |<span class="var">v⃗₁</span>| × |<span class="var">v⃗₂</span>| × cos(<span class="var">θ</span>)
+          </div>
+          <div class="math-desc">
+            <strong>결과 해석:</strong>
+            <ul>
+              <li><strong>dot > 0</strong>: 같은 방향 (0° ~ 90°)</li>
+              <li><strong>dot = 0</strong>: 직각 (90°)</li>
+              <li><strong>dot < 0</strong>: 반대 방향 (90° ~ 180°)</li>
+            </ul>
+          </div>
+          <div class="math-condition">
+            <strong>PASS 조건:</strong> dot > 0 (두 용접선이 같은 방향)
+          </div>
+          <div class="math-condition fail-cond">
+            <strong>FAIL 조건:</strong> dot ≤ 0 → 용접선 방향이 반대 또는 직각
+          </div>
+        `
+      },
+      len: {
+        title: '3. 길이 검사 (Length Difference)',
+        content: `
+          <h3>유클리드 거리 기반 길이 비교</h3>
+          <p class="math-desc">각 선분의 길이를 계산하고 그 차이가 임계값 이내인지 확인합니다.</p>
+          <div class="math-formula">
+            <span class="var">L₁</span> = √[(<span class="var">E1<sub>x</sub></span> - <span class="var">S1<sub>x</sub></span>)² + (<span class="var">E1<sub>y</sub></span> - <span class="var">S1<sub>y</sub></span>)²]
+          </div>
+          <div class="math-formula">
+            <span class="var">L₂</span> = √[(<span class="var">E2<sub>x</sub></span> - <span class="var">S2<sub>x</sub></span>)² + (<span class="var">E2<sub>y</sub></span> - <span class="var">S2<sub>y</sub></span>)²]
+          </div>
+          <div class="math-formula">
+            <span class="var">diff</span> = |<span class="var">L₁</span> - <span class="var">L₂</span>|
+          </div>
+          <div class="math-condition">
+            <strong>PASS 조건:</strong> diff ≤ threshold (기본값: 20mm)
+          </div>
+          <div class="math-condition fail-cond">
+            <strong>FAIL 조건:</strong> diff > threshold → 두 용접선의 길이 차이가 너무 큼
+          </div>
+        `
+      },
+      angle: {
+        title: '4. 각도 검사 (Angle Difference)',
+        content: `
+          <h3>아크탄젠트 기반 각도 비교</h3>
+          <p class="math-desc">각 선분의 기울기 각도를 계산하고 차이가 임계값 이내인지 확인합니다.</p>
+          <div class="math-formula">
+            <span class="var">θ₁</span> = <span class="func">atan2</span>(<span class="var">E1<sub>y</sub></span> - <span class="var">S1<sub>y</sub></span>, <span class="var">E1<sub>x</sub></span> - <span class="var">S1<sub>x</sub></span>) × 180° / π
+          </div>
+          <div class="math-formula">
+            <span class="var">θ₂</span> = <span class="func">atan2</span>(<span class="var">E2<sub>y</sub></span> - <span class="var">S2<sub>y</sub></span>, <span class="var">E2<sub>x</sub></span> - <span class="var">S2<sub>x</sub></span>) × 180° / π
+          </div>
+          <div class="math-formula">
+            <span class="var">diff</span> = |<span class="var">θ₁</span> - <span class="var">θ₂</span>| (단, diff > 180° 이면 diff = 360° - diff)
+          </div>
+          <div class="math-desc">
+            <strong>atan2 함수:</strong> 4사분면 전체에서 정확한 각도(-180° ~ 180°)를 반환합니다.
+          </div>
+          <div class="math-condition">
+            <strong>PASS 조건:</strong> diff ≤ threshold (기본값: 5°)
+          </div>
+          <div class="math-condition fail-cond">
+            <strong>FAIL 조건:</strong> diff > threshold → 두 용접선의 각도 차이가 너무 큼
+          </div>
+        `
+      },
+      dist: {
+        title: '5. 거리 검사 (Point-to-Segment Distance)',
+        content: `
+          <h3>점-선분 최단거리 (수선의 발)</h3>
+          <p class="math-desc">선분1의 중점에서 선분2까지의 최단 거리를 계산합니다.</p>
+          <div class="math-formula">
+            <span class="var">M₁</span> = ((<span class="var">S1<sub>x</sub></span> + <span class="var">E1<sub>x</sub></span>) / 2, (<span class="var">S1<sub>y</sub></span> + <span class="var">E1<sub>y</sub></span>) / 2) &nbsp; (선분1 중점)
+          </div>
+          <div class="math-formula">
+            <span class="var">t</span> = <span class="func">clamp</span>(0, 1, [(<span class="var">M₁</span> - <span class="var">S2</span>) · (<span class="var">E2</span> - <span class="var">S2</span>)] / |<span class="var">E2</span> - <span class="var">S2</span>|²)
+          </div>
+          <div class="math-formula">
+            <span class="var">P</span> = <span class="var">S2</span> + <span class="var">t</span> × (<span class="var">E2</span> - <span class="var">S2</span>) &nbsp; (선분2 위의 최근접점)
+          </div>
+          <div class="math-formula">
+            <span class="var">dist</span> = |<span class="var">M₁</span> - <span class="var">P</span>|
+          </div>
+          <div class="math-desc">
+            <strong>t 값:</strong> 투영 계수로, 0~1 범위로 클램핑하여 선분 내부의 점만 고려합니다.
+          </div>
+          <div class="math-condition">
+            <strong>PASS 조건:</strong> dist ≤ threshold (기본값: 20mm)
+          </div>
+          <div class="math-condition fail-cond">
+            <strong>FAIL 조건:</strong> dist > threshold → 두 용접선 사이 거리가 너무 멂
+          </div>
+        `
+      },
+      startOff: {
+        title: '6. 시작점 변위 검사 (Start Point Offset)',
+        content: `
+          <h3>시작점 간 유클리드 거리</h3>
+          <p class="math-desc">두 용접선의 시작점 간 거리가 임계값 이내인지 확인합니다. 평행 이동된 선분을 검출합니다.</p>
+          <div class="math-formula">
+            <span class="var">dist</span> = √[(<span class="var">S2<sub>x</sub></span> - <span class="var">S1<sub>x</sub></span>)² + (<span class="var">S2<sub>y</sub></span> - <span class="var">S1<sub>y</sub></span>)²]
+          </div>
+          <div class="math-desc">
+            <strong>목적:</strong> 쌍둥이 로봇의 용접선 시작점이 설계 간격(12mm 등) 내에 있는지 확인
+          </div>
+          <div class="math-condition">
+            <strong>PASS 조건:</strong> dist ≤ threshold (기본값: 20mm)
+          </div>
+          <div class="math-condition fail-cond">
+            <strong>FAIL 조건:</strong> dist > threshold → 시작점 위치가 비정상적으로 떨어져 있음
+          </div>
+        `
+      },
+      endOff: {
+        title: '7. 끝점 변위 검사 (End Point Offset)',
+        content: `
+          <h3>끝점 간 유클리드 거리</h3>
+          <p class="math-desc">두 용접선의 끝점 간 거리가 임계값 이내인지 확인합니다.</p>
+          <div class="math-formula">
+            <span class="var">dist</span> = √[(<span class="var">E2<sub>x</sub></span> - <span class="var">E1<sub>x</sub></span>)² + (<span class="var">E2<sub>y</sub></span> - <span class="var">E1<sub>y</sub></span>)²]
+          </div>
+          <div class="math-desc">
+            <strong>목적:</strong> 쌍둥이 로봇의 용접선 끝점이 설계 간격(12mm 등) 내에 있는지 확인
+          </div>
+          <div class="math-condition">
+            <strong>PASS 조건:</strong> dist ≤ threshold (기본값: 20mm)
+          </div>
+          <div class="math-condition fail-cond">
+            <strong>FAIL 조건:</strong> dist > threshold → 끝점 위치가 비정상적으로 떨어져 있음
+          </div>
+        `
+      }
+    };
+
+    function showMathTab(type) {
+      document.querySelectorAll('.math-tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const exp = mathExplanations[type];
+      document.getElementById('mathContent').innerHTML = exp.content;
     }
   </script>
 </body>
