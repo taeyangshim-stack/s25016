@@ -142,16 +142,118 @@
     .number { color: #e67e22; }
     .comment { color: #7f8c8d; }
     .method { color: #16a085; }
+
+    /* 모드 버튼 */
+    .mode-btn {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #f8f9fa;
+      font-size: 12px;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* 일괄 검사 섹션 */
+    .batch-section { display: none; }
+    .batch-section.visible { display: block; }
+    .log-textarea {
+      width: 100%;
+      height: 200px;
+      font-family: 'Consolas', monospace;
+      font-size: 11px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      resize: vertical;
+    }
+    .batch-controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      align-items: center;
+    }
+    .parse-info { font-size: 11px; color: var(--muted); }
+    .batch-results {
+      margin-top: 16px;
+      overflow-x: auto;
+    }
+    .batch-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    .batch-table th, .batch-table td {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .batch-table th {
+      background: #f5f7fa;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+    .batch-table tr:hover { background: #f8f9fa; }
+    .batch-table .pass { color: var(--pass); font-weight: 600; }
+    .batch-table .fail { color: var(--fail); font-weight: 600; }
+    .batch-table .row-pass { background: #e8f8f0; }
+    .batch-table .row-fail { background: #fdf2f2; }
+    .batch-summary {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .batch-summary.all-pass { background: linear-gradient(135deg, #d4efdf, #a9dfbf); color: var(--pass); }
+    .batch-summary.has-fail { background: linear-gradient(135deg, #fadbd8, #f5b7b1); color: var(--fail); }
+    .clickable-row { cursor: pointer; }
+    .clickable-row:hover { background: #e3f2fd !important; }
   </style>
 </head>
 <body>
   <header>
     <h1>용접선 건전성 검증</h1>
     <div class="subtitle">교차 + 방향 + 길이 + 각도 + 거리 + 시작점 + 끝점 검사 (7항목)</div>
+    <div style="margin-top: 8px;">
+      <button onclick="toggleMode('manual')" id="modeManual" class="mode-btn active">수동 입력</button>
+      <button onclick="toggleMode('batch')" id="modeBatch" class="mode-btn">로그 일괄 검사</button>
+    </div>
   </header>
 
   <main>
-    <div class="panel">
+    <!-- 일괄 검사 섹션 -->
+    <div id="batchSection" class="panel batch-section">
+      <h2>gRPC 로그 일괄 검사</h2>
+      <p style="font-size: 11px; color: var(--muted); margin-bottom: 10px;">
+        GantryRobotControllerService 로그를 붙여넣으면 RequestWeldingOperationStart 요청에서 용접선 데이터를 추출하여 일괄 건전성 검사를 진행합니다.
+      </p>
+      <textarea id="logInput" class="log-textarea" placeholder="로그를 여기에 붙여넣으세요...
+
+예시:
+2026-02-03 08:10:24 INFO - [GantryRobotControllerServiceImpl.RequestWeldingOperationStart()] ENTERED. { &quot;request&quot;: {...}, &quot;weldJobs&quot;: [...] }"></textarea>
+      <div class="batch-controls">
+        <div class="settings-box" style="flex-direction: row; gap: 12px; padding: 8px 12px;">
+          <div class="setting-row">길이 <input type="number" id="batchLenThreshold" value="20" min="0">mm</div>
+          <div class="setting-row">각도 <input type="number" id="batchAngleThreshold" value="5" min="0">°</div>
+          <div class="setting-row">거리 <input type="number" id="batchDistThreshold" value="20" min="0">mm</div>
+          <div class="setting-row">변위 <input type="number" id="batchOffsetThreshold" value="20" min="0">mm</div>
+        </div>
+        <button class="primary" onclick="parseLogs()">파싱 & 검사</button>
+        <button onclick="clearLogs()">초기화</button>
+        <span class="parse-info" id="parseInfo"></span>
+      </div>
+      <div id="batchResults" class="batch-results"></div>
+    </div>
+
+    <!-- 수동 입력 섹션 -->
+    <div id="manualSection" class="panel">
       <h2>좌표 입력 & 검사 설정</h2>
       <div class="input-row">
         <div class="line-group line1">
@@ -834,6 +936,228 @@
     });
 
     window.addEventListener('resize', runValidation);
+
+    // === 모드 전환 ===
+    function toggleMode(mode) {
+      const manual = document.getElementById('manualSection');
+      const mainArea = document.querySelector('.main-area');
+      const batch = document.getElementById('batchSection');
+      const codeSection = document.querySelector('.code-section');
+      const btnManual = document.getElementById('modeManual');
+      const btnBatch = document.getElementById('modeBatch');
+
+      if (mode === 'batch') {
+        manual.style.display = 'none';
+        mainArea.style.display = 'none';
+        codeSection.style.display = 'none';
+        batch.classList.add('visible');
+        btnManual.classList.remove('active');
+        btnBatch.classList.add('active');
+      } else {
+        manual.style.display = 'block';
+        mainArea.style.display = 'grid';
+        codeSection.style.display = 'block';
+        batch.classList.remove('visible');
+        btnManual.classList.add('active');
+        btnBatch.classList.remove('active');
+      }
+    }
+
+    // === 로그 파싱 ===
+    function parseLogs() {
+      const logText = document.getElementById('logInput').value;
+      const lines = logText.split('\n');
+      const weldLinePairs = [];
+
+      // RequestWeldingOperationStart 로그에서 JSON 추출
+      for (const line of lines) {
+        if (line.includes('RequestWeldingOperationStart') && line.includes('ENTERED')) {
+          const jsonStart = line.indexOf('{');
+          if (jsonStart === -1) continue;
+
+          try {
+            const jsonStr = line.substring(jsonStart);
+            const data = JSON.parse(jsonStr);
+
+            if (data.weldJobs && Array.isArray(data.weldJobs)) {
+              // Robot 1, 2 쌍 찾기
+              const robot1 = data.weldJobs.find(j => j.targetRobotId === 1);
+              const robot2 = data.weldJobs.find(j => j.targetRobotId === 2);
+
+              if (robot1 && robot2 && robot1.weldLine && robot2.weldLine) {
+                weldLinePairs.push({
+                  weldLineId: robot1.weldLine.weldLineId,
+                  gantryId: robot1.weldLine.gantryId,
+                  macroNumber: robot1.weldLine.macroNumber,
+                  line1: {
+                    start: robot1.weldLine.startPointPosition,
+                    end: robot1.weldLine.endPointPosition,
+                    length: robot1.weldLine.length
+                  },
+                  line2: {
+                    start: robot2.weldLine.startPointPosition,
+                    end: robot2.weldLine.endPointPosition,
+                    length: robot2.weldLine.length
+                  }
+                });
+              }
+            }
+          } catch (e) {
+            console.warn('JSON 파싱 오류:', e);
+          }
+        }
+      }
+
+      document.getElementById('parseInfo').textContent = `${weldLinePairs.length}개 용접선 쌍 추출`;
+
+      if (weldLinePairs.length === 0) {
+        document.getElementById('batchResults').innerHTML = `
+          <div style="padding: 20px; text-align: center; color: var(--muted);">
+            용접선 데이터를 찾을 수 없습니다.<br>
+            RequestWeldingOperationStart 로그가 포함되어 있는지 확인하세요.
+          </div>
+        `;
+        return;
+      }
+
+      // 일괄 검증 실행
+      runBatchValidation(weldLinePairs);
+    }
+
+    function runBatchValidation(pairs) {
+      const lenThreshold = parseFloat(document.getElementById('batchLenThreshold').value) || 20;
+      const angleThreshold = parseFloat(document.getElementById('batchAngleThreshold').value) || 5;
+      const distThreshold = parseFloat(document.getElementById('batchDistThreshold').value) || 20;
+      const offsetThreshold = parseFloat(document.getElementById('batchOffsetThreshold').value) || 20;
+
+      const results = pairs.map(pair => {
+        const l1 = pair.line1, l2 = pair.line2;
+        const s1x = l1.start.x, s1y = l1.start.y;
+        const e1x = l1.end.x, e1y = l1.end.y;
+        const s2x = l2.start.x, s2y = l2.start.y;
+        const e2x = l2.end.x, e2y = l2.end.y;
+
+        const cross = checkCrossing(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y);
+        const dir = checkDirection(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y);
+        const len = checkLength(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, lenThreshold);
+        const angle = checkAngle(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, angleThreshold);
+        const dist = checkDistance(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, distThreshold);
+        const startOff = checkStartOffset(s1x, s1y, s2x, s2y, offsetThreshold);
+        const endOff = checkEndOffset(e1x, e1y, e2x, e2y, offsetThreshold);
+
+        const crossOK = !cross, dirOK = dir, lenOK = len.ok, angleOK = angle.ok;
+        const distOK = dist.ok, startOffOK = startOff.ok, endOffOK = endOff.ok;
+        const allOK = crossOK && dirOK && lenOK && angleOK && distOK && startOffOK && endOffOK;
+
+        return {
+          ...pair,
+          coords: { s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y },
+          crossOK, dirOK, lenOK, angleOK, distOK, startOffOK, endOffOK, allOK,
+          lenDiff: len.diff,
+          angleDiff: angle.diff,
+          distVal: dist.dist,
+          startOffDist: startOff.dist,
+          endOffDist: endOff.dist,
+          len1: len.len1,
+          len2: len.len2
+        };
+      });
+
+      renderBatchResults(results);
+    }
+
+    function renderBatchResults(results) {
+      const passCount = results.filter(r => r.allOK).length;
+      const failCount = results.length - passCount;
+
+      let html = `
+        <table class="batch-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>WeldLine ID</th>
+              <th>Gantry</th>
+              <th>교차</th>
+              <th>방향</th>
+              <th>길이 (mm)</th>
+              <th>각도 (°)</th>
+              <th>거리 (mm)</th>
+              <th>시작점 (mm)</th>
+              <th>끝점 (mm)</th>
+              <th>결과</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      results.forEach((r, idx) => {
+        const rowClass = r.allOK ? 'row-pass' : 'row-fail';
+        html += `
+          <tr class="${rowClass} clickable-row" onclick="loadWeldLine(${idx})" title="클릭하여 상세 보기">
+            <td>${idx + 1}</td>
+            <td><strong>${r.weldLineId}</strong></td>
+            <td>G${r.gantryId}</td>
+            <td class="${r.crossOK ? 'pass' : 'fail'}">${r.crossOK ? '✓' : '✗'}</td>
+            <td class="${r.dirOK ? 'pass' : 'fail'}">${r.dirOK ? '✓' : '✗'}</td>
+            <td class="${r.lenOK ? 'pass' : 'fail'}">${r.lenDiff.toFixed(1)}</td>
+            <td class="${r.angleOK ? 'pass' : 'fail'}">${r.angleDiff.toFixed(2)}</td>
+            <td class="${r.distOK ? 'pass' : 'fail'}">${r.distVal.toFixed(1)}</td>
+            <td class="${r.startOffOK ? 'pass' : 'fail'}">${r.startOffDist.toFixed(1)}</td>
+            <td class="${r.endOffOK ? 'pass' : 'fail'}">${r.endOffDist.toFixed(1)}</td>
+            <td class="${r.allOK ? 'pass' : 'fail'}"><strong>${r.allOK ? 'PASS' : 'FAIL'}</strong></td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+
+      html += `
+        <div class="batch-summary ${failCount === 0 ? 'all-pass' : 'has-fail'}">
+          ${failCount === 0
+            ? `✅ 전체 ${results.length}개 용접선 모두 PASS`
+            : `❌ ${results.length}개 중 ${failCount}개 FAIL (${passCount}개 PASS)`
+          }
+        </div>
+      `;
+
+      document.getElementById('batchResults').innerHTML = html;
+
+      // 전역에 결과 저장 (행 클릭 시 사용)
+      window.batchValidationResults = results;
+    }
+
+    function loadWeldLine(idx) {
+      const r = window.batchValidationResults[idx];
+      if (!r) return;
+
+      // 수동 입력 모드로 전환
+      toggleMode('manual');
+
+      // 좌표 설정
+      setInputValues({
+        s1x: r.coords.s1x.toFixed(2),
+        s1y: r.coords.s1y.toFixed(2),
+        s1z: r.line1.start.z?.toFixed(2) || 0,
+        e1x: r.coords.e1x.toFixed(2),
+        e1y: r.coords.e1y.toFixed(2),
+        e1z: r.line1.end.z?.toFixed(2) || 0,
+        s2x: r.coords.s2x.toFixed(2),
+        s2y: r.coords.s2y.toFixed(2),
+        s2z: r.line2.start.z?.toFixed(2) || 0,
+        e2x: r.coords.e2x.toFixed(2),
+        e2y: r.coords.e2y.toFixed(2),
+        e2z: r.line2.end.z?.toFixed(2) || 0
+      });
+
+      // 검사 실행
+      runValidation();
+    }
+
+    function clearLogs() {
+      document.getElementById('logInput').value = '';
+      document.getElementById('batchResults').innerHTML = '';
+      document.getElementById('parseInfo').textContent = '';
+    }
   </script>
 </body>
 </html>
