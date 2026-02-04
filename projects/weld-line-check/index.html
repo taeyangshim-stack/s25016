@@ -394,6 +394,37 @@
       background: #fef2f2;
       border-color: var(--fail);
     }
+
+    /* 수학적 설명 다이어그램 */
+    .math-diagram {
+      display: flex;
+      gap: 16px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .diagram-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      min-width: 200px;
+    }
+    .diagram-box.pass-case { border-color: var(--pass); background: #f0fdf4; }
+    .diagram-box.fail-case { border-color: var(--fail); background: #fef2f2; }
+    .diagram-label {
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .diagram-box.pass-case .diagram-label { color: var(--pass); }
+    .diagram-box.fail-case .diagram-label { color: var(--fail); }
+    .diagram-svg {
+      display: block;
+      margin: 0 auto;
+    }
   </style>
 </head>
 <body>
@@ -1465,6 +1496,39 @@
         content: `
           <h3>CCW (Counter-Clockwise) 알고리즘</h3>
           <p class="math-desc">세 점 A, B, C가 주어졌을 때, 이들의 방향(시계/반시계)을 외적(Cross Product)으로 판별합니다.</p>
+
+          <div class="math-diagram">
+            <div class="diagram-box pass-case">
+              <div class="diagram-label">✅ PASS: 교차하지 않음</div>
+              <svg class="diagram-svg" width="180" height="120" viewBox="0 0 180 120">
+                <defs>
+                  <marker id="arrow1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#e74c3c"/></marker>
+                  <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#27ae60"/></marker>
+                </defs>
+                <line x1="20" y1="40" x2="160" y2="40" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrow1)"/>
+                <line x1="20" y1="80" x2="160" y2="80" stroke="#27ae60" stroke-width="3" marker-end="url(#arrow2)"/>
+                <circle cx="20" cy="40" r="5" fill="#e74c3c"/><text x="10" y="30" font-size="10" fill="#e74c3c">S1</text>
+                <circle cx="160" cy="40" r="5" fill="#e74c3c"/><text x="150" y="30" font-size="10" fill="#e74c3c">E1</text>
+                <circle cx="20" cy="80" r="5" fill="#27ae60"/><text x="10" y="100" font-size="10" fill="#27ae60">S2</text>
+                <circle cx="160" cy="80" r="5" fill="#27ae60"/><text x="150" y="100" font-size="10" fill="#27ae60">E2</text>
+                <text x="90" y="60" font-size="9" fill="#666" text-anchor="middle">평행 (12mm 간격)</text>
+              </svg>
+            </div>
+            <div class="diagram-box fail-case">
+              <div class="diagram-label">❌ FAIL: 교차함</div>
+              <svg class="diagram-svg" width="180" height="120" viewBox="0 0 180 120">
+                <line x1="20" y1="30" x2="160" y2="90" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrow1)"/>
+                <line x1="20" y1="90" x2="160" y2="30" stroke="#27ae60" stroke-width="3" marker-end="url(#arrow2)"/>
+                <circle cx="20" cy="30" r="5" fill="#e74c3c"/><text x="5" y="25" font-size="10" fill="#e74c3c">S1</text>
+                <circle cx="160" cy="90" r="5" fill="#e74c3c"/><text x="150" y="105" font-size="10" fill="#e74c3c">E1</text>
+                <circle cx="20" cy="90" r="5" fill="#27ae60"/><text x="5" y="105" font-size="10" fill="#27ae60">S2</text>
+                <circle cx="160" cy="30" r="5" fill="#27ae60"/><text x="150" y="25" font-size="10" fill="#27ae60">E2</text>
+                <circle cx="90" cy="60" r="8" fill="none" stroke="#c0392b" stroke-width="2"/>
+                <text x="90" y="63" font-size="10" fill="#c0392b" text-anchor="middle">✗</text>
+              </svg>
+            </div>
+          </div>
+
           <div class="math-formula">
             <span class="func">CCW</span>(<span class="var">A</span>, <span class="var">B</span>, <span class="var">C</span>) = (<span class="var">B<sub>x</sub></span> - <span class="var">A<sub>x</sub></span>) × (<span class="var">C<sub>y</sub></span> - <span class="var">A<sub>y</sub></span>) - (<span class="var">B<sub>y</sub></span> - <span class="var">A<sub>y</sub></span>) × (<span class="var">C<sub>x</sub></span> - <span class="var">A<sub>x</sub></span>)
           </div>
@@ -1492,6 +1556,38 @@
         content: `
           <h3>내적 (Dot Product) 기반 방향 판별</h3>
           <p class="math-desc">두 벡터의 내적 부호로 같은 방향인지 판별합니다.</p>
+
+          <div class="math-diagram">
+            <div class="diagram-box pass-case">
+              <div class="diagram-label">✅ PASS: 같은 방향 (dot > 0)</div>
+              <svg class="diagram-svg" width="180" height="100" viewBox="0 0 180 100">
+                <defs>
+                  <marker id="arr1p" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#e74c3c"/></marker>
+                  <marker id="arr2p" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#27ae60"/></marker>
+                </defs>
+                <line x1="20" y1="35" x2="140" y2="35" stroke="#e74c3c" stroke-width="3" marker-end="url(#arr1p)"/>
+                <line x1="20" y1="65" x2="140" y2="65" stroke="#27ae60" stroke-width="3" marker-end="url(#arr2p)"/>
+                <text x="150" y="38" font-size="10" fill="#e74c3c">→</text>
+                <text x="150" y="68" font-size="10" fill="#27ae60">→</text>
+                <text x="90" y="90" font-size="10" fill="#27ae60" text-anchor="middle">같은 방향</text>
+              </svg>
+            </div>
+            <div class="diagram-box fail-case">
+              <div class="diagram-label">❌ FAIL: 반대 방향 (dot < 0)</div>
+              <svg class="diagram-svg" width="180" height="100" viewBox="0 0 180 100">
+                <defs>
+                  <marker id="arr1f" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#e74c3c"/></marker>
+                  <marker id="arr2f" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto"><path d="M9,0 L9,6 L0,3 z" fill="#27ae60"/></marker>
+                </defs>
+                <line x1="20" y1="35" x2="140" y2="35" stroke="#e74c3c" stroke-width="3" marker-end="url(#arr1f)"/>
+                <line x1="160" y1="65" x2="40" y2="65" stroke="#27ae60" stroke-width="3" marker-end="url(#arr2f)"/>
+                <text x="150" y="38" font-size="10" fill="#e74c3c">→</text>
+                <text x="25" y="68" font-size="10" fill="#27ae60">←</text>
+                <text x="90" y="90" font-size="10" fill="#e74c3c" text-anchor="middle">반대 방향!</text>
+              </svg>
+            </div>
+          </div>
+
           <div class="math-formula">
             <span class="var">v⃗₁</span> = (<span class="var">E1<sub>x</sub></span> - <span class="var">S1<sub>x</sub></span>, <span class="var">E1<sub>y</sub></span> - <span class="var">S1<sub>y</sub></span>)<br><br>
             <span class="var">v⃗₂</span> = (<span class="var">E2<sub>x</sub></span> - <span class="var">S2<sub>x</sub></span>, <span class="var">E2<sub>y</sub></span> - <span class="var">S2<sub>y</sub></span>)
@@ -1520,6 +1616,34 @@
         content: `
           <h3>유클리드 거리 기반 길이 비교</h3>
           <p class="math-desc">각 선분의 길이를 계산하고 그 차이가 임계값 이내인지 확인합니다.</p>
+
+          <div class="math-diagram">
+            <div class="diagram-box pass-case">
+              <div class="diagram-label">✅ PASS: 길이 차이 ≤ 20mm</div>
+              <svg class="diagram-svg" width="180" height="100" viewBox="0 0 180 100">
+                <line x1="20" y1="35" x2="140" y2="35" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="20" y1="65" x2="135" y2="65" stroke="#27ae60" stroke-width="3"/>
+                <text x="80" y="28" font-size="9" fill="#e74c3c" text-anchor="middle">L₁ = 3000mm</text>
+                <text x="78" y="85" font-size="9" fill="#27ae60" text-anchor="middle">L₂ = 2995mm</text>
+                <line x1="140" y1="40" x2="140" y2="60" stroke="#666" stroke-width="1" stroke-dasharray="3"/>
+                <line x1="135" y1="40" x2="135" y2="60" stroke="#666" stroke-width="1" stroke-dasharray="3"/>
+                <text x="160" y="55" font-size="8" fill="#27ae60">Δ=5mm</text>
+              </svg>
+            </div>
+            <div class="diagram-box fail-case">
+              <div class="diagram-label">❌ FAIL: 길이 차이 > 20mm</div>
+              <svg class="diagram-svg" width="180" height="100" viewBox="0 0 180 100">
+                <line x1="20" y1="35" x2="160" y2="35" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="20" y1="65" x2="100" y2="65" stroke="#27ae60" stroke-width="3"/>
+                <text x="90" y="28" font-size="9" fill="#e74c3c" text-anchor="middle">L₁ = 3000mm</text>
+                <text x="60" y="85" font-size="9" fill="#27ae60" text-anchor="middle">L₂ = 2900mm</text>
+                <line x1="160" y1="40" x2="160" y2="60" stroke="#c0392b" stroke-width="1" stroke-dasharray="3"/>
+                <line x1="100" y1="40" x2="100" y2="60" stroke="#c0392b" stroke-width="1" stroke-dasharray="3"/>
+                <text x="130" y="55" font-size="8" fill="#e74c3c">Δ=100mm!</text>
+              </svg>
+            </div>
+          </div>
+
           <div class="math-formula">
             <span class="var">L₁</span> = √[(<span class="var">E1<sub>x</sub></span> - <span class="var">S1<sub>x</sub></span>)² + (<span class="var">E1<sub>y</sub></span> - <span class="var">S1<sub>y</sub></span>)²]
           </div>
@@ -1542,6 +1666,35 @@
         content: `
           <h3>아크탄젠트 기반 각도 비교</h3>
           <p class="math-desc">각 선분의 기울기 각도를 계산하고 차이가 임계값 이내인지 확인합니다.</p>
+
+          <div class="math-diagram">
+            <div class="diagram-box pass-case">
+              <div class="diagram-label">✅ PASS: 각도 차이 ≤ 5°</div>
+              <svg class="diagram-svg" width="180" height="110" viewBox="0 0 180 110">
+                <line x1="20" y1="70" x2="160" y2="60" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="20" y1="85" x2="160" y2="78" stroke="#27ae60" stroke-width="3"/>
+                <path d="M 60 70 A 20 20 0 0 1 60 85" stroke="#3498db" fill="none" stroke-width="1.5"/>
+                <text x="75" y="82" font-size="9" fill="#3498db">2°</text>
+                <line x1="20" y1="95" x2="80" y2="95" stroke="#999" stroke-width="1" stroke-dasharray="2"/>
+                <text x="90" y="98" font-size="8" fill="#666">X축 (기준)</text>
+                <text x="140" y="55" font-size="9" fill="#e74c3c">θ₁=4°</text>
+                <text x="140" y="95" font-size="9" fill="#27ae60">θ₂=6°</text>
+              </svg>
+            </div>
+            <div class="diagram-box fail-case">
+              <div class="diagram-label">❌ FAIL: 각도 차이 > 5°</div>
+              <svg class="diagram-svg" width="180" height="110" viewBox="0 0 180 110">
+                <line x1="20" y1="80" x2="160" y2="50" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="20" y1="85" x2="160" y2="90" stroke="#27ae60" stroke-width="3"/>
+                <path d="M 50 80 A 25 25 0 0 1 50 85" stroke="#e74c3c" fill="none" stroke-width="2"/>
+                <text x="65" y="88" font-size="9" fill="#e74c3c">15°!</text>
+                <line x1="20" y1="95" x2="80" y2="95" stroke="#999" stroke-width="1" stroke-dasharray="2"/>
+                <text x="140" y="45" font-size="9" fill="#e74c3c">θ₁=12°</text>
+                <text x="140" y="105" font-size="9" fill="#27ae60">θ₂=-3°</text>
+              </svg>
+            </div>
+          </div>
+
           <div class="math-formula">
             <span class="var">θ₁</span> = <span class="func">atan2</span>(<span class="var">E1<sub>y</sub></span> - <span class="var">S1<sub>y</sub></span>, <span class="var">E1<sub>x</sub></span> - <span class="var">S1<sub>x</sub></span>) × 180° / π
           </div>
@@ -1567,6 +1720,34 @@
         content: `
           <h3>점-선분 최단거리 (수선의 발)</h3>
           <p class="math-desc">선분1의 중점에서 선분2까지의 최단 거리를 계산합니다.</p>
+
+          <div class="math-diagram">
+            <div class="diagram-box pass-case">
+              <div class="diagram-label">✅ PASS: 거리 ≤ 20mm</div>
+              <svg class="diagram-svg" width="180" height="110" viewBox="0 0 180 110">
+                <line x1="20" y1="40" x2="160" y2="40" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="20" y1="55" x2="160" y2="55" stroke="#27ae60" stroke-width="3"/>
+                <circle cx="90" cy="40" r="4" fill="#9b59b6"/>
+                <text x="78" y="32" font-size="8" fill="#9b59b6">M₁</text>
+                <line x1="90" y1="40" x2="90" y2="55" stroke="#9b59b6" stroke-width="2" stroke-dasharray="4"/>
+                <circle cx="90" cy="55" r="3" fill="#9b59b6"/>
+                <text x="100" y="52" font-size="8" fill="#27ae60">12mm</text>
+              </svg>
+            </div>
+            <div class="diagram-box fail-case">
+              <div class="diagram-label">❌ FAIL: 거리 > 20mm</div>
+              <svg class="diagram-svg" width="180" height="110" viewBox="0 0 180 110">
+                <line x1="20" y1="30" x2="160" y2="30" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="20" y1="80" x2="160" y2="80" stroke="#27ae60" stroke-width="3"/>
+                <circle cx="90" cy="30" r="4" fill="#9b59b6"/>
+                <text x="78" y="22" font-size="8" fill="#9b59b6">M₁</text>
+                <line x1="90" y1="30" x2="90" y2="80" stroke="#e74c3c" stroke-width="2" stroke-dasharray="4"/>
+                <circle cx="90" cy="80" r="3" fill="#9b59b6"/>
+                <text x="100" y="60" font-size="8" fill="#e74c3c">50mm!</text>
+              </svg>
+            </div>
+          </div>
+
           <div class="math-formula">
             <span class="var">M₁</span> = ((<span class="var">S1<sub>x</sub></span> + <span class="var">E1<sub>x</sub></span>) / 2, (<span class="var">S1<sub>y</sub></span> + <span class="var">E1<sub>y</sub></span>) / 2) &nbsp; (선분1 중점)
           </div>
@@ -1595,6 +1776,37 @@
         content: `
           <h3>시작점 간 유클리드 거리</h3>
           <p class="math-desc">두 용접선의 시작점 간 거리가 임계값 이내인지 확인합니다. 평행 이동된 선분을 검출합니다.</p>
+
+          <div class="math-diagram">
+            <div class="diagram-box pass-case">
+              <div class="diagram-label">✅ PASS: 시작점 간격 ≤ 20mm</div>
+              <svg class="diagram-svg" width="180" height="100" viewBox="0 0 180 100">
+                <line x1="30" y1="35" x2="150" y2="35" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="30" y1="50" x2="150" y2="50" stroke="#27ae60" stroke-width="3"/>
+                <circle cx="30" cy="35" r="6" fill="#e74c3c"/>
+                <circle cx="30" cy="50" r="6" fill="#27ae60"/>
+                <text x="12" y="38" font-size="9" fill="#e74c3c">S1</text>
+                <text x="12" y="53" font-size="9" fill="#27ae60">S2</text>
+                <line x1="30" y1="38" x2="30" y2="47" stroke="#3498db" stroke-width="2"/>
+                <text x="38" y="46" font-size="8" fill="#3498db">12mm</text>
+                <rect x="25" y="30" width="10" height="25" fill="none" stroke="#3498db" stroke-width="1" stroke-dasharray="3"/>
+              </svg>
+            </div>
+            <div class="diagram-box fail-case">
+              <div class="diagram-label">❌ FAIL: 시작점 간격 > 20mm</div>
+              <svg class="diagram-svg" width="180" height="100" viewBox="0 0 180 100">
+                <line x1="30" y1="25" x2="150" y2="25" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="80" y1="70" x2="150" y2="70" stroke="#27ae60" stroke-width="3"/>
+                <circle cx="30" cy="25" r="6" fill="#e74c3c"/>
+                <circle cx="80" cy="70" r="6" fill="#27ae60"/>
+                <text x="12" y="28" font-size="9" fill="#e74c3c">S1</text>
+                <text x="62" y="73" font-size="9" fill="#27ae60">S2</text>
+                <line x1="30" y1="28" x2="77" y2="67" stroke="#e74c3c" stroke-width="2" stroke-dasharray="4"/>
+                <text x="55" y="55" font-size="8" fill="#e74c3c">65mm!</text>
+              </svg>
+            </div>
+          </div>
+
           <div class="math-formula">
             <span class="var">dist</span> = √[(<span class="var">S2<sub>x</sub></span> - <span class="var">S1<sub>x</sub></span>)² + (<span class="var">S2<sub>y</sub></span> - <span class="var">S1<sub>y</sub></span>)²]
           </div>
@@ -1614,6 +1826,37 @@
         content: `
           <h3>끝점 간 유클리드 거리</h3>
           <p class="math-desc">두 용접선의 끝점 간 거리가 임계값 이내인지 확인합니다.</p>
+
+          <div class="math-diagram">
+            <div class="diagram-box pass-case">
+              <div class="diagram-label">✅ PASS: 끝점 간격 ≤ 20mm</div>
+              <svg class="diagram-svg" width="180" height="100" viewBox="0 0 180 100">
+                <line x1="30" y1="35" x2="150" y2="35" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="30" y1="50" x2="150" y2="50" stroke="#27ae60" stroke-width="3"/>
+                <circle cx="150" cy="35" r="6" fill="#e74c3c"/>
+                <circle cx="150" cy="50" r="6" fill="#27ae60"/>
+                <text x="158" y="38" font-size="9" fill="#e74c3c">E1</text>
+                <text x="158" y="53" font-size="9" fill="#27ae60">E2</text>
+                <line x1="150" y1="38" x2="150" y2="47" stroke="#3498db" stroke-width="2"/>
+                <text x="132" y="46" font-size="8" fill="#3498db">12mm</text>
+                <rect x="145" y="30" width="10" height="25" fill="none" stroke="#3498db" stroke-width="1" stroke-dasharray="3"/>
+              </svg>
+            </div>
+            <div class="diagram-box fail-case">
+              <div class="diagram-label">❌ FAIL: 끝점 간격 > 20mm</div>
+              <svg class="diagram-svg" width="180" height="100" viewBox="0 0 180 100">
+                <line x1="30" y1="25" x2="150" y2="25" stroke="#e74c3c" stroke-width="3"/>
+                <line x1="30" y1="70" x2="100" y2="70" stroke="#27ae60" stroke-width="3"/>
+                <circle cx="150" cy="25" r="6" fill="#e74c3c"/>
+                <circle cx="100" cy="70" r="6" fill="#27ae60"/>
+                <text x="158" y="28" font-size="9" fill="#e74c3c">E1</text>
+                <text x="108" y="73" font-size="9" fill="#27ae60">E2</text>
+                <line x1="147" y1="28" x2="103" y2="67" stroke="#e74c3c" stroke-width="2" stroke-dasharray="4"/>
+                <text x="125" y="55" font-size="8" fill="#e74c3c">62mm!</text>
+              </svg>
+            </div>
+          </div>
+
           <div class="math-formula">
             <span class="var">dist</span> = √[(<span class="var">E2<sub>x</sub></span> - <span class="var">E1<sub>x</sub></span>)² + (<span class="var">E2<sub>y</sub></span> - <span class="var">E1<sub>y</sub></span>)²]
           </div>
