@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.28";
+CONST string TASK1_VERSION := "v1.9.32";
 CONST string TASK2_VERSION := "v1.9.22";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
@@ -39,11 +39,42 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.28";  ! TCP tracking v2.3 (gantry-based)
+CONST string WELD_SEQUENCE_VERSION := "v1.9.32";  ! Multi-position test added
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.32 (2026-02-04)
+!   - FEAT: TestMultiPosition - Test 5 different Floor positions
+!   - Center [5000,5000,1200], Left [3000,5000,1200], Right [7000,5000,1200]
+!   - LowZ [5000,5000,800], HighZ [5000,5000,1600]
+!   - All tests use 45 deg angle for consistency
+!   - Logs to HOME:/multi_position_test.txt
+!   - TestMenu updated to v2.5.0 (option 10 added)
+!
+! v1.9.31 (2026-02-04)
+!   - FIX: MoveRobotToWeldPosition - Joint Out of Range error
+!   - Keep current Z position (avoid joint limit issues)
+!   - Keep current orientation (avoid incompatible pose)
+!   - Use MoveJ instead of MoveL (more forgiving)
+!
+! v1.9.30 (2026-02-04)
+!   - FIX: MoveRobotToWeldPosition - Missing External Axis Value error
+!   - Changed: Copy entire current_tcp to weld_target first
+!   - This preserves robconf and extax from current position
+!   - Only modify trans and rot fields afterward
+!
+! v1.9.29 (2026-02-04)
+!   - FEAT: Multi-Angle Test (TestMultiAngle)
+!   - Tests 0°, 45°, 90°, -45° weld line angles automatically
+!   - Logs all results to HOME:/multi_angle_test.txt
+!   - FEAT: Robot TCP Movement (MoveRobotToWeldPosition)
+!   - Moves Robot1 TCP to weld start position in WobjGantry
+!   - Uses predefined weld orientation (WELD_R1_ORIENT_Q1~Q4)
+!   - FEAT: Combined Test (TestEdgeToWeldWithRobot)
+!   - Gantry move + Robot TCP move in one sequence
+!   - TestMenu updated to v2.4.0 (options 8, 9 added)
+!
 ! v1.9.28 (2026-02-04)
 !   - FIX: TCP Tracking now uses gantry-based calculation
 !   - Read gantry position, convert to Floor coordinates

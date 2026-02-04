@@ -2583,7 +2583,7 @@ PROC TestMenu()
 		! Display menu
 		TPErase;
 		TPWrite "========================================";
-		TPWrite "  S25016 SpGantry Test Menu (v2.2.0)";
+		TPWrite "  S25016 SpGantry Test Menu (v2.5.0)";
 		TPWrite "========================================";
 		TPWrite "";
 		TPWrite "  1. Sync X1/X2 (Check + Auto-fix)";
@@ -2593,12 +2593,15 @@ PROC TestMenu()
 		TPWrite "  5. Execute Weld Sequence";
 		TPWrite "  6. View Config";
 		TPWrite "  7. View Results";
+		TPWrite "  8. Multi-Angle Test (0/45/90/-45 deg)";
+		TPWrite "  9. Edge to Weld + Robot Move";
+		TPWrite " 10. Multi-Position Test (5 locations)";
 		TPWrite "  0. Exit";
 		TPWrite "";
 		TPWrite "----------------------------------------";
 
 		! Numeric selection
-		TPReadNum menu_sel, "Select (0-7): ";
+		TPReadNum menu_sel, "Select (0-10): ";
 
 		TEST menu_sel
 		CASE 1:
@@ -2655,13 +2658,37 @@ PROC TestMenu()
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
+		CASE 8:
+			TPErase;
+			TPWrite "[Menu] Starting Multi-Angle Test...";
+			TestMultiAngle;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 9:
+			TPErase;
+			TPWrite "[Menu] Edge to Weld + Robot Move...";
+			TestEdgeToWeldWithRobot;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 10:
+			TPErase;
+			TPWrite "[Menu] Starting Multi-Position Test...";
+			TestMultiPosition;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
 		CASE 0:
 			TPErase;
 			TPWrite "[Menu] Exiting Test Menu...";
 			menu_loop := FALSE;
 
 		DEFAULT:
-			TPWrite "[Menu] Invalid selection (0-7)";
+			TPWrite "[Menu] Invalid selection (0-10)";
 			WaitTime 1;
 		ENDTEST
 	ENDWHILE
@@ -3885,6 +3912,452 @@ PROC TestEdgeToWeld()
 	TPWrite "[TEST] Step 7: Returning to HOME...";
 	ReturnGantryToHome;
 	TPWrite "[TEST] Gantry returned to HOME [0,0,0,0]";
+	TPWrite "========================================";
+ENDPROC
+
+! ----------------------------------------
+! Test Multi-Angle: Test 0°, 45°, 90°, -45° (v2.4.0)
+! ----------------------------------------
+! Tests 4 different weld line angles to verify calculation accuracy
+! Temporarily changes EDGE points, runs test, and logs results
+PROC TestMultiAngle()
+	VAR num orig_end1_x;
+	VAR num orig_end1_y;
+	VAR num orig_end2_x;
+	VAR num orig_end2_y;
+	VAR num test_angles{4};
+	VAR num test_dx{4};
+	VAR num test_dy{4};
+	VAR num i;
+	VAR iodev logfile;
+	VAR jointtarget actual_jt;
+	VAR pos gantry_physical;
+	VAR pos gantry_floor;
+	VAR pos target_floor;
+	VAR pos calc_tcp_floor;
+	VAR num target_r;
+	VAR num offset_floor_x;
+	VAR num offset_floor_y;
+	VAR num err_x;
+	VAR num err_y;
+	VAR num err_z;
+	VAR num err_total;
+	VAR robtarget actual_tcp_gantry;
+
+	TPWrite "========================================";
+	TPWrite "[MULTI] Multi-Angle Test v2.4.0";
+	TPWrite "========================================";
+
+	! Save original edge points
+	orig_end1_x := EDGE_END1_X;
+	orig_end1_y := EDGE_END1_Y;
+	orig_end2_x := EDGE_END2_X;
+	orig_end2_y := EDGE_END2_Y;
+
+	! Define test angles (degrees) and corresponding dx, dy for 500mm weld line
+	! 0°:   dx=500, dy=0    (horizontal X+)
+	! 45°:  dx=354, dy=354  (diagonal)
+	! 90°:  dx=0,   dy=500  (vertical Y+)
+	! -45°: dx=354, dy=-354 (diagonal X+, Y-)
+	test_angles{1} := 0;
+	test_dx{1} := 500;
+	test_dy{1} := 0;
+	test_angles{2} := 45;
+	test_dx{2} := 354;
+	test_dy{2} := 354;
+	test_angles{3} := 90;
+	test_dx{3} := 0;
+	test_dy{3} := 500;
+	test_angles{4} := -45;
+	test_dx{4} := 354;
+	test_dy{4} := -354;
+
+	! Open log file
+	Open "HOME:/multi_angle_test.txt", logfile \Write;
+	Write logfile, "Multi-Angle Test Log (v2.4.0) - " + CDate() + " " + CTime();
+	Write logfile, "";
+	Write logfile, "Start Point (Floor): [" + NumToStr(EDGE_START1_X,0) + ", " + NumToStr(EDGE_START1_Y,0) + ", " + NumToStr(EDGE_START1_Z,0) + "]";
+	Write logfile, "";
+	Write logfile, "Angle | Expected R | Actual R | Error X | Error Y | Total (mm)";
+	Write logfile, "------+-----------+----------+---------+---------+-----------";
+
+	! Run tests for each angle
+	FOR i FROM 1 TO 4 DO
+		TPWrite "";
+		TPWrite "----------------------------------------";
+		TPWrite "[MULTI] Test " + NumToStr(i,0) + "/4: Angle = " + NumToStr(test_angles{i},0) + " deg";
+		TPWrite "----------------------------------------";
+
+		! Set edge end points for this angle
+		! Robot1 side: center + dy/2
+		! Robot2 side: center - dy/2
+		EDGE_END1_X := EDGE_START1_X + test_dx{i};
+		EDGE_END1_Y := EDGE_START1_Y + test_dy{i};
+		EDGE_END2_X := EDGE_START2_X + test_dx{i};
+		EDGE_END2_Y := EDGE_START2_Y + test_dy{i};
+
+		TPWrite "[MULTI] Edge End: [" + NumToStr(EDGE_END1_X,0) + ", " + NumToStr(EDGE_END1_Y,0) + "]";
+
+		! Calculate and move
+		CalcCenterFromEdges;
+		DefineWeldLine;
+
+		TPWrite "[MULTI] Calculated R: " + NumToStr(nAngleRzStore,1) + " deg";
+		TPWrite "[MULTI] bRobSwap: " + ValToStr(bRobSwap);
+
+		MoveGantryToWeldPosition;
+
+		! Get actual position
+		actual_jt := CJointT();
+		target_r := actual_jt.extax.eax_d;
+
+		! Calculate TCP tracking
+		gantry_physical.x := actual_jt.extax.eax_a;
+		gantry_physical.y := actual_jt.extax.eax_b;
+		gantry_physical.z := actual_jt.extax.eax_c;
+		gantry_floor := PhysicalToFloor(gantry_physical);
+
+		target_floor := posStart;
+		offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(target_r) - MODE2_TCP_OFFSET_R1_Y * Sin(target_r);
+		offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(target_r) + MODE2_TCP_OFFSET_R1_Y * Cos(target_r);
+
+		calc_tcp_floor.x := gantry_floor.x + offset_floor_x;
+		calc_tcp_floor.y := gantry_floor.y + offset_floor_y;
+		calc_tcp_floor.z := gantry_floor.z - WELD_R1_TCP_Z_OFFSET;
+
+		err_x := calc_tcp_floor.x - target_floor.x;
+		err_y := calc_tcp_floor.y - target_floor.y;
+		err_z := calc_tcp_floor.z - target_floor.z;
+		err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
+
+		TPWrite "[MULTI] Tracking Error: Total=" + NumToStr(err_total,2) + " mm";
+
+		! Log result
+		Write logfile, NumToStr(test_angles{i},0) + " deg | " + NumToStr(test_angles{i},0) + " deg | "
+			+ NumToStr(nAngleRzStore,1) + " deg | " + NumToStr(err_x,2) + " | " + NumToStr(err_y,2)
+			+ " | " + NumToStr(err_total,2);
+
+		! Wait briefly before next test
+		WaitTime 1;
+	ENDFOR
+
+	! Restore original edge points
+	EDGE_END1_X := orig_end1_x;
+	EDGE_END1_Y := orig_end1_y;
+	EDGE_END2_X := orig_end2_x;
+	EDGE_END2_Y := orig_end2_y;
+
+	! Return to home
+	TPWrite "";
+	TPWrite "[MULTI] Returning to HOME...";
+	ReturnGantryToHome;
+
+	Write logfile, "";
+	Write logfile, "Test completed at " + CTime();
+	Close logfile;
+
+	TPWrite "";
+	TPWrite "========================================";
+	TPWrite "[MULTI] Multi-Angle Test Complete";
+	TPWrite "[MULTI] Log saved: HOME:/multi_angle_test.txt";
+	TPWrite "========================================";
+ENDPROC
+
+! ----------------------------------------
+! Test Multi-Position: Test various Floor positions (v2.5.0)
+! ----------------------------------------
+! Tests multiple Floor positions to verify coordinate transformation
+! Uses 45° angle for all tests (consistent with TestMultiAngle)
+PROC TestMultiPosition()
+	VAR num orig_start1_x;
+	VAR num orig_start1_y;
+	VAR num orig_start1_z;
+	VAR num orig_start2_x;
+	VAR num orig_start2_y;
+	VAR num orig_start2_z;
+	VAR num orig_end1_x;
+	VAR num orig_end1_y;
+	VAR num orig_end2_x;
+	VAR num orig_end2_y;
+	VAR num test_x{5};
+	VAR num test_y{5};
+	VAR num test_z{5};
+	VAR string test_name{5};
+	VAR num i;
+	VAR iodev logfile;
+	VAR jointtarget actual_jt;
+	VAR pos gantry_physical;
+	VAR pos gantry_floor;
+	VAR pos target_floor;
+	VAR pos calc_tcp_floor;
+	VAR num target_r;
+	VAR num offset_floor_x;
+	VAR num offset_floor_y;
+	VAR num err_x;
+	VAR num err_y;
+	VAR num err_z;
+	VAR num err_total;
+
+	TPWrite "========================================";
+	TPWrite "[POS] Multi-Position Test v2.5.0";
+	TPWrite "========================================";
+
+	! Save original edge points
+	orig_start1_x := EDGE_START1_X;
+	orig_start1_y := EDGE_START1_Y;
+	orig_start1_z := EDGE_START1_Z;
+	orig_start2_x := EDGE_START2_X;
+	orig_start2_y := EDGE_START2_Y;
+	orig_start2_z := EDGE_START2_Z;
+	orig_end1_x := EDGE_END1_X;
+	orig_end1_y := EDGE_END1_Y;
+	orig_end2_x := EDGE_END2_X;
+	orig_end2_y := EDGE_END2_Y;
+
+	! Define test positions (Floor coordinates)
+	! Position 1: Center (current default)
+	test_name{1} := "Center";
+	test_x{1} := 5000;
+	test_y{1} := 5000;
+	test_z{1} := 1200;
+	! Position 2: Left side (X smaller)
+	test_name{2} := "Left";
+	test_x{2} := 3000;
+	test_y{2} := 5000;
+	test_z{2} := 1200;
+	! Position 3: Right side (X larger)
+	test_name{3} := "Right";
+	test_x{3} := 7000;
+	test_y{3} := 5000;
+	test_z{3} := 1200;
+	! Position 4: Low Z (closer to floor)
+	test_name{4} := "LowZ";
+	test_x{4} := 5000;
+	test_y{4} := 5000;
+	test_z{4} := 800;
+	! Position 5: High Z (higher up)
+	test_name{5} := "HighZ";
+	test_x{5} := 5000;
+	test_y{5} := 5000;
+	test_z{5} := 1600;
+
+	! Open log file
+	Open "HOME:/multi_position_test.txt", logfile \Write;
+	Write logfile, "Multi-Position Test Log (v2.5.0) - " + CDate() + " " + CTime();
+	Write logfile, "";
+	Write logfile, "All tests use 45 deg weld line angle";
+	Write logfile, "";
+	Write logfile, "Position | Floor X,Y,Z | Gantry X,Y,Z,R | Error (mm)";
+	Write logfile, "---------+-------------+----------------+-----------";
+
+	! Run tests for each position
+	FOR i FROM 1 TO 5 DO
+		TPWrite "";
+		TPWrite "----------------------------------------";
+		TPWrite "[POS] Test " + NumToStr(i,0) + "/5: " + test_name{i};
+		TPWrite "[POS] Floor: [" + NumToStr(test_x{i},0) + ", " + NumToStr(test_y{i},0) + ", " + NumToStr(test_z{i},0) + "]";
+		TPWrite "----------------------------------------";
+
+		! Set edge points for this position (45° angle, 500mm weld line)
+		! Robot1 side: center Y + 100
+		! Robot2 side: center Y - 100
+		EDGE_START1_X := test_x{i};
+		EDGE_START1_Y := test_y{i} + 100;
+		EDGE_START1_Z := test_z{i};
+		EDGE_START2_X := test_x{i};
+		EDGE_START2_Y := test_y{i} - 100;
+		EDGE_START2_Z := test_z{i};
+		! End points: 45° diagonal (dx=354, dy=354)
+		EDGE_END1_X := test_x{i} + 354;
+		EDGE_END1_Y := test_y{i} + 100 + 354;
+		EDGE_END2_X := test_x{i} + 354;
+		EDGE_END2_Y := test_y{i} - 100 + 354;
+
+		! Calculate and move
+		CalcCenterFromEdges;
+		DefineWeldLine;
+
+		TPWrite "[POS] Calculated R: " + NumToStr(nAngleRzStore,1) + " deg";
+
+		MoveGantryToWeldPosition;
+
+		! Get actual position
+		actual_jt := CJointT();
+		target_r := actual_jt.extax.eax_d;
+
+		! Calculate TCP tracking
+		gantry_physical.x := actual_jt.extax.eax_a;
+		gantry_physical.y := actual_jt.extax.eax_b;
+		gantry_physical.z := actual_jt.extax.eax_c;
+		gantry_floor := PhysicalToFloor(gantry_physical);
+
+		target_floor := posStart;
+		offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(target_r) - MODE2_TCP_OFFSET_R1_Y * Sin(target_r);
+		offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(target_r) + MODE2_TCP_OFFSET_R1_Y * Cos(target_r);
+
+		calc_tcp_floor.x := gantry_floor.x + offset_floor_x;
+		calc_tcp_floor.y := gantry_floor.y + offset_floor_y;
+		calc_tcp_floor.z := gantry_floor.z - WELD_R1_TCP_Z_OFFSET;
+
+		err_x := calc_tcp_floor.x - target_floor.x;
+		err_y := calc_tcp_floor.y - target_floor.y;
+		err_z := calc_tcp_floor.z - target_floor.z;
+		err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
+
+		TPWrite "[POS] Gantry: X=" + NumToStr(gantry_physical.x,0) + " Y=" + NumToStr(gantry_physical.y,0)
+			+ " Z=" + NumToStr(gantry_physical.z,0) + " R=" + NumToStr(target_r,0);
+		TPWrite "[POS] Tracking Error: " + NumToStr(err_total,2) + " mm";
+
+		! Log result
+		Write logfile, test_name{i} + " | [" + NumToStr(test_x{i},0) + "," + NumToStr(test_y{i},0) + "," + NumToStr(test_z{i},0)
+			+ "] | [" + NumToStr(gantry_physical.x,0) + "," + NumToStr(gantry_physical.y,0) + ","
+			+ NumToStr(gantry_physical.z,0) + "," + NumToStr(target_r,0) + "] | " + NumToStr(err_total,2);
+
+		! Wait briefly before next test
+		WaitTime 1;
+	ENDFOR
+
+	! Restore original edge points
+	EDGE_START1_X := orig_start1_x;
+	EDGE_START1_Y := orig_start1_y;
+	EDGE_START1_Z := orig_start1_z;
+	EDGE_START2_X := orig_start2_x;
+	EDGE_START2_Y := orig_start2_y;
+	EDGE_START2_Z := orig_start2_z;
+	EDGE_END1_X := orig_end1_x;
+	EDGE_END1_Y := orig_end1_y;
+	EDGE_END2_X := orig_end2_x;
+	EDGE_END2_Y := orig_end2_y;
+
+	! Return to home
+	TPWrite "";
+	TPWrite "[POS] Returning to HOME...";
+	ReturnGantryToHome;
+
+	Write logfile, "";
+	Write logfile, "Test completed at " + CTime();
+	Close logfile;
+
+	TPWrite "";
+	TPWrite "========================================";
+	TPWrite "[POS] Multi-Position Test Complete";
+	TPWrite "[POS] Log saved: HOME:/multi_position_test.txt";
+	TPWrite "========================================";
+ENDPROC
+
+! ----------------------------------------
+! Move Robot TCP to Weld Position (v2.4.0)
+! ----------------------------------------
+! Moves Robot1 TCP to the weld start position using WobjGantry
+! Call this AFTER gantry is positioned with MoveGantryToWeldPosition
+PROC MoveRobotToWeldPosition()
+	VAR robtarget weld_target;
+	VAR robtarget current_tcp;
+
+	TPWrite "========================================";
+	TPWrite "[ROB] Move Robot to Weld Position v2.4.2";
+	TPWrite "========================================";
+
+	! Ensure WobjGantry is updated
+	UpdateGantryWobj;
+
+	! Get current TCP position - use this as base for weld_target
+	current_tcp := CRobT(\Tool:=tool0\WObj:=WobjGantry);
+	TPWrite "[ROB] Current TCP (WobjGantry): ["
+		+ NumToStr(current_tcp.trans.x,1) + ", "
+		+ NumToStr(current_tcp.trans.y,1) + ", "
+		+ NumToStr(current_tcp.trans.z,1) + "]";
+
+	! Start with current position (preserves robconf, extax, AND orientation)
+	weld_target := current_tcp;
+
+	! Define weld target in WobjGantry coordinates
+	! X=0 (along weld line)
+	! Y=TCP_OFFSET (offset from gantry center)
+	! Z=keep current (safer, avoids joint limit issues)
+	weld_target.trans.x := 0;
+	weld_target.trans.y := MODE2_TCP_OFFSET_R1_Y;
+	! weld_target.trans.z := WELD_R1_TCP_Z_OFFSET;  ! Commented: may cause joint limit error
+	! Keep current Z for safety (orientation already preserved from current_tcp)
+
+	TPWrite "[ROB] Target TCP (WobjGantry): ["
+		+ NumToStr(weld_target.trans.x,1) + ", "
+		+ NumToStr(weld_target.trans.y,1) + ", "
+		+ NumToStr(weld_target.trans.z,1) + "]";
+	TPWrite "[ROB] Note: Keeping current Z and orientation for safety";
+
+	! Move robot to weld position (MoveJ for more forgiving joint interpolation)
+	TPWrite "[ROB] Moving robot...";
+	MoveJ weld_target, v100, fine, tool0 \WObj:=WobjGantry;
+
+	! Verify position
+	current_tcp := CRobT(\Tool:=tool0\WObj:=WobjGantry);
+	TPWrite "[ROB] Final TCP (WobjGantry): ["
+		+ NumToStr(current_tcp.trans.x,1) + ", "
+		+ NumToStr(current_tcp.trans.y,1) + ", "
+		+ NumToStr(current_tcp.trans.z,1) + "]";
+
+	TPWrite "========================================";
+	TPWrite "[ROB] Robot move complete";
+	TPWrite "========================================";
+ERROR
+	TPWrite "[ROB] ERROR: " + NumToStr(ERRNO,0);
+	TPWrite "[ROB] Robot move failed - check configuration";
+	TPWrite "========================================";
+ENDPROC
+
+! ----------------------------------------
+! Test Edge to Weld with Robot Move (v2.4.0)
+! ----------------------------------------
+! Combined test: Gantry positioning + Robot TCP movement
+PROC TestEdgeToWeldWithRobot()
+	VAR jointtarget actual_jt;
+	VAR robtarget actual_tcp;
+
+	TPWrite "========================================";
+	TPWrite "[TEST] Edge to Weld + Robot Move v2.4.0";
+	TPWrite "========================================";
+
+	! Step 1: Check sync
+	TPWrite "[TEST] Step 1: Check linked motor sync...";
+	CheckLinkedMotorSync;
+
+	! Step 2-3: Calculate
+	TPWrite "[TEST] Step 2-3: Calculate weld position...";
+	CalcCenterFromEdges;
+	DefineWeldLine;
+
+	TPWrite "[RESULT] Weld Start: [" + NumToStr(posStart.x,1) + "," + NumToStr(posStart.y,1) + "]";
+	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,1) + " deg";
+
+	! Step 4: Move gantry
+	TPWrite "[TEST] Step 4: Move gantry...";
+	MoveGantryToWeldPosition;
+
+	actual_jt := CJointT();
+	TPWrite "[VERIFY] Gantry: X=" + NumToStr(actual_jt.extax.eax_a,1)
+		+ " Y=" + NumToStr(actual_jt.extax.eax_b,1)
+		+ " Z=" + NumToStr(actual_jt.extax.eax_c,1)
+		+ " R=" + NumToStr(actual_jt.extax.eax_d,1);
+
+	! Step 5: Move robot
+	TPWrite "[TEST] Step 5: Move robot TCP...";
+	MoveRobotToWeldPosition;
+
+	! Step 6: Verify final position
+	UpdateGantryWobj;
+	actual_tcp := CRobT(\Tool:=tool0\WObj:=WobjGantry);
+	TPWrite "[VERIFY] Robot TCP (WobjGantry): ["
+		+ NumToStr(actual_tcp.trans.x,1) + ", "
+		+ NumToStr(actual_tcp.trans.y,1) + ", "
+		+ NumToStr(actual_tcp.trans.z,1) + "]";
+
+	! Step 7: Return home
+	TPWrite "[TEST] Step 7: Return to HOME...";
+	ReturnGantryToHome;
+
+	TPWrite "========================================";
+	TPWrite "[TEST] Edge to Weld + Robot Complete";
 	TPWrite "========================================";
 ENDPROC
 
