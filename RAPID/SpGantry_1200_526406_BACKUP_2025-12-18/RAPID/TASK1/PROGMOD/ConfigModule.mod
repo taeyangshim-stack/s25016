@@ -300,11 +300,12 @@ PERS num EDGE_START2_Y := 4900;    ! Robot2 side (= WELD_R2_START_Y)
 PERS num EDGE_START2_Z := 1200;    ! Robot2 side (valid range: 600-1600)
 
 ! Edge End Points - Robot1/Robot2 end positions
-PERS num EDGE_END1_X := 5500;      ! Robot1 side (= WELD_R1_END_X)
-PERS num EDGE_END1_Y := 5100;      ! Robot1 side (= WELD_R1_END_Y)
+! TEST: 45 deg diagonal weld line (dx=354, dy=354, ATan2=45 deg)
+PERS num EDGE_END1_X := 5354;      ! Robot1 side (5000+354 for 45° test)
+PERS num EDGE_END1_Y := 5454;      ! Robot1 side (5100+354 for 45° test)
 PERS num EDGE_END1_Z := 1200;      ! Robot1 side (valid range: 600-1600)
-PERS num EDGE_END2_X := 5500;      ! Robot2 side (= WELD_R2_END_X)
-PERS num EDGE_END2_Y := 4900;      ! Robot2 side (= WELD_R2_END_Y)
+PERS num EDGE_END2_X := 5354;      ! Robot2 side (5000+354 for 45° test)
+PERS num EDGE_END2_Y := 5254;      ! Robot2 side (4900+354 for 45° test)
 PERS num EDGE_END2_Z := 1200;      ! Robot2 side (valid range: 600-1600)
 
 ! ========================================

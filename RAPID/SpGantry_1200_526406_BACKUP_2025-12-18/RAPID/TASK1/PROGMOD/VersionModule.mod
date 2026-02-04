@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.23";
+CONST string TASK1_VERSION := "v1.9.28";
 CONST string TASK2_VERSION := "v1.9.22";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
@@ -39,11 +39,43 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.23";  ! X/Y TCP offset support in Edge-to-Weld
+CONST string WELD_SEQUENCE_VERSION := "v1.9.28";  ! TCP tracking v2.3 (gantry-based)
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.28 (2026-02-04)
+!   - FIX: TCP Tracking now uses gantry-based calculation
+!   - Read gantry position, convert to Floor coordinates
+!   - Apply rotated TCP offset to calculate expected TCP Floor position
+!   - Compare calculated vs target weld line position
+!   - Shows actual TCP in WobjGantry for reference
+!   - TestEdgeToWeld updated to v2.3.0
+!
+! v1.9.27 (2026-02-04)
+!   - FEAT: TCP Tracking Verification in TestEdgeToWeld
+!   - Read actual TCP position after gantry move
+!   - Compare actual vs target (weld line position)
+!   - Calculate dX, dY, dZ, Total error
+!   - Log to HOME:/tcp_tracking.txt
+!   - TestEdgeToWeld updated to v2.2.0
+!
+! v1.9.26 (2026-02-04)
+!   - PERF: WaitUntil replaces polling loop (faster response)
+!   - ADD: ForceLinkedMotorSync - auto-fix X1/X2 mismatch
+!   - Menu mode wait reduced: 3 seconds (was 5)
+!   - Normal mode wait reduced: 10 seconds (was 20)
+!
+! v1.9.25 (2026-02-04)
+!   - PERF: Reduced Robot2 wait time for Menu mode (20s -> 5s)
+!   - ADD: TestEdgeToWeld now returns gantry to HOME after test
+!
+! v1.9.24 (2026-02-04)
+!   - FIX: RAPID Cos/Sin use DEGREES, not radians!
+!   - Removed unnecessary radian conversion (angle_rad variable)
+!   - Now: Cos(target_r) instead of Cos(target_r * pi/180)
+!   - R=-45 test: offset should be [-70.7, -70.7], was [-1.4, -100]
+!
 ! v1.9.23 (2026-02-04)
 !   - FEAT: X/Y TCP offset support in MoveGantryToWeldPosition
 !   - Offset rotation by R-axis angle: offset_floor = Rot(R) * tcp_offset

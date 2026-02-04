@@ -509,6 +509,8 @@ PERS num debug_r2_floor_y_offset := 0;
 		VAR string line;
 		VAR string value_str;
 		VAR bool found_value;
+		VAR bool timeout_flag;
+		VAR num max_wait_time;
 
 		! Read TEST_MODE from config.txt
 		test_mode := 0;  ! Default: backward compatible
@@ -530,34 +532,39 @@ PERS num debug_r2_floor_y_offset := 0;
 		! v1.9.17: Share test_mode with TASK2
 		shared_test_mode := test_mode;
 
-		! Open main process log
-		Open "HOME:/main_process.txt", main_logfile \Write;
-		Write main_logfile, "Main Process Log (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
-
-		! Step 1: Initialize Robot1 and Gantry
+		! Step 1: Initialize Robot1 and Gantry (TPWrite FIRST for immediate UI feedback)
 		TPWrite "========================================";
 		TPWrite "MAIN: Starting Robot1 initialization...";
 		TPWrite "========================================";
+
+		! Open main process log (moved after TPWrite - file I/O causes delay)
+		Open "HOME:/main_process.txt", main_logfile \Write;
+		Write main_logfile, "Main Process Log (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 		SetRobot1InitialPosition;
 		TPWrite "MAIN: Robot1 initialization completed";
 		Write main_logfile, "Step1 done (Robot1 init)";
 
-		! Wait for TASK2 (Robot2) initialization to complete using synchronization flag
-		! This replaces the previous fixed WaitTime 10.0 approach
-		TPWrite "MAIN: Waiting for Robot2 initialization (checking flag)...";
-		wait_counter := 0;
-		max_wait_cycles := 200;  ! 20 seconds max (200 * 0.1s)
-		WHILE robot2_init_complete = FALSE AND wait_counter < max_wait_cycles DO
-			WaitTime 0.1;  ! Check every 100ms
-			wait_counter := wait_counter + 1;
-		ENDWHILE
+		! Wait for TASK2 (Robot2) initialization to complete using WaitUntil (reactive)
+		! v1.9.26: WaitUntil replaces polling loop for faster response
+		IF test_mode = 9 THEN
+			! Menu mode: shorter wait (3 seconds max)
+			TPWrite "MAIN: Menu mode - short wait for Robot2...";
+			max_wait_time := 3;
+		ELSE
+			! Normal mode: full wait (10 seconds max)
+			TPWrite "MAIN: Waiting for Robot2 initialization...";
+			max_wait_time := 10;
+		ENDIF
 
-		IF robot2_init_complete = TRUE THEN
+		timeout_flag := FALSE;
+		WaitUntil robot2_init_complete = TRUE \MaxTime:=max_wait_time \TimeFlag:=timeout_flag;
+
+		IF NOT timeout_flag THEN
 			TPWrite "MAIN: Robot2 initialization confirmed (flag = TRUE)";
-			Write main_logfile, "WaitRobot2 ok " + NumToStr(wait_counter * 0.1, 2) + " s";
+			Write main_logfile, "WaitRobot2 ok (WaitUntil)";
 		ELSE
 			TPWrite "MAIN: WARNING - Robot2 initialization timeout!";
-			Write main_logfile, "WaitRobot2 timeout " + NumToStr(max_wait_cycles * 0.1, 1) + " s";
+			Write main_logfile, "WaitRobot2 timeout " + NumToStr(max_wait_time, 1) + " s";
 		ENDIF
 
 		! Step 2: Run Test based on TEST_MODE
@@ -1561,11 +1568,13 @@ PERS num debug_r2_floor_y_offset := 0;
 		VAR num max_iterations;
 		VAR num tolerance;
 
-		! Open log file (1-line summary)
+		! Show message FIRST, then open log (file I/O causes delay)
+		TPWrite "Robot1 init: start";
+
+		! Open log file (moved after TPWrite for faster UI response)
 		Open "HOME:/robot1_init_position.txt", logfile \Write;
 		Write logfile, "Robot1 Init (" + TASK1_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
-		TPWrite "Robot1 init: start";
 		sync_pos := CJointT();
 
 		x1_target := sync_pos.extax.eax_a;
@@ -2574,10 +2583,10 @@ PROC TestMenu()
 		! Display menu
 		TPErase;
 		TPWrite "========================================";
-		TPWrite "  S25016 SpGantry Test Menu (v2.1.2)";
+		TPWrite "  S25016 SpGantry Test Menu (v2.2.0)";
 		TPWrite "========================================";
 		TPWrite "";
-		TPWrite "  1. Check Linked Motor Sync (X1/X2)";
+		TPWrite "  1. Sync X1/X2 (Check + Auto-fix)";
 		TPWrite "  2. Edge to Weld (CALC ONLY, no move)";
 		TPWrite "  3. Edge to Weld (with gantry move)";
 		TPWrite "  4. Test Gantry Floor Coordinates";
@@ -3349,6 +3358,24 @@ FUNC pos FloorToPhysical(pos floor_pos)
 ENDFUNC
 
 ! ----------------------------------------
+! Physical to Floor Coordinate Conversion
+! ----------------------------------------
+! Inverse of FloorToPhysical
+! Converts Physical gantry coordinates to Floor coordinates
+FUNC pos PhysicalToFloor(pos physical_pos)
+	VAR pos floor;
+
+	! Inverse of FloorToPhysical formula:
+	! Floor = FloorHome +/- (Physical - HOME)
+	! FloorHome = [9500, 5300, 2100]
+	floor.x := 9500 + (physical_pos.x - HOME_GANTRY_X);   ! X: addition
+	floor.y := 5300 - (physical_pos.y - HOME_GANTRY_Y);   ! Y: subtraction (inverted)
+	floor.z := 2100 - (physical_pos.z - HOME_GANTRY_Z);   ! Z: subtraction (inverted)
+
+	RETURN floor;
+ENDFUNC
+
+! ----------------------------------------
 ! Move Gantry to Weld Position
 ! ----------------------------------------
 ! Uses calculated posStart and nAngleRzStore to position gantry
@@ -3360,7 +3387,6 @@ PROC MoveGantryToWeldPosition()
 	VAR num target_r;
 	VAR num offset_floor_x;
 	VAR num offset_floor_y;
-	VAR num angle_rad;
 
 	TPWrite "[WELD] Moving gantry to weld position...";
 
@@ -3398,9 +3424,9 @@ PROC MoveGantryToWeldPosition()
 	! TCP offset is relative to robot base which rotates with gantry R-axis
 	! offset_floor = rotation_matrix(target_r) * tcp_offset
 	! NOTE: Use target_r (actual gantry rotation), NOT nAngleRzStore (weld line angle)
-	angle_rad := target_r * 3.14159265 / 180;
-	offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(angle_rad) - MODE2_TCP_OFFSET_R1_Y * Sin(angle_rad);
-	offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(angle_rad) + MODE2_TCP_OFFSET_R1_Y * Cos(angle_rad);
+	! NOTE: RAPID Cos/Sin functions use DEGREES directly (not radians!)
+	offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(target_r) - MODE2_TCP_OFFSET_R1_Y * Sin(target_r);
+	offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(target_r) + MODE2_TCP_OFFSET_R1_Y * Cos(target_r);
 
 	! Calculate gantry Floor position (gantry = weld_center - tcp_offset)
 	! Gantry must be offset so that TCP reaches the weld center
@@ -3477,15 +3503,56 @@ PROC CheckLinkedMotorSync()
 
 	IF diff > 2 THEN
 		TPWrite "[LINKED MOTOR] ERROR: Out of sync!";
-		TPWrite "[LINKED MOTOR] Solution: Restart controller in RobotStudio";
-		TPWrite "  1. Controller menu > Stop";
-		TPWrite "  2. Controller menu > Restart";
-		TPWrite "----------------------------------------";
-		Stop;
+		TPWrite "[LINKED MOTOR] Attempting auto-fix...";
+		ForceLinkedMotorSync;
 	ELSE
 		TPWrite "[LINKED MOTOR] OK - In sync";
 		TPWrite "----------------------------------------";
 	ENDIF
+ENDPROC
+
+! ----------------------------------------
+! Force Linked Motor Sync (v1.9.25)
+! ----------------------------------------
+! Attempts to fix X1/X2 software state mismatch
+! by forcing eax_f := eax_a and performing MoveAbsJ
+PROC ForceLinkedMotorSync()
+	VAR jointtarget current_jt;
+	VAR jointtarget sync_jt;
+	VAR num x1_val;
+
+	current_jt := CJointT();
+	x1_val := current_jt.extax.eax_a;
+
+	TPWrite "[SYNC] Forcing X2 := X1 (" + NumToStr(x1_val,1) + " mm)";
+
+	! Create sync target: keep all values, but force eax_f = eax_a
+	sync_jt := current_jt;
+	sync_jt.extax.eax_f := x1_val;
+
+	! Try MoveAbsJ with synced values
+	TPWrite "[SYNC] Executing MoveAbsJ to sync software state...";
+
+	MoveAbsJ sync_jt, v100, fine, tool0;
+
+	! Verify sync
+	current_jt := CJointT();
+	IF Abs(current_jt.extax.eax_a - current_jt.extax.eax_f) <= 2 THEN
+		TPWrite "[SYNC] SUCCESS - X1/X2 now synced!";
+		TPWrite "  X1=" + NumToStr(current_jt.extax.eax_a,1);
+		TPWrite "  X2=" + NumToStr(current_jt.extax.eax_f,1);
+		TPWrite "----------------------------------------";
+	ELSE
+		TPWrite "[SYNC] FAILED - Still out of sync";
+		TPWrite "[SYNC] Manual restart required";
+		TPWrite "----------------------------------------";
+		Stop;
+	ENDIF
+ERROR
+	TPWrite "[SYNC] ERROR during MoveAbsJ: " + NumToStr(ERRNO,0);
+	TPWrite "[SYNC] Manual restart required";
+	TPWrite "----------------------------------------";
+	Stop;
 ENDPROC
 
 ! ----------------------------------------
@@ -3513,7 +3580,6 @@ PROC TestEdgeToWeldCalcOnly()
 	VAR iodev logfile;
 	VAR num offset_floor_x;
 	VAR num offset_floor_y;
-	VAR num angle_rad;
 
 	TPWrite "========================================";
 	TPWrite "[TEST] Edge to Weld CALC ONLY v1.2";
@@ -3572,9 +3638,9 @@ PROC TestEdgeToWeldCalcOnly()
 	Write logfile, "nAngleRzStore (weld line): " + NumToStr(nAngleRzStore,2) + " deg";
 	Write logfile, "target_r (gantry R): " + NumToStr(target_r,1) + " deg";
 	Write logfile, "NOTE: Use target_r for rotation (actual gantry angle)";
-	angle_rad := target_r * 3.14159265 / 180;
-	offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(angle_rad) - MODE2_TCP_OFFSET_R1_Y * Sin(angle_rad);
-	offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(angle_rad) + MODE2_TCP_OFFSET_R1_Y * Cos(angle_rad);
+	Write logfile, "NOTE: RAPID Cos/Sin use DEGREES directly!";
+	offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(target_r) - MODE2_TCP_OFFSET_R1_Y * Sin(target_r);
+	offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(target_r) + MODE2_TCP_OFFSET_R1_Y * Cos(target_r);
 	Write logfile, "Rotated TCP offset (Floor):";
 	Write logfile, "  offset_floor_x: " + NumToStr(offset_floor_x,1) + " mm";
 	Write logfile, "  offset_floor_y: " + NumToStr(offset_floor_y,1) + " mm";
@@ -3676,8 +3742,24 @@ ENDPROC
 ! Complete test of edge input to gantry positioning
 PROC TestEdgeToWeld()
 	VAR jointtarget actual_jt;
+	VAR robtarget actual_tcp_wobj;
+	VAR robtarget actual_tcp_gantry;
+	VAR pos target_floor;
+	VAR pos gantry_physical;
+	VAR pos gantry_floor;
+	VAR pos calc_tcp_floor;
+	VAR num target_r;
+	VAR num offset_floor_x;
+	VAR num offset_floor_y;
+	VAR num err_x;
+	VAR num err_y;
+	VAR num err_z;
+	VAR num err_total;
+	VAR iodev logfile;
+
 	TPWrite "========================================";
-	TPWrite "[TEST] Edge to Weld Position Test v2.0.1";
+	TPWrite "[TEST] Edge to Weld Position Test v2.3.0";
+	TPWrite "[TEST] + TCP Tracking (Gantry-based)";
 	TPWrite "========================================";
 
 	! Step 0: Check linked motor sync (X1/X2)
@@ -3707,7 +3789,7 @@ PROC TestEdgeToWeld()
 	TPWrite "[TEST] Step 4: Move gantry to weld position...";
 	MoveGantryToWeldPosition;
 
-	! Step 5: Verify final position
+	! Step 5: Verify gantry position
 	actual_jt := CJointT();
 	TPWrite "----------------------------------------";
 	TPWrite "[VERIFY] Actual Gantry Position:";
@@ -3716,8 +3798,93 @@ PROC TestEdgeToWeld()
 	TPWrite "  Z=" + NumToStr(actual_jt.extax.eax_c,1) + " mm";
 	TPWrite "  R=" + NumToStr(actual_jt.extax.eax_d,1) + " deg";
 	TPWrite "  X2=" + NumToStr(actual_jt.extax.eax_f,1) + " mm";
+
+	! Step 6: TCP Tracking Verification (Gantry-based calculation)
+	TPWrite "----------------------------------------";
+	TPWrite "[TCP] Step 6: TCP Tracking Verification";
+
+	! Target: posStart (weld start position in Floor coordinates)
+	target_floor := posStart;
+	TPWrite "[TCP] Target Weld (Floor): [" + NumToStr(target_floor.x,1) + ", "
+	        + NumToStr(target_floor.y,1) + ", " + NumToStr(target_floor.z,1) + "]";
+
+	! Get actual gantry position and convert to Floor
+	gantry_physical.x := actual_jt.extax.eax_a;
+	gantry_physical.y := actual_jt.extax.eax_b;
+	gantry_physical.z := actual_jt.extax.eax_c;
+	target_r := actual_jt.extax.eax_d;
+	gantry_floor := PhysicalToFloor(gantry_physical);
+	TPWrite "[TCP] Gantry (Floor): [" + NumToStr(gantry_floor.x,1) + ", "
+	        + NumToStr(gantry_floor.y,1) + ", " + NumToStr(gantry_floor.z,1) + "]";
+	TPWrite "[TCP] Gantry R: " + NumToStr(target_r,1) + " deg";
+
+	! Calculate TCP offset rotated by R-axis angle
+	! TCP offset in Floor coords = Rot(R) * [TCP_X, TCP_Y]
+	offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(target_r) - MODE2_TCP_OFFSET_R1_Y * Sin(target_r);
+	offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(target_r) + MODE2_TCP_OFFSET_R1_Y * Cos(target_r);
+	TPWrite "[TCP] Rotated Offset: [" + NumToStr(offset_floor_x,1) + ", " + NumToStr(offset_floor_y,1) + "]";
+
+	! Calculate expected TCP position in Floor coordinates
+	! TCP_floor = Gantry_floor + Rotated_TCP_Offset
+	calc_tcp_floor.x := gantry_floor.x + offset_floor_x;
+	calc_tcp_floor.y := gantry_floor.y + offset_floor_y;
+	calc_tcp_floor.z := gantry_floor.z - WELD_R1_TCP_Z_OFFSET;  ! Z: gantry above, TCP below
+	TPWrite "[TCP] Calculated TCP (Floor): [" + NumToStr(calc_tcp_floor.x,1) + ", "
+	        + NumToStr(calc_tcp_floor.y,1) + ", " + NumToStr(calc_tcp_floor.z,1) + "]";
+
+	! Calculate tracking error (Target vs Calculated)
+	err_x := calc_tcp_floor.x - target_floor.x;
+	err_y := calc_tcp_floor.y - target_floor.y;
+	err_z := calc_tcp_floor.z - target_floor.z;
+	err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
+
+	TPWrite "[TCP] Tracking Error (Calc vs Target):";
+	TPWrite "  dX=" + NumToStr(err_x,2) + " mm";
+	TPWrite "  dY=" + NumToStr(err_y,2) + " mm";
+	TPWrite "  dZ=" + NumToStr(err_z,2) + " mm";
+	TPWrite "  Total=" + NumToStr(err_total,2) + " mm";
+
+	! Also read actual TCP in WobjGantry for reference
+	UpdateGantryWobj;
+	actual_tcp_gantry := CRobT(\Tool:=tool0\WObj:=WobjGantry);
+	TPWrite "[TCP] Actual TCP (WobjGantry): [" + NumToStr(actual_tcp_gantry.trans.x,1) + ", "
+	        + NumToStr(actual_tcp_gantry.trans.y,1) + ", " + NumToStr(actual_tcp_gantry.trans.z,1) + "]";
+
+	! Log to file
+	Open "HOME:/tcp_tracking.txt", logfile \Write;
+	Write logfile, "TCP Tracking Log (v2.3) - " + CDate() + " " + CTime();
+	Write logfile, "";
+	Write logfile, "--- Target ---";
+	Write logfile, "Weld Start (Floor): [" + NumToStr(target_floor.x,1) + ", " + NumToStr(target_floor.y,1) + ", " + NumToStr(target_floor.z,1) + "]";
+	Write logfile, "";
+	Write logfile, "--- Gantry Position ---";
+	Write logfile, "Physical: X=" + NumToStr(gantry_physical.x,1) + " Y=" + NumToStr(gantry_physical.y,1) + " Z=" + NumToStr(gantry_physical.z,1) + " R=" + NumToStr(target_r,1);
+	Write logfile, "Floor: [" + NumToStr(gantry_floor.x,1) + ", " + NumToStr(gantry_floor.y,1) + ", " + NumToStr(gantry_floor.z,1) + "]";
+	Write logfile, "";
+	Write logfile, "--- TCP Offset Calculation ---";
+	Write logfile, "TCP Offset (raw): X=" + NumToStr(MODE2_TCP_OFFSET_R1_X,1) + " Y=" + NumToStr(MODE2_TCP_OFFSET_R1_Y,1);
+	Write logfile, "TCP Offset (rotated by R=" + NumToStr(target_r,1) + "): [" + NumToStr(offset_floor_x,1) + ", " + NumToStr(offset_floor_y,1) + "]";
+	Write logfile, "";
+	Write logfile, "--- Calculated TCP Position ---";
+	Write logfile, "TCP Floor (calc): [" + NumToStr(calc_tcp_floor.x,1) + ", " + NumToStr(calc_tcp_floor.y,1) + ", " + NumToStr(calc_tcp_floor.z,1) + "]";
+	Write logfile, "";
+	Write logfile, "--- Tracking Error ---";
+	Write logfile, "dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2) + " dZ=" + NumToStr(err_z,2) + " Total=" + NumToStr(err_total,2) + " mm";
+	Write logfile, "";
+	Write logfile, "--- Robot TCP (reference) ---";
+	Write logfile, "TCP in WobjGantry: [" + NumToStr(actual_tcp_gantry.trans.x,1) + ", " + NumToStr(actual_tcp_gantry.trans.y,1) + ", " + NumToStr(actual_tcp_gantry.trans.z,1) + "]";
+	Close logfile;
+	TPWrite "[TCP] Log saved: HOME:/tcp_tracking.txt";
+
 	TPWrite "========================================";
 	TPWrite "[TEST] Edge to Weld Position Test Complete";
+	TPWrite "========================================";
+
+	! Step 7: Return gantry to HOME
+	TPWrite "";
+	TPWrite "[TEST] Step 7: Returning to HOME...";
+	ReturnGantryToHome;
+	TPWrite "[TEST] Gantry returned to HOME [0,0,0,0]";
 	TPWrite "========================================";
 ENDPROC
 
