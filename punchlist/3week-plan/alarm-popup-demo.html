@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
-            background: #1a1a2e;
+            background: #f8fafc;
             min-height: 100vh;
             padding: 30px;
         }
@@ -24,14 +24,14 @@
         }
 
         h1 {
-            color: #fff;
+            color: #1e293b;
             text-align: center;
             margin-bottom: 10px;
             font-size: 1.8rem;
         }
 
         .subtitle {
-            color: #94a3b8;
+            color: #64748b;
             text-align: center;
             margin-bottom: 30px;
             font-size: 0.95rem;
@@ -45,17 +45,19 @@
         }
 
         .panel {
-            background: #16213e;
+            background: #fff;
             border-radius: 12px;
             padding: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .panel-title {
-            color: #fff;
+            color: #1e293b;
             font-size: 1.2rem;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #334155;
+            border-bottom: 2px solid #e2e8f0;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -202,21 +204,22 @@
 
         /* 개선사항 목록 */
         .improvements {
-            background: #0f172a;
+            background: #f0fdf4;
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
+            border: 1px solid #bbf7d0;
         }
 
         .improvements h3 {
-            color: #22c55e;
+            color: #16a34a;
             margin-bottom: 15px;
             font-size: 1rem;
         }
 
         .improvements ul {
             list-style: none;
-            color: #e2e8f0;
+            color: #166534;
         }
 
         .improvements li {
@@ -244,9 +247,9 @@
 
         .alarm-btn {
             padding: 8px 16px;
-            background: #334155;
-            color: #fff;
-            border: none;
+            background: #e2e8f0;
+            color: #475569;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85rem;
@@ -254,16 +257,17 @@
         }
 
         .alarm-btn:hover {
-            background: #475569;
+            background: #cbd5e1;
         }
 
         .alarm-btn.active {
             background: #f59e0b;
             color: #000;
+            border-color: #f59e0b;
         }
 
         .note {
-            background: #1e3a5f;
+            background: #eff6ff;
             border-left: 4px solid #3b82f6;
             padding: 15px;
             margin-top: 20px;
@@ -271,13 +275,13 @@
         }
 
         .note p {
-            color: #93c5fd;
+            color: #1e40af;
             font-size: 0.9rem;
             margin: 0;
         }
 
         .note strong {
-            color: #60a5fa;
+            color: #2563eb;
         }
 
         @media (max-width: 900px) {
@@ -288,22 +292,23 @@
 
         /* 협의 결과 섹션 스타일 */
         .spec-section {
-            background: #0f172a;
+            background: #fff;
             border-radius: 12px;
             padding: 30px;
             margin-top: 40px;
-            border: 1px solid #334155;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .spec-section h2 {
-            color: #fff;
+            color: #1e293b;
             font-size: 1.5rem;
             margin-bottom: 5px;
             text-align: center;
         }
 
         .spec-date {
-            color: #94a3b8;
+            color: #64748b;
             text-align: center;
             margin-bottom: 25px;
             font-size: 0.9rem;
@@ -323,17 +328,18 @@
         }
 
         .spec-card {
-            background: #1e293b;
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
+            border: 1px solid #e2e8f0;
         }
 
         .spec-card h3 {
-            color: #60a5fa;
+            color: #2563eb;
             font-size: 1.1rem;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         /* 흐름도 스타일 */
@@ -348,14 +354,16 @@
             align-items: flex-start;
             gap: 12px;
             padding: 10px;
-            background: #334155;
+            background: #fff;
             border-radius: 8px;
+            border-left: 3px solid #f59e0b;
+            border: 1px solid #e2e8f0;
             border-left: 3px solid #f59e0b;
         }
 
         .flow-step.success {
             border-left-color: #22c55e;
-            background: rgba(34, 197, 94, 0.1);
+            background: #f0fdf4;
         }
 
         .flow-num {
@@ -381,23 +389,24 @@
         }
 
         .flow-content strong {
-            color: #fff;
+            color: #1e293b;
             font-size: 0.9rem;
         }
 
         .flow-content p {
-            color: #94a3b8;
+            color: #64748b;
             font-size: 0.8rem;
             margin-top: 3px;
         }
 
         .flow-content em {
-            color: #fbbf24;
+            color: #d97706;
             font-style: normal;
+            font-weight: 600;
         }
 
         .flow-arrow {
-            color: #475569;
+            color: #94a3b8;
             text-align: center;
             font-size: 0.9rem;
         }
@@ -413,21 +422,21 @@
         .spec-table td {
             padding: 10px 12px;
             text-align: left;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .spec-table th {
-            background: #334155;
-            color: #e2e8f0;
+            background: #f1f5f9;
+            color: #1e293b;
             font-weight: 600;
         }
 
         .spec-table td {
-            color: #cbd5e1;
+            color: #475569;
         }
 
         .spec-table tr:hover {
-            background: rgba(59, 130, 246, 0.1);
+            background: #f8fafc;
         }
 
         .badge-spec {
@@ -473,26 +482,27 @@
         }
 
         .edge-item {
-            background: #334155;
+            background: #fff;
             border-radius: 8px;
             padding: 15px;
             text-align: center;
+            border: 1px solid #e2e8f0;
         }
 
         .edge-item.active {
-            background: rgba(34, 197, 94, 0.15);
+            background: #f0fdf4;
             border: 2px solid #22c55e;
         }
 
         .edge-title {
-            color: #e2e8f0;
+            color: #1e293b;
             font-weight: 600;
             margin-bottom: 10px;
             font-size: 0.9rem;
         }
 
         .edge-item.active .edge-title {
-            color: #22c55e;
+            color: #16a34a;
         }
 
         .edge-visual {
@@ -506,13 +516,13 @@
         }
 
         .edge-item p {
-            color: #94a3b8;
+            color: #64748b;
             font-size: 0.8rem;
             margin: 0;
         }
 
         .edge-item.active p {
-            color: #86efac;
+            color: #16a34a;
         }
     </style>
 </head>
@@ -563,7 +573,7 @@
                 </div>
 
                 <div class="alarm-selector">
-                    <span style="color:#94a3b8;font-size:0.85rem;margin-right:10px;">알람 선택 (복수 선택 가능):</span>
+                    <span style="color:#64748b;font-size:0.85rem;margin-right:10px;">알람 선택 (복수 선택 가능):</span>
                     <button class="alarm-btn active" onclick="toggleAlarm('air', this)">공압</button>
                     <button class="alarm-btn" onclick="toggleAlarm('co2', this)">CO2</button>
                     <button class="alarm-btn" onclick="toggleAlarm('water', this)">냉각수</button>
@@ -604,7 +614,7 @@
         <!-- 협의 결과 섹션 -->
         <div class="spec-section">
             <h2>삼성 협의 결과</h2>
-            <p class="spec-date">협의일: 2026-02-04 | 협의자: 안창우 프로, 조용현 프로</p>
+            <p class="spec-date">협의일: 2026-02-03 | 협의자: 안창우 프로, 조용현 프로</p>
 
             <div class="spec-grid">
                 <!-- 시스템 흐름 -->
