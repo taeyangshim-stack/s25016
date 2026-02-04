@@ -1203,7 +1203,38 @@
       const passCount = results.filter(r => r.allOK).length;
       const failCount = results.length - passCount;
 
+      // 상단 요약 (Summary at top)
       let html = `
+        <div class="batch-summary ${failCount === 0 ? 'all-pass' : 'has-fail'}" style="margin-bottom: 16px;">
+          ${failCount === 0
+            ? `✅ 전체 ${results.length}개 용접선 모두 PASS`
+            : `❌ ${results.length}개 중 <strong>${failCount}개 FAIL</strong> (${passCount}개 PASS)`
+          }
+        </div>
+      `;
+
+      // 실패 항목 상세 요약 (상단에 표시)
+      if (failCount > 0) {
+        const failDetails = results.filter(r => !r.allOK).map(r => {
+          const items = [];
+          if (!r.crossOK) items.push('교차');
+          if (!r.dirOK) items.push('방향');
+          if (!r.lenOK) items.push(`길이(${r.lenDiff.toFixed(1)}mm)`);
+          if (!r.angleOK) items.push(`각도(${r.angleDiff.toFixed(1)}°)`);
+          if (!r.distOK) items.push(`거리(${r.distVal.toFixed(1)}mm)`);
+          if (!r.startOffOK) items.push(`시작점(${r.startOffDist.toFixed(1)}mm)`);
+          if (!r.endOffOK) items.push(`끝점(${r.endOffDist.toFixed(1)}mm)`);
+          return `<strong>W${r.weldLineId}</strong>: ${items.join(', ')}`;
+        });
+        html += `
+          <div style="margin-bottom: 16px; padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; font-size: 12px;">
+            <strong style="color: var(--fail);">⚠ 불합격 상세:</strong>
+            <ul style="margin: 8px 0 0 16px; padding: 0; line-height: 1.6;">${failDetails.map(d => `<li>${d}</li>`).join('')}</ul>
+          </div>
+        `;
+      }
+
+      html += `
         <table class="batch-table">
           <thead>
             <tr>
@@ -1260,36 +1291,6 @@
       });
 
       html += `</tbody></table>`;
-
-      // 실패 항목 상세 요약
-      if (failCount > 0) {
-        const failDetails = results.filter(r => !r.allOK).map(r => {
-          const items = [];
-          if (!r.crossOK) items.push('교차');
-          if (!r.dirOK) items.push('방향');
-          if (!r.lenOK) items.push(`길이(${r.lenDiff.toFixed(1)}mm)`);
-          if (!r.angleOK) items.push(`각도(${r.angleDiff.toFixed(1)}°)`);
-          if (!r.distOK) items.push(`거리(${r.distVal.toFixed(1)}mm)`);
-          if (!r.startOffOK) items.push(`시작점(${r.startOffDist.toFixed(1)}mm)`);
-          if (!r.endOffOK) items.push(`끝점(${r.endOffDist.toFixed(1)}mm)`);
-          return `W${r.weldLineId}: ${items.join(', ')}`;
-        });
-        html += `
-          <div style="margin-top: 12px; padding: 10px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; font-size: 11px;">
-            <strong style="color: var(--fail);">⚠ 불합격 상세:</strong>
-            <ul style="margin: 6px 0 0 16px; padding: 0;">${failDetails.map(d => `<li>${d}</li>`).join('')}</ul>
-          </div>
-        `;
-      }
-
-      html += `
-        <div class="batch-summary ${failCount === 0 ? 'all-pass' : 'has-fail'}">
-          ${failCount === 0
-            ? `✅ 전체 ${results.length}개 용접선 모두 PASS`
-            : `❌ ${results.length}개 중 ${failCount}개 FAIL (${passCount}개 PASS)`
-          }
-        </div>
-      `;
 
       document.getElementById('batchResults').innerHTML = html;
 
