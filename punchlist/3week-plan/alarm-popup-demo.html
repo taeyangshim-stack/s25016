@@ -625,7 +625,7 @@
                             <div class="flow-num">1</div>
                             <div class="flow-content">
                                 <strong>PLC 감지</strong>
-                                <p>임계값(하한치) 이하 압력이 <em>5초간 지속</em></p>
+                                <p>임계값(하한치) 이하 압력이 <em>5초간 지속</em> (시간값 변수화 가능)</p>
                             </div>
                         </div>
                         <div class="flow-arrow">↓</div>
@@ -633,7 +633,7 @@
                             <div class="flow-num">2</div>
                             <div class="flow-content">
                                 <strong>PLC → UI 트리거</strong>
-                                <p>약속된 인터페이스로 <em>펄스 신호</em> 전송</p>
+                                <p>약속된 인터페이스로 <em>신호 유지</em> 전송</p>
                             </div>
                         </div>
                         <div class="flow-arrow">↓</div>
@@ -689,7 +689,7 @@
                         </tr>
                         <tr>
                             <td>트리거 방식</td>
-                            <td><span class="badge-spec blue">펄스</span> (UI Rising Edge 감지)</td>
+                            <td><span class="badge-spec blue">신호 유지</span> (UI Rising Edge 감지)</td>
                         </tr>
                         <tr>
                             <td>재발생 시</td>
@@ -710,6 +710,10 @@
                         <tr>
                             <td>이력 관리</td>
                             <td>상위시스템(관제)에서 로그 관리</td>
+                        </tr>
+                        <tr>
+                            <td>시간 설정</td>
+                            <td><span class="badge-spec green">변수화</span> UI에서 5초 등 시간값 설정 가능</td>
                         </tr>
                     </table>
                 </div>
