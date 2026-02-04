@@ -213,6 +213,80 @@
     }
     .batch-summary.all-pass { background: linear-gradient(135deg, #d4efdf, #a9dfbf); color: var(--pass); }
     .batch-summary.has-fail { background: linear-gradient(135deg, #fadbd8, #f5b7b1); color: var(--fail); }
+
+    /* 종합평가 대시보드 */
+    .eval-dashboard {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    @media (max-width: 800px) {
+      .eval-dashboard { grid-template-columns: 1fr; }
+    }
+    .eval-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .eval-main.pass { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
+    .eval-main.fail { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+    .eval-main .eval-icon { font-size: 40px; margin-bottom: 8px; }
+    .eval-main .eval-title { font-size: 20px; font-weight: 700; }
+    .eval-main .eval-subtitle { font-size: 12px; opacity: 0.9; margin-top: 4px; }
+    .eval-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 600px) {
+      .eval-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+    .eval-stat {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .eval-stat.has-fail { border-color: var(--fail); background: #fef2f2; }
+    .eval-stat .stat-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+    .eval-stat .stat-value { font-size: 18px; font-weight: 700; color: var(--text); }
+    .eval-stat .stat-detail { font-size: 9px; color: var(--muted); margin-top: 2px; }
+    .eval-stat.has-fail .stat-value { color: var(--fail); }
+    .eval-progress {
+      grid-column: 1 / -1;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .eval-progress .progress-title { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+    .progress-bar {
+      height: 24px;
+      background: #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+    }
+    .progress-bar .pass-bar { background: var(--pass); transition: width 0.5s; }
+    .progress-bar .fail-bar { background: var(--fail); transition: width 0.5s; }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-top: 6px;
+    }
+    .progress-labels .pass-label { color: var(--pass); font-weight: 600; }
+    .progress-labels .fail-label { color: var(--fail); font-weight: 600; }
     .clickable-row { cursor: pointer; }
     .clickable-row:hover { background: #e3f2fd !important; }
 
@@ -1202,18 +1276,71 @@
     function renderBatchResults(results) {
       const passCount = results.filter(r => r.allOK).length;
       const failCount = results.length - passCount;
+      const passRate = results.length > 0 ? (passCount / results.length * 100).toFixed(1) : 0;
 
-      // 상단 요약 (Summary at top)
+      // 각 검사 항목별 통계
+      const stats = {
+        cross: { fail: results.filter(r => !r.crossOK).length, label: '교차', icon: '✖' },
+        dir: { fail: results.filter(r => !r.dirOK).length, label: '방향', icon: '➡' },
+        len: { fail: results.filter(r => !r.lenOK).length, label: '길이', icon: '📏' },
+        angle: { fail: results.filter(r => !r.angleOK).length, label: '각도', icon: '📐' },
+        dist: { fail: results.filter(r => !r.distOK).length, label: '거리', icon: '↔' },
+        startOff: { fail: results.filter(r => !r.startOffOK).length, label: '시작점', icon: '🎯' },
+        endOff: { fail: results.filter(r => !r.endOffOK).length, label: '끝점', icon: '🏁' }
+      };
+
+      // 종합평가 대시보드
       let html = `
-        <div class="batch-summary ${failCount === 0 ? 'all-pass' : 'has-fail'}" style="margin-bottom: 16px;">
-          ${failCount === 0
-            ? `✅ 전체 ${results.length}개 용접선 모두 PASS`
-            : `❌ ${results.length}개 중 <strong>${failCount}개 FAIL</strong> (${passCount}개 PASS)`
-          }
+        <div class="eval-dashboard">
+          <div class="eval-main ${failCount === 0 ? 'pass' : 'fail'}">
+            <div class="eval-icon">${failCount === 0 ? '✅' : '❌'}</div>
+            <div class="eval-title">${failCount === 0 ? '전체 PASS' : '일부 FAIL'}</div>
+            <div class="eval-subtitle">${results.length}개 용접선 검사 완료</div>
+          </div>
+          <div class="eval-stats">
+            <div class="eval-stat">
+              <div class="stat-label">검사 수량</div>
+              <div class="stat-value">${results.length}</div>
+              <div class="stat-detail">용접선 쌍</div>
+            </div>
+            <div class="eval-stat">
+              <div class="stat-label">합격</div>
+              <div class="stat-value" style="color: var(--pass);">${passCount}</div>
+              <div class="stat-detail">${passRate}%</div>
+            </div>
+            <div class="eval-stat ${failCount > 0 ? 'has-fail' : ''}">
+              <div class="stat-label">불합격</div>
+              <div class="stat-value">${failCount}</div>
+              <div class="stat-detail">${(100 - passRate).toFixed(1)}%</div>
+            </div>
+            <div class="eval-stat">
+              <div class="stat-label">검사 항목</div>
+              <div class="stat-value">7</div>
+              <div class="stat-detail">항목/건</div>
+            </div>
+            ${Object.entries(stats).map(([key, s]) => `
+              <div class="eval-stat ${s.fail > 0 ? 'has-fail' : ''}">
+                <div class="stat-label">${s.icon} ${s.label}</div>
+                <div class="stat-value">${s.fail > 0 ? s.fail : '✓'}</div>
+                <div class="stat-detail">${s.fail > 0 ? 'FAIL' : 'ALL PASS'}</div>
+              </div>
+            `).join('')}
+            <div class="eval-progress">
+              <div class="progress-title">합격률 Progress</div>
+              <div class="progress-bar">
+                <div class="pass-bar" style="width: ${passRate}%;"></div>
+                <div class="fail-bar" style="width: ${100 - passRate}%;"></div>
+              </div>
+              <div class="progress-labels">
+                <span class="pass-label">✅ PASS ${passCount}건 (${passRate}%)</span>
+                <span class="fail-label">❌ FAIL ${failCount}건 (${(100 - passRate).toFixed(1)}%)</span>
+              </div>
+            </div>
+          </div>
         </div>
       `;
 
-      // 실패 항목 상세 요약 (상단에 표시)
+      // 불합격 상세 목록
       if (failCount > 0) {
         const failDetails = results.filter(r => !r.allOK).map(r => {
           const items = [];
@@ -1228,7 +1355,7 @@
         });
         html += `
           <div style="margin-bottom: 16px; padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; font-size: 12px;">
-            <strong style="color: var(--fail);">⚠ 불합격 상세:</strong>
+            <strong style="color: var(--fail);">⚠ 불합격 상세 (${failCount}건):</strong>
             <ul style="margin: 8px 0 0 16px; padding: 0; line-height: 1.6;">${failDetails.map(d => `<li>${d}</li>`).join('')}</ul>
           </div>
         `;
