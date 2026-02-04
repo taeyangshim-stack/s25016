@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[S25016] 커스텀 알람 팝업 협의 내용 정리 (2/3 협의)</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+            line-height: 1.7;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            background: #f5f5f5;
+        }
+        .email-container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .email-header {
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        .email-header h1 {
+            color: #1e293b;
+            font-size: 1.4rem;
+            margin: 0 0 10px 0;
+        }
+        .email-meta {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background: #f8fafc;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #f8fafc;
+        }
+        .highlight {
+            background: #fef3c7 !important;
+        }
+        h3 {
+            color: #2563eb;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #2563eb;
+            font-size: 1.1rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-blue {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .badge-green {
+            background: #22c55e;
+            color: #fff;
+        }
+        .badge-yellow {
+            background: #f59e0b;
+            color: #000;
+        }
+        .link-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .link-box a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .link-box a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+        .footer strong {
+            color: #1e293b;
+        }
+        .copy-btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+        .copy-btn:hover {
+            background: #1d4ed8;
+        }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .email-container { box-shadow: none; padding: 20px; }
+            .copy-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>[S25016] 커스텀 알람 팝업 협의 내용 정리 (2/3 협의)</h1>
+            <div class="email-meta">
+                <strong>수신:</strong> 안창우 프로님, 조용현 프로님<br>
+                <strong>발신:</strong> 에스피시스템스 심태양<br>
+                <strong>날짜:</strong> 2026-02-04
+            </div>
+        </div>
+
+        <p>안녕하세요, 에스피시스템스 심태양입니다.</p>
+        <p>지난 2월 3일 협의드린 <strong>커스텀 알람 팝업</strong> 관련 내용을 정리하여 공유드립니다.</p>
+
+        <h3>1. 시스템 동작 흐름</h3>
+        <table>
+            <tr>
+                <th style="width:60px;text-align:center;">순서</th>
+                <th style="width:130px;">동작</th>
+                <th>상세</th>
+            </tr>
+            <tr>
+                <td style="text-align:center;">1</td>
+                <td>PLC 감지</td>
+                <td>임계값(하한치) 이하 압력이 <strong>5초간 지속</strong> (시간값 변수화 가능)</td>
+            </tr>
+            <tr>
+                <td style="text-align:center;">2</td>
+                <td>PLC → UI</td>
+                <td>약속된 인터페이스로 <strong>신호 유지</strong> 전송</td>
+            </tr>
+            <tr>
+                <td style="text-align:center;">3</td>
+                <td>UI 알람</td>
+                <td>Rising Edge 감지 → 커스텀 팝업 표시</td>
+            </tr>
+            <tr>
+                <td style="text-align:center;">4</td>
+                <td>작업자 확인</td>
+                <td>팝업 확인 버튼 클릭 → 창 닫힘</td>
+            </tr>
+            <tr>
+                <td style="text-align:center;">5</td>
+                <td>PLC 경광등</td>
+                <td>적색 경광등 + 버튼램프 이상상태 표시</td>
+            </tr>
+            <tr class="highlight">
+                <td style="text-align:center;">6</td>
+                <td>정상화</td>
+                <td>정상 압력 <strong>5초 이상 유지</strong> → 플래그 리셋, 경광등 자동 해제</td>
+            </tr>
+        </table>
+
+        <h3>2. 협의 결정 사항</h3>
+        <table>
+            <tr>
+                <th style="width:140px;">항목</th>
+                <th>결정 내용</th>
+            </tr>
+            <tr>
+                <td><strong>임계치</strong></td>
+                <td><span class="badge badge-yellow">하한치만</span> 관리 (압력 부족 시 알람)</td>
+            </tr>
+            <tr>
+                <td><strong>트리거 방식</strong></td>
+                <td><span class="badge badge-blue">신호 유지</span> (UI에서 Rising Edge 감지)</td>
+            </tr>
+            <tr>
+                <td><strong>재발생 시</strong></td>
+                <td>기존 팝업에 <strong>내용 추가</strong> 표시</td>
+            </tr>
+            <tr>
+                <td><strong>정상화 시</strong></td>
+                <td>팝업 <strong>자동 닫힘</strong>, 경광등 자동 해제</td>
+            </tr>
+            <tr>
+                <td><strong>수동 닫힘 시</strong></td>
+                <td>압력 비정상이면 팝업 재표시 <strong>안 함</strong> (경광등만 유지)</td>
+            </tr>
+            <tr>
+                <td><strong>이력 관리</strong></td>
+                <td>상위시스템(관제)에서 로그 관리</td>
+            </tr>
+            <tr>
+                <td><strong>시간 설정</strong></td>
+                <td><span class="badge badge-green">변수화</span> UI에서 5초 등 시간값 설정 가능</td>
+            </tr>
+        </table>
+
+        <h3>3. 참고 자료</h3>
+        <div class="link-box">
+            협의 내용을 대시보드로 정리하였습니다:<br>
+            <a href="https://s2501602.vercel.app/punchlist/3week-plan/alarm-popup-demo.html" target="_blank">
+                https://s2501602.vercel.app/punchlist/3week-plan/alarm-popup-demo.html
+            </a>
+        </div>
+
+        <p style="margin-top: 30px;">상기 내용과 다른 부분이 있으시면 회신 부탁드립니다.</p>
+        <p>감사합니다.</p>
+
+        <div class="footer">
+            <strong>에스피시스템스 심태양 드림</strong>
+        </div>
+
+        <button class="copy-btn" onclick="copyEmailContent()">메일 본문 복사</button>
+    </div>
+
+    <script>
+        function copyEmailContent() {
+            const container = document.querySelector('.email-container');
+            const range = document.createRange();
+            range.selectNode(container);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            alert('메일 본문이 복사되었습니다.');
+        }
+    </script>
+</body>
+</html>
