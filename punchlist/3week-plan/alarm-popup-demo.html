@@ -285,6 +285,235 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* 협의 결과 섹션 스타일 */
+        .spec-section {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 40px;
+            border: 1px solid #334155;
+        }
+
+        .spec-section h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .spec-date {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 1000px) {
+            .spec-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .spec-card {
+            background: #1e293b;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .spec-card h3 {
+            color: #60a5fa;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #334155;
+        }
+
+        /* 흐름도 스타일 */
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px;
+            background: #334155;
+            border-radius: 8px;
+            border-left: 3px solid #f59e0b;
+        }
+
+        .flow-step.success {
+            border-left-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .flow-num {
+            width: 24px;
+            height: 24px;
+            background: #f59e0b;
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .flow-step.success .flow-num {
+            background: #22c55e;
+        }
+
+        .flow-content {
+            flex: 1;
+        }
+
+        .flow-content strong {
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .flow-content p {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 3px;
+        }
+
+        .flow-content em {
+            color: #fbbf24;
+            font-style: normal;
+        }
+
+        .flow-arrow {
+            color: #475569;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* 테이블 스타일 */
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .spec-table th,
+        .spec-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+
+        .spec-table th {
+            background: #334155;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .spec-table td {
+            color: #cbd5e1;
+        }
+
+        .spec-table tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .badge-spec {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #f59e0b;
+            color: #000;
+        }
+
+        .badge-spec.blue {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .badge-spec.green {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        .badge-spec.red {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        /* Edge Trigger 카드 */
+        .edge-card {
+            margin-top: 0;
+        }
+
+        .edge-diagram {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .edge-diagram {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .edge-item {
+            background: #334155;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .edge-item.active {
+            background: rgba(34, 197, 94, 0.15);
+            border: 2px solid #22c55e;
+        }
+
+        .edge-title {
+            color: #e2e8f0;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .edge-item.active .edge-title {
+            color: #22c55e;
+        }
+
+        .edge-visual {
+            margin: 10px 0;
+        }
+
+        .edge-svg {
+            width: 100%;
+            max-width: 200px;
+            height: 60px;
+        }
+
+        .edge-item p {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        .edge-item.active p {
+            color: #86efac;
+        }
     </style>
 </head>
 <body>
@@ -367,6 +596,148 @@
                         <li>창 크기에 따라 폰트 자동 조절</li>
                         <li>좌측 강조 바로 가독성 향상</li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- 협의 결과 섹션 -->
+        <div class="spec-section">
+            <h2>삼성 협의 결과</h2>
+            <p class="spec-date">협의일: 2026-02-04 | 협의자: 안창우 프로, 조용현 프로</p>
+
+            <div class="spec-grid">
+                <!-- 시스템 흐름 -->
+                <div class="spec-card">
+                    <h3>시스템 동작 흐름</h3>
+                    <div class="flow-diagram">
+                        <div class="flow-step">
+                            <div class="flow-num">1</div>
+                            <div class="flow-content">
+                                <strong>PLC 감지</strong>
+                                <p>임계값(하한치) 이하 압력이 <em>5초간 지속</em></p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <div class="flow-num">2</div>
+                            <div class="flow-content">
+                                <strong>PLC → UI 트리거</strong>
+                                <p>약속된 인터페이스로 <em>펄스 신호</em> 전송</p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <div class="flow-num">3</div>
+                            <div class="flow-content">
+                                <strong>UI 알람 표시</strong>
+                                <p><em>Rising Edge</em> 감지 → 커스텀 팝업 표시</p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <div class="flow-num">4</div>
+                            <div class="flow-content">
+                                <strong>작업자 확인</strong>
+                                <p>팝업 확인 버튼 클릭 → 창 닫힘</p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step">
+                            <div class="flow-num">5</div>
+                            <div class="flow-content">
+                                <strong>PLC 경광등</strong>
+                                <p>적색 경광등 + 버튼램프로 이상상태 표시</p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step success">
+                            <div class="flow-num">6</div>
+                            <div class="flow-content">
+                                <strong>정상화</strong>
+                                <p>정상 압력 <em>5초 이상 유지</em> → 플래그 리셋, 경광등 해제</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 협의 상세 -->
+                <div class="spec-card">
+                    <h3>협의 상세 내용</h3>
+                    <table class="spec-table">
+                        <tr>
+                            <th>항목</th>
+                            <th>결정 내용</th>
+                        </tr>
+                        <tr>
+                            <td>임계치 관리</td>
+                            <td><span class="badge-spec">하한치만</span> 관리 (압력 부족 시 알람)</td>
+                        </tr>
+                        <tr>
+                            <td>발생 조건</td>
+                            <td>하한치 이하 <strong>5초 지속</strong></td>
+                        </tr>
+                        <tr>
+                            <td>트리거 방식</td>
+                            <td><span class="badge-spec blue">펄스</span> (UI Rising Edge 감지)</td>
+                        </tr>
+                        <tr>
+                            <td>재발생 시</td>
+                            <td>기존 팝업에 <strong>내용 추가</strong> 표시</td>
+                        </tr>
+                        <tr>
+                            <td>정상화 조건</td>
+                            <td>정상 압력 <strong>5초 이상</strong> 유지</td>
+                        </tr>
+                        <tr>
+                            <td>정상화 시 동작</td>
+                            <td>팝업 <span class="badge-spec green">자동 닫힘</span>, 경광등 자동 해제</td>
+                        </tr>
+                        <tr>
+                            <td>수동 닫힘 시</td>
+                            <td>압력 비정상이면 팝업 재표시 <span class="badge-spec red">안 함</span><br/>(경광등만 유지)</td>
+                        </tr>
+                        <tr>
+                            <td>이력 관리</td>
+                            <td>상위시스템(관제)에서 로그 관리</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Edge Trigger 설명 -->
+            <div class="spec-card edge-card">
+                <h3>Edge Trigger 개념</h3>
+                <div class="edge-diagram">
+                    <div class="edge-item">
+                        <div class="edge-title">Level Trigger (레벨)</div>
+                        <div class="edge-visual">
+                            <svg viewBox="0 0 200 60" class="edge-svg">
+                                <line x1="10" y1="40" x2="50" y2="40" stroke="#666" stroke-width="2"/>
+                                <line x1="50" y1="40" x2="50" y2="20" stroke="#666" stroke-width="2"/>
+                                <line x1="50" y1="20" x2="150" y2="20" stroke="#ef4444" stroke-width="3"/>
+                                <line x1="150" y1="20" x2="150" y2="40" stroke="#666" stroke-width="2"/>
+                                <line x1="150" y1="40" x2="190" y2="40" stroke="#666" stroke-width="2"/>
+                                <text x="100" y="55" text-anchor="middle" fill="#ef4444" font-size="10">계속 호출됨</text>
+                            </svg>
+                        </div>
+                        <p>값이 1인 동안 계속 동작</p>
+                    </div>
+                    <div class="edge-item active">
+                        <div class="edge-title">Rising Edge (상승 에지) ✓</div>
+                        <div class="edge-visual">
+                            <svg viewBox="0 0 200 60" class="edge-svg">
+                                <line x1="10" y1="40" x2="50" y2="40" stroke="#666" stroke-width="2"/>
+                                <line x1="50" y1="40" x2="50" y2="20" stroke="#22c55e" stroke-width="3"/>
+                                <circle cx="50" cy="30" r="6" fill="#22c55e"/>
+                                <line x1="50" y1="20" x2="150" y2="20" stroke="#666" stroke-width="2"/>
+                                <line x1="150" y1="20" x2="150" y2="40" stroke="#666" stroke-width="2"/>
+                                <line x1="150" y1="40" x2="190" y2="40" stroke="#666" stroke-width="2"/>
+                                <text x="50" y="55" text-anchor="middle" fill="#22c55e" font-size="10">1회만 호출</text>
+                            </svg>
+                        </div>
+                        <p>0→1 변화 순간에만 1회 동작</p>
+                    </div>
                 </div>
             </div>
         </div>
