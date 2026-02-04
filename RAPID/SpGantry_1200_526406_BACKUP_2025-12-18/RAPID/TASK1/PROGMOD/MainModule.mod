@@ -3460,25 +3460,16 @@ PROC MoveGantryToWeldPosition()
 	gantry_floor := posStart;
 	gantry_floor.x := gantry_floor.x - offset_floor_x;
 	gantry_floor.y := gantry_floor.y - offset_floor_y;
+	! Z offset: Gantry must be ABOVE weld so TCP can reach down
+	! Apply in Floor coordinates BEFORE FloorToPhysical to avoid premature limit clamping
+	! (v1.9.33 fix: was applied after FloorToPhysical causing 300mm error at low Z)
+	gantry_floor.z := gantry_floor.z + WELD_R1_TCP_Z_OFFSET;
 
-	TPWrite "[WELD] TCP X/Y offset (Floor): [" + NumToStr(offset_floor_x,1) + ", " + NumToStr(offset_floor_y,1) + "]";
+	TPWrite "[WELD] TCP offset (Floor): X=" + NumToStr(offset_floor_x,1) + " Y=" + NumToStr(offset_floor_y,1) + " Z=" + NumToStr(WELD_R1_TCP_Z_OFFSET,0);
 
 	! Convert gantry Floor position to Physical coordinates
+	! FloorToPhysical applies limits internally
 	gantry_physical := FloorToPhysical(gantry_floor);
-
-	! NOTE: R limits already applied above (before offset calculation)
-
-	! Adjust Z for TCP offset (gantry must be ABOVE weld so TCP can reach down)
-	! Robot hangs upside down: TCP is below gantry R-center
-	! Gantry Floor Z = Weld Floor Z + TCP_OFFSET
-	! In Physical: subtract offset (Physical Z inversely related to Floor Z)
-	gantry_physical.z := gantry_physical.z - WELD_R1_TCP_Z_OFFSET;
-	IF gantry_physical.z < LIMIT_Z_NEG THEN
-		gantry_physical.z := LIMIT_Z_NEG;
-	ENDIF
-	IF gantry_physical.z > LIMIT_Z_POS THEN
-		gantry_physical.z := LIMIT_Z_POS;
-	ENDIF
 
 	! Set gantry target
 	target_jt.extax.eax_a := gantry_physical.x;  ! X1

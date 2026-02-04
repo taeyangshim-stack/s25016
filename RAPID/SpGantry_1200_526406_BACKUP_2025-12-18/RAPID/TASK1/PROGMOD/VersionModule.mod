@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.32";
+CONST string TASK1_VERSION := "v1.9.33";
 CONST string TASK2_VERSION := "v1.9.22";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
@@ -39,11 +39,18 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.32";  ! Multi-position test added
+CONST string WELD_SEQUENCE_VERSION := "v1.9.33";  ! Z offset order fix
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.33 (2026-02-04)
+!   - FIX: MoveGantryToWeldPosition - Z offset order bug
+!   - TCP Z offset now applied in Floor coords BEFORE FloorToPhysical
+!   - Previously: FloorToPhysical clamped to 1000, then subtract 500 = 500 (wrong)
+!   - Now: Add 500 to Floor Z first, then FloorToPhysical = 800 (correct)
+!   - LowZ test error: 300mm -> expected <0.5mm
+!
 ! v1.9.32 (2026-02-04)
 !   - FEAT: TestMultiPosition - Test 5 different Floor positions
 !   - Center [5000,5000,1200], Left [3000,5000,1200], Right [7000,5000,1200]
