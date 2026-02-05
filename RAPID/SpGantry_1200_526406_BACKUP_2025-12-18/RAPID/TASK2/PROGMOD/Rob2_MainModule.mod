@@ -383,6 +383,11 @@ VAR robjoint robot2_offset_joints;
     PERS pos shared_posEnd_r2;
     PERS num shared_nLengthWeldLine;
 
+    ! stCommand/stReact Protocol (v1.9.39 - T_Head interface)
+    ! T_Head sets stCommand, TASK1/2 respond via stReact
+    PERS string stCommand;
+    PERS string stReact{2};
+
     ! Weld WObj for Robot2 (v1.9.0)
     ! Created by TASK1, referenced by TASK2
     PERS wobjdata WobjWeldR2;
@@ -852,6 +857,12 @@ VAR robjoint robot2_offset_joints;
             TPWrite "TASK2: Command Loop mode (PlanA Style)";
             Robot2_CommandLoop;
             Write main_logfile, "Command Loop exited";
+        ELSEIF test_mode = 11 THEN
+            ! v1.9.39: T_Head stCommand listener mode
+            Write main_logfile, "T_Head Listener mode (test_mode=11)";
+            TPWrite "TASK2: T_Head Listener mode";
+            Rob2_CommandListener;
+            Write main_logfile, "T_Head Listener exited";
         ENDIF
 
         WaitTime 1.0;
@@ -3387,6 +3398,84 @@ PROC Robot2_CommandLoop()
 
 		TPWrite "[R2_CMD] Ready for next command";
 	ENDWHILE
+ENDPROC
+
+! ========================================
+! Rob2_CommandListener: T_Head stCommand handler (v1.9.39)
+! ========================================
+! Responds to stCommand from T_Head task
+! Protocol: "Ready" → receive command → execute → "Ack" → wait clear → "Ready"
+PROC Rob2_CommandListener()
+	VAR iodev head_log;
+	Open "HOME:/head_r2_listener.txt", head_log \Write;
+	Write head_log, "Rob2 CommandListener (v1.9.39) - " + CDate() + " " + CTime();
+
+	TPWrite "[R2] CommandListener started, entering Ready state";
+
+	WHILE TRUE DO
+		stReact{2} := "Ready";
+		Write head_log, "Status: Ready, waiting stCommand...";
+		WaitUntil stCommand <> "";
+		Write head_log, "Received: " + stCommand;
+		TPWrite "[R2] stCommand=" + stCommand;
+
+		TEST stCommand
+			CASE "MoveHome":
+				stReact{2} := "";
+				SetRobot2InitialPosition;
+				stReact{2} := "Ack";
+				Write head_log, "MoveHome done";
+				WaitUntil stCommand = "";
+
+			CASE "EdgeWeld":
+				stReact{2} := "";
+				Write head_log, "EdgeWeld: waiting t1_weld_position_ready";
+				WaitUntil t1_weld_position_ready = TRUE \MaxTime := 60;
+				IF t1_weld_position_ready THEN
+					Robot2_EdgeWeldSequence;
+					WaitUntil t1_weld_done = TRUE \MaxTime := 120;
+				ELSE
+					Write head_log, "EdgeWeld: t1_weld_position_ready timeout";
+					TPWrite "[R2] ERROR: t1_weld_position_ready timeout";
+				ENDIF
+				stReact{2} := "Ack";
+				Write head_log, "EdgeWeld done";
+				WaitUntil stCommand = "";
+
+			CASE "Weld", "WeldMotion", "WeldCorr", "WeldMotionCorr":
+				stReact{2} := "";
+				Write head_log, "Weld: waiting t1_weld_position_ready";
+				WaitUntil t1_weld_position_ready = TRUE \MaxTime := 60;
+				IF t1_weld_position_ready THEN
+					Robot2_EdgeWeldSequence;
+					WaitUntil t1_weld_done = TRUE \MaxTime := 120;
+				ELSE
+					Write head_log, "Weld: t1_weld_position_ready timeout";
+					TPWrite "[R2] ERROR: t1_weld_position_ready timeout";
+				ENDIF
+				stReact{2} := "Ack";
+				Write head_log, "Weld done";
+				WaitUntil stCommand = "";
+
+			CASE "Rob2WireCut":
+				stReact{2} := "";
+				! Stub - Robot2 wire cut
+				stReact{2} := "Ack";
+				Write head_log, "Rob2WireCut done (stub)";
+				WaitUntil stCommand = "";
+
+			DEFAULT:
+				! TASK1-only commands (MoveAbsGantry, TestMenu etc.)
+				! Robot2 not involved - immediate Ack
+				! Note: rDispatchR1 is used for these, so this rarely triggers
+				Write head_log, "Not R2 command: " + stCommand + " (immediate Ack)";
+				stReact{2} := "Ack";
+				WaitUntil stCommand = "";
+		ENDTEST
+	ENDWHILE
+ERROR
+	Write head_log, "ERROR " + NumToStr(ERRNO, 0);
+	Close head_log;
 ENDPROC
 
 ENDMODULE

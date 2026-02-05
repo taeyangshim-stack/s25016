@@ -112,30 +112,15 @@ PRIORITY_FONTS = {
     "긴급": Font(name="맑은 고딕", size=10, bold=True, color="FFFFFF"),
     "높음": Font(name="맑은 고딕", size=10, bold=True),
 }
-PLAN_FILLS = {
-    "2/6(금)": PatternFill(start_color="FFFFDD", end_color="FFFFDD", fill_type="solid"),
-    "2/7(토)": PatternFill(start_color="DDECFF", end_color="DDECFF", fill_type="solid"),
-    "2/8(일)": PatternFill(start_color="DDFFE0", end_color="DDFFE0", fill_type="solid"),
-}
-
-# 6개 그룹 일정 배분 (Sheet 1: 2/6~2/8)
-GROUP_SCHEDULE = {
-    "알람/팝업":       {"2/6(금)": "작업예정", "2/7(토)": "디버깅",   "2/8(일)": "테스트"},
-    "실시간 용접조건":  {"2/6(금)": "작업예정", "2/7(토)": "테스트",   "2/8(일)": "확인"},
-    "UI 조작 로그":    {"2/6(금)": "작업예정", "2/7(토)": "테스트",   "2/8(일)": "확인"},
-    "터치에러 핸들링":  {"2/6(금)": "디버깅",   "2/7(토)": "작업예정", "2/8(일)": "테스트"},
-    "원점관리":        {"2/6(금)": "-",       "2/7(토)": "작업예정", "2/8(일)": "테스트"},
-    "수동티칭":        {"2/6(금)": "-",       "2/7(토)": "작업예정", "2/8(일)": "테스트"},
-}
-
-# 6개 그룹 일정 배분 (Sheet 4: 2/5~2/8)
+# 6개 그룹 일정 배분 (2/5~2/12) - 개발중 → 테스트 → 컨펌배포
 GROUP_SCHEDULE_DAILY = {
-    "알람/팝업":       {"2/5(목)": "분석",   "2/6(금)": "작업예정", "2/7(토)": "디버깅",   "2/8(일)": "테스트"},
-    "실시간 용접조건":  {"2/5(목)": "-",     "2/6(금)": "작업예정", "2/7(토)": "테스트",   "2/8(일)": "확인"},
-    "UI 조작 로그":    {"2/5(목)": "-",     "2/6(금)": "작업예정", "2/7(토)": "테스트",   "2/8(일)": "확인"},
-    "터치에러 핸들링":  {"2/5(목)": "분석",   "2/6(금)": "디버깅",   "2/7(토)": "작업예정", "2/8(일)": "테스트"},
-    "원점관리":        {"2/5(목)": "-",     "2/6(금)": "-",       "2/7(토)": "작업예정", "2/8(일)": "테스트"},
-    "수동티칭":        {"2/5(목)": "-",     "2/6(금)": "-",       "2/7(토)": "작업예정", "2/8(일)": "테스트"},
+    "알람/팝업":       {"2/5(목)": "개발중", "2/6(금)": "개발중",   "2/7(토)": "테스트",   "2/8(일)": "테스트",   "2/9(월)": "컨펌배포", "2/10(화)": "-",       "2/11(수)": "-",       "2/12(목)": "-"},
+    "실시간 용접조건":  {"2/5(목)": "개발중", "2/6(금)": "개발중",   "2/7(토)": "테스트",   "2/8(일)": "컨펌배포", "2/9(월)": "-",       "2/10(화)": "-",       "2/11(수)": "-",       "2/12(목)": "-"},
+    "UI 조작 로그":    {"2/5(목)": "개발중", "2/6(금)": "개발중",   "2/7(토)": "테스트",   "2/8(일)": "컨펌배포", "2/9(월)": "-",       "2/10(화)": "-",       "2/11(수)": "-",       "2/12(목)": "-"},
+    "터치에러 핸들링":  {"2/5(목)": "개발중", "2/6(금)": "개발중",   "2/7(토)": "개발중",   "2/8(일)": "테스트",   "2/9(월)": "테스트",   "2/10(화)": "테스트",   "2/11(수)": "컨펌배포", "2/12(목)": "-"},
+    "원점관리":        {"2/5(목)": "개발중", "2/6(금)": "개발중",   "2/7(토)": "개발중",   "2/8(일)": "테스트",   "2/9(월)": "테스트",   "2/10(화)": "컨펌배포", "2/11(수)": "-",       "2/12(목)": "-"},
+    "수동티칭":        {"2/5(목)": "-",     "2/6(금)": "-",       "2/7(토)": "개발중",   "2/8(일)": "개발중",   "2/9(월)": "테스트",   "2/10(화)": "컨펌배포", "2/11(수)": "-",       "2/12(목)": "-"},
+    "이벤트성 진행":   {"2/5(목)": "개발중", "2/6(금)": "개발중",   "2/7(토)": "개발중",   "2/8(일)": "개발중",   "2/9(월)": "테스트",   "2/10(화)": "테스트",   "2/11(수)": "컨펌배포", "2/12(목)": "컨펌배포"},
 }
 
 
@@ -421,212 +406,6 @@ def get_blocker_info(item):
     return ", ".join(blockers)
 
 
-def create_plan_sheet(ws, grouped_items):
-    """Create Sheet 1: 미완료 항목 + 2/6~2/8 작업 계획"""
-    ws.title = "미완료 항목 + 계획"
-
-    total_incomplete = sum(len(v) for v in grouped_items.values())
-
-    # Title rows
-    headers = [
-        ("No.", 5), ("기능영역", 16), ("ID", 16), ("항목명", 42),
-        ("라인", 8), ("담당자", 10), ("우선순위", 8), ("현재상태", 10),
-        ("2/6(금)", 14), ("2/7(토)", 14), ("2/8(일)", 14),
-        ("의존성/블로커", 20), ("비고", 30), ("이슈 링크", 50),
-    ]
-    last_col = get_column_letter(len(headers))
-
-    ws.merge_cells(f'A1:{last_col}1')
-    c = ws['A1']
-    c.value = "S25016 미완료 항목 현황 및 2/6~2/8 작업 계획"
-    c.font = TITLE_FONT
-    c.alignment = CENTER
-
-    # Status counts
-    scnt = {}
-    for items in grouped_items.values():
-        for i in items:
-            scnt[i["status"]] = scnt.get(i["status"], 0) + 1
-    status_str = ", ".join(f"{s} {scnt.get(s, 0)}" for s in ["신규", "진행중", "검증중"] if scnt.get(s, 0))
-
-    ws.merge_cells(f'A2:{last_col}2')
-    today = datetime.now().strftime('%Y년 %m월 %d일')
-    ws['A2'].value = f"{today} 기준 | 미완료 {total_incomplete}건 ({status_str})"
-    ws['A2'].font = NORMAL_FONT
-    ws['A2'].alignment = CENTER
-
-    # Owner summary
-    ocnt = {}
-    for items in grouped_items.values():
-        for i in items:
-            o = i["owner"] or "미배정"
-            ocnt[o] = ocnt.get(o, 0) + 1
-    owner_str = ", ".join(f"{k} {v}건" for k, v in sorted(ocnt.items(), key=lambda x: -x[1]))
-
-    ws.merge_cells(f'A3:{last_col}3')
-    ws['A3'].value = f"담당자: {owner_str}"
-    ws['A3'].font = NORMAL_FONT
-    ws['A3'].alignment = CENTER
-
-    # Vercel links (row 4)
-    ws.merge_cells(f'A4:G4')
-    link_cell = ws['A4']
-    link_cell.value = f"펀치리스트: {PUNCHLIST_URL}"
-    link_cell.hyperlink = PUNCHLIST_URL
-    link_cell.font = Font(name="맑은 고딕", size=9, color="0563C1", underline="single")
-    link_cell.alignment = LEFT
-
-    ws.merge_cells(f'H4:{last_col}4')
-    gantt_cell = ws['H4']
-    gantt_cell.value = f"3주계획/간트차트: {GANTT_URL}"
-    gantt_cell.hyperlink = GANTT_URL
-    gantt_cell.font = Font(name="맑은 고딕", size=9, color="0563C1", underline="single")
-    gantt_cell.alignment = LEFT
-
-    # Header row (row 5)
-    ROW_HEADER = 5
-    for col, (name, width) in enumerate(headers, 1):
-        ws.column_dimensions[get_column_letter(col)].width = width
-        cell = ws.cell(row=ROW_HEADER, column=col, value=name)
-        style(cell, HEADER_FONT, HEADER_FILL, CENTER, THIN_BORDER)
-
-    ws.freeze_panes = 'A6'
-    ws.auto_filter.ref = f"A{ROW_HEADER}:{last_col}{ROW_HEADER}"
-
-    # Data rows
-    row = ROW_HEADER + 1
-    seq = 0
-
-    # 6개 사용자 그룹 → 이벤트성 진행 순서
-    all_group_names = list(FUNCTIONAL_GROUPS) + (["이벤트성 진행"] if "이벤트성 진행" in grouped_items else [])
-
-    for group_name in all_group_names:
-        if group_name not in grouped_items or not grouped_items[group_name]:
-            continue
-
-        group_items = grouped_items[group_name]
-        colors = GROUP_COLORS.get(group_name, GROUP_COLORS["이벤트성 진행"])
-        is_user_group = group_name in FUNCTIONAL_GROUPS
-
-        # Group separator row
-        gfill = PatternFill(start_color=colors["header"], end_color=colors["header"], fill_type="solid")
-        ws.merge_cells(f'A{row}:{last_col}{row}')
-        cell = ws.cell(row=row, column=1,
-                       value=f"▶ {group_name} ({len(group_items)}건)")
-        style(cell, Font(name="맑은 고딕", size=11, bold=True, color="FFFFFF"),
-              gfill, LEFT, THIN_BORDER)
-        ws.row_dimensions[row].height = 25
-        row += 1
-
-        row_tint = PatternFill(start_color=colors["row"], end_color=colors["row"], fill_type="solid")
-        first_data_row = row
-
-        # Pre-filled schedule
-        schedule = GROUP_SCHEDULE.get(group_name, {})
-
-        for item in group_items:
-            seq += 1
-            blocker = get_blocker_info(item)
-
-            # Plan columns: grouped → schedule, non-grouped → 이벤트성
-            if is_user_group:
-                plan_6 = schedule.get("2/6(금)", "")
-                plan_7 = schedule.get("2/7(토)", "")
-                plan_8 = schedule.get("2/8(일)", "")
-            else:
-                plan_6 = "이벤트성"
-                plan_7 = "이벤트성"
-                plan_8 = "이벤트성"
-
-            area_display = group_name if is_user_group else "-"
-
-            data = [
-                seq, area_display, item["id"], item["title"],
-                item["line"], item["owner"], item["priority"], item["status"],
-                plan_6, plan_7, plan_8,
-                blocker, item["bigo"], "",
-            ]
-
-            for col, val in enumerate(data, 1):
-                cell = ws.cell(row=row, column=col, value=val)
-
-                align = CENTER if col in (1, 2, 5, 6, 7, 8) else LEFT
-                font = NORMAL_FONT
-                fill = row_tint
-
-                # Priority column
-                if col == 7:
-                    p = item["priority"]
-                    if p in PRIORITY_FILLS:
-                        fill = PRIORITY_FILLS[p]
-                    if p in PRIORITY_FONTS:
-                        font = PRIORITY_FONTS[p]
-
-                # Status column
-                if col == 8:
-                    sfill = PatternFill(
-                        start_color=STATUS_COLORS.get(item["status"], "FFFFFF"),
-                        end_color=STATUS_COLORS.get(item["status"], "FFFFFF"),
-                        fill_type="solid")
-                    fill = sfill
-                    font = BOLD_FONT
-
-                # Plan columns
-                if col == 9:
-                    fill = PLAN_FILLS["2/6(금)"]
-                elif col == 10:
-                    fill = PLAN_FILLS["2/7(토)"]
-                elif col == 11:
-                    fill = PLAN_FILLS["2/8(일)"]
-
-                style(cell, font, fill, align, THIN_BORDER)
-
-            # Hyperlink
-            if item["link"]:
-                lc = ws.cell(row=row, column=14, value=item["link"])
-                lc.hyperlink = item["link"]
-                lc.font = LINK_FONT
-                lc.alignment = LEFT
-                lc.border = THIN_BORDER
-
-            ws.row_dimensions[row].height = 28
-            row += 1
-
-        # 사용자 그룹: 기능영역 컬럼(B) 셀 병합으로 그룹 표시
-        if is_user_group and len(group_items) > 1:
-            ws.merge_cells(f'B{first_data_row}:B{row - 1}')
-            mc = ws.cell(row=first_data_row, column=2)
-            mc.value = group_name
-            mc.font = Font(name="맑은 고딕", size=10, bold=True)
-            mc.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-            mc.fill = row_tint
-            mc.border = THIN_BORDER
-
-    # Data Validation for plan columns
-    dv = DataValidation(
-        type="list",
-        formula1='"작업예정,디버깅,테스트,배포,확인,분석,이벤트성,미진행,-"',
-        allow_blank=True,
-        showDropDown=False,
-    )
-    dv.error = "목록에서 선택하세요"
-    dv.errorTitle = "입력 오류"
-    ws.add_data_validation(dv)
-    dv.add(f"I{ROW_HEADER + 1}:K{row - 1}")
-
-    # Footer
-    row += 1
-    ws.merge_cells(f'A{row}:{last_col}{row}')
-    ws[f'A{row}'].value = f"총 미완료 {total_incomplete}건 | 2/6~2/8 열에 작업계획을 입력하세요"
-    ws[f'A{row}'].font = Font(name="맑은 고딕", size=10, italic=True, color="666666")
-    ws[f'A{row}'].alignment = LEFT
-
-    # Print settings
-    ws.page_setup.orientation = 'landscape'
-    ws.page_setup.fitToWidth = 1
-    ws.page_setup.fitToHeight = 0
-
-
 # === Sheet 2: 요약 ===
 
 def create_summary_sheet(ws, items):
@@ -778,26 +557,66 @@ def create_list_sheet(ws, items):
     ws.freeze_panes = 'A2'
     ws.auto_filter.ref = f"A1:{get_column_letter(len(headers))}1"
 
-    row = 2
-    current_group = None
+    # Re-sort: status → functional area → PL number
+    fa_order = {g: i for i, g in enumerate(FUNCTIONAL_GROUPS)}
+    no_area_idx = len(FUNCTIONAL_GROUPS) + 1
 
-    for idx, item in enumerate(items, 1):
-        if item["status"] != current_group:
-            current_group = item["status"]
-            cnt = sum(1 for i in items if i["status"] == current_group)
-            gfill = PatternFill(start_color=STATUS_COLORS.get(current_group, "FFFFFF"),
-                                end_color=STATUS_COLORS.get(current_group, "FFFFFF"), fill_type="solid")
-            ws.merge_cells(f'A{row}:{get_column_letter(len(headers))}{row}')
-            cell = ws.cell(row=row, column=1, value=f"▶ {current_group} ({cnt}건)")
+    resorted = sorted(items, key=lambda x: (
+        STATUS_ORDER.get(x["status"], 99),
+        fa_order.get(FUNCTIONAL_AREA_MAP.get(x["id"], ""), no_area_idx),
+        x["sort_key"][0],
+        x["sort_key"][1],
+    ))
+
+    row = 2
+    current_status = None
+    last_col = get_column_letter(len(headers))
+    merge_ranges = []  # (start_row, end_row, area_name)
+    prev_area = None
+    area_start_row = None
+
+    for idx, item in enumerate(resorted, 1):
+        if item["status"] != current_status:
+            # Finalize previous area merge
+            if prev_area and area_start_row is not None and row - 1 > area_start_row:
+                merge_ranges.append((area_start_row, row - 1, prev_area))
+            elif prev_area and area_start_row == row - 1:
+                merge_ranges.append((area_start_row, area_start_row, prev_area))
+            prev_area = None
+            area_start_row = None
+
+            current_status = item["status"]
+            cnt = sum(1 for i in resorted if i["status"] == current_status)
+            gfill = PatternFill(start_color=STATUS_COLORS.get(current_status, "FFFFFF"),
+                                end_color=STATUS_COLORS.get(current_status, "FFFFFF"), fill_type="solid")
+            ws.merge_cells(f'A{row}:{last_col}{row}')
+            cell = ws.cell(row=row, column=1, value=f"▶ {current_status} ({cnt}건)")
             style(cell, Font(name="맑은 고딕", size=11, bold=True), gfill, LEFT, THIN_BORDER)
             ws.row_dimensions[row].height = 25
             row += 1
 
-        sfill = PatternFill(start_color=STATUS_COLORS.get(item["status"], "FFFFFF"),
-                            end_color=STATUS_COLORS.get(item["status"], "FFFFFF"), fill_type="solid")
-
         area = classify_functional_area(item)
         area_display = area if item["id"] in FUNCTIONAL_AREA_MAP else ""
+
+        # Track consecutive same-area items for merging
+        if area_display:
+            if area_display != prev_area:
+                if prev_area and area_start_row is not None and row - 1 > area_start_row:
+                    merge_ranges.append((area_start_row, row - 1, prev_area))
+                elif prev_area and area_start_row == row - 1:
+                    merge_ranges.append((area_start_row, area_start_row, prev_area))
+                prev_area = area_display
+                area_start_row = row
+        else:
+            if prev_area and area_start_row is not None and row - 1 > area_start_row:
+                merge_ranges.append((area_start_row, row - 1, prev_area))
+            elif prev_area and area_start_row == row - 1:
+                merge_ranges.append((area_start_row, area_start_row, prev_area))
+            prev_area = None
+            area_start_row = None
+
+        sfill = PatternFill(start_color=STATUS_COLORS.get(item["status"], "FFFFFF"),
+                            end_color=STATUS_COLORS.get(item["status"], "FFFFFF"), fill_type="solid")
 
         data = [
             idx, item["id"], area_display, item["title"], item["line"],
@@ -811,7 +630,6 @@ def create_list_sheet(ws, items):
             align = CENTER if col in (1, 3, 5, 6, 7, 8, 9, 10, 11, 12) else LEFT
             font = BOLD_FONT if col == 8 else NORMAL_FONT
             fill = sfill if col == 8 else None
-            # 기능영역 컬럼 색상 (col 3)
             if col == 3 and area_display and area_display in GROUP_COLORS:
                 gc = GROUP_COLORS[area_display]
                 fill = PatternFill(start_color=gc["row"], end_color=gc["row"], fill_type="solid")
@@ -828,151 +646,185 @@ def create_list_sheet(ws, items):
         ws.row_dimensions[row].height = 22
         row += 1
 
+    # Finalize last area
+    if prev_area and area_start_row is not None and row - 1 > area_start_row:
+        merge_ranges.append((area_start_row, row - 1, prev_area))
+    elif prev_area and area_start_row == row - 1:
+        merge_ranges.append((area_start_row, area_start_row, prev_area))
+
+    # Apply 기능영역 column (C) merges
+    for start, end, area_name in merge_ranges:
+        if end > start:
+            ws.merge_cells(f'C{start}:C{end}')
+        mc = ws.cell(row=start, column=3)
+        mc.value = area_name
+        gc = GROUP_COLORS.get(area_name, {})
+        if gc:
+            mc.fill = PatternFill(start_color=gc["row"], end_color=gc["row"], fill_type="solid")
+        mc.font = Font(name="맑은 고딕", size=9, bold=True)
+        mc.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        mc.border = THIN_BORDER
+
 
 # === Sheet 4: 일일계획 ===
 
-PLAN_DAYS = ["2/5(목)", "2/6(금)", "2/7(토)", "2/8(일)"]
+PLAN_DAYS = ["2/5(목)", "2/6(금)", "2/7(토)", "2/8(일)", "2/9(월)", "2/10(화)", "2/11(수)", "2/12(목)"]
 PLAN_DAY_FILLS = {
-    "2/5(목)": PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid"),
-    "2/6(금)": PatternFill(start_color="FFFFDD", end_color="FFFFDD", fill_type="solid"),
-    "2/7(토)": PatternFill(start_color="DDECFF", end_color="DDECFF", fill_type="solid"),
-    "2/8(일)": PatternFill(start_color="DDFFE0", end_color="DDFFE0", fill_type="solid"),
+    "2/5(목)":  PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid"),
+    "2/6(금)":  PatternFill(start_color="FFFFDD", end_color="FFFFDD", fill_type="solid"),
+    "2/7(토)":  PatternFill(start_color="DDECFF", end_color="DDECFF", fill_type="solid"),
+    "2/8(일)":  PatternFill(start_color="DDFFE0", end_color="DDFFE0", fill_type="solid"),
+    "2/9(월)":  PatternFill(start_color="E8D5F5", end_color="E8D5F5", fill_type="solid"),
+    "2/10(화)": PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid"),
+    "2/11(수)": PatternFill(start_color="D6E4F0", end_color="D6E4F0", fill_type="solid"),
+    "2/12(목)": PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid"),
 }
 
 
 def create_daily_plan_sheet(ws, grouped_items):
-    """Create Sheet 4: 일일계획 - 담당자별/날짜별 작업 배분표"""
+    """Create Sheet 1: 기능영역별 일일계획 (2/5~2/12) + 블로커/비고/링크"""
     ws.title = "일일계획"
 
-    # Collect all incomplete items with owner info
-    all_items = []
-    for group_name, items in grouped_items.items():
-        for item in items:
-            all_items.append({**item, "group": group_name})
+    total_incomplete = sum(len(v) for v in grouped_items.values())
+    num_plan_days = len(PLAN_DAYS)
+    plan_col_start = 9  # col I
+    plan_col_end = plan_col_start + num_plan_days - 1
+    extra_cols = ["의존성/블로커", "비고", "이슈 링크"]
+    total_cols = plan_col_end + len(extra_cols)
+    last_col_letter = get_column_letter(total_cols)
 
-    # Group by owner
-    by_owner = OrderedDict()
-    for item in all_items:
-        owner = item["owner"] or "미배정"
-        if owner not in by_owner:
-            by_owner[owner] = []
-        by_owner[owner].append(item)
+    # Column widths
+    base_widths = {'A': 5, 'B': 14, 'C': 16, 'D': 42, 'E': 8, 'F': 10, 'G': 8, 'H': 10}
+    for c, w in base_widths.items():
+        ws.column_dimensions[c].width = w
+    for i, day in enumerate(PLAN_DAYS):
+        ws.column_dimensions[get_column_letter(plan_col_start + i)].width = 12
+    ws.column_dimensions[get_column_letter(plan_col_end + 1)].width = 20   # 의존성/블로커
+    ws.column_dimensions[get_column_letter(plan_col_end + 2)].width = 30   # 비고
+    ws.column_dimensions[get_column_letter(plan_col_end + 3)].width = 50   # 이슈 링크
 
-    # Sort owners by item count (descending)
-    by_owner = OrderedDict(sorted(by_owner.items(), key=lambda x: -len(x[1])))
-
-    last_col_letter = "K"
-
-    # Title
+    # Title rows
     ws.merge_cells(f'A1:{last_col_letter}1')
-    ws['A1'].value = "S25016 잔여 펀치리스트 일일 진행계획 (2/5~2/8)"
+    ws['A1'].value = "S25016 미완료 항목 현황 및 일일 진행계획 (2/5~2/12)"
     ws['A1'].font = TITLE_FONT
     ws['A1'].alignment = CENTER
 
+    scnt = {}
+    for items in grouped_items.values():
+        for i in items:
+            scnt[i["status"]] = scnt.get(i["status"], 0) + 1
+    status_str = ", ".join(f"{s} {scnt.get(s, 0)}" for s in ["신규", "진행중", "검증중"] if scnt.get(s, 0))
+
     ws.merge_cells(f'A2:{last_col_letter}2')
     today = datetime.now().strftime('%Y년 %m월 %d일')
-    ws['A2'].value = f"{today} 작성 | 미완료 {len(all_items)}건 | 담당자 {len(by_owner)}명"
+    ws['A2'].value = f"{today} 기준 | 미완료 {total_incomplete}건 ({status_str})"
     ws['A2'].font = NORMAL_FONT
     ws['A2'].alignment = CENTER
 
-    # Summary table: 담당자별 건수 x 우선순위
-    row = 4
-    ws.merge_cells(f'A{row}:G{row}')
-    ws[f'A{row}'].value = "■ 담당자별 미완료 현황"
-    ws[f'A{row}'].font = SUBTITLE_FONT
-
-    row += 1
-    sum_headers = ["담당자", "전체", "긴급", "높음", "보통", "낮음", "주요 기능영역"]
-    for col, h in enumerate(sum_headers, 1):
-        cell = ws.cell(row=row, column=col, value=h)
-        style(cell, HEADER_FONT, HEADER_FILL, CENTER, THIN_BORDER)
-
-    for owner, items in by_owner.items():
-        row += 1
-        pcnt = {"긴급": 0, "높음": 0, "보통": 0, "낮음": 0}
-        groups_set = set()
+    ocnt = {}
+    for items in grouped_items.values():
         for i in items:
-            p = i["priority"] or "보통"
-            pcnt[p] = pcnt.get(p, 0) + 1
-            groups_set.add(i["group"])
-        groups_str = ", ".join(sorted(groups_set)[:3])
+            o = i["owner"] or "미배정"
+            ocnt[o] = ocnt.get(o, 0) + 1
+    owner_str = ", ".join(f"{k} {v}건" for k, v in sorted(ocnt.items(), key=lambda x: -x[1]))
 
-        for col, val in enumerate([owner, len(items), pcnt["긴급"], pcnt["높음"],
-                                    pcnt["보통"], pcnt["낮음"], groups_str], 1):
-            cell = ws.cell(row=row, column=col, value=val)
-            align = LEFT if col == 7 else CENTER
-            style(cell, NORMAL_FONT, None, align, THIN_BORDER)
+    ws.merge_cells(f'A3:{last_col_letter}3')
+    ws['A3'].value = f"담당자: {owner_str}"
+    ws['A3'].font = NORMAL_FONT
+    ws['A3'].alignment = CENTER
 
-    # Column widths for plan section
-    col_widths = {'A': 5, 'B': 14, 'C': 16, 'D': 42, 'E': 8, 'F': 8, 'G': 10,
-                  'H': 16, 'I': 16, 'J': 16, 'K': 16}
-    for c, w in col_widths.items():
-        ws.column_dimensions[c].width = w
+    # Vercel links (row 4)
+    ws.merge_cells(f'A4:H4')
+    lc = ws['A4']
+    lc.value = f"펀치리스트: {PUNCHLIST_URL}"
+    lc.hyperlink = PUNCHLIST_URL
+    lc.font = Font(name="맑은 고딕", size=9, color="0563C1", underline="single")
+    lc.alignment = LEFT
 
-    # Daily plan section: per owner
-    row += 2
-    ws.merge_cells(f'A{row}:{last_col_letter}{row}')
-    ws[f'A{row}'].value = "■ 담당자별 일일 작업 배분"
-    ws[f'A{row}'].font = SUBTITLE_FONT
+    mid_col = get_column_letter(plan_col_start)
+    ws.merge_cells(f'{mid_col}4:{last_col_letter}4')
+    gc = ws[f'{mid_col}4']
+    gc.value = f"3주계획/간트차트: {GANTT_URL}"
+    gc.hyperlink = GANTT_URL
+    gc.font = Font(name="맑은 고딕", size=9, color="0563C1", underline="single")
+    gc.alignment = LEFT
 
-    row += 1
-    plan_headers = ["No.", "기능영역", "ID", "항목명", "라인", "우선순위", "현재상태",
-                    "2/5(목)", "2/6(금)", "2/7(토)", "2/8(일)"]
+    # Header row (row 5)
+    ROW_HEADER = 5
+    plan_headers = ["No.", "기능영역", "ID", "항목명", "라인", "담당자", "우선순위", "현재상태"]
+    plan_headers += PLAN_DAYS
+    plan_headers += extra_cols
+
     for col, h in enumerate(plan_headers, 1):
-        cell = ws.cell(row=row, column=col, value=h)
+        cell = ws.cell(row=ROW_HEADER, column=col, value=h)
         style(cell, HEADER_FONT, HEADER_FILL, CENTER, THIN_BORDER)
-    header_row = row
+    header_row = ROW_HEADER
 
-    row += 1
+    ws.freeze_panes = 'A6'
+    ws.auto_filter.ref = f"A{ROW_HEADER}:{last_col_letter}{ROW_HEADER}"
+
+    # Data rows
+    row = ROW_HEADER + 1
     seq = 0
+    link_col = plan_col_end + 3
 
-    for owner, items in by_owner.items():
-        # Owner separator row
+    all_group_names = list(FUNCTIONAL_GROUPS) + (["이벤트성 진행"] if "이벤트성 진행" in grouped_items else [])
+
+    for group_name in all_group_names:
+        if group_name not in grouped_items or not grouped_items[group_name]:
+            continue
+
+        group_items = grouped_items[group_name]
+        colors = GROUP_COLORS.get(group_name, GROUP_COLORS["이벤트성 진행"])
+        is_user_group = group_name in FUNCTIONAL_GROUPS
+
+        # Group separator row
+        gfill = PatternFill(start_color=colors["header"], end_color=colors["header"], fill_type="solid")
         ws.merge_cells(f'A{row}:{last_col_letter}{row}')
         cell = ws.cell(row=row, column=1,
-                       value=f"▶ {owner} ({len(items)}건)")
-        ofill = PatternFill(start_color="D9E2F3", end_color="D9E2F3", fill_type="solid")
-        style(cell, Font(name="맑은 고딕", size=11, bold=True), ofill, LEFT, THIN_BORDER)
+                       value=f"▶ {group_name} ({len(group_items)}건)")
+        style(cell, Font(name="맑은 고딕", size=11, bold=True, color="FFFFFF"),
+              gfill, LEFT, THIN_BORDER)
         ws.row_dimensions[row].height = 25
         row += 1
 
-        # Sort: priority first
-        sorted_items = sorted(items, key=lambda x: (
+        row_tint = PatternFill(start_color=colors["row"], end_color=colors["row"], fill_type="solid")
+        first_data_row = row
+
+        schedule = GROUP_SCHEDULE_DAILY.get(group_name, {})
+
+        sorted_grp = sorted(group_items, key=lambda x: (
             PRIORITY_ORDER.get(x["priority"], 99),
             x["sort_key"][0], x["sort_key"][1]
         ))
 
-        for item in sorted_items:
+        for item in sorted_grp:
             seq += 1
-
-            # Plan columns based on group membership
-            group = item["group"]
-            if group in GROUP_SCHEDULE_DAILY:
-                sched = GROUP_SCHEDULE_DAILY[group]
-                plan_vals = [sched.get(d, "") for d in PLAN_DAYS]
-            else:
-                plan_vals = ["이벤트성"] * 4
+            blocker = get_blocker_info(item)
+            plan_vals = [schedule.get(d, "") for d in PLAN_DAYS]
+            area_display = group_name if is_user_group else "-"
 
             data = [
-                seq, item["group"], item["id"], item["title"],
-                item["line"], item["priority"], item["status"],
+                seq, area_display, item["id"], item["title"],
+                item["line"], item["owner"], item["priority"], item["status"],
                 *plan_vals,
+                blocker, item["bigo"], "",
             ]
 
             for col, val in enumerate(data, 1):
                 cell = ws.cell(row=row, column=col, value=val)
-                align = CENTER if col in (1, 5, 6, 7) else LEFT
+                align = CENTER if col in (1, 5, 6, 7, 8) else LEFT
                 font = NORMAL_FONT
                 fill = None
 
-                if col == 6:  # priority
+                if col == 7:  # priority
                     p = item["priority"]
                     if p in PRIORITY_FILLS:
                         fill = PRIORITY_FILLS[p]
                     if p in PRIORITY_FONTS:
                         font = PRIORITY_FONTS[p]
 
-                if col == 7:  # status
+                if col == 8:  # status
                     fill = PatternFill(
                         start_color=STATUS_COLORS.get(item["status"], "FFFFFF"),
                         end_color=STATUS_COLORS.get(item["status"], "FFFFFF"),
@@ -980,40 +832,57 @@ def create_daily_plan_sheet(ws, grouped_items):
                     font = BOLD_FONT
 
                 # Plan day columns
-                if col == 8:
-                    fill = PLAN_DAY_FILLS["2/5(목)"]
-                elif col == 9:
-                    fill = PLAN_DAY_FILLS["2/6(금)"]
-                elif col == 10:
-                    fill = PLAN_DAY_FILLS["2/7(토)"]
-                elif col == 11:
-                    fill = PLAN_DAY_FILLS["2/8(일)"]
+                if plan_col_start <= col <= plan_col_end:
+                    day_idx = col - plan_col_start
+                    fill = PLAN_DAY_FILLS[PLAN_DAYS[day_idx]]
 
                 style(cell, font, fill, align, THIN_BORDER)
 
-            ws.row_dimensions[row].height = 26
+            # Issue link hyperlink
+            if item["link"]:
+                lkc = ws.cell(row=row, column=link_col, value=item["link"])
+                lkc.hyperlink = item["link"]
+                lkc.font = LINK_FONT
+                lkc.alignment = LEFT
+                lkc.border = THIN_BORDER
+
+            ws.row_dimensions[row].height = 28
             row += 1
+
+        # Merge 기능영역 column (B)
+        if is_user_group and len(sorted_grp) > 1:
+            ws.merge_cells(f'B{first_data_row}:B{row - 1}')
+            mc = ws.cell(row=first_data_row, column=2)
+            mc.value = group_name
+            mc.font = Font(name="맑은 고딕", size=10, bold=True)
+            mc.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+            mc.fill = row_tint
+            mc.border = THIN_BORDER
 
     # Data Validation for plan columns
     dv = DataValidation(
         type="list",
-        formula1='"작업예정,디버깅,테스트,배포,확인,분석,이벤트성,미진행,-"',
+        formula1='"개발중,테스트,컨펌배포,미진행,-"',
         allow_blank=True,
         showDropDown=False,
     )
     dv.error = "목록에서 선택하세요"
+    dv.errorTitle = "입력 오류"
     ws.add_data_validation(dv)
-    dv.add(f"H{header_row + 1}:K{row - 1}")
+    plan_start_letter = get_column_letter(plan_col_start)
+    plan_end_letter = get_column_letter(plan_col_end)
+    dv.add(f"{plan_start_letter}{header_row + 1}:{plan_end_letter}{row - 1}")
 
     # Footer
     row += 1
     ws.merge_cells(f'A{row}:{last_col_letter}{row}')
-    ws[f'A{row}'].value = "2/5~2/8 열에 일일 작업계획을 입력하세요 (드롭다운 선택 가능)"
+    ws[f'A{row}'].value = f"총 미완료 {total_incomplete}건 | 2/5~2/12 일정 열에 작업계획을 입력하세요 (드롭다운 선택 가능)"
     ws[f'A{row}'].font = Font(name="맑은 고딕", size=10, italic=True, color="666666")
     ws[f'A{row}'].alignment = LEFT
 
     ws.page_setup.orientation = 'landscape'
     ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 0
 
 
 # === Main ===
@@ -1046,12 +915,12 @@ def main():
     for g, items_g in grouped.items():
         print(f"  {g}: {len(items_g)}건")
 
-    # Create workbook
+    # Create workbook (3 sheets)
     wb = Workbook()
 
-    # Sheet 1: 미완료 항목 + 계획
+    # Sheet 1: 일일계획 (기능영역별 + 2/5~2/12 + 블로커/비고/링크)
     ws_plan = wb.active
-    create_plan_sheet(ws_plan, grouped)
+    create_daily_plan_sheet(ws_plan, grouped)
 
     # Sheet 2: 요약
     ws_summary = wb.create_sheet()
@@ -1060,10 +929,6 @@ def main():
     # Sheet 3: 전체 목록
     ws_list = wb.create_sheet()
     create_list_sheet(ws_list, sorted_items)
-
-    # Sheet 4: 일일계획
-    ws_daily = wb.create_sheet()
-    create_daily_plan_sheet(ws_daily, grouped)
 
     wb.save(OUTPUT_PATH)
     print(f"\n엑셀 파일 생성: {OUTPUT_PATH}")

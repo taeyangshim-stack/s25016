@@ -9,9 +9,10 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.38";
+CONST string TASK1_VERSION := "v1.9.39";
 CONST string TASK2_VERSION := "v1.9.28";
 CONST string TASK_BG_VERSION := "v1.0.0";
+CONST string TASK_HEAD_VERSION := "v1.9.39";
 
 ! ========================================
 ! Module Versions
@@ -22,8 +23,8 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-05";
-CONST string BUILD_TIME := "12:00:00";
+CONST string BUILD_DATE := "2026-02-06";
+CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
 ! ========================================
@@ -39,11 +40,24 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.38";  ! torchmotion + multi-pass + approach/retract
+CONST string WELD_SEQUENCE_VERSION := "v1.9.39";  ! T_Head task + stCommand dispatch
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.39 (2026-02-06)
+!   - FEAT: T_Head task (TASK8) created - PlanA-compatible command dispatcher
+!   - FEAT: stCommand/stReact{2} protocol for TASK1/TASK2 dispatch
+!   - FEAT: Rob1_CommandListener - responds to T_Head stCommand
+!   - FEAT: Rob2_CommandListener - responds to T_Head stCommand
+!   - FEAT: test_mode=11 enables T_Head listener mode
+!   - FEAT: Head_Data.mod - shared PERS variables for upper system
+!   - FEAT: Head_MainModule.mod - command loop with rCheckCmdMatch
+!   - FEAT: rDispatchAndWait/rDispatchR1 for dual/single task dispatch
+!   - FEAT: MoveAbsGantryFromExtPos/MoveIncGantryFromExtPos extracted as PROCs
+!   - KEEP: test_mode 0-10 backward compatible (existing flows unchanged)
+!   - SYS.cfg: T_Head added as NORMAL task (non-motion)
+!
 ! v1.9.38 (2026-02-05)
 !   - FEAT: torchmotion RECORD adopted from PlanA (22 fields, upper system compatible)
 !   - FEAT: macroStartBuffer1/macroEndBuffer1 arrays (10 passes, PERS)

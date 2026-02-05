@@ -505,6 +505,11 @@ PERS num debug_r2_floor_y_offset := 0;
 	PERS pos shared_posEnd_r2 := [0, 0, 0];
 	PERS num shared_nLengthWeldLine := 0;
 
+	! stCommand/stReact Protocol (v1.9.39 - T_Head interface)
+	! T_Head sets stCommand, TASK1/2 respond via stReact
+	PERS string stCommand := "";
+	PERS string stReact{2} := ["",""];
+
 	PROC main()
 		VAR iodev main_logfile;
 		VAR iodev configfile;
@@ -607,10 +612,15 @@ PERS num debug_r2_floor_y_offset := 0;
 			Write main_logfile, "Step2 mode=10 type=CommandLoop";
 			rInit;
 			CommandLoop;
+		ELSEIF test_mode = 11 THEN
+			! T_Head mode - enter stCommand listener (v1.9.39)
+			TPWrite "MAIN: Starting T_Head Listener Mode";
+			Write main_logfile, "Step2 mode=11 type=T_Head_Listener";
+			Rob1_CommandListener;
 		ELSE
 			TPWrite "ERROR: Invalid TEST_MODE=" + NumToStr(test_mode,0);
 			Write main_logfile, "ERROR: Invalid TEST_MODE=" + NumToStr(test_mode,0);
-			TPWrite "Valid: 0=Single, 1=R-axis, 2=Mode2, 3=Weld, 9=Menu, 10=CmdLoop";
+			TPWrite "Valid: 0=Single, 1=R-axis, 2=Mode2, 3=Weld, 9=Menu, 10=CmdLoop, 11=T_Head";
 		ENDIF
 
 		TPWrite "MAIN: Test completed";
@@ -4847,6 +4857,165 @@ PROC CommandLoop()
 
 		TPWrite "[CMD] Ready for next command";
 	ENDWHILE
+ENDPROC
+
+! ========================================
+! MoveAbsGantryFromExtPos: Absolute gantry move (v1.9.39)
+! ========================================
+! Extracted from CommandLoop CASE CMD_MOVE_ABS_GANTRY for reuse
+PROC MoveAbsGantryFromExtPos()
+	VAR jointtarget abs_jt;
+	TPWrite "[R1] MoveAbsGantry X=" + NumToStr(extGantryPos.eax_a, 1)
+	       + " Y=" + NumToStr(extGantryPos.eax_b, 1)
+	       + " Z=" + NumToStr(extGantryPos.eax_c, 1)
+	       + " R=" + NumToStr(extGantryPos.eax_d, 1);
+	abs_jt := CJointT();
+	abs_jt.extax.eax_a := extGantryPos.eax_a;
+	abs_jt.extax.eax_b := extGantryPos.eax_b;
+	abs_jt.extax.eax_c := extGantryPos.eax_c;
+	abs_jt.extax.eax_d := extGantryPos.eax_d;
+	abs_jt.extax.eax_f := extGantryPos.eax_a;  ! X2 sync
+	MoveAbsJ abs_jt, v500, fine, tool0;
+	UpdateGantryWobj;
+ENDPROC
+
+! ========================================
+! MoveIncGantryFromExtPos: Incremental gantry move (v1.9.39)
+! ========================================
+! Extracted from CommandLoop CASE CMD_MOVE_INC_GANTRY for reuse
+PROC MoveIncGantryFromExtPos()
+	VAR jointtarget inc_jt;
+	TPWrite "[R1] MoveIncGantry dX=" + NumToStr(extGantryPos.eax_a, 1)
+	       + " dY=" + NumToStr(extGantryPos.eax_b, 1)
+	       + " dZ=" + NumToStr(extGantryPos.eax_c, 1)
+	       + " dR=" + NumToStr(extGantryPos.eax_d, 1);
+	inc_jt := CJointT();
+	inc_jt.extax.eax_a := inc_jt.extax.eax_a + extGantryPos.eax_a;
+	inc_jt.extax.eax_b := inc_jt.extax.eax_b + extGantryPos.eax_b;
+	inc_jt.extax.eax_c := inc_jt.extax.eax_c + extGantryPos.eax_c;
+	inc_jt.extax.eax_d := inc_jt.extax.eax_d + extGantryPos.eax_d;
+	inc_jt.extax.eax_f := inc_jt.extax.eax_a;  ! X2 sync
+	MoveAbsJ inc_jt, v500, fine, tool0;
+	UpdateGantryWobj;
+ENDPROC
+
+! ========================================
+! Rob1_CommandListener: T_Head stCommand handler (v1.9.39)
+! ========================================
+! Responds to stCommand from T_Head task
+! Protocol: "Ready" → receive command → execute → "Ack" → wait clear → "Ready"
+PROC Rob1_CommandListener()
+	VAR iodev head_log;
+	Open "HOME:/head_r1_listener.txt", head_log \Write;
+	Write head_log, "Rob1 CommandListener (v1.9.39) - " + CDate() + " " + CTime();
+
+	TPWrite "[R1] CommandListener started, entering Ready state";
+
+	WHILE TRUE DO
+		stReact{1} := "Ready";
+		Write head_log, "Status: Ready, waiting stCommand...";
+		WaitUntil stCommand <> "";
+		Write head_log, "Received: " + stCommand;
+		TPWrite "[R1] stCommand=" + stCommand;
+
+		TEST stCommand
+			CASE "MoveHome":
+				stReact{1} := "";
+				SetRobot1InitialPosition;
+				stReact{1} := "Ack";
+				Write head_log, "MoveHome done";
+				WaitUntil stCommand = "";
+
+			CASE "MoveMeasurementHome":
+				stReact{1} := "";
+				! Stub - measurement home position
+				stReact{1} := "Ack";
+				Write head_log, "MoveMeasurementHome done (stub)";
+				WaitUntil stCommand = "";
+
+			CASE "MoveAbsGantry":
+				stReact{1} := "";
+				MoveAbsGantryFromExtPos;
+				stReact{1} := "Ack";
+				Write head_log, "MoveAbsGantry done";
+				WaitUntil stCommand = "";
+
+			CASE "MoveIncGantry":
+				stReact{1} := "";
+				MoveIncGantryFromExtPos;
+				stReact{1} := "Ack";
+				Write head_log, "MoveIncGantry done";
+				WaitUntil stCommand = "";
+
+			CASE "EdgeWeld":
+				stReact{1} := "";
+				Write head_log, "EdgeWeld: calling TestFullWeldSequence";
+				TestFullWeldSequence;
+				stReact{1} := "Ack";
+				Write head_log, "EdgeWeld done";
+				WaitUntil stCommand = "";
+
+			CASE "Weld", "WeldMotion":
+				stReact{1} := "";
+				Write head_log, "Weld/WeldMotion: calling TestWeldSequence";
+				TestWeldSequence;
+				stReact{1} := "Ack";
+				Write head_log, "Weld done";
+				WaitUntil stCommand = "";
+
+			CASE "WeldCorr", "WeldMotionCorr":
+				stReact{1} := "";
+				Write head_log, "WeldCorr: calling TestWeldSequence (with corr)";
+				TestWeldSequence;
+				stReact{1} := "Ack";
+				Write head_log, "WeldCorr done";
+				WaitUntil stCommand = "";
+
+			CASE "WireCut", "Rob1WireCut":
+				stReact{1} := "";
+				! Stub - wire cut
+				stReact{1} := "Ack";
+				Write head_log, "WireCut done (stub)";
+				WaitUntil stCommand = "";
+
+			CASE "TestMenu":
+				stReact{1} := "";
+				TestMenu;
+				stReact{1} := "Ack";
+				Write head_log, "TestMenu done";
+				WaitUntil stCommand = "";
+
+			CASE "TestSingle":
+				stReact{1} := "";
+				TestGantryFloorCoordinates;
+				stReact{1} := "Ack";
+				Write head_log, "TestSingle done";
+				WaitUntil stCommand = "";
+
+			CASE "TestRotation":
+				stReact{1} := "";
+				TestGantryRotation;
+				stReact{1} := "Ack";
+				Write head_log, "TestRotation done";
+				WaitUntil stCommand = "";
+
+			CASE "TestMode2":
+				stReact{1} := "";
+				TestGantryMode2;
+				stReact{1} := "Ack";
+				Write head_log, "TestMode2 done";
+				WaitUntil stCommand = "";
+
+			DEFAULT:
+				Write head_log, "Unknown command: " + stCommand;
+				TPWrite "[R1] Unknown stCommand: " + stCommand;
+				stReact{1} := "Ack";
+				WaitUntil stCommand = "";
+		ENDTEST
+	ENDWHILE
+ERROR
+	Write head_log, "ERROR " + NumToStr(ERRNO, 0);
+	Close head_log;
 ENDPROC
 
 ENDMODULE
