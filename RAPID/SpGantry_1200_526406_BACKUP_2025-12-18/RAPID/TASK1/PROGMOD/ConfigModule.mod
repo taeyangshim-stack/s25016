@@ -417,4 +417,29 @@ PERS bool bMotionFinish := TRUE;
 ! 5. Set WELD_SPEED for gantry travel speed during welding
 ! 6. Run ExecuteWeldSequence() to start welding
 
+! ========================================
+! Torch Orientation Control (v1.9.37)
+! ========================================
+! PlanA reference: RelTool(pos,0,0,0\Rx:=TravelAngle\Ry:=WorkingAngle)
+! TravelAngle: rotation around weld direction (Rx in weld wobj)
+! WorkingAngle: rotation around perpendicular axis (Ry in weld wobj)
+PERS num WELD_TRAVEL_ANGLE := 0;     ! Travel angle (degrees), 0=vertical to surface
+PERS num WELD_WORKING_ANGLE := 0;    ! Working angle (degrees), 0=perpendicular to weld
+PERS bool WELD_USE_ORIENT := FALSE;  ! TRUE=apply WELD_R1_ORIENT, FALSE=keep current orient
+
+! ========================================
+! Arc Welding Parameters (v1.9.37)
+! ========================================
+! PlanA reference: welddata wd1=[10,0,[5,0,36.5,230,0,380,0,0,0],...]
+! Set WELD_ARC_ENABLED=TRUE only when arc welding hardware is connected
+PERS bool WELD_ARC_ENABLED := FALSE; ! TRUE=ArcLStart/ArcL, FALSE=MoveJ/MoveL (simulation)
+PERS num WELD_ARC_VOLTAGE := 36.5;   ! Arc voltage (V) - PlanA default
+PERS num WELD_ARC_CURRENT := 380;    ! Weld current (A) - PlanA default
+PERS num WELD_ARC_WIRE_FEED := 230;  ! Wire feed speed (mm/s) - PlanA default
+PERS num WELD_ARC_SPEED := 100;      ! Weld travel speed (mm/s)
+
+! Weave Parameters (PlanA reference: weavedata weave1)
+PERS num WELD_WEAVE_WIDTH := 0;      ! Weave width (mm), 0=no weave
+PERS num WELD_WEAVE_LENGTH := 0;     ! Weave cycle length (mm)
+
 ENDMODULE

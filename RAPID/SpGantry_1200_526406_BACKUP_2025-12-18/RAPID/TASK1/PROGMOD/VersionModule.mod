@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.36";
+CONST string TASK1_VERSION := "v1.9.37";
 CONST string TASK2_VERSION := "v1.9.28";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
@@ -39,11 +39,24 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.36";  ! TraceWeldLine added
+CONST string WELD_SEQUENCE_VERSION := "v1.9.37";  ! Z-axis + Orient + Arc + Robot2 sync
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.37 (2026-02-05)
+!   - FEAT: Z-axis enabled in TraceWeldLine (posStart.z/posEnd.z applied)
+!   - FEAT: Torch orientation support (WELD_USE_ORIENT flag, WELD_R1_ORIENT quaternion)
+!   - FEAT: Arc welding preparation (WELD_ARC_ENABLED flag, voltage/current/wire params)
+!   - FEAT: Robot2 weld tracking - edge positions shared via PERS (shared_posStart_r2)
+!   - FEAT: Robot2_EdgeWeldSequence logs to HOME:/robot2_weld_trace.txt
+!   - FEAT: Robot2 monitors t1_weld_start/t1_weld_done during weld phase
+!   - ADD: ConfigModule - WELD_TRAVEL_ANGLE, WELD_WORKING_ANGLE, WELD_ARC_* params
+!   - ADD: 3D position error (dX, dY, dZ) in TraceWeldLine verification
+!   - ADD: Weld speed from WELD_ARC_SPEED (configurable, default 100mm/s)
+!   - NOTE: Arc welding placeholder (MoveL) - replace with ArcLStart/ArcL when ready
+!   - NOTE: Robot2 MoveAbsJ only (no config linkage) - MultiMove needed for full tracking
+!
 ! v1.9.36 (2026-02-05)
 !   - FEAT: TraceWeldLine - Robot1 TCP traces weld line (posStart -> posEnd)
 !   - Uses WobjFloor (not WobjGantry) for Floor coordinate movement

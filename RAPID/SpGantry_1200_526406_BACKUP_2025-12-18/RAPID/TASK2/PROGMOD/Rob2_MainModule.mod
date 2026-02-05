@@ -376,6 +376,11 @@ VAR robjoint robot2_offset_joints;
     PERS bool t1_weld_position_ready;  ! TASK1 gantry+Robot1 positioned
     PERS bool shared_bRobSwap;         ! Robot swap flag from TASK1
 
+    ! Robot2 edge positions (shared from TASK1, v1.9.37)
+    PERS pos shared_posStart_r2;
+    PERS pos shared_posEnd_r2;
+    PERS num shared_nLengthWeldLine;
+
     ! Weld WObj for Robot2 (v1.9.0)
     ! Created by TASK1, referenced by TASK2
     PERS wobjdata WobjWeldR2;
@@ -3203,73 +3208,127 @@ ENDPROC
 ! then moves Robot2 to weld position considering bRobSwap
 
 ! ----------------------------------------
-! Robot2 Edge-based Weld Sequence
+! Robot2 Edge-based Weld Sequence (v1.9.37)
 ! ----------------------------------------
 ! Waits for t1_weld_position_ready, then positions Robot2
+! v1.9.37: Weld tracking with position logging, edge data from TASK1
 PROC Robot2_EdgeWeldSequence()
 	VAR num wait_count := 0;
 	VAR num max_wait := 200;  ! 20 seconds timeout
-	VAR robtarget weld_target;
 	VAR jointtarget safe_jt;
-	VAR jointtarget gantry_jt;
+	VAR iodev r2_log;
 
 	TPWrite "========================================";
-	TPWrite "[R2_EDGE] v2.0.0 Robot2 Edge Weld Sequence";
+	TPWrite "[R2_EDGE] v1.9.37 Robot2 Edge Weld Sequence";
 	TPWrite "========================================";
+
+	! Open Robot2 weld trace log
+	Open "HOME:/robot2_weld_trace.txt", r2_log \Write;
+	Write r2_log, "Robot2 Weld Trace Log (v1.9.37) - " + CDate() + " " + CTime();
 
 	! Reset flags
 	t2_weld_ready := FALSE;
 
 	! Step 1: Wait for TASK1 to position gantry + Robot1
-	TPWrite "[R2_EDGE] Waiting for TASK1 gantry positioning...";
+	TPWrite "[R2_EDGE] Step 1: Waiting for TASK1 gantry positioning...";
 	WHILE NOT t1_weld_position_ready DO
 		WaitTime 0.1;
 		wait_count := wait_count + 1;
 		IF wait_count > max_wait THEN
 			TPWrite "[R2_EDGE] ERROR: Timeout waiting for TASK1";
+			Write r2_log, "ERROR: Timeout waiting for TASK1 (" + NumToStr(wait_count * 0.1, 1) + "s)";
+			Close r2_log;
 			RETURN;
 		ENDIF
 	ENDWHILE
-	TPWrite "[R2_EDGE] TASK1 gantry positioned";
+	TPWrite "[R2_EDGE] TASK1 gantry positioned (" + NumToStr(wait_count * 0.1, 1) + "s)";
+	Write r2_log, "TASK1 ready after " + NumToStr(wait_count * 0.1, 1) + "s";
 
-	! Step 2: Check bRobSwap flag
-	TPWrite "[R2_EDGE] bRobSwap = " + ValToStr(shared_bRobSwap);
+	! Step 2: Log weld configuration
+	TPWrite "[R2_EDGE] bRobSwap=" + ValToStr(shared_bRobSwap);
+	Write r2_log, "bRobSwap=" + ValToStr(shared_bRobSwap);
+	Write r2_log, "Robot2 edge Start=["
+		+ NumToStr(shared_posStart_r2.x,1) + ","
+		+ NumToStr(shared_posStart_r2.y,1) + ","
+		+ NumToStr(shared_posStart_r2.z,1) + "]";
+	Write r2_log, "Robot2 edge End=["
+		+ NumToStr(shared_posEnd_r2.x,1) + ","
+		+ NumToStr(shared_posEnd_r2.y,1) + ","
+		+ NumToStr(shared_posEnd_r2.z,1) + "]";
+	Write r2_log, "Weld line length=" + NumToStr(shared_nLengthWeldLine,1) + "mm";
+	TPWrite "[R2_EDGE] Edge: [" + NumToStr(shared_posStart_r2.x,0) + ","
+		+ NumToStr(shared_posStart_r2.y,0) + "] -> ["
+		+ NumToStr(shared_posEnd_r2.x,0) + ","
+		+ NumToStr(shared_posEnd_r2.y,0) + "]";
 
-	! Step 3: Move Robot2 to weld-ready position (v1.9.28)
-	! Robot2 has NO config linkage to Gantry. After Gantry moves to weld position,
-	! MoveJ with WobjGantry_Rob2 fails ("Position outside reach") because the
-	! controller thinks Robot2 base is at its fixed configured position.
-	! Solution: Use MoveAbsJ (joint-based) - bypasses World coord reach check.
-	! Robot2 is already at correct relative position from initialization.
-	TPWrite "[R2_EDGE] Step 3: Moving Robot2 to weld-ready (MoveAbsJ)";
-
-	! Get Robot2's current joint position
+	! Step 3: Position Robot2 (v1.9.28: MoveAbsJ only)
+	! Robot2 has NO config linkage to Gantry.
+	! MoveJ/MoveL with WObj fails at non-HOME positions.
+	! MoveAbsJ bypasses World coord reach check.
+	! Robot2 maintains its relative position from initialization.
+	! NOTE: For full weld tracking (like PlanA), MultiMove or custom IK needed.
 	safe_jt := CJointT();
-	TPWrite "[R2_EDGE] Robot2 J1=" + NumToStr(safe_jt.robax.rax_1, 1) + " J2=" + NumToStr(safe_jt.robax.rax_2, 1);
+	TPWrite "[R2_EDGE] Step 3: Robot2 joints J1=" + NumToStr(safe_jt.robax.rax_1, 1)
+		+ " J2=" + NumToStr(safe_jt.robax.rax_2, 1)
+		+ " J3=" + NumToStr(safe_jt.robax.rax_3, 1);
+	Write r2_log, "Robot2 joints=["
+		+ NumToStr(safe_jt.robax.rax_1,2) + ","
+		+ NumToStr(safe_jt.robax.rax_2,2) + ","
+		+ NumToStr(safe_jt.robax.rax_3,2) + ","
+		+ NumToStr(safe_jt.robax.rax_4,2) + ","
+		+ NumToStr(safe_jt.robax.rax_5,2) + ","
+		+ NumToStr(safe_jt.robax.rax_6,2) + "]";
 
 	IF shared_bRobSwap = TRUE THEN
-		TPWrite "[R2_EDGE] bRobSwap=TRUE: Robot2 maintains current position";
-		! TODO: Adjust joint angles for swapped weld configuration
+		TPWrite "[R2_EDGE] bRobSwap=TRUE: Robot2 at swapped position";
+		Write r2_log, "bRobSwap=TRUE: Robot2 holding swapped position";
 	ELSE
-		TPWrite "[R2_EDGE] bRobSwap=FALSE: Robot2 maintains current position";
+		TPWrite "[R2_EDGE] bRobSwap=FALSE: Robot2 at normal position";
+		Write r2_log, "bRobSwap=FALSE: Robot2 holding normal position";
 	ENDIF
 
-	! MoveAbsJ to confirm position (joint-based, no World coord dependency)
 	MoveAbsJ safe_jt, v100, fine, tool0;
+	Write r2_log, "MoveAbsJ confirmed at " + CTime();
 
-	! Step 4: Signal ready
+	! Step 4: Signal ready to TASK1
 	t2_weld_ready := TRUE;
-	TPWrite "[R2_EDGE] Robot2 at weld position, signaling ready";
+	TPWrite "[R2_EDGE] Robot2 ready, signaling TASK1";
+	Write r2_log, "t2_weld_ready=TRUE";
 
-	! Step 5: Wait for weld to complete
-	TPWrite "[R2_EDGE] Waiting for weld completion...";
+	! Step 5: Monitor weld progress
+	TPWrite "[R2_EDGE] Step 5: Monitoring weld (waiting for t1_weld_start)...";
+	wait_count := 0;
+	WHILE NOT t1_weld_start DO
+		WaitTime 0.1;
+		wait_count := wait_count + 1;
+		IF wait_count > 300 THEN  ! 30s timeout
+			TPWrite "[R2_EDGE] WARNING: t1_weld_start timeout";
+			Write r2_log, "WARNING: t1_weld_start timeout";
+			GOTO wait_done;
+		ENDIF
+	ENDWHILE
+	Write r2_log, "Weld started at " + CTime() + " (after " + NumToStr(wait_count * 0.1, 1) + "s)";
+	TPWrite "[R2_EDGE] Weld started by TASK1";
+
+	! Monitor until weld done
+	TPWrite "[R2_EDGE] Weld in progress... holding position";
 	WHILE NOT t1_weld_done DO
 		WaitTime 0.1;
 	ENDWHILE
+	Write r2_log, "Weld completed at " + CTime();
+	TPWrite "[R2_EDGE] Weld complete";
+
+wait_done:
+	Write r2_log, "Robot2 Edge Weld Sequence complete at " + CTime();
+	Close r2_log;
 
 	TPWrite "========================================";
 	TPWrite "[R2_EDGE] Robot2 Edge Weld Sequence Complete!";
 	TPWrite "========================================";
+ERROR
+	TPWrite "[R2_EDGE] ERROR: " + NumToStr(ERRNO, 0);
+	Write r2_log, "ERROR: " + NumToStr(ERRNO, 0);
+	Close r2_log;
 ENDPROC
 
 ! ========================================
