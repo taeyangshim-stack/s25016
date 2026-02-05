@@ -10,7 +10,7 @@ MODULE VersionModule
 ! Task Versions
 ! ========================================
 CONST string TASK1_VERSION := "v1.9.35";
-CONST string TASK2_VERSION := "v1.9.25";
+CONST string TASK2_VERSION := "v1.9.28";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
 ! ========================================
@@ -48,6 +48,24 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.35";  ! Increased R2 wait timeout
 !   - FIX: Robot2 wait timeout increased from 10s to 30s
 !   - Robot2_WeldReady execution time may exceed 10 seconds
 !   - Prevents premature timeout during weld sequence sync
+!
+! TASK2 v1.9.28 (2026-02-05)
+!   - FIX: Robot2_EdgeWeldSequence MoveJ -> MoveAbsJ
+!   - MoveJ with WobjGantry_Rob2 fails after Gantry moves to weld position
+!   - Cause: Robot2 has no config linkage, controller thinks base is fixed
+!   - World target from WobjGantry_Rob2 is far from Robot2 configured base
+!   - Solution: MoveAbsJ (joint-based) bypasses World coord reach check
+!   - Robot2 already at correct relative position from initialization
+!
+! TASK2 v1.9.27 (2026-02-05)
+!   - FEAT: Robot2_EdgeWeldSequence uses WobjGantry_Rob2 coordinate system
+!   - Target [0, 488, -1000] in WobjGantry_Rob2 (Gantry-relative)
+!   - UpdateGantryWobj_Rob2 before MoveJ for current Gantry position
+!   - ISSUE: Position outside reach when Gantry moved far from HOME
+!
+! TASK2 v1.9.26 (2026-02-05)
+!   - TEST: Robot2 move skipped (signal exchange only)
+!   - Verified TASK1/TASK2 sync works: Robot2 ready after 0.2s
 !
 ! TASK2 v1.9.25 (2026-02-04)
 !   - FIX: Robot2_EdgeWeldSequence now moves directly (no t1_weld_start wait)

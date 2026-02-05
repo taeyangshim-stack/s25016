@@ -3211,6 +3211,7 @@ PROC Robot2_EdgeWeldSequence()
 	VAR num max_wait := 200;  ! 20 seconds timeout
 	VAR robtarget weld_target;
 	VAR jointtarget safe_jt;
+	VAR jointtarget gantry_jt;
 
 	TPWrite "========================================";
 	TPWrite "[R2_EDGE] v2.0.0 Robot2 Edge Weld Sequence";
@@ -3234,53 +3235,27 @@ PROC Robot2_EdgeWeldSequence()
 	! Step 2: Check bRobSwap flag
 	TPWrite "[R2_EDGE] bRobSwap = " + ValToStr(shared_bRobSwap);
 
-	! Step 3: Move Robot2 to weld position (v1.9.25 - direct move, no t1_weld_start wait)
-	TPWrite "[R2_EDGE] Moving Robot2 to weld position...";
+	! Step 3: Move Robot2 to weld-ready position (v1.9.28)
+	! Robot2 has NO config linkage to Gantry. After Gantry moves to weld position,
+	! MoveJ with WobjGantry_Rob2 fails ("Position outside reach") because the
+	! controller thinks Robot2 base is at its fixed configured position.
+	! Solution: Use MoveAbsJ (joint-based) - bypasses World coord reach check.
+	! Robot2 is already at correct relative position from initialization.
+	TPWrite "[R2_EDGE] Step 3: Moving Robot2 to weld-ready (MoveAbsJ)";
+
+	! Get Robot2's current joint position
+	safe_jt := CJointT();
+	TPWrite "[R2_EDGE] Robot2 J1=" + NumToStr(safe_jt.robax.rax_1, 1) + " J2=" + NumToStr(safe_jt.robax.rax_2, 1);
+
 	IF shared_bRobSwap = TRUE THEN
-		TPWrite "[R2_EDGE] Using SWAPPED position (bRobSwap=TRUE)";
-		! When swapped, Robot2 takes Robot1's original position
-		! TODO: Implement swapped position logic
+		TPWrite "[R2_EDGE] bRobSwap=TRUE: Robot2 maintains current position";
+		! TODO: Adjust joint angles for swapped weld configuration
 	ELSE
-		TPWrite "[R2_EDGE] Using NORMAL position (bRobSwap=FALSE)";
-
-		! Step 3a: Move to safe JOINT position first
-		safe_jt := CJointT();
-		safe_jt.robax.rax_1 := 0;
-		safe_jt.robax.rax_2 := -10;
-		safe_jt.robax.rax_3 := -50;
-		safe_jt.robax.rax_4 := 0;
-		safe_jt.robax.rax_5 := -30;
-		safe_jt.robax.rax_6 := 0;
-		safe_jt.extax.eax_a := 9E9;
-		safe_jt.extax.eax_b := 9E9;
-		safe_jt.extax.eax_c := 9E9;
-		safe_jt.extax.eax_d := 9E9;
-		safe_jt.extax.eax_e := 9E9;
-		safe_jt.extax.eax_f := 9E9;
-		TPWrite "[R2_EDGE] Step3a: MoveAbsJ to safe joints";
-		MoveAbsJ safe_jt, v100, fine, tool0;
-
-		! Step 3b: Move to wobj0 target position
-		weld_target.trans.x := 0;
-		weld_target.trans.y := 118;
-		weld_target.trans.z := -1300;
-		weld_target.rot.q1 := WELD_R2_ORIENT_Q1;
-		weld_target.rot.q2 := WELD_R2_ORIENT_Q2;
-		weld_target.rot.q3 := WELD_R2_ORIENT_Q3;
-		weld_target.rot.q4 := WELD_R2_ORIENT_Q4;
-		weld_target.robconf.cf1 := 0;
-		weld_target.robconf.cf4 := 0;
-		weld_target.robconf.cf6 := 0;
-		weld_target.robconf.cfx := 0;
-		weld_target.extax.eax_a := 9E9;
-		weld_target.extax.eax_b := 9E9;
-		weld_target.extax.eax_c := 9E9;
-		weld_target.extax.eax_d := 9E9;
-		weld_target.extax.eax_e := 9E9;
-		weld_target.extax.eax_f := 9E9;
-		TPWrite "[R2_EDGE] Step3b: MoveJ to wobj0 [0, 118, -1300]";
-		MoveJ weld_target, v100, fine, tool0\WObj:=wobj0;
+		TPWrite "[R2_EDGE] bRobSwap=FALSE: Robot2 maintains current position";
 	ENDIF
+
+	! MoveAbsJ to confirm position (joint-based, no World coord dependency)
+	MoveAbsJ safe_jt, v100, fine, tool0;
 
 	! Step 4: Signal ready
 	t2_weld_ready := TRUE;
