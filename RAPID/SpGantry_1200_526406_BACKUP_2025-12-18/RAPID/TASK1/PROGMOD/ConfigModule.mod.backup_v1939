@@ -2,57 +2,19 @@ MODULE ConfigModule
 ! ========================================
 ! S25016 SpGantry Configuration Module
 ! ========================================
-! Version: v1.9.40
-! Date: 2026-02-06
+! Version: v2.2.0
+! Date: 2026-02-03
 ! Purpose: Centralized configuration using PERS variables
 ! v1.9.0: Added weld sequence configuration
 ! v1.9.1: Fixed R-axis (X+=0°), added WObj positions, 45° torch
 ! v2.0.0: Added Edge points and Home/Limit configuration
 ! v2.1.0: Added PlanA-style command interface (nCmdInput/nCmdOutput)
 ! v2.2.0: Added PlanA data structures (edgedata, targetdata, corrorder)
-! v1.9.40: PlanA-PlanB variable integration complete
-!   - Changed variable names to PlanA style (nLimitX_Negative, etc.)
-!   - Added dual HOME variables (internal + UI interface)
-!   - Added RECORDs: breakpoint, jointgroup, pointgroup, monRobs
-!   - Added ~50 new PERS variables (bRobSwap, nRobHeight*, etc.)
-!   - Added CMD constants (104, 107, 311-324, 505-507)
-!   - Added 40-step welddata/weavedata/trackdata arrays
-!   - Added stCommand/stReact for T_Head communication
 ! ========================================
 
 ! ========================================
-! Data Type Definitions (v1.9.40 - PlanA Complete)
+! Data Type Definitions (v2.2.0 - PlanA Style)
 ! ========================================
-
-! Breakpoint Data Structure (PlanA)
-RECORD breakpoint
-    pos Position;
-    num Angle;
-ENDRECORD
-
-! Joint Group Data Structure (PlanA - 3-axis sync)
-RECORD jointgroup
-    jointtarget Joint1;
-    jointtarget Joint2;
-    jointtarget JointG;
-ENDRECORD
-
-! Point Group Data Structure (PlanA)
-RECORD pointgroup
-    robtarget Point1;
-    robtarget Point2;
-    robtarget PointG;
-ENDRECORD
-
-! Robot Monitor Data Structure (PlanA)
-RECORD monRobs
-    extjoint monExt;
-    robjoint monJoint1;
-    robjoint monJoint2;
-    pose monPose1;
-    pose monPose2;
-ENDRECORD
-
 ! Edge Point Data Structure
 ! Contains position, geometry, and material information for weld edges
 RECORD edgedata
@@ -435,42 +397,23 @@ PERS num EDGE_END2_Z := 1200;      ! Robot2 side (valid range: 600-1600)
 ! ========================================
 ! From PlanA Head_Data.mod
 ! HOME position: Physical origin [0,0,0,0] = Floor [9500, 5300, 2100, 0]
-! Internal calculation variables (PlanB style - DO NOT CHANGE)
 PERS num HOME_GANTRY_X := 0;       ! Physical X at HOME (Floor 9500 = Physical 0)
 PERS num HOME_GANTRY_Y := 0;       ! Physical Y at HOME (Floor 5300 = Physical 0)
 PERS num HOME_GANTRY_Z := 0;       ! Physical Z at HOME (Floor 2100 = Physical 0)
 PERS num HOME_GANTRY_R := 0;       ! Physical R at HOME (degrees)
 
-! UI Interface variables (PlanA style - for upper system)
-PERS num nHomeGantryX := -9500;    ! Floor X at HOME position
-PERS num nHomeGantryY := 5300;     ! Floor Y at HOME position
-PERS num nHomeGantryZ := 2100;     ! Floor Z at HOME position
-PERS num nHomeGantryR := 0;        ! Rotation at HOME (degrees)
+! Physical axis limits (mm, degrees)
+PERS num LIMIT_X_NEG := -9500;
+PERS num LIMIT_X_POS := 12300;
+PERS num LIMIT_Y_NEG := 0;
+PERS num LIMIT_Y_POS := 5300;
+PERS num LIMIT_Z_NEG := 0;
+PERS num LIMIT_Z_POS := 1000;  ! MOC.cfg M3DM3 limit: 1050mm
+PERS num LIMIT_R_NEG := -90;
+PERS num LIMIT_R_POS := 90;
 
-! TCP position at HOME (PlanA)
-PERS num nHomeTcpX := -9500;
-PERS num nHomeTcpY := 5300;
-PERS num nHomeTcpZ := 2100;
-
-! Physical axis limits (mm, degrees) - PlanA naming convention
-PERS num nLimitX_Negative := -9500;
-PERS num nLimitX_Positive := 12300;
-PERS num nLimitY_Negative := 0;
-PERS num nLimitY_Positive := 5300;
-PERS num nLimitZ_Negative := 0;
-PERS num nLimitZ_Positive := 2100;  ! PlanA value (was 1000)
-PERS num nLimitR_Negative := -90;
-PERS num nLimitR_Positive := 90;
-
-! Robot Height Parameters (PlanA naming)
-PERS num nRobWeldSpaceHeight := 1620;    ! Robot weld space height (R-center)
-PERS num nRobHeightMin := 1100;          ! Minimum robot height
-PERS num nRobCorrSpaceHeight := 1680;    ! Correction space height
-PERS num nRobWorkSpaceHeight := 1680;    ! Work space height
-
-! Rotation limits (PlanA style)
-PERS num nRotationNegLimit := -90;
-PERS num nRotationPosLimit := 90;
+! Robot Height Parameters
+PERS num ROB_WELD_SPACE_HEIGHT := 1620;  ! Robot weld space height (R-center)
 
 ! ========================================
 ! Command Interface (v2.1.0 - PlanA Style)
@@ -488,10 +431,8 @@ PERS num nCmdMatch := 0;
 ! Command Constants - Movement (100 series)
 CONST num CMD_MOVE_TO_WORLDHOME := 101;
 CONST num CMD_MOVE_TO_MEASUREMENTHOME := 102;
-CONST num CMD_MOVE_TO_TEACHING_All := 104;    ! v1.9.40 - PlanA
 CONST num CMD_MOVE_TO_TEACHING_R1 := 105;
 CONST num CMD_MOVE_TO_TEACHING_R2 := 106;
-CONST num CMD_MOVE_JOINTS := 107;              ! v1.9.40 - PlanA
 CONST num CMD_MOVE_ABS_GANTRY := 108;
 CONST num CMD_MOVE_INC_GANTRY := 109;
 CONST num CMD_MOVE_TO_ZHOME := 110;
@@ -513,22 +454,10 @@ CONST num CMD_CAMERA_DOOR_OPEN := 301;
 CONST num CMD_CAMERA_DOOR_CLOSE := 302;
 CONST num CMD_CAMERA_BLOW_ON := 303;
 CONST num CMD_CAMERA_BLOW_OFF := 304;
-! Individual camera control (v1.9.40 - PlanA)
-CONST num CMD_CAMERA1_DOOR_OPEN := 311;
-CONST num CMD_CAMERA1_DOOR_CLOSE := 312;
-CONST num CMD_CAMERA1_BLOW_ON := 313;
-CONST num CMD_CAMERA1_BLOW_OFF := 314;
-CONST num CMD_CAMERA2_DOOR_OPEN := 321;
-CONST num CMD_CAMERA2_DOOR_CLOSE := 322;
-CONST num CMD_CAMERA2_BLOW_ON := 323;
-CONST num CMD_CAMERA2_BLOW_OFF := 324;
 
 ! Command Constants - Wire (500 series)
 CONST num CMD_WIRE_CUT := 501;
 CONST num CMD_WIRE_CLEAN := 502;
-CONST num CMD_WIRE_BULLSEYE_CHECK := 505;    ! v1.9.40 - PlanA
-CONST num CMD_WIRE_BULLSEYE_UPDATE := 506;   ! v1.9.40 - PlanA
-CONST num CMD_WIRE_ReplacementMode := 507;   ! v1.9.40 - PlanA
 CONST num CMD_ROB1_WIRE_CUT := 511;
 CONST num CMD_ROB2_WIRE_CUT := 512;
 
@@ -589,234 +518,5 @@ PERS bool WELD_ARC_ENABLED := FALSE; ! TRUE=ArcLStart/ArcL, FALSE=MoveJ/MoveL (s
 ! WELD_WEAVE_WIDTH -> macroStartBuffer1{pass}.WeaveWidth
 ! WELD_WEAVE_LENGTH -> macroStartBuffer1{pass}.WeaveLength
 ! WELD_USE_ORIENT -> removed (RelTool with TravelAngle/WorkingAngle replaces quaternion)
-
-! ========================================
-! PlanA Additional Variables (v1.9.40)
-! ========================================
-
-! Robot Swap Flag
-PERS bool bRobSwap := FALSE;
-
-! Weld Output Safety
-PERS bool bWeldOutputDisable := TRUE;
-
-! Gantry Move Flag
-PERS bool bMoveGantry := FALSE;
-
-! Wire Touch Detection
-PERS bool bWireTouch1;
-PERS bool bWireTouch2;
-
-! Home Move Flag
-PERS bool bMoveHome_Head;
-
-! Gantry Speed/Height Parameters
-PERS num nGantrySpeed := 0;
-PERS num nCurrentGantryHeight := 0;
-PERS num nTargetGantryHeight := 0;
-PERS num nCalculatedGantryHeight := 0;
-PERS num nGantrySafetyHeight := -100;
-
-! Weld Line Parameters
-PERS num nLengthWeldLine := 0;
-PERS num nOffsetLength := 0;
-PERS num nOffsetLengthBuffer := 10;
-PERS num nMotionStartStepLast{2} := [1,1];
-PERS num nMotionEndStepLast{2} := [1,1];
-
-! Macro Parsing Variables
-PERS num nMacro100{2} := [0,0];
-PERS num nMacro010{2} := [0,0];
-PERS num nMacro001{2} := [0,0];
-PERS num nMacro{2} := [0,0];
-PERS num Command := 0;
-
-! Position Data
-PERS pos posNull := [0,0,0];
-PERS pos posStart := [0,0,0];
-PERS pos posStartLast := [0,0,0];
-PERS num nStartThick := 12;
-PERS pos posEnd := [0,0,0];
-PERS pos posEndLast := [0,0,0];
-PERS num nEndThick := 12;
-
-! Camera/Inspection Variables
-PERS num Camera_Door := 0;
-PERS num Camera_Tilt := 0;
-PERS num nCameraRotationAngle := 0;
-
-! Speed Data
-PERS num nDryRunSpeed := 2.5;
-PERS num nWireCutSpeed := 500;
-
-! Status Flags
-PERS bool bWeldLineLengthCalc := FALSE;
-PERS bool bPlateTiltedRx := FALSE;
-PERS bool bArcError := FALSE;
-
-! Error Data
-PERS num nErrorCmd;
-PERS num nWeldDist;
-PERS num nEntryRetryCount{2} := [0,0];
-PERS num nTouchRetryCount{2} := [0,0];
-
-! Breakpoints
-PERS breakpoint BreakPoints{10} := [[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0]];
-
-! ========================================
-! Auto/Manual Macro Arrays (v1.9.40 - PlanA)
-! ========================================
-PERS torchmotion macroAutoStartA{2,10};
-PERS torchmotion macroAutoStartB{2,10};
-PERS torchmotion macroAutoEndA{2,10};
-PERS torchmotion macroAutoEndB{2,10};
-PERS torchmotion macroManualStartA{2,10};
-PERS torchmotion macroManualStartB{2,10};
-PERS torchmotion macroManualEndA{2,10};
-PERS torchmotion macroManualEndB{2,10};
-
-! ========================================
-! 40-Step Weld Data Arrays (v1.9.40 - PlanA)
-! ========================================
-! welddata format: [heat, speed, [9-params], [9-params]]
-PERS welddata wd1 := [10,0,[5,0,36.5,230,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd2 := [10,0,[5,0,36.5,230,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd3 := [10,0,[5,0,36.5,230,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd4 := [10,0,[5,0,36.5,230,0,380,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd5 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd6 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd7 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd8 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd9 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd10 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd11 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd12 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd13 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd14 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd15 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd16 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd17 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd18 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd19 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd20 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd21 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd22 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd23 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd24 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd25 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd26 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd27 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd28 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd29 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd30 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd31 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd32 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd33 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd34 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd35 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd36 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd37 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd38 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd39 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-PERS welddata wd40 := [0,0,[5,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
-
-! ========================================
-! 40-Step Weave Data Arrays (v1.9.40 - PlanA)
-! ========================================
-! weavedata format: [shape, type, length, width, dwellL, dwellR, bias, ...] (15 params)
-PERS weavedata weave1 := [1,2,2.5,1.7,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave2 := [1,2,2.5,1.7,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave3 := [1,2,2.5,1.7,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave4 := [1,2,2.5,1.7,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave5 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave6 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave7 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave8 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave9 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave10 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave11 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave12 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave13 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave14 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave15 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave16 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave17 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave18 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave19 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave20 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave21 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave22 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave23 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave24 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave25 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave26 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave27 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave28 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave29 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave30 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave31 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave32 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave33 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave34 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave35 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave36 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave37 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave38 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave39 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-PERS weavedata weave40 := [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-
-! ========================================
-! 40-Step Track Data Arrays (v1.9.40 - PlanA)
-! ========================================
-! trackdata format: [type, enable, maxCorr, [9-params], [7-params]]
-PERS trackdata track0 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track1 := [0,FALSE,50,[0,15,30,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track2 := [0,FALSE,50,[0,15,30,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track3 := [0,FALSE,50,[0,15,30,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track4 := [0,FALSE,50,[0,15,30,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track5 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track6 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track7 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track8 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track9 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track10 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track11 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track12 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track13 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track14 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track15 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track16 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track17 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track18 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track19 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track20 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track21 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track22 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track23 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track24 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track25 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track26 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track27 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track28 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track29 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track30 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track31 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track32 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track33 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track34 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track35 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track36 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track37 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track38 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track39 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-PERS trackdata track40 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
-
-! ========================================
-! T_Head Communication Variables (v1.9.40)
-! ========================================
-! stCommand: T_Head sets command string for TASK1/TASK2
-! stReact: TASK1/TASK2 report status ("Ready", "Ack", etc.)
-PERS string stCommand := "";
-PERS string stReact{2} := ["", ""];
 
 ENDMODULE
