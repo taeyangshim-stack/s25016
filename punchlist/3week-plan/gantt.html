@@ -99,10 +99,10 @@
             overflow-x: auto;
         }
 
-        /* 간트 헤더 (날짜) - 20일 전체 */
+        /* 간트 헤더 (날짜) - 27일 전체 */
         .gantt-header {
             display: grid;
-            grid-template-columns: 180px repeat(20, minmax(55px, 1fr));
+            grid-template-columns: 180px repeat(27, minmax(55px, 1fr));
             background: #f9fafb;
             border-bottom: 1px solid #e5e7eb;
             position: sticky;
@@ -141,7 +141,7 @@
         /* 주차 구분 헤더 */
         .week-header {
             display: grid;
-            grid-template-columns: 180px repeat(20, minmax(55px, 1fr));
+            grid-template-columns: 180px repeat(27, minmax(55px, 1fr));
             background: #eff6ff;
             min-width: 1400px;
         }
@@ -154,6 +154,7 @@
         .week-header-cell.w1 { background: #fef2f2; color: #dc2626; }
         .week-header-cell.w2 { background: #fffbeb; color: #d97706; }
         .week-header-cell.w3 { background: #ecfdf5; color: #059669; }
+        .week-header-cell.w4 { background: #f3e8ff; color: #7c3aed; }
 
         /* 담당자 섹션 */
         .owner-section {
@@ -161,7 +162,7 @@
         }
         .owner-row {
             display: grid;
-            grid-template-columns: 180px repeat(20, minmax(55px, 1fr));
+            grid-template-columns: 180px repeat(27, minmax(55px, 1fr));
             background: #fff;
             border-bottom: 1px solid #e5e7eb;
             min-width: 1400px;
@@ -433,7 +434,7 @@
         /* 요약 통계 */
         .summary-row {
             display: grid;
-            grid-template-columns: 180px repeat(20, minmax(55px, 1fr));
+            grid-template-columns: 180px repeat(27, minmax(55px, 1fr));
             background: #eff6ff;
             border-top: 2px solid #2563eb;
             min-width: 1400px;
@@ -625,7 +626,7 @@
             <div class="header-info">
                 <span>총 53건</span>
                 <span>담당자 6명</span>
-                <span>2026.01.19 ~ 2026.02.07 (20일)</span>
+                <span>2026.01.19 ~ 2026.02.14 (27일)</span>
                 <span style="background:#fbbf24;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:0.8rem;">Updated: 2/2</span>
             </div>
         </div>
@@ -665,9 +666,11 @@
                 <div class="week-header-cell w2" style="grid-column: span 7;">2주차 (27건) 1/26~2/1</div>
                 <!-- 3주차: 2/2(월)~2/7(토) = 6일 -->
                 <div class="week-header-cell w3" style="grid-column: span 6;">3주차 (31건) 2/2~2/7</div>
+                <!-- 4주차: 2/8(일)~2/14(토) = 7일 -->
+                <div class="week-header-cell w4" style="grid-column: span 7;">4주차 2/8~2/14</div>
             </div>
 
-            <!-- 날짜 헤더 - 20일 전체 -->
+            <!-- 날짜 헤더 - 27일 전체 -->
             <div class="gantt-header">
                 <div class="gantt-header-cell label">담당자</div>
                 <!-- 1주차: 1/19(월)~1/25(일) -->
@@ -687,12 +690,20 @@
                 <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">1/31</div></div>
                 <div class="gantt-header-cell weekend"><div class="day">일</div><div class="date">2/1</div></div>
                 <!-- 3주차: 2/2(월)~2/7(토) -->
-                <div class="gantt-header-cell week-start" style="background:rgba(59,130,246,0.3);border:2px solid #3b82f6;"><div class="day" style="color:#3b82f6;font-weight:bold;">월</div><div class="date" style="color:#3b82f6;font-weight:bold;">2/2</div><div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;">TODAY</div></div>
+                <div class="gantt-header-cell week-start"><div class="day">월</div><div class="date">2/2</div></div>
                 <div class="gantt-header-cell"><div class="day">화</div><div class="date">2/3</div></div>
                 <div class="gantt-header-cell"><div class="day">수</div><div class="date">2/4</div></div>
                 <div class="gantt-header-cell"><div class="day">목</div><div class="date">2/5</div></div>
-                <div class="gantt-header-cell"><div class="day">금</div><div class="date">2/6</div></div>
+                <div class="gantt-header-cell" style="background:rgba(59,130,246,0.3);border:2px solid #3b82f6;"><div class="day" style="color:#3b82f6;font-weight:bold;">금</div><div class="date" style="color:#3b82f6;font-weight:bold;">2/6</div><div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;">TODAY</div></div>
                 <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">2/7</div></div>
+                <!-- 4주차: 2/8(일)~2/14(토) -->
+                <div class="gantt-header-cell weekend"><div class="day">일</div><div class="date">2/8</div></div>
+                <div class="gantt-header-cell week-start"><div class="day">월</div><div class="date">2/9</div></div>
+                <div class="gantt-header-cell"><div class="day">화</div><div class="date">2/10</div></div>
+                <div class="gantt-header-cell"><div class="day">수</div><div class="date">2/11</div></div>
+                <div class="gantt-header-cell"><div class="day">목</div><div class="date">2/12</div></div>
+                <div class="gantt-header-cell"><div class="day">금</div><div class="date">2/13</div></div>
+                <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">2/14</div></div>
             </div>
 
             <!-- 박주한 -->
@@ -806,6 +817,14 @@
                             </div>
                         </div>
                     </div>
+                    <!-- 4주차 2/8~2/14 -->
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend"></div>
                 </div>
             </div>
 
@@ -1063,6 +1082,14 @@
                             </div>
                         </div>
                     </div>
+                    <!-- 4주차 2/8~2/14 -->
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend"></div>
                 </div>
             </div>
 
@@ -1164,6 +1191,14 @@
                     </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
+                    <!-- 4주차 2/8~2/14 -->
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend"></div>
                 </div>
             </div>
 
@@ -1247,6 +1282,14 @@
                     </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
+                    <!-- 4주차 2/8~2/14 -->
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend"></div>
                 </div>
             </div>
 
@@ -1312,6 +1355,14 @@
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell"></div>
+                    <!-- 4주차 2/8~2/14 -->
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend"></div>
                 </div>
             </div>
 
@@ -1818,6 +1869,14 @@
                             </div>
                         </div>
                     </div>
+                    <!-- 4주차 2/8~2/14 -->
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend"></div>
                 </div>
             </div>
 
@@ -1927,6 +1986,14 @@
                             </div>
                         </div>
                     </div>
+                    <!-- 4주차 2/8~2/14 -->
+                    <div class="gantt-cell weekend"></div>
+                    <div class="gantt-cell week-start"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell weekend"></div>
                 </div>
             </div>
 
@@ -1951,13 +2018,21 @@
                 <div class="summary-cell"><div class="num">5</div></div>
                 <div class="summary-cell"><div class="num">1</div></div>
                 <div class="summary-cell weekend">-</div>
-                <!-- 3주차 (TODAY) -->
-                <div class="summary-cell weekend">-</div>
-                <div class="summary-cell" style="background:rgba(59,130,246,0.2);border:2px solid #3b82f6;"><div class="num" style="color:#3b82f6;">TODAY</div></div><!-- 2/2 TODAY -->
-                <div class="summary-cell"><div class="num">5</div></div>
-                <div class="summary-cell"><div class="num">5</div></div>
-                <div class="summary-cell"><div class="num">4</div></div>
-                <div class="summary-cell"><div class="num">4</div></div>
+                <!-- 3주차 2/2~2/7 (6일) -->
+                <div class="summary-cell week-start"><div class="num">5</div></div><!-- 2/2 월 -->
+                <div class="summary-cell"><div class="num">5</div></div><!-- 2/3 화 -->
+                <div class="summary-cell"><div class="num">5</div></div><!-- 2/4 수 -->
+                <div class="summary-cell"><div class="num">4</div></div><!-- 2/5 목 -->
+                <div class="summary-cell" style="background:rgba(59,130,246,0.2);border:2px solid #3b82f6;"><div class="num" style="color:#3b82f6;">TODAY</div></div><!-- 2/6 금 TODAY -->
+                <div class="summary-cell weekend">-</div><!-- 2/7 토 -->
+                <!-- 4주차 2/8~2/14 -->
+                <div class="summary-cell weekend">-</div><!-- 2/8 일 -->
+                <div class="summary-cell week-start">-</div><!-- 2/9 월 -->
+                <div class="summary-cell">-</div><!-- 2/10 화 -->
+                <div class="summary-cell">-</div><!-- 2/11 수 -->
+                <div class="summary-cell">-</div><!-- 2/12 목 -->
+                <div class="summary-cell">-</div><!-- 2/13 금 -->
+                <div class="summary-cell weekend">-</div><!-- 2/14 토 -->
             </div>
         </div>
 
@@ -3140,7 +3215,7 @@
 
         <div class="footer">
             <p>S25016 프로젝트 3주 완료 계획 일정표 (Full Version)</p>
-            <p>기간: 2026.01.19 ~ 2026.02.07 (20일) | 담당: SP 심태양</p>
+            <p>기간: 2026.01.19 ~ 2026.02.14 (27일) | 담당: SP 심태양</p>
         </div>
     </div>
 
