@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.35";
+CONST string TASK1_VERSION := "v1.9.36";
 CONST string TASK2_VERSION := "v1.9.28";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
@@ -22,7 +22,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-04";
+CONST string BUILD_DATE := "2026-02-05";
 CONST string BUILD_TIME := "12:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -39,11 +39,19 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.35";  ! Increased R2 wait timeout
+CONST string WELD_SEQUENCE_VERSION := "v1.9.36";  ! TraceWeldLine added
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.36 (2026-02-05)
+!   - FEAT: TraceWeldLine - Robot1 TCP traces weld line (posStart -> posEnd)
+!   - Uses WobjFloor (not WobjGantry) for Floor coordinate movement
+!   - CRobT(\WObj:=WobjFloor) gets TCP in Floor coords directly
+!   - MoveJ to start, MoveL to end (gantry stays fixed via extax)
+!   - Position error verification at start and end points
+!   - TestFullWeldSequence Step 8 calls TraceWeldLine
+!
 ! v1.9.35 (2026-02-04)
 !   - FIX: Robot2 wait timeout increased from 10s to 30s
 !   - Robot2_WeldReady execution time may exceed 10 seconds

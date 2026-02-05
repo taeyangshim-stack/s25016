@@ -4308,6 +4308,104 @@ ERROR
 ENDPROC
 
 ! ----------------------------------------
+! Trace Weld Line: Move Robot1 TCP along weld line (v1.9.36)
+! ----------------------------------------
+! Moves Robot1 TCP from posStart to posEnd in Floor coordinates
+! Uses WobjFloor for correct Floor<->World transformation
+! Gantry stays at current position (extax preserved from CRobT)
+! MoveJ to start (large position change), MoveL along weld (linear path)
+PROC TraceWeldLine()
+	VAR robtarget current_floor;
+	VAR robtarget weld_start;
+	VAR robtarget weld_end;
+	VAR robtarget actual_floor;
+	VAR num err_x;
+	VAR num err_y;
+	VAR num err_total;
+	VAR iodev trace_log;
+
+	TPWrite "[TRACE] TraceWeldLine v1.9.36";
+
+	! Open own log file (iodev cannot be passed as parameter in RAPID)
+	Open "HOME:/trace_weld_line.txt", trace_log \Write;
+	Write trace_log, "TraceWeldLine Log (v1.9.36) - " + CDate() + " " + CTime();
+
+	! Step 1: Get current TCP in Floor coordinates
+	current_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+	TPWrite "[TRACE] Current TCP (Floor): ["
+		+ NumToStr(current_floor.trans.x,1) + ", "
+		+ NumToStr(current_floor.trans.y,1) + ", "
+		+ NumToStr(current_floor.trans.z,1) + "]";
+	Write trace_log, "Current Floor TCP=["
+		+ NumToStr(current_floor.trans.x,1) + ","
+		+ NumToStr(current_floor.trans.y,1) + ","
+		+ NumToStr(current_floor.trans.z,1) + "]";
+
+	! Step 2: Weld start target (Floor coords)
+	! Preserve robconf, extax, orientation from current position
+	weld_start := current_floor;
+	weld_start.trans.x := posStart.x;
+	weld_start.trans.y := posStart.y;
+	! Keep current Z for safety (first version)
+
+	TPWrite "[TRACE] Weld Start (Floor): ["
+		+ NumToStr(weld_start.trans.x,1) + ", "
+		+ NumToStr(weld_start.trans.y,1) + ", "
+		+ NumToStr(weld_start.trans.z,1) + "]";
+	Write trace_log, "Start target=["
+		+ NumToStr(weld_start.trans.x,1) + ","
+		+ NumToStr(weld_start.trans.y,1) + ","
+		+ NumToStr(weld_start.trans.z,1) + "]";
+
+	! Step 3: Weld end target (Floor coords)
+	weld_end := weld_start;
+	weld_end.trans.x := posEnd.x;
+	weld_end.trans.y := posEnd.y;
+	! Keep same Z as start
+
+	TPWrite "[TRACE] Weld End (Floor): ["
+		+ NumToStr(weld_end.trans.x,1) + ", "
+		+ NumToStr(weld_end.trans.y,1) + ", "
+		+ NumToStr(weld_end.trans.z,1) + "]";
+	Write trace_log, "End target=["
+		+ NumToStr(weld_end.trans.x,1) + ","
+		+ NumToStr(weld_end.trans.y,1) + ","
+		+ NumToStr(weld_end.trans.z,1) + "] length="
+		+ NumToStr(nLengthWeldLine,1) + "mm";
+
+	! Step 4: MoveJ to weld start (joint interp - safer for large move)
+	TPWrite "[TRACE] MoveJ to weld start...";
+	MoveJ weld_start, v100, fine, tool0 \WObj:=WobjFloor;
+
+	! Verify start position
+	actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+	err_x := actual_floor.trans.x - posStart.x;
+	err_y := actual_floor.trans.y - posStart.y;
+	err_total := Sqrt(err_x*err_x + err_y*err_y);
+	TPWrite "[TRACE] At start. err=" + NumToStr(err_total,2) + "mm";
+	Write trace_log, "At start err=" + NumToStr(err_total,2) + "mm";
+
+	! Step 5: MoveL along weld line (linear path = weld trace)
+	TPWrite "[TRACE] MoveL to weld end...";
+	MoveL weld_end, v100, fine, tool0 \WObj:=WobjFloor;
+
+	! Verify end position
+	actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+	err_x := actual_floor.trans.x - posEnd.x;
+	err_y := actual_floor.trans.y - posEnd.y;
+	err_total := Sqrt(err_x*err_x + err_y*err_y);
+	TPWrite "[TRACE] At end. err=" + NumToStr(err_total,2) + "mm";
+	Write trace_log, "At end err=" + NumToStr(err_total,2) + "mm";
+
+	Write trace_log, "TraceWeldLine complete at " + CTime();
+	Close trace_log;
+	TPWrite "[TRACE] TraceWeldLine complete";
+ERROR
+	TPWrite "[TRACE] ERROR: " + NumToStr(ERRNO,0);
+	Close trace_log;
+ENDPROC
+
+! ----------------------------------------
 ! Test Edge to Weld with Robot Move (v2.4.0)
 ! ----------------------------------------
 ! Combined test: Gantry positioning + Robot TCP movement
@@ -4375,12 +4473,12 @@ PROC TestFullWeldSequence()
 	VAR iodev logfile;
 
 	TPWrite "========================================";
-	TPWrite "[FULL] Full Weld Sequence v1.9.35";
+	TPWrite "[FULL] Full Weld Sequence v1.9.36";
 	TPWrite "========================================";
 
 	! Open log file
 	Open "HOME:/full_weld_sequence.txt", logfile \Write;
-	Write logfile, "Full Weld Sequence Log (v1.9.35) - " + CDate() + " " + CTime();
+	Write logfile, "Full Weld Sequence Log (v1.9.36) - " + CDate() + " " + CTime();
 	Write logfile, "";
 
 	! Step 0: Reset sync flags
@@ -4442,10 +4540,12 @@ PROC TestFullWeldSequence()
 	Write logfile, "Step 7: Robot2 ready after " + NumToStr(wait_count * 0.1, 1) + "s";
 
 skip_r2_wait:
-	! Step 8: Weld start (placeholder)
-	TPWrite "[FULL] Step 8: Weld position reached (both robots)";
-	Write logfile, "Step 8: Weld position reached";
-	Write logfile, "        (Weld start/end not implemented yet)";
+	! Step 8: Trace weld line (Robot1 TCP: posStart -> posEnd)
+	TPWrite "[FULL] Step 8: Trace weld line...";
+	Write logfile, "Step 8: TraceWeldLine start";
+	t1_weld_start := TRUE;
+	TraceWeldLine;
+	Write logfile, "Step 8: TraceWeldLine complete";
 
 	! Step 9: Signal weld done
 	TPWrite "[FULL] Step 9: Signal weld done...";
