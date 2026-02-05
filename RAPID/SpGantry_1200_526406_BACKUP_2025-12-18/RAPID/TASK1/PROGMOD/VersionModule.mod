@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.37";
+CONST string TASK1_VERSION := "v1.9.38";
 CONST string TASK2_VERSION := "v1.9.28";
 CONST string TASK_BG_VERSION := "v1.0.0";
 
@@ -39,11 +39,23 @@ CONST string GANTRY_CONTROL_VERSION := "v1.8.35";  ! Robot init + sync
 CONST string MODE2_TEST_VERSION := "v1.8.77";  ! 10 test positions configured
 
 ! Weld Sequence (v1.9.0 NEW)
-CONST string WELD_SEQUENCE_VERSION := "v1.9.37";  ! Z-axis + Orient + Arc + Robot2 sync
+CONST string WELD_SEQUENCE_VERSION := "v1.9.38";  ! torchmotion + multi-pass + approach/retract
 
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.38 (2026-02-05)
+!   - FEAT: torchmotion RECORD adopted from PlanA (22 fields, upper system compatible)
+!   - FEAT: macroStartBuffer1/macroEndBuffer1 arrays (10 passes, PERS)
+!   - FEAT: Multi-pass welding loop (nWeldPassCount passes)
+!   - FEAT: Approach path (-100mm RelTool Z) before weld start
+!   - FEAT: Retract path (-50mm RelTool Z) after weld end
+!   - FEAT: RelTool torch orientation (TravelAngle=\Rx, WorkingAngle=\Ry)
+!   - FEAT: bRobSwap-dependent base orientation ([0.5,0.5,-0.5,0.5] vs [-0.5])
+!   - FEAT: Per-pass weld parameters from torchmotion (voltage, current, speed, weave)
+!   - REFACTOR: Individual WELD_ARC_* PERS replaced by macroStartBuffer fields
+!   - KEEP: WELD_ARC_ENABLED flag (simulation vs hardware)
+!
 ! v1.9.37 (2026-02-05)
 !   - FEAT: Z-axis enabled in TraceWeldLine (posStart.z/posEnd.z applied)
 !   - FEAT: Torch orientation support (WELD_USE_ORIENT flag, WELD_R1_ORIENT quaternion)

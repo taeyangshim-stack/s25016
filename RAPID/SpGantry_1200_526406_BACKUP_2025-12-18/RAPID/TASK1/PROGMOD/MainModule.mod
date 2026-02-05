@@ -4313,21 +4313,25 @@ ERROR
 ENDPROC
 
 ! ----------------------------------------
-! Trace Weld Line: Move Robot1 TCP along weld line (v1.9.37)
+! Trace Weld Line: Multi-pass weld with Approach/Retract (v1.9.38)
 ! ----------------------------------------
 ! Moves Robot1 TCP from posStart to posEnd in Floor coordinates
 ! Uses WobjFloor for correct Floor<->World transformation
-! Gantry stays at current position (extax preserved from CRobT)
-! v1.9.37: Z-axis enabled, torch orientation, arc welding preparation
+! v1.9.38: torchmotion macroBuffer, multi-pass, approach/retract, RelTool orient
 !
-! Feature flags (ConfigModule):
-!   WELD_USE_ORIENT: Apply calibrated torch orientation (WELD_R1_ORIENT)
-!   WELD_ARC_ENABLED: Use ArcLStart/ArcL instead of MoveJ/MoveL
-!   WELD_TRAVEL_ANGLE/WELD_WORKING_ANGLE: Torch angle fine adjustment
+! Parameters from ConfigModule (torchmotion macroStartBuffer1/macroEndBuffer1):
+!   .TravelAngle/.WorkingAngle: Torch orientation via RelTool
+!   .HeightOffset: Per-pass Z shift (mm)
+!   .WeldingSpeed: Weld speed (mm/s)
+!   .Voltage/.Current/.FeedingSpeed: Arc parameters
+!   nWeldPassCount: Number of active passes (1-10)
+!   WELD_ARC_ENABLED: Simulation vs hardware mode
 PROC TraceWeldLine()
 	VAR robtarget current_floor;
 	VAR robtarget weld_start;
 	VAR robtarget weld_end;
+	VAR robtarget approach_pos;
+	VAR robtarget retract_pos;
 	VAR robtarget actual_floor;
 	VAR num err_x;
 	VAR num err_y;
@@ -4335,158 +4339,164 @@ PROC TraceWeldLine()
 	VAR num err_total;
 	VAR iodev trace_log;
 	VAR speeddata weld_speed;
-	VAR orient weld_orient;
+	VAR num pass;
+	VAR num start_x;
+	VAR num start_y;
+	VAR num start_z;
+	VAR num end_x;
+	VAR num end_y;
+	VAR num end_z;
 
-	TPWrite "[TRACE] TraceWeldLine v1.9.37";
+	TPWrite "[TRACE] TraceWeldLine v1.9.38";
 
 	! Open own log file (iodev cannot be passed as parameter in RAPID)
 	Open "HOME:/trace_weld_line.txt", trace_log \Write;
-	Write trace_log, "TraceWeldLine Log (v1.9.37) - " + CDate() + " " + CTime();
+	Write trace_log, "TraceWeldLine Log (v1.9.38) - " + CDate() + " " + CTime();
+	Write trace_log, "Passes=" + NumToStr(nWeldPassCount,0)
+		+ " arc_enabled=" + ValToStr(WELD_ARC_ENABLED)
+		+ " bRobSwap=" + ValToStr(bRobSwap);
 
-	! Step 1: Get current TCP in Floor coordinates
+	! Get current TCP in Floor coordinates (preserves robconf + extax)
 	current_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
-	TPWrite "[TRACE] Current TCP (Floor): ["
-		+ NumToStr(current_floor.trans.x,1) + ", "
-		+ NumToStr(current_floor.trans.y,1) + ", "
-		+ NumToStr(current_floor.trans.z,1) + "]";
 	Write trace_log, "Current Floor TCP=["
 		+ NumToStr(current_floor.trans.x,1) + ","
 		+ NumToStr(current_floor.trans.y,1) + ","
 		+ NumToStr(current_floor.trans.z,1) + "]";
-	Write trace_log, "Current orient=["
-		+ NumToStr(current_floor.rot.q1,4) + ","
-		+ NumToStr(current_floor.rot.q2,4) + ","
-		+ NumToStr(current_floor.rot.q3,4) + ","
-		+ NumToStr(current_floor.rot.q4,4) + "]";
 
-	! Step 2: Weld start target (Floor coords)
-	! Preserve robconf, extax from current position
-	weld_start := current_floor;
-	weld_start.trans.x := posStart.x;
-	weld_start.trans.y := posStart.y;
-	! v1.9.37: Z-axis enabled - move TCP to actual weld height
-	weld_start.trans.z := posStart.z;
+	! === Multi-Pass Loop ===
+	FOR pass FROM 1 TO nWeldPassCount DO
+		TPWrite "[TRACE] === Pass " + NumToStr(pass,0) + "/" + NumToStr(nWeldPassCount,0) + " ===";
+		Write trace_log, "";
+		Write trace_log, "=== Pass " + NumToStr(pass,0) + "/" + NumToStr(nWeldPassCount,0) + " ===";
 
-	! Step 2b: Torch orientation (v1.9.37)
-	IF WELD_USE_ORIENT = TRUE THEN
-		! Apply calibrated weld orientation (from ConfigModule)
-		! Note: WELD_R1_ORIENT is calibrated in WobjGantry frame
-		! For WobjFloor, the orientation needs frame transformation
-		! WobjFloor has [0,1,0,0] rotation (180° X-axis vs World)
-		! Transform: q_floor = conj(q_WobjFloor) * q_WobjGantry * q_orient
-		! For now, apply directly (valid when gantry R is small)
-		weld_orient.q1 := WELD_R1_ORIENT_Q1;
-		weld_orient.q2 := WELD_R1_ORIENT_Q2;
-		weld_orient.q3 := WELD_R1_ORIENT_Q3;
-		weld_orient.q4 := WELD_R1_ORIENT_Q4;
-		weld_start.rot := weld_orient;
-		TPWrite "[TRACE] Torch orient (calibrated): ["
-			+ NumToStr(weld_orient.q1,4) + ","
-			+ NumToStr(weld_orient.q2,4) + ","
-			+ NumToStr(weld_orient.q3,4) + ","
-			+ NumToStr(weld_orient.q4,4) + "]";
-		Write trace_log, "Torch orient=CALIBRATED ["
-			+ NumToStr(weld_orient.q1,4) + ","
-			+ NumToStr(weld_orient.q2,4) + ","
-			+ NumToStr(weld_orient.q3,4) + ","
-			+ NumToStr(weld_orient.q4,4) + "]";
-	ELSE
-		! Keep current orientation (safe default)
-		TPWrite "[TRACE] Torch orient: CURRENT (no change)";
-		Write trace_log, "Torch orient=CURRENT (WELD_USE_ORIENT=FALSE)";
-	ENDIF
+		! --- Calculate start position with torchmotion offsets ---
+		start_x := posStart.x + macroStartBuffer1{pass}.LengthOffset;
+		start_y := posStart.y + macroStartBuffer1{pass}.BreadthOffset;
+		start_z := posStart.z + macroStartBuffer1{pass}.HeightOffset;
 
-	TPWrite "[TRACE] Weld Start (Floor): ["
-		+ NumToStr(weld_start.trans.x,1) + ", "
-		+ NumToStr(weld_start.trans.y,1) + ", "
-		+ NumToStr(weld_start.trans.z,1) + "]";
-	Write trace_log, "Start target=["
-		+ NumToStr(weld_start.trans.x,1) + ","
-		+ NumToStr(weld_start.trans.y,1) + ","
-		+ NumToStr(weld_start.trans.z,1) + "]";
+		weld_start := current_floor;
+		weld_start.trans.x := start_x;
+		weld_start.trans.y := start_y;
+		weld_start.trans.z := start_z;
 
-	! Step 3: Weld end target (Floor coords)
-	weld_end := weld_start;
-	weld_end.trans.x := posEnd.x;
-	weld_end.trans.y := posEnd.y;
-	! v1.9.37: Z-axis enabled
-	weld_end.trans.z := posEnd.z;
+		! --- Torch orientation via RelTool (PlanA compatible) ---
+		! bRobSwap determines base orientation and angle sign
+		IF bRobSwap = FALSE THEN
+			weld_start.rot := [0.5, 0.5, -0.5, 0.5];
+			weld_start := RelTool(weld_start, 0, 0, 0
+				\Rx:=-1*macroStartBuffer1{pass}.TravelAngle
+				\Ry:=-1*macroStartBuffer1{pass}.WorkingAngle);
+		ELSE
+			weld_start.rot := [0.5, -0.5, -0.5, -0.5];
+			weld_start := RelTool(weld_start, 0, 0, 0
+				\Rx:=macroStartBuffer1{pass}.TravelAngle
+				\Ry:=-1*macroStartBuffer1{pass}.WorkingAngle);
+		ENDIF
 
-	TPWrite "[TRACE] Weld End (Floor): ["
-		+ NumToStr(weld_end.trans.x,1) + ", "
-		+ NumToStr(weld_end.trans.y,1) + ", "
-		+ NumToStr(weld_end.trans.z,1) + "]";
-	Write trace_log, "End target=["
-		+ NumToStr(weld_end.trans.x,1) + ","
-		+ NumToStr(weld_end.trans.y,1) + ","
-		+ NumToStr(weld_end.trans.z,1) + "] length="
-		+ NumToStr(nLengthWeldLine,1) + "mm";
+		Write trace_log, "Start=[" + NumToStr(start_x,1) + ","
+			+ NumToStr(start_y,1) + "," + NumToStr(start_z,1) + "]"
+			+ " TA=" + NumToStr(macroStartBuffer1{pass}.TravelAngle,1)
+			+ " WA=" + NumToStr(macroStartBuffer1{pass}.WorkingAngle,1);
 
-	! Weld speed (component assignment for PERS compatibility)
-	weld_speed.v_tcp := WELD_ARC_SPEED;
-	weld_speed.v_ori := 500;
-	weld_speed.v_leax := 5000;
-	weld_speed.v_reax := 1000;
-	Write trace_log, "Weld speed=" + NumToStr(WELD_ARC_SPEED,0) + "mm/s"
-		+ " arc_enabled=" + ValToStr(WELD_ARC_ENABLED);
+		! --- Calculate end position with torchmotion offsets ---
+		end_x := posEnd.x + macroEndBuffer1{pass}.LengthOffset;
+		end_y := posEnd.y + macroEndBuffer1{pass}.BreadthOffset;
+		end_z := posEnd.z + macroEndBuffer1{pass}.HeightOffset;
 
-	! Step 4: MoveJ to weld start (joint interp - safer for large move)
-	TPWrite "[TRACE] MoveJ to weld start...";
-	MoveJ weld_start, v100, fine, tool0 \WObj:=WobjFloor;
+		weld_end := weld_start;
+		weld_end.trans.x := end_x;
+		weld_end.trans.y := end_y;
+		weld_end.trans.z := end_z;
 
-	! Verify start position
-	actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
-	err_x := actual_floor.trans.x - posStart.x;
-	err_y := actual_floor.trans.y - posStart.y;
-	err_z := actual_floor.trans.z - posStart.z;
-	err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
-	TPWrite "[TRACE] At start. err=" + NumToStr(err_total,2) + "mm"
-		+ " (dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2)
-		+ " dZ=" + NumToStr(err_z,2) + ")";
-	Write trace_log, "At start err=" + NumToStr(err_total,2) + "mm"
-		+ " dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2)
-		+ " dZ=" + NumToStr(err_z,2);
+		IF bRobSwap = FALSE THEN
+			weld_end.rot := [0.5, 0.5, -0.5, 0.5];
+			weld_end := RelTool(weld_end, 0, 0, 0
+				\Rx:=-1*macroEndBuffer1{pass}.TravelAngle
+				\Ry:=-1*macroEndBuffer1{pass}.WorkingAngle);
+		ELSE
+			weld_end.rot := [0.5, -0.5, -0.5, -0.5];
+			weld_end := RelTool(weld_end, 0, 0, 0
+				\Rx:=macroEndBuffer1{pass}.TravelAngle
+				\Ry:=-1*macroEndBuffer1{pass}.WorkingAngle);
+		ENDIF
 
-	! Step 5: Trace weld line (MoveL or ArcL)
-	IF WELD_ARC_ENABLED = TRUE THEN
-		! Arc welding mode
-		! NOTE: Requires ArcWelding option in RobotStudio/Controller
-		! ArcLStart weld_end, weld_speed, seam_data, weld_data, fine, tool0 \WObj:=WobjFloor;
-		! For multi-step: ArcL weld_end, weld_speed, seam_data, weld_data, fine, tool0 \WObj:=WobjFloor;
-		! ArcLEnd;
-		TPWrite "[TRACE] ARC WELD: V=" + NumToStr(WELD_ARC_VOLTAGE,1)
-			+ "V A=" + NumToStr(WELD_ARC_CURRENT,0)
-			+ "A WFS=" + NumToStr(WELD_ARC_WIRE_FEED,0) + "mm/s";
-		Write trace_log, "ARC WELD: voltage=" + NumToStr(WELD_ARC_VOLTAGE,1)
-			+ "V current=" + NumToStr(WELD_ARC_CURRENT,0)
-			+ "A wire_feed=" + NumToStr(WELD_ARC_WIRE_FEED,0) + "mm/s";
-		! PLACEHOLDER: Use MoveL until ArcWelding option is confirmed
-		! Replace this MoveL with ArcLStart/ArcL/ArcLEnd when ready
-		TPWrite "[TRACE] MoveL to weld end (ARC placeholder)...";
-		MoveL weld_end, weld_speed, fine, tool0 \WObj:=WobjFloor;
-		Write trace_log, "ARC WELD: completed (MoveL placeholder)";
-	ELSE
-		! Simulation mode - linear path trace
-		TPWrite "[TRACE] MoveL to weld end (simulation)...";
-		MoveL weld_end, weld_speed, fine, tool0 \WObj:=WobjFloor;
-	ENDIF
+		Write trace_log, "End=[" + NumToStr(end_x,1) + ","
+			+ NumToStr(end_y,1) + "," + NumToStr(end_z,1) + "]"
+			+ " len=" + NumToStr(nLengthWeldLine,1) + "mm";
 
-	! Verify end position
-	actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
-	err_x := actual_floor.trans.x - posEnd.x;
-	err_y := actual_floor.trans.y - posEnd.y;
-	err_z := actual_floor.trans.z - posEnd.z;
-	err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
-	TPWrite "[TRACE] At end. err=" + NumToStr(err_total,2) + "mm"
-		+ " (dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2)
-		+ " dZ=" + NumToStr(err_z,2) + ")";
-	Write trace_log, "At end err=" + NumToStr(err_total,2) + "mm"
-		+ " dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2)
-		+ " dZ=" + NumToStr(err_z,2);
+		! --- Weld speed from torchmotion ---
+		weld_speed.v_tcp := macroStartBuffer1{pass}.WeldingSpeed;
+		weld_speed.v_ori := 500;
+		weld_speed.v_leax := 5000;
+		weld_speed.v_reax := 1000;
 
+		Write trace_log, "Speed=" + NumToStr(macroStartBuffer1{pass}.WeldingSpeed,0)
+			+ "mm/s V=" + NumToStr(macroStartBuffer1{pass}.Voltage,1)
+			+ "V A=" + NumToStr(macroStartBuffer1{pass}.Current,0)
+			+ "A WFS=" + NumToStr(macroStartBuffer1{pass}.FeedingSpeed,0);
+
+		! --- Approach: 100mm above weld start along tool Z ---
+		approach_pos := RelTool(weld_start, 0, 0, -100);
+		TPWrite "[TRACE] Approach (-100mm)...";
+		MoveJ approach_pos, v100, fine, tool0 \WObj:=WobjFloor;
+		Write trace_log, "Approach (-100mm) OK";
+
+		! --- Move to weld start ---
+		TPWrite "[TRACE] MoveL to start...";
+		MoveL weld_start, v100, fine, tool0 \WObj:=WobjFloor;
+
+		! --- Verify start position ---
+		actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+		err_x := actual_floor.trans.x - start_x;
+		err_y := actual_floor.trans.y - start_y;
+		err_z := actual_floor.trans.z - start_z;
+		err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
+		TPWrite "[TRACE] At start err=" + NumToStr(err_total,2) + "mm";
+		Write trace_log, "At start err=" + NumToStr(err_total,2) + "mm"
+			+ " dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2)
+			+ " dZ=" + NumToStr(err_z,2);
+
+		! --- Trace weld line ---
+		IF WELD_ARC_ENABLED = TRUE THEN
+			! ARC placeholder (replace with ArcLStart/ArcL/ArcLEnd when ready)
+			TPWrite "[TRACE] ARC WELD pass " + NumToStr(pass,0) + "...";
+			Write trace_log, "ARC: V=" + NumToStr(macroStartBuffer1{pass}.Voltage,1)
+				+ "V A=" + NumToStr(macroStartBuffer1{pass}.Current,0)
+				+ "A WFS=" + NumToStr(macroStartBuffer1{pass}.FeedingSpeed,0);
+			MoveL weld_end, weld_speed, fine, tool0 \WObj:=WobjFloor;
+		ELSE
+			TPWrite "[TRACE] MoveL weld pass " + NumToStr(pass,0) + "...";
+			MoveL weld_end, weld_speed, fine, tool0 \WObj:=WobjFloor;
+		ENDIF
+
+		! --- Verify end position ---
+		actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+		err_x := actual_floor.trans.x - end_x;
+		err_y := actual_floor.trans.y - end_y;
+		err_z := actual_floor.trans.z - end_z;
+		err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
+		TPWrite "[TRACE] At end err=" + NumToStr(err_total,2) + "mm";
+		Write trace_log, "At end err=" + NumToStr(err_total,2) + "mm"
+			+ " dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2)
+			+ " dZ=" + NumToStr(err_z,2);
+
+		! --- Retract: 50mm above weld end along tool Z ---
+		retract_pos := RelTool(weld_end, 0, 0, -50);
+		TPWrite "[TRACE] Retract (-50mm)...";
+		MoveL retract_pos, v100, fine, tool0 \WObj:=WobjFloor;
+		Write trace_log, "Retract (-50mm) OK";
+
+		! --- Inter-pass delay ---
+		IF pass < nWeldPassCount THEN
+			WaitTime 1.0;
+			Write trace_log, "Inter-pass delay 1.0s";
+		ENDIF
+	ENDFOR
+
+	Write trace_log, "";
 	Write trace_log, "TraceWeldLine complete at " + CTime();
 	Close trace_log;
-	TPWrite "[TRACE] TraceWeldLine complete";
+	TPWrite "[TRACE] TraceWeldLine complete (" + NumToStr(nWeldPassCount,0) + " passes)";
 ERROR
 	TPWrite "[TRACE] ERROR: " + NumToStr(ERRNO,0);
 	Write trace_log, "TraceWeldLine ERROR " + NumToStr(ERRNO,0);
@@ -4561,12 +4571,12 @@ PROC TestFullWeldSequence()
 	VAR iodev logfile;
 
 	TPWrite "========================================";
-	TPWrite "[FULL] Full Weld Sequence v1.9.37";
+	TPWrite "[FULL] Full Weld Sequence v1.9.38";
 	TPWrite "========================================";
 
 	! Open log file
 	Open "HOME:/full_weld_sequence.txt", logfile \Write;
-	Write logfile, "Full Weld Sequence Log (v1.9.37) - " + CDate() + " " + CTime();
+	Write logfile, "Full Weld Sequence Log (v1.9.38) - " + CDate() + " " + CTime();
 	Write logfile, "";
 
 	! Step 0: Reset sync flags
@@ -4639,9 +4649,10 @@ PROC TestFullWeldSequence()
 	Write logfile, "Step 7: Robot2 ready after " + NumToStr(wait_count * 0.1, 1) + "s";
 
 skip_r2_wait:
-	! Step 8: Trace weld line (Robot1 TCP: posStart -> posEnd)
-	TPWrite "[FULL] Step 8: Trace weld line...";
-	Write logfile, "Step 8: TraceWeldLine start";
+	! Step 8: Trace weld line (multi-pass, approach/retract, RelTool orient)
+	TPWrite "[FULL] Step 8: Trace weld line (" + NumToStr(nWeldPassCount,0) + " passes)...";
+	Write logfile, "Step 8: TraceWeldLine start (passes=" + NumToStr(nWeldPassCount,0)
+		+ " speed=" + NumToStr(macroStartBuffer1{1}.WeldingSpeed,0) + "mm/s)";
 	t1_weld_start := TRUE;
 	TraceWeldLine;
 	Write logfile, "Step 8: TraceWeldLine complete";

@@ -63,6 +63,90 @@ RECORD corrorder
 ENDRECORD
 
 ! ========================================
+! Torch Motion Data Structure (v1.9.38 - PlanA compatible)
+! ========================================
+! Upper system interface for weld parameters per pass/step
+! PlanA reference: Head_Data.mod lines 70-93
+RECORD torchmotion
+    num No;               ! Sequence number
+    num LengthOffset;     ! Weld direction offset (mm)
+    num BreadthOffset;    ! Perpendicular offset (mm)
+    num HeightOffset;     ! Height offset (mm) - multi-pass Z shift
+    num WorkingAngle;     ! Working angle (deg) - RelTool \Ry
+    num TravelAngle;      ! Travel angle (deg) - RelTool \Rx
+    num WeldingSpeed;     ! Weld speed (mm/s)
+    num Schedule;         ! Weld schedule number
+    num Voltage;          ! Arc voltage (V)
+    num FeedingSpeed;     ! Wire feed speed (mm/s)
+    num Current;          ! Weld current (A)
+    num WeaveShape;       ! Weave shape (0=none)
+    num WeaveType;        ! Weave type
+    num WeaveLength;      ! Weave cycle length (mm)
+    num WeaveWidth;       ! Weave width (mm)
+    num WeaveDwellLeft;   ! Left dwell time (ms)
+    num WeaveDwellRight;  ! Right dwell time (ms)
+    num TrackType;        ! Track type (0=none)
+    num TrackGainY;       ! Y tracking gain
+    num TrackGainZ;       ! Z tracking gain
+    num MaxCorr;          ! Max correction (mm)
+    num Bias;             ! Bias
+ENDRECORD
+
+! ========================================
+! Macro Buffers (v1.9.38 - PlanA compatible)
+! ========================================
+! Buffer1 = Robot1, Buffer2 = Robot2
+! Index = pass number (1-10)
+! Upper system writes these before sending CMD_EDGE_WELD
+PERS torchmotion macroStartBuffer1{10} := [
+    [1,0,0,0, 0,0,100,0, 36.5,230,380, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0]];
+PERS torchmotion macroEndBuffer1{10} := [
+    [1,0,0,0, 0,0,100,0, 36.5,230,380, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0]];
+PERS torchmotion macroStartBuffer2{10} := [
+    [1,0,0,0, 0,0,100,0, 36.5,230,380, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0]];
+PERS torchmotion macroEndBuffer2{10} := [
+    [1,0,0,0, 0,0,100,0, 36.5,230,380, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0],
+    [0,0,0,0, 0,0,0,0, 0,0,0, 0,0,0,0,0,0, 0,0,0,0,0]];
+
+! Number of active weld passes (upper system sets this)
+PERS num nWeldPassCount := 1;
+
+! ========================================
 ! Edge Data Arrays (v2.2.0)
 ! ========================================
 ! Edge points from upper system (2 robots)
@@ -418,28 +502,21 @@ PERS bool bMotionFinish := TRUE;
 ! 6. Run ExecuteWeldSequence() to start welding
 
 ! ========================================
-! Torch Orientation Control (v1.9.37)
+! Arc Welding System Flag (v1.9.38)
 ! ========================================
-! PlanA reference: RelTool(pos,0,0,0\Rx:=TravelAngle\Ry:=WorkingAngle)
-! TravelAngle: rotation around weld direction (Rx in weld wobj)
-! WorkingAngle: rotation around perpendicular axis (Ry in weld wobj)
-PERS num WELD_TRAVEL_ANGLE := 0;     ! Travel angle (degrees), 0=vertical to surface
-PERS num WELD_WORKING_ANGLE := 0;    ! Working angle (degrees), 0=perpendicular to weld
-PERS bool WELD_USE_ORIENT := FALSE;  ! TRUE=apply WELD_R1_ORIENT, FALSE=keep current orient
-
-! ========================================
-! Arc Welding Parameters (v1.9.37)
-! ========================================
-! PlanA reference: welddata wd1=[10,0,[5,0,36.5,230,0,380,0,0,0],...]
-! Set WELD_ARC_ENABLED=TRUE only when arc welding hardware is connected
+! PlanB-specific: simulation vs hardware mode
+! Set TRUE only when arc welding hardware (Lincoln Power Wave) is connected
 PERS bool WELD_ARC_ENABLED := FALSE; ! TRUE=ArcLStart/ArcL, FALSE=MoveJ/MoveL (simulation)
-PERS num WELD_ARC_VOLTAGE := 36.5;   ! Arc voltage (V) - PlanA default
-PERS num WELD_ARC_CURRENT := 380;    ! Weld current (A) - PlanA default
-PERS num WELD_ARC_WIRE_FEED := 230;  ! Wire feed speed (mm/s) - PlanA default
-PERS num WELD_ARC_SPEED := 100;      ! Weld travel speed (mm/s)
 
-! Weave Parameters (PlanA reference: weavedata weave1)
-PERS num WELD_WEAVE_WIDTH := 0;      ! Weave width (mm), 0=no weave
-PERS num WELD_WEAVE_LENGTH := 0;     ! Weave cycle length (mm)
+! NOTE (v1.9.38): Individual weld parameters moved to torchmotion macroStartBuffer
+! WELD_TRAVEL_ANGLE -> macroStartBuffer1{pass}.TravelAngle
+! WELD_WORKING_ANGLE -> macroStartBuffer1{pass}.WorkingAngle
+! WELD_ARC_VOLTAGE -> macroStartBuffer1{pass}.Voltage
+! WELD_ARC_CURRENT -> macroStartBuffer1{pass}.Current
+! WELD_ARC_WIRE_FEED -> macroStartBuffer1{pass}.FeedingSpeed
+! WELD_ARC_SPEED -> macroStartBuffer1{pass}.WeldingSpeed
+! WELD_WEAVE_WIDTH -> macroStartBuffer1{pass}.WeaveWidth
+! WELD_WEAVE_LENGTH -> macroStartBuffer1{pass}.WeaveLength
+! WELD_USE_ORIENT -> removed (RelTool with TravelAngle/WorkingAngle replaces quaternion)
 
 ENDMODULE

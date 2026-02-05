@@ -143,6 +143,8 @@ MODULE Rob2_MainModule
         num TrackType;
         num TrackGainY;
         num TrackGainZ;
+        num MaxCorr;
+        num Bias;
     ENDRECORD
 
     RECORD corrorder
