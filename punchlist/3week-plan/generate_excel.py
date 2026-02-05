@@ -118,6 +118,26 @@ PLAN_FILLS = {
     "2/8(일)": PatternFill(start_color="DDFFE0", end_color="DDFFE0", fill_type="solid"),
 }
 
+# 6개 그룹 일정 배분 (Sheet 1: 2/6~2/8)
+GROUP_SCHEDULE = {
+    "알람/팝업":       {"2/6(금)": "작업예정", "2/7(토)": "디버깅",   "2/8(일)": "테스트"},
+    "실시간 용접조건":  {"2/6(금)": "작업예정", "2/7(토)": "테스트",   "2/8(일)": "확인"},
+    "UI 조작 로그":    {"2/6(금)": "작업예정", "2/7(토)": "테스트",   "2/8(일)": "확인"},
+    "터치에러 핸들링":  {"2/6(금)": "디버깅",   "2/7(토)": "작업예정", "2/8(일)": "테스트"},
+    "원점관리":        {"2/6(금)": "-",       "2/7(토)": "작업예정", "2/8(일)": "테스트"},
+    "수동티칭":        {"2/6(금)": "-",       "2/7(토)": "작업예정", "2/8(일)": "테스트"},
+}
+
+# 6개 그룹 일정 배분 (Sheet 4: 2/5~2/8)
+GROUP_SCHEDULE_DAILY = {
+    "알람/팝업":       {"2/5(목)": "분석",   "2/6(금)": "작업예정", "2/7(토)": "디버깅",   "2/8(일)": "테스트"},
+    "실시간 용접조건":  {"2/5(목)": "-",     "2/6(금)": "작업예정", "2/7(토)": "테스트",   "2/8(일)": "확인"},
+    "UI 조작 로그":    {"2/5(목)": "-",     "2/6(금)": "작업예정", "2/7(토)": "테스트",   "2/8(일)": "확인"},
+    "터치에러 핸들링":  {"2/5(목)": "분석",   "2/6(금)": "디버깅",   "2/7(토)": "작업예정", "2/8(일)": "테스트"},
+    "원점관리":        {"2/5(목)": "-",     "2/6(금)": "-",       "2/7(토)": "작업예정", "2/8(일)": "테스트"},
+    "수동티칭":        {"2/5(목)": "-",     "2/6(금)": "-",       "2/7(토)": "작업예정", "2/8(일)": "테스트"},
+}
+
 
 def style(cell, font=None, fill=None, align=None, border=None):
     if font: cell.font = font
@@ -351,20 +371,7 @@ def classify_functional_area(item):
     pl_id = item["id"]
     if pl_id in FUNCTIONAL_AREA_MAP:
         return FUNCTIONAL_AREA_MAP[pl_id]
-    # Fallback by subcategory / category
-    subcat = item.get("subcategory", "")
-    cat = item.get("category", "")
-    if "계측" in subcat:
-        return "원점관리"
-    if "PLC" in subcat:
-        return "갠트리/안전/PLC"
-    if cat in ("기계", "전기"):
-        return "기계/설비/전기"
-    if "로봇" in subcat:
-        return "로봇 제어/모션"
-    if "UI" in subcat or "HMI" in subcat:
-        return "기타"
-    return "기타"
+    return "이벤트성 진행"
 
 
 def group_and_sort_incomplete(incomplete_items):
@@ -372,12 +379,14 @@ def group_and_sort_incomplete(incomplete_items):
     grouped = OrderedDict()
     for g in FUNCTIONAL_GROUPS:
         grouped[g] = []
+    grouped["이벤트성 진행"] = []
 
     for item in incomplete_items:
         area = classify_functional_area(item)
-        if area not in grouped:
-            area = "기타"
-        grouped[area].append(item)
+        if area in grouped:
+            grouped[area].append(item)
+        else:
+            grouped["이벤트성 진행"].append(item)
 
     for g in grouped:
         grouped[g].sort(key=lambda x: (
@@ -488,12 +497,16 @@ def create_plan_sheet(ws, grouped_items):
     row = ROW_HEADER + 1
     seq = 0
 
-    for group_name in FUNCTIONAL_GROUPS:
+    # 6개 사용자 그룹 → 이벤트성 진행 순서
+    all_group_names = list(FUNCTIONAL_GROUPS) + (["이벤트성 진행"] if "이벤트성 진행" in grouped_items else [])
+
+    for group_name in all_group_names:
         if group_name not in grouped_items or not grouped_items[group_name]:
             continue
 
         group_items = grouped_items[group_name]
-        colors = GROUP_COLORS[group_name]
+        colors = GROUP_COLORS.get(group_name, GROUP_COLORS["이벤트성 진행"])
+        is_user_group = group_name in FUNCTIONAL_GROUPS
 
         # Group separator row
         gfill = PatternFill(start_color=colors["header"], end_color=colors["header"], fill_type="solid")
@@ -506,15 +519,31 @@ def create_plan_sheet(ws, grouped_items):
         row += 1
 
         row_tint = PatternFill(start_color=colors["row"], end_color=colors["row"], fill_type="solid")
+        first_data_row = row
+
+        # Pre-filled schedule
+        schedule = GROUP_SCHEDULE.get(group_name, {})
 
         for item in group_items:
             seq += 1
             blocker = get_blocker_info(item)
 
+            # Plan columns: grouped → schedule, non-grouped → 이벤트성
+            if is_user_group:
+                plan_6 = schedule.get("2/6(금)", "")
+                plan_7 = schedule.get("2/7(토)", "")
+                plan_8 = schedule.get("2/8(일)", "")
+            else:
+                plan_6 = "이벤트성"
+                plan_7 = "이벤트성"
+                plan_8 = "이벤트성"
+
+            area_display = group_name if is_user_group else "-"
+
             data = [
-                seq, group_name, item["id"], item["title"],
+                seq, area_display, item["id"], item["title"],
                 item["line"], item["owner"], item["priority"], item["status"],
-                "", "", "",  # 2/6, 2/7, 2/8 - empty for user
+                plan_6, plan_7, plan_8,
                 blocker, item["bigo"], "",
             ]
 
@@ -563,10 +592,20 @@ def create_plan_sheet(ws, grouped_items):
             ws.row_dimensions[row].height = 28
             row += 1
 
+        # 사용자 그룹: 기능영역 컬럼(B) 셀 병합으로 그룹 표시
+        if is_user_group and len(group_items) > 1:
+            ws.merge_cells(f'B{first_data_row}:B{row - 1}')
+            mc = ws.cell(row=first_data_row, column=2)
+            mc.value = group_name
+            mc.font = Font(name="맑은 고딕", size=10, bold=True)
+            mc.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+            mc.fill = row_tint
+            mc.border = THIN_BORDER
+
     # Data Validation for plan columns
     dv = DataValidation(
         type="list",
-        formula1='"작업예정,디버깅,테스트,배포,확인,미진행,-"',
+        formula1='"작업예정,디버깅,테스트,배포,확인,분석,이벤트성,미진행,-"',
         allow_blank=True,
         showDropDown=False,
     )
@@ -906,10 +945,18 @@ def create_daily_plan_sheet(ws, grouped_items):
         for item in sorted_items:
             seq += 1
 
+            # Plan columns based on group membership
+            group = item["group"]
+            if group in GROUP_SCHEDULE_DAILY:
+                sched = GROUP_SCHEDULE_DAILY[group]
+                plan_vals = [sched.get(d, "") for d in PLAN_DAYS]
+            else:
+                plan_vals = ["이벤트성"] * 4
+
             data = [
                 seq, item["group"], item["id"], item["title"],
                 item["line"], item["priority"], item["status"],
-                "", "", "", "",  # 2/5~2/8 empty
+                *plan_vals,
             ]
 
             for col, val in enumerate(data, 1):
@@ -950,7 +997,7 @@ def create_daily_plan_sheet(ws, grouped_items):
     # Data Validation for plan columns
     dv = DataValidation(
         type="list",
-        formula1='"작업예정,디버깅,테스트,배포,확인,미진행,-"',
+        formula1='"작업예정,디버깅,테스트,배포,확인,분석,이벤트성,미진행,-"',
         allow_blank=True,
         showDropDown=False,
     )
