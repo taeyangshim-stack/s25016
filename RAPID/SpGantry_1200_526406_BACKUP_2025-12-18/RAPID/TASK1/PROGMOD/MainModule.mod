@@ -4903,7 +4903,7 @@ ENDPROC
 ! Rob1_CommandListener: T_Head stCommand handler (v1.9.39)
 ! ========================================
 ! Responds to stCommand from T_Head task
-! Protocol: "Ready" → receive command → execute → "Ack" → wait clear → "Ready"
+! Protocol: "Ready" -> receive command -> execute -> "Ack" -> wait clear -> "Ready"
 PROC Rob1_CommandListener()
 	VAR iodev head_log;
 	Open "HOME:/head_r1_listener.txt", head_log \Write;
