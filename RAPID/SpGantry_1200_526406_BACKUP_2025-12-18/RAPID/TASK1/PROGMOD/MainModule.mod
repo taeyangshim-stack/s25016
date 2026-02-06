@@ -3387,23 +3387,23 @@ FUNC pos FloorToPhysical(pos floor_pos)
 	physical.z := HOME_GANTRY_Z - (floor_pos.z - 2100);   ! Z: subtraction (inverted)
 
 	! Apply limits
-	IF physical.x < LIMIT_X_NEG THEN
-		physical.x := LIMIT_X_NEG;
+	IF physical.x < nLimitX_Negative THEN
+		physical.x := nLimitX_Negative;
 	ENDIF
-	IF physical.x > LIMIT_X_POS THEN
-		physical.x := LIMIT_X_POS;
+	IF physical.x > nLimitX_Positive THEN
+		physical.x := nLimitX_Positive;
 	ENDIF
-	IF physical.y < LIMIT_Y_NEG THEN
-		physical.y := LIMIT_Y_NEG;
+	IF physical.y < nLimitY_Negative THEN
+		physical.y := nLimitY_Negative;
 	ENDIF
-	IF physical.y > LIMIT_Y_POS THEN
-		physical.y := LIMIT_Y_POS;
+	IF physical.y > nLimitY_Positive THEN
+		physical.y := nLimitY_Positive;
 	ENDIF
-	IF physical.z < LIMIT_Z_NEG THEN
-		physical.z := LIMIT_Z_NEG;
+	IF physical.z < nLimitZ_Negative THEN
+		physical.z := nLimitZ_Negative;
 	ENDIF
-	IF physical.z > LIMIT_Z_POS THEN
-		physical.z := LIMIT_Z_POS;
+	IF physical.z > nLimitZ_Positive THEN
+		physical.z := nLimitZ_Positive;
 	ENDIF
 
 	RETURN physical;
@@ -3465,11 +3465,11 @@ PROC MoveGantryToWeldPosition()
 	target_r := HOME_GANTRY_R - nAngleRzStore;
 
 	! Apply R limits first (needed for offset calculation)
-	IF target_r < LIMIT_R_NEG THEN
-		target_r := LIMIT_R_NEG;
+	IF target_r < nLimitR_Negative THEN
+		target_r := nLimitR_Negative;
 	ENDIF
-	IF target_r > LIMIT_R_POS THEN
-		target_r := LIMIT_R_POS;
+	IF target_r > nLimitR_Positive THEN
+		target_r := nLimitR_Positive;
 	ENDIF
 
 	! Calculate TCP X/Y offsets rotated by gantry R-axis angle
@@ -3671,8 +3671,8 @@ PROC TestEdgeToWeldCalcOnly()
 
 	! Calculate R-axis first (needed for X/Y offset rotation)
 	target_r := HOME_GANTRY_R - nAngleRzStore;
-	IF target_r < LIMIT_R_NEG THEN target_r := LIMIT_R_NEG; ENDIF
-	IF target_r > LIMIT_R_POS THEN target_r := LIMIT_R_POS; ENDIF
+	IF target_r < nLimitR_Negative THEN target_r := nLimitR_Negative; ENDIF
+	IF target_r > nLimitR_Positive THEN target_r := nLimitR_Positive; ENDIF
 
 	! Calculate X/Y TCP offsets rotated by gantry R-axis angle
 	Write logfile, "--- X/Y TCP Offset Calculation ---";
@@ -3718,13 +3718,13 @@ PROC TestEdgeToWeldCalcOnly()
 	Write logfile, "Formula: Gantry_Z = Raw_Z - TCP_OFFSET (subtract!)";
 	gantry_physical.z := gantry_physical.z - WELD_R1_TCP_Z_OFFSET;
 	Write logfile, "gantry_physical.z (after offset): " + NumToStr(gantry_physical.z,1) + " mm";
-	Write logfile, "LIMIT_Z: [" + NumToStr(LIMIT_Z_NEG,1) + ", " + NumToStr(LIMIT_Z_POS,1) + "] mm";
-	IF gantry_physical.z < LIMIT_Z_NEG THEN
-		gantry_physical.z := LIMIT_Z_NEG;
+	Write logfile, "LIMIT_Z: [" + NumToStr(nLimitZ_Negative,1) + ", " + NumToStr(nLimitZ_Positive,1) + "] mm";
+	IF gantry_physical.z < nLimitZ_Negative THEN
+		gantry_physical.z := nLimitZ_Negative;
 		Write logfile, "gantry_physical.z (limited to min): " + NumToStr(gantry_physical.z,1) + " mm";
 	ENDIF
-	IF gantry_physical.z > LIMIT_Z_POS THEN
-		gantry_physical.z := LIMIT_Z_POS;
+	IF gantry_physical.z > nLimitZ_Positive THEN
+		gantry_physical.z := nLimitZ_Positive;
 		Write logfile, "gantry_physical.z (limited to max): " + NumToStr(gantry_physical.z,1) + " mm";
 	ENDIF
 	Write logfile, "";
@@ -3734,7 +3734,7 @@ PROC TestEdgeToWeldCalcOnly()
 	Write logfile, "HOME_GANTRY_R: " + NumToStr(HOME_GANTRY_R,1) + " deg";
 	Write logfile, "nAngleRzStore: " + NumToStr(nAngleRzStore,2) + " deg";
 	Write logfile, "target_r (final, with limits): " + NumToStr(target_r,1) + " deg";
-	Write logfile, "LIMIT_R: [" + NumToStr(LIMIT_R_NEG,1) + ", " + NumToStr(LIMIT_R_POS,1) + "] deg";
+	Write logfile, "LIMIT_R: [" + NumToStr(nLimitR_Negative,1) + ", " + NumToStr(nLimitR_Positive,1) + "] deg";
 	Write logfile, "";
 
 	! Final target summary
@@ -3772,7 +3772,7 @@ PROC TestEdgeToWeldCalcOnly()
 	TPWrite "[TARGET] Gantry Physical (with offsets):";
 	TPWrite "  X: " + NumToStr(gantry_physical.x,1) + " mm";
 	TPWrite "  Y: " + NumToStr(gantry_physical.y,1) + " mm";
-	TPWrite "  Z: " + NumToStr(gantry_physical.z,1) + " mm (limit:" + NumToStr(LIMIT_Z_POS,0) + ")";
+	TPWrite "  Z: " + NumToStr(gantry_physical.z,1) + " mm (limit:" + NumToStr(nLimitZ_Positive,0) + ")";
 	TPWrite "  R: " + NumToStr(target_r,1) + " deg";
 	TPWrite "========================================";
 	TPWrite "[TEST] Log saved: HOME:/edge_to_weld_calc.txt";
