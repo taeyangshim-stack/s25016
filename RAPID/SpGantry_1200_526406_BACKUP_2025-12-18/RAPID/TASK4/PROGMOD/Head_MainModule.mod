@@ -42,8 +42,8 @@ PROC main()
         TPWrite "T_Head CMD=" + NumToStr(nCmdInput, 0) + " at " + sTime;
 
         TEST nCmdInput
-            ! --- Movement (100 series) ---
             CASE CMD_MOVE_TO_WORLDHOME:
+                ! --- Movement (100 series) ---
                 rCheckCmdMatch CMD_MOVE_TO_WORLDHOME;
                 rDispatchAndWait "MoveHome";
 
@@ -75,8 +75,8 @@ PROC main()
                 rCheckCmdMatch CMD_MOVE_TO_WARMUP;
                 rDispatchR1 "MoveWarmup";
 
-            ! --- Welding (200 series) ---
             CASE CMD_WELD:
+                ! --- Welding (200 series) ---
                 rCheckCmdMatch CMD_WELD;
                 bEnableWeldSkip := FALSE;
                 rDispatchAndWait "Weld";
@@ -103,8 +103,8 @@ PROC main()
                 bEnableWeldSkip := FALSE;
                 rDispatchAndWait "EdgeWeld";
 
-            ! --- Camera (300 series) ---
             CASE CMD_CAMERA_DOOR_OPEN:
+                ! --- Camera (300 series) ---
                 rCheckCmdMatch CMD_CAMERA_DOOR_OPEN;
                 rDispatchR1 "CameraDoorOpen";
 
@@ -120,8 +120,8 @@ PROC main()
                 rCheckCmdMatch CMD_CAMERA_BLOW_OFF;
                 rDispatchR1 "CameraBlowOff";
 
-            ! --- Wire (500 series) ---
             CASE CMD_WIRE_CUT:
+                ! --- Wire (500 series) ---
                 rCheckCmdMatch CMD_WIRE_CUT;
                 rDispatchR1 "WireCut";
 
@@ -137,8 +137,8 @@ PROC main()
                 rCheckCmdMatch CMD_ROB2_WIRE_CUT;
                 rDispatchR1 "Rob2WireCut";
 
-            ! --- Inspection (600 series) ---
             CASE CMD_HOLE_CHECK:
+                ! --- Inspection (600 series) ---
                 rCheckCmdMatch CMD_HOLE_CHECK;
                 rDispatchR1 "HoleCheck";
 
@@ -146,8 +146,8 @@ PROC main()
                 rCheckCmdMatch CMD_LDS_CHECK;
                 rDispatchR1 "LdsCheck";
 
-            ! --- Test/Debug (900 series) ---
             CASE CMD_TEST_MENU:
+                ! --- Test/Debug (900 series) ---
                 rCheckCmdMatch CMD_TEST_MENU;
                 rDispatchR1 "TestMenu";
 

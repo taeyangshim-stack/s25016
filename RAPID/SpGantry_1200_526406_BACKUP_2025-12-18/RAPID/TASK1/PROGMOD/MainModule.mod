@@ -484,8 +484,9 @@ PERS num debug_r2_floor_y_offset := 0;
 	! Edge-based Weld Variables (v2.0.0)
 	! ========================================
 	! PlanA compatible naming for center line
-	VAR pos posStart;             ! Center line start (avg of edgeStart{1,2})
-	VAR pos posEnd;               ! Center line end (avg of edgeEnd{1,2})
+	! NOTE: calcPosStart/calcPosEnd PERS defined in ConfigModule
+	VAR pos calcPosStart;         ! Local calc: center line start (avg of edgeStart{1,2})
+	VAR pos calcPosEnd;           ! Local calc: center line end (avg of edgeEnd{1,2})
 	VAR num nAngleRzStore;        ! R-axis angle (degrees) - PlanA naming
 	PERS bool bRobSwap := FALSE;  ! TRUE when |R| > 90 degrees
 	VAR num nLengthWeldLine;      ! Weld line length (mm) - PlanA naming
@@ -501,14 +502,13 @@ PERS num debug_r2_floor_y_offset := 0;
 	PERS bool t2_weld_ready := FALSE;
 
 	! Robot2 edge positions (shared with TASK2 via PERS, v1.9.37)
-	PERS pos shared_posStart_r2 := [0, 0, 0];
-	PERS pos shared_posEnd_r2 := [0, 0, 0];
+	PERS pos shared_calcPosStart_r2 := [0, 0, 0];
+	PERS pos shared_calcPosEnd_r2 := [0, 0, 0];
 	PERS num shared_nLengthWeldLine := 0;
 
 	! stCommand/stReact Protocol (v1.9.39 - T_Head interface)
 	! T_Head sets stCommand, TASK1/2 respond via stReact
-	PERS string stCommand := "";
-	PERS string stReact{2} := ["",""];
+	! NOTE: stCommand/stReact defined in ConfigModule (cross-task PERS)
 
 	PROC main()
 		VAR iodev main_logfile;
@@ -3296,19 +3296,19 @@ ENDPROC
 ! Calculate Center Line from Edge Points
 ! ----------------------------------------
 ! Reads EDGE_START1/2, EDGE_END1/2 from ConfigModule
-! Calculates posStart, posEnd as averages
+! Calculates calcPosStart, calcPosEnd as averages
 PROC CalcCenterFromEdges()
 	TPWrite "[EDGE] Calculating center line from edges...";
 
 	! Calculate center line start (average of edgeStart{1} and edgeStart{2})
-	posStart.x := (EDGE_START1_X + EDGE_START2_X) / 2;
-	posStart.y := (EDGE_START1_Y + EDGE_START2_Y) / 2;
-	posStart.z := (EDGE_START1_Z + EDGE_START2_Z) / 2;
+	calcPosStart.x := (EDGE_START1_X + EDGE_START2_X) / 2;
+	calcPosStart.y := (EDGE_START1_Y + EDGE_START2_Y) / 2;
+	calcPosStart.z := (EDGE_START1_Z + EDGE_START2_Z) / 2;
 
 	! Calculate center line end (average of edgeEnd{1} and edgeEnd{2})
-	posEnd.x := (EDGE_END1_X + EDGE_END2_X) / 2;
-	posEnd.y := (EDGE_END1_Y + EDGE_END2_Y) / 2;
-	posEnd.z := (EDGE_END1_Z + EDGE_END2_Z) / 2;
+	calcPosEnd.x := (EDGE_END1_X + EDGE_END2_X) / 2;
+	calcPosEnd.y := (EDGE_END1_Y + EDGE_END2_Y) / 2;
+	calcPosEnd.z := (EDGE_END1_Z + EDGE_END2_Z) / 2;
 
 	TPWrite "[EDGE] Edge Start 1: [" + NumToStr(EDGE_START1_X,0) + ","
 	        + NumToStr(EDGE_START1_Y,0) + "," + NumToStr(EDGE_START1_Z,0) + "]";
@@ -3318,10 +3318,10 @@ PROC CalcCenterFromEdges()
 	        + NumToStr(EDGE_END1_Y,0) + "," + NumToStr(EDGE_END1_Z,0) + "]";
 	TPWrite "[EDGE] Edge End 2: [" + NumToStr(EDGE_END2_X,0) + ","
 	        + NumToStr(EDGE_END2_Y,0) + "," + NumToStr(EDGE_END2_Z,0) + "]";
-	TPWrite "[EDGE] Center Start: [" + NumToStr(posStart.x,1) + ","
-	        + NumToStr(posStart.y,1) + "," + NumToStr(posStart.z,1) + "]";
-	TPWrite "[EDGE] Center End: [" + NumToStr(posEnd.x,1) + ","
-	        + NumToStr(posEnd.y,1) + "," + NumToStr(posEnd.z,1) + "]";
+	TPWrite "[EDGE] Center Start: [" + NumToStr(calcPosStart.x,1) + ","
+	        + NumToStr(calcPosStart.y,1) + "," + NumToStr(calcPosStart.z,1) + "]";
+	TPWrite "[EDGE] Center End: [" + NumToStr(calcPosEnd.x,1) + ","
+	        + NumToStr(calcPosEnd.y,1) + "," + NumToStr(calcPosEnd.z,1) + "]";
 ENDPROC
 
 ! ----------------------------------------
@@ -3337,9 +3337,9 @@ PROC DefineWeldLine()
 	TPWrite "[WELD] Defining weld line...";
 
 	! Calculate direction vector
-	dx := posEnd.x - posStart.x;
-	dy := posEnd.y - posStart.y;
-	dz := posEnd.z - posStart.z;
+	dx := calcPosEnd.x - calcPosStart.x;
+	dy := calcPosEnd.y - calcPosStart.y;
+	dz := calcPosEnd.z - calcPosStart.z;
 
 	! Calculate weld line length
 	nLengthWeldLine := Sqrt(dx*dx + dy*dy + dz*dz);
@@ -3430,7 +3430,7 @@ ENDFUNC
 ! ----------------------------------------
 ! Move Gantry to Weld Position
 ! ----------------------------------------
-! Uses calculated posStart and nAngleRzStore to position gantry
+! Uses calculated calcPosStart and nAngleRzStore to position gantry
 PROC MoveGantryToWeldPosition()
 	VAR jointtarget current_jt;
 	VAR jointtarget target_jt;
@@ -3482,7 +3482,7 @@ PROC MoveGantryToWeldPosition()
 
 	! Calculate gantry Floor position (gantry = weld_center - tcp_offset)
 	! Gantry must be offset so that TCP reaches the weld center
-	gantry_floor := posStart;
+	gantry_floor := calcPosStart;
 	gantry_floor.x := gantry_floor.x - offset_floor_x;
 	gantry_floor.y := gantry_floor.y - offset_floor_y;
 	! Z offset: Gantry must be ABOVE weld so TCP can reach down
@@ -3662,8 +3662,8 @@ PROC TestEdgeToWeldCalcOnly()
 
 	! Log calculation results
 	Write logfile, "--- RESULT: Center Line (Floor) ---";
-	Write logfile, "posStart: [" + NumToStr(posStart.x,1) + ", " + NumToStr(posStart.y,1) + ", " + NumToStr(posStart.z,1) + "]";
-	Write logfile, "posEnd:   [" + NumToStr(posEnd.x,1) + ", " + NumToStr(posEnd.y,1) + ", " + NumToStr(posEnd.z,1) + "]";
+	Write logfile, "calcPosStart: [" + NumToStr(calcPosStart.x,1) + ", " + NumToStr(calcPosStart.y,1) + ", " + NumToStr(calcPosStart.z,1) + "]";
+	Write logfile, "calcPosEnd:   [" + NumToStr(calcPosEnd.x,1) + ", " + NumToStr(calcPosEnd.y,1) + ", " + NumToStr(calcPosEnd.z,1) + "]";
 	Write logfile, "nAngleRzStore: " + NumToStr(nAngleRzStore,2) + " deg";
 	Write logfile, "bRobSwap: " + ValToStr(bRobSwap);
 	Write logfile, "nLengthWeldLine: " + NumToStr(nLengthWeldLine,1) + " mm";
@@ -3691,8 +3691,8 @@ PROC TestEdgeToWeldCalcOnly()
 
 	! Calculate gantry Floor position (gantry = weld_center - tcp_offset)
 	Write logfile, "--- Gantry Floor Position (with X/Y offset) ---";
-	Write logfile, "posStart (weld center): [" + NumToStr(posStart.x,1) + ", " + NumToStr(posStart.y,1) + ", " + NumToStr(posStart.z,1) + "]";
-	gantry_floor := posStart;
+	Write logfile, "calcPosStart (weld center): [" + NumToStr(calcPosStart.x,1) + ", " + NumToStr(calcPosStart.y,1) + ", " + NumToStr(calcPosStart.z,1) + "]";
+	gantry_floor := calcPosStart;
 	gantry_floor.x := gantry_floor.x - offset_floor_x;
 	gantry_floor.y := gantry_floor.y - offset_floor_y;
 	Write logfile, "gantry_floor (after X/Y offset): [" + NumToStr(gantry_floor.x,1) + ", " + NumToStr(gantry_floor.y,1) + ", " + NumToStr(gantry_floor.z,1) + "]";
@@ -3761,8 +3761,8 @@ PROC TestEdgeToWeldCalcOnly()
 	TPWrite "  End2: [" + NumToStr(EDGE_END2_X,0) + "," + NumToStr(EDGE_END2_Y,0) + "," + NumToStr(EDGE_END2_Z,0) + "]";
 	TPWrite "----------------------------------------";
 	TPWrite "[RESULT] Center (Floor):";
-	TPWrite "  Start: [" + NumToStr(posStart.x,1) + "," + NumToStr(posStart.y,1) + "," + NumToStr(posStart.z,1) + "]";
-	TPWrite "  End: [" + NumToStr(posEnd.x,1) + "," + NumToStr(posEnd.y,1) + "," + NumToStr(posEnd.z,1) + "]";
+	TPWrite "  Start: [" + NumToStr(calcPosStart.x,1) + "," + NumToStr(calcPosStart.y,1) + "," + NumToStr(calcPosStart.z,1) + "]";
+	TPWrite "  End: [" + NumToStr(calcPosEnd.x,1) + "," + NumToStr(calcPosEnd.y,1) + "," + NumToStr(calcPosEnd.z,1) + "]";
 	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,2) + " deg";
 	TPWrite "[RESULT] bRobSwap: " + ValToStr(bRobSwap);
 	TPWrite "[RESULT] Weld Length: " + NumToStr(nLengthWeldLine,1) + " mm";
@@ -3819,10 +3819,10 @@ PROC TestEdgeToWeld()
 
 	! Step 3: Display calculated results
 	TPWrite "----------------------------------------";
-	TPWrite "[RESULT] Center Start: [" + NumToStr(posStart.x,1) + ","
-	        + NumToStr(posStart.y,1) + "," + NumToStr(posStart.z,1) + "]";
-	TPWrite "[RESULT] Center End: [" + NumToStr(posEnd.x,1) + ","
-	        + NumToStr(posEnd.y,1) + "," + NumToStr(posEnd.z,1) + "]";
+	TPWrite "[RESULT] Center Start: [" + NumToStr(calcPosStart.x,1) + ","
+	        + NumToStr(calcPosStart.y,1) + "," + NumToStr(calcPosStart.z,1) + "]";
+	TPWrite "[RESULT] Center End: [" + NumToStr(calcPosEnd.x,1) + ","
+	        + NumToStr(calcPosEnd.y,1) + "," + NumToStr(calcPosEnd.z,1) + "]";
 	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,2) + " deg";
 	TPWrite "[RESULT] bRobSwap: " + ValToStr(bRobSwap);
 	TPWrite "[RESULT] Weld Length: " + NumToStr(nLengthWeldLine,1) + " mm";
@@ -3846,8 +3846,8 @@ PROC TestEdgeToWeld()
 	TPWrite "----------------------------------------";
 	TPWrite "[TCP] Step 6: TCP Tracking Verification";
 
-	! Target: posStart (weld start position in Floor coordinates)
-	target_floor := posStart;
+	! Target: calcPosStart (weld start position in Floor coordinates)
+	target_floor := calcPosStart;
 	TPWrite "[TCP] Target Weld (Floor): [" + NumToStr(target_floor.x,1) + ", "
 	        + NumToStr(target_floor.y,1) + ", " + NumToStr(target_floor.z,1) + "]";
 
@@ -4033,7 +4033,7 @@ PROC TestMultiAngle()
 		gantry_physical.z := actual_jt.extax.eax_c;
 		gantry_floor := PhysicalToFloor(gantry_physical);
 
-		target_floor := posStart;
+		target_floor := calcPosStart;
 		offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(target_r) - MODE2_TCP_OFFSET_R1_Y * Sin(target_r);
 		offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(target_r) + MODE2_TCP_OFFSET_R1_Y * Cos(target_r);
 
@@ -4207,7 +4207,7 @@ PROC TestMultiPosition()
 		gantry_physical.z := actual_jt.extax.eax_c;
 		gantry_floor := PhysicalToFloor(gantry_physical);
 
-		target_floor := posStart;
+		target_floor := calcPosStart;
 		offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(target_r) - MODE2_TCP_OFFSET_R1_Y * Sin(target_r);
 		offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(target_r) + MODE2_TCP_OFFSET_R1_Y * Cos(target_r);
 
@@ -4325,7 +4325,7 @@ ENDPROC
 ! ----------------------------------------
 ! Trace Weld Line: Multi-pass weld with Approach/Retract (v1.9.38)
 ! ----------------------------------------
-! Moves Robot1 TCP from posStart to posEnd in Floor coordinates
+! Moves Robot1 TCP from calcPosStart to calcPosEnd in Floor coordinates
 ! Uses WobjFloor for correct Floor<->World transformation
 ! v1.9.38: torchmotion macroBuffer, multi-pass, approach/retract, RelTool orient
 !
@@ -4380,9 +4380,9 @@ PROC TraceWeldLine()
 		Write trace_log, "=== Pass " + NumToStr(pass,0) + "/" + NumToStr(nWeldPassCount,0) + " ===";
 
 		! --- Calculate start position with torchmotion offsets ---
-		start_x := posStart.x + macroStartBuffer1{pass}.LengthOffset;
-		start_y := posStart.y + macroStartBuffer1{pass}.BreadthOffset;
-		start_z := posStart.z + macroStartBuffer1{pass}.HeightOffset;
+		start_x := calcPosStart.x + macroStartBuffer1{pass}.LengthOffset;
+		start_y := calcPosStart.y + macroStartBuffer1{pass}.BreadthOffset;
+		start_z := calcPosStart.z + macroStartBuffer1{pass}.HeightOffset;
 
 		weld_start := current_floor;
 		weld_start.trans.x := start_x;
@@ -4409,9 +4409,9 @@ PROC TraceWeldLine()
 			+ " WA=" + NumToStr(macroStartBuffer1{pass}.WorkingAngle,1);
 
 		! --- Calculate end position with torchmotion offsets ---
-		end_x := posEnd.x + macroEndBuffer1{pass}.LengthOffset;
-		end_y := posEnd.y + macroEndBuffer1{pass}.BreadthOffset;
-		end_z := posEnd.z + macroEndBuffer1{pass}.HeightOffset;
+		end_x := calcPosEnd.x + macroEndBuffer1{pass}.LengthOffset;
+		end_y := calcPosEnd.y + macroEndBuffer1{pass}.BreadthOffset;
+		end_z := calcPosEnd.z + macroEndBuffer1{pass}.HeightOffset;
 
 		weld_end := weld_start;
 		weld_end.trans.x := end_x;
@@ -4534,7 +4534,7 @@ PROC TestEdgeToWeldWithRobot()
 	CalcCenterFromEdges;
 	DefineWeldLine;
 
-	TPWrite "[RESULT] Weld Start: [" + NumToStr(posStart.x,1) + "," + NumToStr(posStart.y,1) + "]";
+	TPWrite "[RESULT] Weld Start: [" + NumToStr(calcPosStart.x,1) + "," + NumToStr(calcPosStart.y,1) + "]";
 	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,1) + " deg";
 
 	! Step 4: Move gantry
@@ -4607,21 +4607,21 @@ PROC TestFullWeldSequence()
 	TPWrite "[FULL] Step 2-3: Calculate weld position...";
 	CalcCenterFromEdges;
 	DefineWeldLine;
-	Write logfile, "Step 2-3: Weld Start=[" + NumToStr(posStart.x,1) + "," + NumToStr(posStart.y,1) + "," + NumToStr(posStart.z,1) + "]";
+	Write logfile, "Step 2-3: Weld Start=[" + NumToStr(calcPosStart.x,1) + "," + NumToStr(calcPosStart.y,1) + "," + NumToStr(calcPosStart.z,1) + "]";
 	Write logfile, "         R-axis=" + NumToStr(nAngleRzStore,1) + " deg, bRobSwap=" + ValToStr(bRobSwap);
 
 	! v1.9.37: Share Robot2 edge positions with TASK2
-	shared_posStart_r2.x := EDGE_START2_X;
-	shared_posStart_r2.y := EDGE_START2_Y;
-	shared_posStart_r2.z := EDGE_START2_Z;
-	shared_posEnd_r2.x := EDGE_END2_X;
-	shared_posEnd_r2.y := EDGE_END2_Y;
-	shared_posEnd_r2.z := EDGE_END2_Z;
+	shared_calcPosStart_r2.x := EDGE_START2_X;
+	shared_calcPosStart_r2.y := EDGE_START2_Y;
+	shared_calcPosStart_r2.z := EDGE_START2_Z;
+	shared_calcPosEnd_r2.x := EDGE_END2_X;
+	shared_calcPosEnd_r2.y := EDGE_END2_Y;
+	shared_calcPosEnd_r2.z := EDGE_END2_Z;
 	shared_nLengthWeldLine := nLengthWeldLine;
 	Write logfile, "         Robot2 edge: Start=[" + NumToStr(EDGE_START2_X,0) + "," + NumToStr(EDGE_START2_Y,0) + "," + NumToStr(EDGE_START2_Z,0) + "]"
 		+ " End=[" + NumToStr(EDGE_END2_X,0) + "," + NumToStr(EDGE_END2_Y,0) + "," + NumToStr(EDGE_END2_Z,0) + "]";
 
-	TPWrite "[RESULT] Weld Start: [" + NumToStr(posStart.x,1) + "," + NumToStr(posStart.y,1) + "]";
+	TPWrite "[RESULT] Weld Start: [" + NumToStr(calcPosStart.x,1) + "," + NumToStr(calcPosStart.y,1) + "]";
 	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,1) + " deg, bRobSwap=" + ValToStr(bRobSwap);
 
 	! Step 4: Move gantry

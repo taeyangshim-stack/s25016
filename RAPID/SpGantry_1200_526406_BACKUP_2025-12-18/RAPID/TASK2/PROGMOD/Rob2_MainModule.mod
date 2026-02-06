@@ -359,7 +359,7 @@ VAR robjoint robot2_offset_joints;
     TASK VAR syncident Wait{100};
 
     PERS string stCommand;
-    PERS string stReact{3};
+    PERS string stReact{2};
     PERS num idSync;
     PERS speeddata vSync;
     PERS zonedata zSync;
@@ -385,8 +385,7 @@ VAR robjoint robot2_offset_joints;
 
     ! stCommand/stReact Protocol (v1.9.39 - T_Head interface)
     ! T_Head sets stCommand, TASK1/2 respond via stReact
-    PERS string stCommand;
-    PERS string stReact{2};
+    ! NOTE: stCommand/stReact already declared above (lines 361-362)
 
     ! Weld WObj for Robot2 (v1.9.0)
     ! Created by TASK1, referenced by TASK2
