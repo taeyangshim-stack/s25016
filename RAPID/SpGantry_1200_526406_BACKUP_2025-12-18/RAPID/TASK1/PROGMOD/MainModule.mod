@@ -489,7 +489,7 @@ PERS num debug_r2_floor_y_offset := 0;
 	VAR pos calcPosEnd;           ! Local calc: center line end (avg of edgeEnd{1,2})
 	VAR num nAngleRzStore;        ! R-axis angle (degrees) - PlanA naming
 	! NOTE: bRobSwap PERS defined in ConfigModule
-	VAR num nLengthWeldLine;      ! Weld line length (mm) - PlanA naming
+	VAR num calcLengthWeldLine;      ! Weld line length (mm) - PlanA naming
 	VAR num nOffsetLengthBuffer;  ! Robot offset from weld line
 
 	! TASK2 sync flags for edge-based weld sequence (v2.0.0)
@@ -504,7 +504,7 @@ PERS num debug_r2_floor_y_offset := 0;
 	! Robot2 edge positions (shared with TASK2 via PERS, v1.9.37)
 	PERS pos shared_calcPosStart_r2 := [0, 0, 0];
 	PERS pos shared_calcPosEnd_r2 := [0, 0, 0];
-	PERS num shared_nLengthWeldLine := 0;
+	PERS num shared_calcLengthWeldLine := 0;
 
 	! stCommand/stReact Protocol (v1.9.39 - T_Head interface)
 	! T_Head sets stCommand, TASK1/2 respond via stReact
@@ -3342,7 +3342,7 @@ PROC DefineWeldLine()
 	dz := calcPosEnd.z - calcPosStart.z;
 
 	! Calculate weld line length
-	nLengthWeldLine := Sqrt(dx*dx + dy*dy + dz*dz);
+	calcLengthWeldLine := Sqrt(dx*dx + dy*dy + dz*dz);
 
 	! Calculate R-axis angle (ATan2 gives angle from X+ axis in degrees)
 	! Floor coordinate: X+ = gantry forward, Y+ = left
@@ -3361,14 +3361,14 @@ PROC DefineWeldLine()
 	ENDIF
 
 	! Calculate robot offset length
-	IF nLengthWeldLine < 20 THEN
+	IF calcLengthWeldLine < 20 THEN
 		nOffsetLengthBuffer := 10;
 	ELSE
 		nOffsetLengthBuffer := 10;  ! Default offset for now
 	ENDIF
 
 	TPWrite "[WELD] R-axis angle: " + NumToStr(nAngleRzStore, 2) + " deg";
-	TPWrite "[WELD] Weld length: " + NumToStr(nLengthWeldLine, 1) + " mm";
+	TPWrite "[WELD] Weld length: " + NumToStr(calcLengthWeldLine, 1) + " mm";
 ENDPROC
 
 ! ----------------------------------------
@@ -3666,7 +3666,7 @@ PROC TestEdgeToWeldCalcOnly()
 	Write logfile, "calcPosEnd:   [" + NumToStr(calcPosEnd.x,1) + ", " + NumToStr(calcPosEnd.y,1) + ", " + NumToStr(calcPosEnd.z,1) + "]";
 	Write logfile, "nAngleRzStore: " + NumToStr(nAngleRzStore,2) + " deg";
 	Write logfile, "bRobSwap: " + ValToStr(bRobSwap);
-	Write logfile, "nLengthWeldLine: " + NumToStr(nLengthWeldLine,1) + " mm";
+	Write logfile, "calcLengthWeldLine: " + NumToStr(calcLengthWeldLine,1) + " mm";
 	Write logfile, "";
 
 	! Calculate R-axis first (needed for X/Y offset rotation)
@@ -3765,7 +3765,7 @@ PROC TestEdgeToWeldCalcOnly()
 	TPWrite "  End: [" + NumToStr(calcPosEnd.x,1) + "," + NumToStr(calcPosEnd.y,1) + "," + NumToStr(calcPosEnd.z,1) + "]";
 	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,2) + " deg";
 	TPWrite "[RESULT] bRobSwap: " + ValToStr(bRobSwap);
-	TPWrite "[RESULT] Weld Length: " + NumToStr(nLengthWeldLine,1) + " mm";
+	TPWrite "[RESULT] Weld Length: " + NumToStr(calcLengthWeldLine,1) + " mm";
 	TPWrite "----------------------------------------";
 	TPWrite "[OFFSET] TCP X/Y (rotated to Floor):";
 	TPWrite "  X: " + NumToStr(offset_floor_x,1) + " mm, Y: " + NumToStr(offset_floor_y,1) + " mm";
@@ -3825,7 +3825,7 @@ PROC TestEdgeToWeld()
 	        + NumToStr(calcPosEnd.y,1) + "," + NumToStr(calcPosEnd.z,1) + "]";
 	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,2) + " deg";
 	TPWrite "[RESULT] bRobSwap: " + ValToStr(bRobSwap);
-	TPWrite "[RESULT] Weld Length: " + NumToStr(nLengthWeldLine,1) + " mm";
+	TPWrite "[RESULT] Weld Length: " + NumToStr(calcLengthWeldLine,1) + " mm";
 	TPWrite "----------------------------------------";
 
 	! Step 4: Move gantry to weld position
@@ -4432,7 +4432,7 @@ PROC TraceWeldLine()
 
 		Write trace_log, "End=[" + NumToStr(end_x,1) + ","
 			+ NumToStr(end_y,1) + "," + NumToStr(end_z,1) + "]"
-			+ " len=" + NumToStr(nLengthWeldLine,1) + "mm";
+			+ " len=" + NumToStr(calcLengthWeldLine,1) + "mm";
 
 		! --- Weld speed from torchmotion ---
 		weld_speed.v_tcp := macroStartBuffer1{pass}.WeldingSpeed;
@@ -4617,7 +4617,7 @@ PROC TestFullWeldSequence()
 	shared_calcPosEnd_r2.x := EDGE_END2_X;
 	shared_calcPosEnd_r2.y := EDGE_END2_Y;
 	shared_calcPosEnd_r2.z := EDGE_END2_Z;
-	shared_nLengthWeldLine := nLengthWeldLine;
+	shared_calcLengthWeldLine := calcLengthWeldLine;
 	Write logfile, "         Robot2 edge: Start=[" + NumToStr(EDGE_START2_X,0) + "," + NumToStr(EDGE_START2_Y,0) + "," + NumToStr(EDGE_START2_Z,0) + "]"
 		+ " End=[" + NumToStr(EDGE_END2_X,0) + "," + NumToStr(EDGE_END2_Y,0) + "," + NumToStr(EDGE_END2_Z,0) + "]";
 
