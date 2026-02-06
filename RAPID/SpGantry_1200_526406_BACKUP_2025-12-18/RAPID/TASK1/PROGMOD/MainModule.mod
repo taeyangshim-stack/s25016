@@ -488,7 +488,7 @@ PERS num debug_r2_floor_y_offset := 0;
 	VAR pos calcPosStart;         ! Local calc: center line start (avg of edgeStart{1,2})
 	VAR pos calcPosEnd;           ! Local calc: center line end (avg of edgeEnd{1,2})
 	VAR num nAngleRzStore;        ! R-axis angle (degrees) - PlanA naming
-	PERS bool bRobSwap := FALSE;  ! TRUE when |R| > 90 degrees
+	! NOTE: bRobSwap PERS defined in ConfigModule
 	VAR num nLengthWeldLine;      ! Weld line length (mm) - PlanA naming
 	VAR num nOffsetLengthBuffer;  ! Robot offset from weld line
 
