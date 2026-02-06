@@ -490,7 +490,7 @@ PERS num debug_r2_floor_y_offset := 0;
 	VAR num nAngleRzStore;        ! R-axis angle (degrees) - PlanA naming
 	! NOTE: bRobSwap PERS defined in ConfigModule
 	VAR num calcLengthWeldLine;      ! Weld line length (mm) - PlanA naming
-	VAR num nOffsetLengthBuffer;  ! Robot offset from weld line
+	VAR num calcOffsetLengthBuffer;  ! Robot offset from weld line (renamed to avoid PERS conflict)
 
 	! TASK2 sync flags for edge-based weld sequence (v2.0.0)
 	PERS bool t1_weld_position_ready := FALSE;  ! Gantry + Robot1 positioned
@@ -3362,9 +3362,9 @@ PROC DefineWeldLine()
 
 	! Calculate robot offset length
 	IF calcLengthWeldLine < 20 THEN
-		nOffsetLengthBuffer := 10;
+		calcOffsetLengthBuffer := 10;
 	ELSE
-		nOffsetLengthBuffer := 10;  ! Default offset for now
+		calcOffsetLengthBuffer := 10;  ! Default offset for now
 	ENDIF
 
 	TPWrite "[WELD] R-axis angle: " + NumToStr(nAngleRzStore, 2) + " deg";
