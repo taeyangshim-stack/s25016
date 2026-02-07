@@ -1,0 +1,45 @@
+{
+  "_comment": "용접선 데이터 추출 설정 파일",
+  "_preset_info": "프리셋: full, basic, coordinates, image_format",
+
+  "preset": "image_format",
+
+  "custom_fields": [
+    "requestId",
+    "호기정보",
+    "startX1",
+    "startY1",
+    "startZ1",
+    "endX1",
+    "endY1",
+    "endZ1",
+    "startThickness1",
+    "endThickness1",
+    "length1",
+    "weldingLeg1",
+    "startX2",
+    "startY2",
+    "startZ2",
+    "endX2",
+    "endY2",
+    "endZ2",
+    "startThickness2",
+    "endThickness2",
+    "length2",
+    "weldingLeg2"
+  ],
+
+  "output_settings": {
+    "format": "csv",
+    "encoding": "utf-8-sig",
+    "delimiter": ",",
+    "include_header": true,
+    "output_dir": "extracted_data"
+  },
+
+  "processing_options": {
+    "merge_all_girders": false,
+    "separate_by_date": true,
+    "skip_empty_files": true
+  }
+}

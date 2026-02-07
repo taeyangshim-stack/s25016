@@ -899,15 +899,49 @@
       return { ok: dist <= maxDist, dist, mid1x, mid1y };
     }
 
-    function checkStartOffset(s1x, s1y, s2x, s2y, threshold) {
-      const dx = s2x - s1x, dy = s2y - s1y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+    // 양방향 투영 방식: XY 평면에서 점을 선분에 투영
+    function projectPointToLineXY(px, py, sx, sy, ex, ey) {
+      const dx = ex - sx;
+      const dy = ey - sy;
+      const lenSq = dx * dx + dy * dy;
+
+      if (lenSq === 0) return { x: sx, y: sy, t: 0 };
+
+      let t = ((px - sx) * dx + (py - sy) * dy) / lenSq;
+      t = Math.max(0, Math.min(1, t)); // 선분 범위로 제한
+
+      return {
+        x: sx + t * dx,
+        y: sy + t * dy,
+        t
+      };
+    }
+
+    function checkStartOffset(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, threshold) {
+      // S1을 Line2에 투영 → P1, 거리 S2↔P1
+      const p1 = projectPointToLineXY(s1x, s1y, s2x, s2y, e2x, e2y);
+      const dist1 = Math.sqrt((p1.x - s2x) ** 2 + (p1.y - s2y) ** 2);
+
+      // S2를 Line1에 투영 → P2, 거리 S1↔P2
+      const p2 = projectPointToLineXY(s2x, s2y, s1x, s1y, e1x, e1y);
+      const dist2 = Math.sqrt((p2.x - s1x) ** 2 + (p2.y - s1y) ** 2);
+
+      // 최대값 사용
+      const dist = Math.max(dist1, dist2);
       return { ok: dist <= threshold, dist };
     }
 
-    function checkEndOffset(e1x, e1y, e2x, e2y, threshold) {
-      const dx = e2x - e1x, dy = e2y - e1y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+    function checkEndOffset(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, threshold) {
+      // E1을 Line2에 투영 → P3, 거리 E2↔P3
+      const p3 = projectPointToLineXY(e1x, e1y, s2x, s2y, e2x, e2y);
+      const dist3 = Math.sqrt((p3.x - e2x) ** 2 + (p3.y - e2y) ** 2);
+
+      // E2를 Line1에 투영 → P4, 거리 E1↔P4
+      const p4 = projectPointToLineXY(e2x, e2y, s1x, s1y, e1x, e1y);
+      const dist4 = Math.sqrt((p4.x - e1x) ** 2 + (p4.y - e1y) ** 2);
+
+      // 최대값 사용
+      const dist = Math.max(dist3, dist4);
       return { ok: dist <= threshold, dist };
     }
 
@@ -973,8 +1007,8 @@
       const len = checkLength(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.lenThreshold);
       const angle = checkAngle(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.angleThreshold);
       const dist = checkDistance(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.distThreshold);
-      const startOff = checkStartOffset(v.s1x, v.s1y, v.s2x, v.s2y, v.offsetThreshold);
-      const endOff = checkEndOffset(v.e1x, v.e1y, v.e2x, v.e2y, v.offsetThreshold);
+      const startOff = checkStartOffset(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.offsetThreshold);
+      const endOff = checkEndOffset(v.s1x, v.s1y, v.e1x, v.e1y, v.s2x, v.s2y, v.e2x, v.e2y, v.offsetThreshold);
 
       const crossOK = !cross, dirOK = dir, lenOK = len.ok, angleOK = angle.ok, distOK = dist.ok;
       const startOffOK = startOff.ok, endOffOK = endOff.ok;
@@ -1280,8 +1314,8 @@
         const len = checkLength(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, lenThreshold);
         const angle = checkAngle(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, angleThreshold);
         const dist = checkDistance(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, distThreshold);
-        const startOff = checkStartOffset(s1x, s1y, s2x, s2y, offsetThreshold);
-        const endOff = checkEndOffset(e1x, e1y, e2x, e2y, offsetThreshold);
+        const startOff = checkStartOffset(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, offsetThreshold);
+        const endOff = checkEndOffset(s1x, s1y, e1x, e1y, s2x, s2y, e2x, e2y, offsetThreshold);
 
         const crossOK = !cross, dirOK = dir, lenOK = len.ok, angleOK = angle.ok;
         const distOK = dist.ok, startOffOK = startOff.ok, endOffOK = endOff.ok;
