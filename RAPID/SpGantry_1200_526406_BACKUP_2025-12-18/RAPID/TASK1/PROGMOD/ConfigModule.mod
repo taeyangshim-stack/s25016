@@ -817,6 +817,6 @@ PERS trackdata track40 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
 ! stCommand: T_Head sets command string for TASK1/TASK2
 ! stReact: TASK1/TASK2 report status ("Ready", "Ack", etc.)
 PERS string stCommand := "";
-PERS string stReact{2} := ["", ""];
+PERS string stReact{3} := ["", "", ""];
 
 ENDMODULE
