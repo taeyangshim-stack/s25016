@@ -43,3 +43,7 @@ cloudinary-uploader/test-files/
 .sisyphus/
 
 gha-creds-*.json
+
+# Python
+__pycache__/
+*.pyc
