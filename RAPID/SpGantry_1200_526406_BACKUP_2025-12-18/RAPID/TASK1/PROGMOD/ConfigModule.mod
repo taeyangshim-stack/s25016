@@ -83,6 +83,8 @@ RECORD targetdata
     num TrackType;         ! Seam tracking type (0-3)
     num TrackGainY;        ! Tracking Y gain
     num TrackGainZ;        ! Tracking Z gain
+    num MaxCorr;           ! Max correction value
+    num Bias;              ! Bias value
 ENDRECORD
 
 ! Correction Order Data Structure
