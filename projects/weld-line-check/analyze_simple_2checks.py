@@ -2,6 +2,7 @@
 """
 대각거리 방식 (2가지 검사) 보고서 생성
 시작점/끝점 변위 검사만 수행 (대각거리 측정)
+부동소수점 보정: round(distance, 6) < threshold
 """
 
 from pathlib import Path
@@ -19,11 +20,15 @@ from collections import Counter
 class SimpleValidator:
     """간단 검증기 - 2가지 검사만 수행"""
 
+    ROUND_DIGITS = 6  # 부동소수점 보정 반올림 자릿수
+
     def __init__(self, offset_threshold):
         self.offset_threshold = offset_threshold
 
     def check_simple(self, line1, line2):
-        """2가지 검사만 수행: 시작점 변위, 끝점 변위 (대각거리 방식)"""
+        """2가지 검사만 수행: 시작점 변위, 끝점 변위 (대각거리 방식)
+        부동소수점 보정: round(distance, 6) < threshold
+        """
         s1x, s1y = line1['start']['x'], line1['start']['y']
         e1x, e1y = line1['end']['x'], line1['end']['y']
         s2x, s2y = line2['start']['x'], line2['start']['y']
@@ -37,20 +42,22 @@ class SimpleValidator:
 
         # 시작점 변위 (대각거리 - 직선거리)
         start_off = math.sqrt((s1x - s2x)**2 + (s1y - s2y)**2 + (s1z - s2z)**2)
-        start_ok = start_off <= self.offset_threshold
+        start_off_round = round(start_off, self.ROUND_DIGITS)
+        start_ok = start_off_round < self.offset_threshold
 
         # 끝점 변위 (대각거리 - 직선거리)
         end_off = math.sqrt((e1x - e2x)**2 + (e1y - e2y)**2 + (e1z - e2z)**2)
-        end_ok = end_off <= self.offset_threshold
+        end_off_round = round(end_off, self.ROUND_DIGITS)
+        end_ok = end_off_round < self.offset_threshold
 
         all_ok = start_ok and end_ok
 
         # 실패 사유
         fail_reasons = []
         if not start_ok:
-            fail_reasons.append(f"시작점변위({start_off:.1f}mm > {self.offset_threshold}mm)")
+            fail_reasons.append(f"시작점변위({start_off_round}mm >= {self.offset_threshold}mm)")
         if not end_ok:
-            fail_reasons.append(f"끝점변위({end_off:.1f}mm > {self.offset_threshold}mm)")
+            fail_reasons.append(f"끝점변위({end_off_round}mm >= {self.offset_threshold}mm)")
 
         return {
             'all_ok': all_ok,
@@ -58,6 +65,8 @@ class SimpleValidator:
             'end_ok': end_ok,
             'start_off': start_off,
             'end_off': end_off,
+            'start_off_round': start_off_round,
+            'end_off_round': end_off_round,
             'fail_reasons': ', '.join(fail_reasons) if fail_reasons else 'N/A'
         }
 
@@ -159,7 +168,7 @@ def create_summary_sheet(wb, all_results, offset_threshold):
     )
 
     # 제목
-    ws['A1'] = '대각거리 방식 (2가지 검사) 보고서'
+    ws['A1'] = '대각거리 방식 (2가지 검사) 보고서 - 부동소수점 보정'
     ws['A1'].font = Font(size=18, bold=True, color='366092')
     ws.merge_cells('A1:I1')
 
@@ -171,7 +180,9 @@ def create_summary_sheet(wb, all_results, offset_threshold):
     ws['A5'] = '분석 파일 수:'
     ws['B5'] = len(all_results)
     ws['A6'] = '검증 기준:'
-    ws['B6'] = f"변위≤{offset_threshold}mm"
+    ws['B6'] = f"round(변위, 6) < {offset_threshold}mm (부동소수점 보정)"
+    ws['A7'] = '보정 사유:'
+    ws['B7'] = 'sqrt() 부동소수점 오차로 20.0mm 경계값이 19.999... 또는 20.000...으로 산출되는 문제 해결'
 
     # 헤더
     row = 8
@@ -238,8 +249,10 @@ def create_detail_sheet(wb, sheet_name, results, weld_data, metadata, offset_thr
     headers = [
         '번호', '날짜시간', '거더', 'RequestID', '종합결과', '실패사유',
         '시작점', '끝점',
-        f'시작점변위\n(≤{offset_threshold}mm)',
-        f'끝점변위\n(≤{offset_threshold}mm)',
+        f'시작점변위(raw)',
+        f'시작점변위\n(round)',
+        f'끝점변위(raw)',
+        f'끝점변위\n(round)',
         'Line1_SX', 'Line1_SY', 'Line1_SZ',
         'Line1_EX', 'Line1_EY', 'Line1_EZ',
         'Line2_SX', 'Line2_SY', 'Line2_SZ',
@@ -261,10 +274,10 @@ def create_detail_sheet(wb, sheet_name, results, weld_data, metadata, offset_thr
     ws.column_dimensions['E'].width = 10
     ws.column_dimensions['F'].width = 50
 
-    for col in range(7, 11):
-        ws.column_dimensions[get_column_letter(col)].width = 12
+    for col in range(7, 13):
+        ws.column_dimensions[get_column_letter(col)].width = 14
 
-    for col in range(11, 23):
+    for col in range(13, 25):
         ws.column_dimensions[get_column_letter(col)].width = 11
 
     # 데이터 행
@@ -283,8 +296,10 @@ def create_detail_sheet(wb, sheet_name, results, weld_data, metadata, offset_thr
             result['fail_reasons'],
             'OK' if result['start_ok'] else 'FAIL',
             'OK' if result['end_ok'] else 'FAIL',
-            round(result['start_off'], 2),
-            round(result['end_off'], 2),
+            result['start_off'],
+            result['start_off_round'],
+            result['end_off'],
+            result['end_off_round'],
             round(s1['x'], 3), round(s1['y'], 3), round(s1.get('z', 0), 3),
             round(e1['x'], 3), round(e1['y'], 3), round(e1.get('z', 0), 3),
             round(s2['x'], 3), round(s2['y'], 3), round(s2.get('z', 0), 3),
@@ -303,12 +318,117 @@ def create_detail_sheet(wb, sheet_name, results, weld_data, metadata, offset_thr
                 else:
                     cell.fill = fail_fill
                     cell.font = Font(bold=True, color='9C0006')
-            elif col >= 7 and col <= 8:
+            elif col in (7, 8):
                 if value == 'FAIL':
+                    cell.fill = fail_fill
+            elif col in (10, 12):  # round 값 컬럼 - 경계값 강조
+                if isinstance(value, (int, float)) and value >= offset_threshold:
                     cell.fill = fail_fill
 
     ws.auto_filter.ref = f"A1:{get_column_letter(len(headers))}1"
     ws.freeze_panes = 'A2'
+
+
+def create_boundary_sheet(wb, all_results, offset_threshold):
+    """경계값 분석 시트 생성 (19~21mm 범위 케이스)"""
+    ws = wb.create_sheet('경계값분석')
+
+    header_fill = PatternFill(start_color='8B4513', end_color='8B4513', fill_type='solid')
+    header_font = Font(color='FFFFFF', bold=True, size=10)
+    pass_fill = PatternFill(start_color='C6EFCE', end_color='C6EFCE', fill_type='solid')
+    fail_fill = PatternFill(start_color='FFC7CE', end_color='FFC7CE', fill_type='solid')
+    changed_fill = PatternFill(start_color='FFEB9C', end_color='FFEB9C', fill_type='solid')
+    border = Border(
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'), bottom=Side(style='thin')
+    )
+
+    # 설명
+    ws['A1'] = '경계값 분석 (19.0 ~ 21.0mm 범위)'
+    ws['A1'].font = Font(size=14, bold=True, color='8B4513')
+    ws.merge_cells('A1:J1')
+    ws['A2'] = f'부동소수점 보정 전후 판정 변경 케이스 분석 (threshold={offset_threshold}mm)'
+    ws['A2'].font = Font(size=10, color='666666')
+    ws.merge_cells('A2:J2')
+
+    # 헤더
+    headers = ['거더', 'RequestID', '시작점(raw)', '시작점(round)',
+               '끝점(raw)', '끝점(round)', '기존판정\n(<=)', '보정판정\n(round<)', '변경여부']
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(4, col, header)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        cell.border = border
+
+    row = 5
+    boundary_count = 0
+    changed_count = 0
+
+    for result in all_results:
+        for r, d in zip(result['results'], result['weld_data']):
+            start_raw = r['start_off']
+            end_raw = r['end_off']
+            start_round = r['start_off_round']
+            end_round = r['end_off_round']
+
+            # 19~21 범위 체크
+            in_boundary = ((offset_threshold - 1.0) <= start_raw <= (offset_threshold + 1.0)) or \
+                          ((offset_threshold - 1.0) <= end_raw <= (offset_threshold + 1.0))
+
+            if not in_boundary:
+                continue
+
+            boundary_count += 1
+
+            # 기존 판정 (<=)
+            old_ok = (start_raw <= offset_threshold) and (end_raw <= offset_threshold)
+            # 보정 판정 (round <)
+            new_ok = (start_round < offset_threshold) and (end_round < offset_threshold)
+            changed = old_ok != new_ok
+
+            if changed:
+                changed_count += 1
+
+            old_str = 'PASS' if old_ok else 'FAIL'
+            new_str = 'PASS' if new_ok else 'FAIL'
+            changed_str = 'PASS→FAIL' if (old_ok and not new_ok) else ('FAIL→PASS' if (not old_ok and new_ok) else '-')
+
+            row_data = [
+                result['girder'], d['requestId'],
+                start_raw, start_round,
+                end_raw, end_round,
+                old_str, new_str, changed_str
+            ]
+
+            for col, value in enumerate(row_data, 1):
+                cell = ws.cell(row, col, value)
+                cell.border = border
+                cell.alignment = Alignment(horizontal='center', vertical='center')
+
+                if col == 7:  # 기존판정
+                    cell.fill = pass_fill if value == 'PASS' else fail_fill
+                elif col == 8:  # 보정판정
+                    cell.fill = pass_fill if value == 'PASS' else fail_fill
+                elif col == 9 and changed:  # 변경여부
+                    cell.fill = changed_fill
+                    cell.font = Font(bold=True, color='9C6500')
+
+            row += 1
+
+    # 요약
+    ws.cell(row + 1, 1, f'경계값 케이스: {boundary_count}건').font = Font(bold=True)
+    ws.cell(row + 2, 1, f'판정 변경: {changed_count}건').font = Font(bold=True, color='9C6500')
+
+    # 열 너비
+    ws.column_dimensions['A'].width = 18
+    ws.column_dimensions['B'].width = 12
+    for col in range(3, 7):
+        ws.column_dimensions[get_column_letter(col)].width = 22
+    for col in range(7, 10):
+        ws.column_dimensions[get_column_letter(col)].width = 14
+
+    ws.freeze_panes = 'A5'
 
 
 def analyze_single_log(log_file: Path, offset_threshold: float) -> Dict:
@@ -388,9 +508,9 @@ def main():
     offset_threshold = 20.0
 
     print("="*80)
-    print("대각거리 방식 (2가지 검사) 보고서 생성")
+    print("대각거리 방식 (2가지 검사) 보고서 생성 - 부동소수점 보정")
     print("="*80)
-    print(f"검증 방식: 시작점 변위, 끝점 변위 (대각거리, ≤{offset_threshold}mm)")
+    print(f"검증 방식: round(변위, 6) < {offset_threshold}mm")
     print("="*80)
 
     # 로그 파일 검색
@@ -429,18 +549,22 @@ def main():
     # 전체 요약 시트 생성
     create_summary_sheet(wb, all_results, offset_threshold)
 
+    # 경계값 분석 시트 생성
+    create_boundary_sheet(wb, all_results, offset_threshold)
+
     # 저장
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    output_file = base_dir / f"대각거리방식_2가지검사_{timestamp}.xlsx"
+    output_file = base_dir / f"대각거리방식_2가지검사_반올림보정_{timestamp}.xlsx"
     wb.save(output_file)
 
     print("\n" + "="*80)
     print("분석 완료!")
     print("="*80)
-    print(f"\n✅ 대각거리 방식 (2가지 검사) 보고서 저장: {output_file}")
+    print(f"\n✅ 보고서 저장: {output_file}")
     print(f"   - 요약 시트: 1개")
     print(f"   - 상세 시트: {len(all_results)}개 (각 거더/날짜별)")
-    print(f"   - 전체 시트 수: {len(all_results) + 1}개")
+    print(f"   - 경계값분석 시트: 1개")
+    print(f"   - 전체 시트 수: {len(all_results) + 2}개")
 
 
 if __name__ == '__main__':
