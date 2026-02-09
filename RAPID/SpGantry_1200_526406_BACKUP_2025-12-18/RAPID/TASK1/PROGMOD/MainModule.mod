@@ -522,6 +522,9 @@ PERS num debug_r2_floor_y_offset := 0;
 		VAR bool timeout_flag;
 		VAR num max_wait_time;
 
+		! v1.9.40: Reset shared_test_mode to prevent TASK2 from using stale PERS value
+		shared_test_mode := 0;
+
 		! Read TEST_MODE from config.txt
 		test_mode := 0;  ! Default: backward compatible
 		Open "HOME:/config.txt", configfile \Read;
