@@ -26,6 +26,8 @@
         })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -33,255 +35,359 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-light: #e0e7ff;
+            --accent-hover: #4f46e5;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px;
+            color: var(--text-primary);
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1440px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
         }
 
+        /* ── Header ── */
         .header {
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
+            background: var(--surface);
+            color: var(--text-primary);
+            padding: 48px 48px 32px;
+            border-bottom: 1px solid var(--border);
         }
 
         .header h1 {
-            font-size: 2.8em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
         }
 
         .header p {
-            font-size: 1.3em;
-            opacity: 0.9;
+            font-size: 1.05em;
+            color: var(--text-secondary);
+            font-weight: 400;
         }
 
+        /* ── Tab Navigation ── */
         .nav-tabs {
             display: flex;
-            background: #f8f9fa;
-            border-bottom: 3px solid #4a90e2;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
             overflow-x: auto;
+            padding: 0 32px;
+            gap: 4px;
         }
 
         .nav-tab {
-            padding: 20px 30px;
+            padding: 14px 24px;
             cursor: pointer;
-            background: #ecf0f1;
+            background: transparent;
             border: none;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            flex: 1;
-            min-width: 200px;
+            font-size: 0.92em;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all var(--transition);
+            flex-shrink: 0;
+            min-width: auto;
             text-align: center;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
+            font-family: inherit;
+            position: relative;
         }
 
         .nav-tab:hover {
-            background: #d5dbdb;
+            color: var(--text-secondary);
+            background: var(--accent-light);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
         }
 
         .nav-tab.active {
-            background: white;
-            color: #4a90e2;
-            border-bottom: 3px solid #4a90e2;
-            margin-bottom: -3px;
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+            background: transparent;
         }
 
+        /* ── Tab Content ── */
         .tab-content {
             display: none;
-            padding: 30px;
+            padding: 40px 48px;
         }
 
         .tab-content.active {
             display: block;
         }
 
+        /* ── Dashboard Grid ── */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
         }
 
+        /* ── Cards ── */
         .card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border-left: 5px solid #4a90e2;
-            transition: transform 0.3s ease;
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            transition: all var(--transition);
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
         }
 
         .card h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.4em;
+            color: var(--text-primary);
+            margin-bottom: 18px;
+            font-size: 1.15em;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 10px;
+            letter-spacing: -0.01em;
         }
 
-        .card-devicenet {
-            border-left-color: #27ae60;
-        }
+        .card-devicenet { border-left-color: #10b981; }
+        .card-robot { border-left-color: #f43f5e; }
+        .card-hexagon { border-left-color: #8b5cf6; }
 
-        .card-robot {
-            border-left-color: #e74c3c;
-        }
-
-        .card-hexagon {
-            border-left-color: #9b59b6;
-        }
-
+        /* ── Project Links ── */
         .project-link {
-            display: block;
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-            color: white;
+            display: flex;
+            align-items: center;
+            padding: 12px 18px;
+            background: var(--accent-light);
+            color: var(--accent);
             text-decoration: none;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            text-align: center;
+            border-radius: var(--radius-sm);
+            margin: 8px 0;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all var(--transition);
+            text-align: left;
+            border: 1px solid transparent;
         }
 
         .project-link:hover {
-            transform: translateX(10px);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+            background: var(--accent);
+            color: white;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(99,102,241,0.25);
         }
 
         .project-link-devicenet {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            background: #ecfdf5;
+            color: #059669;
         }
-
         .project-link-devicenet:hover {
-            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+            background: #10b981;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.25);
         }
 
         .project-link-robot {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            background: #fff1f2;
+            color: #e11d48;
         }
-
         .project-link-robot:hover {
-            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+            background: #f43f5e;
+            color: white;
+            box-shadow: 0 4px 12px rgba(244,63,94,0.25);
         }
 
+        .project-link-amber {
+            background: #fffbeb; color: #d97706;
+        }
+        .project-link-amber:hover {
+            background: #f59e0b; color: white;
+            box-shadow: 0 4px 12px rgba(245,158,11,0.25);
+        }
+
+        .project-link-violet {
+            background: #f5f3ff; color: #7c3aed;
+        }
+        .project-link-violet:hover {
+            background: #8b5cf6; color: white;
+            box-shadow: 0 4px 12px rgba(139,92,246,0.25);
+        }
+
+        .project-link-sky {
+            background: #f0f9ff; color: #0284c7;
+        }
+        .project-link-sky:hover {
+            background: #0ea5e9; color: white;
+            box-shadow: 0 4px 12px rgba(14,165,233,0.25);
+        }
+
+        .project-link-teal {
+            background: #f0fdfa; color: #0d9488;
+        }
+        .project-link-teal:hover {
+            background: #14b8a6; color: white;
+            box-shadow: 0 4px 12px rgba(20,184,166,0.25);
+        }
+
+        .project-link-pink {
+            background: #fdf2f8; color: #db2777;
+        }
+        .project-link-pink:hover {
+            background: #ec4899; color: white;
+            box-shadow: 0 4px 12px rgba(236,72,153,0.25);
+        }
+
+        /* ── Folder Structure ── */
         .folder-structure {
             list-style: none;
             padding-left: 0;
         }
 
         .folder-structure li {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ecf0f1;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: background 0.2s ease;
+            transition: background var(--transition);
+            font-size: 0.92em;
+            border-radius: 6px;
+        }
+
+        .folder-structure li:last-child {
+            border-bottom: none;
         }
 
         .folder-structure li:hover {
-            background: #f8f9fa;
+            background: var(--accent-light);
         }
 
         .folder-icon {
-            font-size: 1.3em;
+            font-size: 1.15em;
         }
 
+        /* ── Info Box ── */
         .info-box {
-            background: #e8f4f8;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 5px solid #4a90e2;
-            margin: 20px 0;
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--accent);
+            margin: 16px 0;
         }
 
         .info-box h4 {
-            color: #2c3e50;
-            margin-bottom: 10px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            font-weight: 700;
         }
 
         .info-box p {
             line-height: 1.8;
-            color: #555;
+            color: var(--text-secondary);
+            font-size: 0.9em;
         }
 
+        /* ── Stats Grid ── */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
-            padding: 20px;
-            border-radius: 10px;
+            background: var(--surface);
+            padding: 24px 20px;
+            border-radius: var(--radius);
             text-align: center;
-            border-left: 4px solid #4a90e2;
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #4a90e2;
+            font-size: 2.2em;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.03em;
         }
 
         .stat-label {
-            font-size: 0.9em;
-            color: #7f8c8d;
-            margin-top: 5px;
+            font-size: 0.82em;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
         }
 
+        /* ── File Links ── */
         .file-link {
             display: inline-block;
-            padding: 8px 15px;
-            background: #ecf0f1;
-            color: #2c3e50;
+            padding: 7px 14px;
+            background: var(--accent-light);
+            color: var(--accent);
             text-decoration: none;
-            border-radius: 5px;
-            margin: 5px;
-            transition: all 0.3s ease;
-            font-size: 0.95em;
+            border-radius: 8px;
+            margin: 4px;
+            transition: all var(--transition);
+            font-size: 0.85em;
+            font-weight: 500;
         }
 
         .file-link:hover {
-            background: #4a90e2;
+            background: var(--accent);
             color: white;
         }
 
         .emoji {
-            font-size: 1.5em;
+            font-size: 1.3em;
         }
 
+        /* ── Highlight Box ── */
         .highlight-box {
-            background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 5px solid #f39c12;
-            margin: 20px 0;
+            background: #fffbeb;
+            padding: 18px;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid #f59e0b;
+            margin: 16px 0;
         }
 
+        /* ── Timeline ── */
         .timeline {
             position: relative;
-            padding-left: 30px;
-            margin-top: 20px;
+            padding-left: 32px;
+            margin-top: 28px;
         }
 
         .timeline::before {
@@ -290,88 +396,178 @@
             left: 15px;
             top: 0;
             bottom: 0;
-            width: 3px;
-            background: linear-gradient(180deg, #4a90e2 0%, #27ae60 100%);
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent) 0%, #a5b4fc 100%);
         }
 
         .timeline-item {
             position: relative;
-            margin-bottom: 25px;
-            background: #f8f9fa;
-            padding: 18px;
-            border-radius: 8px;
+            margin-bottom: 20px;
+            background: var(--surface);
+            padding: 18px 20px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+
+        .timeline-item:hover {
+            box-shadow: var(--shadow-sm);
         }
 
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: -22px;
+            left: -24px;
             top: 20px;
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            background: #4a90e2;
-            border: 3px solid white;
-            box-shadow: 0 0 0 3px #4a90e2;
+            background: var(--accent);
+            border: 3px solid var(--surface);
+            box-shadow: 0 0 0 2px var(--accent);
         }
 
+        /* ── Badges ── */
         .badge {
             display: inline-block;
-            padding: 5px 12px;
-            border-radius: 15px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            margin-left: 8px;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-new { background: #fee2e2; color: #dc2626; }
+        .badge-update { background: #fef3c7; color: #d97706; }
+        .badge-complete { background: #dcfce7; color: #16a34a; }
+
+        /* ── Utility Classes ── */
+        .detail-note {
+            margin-top: 14px;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 3px solid var(--border);
+            font-size: 0.88em;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .detail-note strong { color: var(--text-primary); }
+
+        .detail-text {
+            margin: 0;
+            font-size: 0.88em;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .section-extra { margin-top: 16px; }
+
+        .small-note {
+            margin-top: 8px;
+            font-size: 0.75em;
+            color: var(--text-muted);
+        }
+
+        .text-muted {
+            margin-top: 14px;
+            font-size: 0.82em;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .text-green { color: #10b981; }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 14px 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 10px;
+            font-size: 0.88em;
+            line-height: 1.6;
+        }
+
+        .code-tree {
+            background: #f8fafc;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-top: 14px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
             font-size: 0.85em;
-            font-weight: bold;
-            margin-left: 10px;
+            line-height: 1.8;
+            color: var(--text-secondary);
         }
 
-        .badge-new {
-            background: #e74c3c;
-            color: white;
+        .tree-indent { padding-left: 20px; }
+
+        .inline-code {
+            background: var(--accent-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.88em;
         }
 
-        .badge-update {
-            background: #f39c12;
-            color: white;
+        .card-full { grid-column: 1 / -1; }
+
+        .list-padded {
+            padding-left: 20px;
+            margin-top: 10px;
         }
 
-        .badge-complete {
-            background: #27ae60;
-            color: white;
+        .link-accent {
+            color: var(--accent);
+            font-weight: 600;
         }
 
+        /* ── Responsive ── */
         @media (max-width: 768px) {
+            body { padding: 12px; }
+
+            .header { padding: 28px 20px 20px; }
+            .header h1 { font-size: 1.5em; }
+
+            .tab-content { padding: 24px 20px; }
+
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
 
             .nav-tabs {
-                flex-direction: column;
+                padding: 0 12px;
+                gap: 0;
             }
 
             .nav-tab {
-                min-width: 100%;
+                padding: 12px 16px;
+                font-size: 0.82em;
             }
 
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
             }
+
+            .card { padding: 20px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 S25016 프로젝트 통합 대시보드</h1>
+            <h1>S25016 프로젝트 통합 대시보드</h1>
             <p>로봇 시스템 개발 · DeviceNet 통신 · 정밀 측정 솔루션</p>
         </div>
 
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('overview')">🏠 전체 개요</button>
-            <button class="nav-tab" onclick="showTab('punchlist')">📋 펀치리스트</button>
-            <button class="nav-tab" onclick="showTab('eventlog')">📊 이벤트 로그</button>
-            <button class="nav-tab" onclick="showTab('work-manage')">🏭 근무관리</button>
-            <button class="nav-tab" onclick="showTab('documents')">📚 문서 자료</button>
-            <button class="nav-tab" onclick="showTab('planb-motion')">🤖 Plan B & 모션</button>
+            <button class="nav-tab active" onclick="showTab('overview')">전체 개요</button>
+            <button class="nav-tab" onclick="showTab('punchlist')">펀치리스트</button>
+            <button class="nav-tab" onclick="showTab('eventlog')">이벤트 로그</button>
+            <button class="nav-tab" onclick="showTab('work-manage')">근무관리</button>
+            <button class="nav-tab" onclick="showTab('documents')">문서 자료</button>
+            <button class="nav-tab" onclick="showTab('planb-motion')">Plan B & 모션</button>
         </div>
 
         <!-- 전체 개요 탭 -->
@@ -389,8 +585,8 @@
                     <div class="stat-number">14</div>
                     <div class="stat-label">용접 시퀀스 상태</div>
                 </div>
-                <div class="stat-card" style="border-left-color: #3498db;">
-                    <div class="stat-number" style="color: #3498db;">☁️</div>
+                <div class="stat-card">
+                    <div class="stat-number">☁️</div>
                     <div class="stat-label">파일 업로더</div>
                 </div>
             </div>
@@ -406,18 +602,18 @@
                             <strong>분량:</strong> 76페이지 기술 사양서
                         </p>
                     </div>
-                    <div class="highlight-box" style="background: #fff3e6; border-left-color: #f39c12; margin: 15px 0;">
-                        <h4 style="color: #c87800;">🚨 통신 문제 해결 현황</h4>
-                        <p style="font-size: 0.95em;">
+                    <div class="highlight-box">
+                        <h4>🚨 통신 문제 해결 현황</h4>
+                        <p>
                             <strong>📅 기간:</strong> 10/2 ~ 10/9 (진행 중)<br>
                             <strong>⚡ 상태:</strong> 10/9 ABB+Lincoln 현장 작업 완료<br>
                             <strong>📍 최신:</strong> 1~2호기 파라미터 최적화, 3호기 리빌딩
                         </p>
                     </div>
-                    <a href="projects/devicenet/docs/251009_작업진행_세부내용.html" class="project-link" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%);" target="_blank">
+                    <a href="projects/devicenet/docs/251009_작업진행_세부내용.html" class="project-link" target="_blank">
                         📋 10/9 작업 진행 세부내용 (최신)
                     </a>
-                    <a href="projects/devicenet/index.html" class="project-link" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);" target="_blank">
+                    <a href="projects/devicenet/index.html" class="project-link" target="_blank">
                         🔧 통신 문제 해결 진행 현황 보고
                     </a>
                     <a href="projects/devicenet/signals.html" class="project-link project-link-devicenet" target="_blank">
@@ -441,9 +637,9 @@
                             <strong>팀 구성:</strong> 3명 협업 체제
                         </p>
                     </div>
-                    <div class="highlight-box" style="background: #e3f2fd; border-left-color: #2196f3; margin: 15px 0;">
-                        <h4 style="color: #1976d2;">🧪 UI 테스트 현황</h4>
-                        <p style="font-size: 0.95em;">
+                    <div class="highlight-box">
+                        <h4>🧪 UI 테스트 현황</h4>
+                        <p>
                             <strong>✅ 통합 결과:</strong> 10/3-10/4 완료 (31개 항목)<br>
                             <strong>📊 현황:</strong> 완료 13 | 개선 11 | 보류 7<br>
                             <strong>📅 다음:</strong> 10/11 UI 개선 및 에러 핸들링
@@ -452,7 +648,7 @@
                     <a href="projects/robot-vertical-axis/dashboard.html" class="project-link project-link-robot" target="_blank">
                         🎯 상하축 이슈 대시보드
                     </a>
-                    <a href="robot_sync_issue_report.html" class="project-link" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);" target="_blank">
+                    <a href="robot_sync_issue_report.html" class="project-link" target="_blank">
                         🚨 로봇 동기화 이슈 보고서 (긴급)
                     </a>
                     <a href="robot_backup_comparison.html" class="project-link project-link-robot" target="_blank">
@@ -470,13 +666,13 @@
                     <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
                         🧪 ROBOT↔UI 테스트 통합 결과 (10/3-10/4)
                     </a>
-                    <a href="planb_specification.html" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                    <a href="planb_specification.html" class="project-link" target="_blank">
                         📋 Plan B 시스템 재구성 사양서
                     </a>
-                    <a href="abb_robot_programming_specification.html" class="project-link" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);" target="_blank">
+                    <a href="abb_robot_programming_specification.html" class="project-link" target="_blank">
                         📄 ABB 로봇 프로그래밍 발주 사양서 (기본)
                     </a>
-                    <a href="abb_spec_detailed.html" class="project-link" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);" target="_blank">
+                    <a href="abb_spec_detailed.html" class="project-link" target="_blank">
                         📑 ABB 로봇 프로그래밍 견적 사양서
                     </a>
                 </div>
@@ -499,9 +695,9 @@
                     </a>
                 </div>
 
-                <div class="card" style="border-left-color: #3498db;">
+                <div class="card">
                     <h3><span class="emoji">☁️</span> Cloudinary 파일 업로더</h3>
-                    <div class="info-box" style="background: #e3f2fd; border-left-color: #2196f3;">
+                    <div class="info-box">
                         <h4>드래그 앤 드롭 업로드</h4>
                         <p>
                             <strong>기능:</strong> 이미지/PDF/문서 일괄 업로드<br>
@@ -509,14 +705,14 @@
                             <strong>저장소:</strong> Cloudinary Cloud Storage
                         </p>
                     </div>
-                    <a href="cloudinary-uploader/dashboard.html" class="project-link" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" target="_blank">
+                    <a href="cloudinary-uploader/dashboard.html" class="project-link" target="_blank">
                         ☁️ Cloudinary 업로더 열기
                     </a>
                 </div>
 
-                <div class="card" style="border-left-color: #f39c12;">
+                <div class="card">
                     <h3><span class="emoji">🏭</span> 근무관리 시스템</h3>
-                    <div class="info-box" style="background: #fff3e6; border-left-color: #f39c12;">
+                    <div class="info-box">
                         <h4>현장 출입 및 근무 시간 관리</h4>
                         <p>
                             <strong>기능:</strong> 출퇴근 기록, 통계, 조회<br>
@@ -524,17 +720,17 @@
                             <strong>알림:</strong> 자동 메일 발송
                         </p>
                     </div>
-                    <a href="projects/work-management/index.html" class="project-link" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);" target="_blank">
+                    <a href="projects/work-management/index.html" class="project-link" target="_blank">
                         🏭 근무관리 대시보드
                     </a>
-                    <a href="projects/work-management/pages/input.html" class="project-link" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" target="_blank">
+                    <a href="projects/work-management/pages/input.html" class="project-link" target="_blank">
                         📝 출입 기록 입력
                     </a>
                 </div>
 
-                <div class="card" style="border-left-color: #8b5cf6;">
+                <div class="card">
                     <h3><span class="emoji">✈️</span> 출장신청서 관리</h3>
-                    <div class="info-box" style="background: #f5f3ff; border-left-color: #8b5cf6;">
+                    <div class="info-box">
                         <h4>출장 신청 및 승인 시스템</h4>
                         <p>
                             <strong>기능:</strong> 출장 신청, 상태 관리, 일정 추적<br>
@@ -542,17 +738,17 @@
                             <strong>규정:</strong> 평일 45,000원, 휴일 50,000원
                         </p>
                     </div>
-                    <a href="projects/business-trip/index.html" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                    <a href="projects/business-trip/index.html" class="project-link" target="_blank">
                         ✈️ 출장신청서 대시보드
                     </a>
-                    <a href="projects/business-trip/pages/create.html" class="project-link" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);" target="_blank">
+                    <a href="projects/business-trip/pages/create.html" class="project-link" target="_blank">
                         📝 신규 출장 신청
                     </a>
                 </div>
 
-                <div class="card" style="border-left-color: #ec4899;">
+                <div class="card">
                     <h3><span class="emoji">🎬</span> 듀얼 토치 모션 뷰어</h3>
-                    <div class="info-box" style="background: #fdf2f8; border-left-color: #ec4899;">
+                    <div class="info-box">
                         <h4>용접 모션 시각화 및 분석</h4>
                         <p>
                             <strong>기능:</strong> TCP 경로 3D 시각화, 타임라인 재생<br>
@@ -560,17 +756,17 @@
                             <strong>분석:</strong> T바 형상, R축 회전, 위빙, 토치 벡터, 비전 포인트
                         </p>
                     </div>
-                    <a href="advanced_motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="project-link" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);" target="_blank">
+                    <a href="advanced_motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="project-link" target="_blank">
                         🏭 고급 모션 뷰어 (XYZR + T바)
                     </a>
-                    <a href="motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="project-link" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);" target="_blank">
+                    <a href="motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="project-link" target="_blank">
                         🎬 간단 모션 뷰어
                     </a>
-                    <a href="motion_viewer_index.html" class="project-link" style="background: linear-gradient(135deg, #f472b6 0%, #ec4899 100%);" target="_blank">
+                    <a href="motion_viewer_index.html" class="project-link" target="_blank">
                         📚 모션 뷰어 인덱스 & 샘플 데이터
                     </a>
-                    <div style="margin-top: 15px;">
-                        <h4 style="font-size: 13px; color: #666; margin-bottom: 8px;">샘플 데이터 (웹 각도별):</h4>
+                    <div class="section-extra">
+                        <h4>샘플 데이터 (웹 각도별):</h4>
                         <a href="sample_data/welding_case_web00deg.csv" class="file-link" download>📊 웹 0° (R=90°)</a>
                         <a href="sample_data/welding_case_web15deg.csv" class="file-link" download>📊 웹 15° (R=105°) ⚠️</a>
                         <a href="sample_data/welding_case_web30deg.csv" class="file-link" download>📊 웹 30° (R=120°) ⚠️</a>
@@ -578,7 +774,7 @@
                         <a href="sample_data/welding_case_web60deg.csv" class="file-link" download>📊 웹 60° (R=150°) ⚠️</a>
                         <a href="sample_data/welding_case_web90deg.csv" class="file-link" download>📊 웹 90° (R=180°) ⚠️</a>
                         <a href="sample_data/welding_case_web100deg.csv" class="file-link" download>📊 웹 100° (R=190°) ⚠️</a>
-                        <div style="margin-top: 8px; font-size: 11px; color: #f59e0b;">
+                        <div class="small-note">
                             ⚠️ = R축 제한(±100°) 초과 - 참고용
                         </div>
                     </div>
@@ -598,9 +794,9 @@
                     </ul>
                 </div>
 
-                <div class="card" style="border-left-color: #8b5cf6;">
+                <div class="card">
                     <h3><span class="emoji">📋</span> Plan B 로봇 시스템 재구성</h3>
-                    <div class="info-box" style="background: #f5f3ff; border-left-color: #8b5cf6;">
+                    <div class="info-box">
                         <h4>외부축 통합 방식 사양서</h4>
                         <p>
                             <strong>목표:</strong> 3-Task 소프트웨어 동기 → 외부축 하드웨어 동기<br>
@@ -608,17 +804,17 @@
                             <strong>담당:</strong> 황동호 팀장, 유대영 차장
                         </p>
                     </div>
-                    <a href="planb_specification.html" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                    <a href="planb_specification.html" class="project-link" target="_blank">
                         📋 Plan B 사양서 보기
                     </a>
-                    <a href="robot_system_review.html" class="project-link" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);" target="_blank">
+                    <a href="robot_system_review.html" class="project-link" target="_blank">
                         📊 현행 시스템 검토 (Plan A)
                     </a>
                 </div>
             </div>
 
             <div class="timeline">
-                <h3 style="margin-bottom: 20px; color: #2c3e50;">📅 최근 프로젝트 타임라인</h3>
+                <h3>📅 최근 프로젝트 타임라인</h3>
                 <div class="timeline-item">
                     <strong>2024.10.04</strong>
                     <span class="badge badge-complete">COMPLETE</span>
@@ -652,9 +848,9 @@
 
         <!-- 펀치리스트 탭 -->
         <div id="punchlist" class="tab-content">
-            <div class="highlight-box" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-left-color: #0284c7;">
-                <h2 style="color: #0c4a6e; margin-bottom: 15px;">📋 S25016 펀치리스트 관리</h2>
-                <p style="line-height: 1.8;">
+            <div class="highlight-box">
+                <h2>📋 S25016 펀치리스트 관리</h2>
+                <p>
                     프로젝트 이슈를 체계적으로 추적하고 관리하는 펀치리스트 시스템입니다.
                     기계/전기/제어 분류별로 이슈를 등록하고, 담당자, 일정, 조치 내용을 관리합니다.
                 </p>
@@ -662,31 +858,31 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-number" style="color: #0284c7;">0</div>
+                    <div class="stat-number">0</div>
                     <div class="stat-label">전체 이슈</div>
                 </div>
-                <div class="stat-card" style="border-left-color: #f59e0b;">
-                    <div class="stat-number" style="color: #f59e0b;">0</div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
                     <div class="stat-label">진행중</div>
                 </div>
-                <div class="stat-card" style="border-left-color: #6b7280;">
-                    <div class="stat-number" style="color: #6b7280;">0</div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
                     <div class="stat-label">보류</div>
                 </div>
-                <div class="stat-card" style="border-left-color: #10b981;">
-                    <div class="stat-number" style="color: #10b981;">0</div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
                     <div class="stat-label">완료</div>
                 </div>
-                <div class="stat-card" style="border-left-color: #dc2626;">
-                    <div class="stat-number" style="color: #dc2626;">0</div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
                     <div class="stat-label">지연</div>
                 </div>
             </div>
 
             <div class="dashboard-grid">
-                <div class="card" style="border-left-color: #0284c7;">
+                <div class="card">
                     <h3><span class="emoji">📋</span> 이슈 분류 체계</h3>
-                    <div class="info-box" style="background: #eff6ff; border-left-color: #0284c7;">
+                    <div class="info-box">
                         <h4>3가지 주요 분류</h4>
                         <ul class="folder-structure">
                             <li><span class="folder-icon">🔧</span> 기계 (구조물, 프레임, 이송장치)</li>
@@ -696,18 +892,18 @@
                     </div>
                 </div>
 
-                <div class="card" style="border-left-color: #8b5cf6;">
+                <div class="card">
                     <h3><span class="emoji">📊</span> 이슈 관리 항목</h3>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                        <p style="margin: 8px 0;"><strong>기본:</strong> ID, 제목, 분류, 우선순위, 상태</p>
-                        <p style="margin: 8px 0;"><strong>내용:</strong> 문제상황, 원인분석, 조치계획, 조치결과</p>
-                        <p style="margin: 8px 0;"><strong>담당:</strong> 담당자, 협의자, 승인자</p>
-                        <p style="margin: 8px 0;"><strong>일정:</strong> 요청일, 목표일, 완료일</p>
-                        <p style="margin: 8px 0;"><strong>기타:</strong> 첨부파일, 댓글, 이력</p>
+                    <div class="detail-note">
+                        <p><strong>기본:</strong> ID, 제목, 분류, 우선순위, 상태</p>
+                        <p><strong>내용:</strong> 문제상황, 원인분석, 조치계획, 조치결과</p>
+                        <p><strong>담당:</strong> 담당자, 협의자, 승인자</p>
+                        <p><strong>일정:</strong> 요청일, 목표일, 완료일</p>
+                        <p><strong>기타:</strong> 첨부파일, 댓글, 이력</p>
                     </div>
                 </div>
 
-                <div class="card" style="border-left-color: #f59e0b;">
+                <div class="card">
                     <h3><span class="emoji">🎯</span> 주요 기능</h3>
                     <ul class="folder-structure">
                         <li><span class="folder-icon">➕</span> 이슈 생성 및 수정</li>
@@ -719,28 +915,28 @@
                     </ul>
                 </div>
 
-                <div class="card" style="border-left-color: #10b981;">
+                <div class="card">
                     <h3><span class="emoji">🚀</span> 빠른 시작</h3>
-                    <a href="punchlist/index.html" class="project-link" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);" target="_blank">
+                    <a href="punchlist/index.html" class="project-link" target="_blank">
                         📋 펀치리스트 대시보드
                     </a>
-                    <a href="punchlist/pages/create.html" class="project-link" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" target="_blank">
+                    <a href="punchlist/pages/create.html" class="project-link" target="_blank">
                         ➕ 새 이슈 등록
                     </a>
-                    <a href="punchlist/README.md" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                    <a href="punchlist/README.md" class="project-link" target="_blank">
                         📖 사용 가이드
                     </a>
-                    <a href="punchlist/docs/punchlist_a_line_251112.html" class="project-link" style="background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);" target="_blank">
+                    <a href="punchlist/docs/punchlist_a_line_251112.html" class="project-link" target="_blank">
                         🅰️ A라인 운영SW 진행상황 (251112)
                     </a>
-                    <a href="punchlist/docs/punchlist_b_line_251112.html" class="project-link" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);" target="_blank">
+                    <a href="punchlist/docs/punchlist_b_line_251112.html" class="project-link" target="_blank">
                         🅱️ B라인 운영SW 진행상황 (251112)
                     </a>
                 </div>
 
-                <div class="card" style="border-left-color: #dc2626;">
+                <div class="card">
                     <h3><span class="emoji">⚙️</span> Google Sheets 설정</h3>
-                    <div class="info-box" style="background: #fee2e2; border-left-color: #dc2626;">
+                    <div class="info-box">
                         <h4>초기 설정 필요</h4>
                         <p>
                             펀치리스트를 사용하려면 Google Sheets 연동이 필요합니다.<br>
@@ -780,8 +976,8 @@
 
         <!-- 이벤트 로그 탭 -->
         <div id="eventlog" class="tab-content">
-            <div class="highlight-box" style="background: linear-gradient(135deg, #e6f3ff 0%, #cce6ff 100%); border-left-color: #4a90e2;">
-                <h2 style="color: #4a90e2; margin-bottom: 15px;">📊 B_Line EventMessage 로그 분석</h2>
+            <div class="highlight-box">
+                <h2>📊 B_Line EventMessage 로그 분석</h2>
                 <p><strong>로봇 시스템 이벤트 로그 통합 분석</strong></p>
                 <p>1호기, 2호기, 3호기의 EventMessage 로그를 자동 분석하여 에러 패턴, 활동 통계, 데이터 품질을 시각화합니다.</p>
             </div>
@@ -790,14 +986,14 @@
                 <div class="card">
                     <h3>📈 로그 분석 대시보드</h3>
                     <p>실시간 로그 통계 및 시각화</p>
-                    <p style="margin-top: 15px;">
-                        <a href="B_Line_EventMessage_Report.html" class="file-link" style="display: inline-block; margin: 5px 0;">
+                    <p>
+                        <a href="B_Line_EventMessage_Report.html" class="file-link">
                             🔗 분석 리포트 열기
                         </a>
                     </p>
-                    <div class="info-box" style="margin-top: 20px;">
+                    <div class="info-box">
                         <h4>주요 기능</h4>
-                        <ul style="padding-left: 20px; margin-top: 10px;">
+                        <ul class="list-padded">
                             <li>호기별 로그 통계 (에러/정보)</li>
                             <li>날짜별 활동 타임라인</li>
                             <li>데이터 품질 분석</li>
@@ -809,31 +1005,31 @@
                 <div class="card">
                     <h3>🔍 로그 분석 스크립트</h3>
                     <p>Python 자동 분석 도구</p>
-                    <div class="info-box" style="margin-top: 15px;">
+                    <div class="info-box">
                         <h4>실행 방법</h4>
-                        <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; margin-top: 10px;">cd B_Line_EventMessage
+                        <pre class="code-block">cd B_Line_EventMessage
 python3 log_analyzer.py</pre>
-                        <p style="margin-top: 15px; font-size: 0.9em; color: #555;">
-                            분석 결과는 <code style="background: #ecf0f1; padding: 2px 8px; border-radius: 3px;">analysis/log_analysis_latest.json</code>에 저장됩니다.
+                        <p class="text-muted">
+                            분석 결과는 <code class="inline-code">analysis/log_analysis_latest.json</code>에 저장됩니다.
                         </p>
                     </div>
                 </div>
 
                 <div class="card">
                     <h3>📂 로그 폴더 구조</h3>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 15px; font-family: monospace; font-size: 0.9em;">
+                    <div class="detail-note">
                         <div>📁 B_Line_EventMessage/</div>
-                        <div style="padding-left: 20px;">├── 1호기 EventMessage/</div>
-                        <div style="padding-left: 20px;">├── 2호기 EventMessage/</div>
-                        <div style="padding-left: 20px;">├── 3호기 EventMessage/</div>
-                        <div style="padding-left: 20px;">├── analysis/ <span style="color: #27ae60;">← JSON 통계</span></div>
-                        <div style="padding-left: 20px;">└── log_analyzer.py <span style="color: #27ae60;">← 분석 스크립트</span></div>
+                        <div class="tree-indent">├── 1호기 EventMessage/</div>
+                        <div class="tree-indent">├── 2호기 EventMessage/</div>
+                        <div class="tree-indent">├── 3호기 EventMessage/</div>
+                        <div class="tree-indent">├── analysis/ <span class="text-green">← JSON 통계</span></div>
+                        <div class="tree-indent">└── log_analyzer.py <span class="text-green">← 분석 스크립트</span></div>
                     </div>
                 </div>
 
                 <div class="card">
                     <h3>📊 최근 통계 (요약)</h3>
-                    <div class="stats-grid" style="margin-top: 15px;">
+                    <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-number">744</div>
                             <div class="stat-label">총 로그 파일</div>
@@ -851,7 +1047,7 @@ python3 log_analyzer.py</pre>
                             <div class="stat-label">MB</div>
                         </div>
                     </div>
-                    <p style="margin-top: 15px; font-size: 0.85em; color: #7f8c8d; text-align: center;">
+                    <p class="text-muted">
                         최종 업데이트: 2025-10-23 (18일간 로그)
                     </p>
                 </div>
@@ -860,9 +1056,9 @@ python3 log_analyzer.py</pre>
 
         <!-- 근무관리 탭 -->
         <div id="work-manage" class="tab-content">
-            <div class="highlight-box" style="background: linear-gradient(135deg, #fff3e6 0%, #ffe6cc 100%); border-left-color: #f39c12;">
-                <h2 style="color: #c87800; margin-bottom: 15px;">🏭 현장 출입 및 근무 시간 관리</h2>
-                <p style="line-height: 1.8;">
+            <div class="highlight-box">
+                <h2>🏭 현장 출입 및 근무 시간 관리</h2>
+                <p>
                     S25016 프로젝트 팀원들의 현장 출입 기록과 근무 시간을 관리하는 시스템입니다.
                     Google Sheets와 연동하여 실시간으로 기록을 저장하고, 자동으로 이메일을 발송합니다.
                 </p>
@@ -879,7 +1075,7 @@ python3 log_analyzer.py</pre>
                             <strong>작업:</strong> 작업 내용 및 비고
                         </p>
                     </div>
-                    <a href="projects/work-management/pages/input.html" class="project-link" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" target="_blank">
+                    <a href="projects/work-management/pages/input.html" class="project-link" target="_blank">
                         📝 출입 기록 입력하기
                     </a>
                 </div>
@@ -894,14 +1090,14 @@ python3 log_analyzer.py</pre>
                             <strong>필터:</strong> 날짜/인원별 검색
                         </p>
                     </div>
-                    <a href="projects/work-management/index.html" class="project-link" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);" target="_blank">
+                    <a href="projects/work-management/index.html" class="project-link" target="_blank">
                         📊 근무관리 대시보드
                     </a>
                 </div>
 
                 <div class="card">
                     <h3>⚙️ Google Sheets 연동</h3>
-                    <div class="info-box" style="background: #e8f5e9; border-left-color: #27ae60;">
+                    <div class="info-box">
                         <h4>자동 저장 및 메일 발송</h4>
                         <p>
                             <strong>저장:</strong> Google Sheets 자동 기록<br>
@@ -909,7 +1105,7 @@ python3 log_analyzer.py</pre>
                             <strong>공유:</strong> 팀원 실시간 공유
                         </p>
                     </div>
-                    <a href="projects/work-management/docs/deployment-checklist.html" class="project-link" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%);" target="_blank">
+                    <a href="projects/work-management/docs/deployment-checklist.html" class="project-link" target="_blank">
                         ⚙️ Google Sheets 설정 가이드
                     </a>
                 </div>
@@ -928,10 +1124,10 @@ python3 log_analyzer.py</pre>
                 </div>
             </div>
 
-            <div class="info-box" style="margin-top: 30px; background: #e0f2fe; border-left-color: #0284c7;">
+            <div class="info-box">
                 <h4>💡 사용 방법</h4>
-                <p style="line-height: 2;">
-                    <strong>1단계:</strong> <a href="projects/work-management/docs/deployment-checklist.html" style="color: #0284c7; font-weight: bold;">Google Sheets 설정 가이드</a>를 따라 Google Apps Script 설정<br>
+                <p>
+                    <strong>1단계:</strong> <a href="projects/work-management/docs/deployment-checklist.html" class="link-accent">Google Sheets 설정 가이드</a>를 따라 Google Apps Script 설정<br>
                     <strong>2단계:</strong> 입력 페이지에서 Script URL 업데이트<br>
                     <strong>3단계:</strong> 출입 기록 입력 시작<br>
                     <strong>4단계:</strong> 대시보드에서 통계 확인 및 기록 조회
@@ -941,7 +1137,7 @@ python3 log_analyzer.py</pre>
 
         <!-- 문서 자료 탭 -->
         <div id="documents" class="tab-content">
-            <h2 style="color: #2c3e50; margin-bottom: 20px;">📚 프로젝트 문서 자료</h2>
+            <h2>📚 프로젝트 문서 자료</h2>
 
             <div class="dashboard-grid">
                 <div class="card">
@@ -959,13 +1155,13 @@ python3 log_analyzer.py</pre>
 
                 <div class="card">
                     <h3>🔌 DeviceNet 문서</h3>
-                    <a href="projects/devicenet/docs/251010_시운전현황보고.html" class="project-link" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);" target="_blank">
+                    <a href="projects/devicenet/docs/251010_시운전현황보고.html" class="project-link" target="_blank">
                         📊 10/10 시운전 현황 및 10/11 계획 (최신)
                     </a>
-                    <a href="projects/devicenet/docs/251009_작업진행_세부내용.html" class="project-link" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%);" target="_blank">
+                    <a href="projects/devicenet/docs/251009_작업진행_세부내용.html" class="project-link" target="_blank">
                         📋 10/9 작업 진행 세부내용
                     </a>
-                    <a href="projects/devicenet/index.html" class="project-link" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);" target="_blank">
+                    <a href="projects/devicenet/index.html" class="project-link" target="_blank">
                         🔧 통신 문제 해결 진행 현황 보고
                     </a>
                     <a href="projects/devicenet/docs/251009_아크불량_체크리스트.html" class="project-link project-link-devicenet" target="_blank">
@@ -980,8 +1176,8 @@ python3 log_analyzer.py</pre>
                     <a href="projects/devicenet/signals.html" class="project-link project-link-devicenet" target="_blank">
                         📋 DeviceNet 신호 테이블
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #e8f5e9; border-radius: 8px; border-left: 3px solid #27ae60;">
-                        <p style="margin: 0; color: #27ae60; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>✅ 10/9 작업:</strong> ABB+Lincoln 현장 지원 완료<br>
                             <strong>📊 진행:</strong> 1~2호기 파라미터 최적화, 3호기 리빌딩<br>
                             <strong>📄 원본 사양서:</strong> Y50031-21 (76 pages)
@@ -991,10 +1187,10 @@ python3 log_analyzer.py</pre>
 
                 <div class="card">
                     <h3>🤖 로봇 시스템 문서</h3>
-                    <a href="planb_specification.html" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                    <a href="planb_specification.html" class="project-link" target="_blank">
                         📋 Plan B 시스템 재구성 사양서
                     </a>
-                    <a href="robot_system_review.html" class="project-link" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);" target="_blank">
+                    <a href="robot_system_review.html" class="project-link" target="_blank">
                         📊 현행 시스템 검토 (Plan A)
                     </a>
                     <a href="상하축이슈_대시보드.html" class="project-link project-link-robot" target="_blank">
@@ -1009,33 +1205,33 @@ python3 log_analyzer.py</pre>
                     <a href="robot_comparison_report.html" class="project-link project-link-robot" target="_blank">
                         📊 로봇 비교 보고서
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 3px solid #dc2626;">
-                        <p style="margin: 0; color: #991b1b; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>🚨 긴급 이슈:</strong> 충돌검사 미작동<br>
                             <strong>📅 다음 테스트:</strong> 2024.10.09 (에러핸들링 집중)
                         </p>
                     </div>
                 </div>
 
-                <div class="card" style="border-left-color: #ef4444;">
+                <div class="card">
                     <h3>🗂️ 로봇 백업 분석</h3>
-                    <a href="projects/robot-backup/robot_backup_detailed_report.html" class="project-link" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);" target="_blank">
+                    <a href="projects/robot-backup/robot_backup_detailed_report.html" class="project-link" target="_blank">
                         📄 로봇 백업 상세 분석 보고서
                     </a>
-                    <a href="projects/robot-backup/robot_backup_comparison_report.html" class="project-link" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);" target="_blank">
+                    <a href="projects/robot-backup/robot_backup_comparison_report.html" class="project-link" target="_blank">
                         📊 로봇 백업 비교 리포트
                     </a>
-                    <a href="projects/robot-backup/report-20251015-9c3f7bd2.html" class="project-link" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" target="_blank">
+                    <a href="projects/robot-backup/report-20251015-9c3f7bd2.html" class="project-link" target="_blank">
                         🗂️ 로봇 백업 업데이트 인덱스 (2025-10-15)
                     </a>
-                    <a href="robot_backup_history.html" class="project-link" style="background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);" target="_blank">
+                    <a href="robot_backup_history.html" class="project-link" target="_blank">
                         📚 ABB 로봇 백업 변경 이력 (Git 기반)
                     </a>
-                    <a href="robot_backup_comparison.html" class="project-link" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);" target="_blank">
+                    <a href="robot_backup_comparison.html" class="project-link" target="_blank">
                         📋 로봇 백업 비교 보고서 (실용적 분석)
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 3px solid #ef4444;">
-                        <p style="margin: 0; color: #991b1b; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>📌 최신 업데이트:</strong> 2025-10-15<br>
                             <strong>🔧 대상:</strong> 1호기, 2호기, 3호기 컨트롤러<br>
                             <strong>📊 내용:</strong> 용접 파라미터 최적화, I/O 세팅 통일
@@ -1043,28 +1239,28 @@ python3 log_analyzer.py</pre>
                     </div>
                 </div>
 
-                <div class="card" style="border-left-color: #dc2626;">
+                <div class="card">
                     <h3>📋 상하축 이슈 상세 문서</h3>
-                    <a href="250917_상하축이슈/05_문서자료/251013_Codex_리포지터리_리뷰.html" class="project-link" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);" target="_blank">
+                    <a href="250917_상하축이슈/05_문서자료/251013_Codex_리포지터리_리뷰.html" class="project-link" target="_blank">
                         📂 251013 Codex 리포지터리 리뷰
                     </a>
-                    <a href="250917_상하축이슈/05_문서자료/251018_Codex_3호기_Arc에러_복구점검.html" class="project-link" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);" target="_blank">
+                    <a href="250917_상하축이슈/05_문서자료/251018_Codex_3호기_Arc에러_복구점검.html" class="project-link" target="_blank">
                         ⚡ 251018 3호기 Arc 에러 복구 점검
                     </a>
-                    <a href="250917_상하축이슈/05_문서자료/251021_3호기_Arc재시작_멍때림_문제분석.html" class="project-link" style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);" target="_blank">
+                    <a href="250917_상하축이슈/05_문서자료/251021_3호기_Arc재시작_멍때림_문제분석.html" class="project-link" target="_blank">
                         🔍 251021 3호기 Arc 재시작 멍때림 분석
                     </a>
-                    <a href="250917_상하축이슈/05_문서자료/251021_3호기_터치센싱_멍때림_문제분석.html" class="project-link" style="background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);" target="_blank">
+                    <a href="250917_상하축이슈/05_문서자료/251021_3호기_터치센싱_멍때림_문제분석.html" class="project-link" target="_blank">
                         📊 251021 3호기 터치센싱 멍때림 분석
                     </a>
-                    <a href="250917_상하축이슈/05_문서자료/251021_CrossStop신호_초기화_문제.html" class="project-link" style="background: linear-gradient(135deg, #fda4af 0%, #fb7185 100%);" target="_blank">
+                    <a href="250917_상하축이슈/05_문서자료/251021_CrossStop신호_초기화_문제.html" class="project-link" target="_blank">
                         🚨 251021 CrossStop 신호 초기화 문제
                     </a>
-                    <a href="250917_상하축이슈/05_문서자료/251013_SP_로봇백업비교.html" class="project-link" style="background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);" target="_blank">
+                    <a href="250917_상하축이슈/05_문서자료/251013_SP_로봇백업비교.html" class="project-link" target="_blank">
                         📄 251013 로봇 백업 비교 보고서
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 3px solid #dc2626;">
-                        <p style="margin: 0; color: #991b1b; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>🚨 중요:</strong> 3호기 관련 주요 이슈 문서<br>
                             <strong>📅 기간:</strong> 2024.10.13 ~ 10.21<br>
                             <strong>🔧 내용:</strong> Arc 에러, 터치센싱, CrossStop 신호 분석
@@ -1072,19 +1268,19 @@ python3 log_analyzer.py</pre>
                     </div>
                 </div>
 
-                <div class="card" style="border-left-color: #0ea5e9;">
+                <div class="card">
                     <h3>📧 ABB 기술 지원</h3>
-                    <a href="email_to_abb_technical_support.html" class="project-link" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);" target="_blank">
+                    <a href="email_to_abb_technical_support.html" class="project-link" target="_blank">
                         📧 ABB 기술 지원 이메일
                     </a>
-                    <a href="robot_sync_issue_report.html" class="project-link" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);" target="_blank">
+                    <a href="robot_sync_issue_report.html" class="project-link" target="_blank">
                         🚨 로봇 동기화 이슈 보고서 (긴급)
                     </a>
-                    <a href="setting_planb_comparison.html" class="project-link" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);" target="_blank">
+                    <a href="setting_planb_comparison.html" class="project-link" target="_blank">
                         🧭 Setting Plan B 전·후 비교 (3호기)
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #e0f2fe; border-radius: 8px; border-left: 3px solid #0ea5e9;">
-                        <p style="margin: 0; color: #075985; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>📌 용도:</strong> ABB 기술팀 지원 요청 문서<br>
                             <strong>🔧 내용:</strong> 동기화 이슈, Plan B 설정 비교<br>
                             <strong>📊 상태:</strong> 진행 중
@@ -1092,22 +1288,22 @@ python3 log_analyzer.py</pre>
                     </div>
                 </div>
 
-                <div class="card" style="border-left-color: #0284c7;">
+                <div class="card">
                     <h3>🧪 ROBOT↔UI 통합 테스트</h3>
-                    <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);" target="_blank">
+                    <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link" target="_blank">
                         📋 통합 테스트 결과 상세 보기 (10/3-10/4)
                     </a>
-                    <a href="projects/robot-ui-integration-test/test-results/251004_고객발송_테스트결과.html" class="project-link" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);" target="_blank">
+                    <a href="projects/robot-ui-integration-test/test-results/251004_고객발송_테스트결과.html" class="project-link" target="_blank">
                         📤 고객 발송용 보고서
                     </a>
-                    <a href="projects/robot-ui-integration-test/test-results/251004_테스트결과_메신저보고.txt" class="project-link" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" target="_blank">
+                    <a href="projects/robot-ui-integration-test/test-results/251004_테스트결과_메신저보고.txt" class="project-link" target="_blank">
                         💬 메신저 보고용 텍스트
                     </a>
-                    <a href="projects/robot-ui-integration-test/test-results/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);" target="_blank">
+                    <a href="projects/robot-ui-integration-test/test-results/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link" target="_blank">
                         📄 1차 결과 백업 (10/3)
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #e0f2fe; border-radius: 8px; border-left: 3px solid #0284c7;">
-                        <p style="margin: 0; color: #075985; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>📊 테스트 현황:</strong> 총 31개 항목<br>
                             <strong>✅ 완료:</strong> 13개 | <strong>⚠️ 개선:</strong> 11개 | <strong>⏸️ 보류:</strong> 7개<br>
                             <strong>📅 기간:</strong> 2024.10.03 ~ 10.04<br>
@@ -1116,22 +1312,22 @@ python3 log_analyzer.py</pre>
                     </div>
                 </div>
 
-                <div class="card" style="border-left-color: #9b59b6;">
+                <div class="card">
                     <h3>📐 Hexagon 로봇 정밀도 측정</h3>
-                    <a href="projects/hexagon/index.html" class="project-link" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);" target="_blank">
+                    <a href="projects/hexagon/index.html" class="project-link" target="_blank">
                         🏠 Hexagon 메인 대시보드
                     </a>
-                    <a href="projects/hexagon/robot-accuracy.html" class="project-link" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);" target="_blank">
+                    <a href="projects/hexagon/robot-accuracy.html" class="project-link" target="_blank">
                         📊 로봇 정확도 분석
                     </a>
-                    <a href="projects/hexagon/schedule.html" class="project-link" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" target="_blank">
+                    <a href="projects/hexagon/schedule.html" class="project-link" target="_blank">
                         📅 프로젝트 일정표
                     </a>
-                    <a href="projects/hexagon/punchlist.html" class="project-link" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" target="_blank">
+                    <a href="projects/hexagon/punchlist.html" class="project-link" target="_blank">
                         ✅ 펀치리스트
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #f3e6ff; border-radius: 8px; border-left: 3px solid #9b59b6;">
-                        <p style="margin: 0; color: #6b21a8; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>🎯 목적:</strong> 로봇 시스템 정확도 검증 및 측정<br>
                             <strong>📐 방법:</strong> Hexagon 정밀 측정 장비 활용<br>
                             <strong>📊 관리:</strong> 일정, 펀치리스트, 정확도 분석<br>
@@ -1141,7 +1337,7 @@ python3 log_analyzer.py</pre>
                 </div>
             </div>
 
-            <div class="info-box" style="margin-top: 30px;">
+            <div class="info-box">
                 <h4>📌 문서 관리 가이드</h4>
                 <p>
                     • 파일명 규칙: YYMMDD_작성자_제목.확장자<br>
@@ -1155,26 +1351,26 @@ python3 log_analyzer.py</pre>
 
         <!-- Plan B & 모션 뷰어 탭 -->
         <div id="planb-motion" class="tab-content">
-            <h2 style="color: #2c3e50; margin-bottom: 20px;">🤖 Plan B 로봇 시스템 고도화 & XYZR 갠트리 모션</h2>
+            <h2>🤖 Plan B 로봇 시스템 고도화 & XYZR 갠트리 모션</h2>
 
             <div class="dashboard-grid">
                 <!-- XYZR 갠트리 모션 시스템 -->
-                <div class="card" style="border-left-color: #8b5cf6;">
+                <div class="card">
                     <h3>📐 XYZR 갠트리 + 듀얼 로봇 모션 시스템</h3>
-                    <a href="advanced_motion_viewer.html" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                    <a href="advanced_motion_viewer.html" class="project-link" target="_blank">
                         🎬 고급 용접 모션 뷰어 (XYZR 갠트리 + 듀얼 로봇)
                     </a>
-                    <a href="motion_viewer_index.html" class="project-link" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);" target="_blank">
+                    <a href="motion_viewer_index.html" class="project-link" target="_blank">
                         📋 듀얼 토치 모션 뷰어 인덱스
                     </a>
-                    <a href="motion_viewer.html" class="project-link" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);" target="_blank">
+                    <a href="motion_viewer.html" class="project-link" target="_blank">
                         📊 기본 모션 뷰어
                     </a>
-                    <a href="punchlist/docs/251113_codex_갠트리XYZR시각화요구사항.md" class="project-link" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);" target="_blank">
+                    <a href="punchlist/docs/251113_codex_갠트리XYZR시각화요구사항.md" class="project-link" target="_blank">
                         📝 갠트리 XYZR 시각화 상세 요구사항
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #f3e8ff; border-radius: 8px; border-left: 3px solid #8b5cf6;">
-                        <p style="margin: 0; color: #6b21a8; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>🎯 시스템:</strong> XYZ 선형축 + R축 회전 갠트리<br>
                             <strong>🤖 구성:</strong> R축 바디에 2대 로봇 부착 (±488mm)<br>
                             <strong>🔧 용도:</strong> T-bar 웹 양면 동시/교대 용접<br>
@@ -1184,50 +1380,50 @@ python3 log_analyzer.py</pre>
                 </div>
 
                 <!-- Plan B 로봇 시스템 재구성 -->
-                <div class="card" style="border-left-color: #667eea;">
+                <div class="card">
                     <h3>📘 Plan B 로봇 시스템 재구성</h3>
-                    <a href="planb_specification.html" class="project-link" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" target="_blank">
+                    <a href="planb_specification.html" class="project-link" target="_blank">
                         📋 Plan B 시스템 재구성 사양서 (메인)
                     </a>
-                    <a href="setting_planb_comparison.html" class="project-link" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" target="_blank">
+                    <a href="setting_planb_comparison.html" class="project-link" target="_blank">
                         ⚖️ Plan A vs Plan B 설정 비교
                     </a>
-                    <a href="ppt_slides/index.html" class="project-link" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);" target="_blank">
+                    <a href="ppt_slides/index.html" class="project-link" target="_blank">
                         🎬 PPT 슬라이드 인덱스 (17개 슬라이드)
                     </a>
-                    <a href="ppt_slides/Plan_B_Accurate.pptx" class="project-link" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" download>
+                    <a href="ppt_slides/Plan_B_Accurate.pptx" class="project-link" download>
                         📥 PowerPoint 다운로드 (Plan_B_Accurate.pptx - 38슬라이드)
                     </a>
-                    <a href="Plan_B_Robot_Reconfiguration_Spec.pptx" class="project-link" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);" download>
+                    <a href="Plan_B_Robot_Reconfiguration_Spec.pptx" class="project-link" download>
                         📥 PowerPoint 다운로드 (Plan_B_Robot_Reconfiguration_Spec.pptx)
                     </a>
-                    <a href="RAPID/PlanB_ToolControl2/docs/index.html" class="project-link" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" target="_blank">
+                    <a href="RAPID/PlanB_ToolControl2/docs/index.html" class="project-link" target="_blank">
                         🤖 RAPID 개발 문서화 프로젝트 (Plan B ToolControl2)
                     </a>
-                    <a href="RAPID/SpGantry_1200_526406_BACKUP_2025-11-18/RAPID/README.md" class="project-link" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);" target="_blank">
+                    <a href="RAPID/SpGantry_1200_526406_BACKUP_2025-11-18/RAPID/README.md" class="project-link" target="_blank">
                         📐 SpGantry 백업 & CoordTransform 모듈 (2025-11-18)
                     </a>
-                    <a href="251122_로봇좌표변환_중간보고.html" class="project-link" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" target="_blank">
+                    <a href="251122_로봇좌표변환_중간보고.html" class="project-link" target="_blank">
                         📊 로봇 좌표 변환 시스템 - 중간 진행 보고 (2025-11-22)
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 3px solid #f59e0b;">
-                        <p style="margin: 0; color: #856404; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>📅 최신:</strong> 2025-11-22 좌표 변환 테스트 PASSED<br>
                             <strong>✅ 성과:</strong> 목표 976mm vs 실측 982.21mm (오차 6.21mm)<br>
                             <strong>🔧 진행:</strong> TestMoveToWorldOrigin Z=500 테스트 대기<br>
                             <strong>🎯 다음:</strong> 시스템 지오메트리 분석 및 검증 완료
                         </p>
                     </div>
-                    <div style="margin-top: 15px; padding: 15px; background: #fce7f3; border-radius: 8px; border-left: 3px solid #ec4899;">
-                        <p style="margin: 0; color: #831843; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>📅 개발:</strong> 2025-11-18 CoordTransform.mod v1.2<br>
                             <strong>🎯 기능:</strong> 로봇2 TCP → 갠트리 좌표계 변환<br>
                             <strong>🤖 시스템:</strong> R축 회전 적용 (±488mm 오프셋)<br>
                             <strong>✅ 상태:</strong> RAPID 문법 검증 완료, RobotStudio 테스트 대기
                         </p>
                     </div>
-                    <div style="margin-top: 15px; padding: 15px; background: #e0e7ff; border-radius: 8px; border-left: 3px solid #667eea;">
-                        <p style="margin: 0; color: #3730a3; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>🎯 목표:</strong> 3-Task → 2-Task 구조 단순화<br>
                             <strong>⚡ 개선:</strong> 좌표 변환 함수 제거, 자동 동기화<br>
                             <strong>📅 프로젝트:</strong> S25016 - 34bay 자동용접 A/B라인<br>
@@ -1237,28 +1433,28 @@ python3 log_analyzer.py</pre>
                 </div>
 
                 <!-- 관련 기술 문서 -->
-                <div class="card" style="border-left-color: #06b6d4;">
+                <div class="card">
                     <h3>📚 관련 기술 문서</h3>
-                    <a href="robot_system_review.html" class="project-link" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);" target="_blank">
+                    <a href="robot_system_review.html" class="project-link" target="_blank">
                         📊 로봇 시스템 리뷰 (현행 분석)
                     </a>
-                    <a href="robot_system_review_ko.html" class="project-link" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);" target="_blank">
+                    <a href="robot_system_review_ko.html" class="project-link" target="_blank">
                         📋 로봇 시스템 리뷰 (한글)
                     </a>
-                    <a href="robot_backup_comparison.html" class="project-link" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);" target="_blank">
+                    <a href="robot_backup_comparison.html" class="project-link" target="_blank">
                         🗂️ 로봇 백업 비교 분석
                     </a>
-                    <a href="robot_backup_history.html" class="project-link" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" target="_blank">
+                    <a href="robot_backup_history.html" class="project-link" target="_blank">
                         📚 ABB 로봇 백업 변경 이력
                     </a>
-                    <a href="abb_robot_programming_specification.html" class="project-link" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" target="_blank">
+                    <a href="abb_robot_programming_specification.html" class="project-link" target="_blank">
                         📖 ABB 로봇 프로그래밍 사양서
                     </a>
-                    <a href="abb_spec_detailed.html" class="project-link" style="background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);" target="_blank">
+                    <a href="abb_spec_detailed.html" class="project-link" target="_blank">
                         📄 ABB 상세 사양
                     </a>
-                    <div style="margin-top: 15px; padding: 15px; background: #cffafe; border-radius: 8px; border-left: 3px solid #06b6d4;">
-                        <p style="margin: 0; color: #155e75; font-size: 0.95em;">
+                    <div class="detail-note">
+                        <p class="detail-text">
                             <strong>📌 참고:</strong> 시스템 전환 및 고도화를 위한 기술 문서<br>
                             <strong>🔧 범위:</strong> 로봇 설정, 백업, 프로그래밍 가이드<br>
                             <strong>✅ 활용:</strong> Plan B 구현 및 모션 시스템 개발
@@ -1267,9 +1463,9 @@ python3 log_analyzer.py</pre>
                 </div>
 
                 <!-- 프로젝트 정보 카드 -->
-                <div class="card" style="border-left-color: #f59e0b; grid-column: 1 / -1;">
+                <div class="card">
                     <h3>📊 프로젝트 개요</h3>
-                    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                    <div class="dashboard-grid">
                         <div class="info-box">
                             <h4>🎯 Plan B 시스템 재구성</h4>
                             <p>
