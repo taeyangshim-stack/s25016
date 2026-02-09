@@ -1829,39 +1829,59 @@
 
           <div class="math-diagram">
             <div class="diagram-box pass-case">
-              <div class="diagram-label">✅ PASS: 투영 오프셋 < 20mm</div>
-              <svg class="diagram-svg" width="180" height="120" viewBox="0 0 180 120">
-                <line x1="20" y1="35" x2="160" y2="35" stroke="#e74c3c" stroke-width="3"/>
-                <line x1="40" y1="55" x2="160" y2="55" stroke="#27ae60" stroke-width="3"/>
+              <div class="diagram-label">✅ PASS: 병렬 운행 (Y간격 20mm)</div>
+              <svg class="diagram-svg" width="220" height="130" viewBox="0 0 220 130">
+                <!-- Line1 -->
+                <line x1="20" y1="35" x2="180" y2="35" stroke="#e74c3c" stroke-width="3"/>
+                <text x="182" y="38" font-size="7" fill="#e74c3c">Line1</text>
+                <!-- Line2 (평행, Y만 다름) -->
+                <line x1="20" y1="65" x2="180" y2="65" stroke="#27ae60" stroke-width="3"/>
+                <text x="182" y="68" font-size="7" fill="#27ae60">Line2</text>
+                <!-- S1 -->
                 <circle cx="20" cy="35" r="5" fill="#e74c3c"/>
-                <circle cx="40" cy="55" r="5" fill="#27ae60"/>
-                <text x="5" y="30" font-size="8" fill="#e74c3c">S1</text>
-                <text x="25" y="65" font-size="8" fill="#27ae60">S2</text>
-                <!-- S1 투영 -->
-                <line x1="20" y1="38" x2="20" y2="55" stroke="#9b59b6" stroke-width="1.5" stroke-dasharray="3"/>
-                <circle cx="20" cy="55" r="3" fill="#9b59b6"/>
-                <text x="3" y="50" font-size="7" fill="#9b59b6">P1</text>
-                <!-- S2→S1 투영 -->
-                <line x1="40" y1="52" x2="40" y2="35" stroke="#f39c12" stroke-width="1.5" stroke-dasharray="3"/>
-                <circle cx="40" cy="35" r="3" fill="#f39c12"/>
-                <text x="45" y="30" font-size="7" fill="#f39c12">P2</text>
-                <!-- 거리 표시 -->
-                <text x="55" y="80" font-size="8" fill="#3498db">dist = max(S2↔P1, S1↔P2)</text>
-                <text x="75" y="95" font-size="8" fill="#27ae60">= 0mm (정상)</text>
+                <text x="5" y="27" font-size="9" fill="#e74c3c">S1</text>
+                <!-- S2 (X 동일, Y만 다름) -->
+                <circle cx="20" cy="65" r="5" fill="#27ae60"/>
+                <text x="5" y="78" font-size="9" fill="#27ae60">S2</text>
+                <!-- S1→Line2 수직 투영 -->
+                <line x1="20" y1="40" x2="20" y2="60" stroke="#9b59b6" stroke-width="2" stroke-dasharray="4"/>
+                <circle cx="20" cy="65" r="3" fill="#9b59b6"/>
+                <text x="25" y="55" font-size="7" fill="#9b59b6">P1=S2</text>
+                <!-- Y간격 표시 -->
+                <line x1="195" y1="35" x2="195" y2="65" stroke="#95a5a6" stroke-width="1" stroke-dasharray="2"/>
+                <text x="198" y="53" font-size="7" fill="#95a5a6">20mm</text>
+                <!-- 결과 -->
+                <text x="40" y="90" font-size="8" fill="#3498db">P1=S2 → dist1=|S2-P1|=0</text>
+                <text x="40" y="103" font-size="8" fill="#3498db">P2=S1 → dist2=|S1-P2|=0</text>
+                <text x="40" y="120" font-size="9" fill="#27ae60" font-weight="bold">max(0, 0) = 0mm → PASS</text>
               </svg>
             </div>
             <div class="diagram-box fail-case">
-              <div class="diagram-label">❌ FAIL: 투영 오프셋 ≥ 20mm</div>
-              <svg class="diagram-svg" width="180" height="120" viewBox="0 0 180 120">
-                <line x1="20" y1="25" x2="160" y2="25" stroke="#e74c3c" stroke-width="3"/>
-                <line x1="80" y1="75" x2="160" y2="75" stroke="#27ae60" stroke-width="3"/>
-                <circle cx="20" cy="25" r="5" fill="#e74c3c"/>
-                <circle cx="80" cy="75" r="5" fill="#27ae60"/>
-                <text x="5" y="20" font-size="8" fill="#e74c3c">S1</text>
-                <text x="62" y="85" font-size="8" fill="#27ae60">S2</text>
-                <!-- 투영 -->
-                <line x1="20" y1="28" x2="80" y2="72" stroke="#9b59b6" stroke-width="1.5" stroke-dasharray="3"/>
-                <text x="40" y="55" font-size="8" fill="#e74c3c">100mm!</text>
+              <div class="diagram-label">❌ FAIL: 시작점 이탈 (X방향 오프셋)</div>
+              <svg class="diagram-svg" width="220" height="130" viewBox="0 0 220 130">
+                <!-- Line1 -->
+                <line x1="20" y1="30" x2="180" y2="30" stroke="#e74c3c" stroke-width="3"/>
+                <text x="182" y="33" font-size="7" fill="#e74c3c">Line1</text>
+                <!-- Line2 (시작점이 우측으로 이탈) -->
+                <line x1="100" y1="65" x2="180" y2="65" stroke="#27ae60" stroke-width="3"/>
+                <text x="182" y="68" font-size="7" fill="#27ae60">Line2</text>
+                <!-- S1 -->
+                <circle cx="20" cy="30" r="5" fill="#e74c3c"/>
+                <text x="5" y="23" font-size="9" fill="#e74c3c">S1</text>
+                <!-- S2 -->
+                <circle cx="100" cy="65" r="5" fill="#27ae60"/>
+                <text x="85" y="78" font-size="9" fill="#27ae60">S2</text>
+                <!-- S2→Line1 수직 투영 -->
+                <line x1="100" y1="62" x2="100" y2="33" stroke="#f39c12" stroke-width="2" stroke-dasharray="4"/>
+                <circle cx="100" cy="30" r="3" fill="#f39c12"/>
+                <text x="104" y="26" font-size="7" fill="#f39c12">P2</text>
+                <!-- S1↔P2 거리 표시 -->
+                <line x1="23" y1="24" x2="97" y2="24" stroke="#e74c3c" stroke-width="1.5"/>
+                <text x="45" y="20" font-size="8" fill="#e74c3c" font-weight="bold">80mm</text>
+                <!-- 결과 -->
+                <text x="20" y="95" font-size="8" fill="#3498db">P2=proj(S2→Line1)</text>
+                <text x="20" y="108" font-size="8" fill="#3498db">dist2 = |S1 - P2| = 80mm</text>
+                <text x="20" y="123" font-size="9" fill="#e74c3c" font-weight="bold">max(0, 80) = 80mm → FAIL</text>
               </svg>
             </div>
           </div>
@@ -1890,38 +1910,62 @@
 
           <div class="math-diagram">
             <div class="diagram-box pass-case">
-              <div class="diagram-label">✅ PASS: 투영 오프셋 < 20mm</div>
-              <svg class="diagram-svg" width="180" height="120" viewBox="0 0 180 120">
-                <line x1="20" y1="35" x2="160" y2="35" stroke="#e74c3c" stroke-width="3"/>
-                <line x1="20" y1="55" x2="140" y2="55" stroke="#27ae60" stroke-width="3"/>
-                <circle cx="160" cy="35" r="5" fill="#e74c3c"/>
-                <circle cx="140" cy="55" r="5" fill="#27ae60"/>
-                <text x="163" y="30" font-size="8" fill="#e74c3c">E1</text>
-                <text x="143" y="65" font-size="8" fill="#27ae60">E2</text>
-                <!-- E1 투영 -->
-                <line x1="160" y1="38" x2="160" y2="55" stroke="#9b59b6" stroke-width="1.5" stroke-dasharray="3"/>
-                <circle cx="160" cy="55" r="3" fill="#9b59b6"/>
-                <text x="163" y="50" font-size="7" fill="#9b59b6">P3</text>
-                <!-- E2 투영 -->
-                <line x1="140" y1="52" x2="140" y2="35" stroke="#f39c12" stroke-width="1.5" stroke-dasharray="3"/>
-                <circle cx="140" cy="35" r="3" fill="#f39c12"/>
-                <text x="125" y="30" font-size="7" fill="#f39c12">P4</text>
-                <!-- 거리 표시 -->
-                <text x="35" y="85" font-size="8" fill="#3498db">dist = max(E2↔P3, E1↔P4)</text>
-                <text x="55" y="100" font-size="8" fill="#27ae60">= 0mm (정상)</text>
+              <div class="diagram-label">✅ PASS: 병렬 운행 (끝점 정렬)</div>
+              <svg class="diagram-svg" width="220" height="130" viewBox="0 0 220 130">
+                <!-- Line1 -->
+                <line x1="20" y1="35" x2="180" y2="35" stroke="#e74c3c" stroke-width="3"/>
+                <text x="5" y="38" font-size="7" fill="#e74c3c">Line1</text>
+                <!-- Line2 (평행, Y만 다름) -->
+                <line x1="20" y1="65" x2="180" y2="65" stroke="#27ae60" stroke-width="3"/>
+                <text x="5" y="68" font-size="7" fill="#27ae60">Line2</text>
+                <!-- E1 -->
+                <circle cx="180" cy="35" r="5" fill="#e74c3c"/>
+                <text x="165" y="27" font-size="9" fill="#e74c3c">E1</text>
+                <!-- E2 (X 동일, Y만 다름) -->
+                <circle cx="180" cy="65" r="5" fill="#27ae60"/>
+                <text x="165" y="78" font-size="9" fill="#27ae60">E2</text>
+                <!-- E1→Line2 수직 투영 -->
+                <line x1="180" y1="40" x2="180" y2="60" stroke="#9b59b6" stroke-width="2" stroke-dasharray="4"/>
+                <circle cx="180" cy="65" r="3" fill="#9b59b6"/>
+                <text x="185" y="55" font-size="7" fill="#9b59b6">P3=E2</text>
+                <!-- Y간격 표시 -->
+                <line x1="195" y1="35" x2="195" y2="65" stroke="#95a5a6" stroke-width="1" stroke-dasharray="2"/>
+                <text x="198" y="53" font-size="7" fill="#95a5a6">20mm</text>
+                <!-- 결과 -->
+                <text x="20" y="90" font-size="8" fill="#3498db">P3=E2 → dist3=|E2-P3|=0</text>
+                <text x="20" y="103" font-size="8" fill="#3498db">P4=E1 → dist4=|E1-P4|=0</text>
+                <text x="20" y="120" font-size="9" fill="#27ae60" font-weight="bold">max(0, 0) = 0mm → PASS</text>
               </svg>
             </div>
             <div class="diagram-box fail-case">
-              <div class="diagram-label">❌ FAIL: 투영 오프셋 ≥ 20mm</div>
-              <svg class="diagram-svg" width="180" height="120" viewBox="0 0 180 120">
-                <line x1="20" y1="25" x2="160" y2="25" stroke="#e74c3c" stroke-width="3"/>
-                <line x1="20" y1="75" x2="100" y2="75" stroke="#27ae60" stroke-width="3"/>
-                <circle cx="160" cy="25" r="5" fill="#e74c3c"/>
-                <circle cx="100" cy="75" r="5" fill="#27ae60"/>
-                <text x="163" y="20" font-size="8" fill="#e74c3c">E1</text>
-                <text x="103" y="85" font-size="8" fill="#27ae60">E2</text>
-                <line x1="157" y1="28" x2="103" y2="72" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="3"/>
-                <text x="125" y="55" font-size="8" fill="#e74c3c">62mm!</text>
+              <div class="diagram-label">❌ FAIL: 끝점 이탈 (Line2 짧음)</div>
+              <svg class="diagram-svg" width="220" height="130" viewBox="0 0 220 130">
+                <!-- Line1 -->
+                <line x1="20" y1="30" x2="180" y2="30" stroke="#e74c3c" stroke-width="3"/>
+                <text x="5" y="23" font-size="7" fill="#e74c3c">Line1</text>
+                <!-- Line2 (끝점이 짧음) -->
+                <line x1="20" y1="65" x2="110" y2="65" stroke="#27ae60" stroke-width="3"/>
+                <text x="5" y="78" font-size="7" fill="#27ae60">Line2</text>
+                <!-- E1 -->
+                <circle cx="180" cy="30" r="5" fill="#e74c3c"/>
+                <text x="165" y="23" font-size="9" fill="#e74c3c">E1</text>
+                <!-- E2 -->
+                <circle cx="110" cy="65" r="5" fill="#27ae60"/>
+                <text x="114" y="78" font-size="9" fill="#27ae60">E2</text>
+                <!-- E1→Line2 수직 투영 (클램핑→E2) -->
+                <line x1="180" y1="33" x2="110" y2="62" stroke="#9b59b6" stroke-width="2" stroke-dasharray="4"/>
+                <circle cx="110" cy="65" r="3" fill="#9b59b6"/>
+                <text x="140" y="55" font-size="7" fill="#9b59b6">P3(클램핑→E2)</text>
+                <!-- E2→Line1 수직 투영 -->
+                <line x1="110" y1="62" x2="110" y2="33" stroke="#f39c12" stroke-width="2" stroke-dasharray="4"/>
+                <circle cx="110" cy="30" r="3" fill="#f39c12"/>
+                <text x="114" y="26" font-size="7" fill="#f39c12">P4</text>
+                <!-- E1↔P4 거리 표시 -->
+                <line x1="113" y1="24" x2="177" y2="24" stroke="#e74c3c" stroke-width="1.5"/>
+                <text x="133" y="18" font-size="8" fill="#e74c3c" font-weight="bold">70mm</text>
+                <!-- 결과 -->
+                <text x="20" y="95" font-size="8" fill="#3498db">dist4 = |E1 - P4| = 70mm</text>
+                <text x="20" y="110" font-size="9" fill="#e74c3c" font-weight="bold">max(0, 70) = 70mm → FAIL</text>
               </svg>
             </div>
           </div>
