@@ -627,7 +627,7 @@
                 <span>총 53건</span>
                 <span>담당자 6명</span>
                 <span>2026.01.19 ~ 2026.02.14 (27일)</span>
-                <span style="background:#fbbf24;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:0.8rem;">Updated: 2/10</span>
+                <span style="background:#fbbf24;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:0.8rem;">Updated: 2/11</span>
             </div>
         </div>
 
@@ -699,8 +699,8 @@
                 <!-- 4주차: 2/8(일)~2/14(토) -->
                 <div class="gantt-header-cell weekend"><div class="day">일</div><div class="date">2/8</div></div>
                 <div class="gantt-header-cell week-start"><div class="day">월</div><div class="date">2/9</div><div style="font-size:0.55rem;color:#059669;">✓7배포</div></div>
-                <div class="gantt-header-cell" style="background:rgba(59,130,246,0.3);border:2px solid #3b82f6;"><div class="day" style="color:#3b82f6;font-weight:bold;">화</div><div class="date" style="color:#3b82f6;font-weight:bold;">2/10</div><div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;">TODAY</div></div>
-                <div class="gantt-header-cell"><div class="day">수</div><div class="date">2/11</div></div>
+                <div class="gantt-header-cell" style="background:rgba(5,150,105,0.2);"><div class="day">화</div><div class="date">2/10</div><div style="font-size:0.55rem;color:#059669;">✓4컨펌</div></div>
+                <div class="gantt-header-cell" style="background:rgba(59,130,246,0.3);border:2px solid #3b82f6;"><div class="day" style="color:#3b82f6;font-weight:bold;">수</div><div class="date" style="color:#3b82f6;font-weight:bold;">2/11</div><div style="font-size:0.6rem;color:#3b82f6;font-weight:bold;">TODAY</div></div>
                 <div class="gantt-header-cell"><div class="day">목</div><div class="date">2/12</div></div>
                 <div class="gantt-header-cell"><div class="day">금</div><div class="date">2/13</div></div>
                 <div class="gantt-header-cell weekend"><div class="day">토</div><div class="date">2/14</div></div>
@@ -878,12 +878,20 @@
                         <div class="task-bar normal" style="font-size:0.5rem;">20건
                             <div class="task-tooltip">
                                 <div class="tt-title">2/11(수) 20건</div>
-                                <div>컨펌배포 6건</div>
-                                <div class="tt-row"><span class="tt-label">주요:</span> 020,169,200,115,175,195 최종배포</div>
+                                <div>부분보완/컨펌배포 4건, 컨펌배포 8건, 테스트 5건 등</div>
+                                <div class="tt-row"><span class="tt-label">주요:</span> 152,155,153,170 부분보완 / 020,169,200,115,175,195 컨펌배포</div>
                             </div>
                         </div>
                     </div>
-                    <div class="gantt-cell"></div>
+                    <div class="gantt-cell">
+                        <div class="task-bar normal" style="font-size:0.5rem;">14건
+                            <div class="task-tooltip">
+                                <div class="tt-title">2/12(목) 14건</div>
+                                <div>컨펌배포 12건, 작성중 1건 등</div>
+                                <div class="tt-row"><span class="tt-label">주요:</span> 065,091,099,104,020,169,200,215,115,175,195,216,100 컨펌배포</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="gantt-cell"></div>
                     <div class="gantt-cell weekend"></div>
                 </div>
@@ -2241,8 +2249,8 @@
                 <!-- 4주차 2/8~2/14 -->
                 <div class="summary-cell weekend">-</div><!-- 2/8 일 -->
                 <div class="summary-cell week-start" style="background:rgba(5,150,105,0.2);"><div class="num" style="color:#059669;">15 ✓7배포</div></div><!-- 2/9 월 완료 -->
-                <div class="summary-cell" style="background:rgba(59,130,246,0.2);border:2px solid #3b82f6;"><div class="num" style="color:#3b82f6;">23 TODAY</div></div><!-- 2/10 화 TODAY -->
-                <div class="summary-cell"><div class="num">20</div></div><!-- 2/11 수 -->
+                <div class="summary-cell" style="background:rgba(5,150,105,0.2);"><div class="num" style="color:#059669;">23 ✓4컨펌</div></div><!-- 2/10 화 완료 -->
+                <div class="summary-cell" style="background:rgba(59,130,246,0.2);border:2px solid #3b82f6;"><div class="num" style="color:#3b82f6;">20 TODAY</div></div><!-- 2/11 수 TODAY -->
                 <div class="summary-cell"><div class="num">14</div></div><!-- 2/12 목 -->
                 <div class="summary-cell">-</div><!-- 2/13 금 -->
                 <div class="summary-cell weekend">-</div><!-- 2/14 토 -->
@@ -3673,9 +3681,9 @@
 
         // 과거 완료 항목 고스트 처리 (오늘 날짜 기준)
         (function applyPastCompletedGhost() {
-            // 오늘 날짜: 2/10 (화) = 컬럼 인덱스 23 (0-based from 담당자 컬럼)
-            // 날짜 매핑: 1/19=1, 1/20=2, ... 1/31=13, 2/1=14, 2/2=15, ..., 2/9=22, 2/10=23
-            const todayColumnIndex = 23; // 2/10 (화)
+            // 오늘 날짜: 2/11 (수) = 컬럼 인덱스 24 (0-based from 담당자 컬럼)
+            // 날짜 매핑: 1/19=1, 1/20=2, ... 1/31=13, 2/1=14, 2/2=15, ..., 2/10=23, 2/11=24
+            const todayColumnIndex = 24; // 2/11 (수)
 
             // 모든 owner-row 내의 셀들을 순회
             document.querySelectorAll('.owner-row').forEach(row => {
