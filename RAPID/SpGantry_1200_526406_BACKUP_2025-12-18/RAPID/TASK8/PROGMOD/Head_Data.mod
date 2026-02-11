@@ -608,6 +608,7 @@ MODULE Head_Data
     PERS bool bArc_On{2}:=[FALSE,FALSE];
     PERS num nWarmUp_Speed:=10;
     PERS num nWarmUp_Distance:=100;
-    PERS num nWarmUp_Count:=2;     
+    PERS num nWarmUp_Count:=2;
+    PERS num nWarmUpCycle:=0;
 
 ENDMODULE

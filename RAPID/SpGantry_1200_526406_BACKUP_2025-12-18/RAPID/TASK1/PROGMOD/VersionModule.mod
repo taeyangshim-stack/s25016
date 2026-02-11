@@ -11,8 +11,9 @@ MODULE VersionModule
 ! ========================================
 CONST string TASK1_VERSION := "v1.9.40";
 CONST string TASK2_VERSION := "v1.9.28";
-CONST string TASK_BG_VERSION := "v1.0.0";
-CONST string TASK_HEAD_VERSION := "v1.9.40";
+CONST string TASK_BG_VERSION := "v2.0.0";
+CONST string TASK_HEAD_VERSION := "v1.9.41";
+CONST string TASK_TEACHING_VERSION := "v1.0.0";
 
 ! ========================================
 ! Module Versions
@@ -23,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-06";
+CONST string BUILD_DATE := "2026-02-11";
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -45,6 +46,20 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! UI-FIX (2026-02-11) - Upper Control UI Integration Fix
+!   - FIX: 9 RAPID symbol not found errors resolved (UI↔Controller)
+!   - TASK7(T_BG) Static.mod v2.0.0: Full PlanA TASK9 monitoring code ported
+!     - RECORD: monRobs, StatusWeld, pointgroup, targetdata
+!     - PERS: MonitorPosition, nTorques{18}, stWeld1, stWeld2, ~50 shared vars
+!     - PROC: rReadMotorTorque, rUpdateCurrentPosition, rUpdateWeldStatus, etc.
+!     - Adapted: CJointT(\TaskName:="T_Gantry") → CJointT(\TaskName:="T_Rob1")
+!   - TASK8(T_Head) Head_Data.mod v1.9.41: nWarmUpCycle PERS variable added
+!   - TASK9(T_Teaching) v1.0.0: New task created from PlanA TASK10
+!     - Teaching.mod: targetdata RECORD, real-time weld parameter monitor
+!     - user.sys: System module for T_Teaching task
+!     - SYS.cfg: T_Teaching task definition added (UseMechanicalUnitGroup "rob1")
+!   - ROOT CAUSE: PlanB consolidated 10→8 tasks, UI expects PlanA 10-task structure
+!
 ! v1.9.40 (2026-02-06)
 !   - FEAT: PlanA-PlanB variable integration complete (100% UI compatibility)
 !   - CHANGE: Variable names to PlanA style (nLimitX_Negative, etc.)
@@ -561,6 +576,9 @@ PROC PrintVersionInfo()
     TPWrite "========================================";
     TPWrite "TASK1 Version: " + TASK1_VERSION;
     TPWrite "TASK2 Version: " + TASK2_VERSION;
+    TPWrite "T_BG Version: " + TASK_BG_VERSION;
+    TPWrite "T_Head Version: " + TASK_HEAD_VERSION;
+    TPWrite "T_Teaching Version: " + TASK_TEACHING_VERSION;
     TPWrite "Build Date: " + BUILD_DATE + " " + BUILD_TIME;
     TPWrite "========================================";
     TPWrite "Components:";
@@ -586,8 +604,12 @@ FUNC string GetVersionLine(num line_num)
     ELSEIF line_num = 6 THEN
         RETURN "T_BG: " + TASK_BG_VERSION;
     ELSEIF line_num = 7 THEN
-        RETURN "Build: " + BUILD_DATE + " " + BUILD_TIME;
+        RETURN "T_Head: " + TASK_HEAD_VERSION;
     ELSEIF line_num = 8 THEN
+        RETURN "T_Teaching: " + TASK_TEACHING_VERSION;
+    ELSEIF line_num = 9 THEN
+        RETURN "Build: " + BUILD_DATE + " " + BUILD_TIME;
+    ELSEIF line_num = 10 THEN
         RETURN "========================================";
     ELSE
         RETURN "";
@@ -597,7 +619,7 @@ ENDFUNC
 ! Example: Write version info to log file
 ! Usage:
 !   Open "HOME:/mylog.txt", logfile \Write;
-!   FOR i FROM 1 TO 8 DO
+!   FOR i FROM 1 TO 10 DO
 !       Write logfile, GetVersionLine(i);
 !   ENDFOR
 !   Close logfile;
