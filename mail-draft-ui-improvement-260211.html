@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[S25016] 원점관리 및 수동조깅 UI 개선 - 검토 요청 (2/11)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Malgun Gothic', 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: #fff;
+            padding: 20px 25px;
+        }
+        .header h1 { font-size: 1.3rem; margin-bottom: 5px; }
+        .header .meta { font-size: 0.85rem; opacity: 0.9; }
+
+        .mail-info {
+            background: #f8fafc;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+        }
+        .mail-info div { margin: 5px 0; }
+        .mail-info label {
+            display: inline-block;
+            width: 60px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .content {
+            padding: 25px;
+            line-height: 1.8;
+        }
+        .greeting {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            background: #f0f9ff;
+            border-left: 4px solid #2563eb;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 1.05rem;
+        }
+        .section-title.green {
+            background: #f0fdf4;
+            border-left-color: #16a34a;
+            color: #166534;
+        }
+
+        .pl-tags {
+            margin-bottom: 12px;
+        }
+        .pl-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+        .pl-tag.blue { background: #dbeafe; color: #1e40af; }
+        .pl-tag.green { background: #dcfce7; color: #166534; }
+        .pl-tag.orange { background: #ffedd5; color: #9a3412; }
+
+        .improve-list {
+            padding-left: 0;
+            list-style: none;
+        }
+        .improve-list li {
+            padding: 8px 12px;
+            margin: 6px 0;
+            background: #f8fafc;
+            border-left: 3px solid #2563eb;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.95rem;
+        }
+        .improve-list li strong {
+            color: #1e40af;
+        }
+        .improve-list.green li {
+            border-left-color: #16a34a;
+        }
+        .improve-list.green li strong {
+            color: #166534;
+        }
+
+        .screenshot {
+            margin: 15px 0;
+            text-align: center;
+        }
+        .screenshot img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .screenshot .caption {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        .attachment-box {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-size: 0.9rem;
+        }
+        .attachment-box .icon { margin-right: 6px; }
+        .attachment-box .file-name { font-weight: 600; color: #92400e; }
+
+        .line-label {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+        .line-label.a { background: #dbeafe; color: #1e40af; }
+        .line-label.b { background: #fce7f3; color: #be185d; }
+
+        .signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #666;
+        }
+        .signature .name { font-weight: 600; color: #333; }
+
+        .copy-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .copy-btn:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>[S25016] 원점관리 및 수동조깅 UI 개선 - 검토 요청</h1>
+            <div class="meta">2026년 2월 11일(수) | 컨펌 완료 항목 UI 보완 배포</div>
+        </div>
+
+        <div class="mail-info">
+            <div><label>받는이:</label> 이동혁 프로님 (삼성중공업)</div>
+            <div><label>참조:</label> 박주한 주임님, 관계자 분들</div>
+            <div><label>제목:</label> [S25016] 원점관리 및 수동조깅 UI 개선 - 검토 요청 (2/11)</div>
+        </div>
+
+        <div class="content">
+            <div class="greeting">
+                안녕하세요, 이동혁 프로님.<br>
+                어제(2/10) 기능 컨펌 완료된 항목들에 대해 UI 개선 작업을 진행하여 안내드립니다.<br>
+                검토 부탁드립니다.
+            </div>
+
+            <!-- ===================== 원점관리 UI 개선 ===================== -->
+            <div class="section">
+                <div class="section-title">1. 원점관리 UI 개선</div>
+
+                <div class="pl-tags">
+                    <span class="pl-tag blue">PL-2025-152</span> LDS 센서 기반 원점 인식 (이마룬)
+                    <span style="font-size:0.8rem;color:#16a34a;font-weight:600;margin-left:8px;">기능 컨펌 완료</span><br>
+                    <span class="pl-tag blue">PL-2025-155</span> 홀 센서 기반 원점 인식 (최광년)
+                    <span style="font-size:0.8rem;color:#16a34a;font-weight:600;margin-left:8px;">기능 컨펌 완료</span><br>
+                    <span class="pl-tag blue">PL-2025-153</span> 십자레이저 갠트리 원점 오차 확인 (최광년)
+                </div>
+
+                <p style="font-weight:600;color:#1e40af;margin:15px 0 8px 0;">개선 내용</p>
+                <ul class="improve-list">
+                    <li><strong>1) 표시데이터 변경 (홀센서)</strong><br>
+                        X1, X2, 스큐 데이터 표시로 변경</li>
+                    <li><strong>2) 표시데이터 변경 (LDS센서)</strong><br>
+                        X, Y, Z 데이터 표시로 변경</li>
+                    <li><strong>3) 수동 원점확인 버튼 구성</strong><br>
+                        수동으로 원점 확인 가능하도록 버튼 추가</li>
+                    <li><strong>4) 엑셀(CSV) 내보내기 구성</strong><br>
+                        측정이력 전체 내보내기 기능 추가</li>
+                    <li><strong>5) 측정 취소 및 닫기 버튼 구성</strong><br>
+                        측정 중 → 닫기 버튼 비활성화<br>
+                        미측정 중 → 측정취소 버튼 비활성화<br>
+                        <em style="color:#dc2626;">→ 오동작 방지 기능 적용</em></li>
+                </ul>
+
+                <div class="screenshot">
+                    <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1770816521/s25016/punchlist/se09hlco3mssbbkeqg5s3gpwl.png" alt="원점관리 UI 개선 화면">
+                    <div class="caption">원점관리 UI 개선 화면 (A/B라인 공통)</div>
+                </div>
+
+                <div class="attachment-box">
+                    <span class="icon">🎬</span>
+                    <span class="file-name">34bay_ab_원점확인_260211.mp4</span> — A/B라인 원점확인 동작 영상 (별첨)
+                </div>
+            </div>
+
+            <!-- ===================== 수동조깅 UI 개선 ===================== -->
+            <div class="section">
+                <div class="section-title green">2. 갠트리 수동조깅 UI 개선</div>
+
+                <div class="pl-tags">
+                    <span class="pl-tag green">PL-2026-170</span> 갠트리 상대이동 조깅 기능
+                </div>
+
+                <p style="font-weight:600;color:#166534;margin:15px 0 8px 0;">개선 내용</p>
+                <ul class="improve-list green">
+                    <li><strong>1) 전체 레이아웃 구성</strong><br>
+                        화면 폭 개선으로 가독성 향상</li>
+                    <li><strong>2) 항목 구분(제목) 폰트사이즈 개선</strong><br>
+                        섹션 구분 명확화</li>
+                    <li><strong>3) 속도설정값 자동복귀 기능 적용</strong><br>
+                        사용자 설정 속도값 기록 → 수동조깅 (조깅 내 속도조절) → 수동조깅 종료 시 <strong>사용자 설정 속도값 자동 복귀</strong></li>
+                </ul>
+
+                <p style="margin:15px 0 8px 0;font-weight:600;">
+                    <span class="line-label a">A라인</span> 수동조깅 UI
+                </p>
+                <div class="screenshot">
+                    <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1770816583/s25016/punchlist/b91v8o7zm0iomg0izel0lmbr3.png" alt="A라인 수동조깅 UI">
+                    <div class="caption">A라인 수동조깅 UI 화면</div>
+                </div>
+
+                <p style="margin:15px 0 8px 0;font-weight:600;">
+                    <span class="line-label b">B라인</span> 수동조깅 UI
+                </p>
+                <div class="screenshot">
+                    <img src="https://res.cloudinary.com/dmmjpofcc/image/upload/v1770816606/s25016/punchlist/zlezprqoqvkjmv48w9ap0yyyc.png" alt="B라인 수동조깅 UI">
+                    <div class="caption">B라인 수동조깅 UI 화면</div>
+                </div>
+
+                <div class="attachment-box">
+                    <span class="icon">🎬</span>
+                    <span class="file-name">34bay_a_수동조깅_260211.mp4</span> — A라인 수동조깅 동작 영상 (별첨)
+                </div>
+                <div class="attachment-box">
+                    <span class="icon">🎬</span>
+                    <span class="file-name">34bay_b_수동조깅_260211.mp4</span> — B라인 수동조깅 동작 영상 (별첨)
+                </div>
+            </div>
+
+            <!-- ===================== 마무리 ===================== -->
+            <p style="margin-top:10px;">
+                상기 UI 개선 내용 및 첨부 동영상 확인 후 검토 부탁드립니다.
+            </p>
+
+            <div class="signature">
+                감사합니다.<br><br>
+                <span class="name">심태양</span><br>
+                에스피시스템스 / S25016 자동용접 시스템
+            </div>
+        </div>
+    </div>
+
+    <button class="copy-btn" onclick="copyToClipboard()">메일 본문 복사</button>
+
+    <script>
+        function copyToClipboard() {
+            const content = document.querySelector('.content');
+            const range = document.createRange();
+            range.selectNode(content);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = '복사됨!';
+            btn.style.background = '#10b981';
+            setTimeout(() => {
+                btn.textContent = '메일 본문 복사';
+                btn.style.background = '#2563eb';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
