@@ -13,9 +13,22 @@ cloudinary-uploader/.env
 cloudinary-uploader/.env.example
 
 # Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+conversation_*.log
+conversation_summary.md
+
+# Network capture
+*.pcapng
+
+# Robot backup/diagnostics
+robot)badkup/
+**/SysDiagnosticsData*
+
+# Source maps
+*.map
 
 # OS
 .DS_Store
