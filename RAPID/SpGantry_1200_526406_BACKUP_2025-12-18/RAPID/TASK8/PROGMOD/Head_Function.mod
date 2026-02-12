@@ -20,7 +20,7 @@ MODULE Head_Function
         VAR jointtarget jExt;
         VAR robtarget result:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 
-        jExt:=fnJointToCoord(CJointT(\taskname:="T_Gantry"));
+        jExt:=fnJointToCoord(CJointT(\taskname:="T_Rob1"));
 
         IF Present(R1)=TRUE pTemp:=CRobT(\taskname:="T_ROB1"\Tool:=tWeld1\WObj:=wobjRotCtr1);
         IF Present(R2)=TRUE pTemp:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobjRotCtr2);
@@ -138,7 +138,7 @@ MODULE Head_Function
         nMoveid:=nMoveid+5;
         result.Joint1:=CJointT(\TaskName:="T_ROB1");
         result.Joint2:=CJointT(\TaskName:="T_ROB2");
-        result.JointG:=CJointT(\TaskName:="T_Gantry");
+        result.JointG:=CJointT(\TaskName:="T_Rob1");
 
         IF Present(Rob1)=TRUE result.Joint1:=Rob1;
         IF Present(Rob2)=TRUE result.Joint2:=Rob2;
@@ -152,7 +152,7 @@ MODULE Head_Function
         nMoveid:=nMoveid+5;
         result.point1:=CRobT(\TaskName:="T_ROB1"\tool:=tWeld1);
         result.point2:=CRobT(\TaskName:="T_ROB2"\tool:=tWeld2);
-        result.PointG:=fnExtaxToPose(CJointT(\TaskName:="T_Gantry"));
+        result.PointG:=fnExtaxToPose(CJointT(\TaskName:="T_Rob1"));
 
         IF Present(Rob1)=TRUE result.point1:=Rob1;
         IF Present(Rob2)=TRUE result.point2:=Rob2;

@@ -4916,6 +4916,7 @@ PROC Rob1_CommandListener()
 
 	WHILE TRUE DO
 		stReact{1} := "Ready";
+		stReact{3} := "Ready";
 		Write head_log, "Status: Ready, waiting stCommand...";
 		WaitUntil stCommand <> "";
 		Write head_log, "Received: " + stCommand;
@@ -4924,88 +4925,112 @@ PROC Rob1_CommandListener()
 		TEST stCommand
 			CASE "MoveHome":
 				stReact{1} := "";
+				stReact{3} := "";
 				SetRobot1InitialPosition;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "MoveHome done";
 				WaitUntil stCommand = "";
 
 			CASE "MoveMeasurementHome":
 				stReact{1} := "";
+				stReact{3} := "";
 				! Stub - measurement home position
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "MoveMeasurementHome done (stub)";
 				WaitUntil stCommand = "";
 
 			CASE "MoveAbsGantry":
 				stReact{1} := "";
+				stReact{3} := "";
 				MoveAbsGantryFromExtPos;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "MoveAbsGantry done";
 				WaitUntil stCommand = "";
 
 			CASE "MoveIncGantry":
 				stReact{1} := "";
+				stReact{3} := "";
 				MoveIncGantryFromExtPos;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "MoveIncGantry done";
 				WaitUntil stCommand = "";
 
 			CASE "EdgeWeld":
 				stReact{1} := "";
+				stReact{3} := "";
 				Write head_log, "EdgeWeld: calling TestFullWeldSequence";
 				TestFullWeldSequence;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "EdgeWeld done";
 				WaitUntil stCommand = "";
 
 			CASE "Weld", "WeldMotion":
 				stReact{1} := "";
+				stReact{3} := "";
 				Write head_log, "Weld/WeldMotion: calling TestWeldSequence";
 				TestWeldSequence;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "Weld done";
 				WaitUntil stCommand = "";
 
 			CASE "WeldCorr", "WeldMotionCorr":
 				stReact{1} := "";
+				stReact{3} := "";
 				Write head_log, "WeldCorr: calling TestWeldSequence (with corr)";
 				TestWeldSequence;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "WeldCorr done";
 				WaitUntil stCommand = "";
 
 			CASE "WireCut", "Rob1WireCut":
 				stReact{1} := "";
+				stReact{3} := "";
 				! Stub - wire cut
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "WireCut done (stub)";
 				WaitUntil stCommand = "";
 
 			CASE "TestMenu":
 				stReact{1} := "";
+				stReact{3} := "";
 				TestMenu;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "TestMenu done";
 				WaitUntil stCommand = "";
 
 			CASE "TestSingle":
 				stReact{1} := "";
+				stReact{3} := "";
 				TestGantryFloorCoordinates;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "TestSingle done";
 				WaitUntil stCommand = "";
 
 			CASE "TestRotation":
 				stReact{1} := "";
+				stReact{3} := "";
 				TestGantryRotation;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "TestRotation done";
 				WaitUntil stCommand = "";
 
 			CASE "TestMode2":
 				stReact{1} := "";
+				stReact{3} := "";
 				TestGantryMode2;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				Write head_log, "TestMode2 done";
 				WaitUntil stCommand = "";
 
@@ -5013,6 +5038,7 @@ PROC Rob1_CommandListener()
 				Write head_log, "Unknown command: " + stCommand;
 				TPWrite "[R1] Unknown stCommand: " + stCommand;
 				stReact{1} := "Ack";
+				stReact{3} := "Ack";
 				WaitUntil stCommand = "";
 		ENDTEST
 	ENDWHILE

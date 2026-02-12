@@ -1,8 +1,8 @@
 MODULE Head_Command
     PERS tasks taskGroup12{2}:=[["T_ROB1"],["T_ROB2"]];
-    PERS tasks taskGroup13{2}:=[["T_ROB1"],["T_Gantry"]];
-    PERS tasks taskGroup23{2}:=[["T_ROB2"],["T_Gantry"]];
-    PERS tasks taskGroup123{3}:=[["T_ROB1"],["T_ROB2"],["T_Gantry"]];
+    PERS tasks taskGroup13{2}:=[["T_ROB1"],["T_Rob1"]];
+    PERS tasks taskGroup23{2}:=[["T_ROB2"],["T_Rob1"]];
+    PERS tasks taskGroup123{3}:=[["T_ROB1"],["T_ROB2"],["T_Rob1"]];
 
     ! Sync Data
     TASK VAR syncident Synchronize;

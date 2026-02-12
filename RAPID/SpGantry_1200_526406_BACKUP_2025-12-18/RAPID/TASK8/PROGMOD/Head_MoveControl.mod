@@ -1206,7 +1206,7 @@ MODULE Head_MoveControl
         rMoveToRobotHome;
 
         !!! Save Current Location To jTempCurrentExtax
-        jTempG:=CJointT(\TaskName:="T_Gantry");
+        jTempG:=CJointT(\TaskName:="T_Rob1");
         ! Calling a Routine To Send The Robot Home
         !        rRbtCheckAtHome;
         !!! Save Current Location To jTemp
@@ -1241,7 +1241,7 @@ MODULE Head_MoveControl
         rMoveToRobotHome;
 
         !!! Save Current Location To jTempCurrentExtax
-        jTempG:=CJointT(\TaskName:="T_Gantry");
+        jTempG:=CJointT(\TaskName:="T_Rob1");
         ! Calling a Routine To Send The Robot Home
         !        rRbtCheckAtHome;
         !!! Save Current Location To jTemp
@@ -1320,8 +1320,8 @@ MODULE Head_MoveControl
 
         jTemp1:=CJointT(\TaskName:="T_Rob1");
         jTemp2:=CJointT(\TaskName:="T_Rob2");
-        jTempG:=CJointT(\TaskName:="T_Gantry");
-        jTempGBuffer:=CJointT(\TaskName:="T_Gantry");
+        jTempG:=CJointT(\TaskName:="T_Rob1");
+        jTempGBuffer:=CJointT(\TaskName:="T_Rob1");
 
         jTempG.extax.eax_a:=nHomeGantryX+extGantryPos.eax_a;
         jTempG.extax.eax_b:=nHomeGantryY-extGantryPos.eax_b;
@@ -1345,7 +1345,7 @@ MODULE Head_MoveControl
 
         jTemp1:=CJointT(\TaskName:="T_Rob1");
         jTemp2:=CJointT(\TaskName:="T_Rob2");
-        jTempG:=CJointT(\TaskName:="T_Gantry");
+        jTempG:=CJointT(\TaskName:="T_Rob1");
 
         jTempG.extax.eax_a:=jTempG.extax.eax_a+extGantryPos.eax_a;
         jTempG.extax.eax_b:=jTempG.extax.eax_b-extGantryPos.eax_b;
@@ -1391,7 +1391,7 @@ MODULE Head_MoveControl
 
         jgEmptyTarget.Joint1:=CJointT(\TaskName:="T_Rob1");
         jgEmptyTarget.Joint2:=CJointT(\TaskName:="T_Rob2");
-        jgEmptyTarget.JointG:=CJointT(\TaskName:="T_Gantry");
+        jgEmptyTarget.JointG:=CJointT(\TaskName:="T_Rob1");
         IF bHomeCheck=FALSE THEN 
           jgEmptyTarget.JointG.extax.eax_c:=0;
           MoveJgJ jgEmptyTarget,vTargetSpeed,fine;
@@ -1414,7 +1414,7 @@ MODULE Head_MoveControl
 
             jgEmptyTarget.Joint1:=CJointT(\TaskName:="T_Rob1");
             jgEmptyTarget.Joint2:=CJointT(\TaskName:="T_Rob2");
-            jgEmptyTarget.JointG:=CJointT(\TaskName:="T_Gantry");
+            jgEmptyTarget.JointG:=CJointT(\TaskName:="T_Rob1");
             jgEmptyTarget.Joint1.robax:=jgHomeJoint.Joint1.robax;
             jgEmptyTarget.Joint2.robax:=jgHomeJoint.Joint2.robax;
             MoveJgJ jgEmptyTarget,vTargetSpeed,fine;
@@ -1574,7 +1574,7 @@ MODULE Head_MoveControl
         !        StopMove;
         !        ClearPath;
         !        StartMove;
-        !        pTemp:=CRobT(\TaskName:="T_Gantry"\tool:=tWeld\WObj:=wobjWeldLine);
+        !        pTemp:=CRobT(\TaskName:="T_Rob1"\tool:=tWeld\WObj:=wobjWeldLine);
         !        pArcErrorPos:=CRobT(\tool:=tWeld\WObj:=WobjFloor);
         !        MoveL RelTool(pTemp,0,0,-10),v200,z10,tWeld\WObj:=wobjWeldLine;
         !        rMoveToRobotHome;
@@ -2153,7 +2153,7 @@ MODULE Head_MoveControl
 
         jgEmptyTarget.Joint1:=CJointT(\TaskName:="T_Rob1");
         jgEmptyTarget.Joint2:=CJointT(\TaskName:="T_Rob2");
-        jgEmptyTarget.JointG:=CJointT(\TaskName:="T_Gantry");
+        jgEmptyTarget.JointG:=CJointT(\TaskName:="T_Rob1");
         jgEmptyTarget.JointG.extax.eax_c:=0;
         MoveJgJ jgEmptyTarget,vTargetSpeed,fine;
 
@@ -2178,7 +2178,7 @@ MODULE Head_MoveControl
 
         jgEmptyTarget.Joint1:=CJointT(\TaskName:="T_Rob1");
         jgEmptyTarget.Joint2:=CJointT(\TaskName:="T_Rob2");
-        jgEmptyTarget.JointG:=CJointT(\TaskName:="T_Gantry");
+        jgEmptyTarget.JointG:=CJointT(\TaskName:="T_Rob1");
         IF nHomeNo=1 THEN
             jgEmptyTarget.Joint1.robax:=jgMeasurementHome.Joint1.robax;
             jgEmptyTarget.Joint2.robax:=jgMeasurementHome.Joint2.robax;
