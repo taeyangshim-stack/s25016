@@ -3428,6 +3428,27 @@ PROC Rob2_CommandListener()
 				Write head_log, "MoveHome done";
 				WaitUntil stCommand = "";
 
+			CASE "MoveJgJ":
+				stReact{2} := "";
+				MoveAbsJ jRob2, vSync, zSync, tool0;
+				stReact{2} := "Ack";
+				Write head_log, "MoveJgJ done";
+				WaitUntil stCommand = "";
+
+			CASE "MovePgJ":
+				stReact{2} := "";
+				MoveJ pRob2, vSync, zSync, tool0;
+				stReact{2} := "Ack";
+				Write head_log, "MovePgJ done";
+				WaitUntil stCommand = "";
+
+			CASE "MovePgL":
+				stReact{2} := "";
+				MoveL pRob2, vSync, zSync, tool0;
+				stReact{2} := "Ack";
+				Write head_log, "MovePgL done";
+				WaitUntil stCommand = "";
+
 			CASE "EdgeWeld":
 				stReact{2} := "";
 				Write head_log, "EdgeWeld: waiting t1_weld_position_ready";
