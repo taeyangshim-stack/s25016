@@ -294,7 +294,7 @@ MODULE Static
 
     PROC rReadMotorTorque()
         FOR i FROM 13 TO 16 DO
-            nTorques{i}:=Abs(GetMotorTorque(\mecunit:=GantryRob_7,i-12));
+            nTorques{i}:=Abs(GetMotorTorque(\mecunit:=GantryRob,i-12));
         ENDFOR
 
         nTorques{17}:=9E+09;

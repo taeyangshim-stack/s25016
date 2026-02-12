@@ -47,18 +47,18 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! Version History (Latest 10)
 ! ========================================
 ! UI-FIX (2026-02-11) - Upper Control UI Integration Fix
-!   - FIX: 9 RAPID symbol not found errors resolved (UI↔Controller)
+!   - FIX: 9 RAPID symbol not found errors resolved (UI<->Controller)
 !   - TASK7(T_BG) Static.mod v2.0.0: Full PlanA TASK9 monitoring code ported
 !     - RECORD: monRobs, StatusWeld, pointgroup, targetdata
 !     - PERS: MonitorPosition, nTorques{18}, stWeld1, stWeld2, ~50 shared vars
 !     - PROC: rReadMotorTorque, rUpdateCurrentPosition, rUpdateWeldStatus, etc.
-!     - Adapted: CJointT(\TaskName:="T_Gantry") → CJointT(\TaskName:="T_Rob1")
+!     - Adapted: CJointT(\TaskName:="T_Gantry") -> CJointT(\TaskName:="T_Rob1")
 !   - TASK8(T_Head) Head_Data.mod v1.9.41: nWarmUpCycle PERS variable added
 !   - TASK9(T_Teaching) v1.0.0: New task created from PlanA TASK10
 !     - Teaching.mod: targetdata RECORD, real-time weld parameter monitor
 !     - user.sys: System module for T_Teaching task
 !     - SYS.cfg: T_Teaching task definition added (UseMechanicalUnitGroup "rob1")
-!   - ROOT CAUSE: PlanB consolidated 10→8 tasks, UI expects PlanA 10-task structure
+!   - ROOT CAUSE: PlanB consolidated 10->8 tasks, UI expects PlanA 10-task structure
 !
 ! v1.9.40 (2026-02-06)
 !   - FEAT: PlanA-PlanB variable integration complete (100% UI compatibility)
@@ -195,7 +195,7 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 !
 ! v1.9.29 (2026-02-04)
 !   - FEAT: Multi-Angle Test (TestMultiAngle)
-!   - Tests 0°, 45°, 90°, -45° weld line angles automatically
+!   - Tests 0deg, 45deg, 90deg, -45deg weld line angles automatically
 !   - Logs all results to HOME:/multi_angle_test.txt
 !   - FEAT: Robot TCP Movement (MoveRobotToWeldPosition)
 !   - Moves Robot1 TCP to weld start position in WobjGantry
@@ -368,15 +368,15 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 !   - ViewCurrentConfig: Display current configuration on TP
 !
 ! v1.9.1 (2026-01-17)
-!   - FIX: R-axis angle calculation: Floor X+ = R=0° (was Y+ = 0°)
+!   - FIX: R-axis angle calculation: Floor X+ = R=0deg (was Y+ = 0deg)
 !   - FIX: WObj creation: X = weld direction using ATan2(dy, dx)
 !   - FIX: TCP Z offset: 1600mm (was 1500mm)
 !   - FIX: Torch orientation: Rx rotation (around weld line), not Ry
 !   - ADD: Robot weld positions in WObj coordinates
 !     Robot1: (0, -12, 1600), Robot2: (0, 476, -1600)
-!   - ADD: 45° torch angle (Rx rotation around weld line X-axis)
-!     Robot1: Rx +45° [0.9239, 0.3827, 0, 0]
-!     Robot2: Rx -45° [0.9239, -0.3827, 0, 0]
+!   - ADD: 45deg torch angle (Rx rotation around weld line X-axis)
+!     Robot1: Rx +45deg [0.9239, 0.3827, 0, 0]
+!     Robot2: Rx -45deg [0.9239, -0.3827, 0, 0]
 !   - ADD: WELD_R1/R2_WObj_X/Y/Z variables in ConfigModule
 !
 ! v1.9.0 (2026-01-16)
