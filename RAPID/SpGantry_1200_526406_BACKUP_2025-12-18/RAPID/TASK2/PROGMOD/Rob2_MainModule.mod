@@ -3402,14 +3402,14 @@ PROC Robot2_CommandLoop()
 ENDPROC
 
 ! ========================================
-! Rob2_CommandListener: T_Head stCommand handler (v1.9.39)
+! Rob2_CommandListener: T_Head stCommand handler (v1.9.42)
 ! ========================================
 ! Responds to stCommand from T_Head task
 ! Protocol: "Ready" -> receive command -> execute -> "Ack" -> wait clear -> "Ready"
 PROC Rob2_CommandListener()
 	VAR iodev head_log;
 	Open "HOME:/head_r2_listener.txt", head_log \Write;
-	Write head_log, "Rob2 CommandListener (v1.9.39) - " + CDate() + " " + CTime();
+	Write head_log, "Rob2 CommandListener (v1.9.42) - " + CDate() + " " + CTime();
 
 	TPWrite "[R2] CommandListener started, entering Ready state";
 
@@ -3463,6 +3463,13 @@ PROC Rob2_CommandListener()
 				! Stub - Robot2 wire cut
 				stReact{2} := "Ack";
 				Write head_log, "Rob2WireCut done (stub)";
+				WaitUntil stCommand = "";
+
+			CASE "checkpos":
+				stReact{2} := "";
+				rT_ROB2check;
+				stReact{2} := "checkposok";
+				Write head_log, "checkpos done";
 				WaitUntil stCommand = "";
 
 			DEFAULT:

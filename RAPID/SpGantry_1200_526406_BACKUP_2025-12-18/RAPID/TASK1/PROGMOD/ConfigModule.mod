@@ -821,4 +821,16 @@ PERS trackdata track40 := [0,FALSE,50,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
 PERS string stCommand := "";
 PERS string stReact{3} := ["", "", ""];
 
+! ========================================
+! T_Head Shared Motion Variables (v1.9.41)
+! ========================================
+! Shared PERS with T_Head (Head_Command.mod) for MoveJgJ/MovePgJ/MovePgL
+! T_Head sets these targets, TASK1 executes the motion
+PERS jointtarget jRob1;
+PERS jointtarget jGantry;
+PERS robtarget pRob1;
+PERS speeddata vSync;
+PERS zonedata zSync;
+PERS num idSync;
+
 ENDMODULE

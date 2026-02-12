@@ -473,6 +473,9 @@ PERS num debug_r2_floor_y_offset := 0;
 	! Origin = weld start point, X = weld direction, Z = down
 	PERS wobjdata WobjWeldR2 := [FALSE, TRUE, "", [[0, 0, 0], [1, 0, 0, 0]], [[0, 0, 0], [1, 0, 0, 0]]];
 
+	! wobjWeldLine1: Shared PERS from T_Head (weld line coordinate for Robot1 safety check)
+	PERS wobjdata wobjWeldLine1;
+
 	! Weld Sequence Variables (v1.9.0)
 	! Center line calculated from Robot1 and Robot2 weld lines
 	VAR pos weld_center_start;
@@ -4863,6 +4866,37 @@ PROC CommandLoop()
 ENDPROC
 
 ! ========================================
+! ExecMoveJgJ: Execute MoveJgJ from T_Head (v1.9.41)
+! ========================================
+! PlanB: Combines jRob1.robax (robot target) with jGantry.extax (gantry target)
+! In PlanA, separate tasks moved each axis group. In PlanB, TASK1 moves both.
+PROC ExecMoveJgJ()
+	VAR jointtarget jMoveTarget;
+	jMoveTarget.robax := jRob1.robax;
+	jMoveTarget.extax := jGantry.extax;
+	MoveAbsJ jMoveTarget, vSync, zSync, tool0;
+	UpdateGantryWobj;
+ENDPROC
+
+! ========================================
+! ExecMovePgJ: Execute MovePgJ from T_Head (v1.9.41)
+! ========================================
+! PlanB: MoveJ to robtarget pRob1 set by T_Head
+PROC ExecMovePgJ()
+	MoveJ pRob1, vSync, zSync, tool0;
+	UpdateGantryWobj;
+ENDPROC
+
+! ========================================
+! ExecMovePgL: Execute MovePgL from T_Head (v1.9.41)
+! ========================================
+! PlanB: MoveL to robtarget pRob1 set by T_Head
+PROC ExecMovePgL()
+	MoveL pRob1, vSync, zSync, tool0;
+	UpdateGantryWobj;
+ENDPROC
+
+! ========================================
 ! MoveAbsGantryFromExtPos: Absolute gantry move (v1.9.39)
 ! ========================================
 ! Extracted from CommandLoop CASE CMD_MOVE_ABS_GANTRY for reuse
@@ -4903,14 +4937,33 @@ PROC MoveIncGantryFromExtPos()
 ENDPROC
 
 ! ========================================
-! Rob1_CommandListener: T_Head stCommand handler (v1.9.39)
+! rT_ROB1check: Safety position check before MoveToZHome
+! ========================================
+! If Robot1 is near weld line (Y<100, Z<200), move to safe Y position
+PROC rT_ROB1check()
+	VAR robtarget pTemp;
+	pTemp := CRobT(\TaskName:="T_ROB1"\Tool:=tWeld1\WObj:=wobjWeldLine1);
+	IF Abs(pTemp.trans.Y) < 100 AND Abs(pTemp.trans.Z) < 200 THEN
+		IF pTemp.trans.Y > 0 THEN
+			pTemp.trans.y := 130;
+			MoveL pTemp, v100, fine, tWeld1\WObj:=wobjWeldLine1;
+		ENDIF
+		IF pTemp.trans.Y < 0 THEN
+			pTemp.trans.y := -130;
+			MoveL pTemp, v100, fine, tWeld1\WObj:=wobjWeldLine1;
+		ENDIF
+	ENDIF
+ENDPROC
+
+! ========================================
+! Rob1_CommandListener: T_Head stCommand handler (v1.9.41)
 ! ========================================
 ! Responds to stCommand from T_Head task
 ! Protocol: "Ready" -> receive command -> execute -> "Ack" -> wait clear -> "Ready"
 PROC Rob1_CommandListener()
 	VAR iodev head_log;
 	Open "HOME:/head_r1_listener.txt", head_log \Write;
-	Write head_log, "Rob1 CommandListener (v1.9.39) - " + CDate() + " " + CTime();
+	Write head_log, "Rob1 CommandListener (v1.9.42) - " + CDate() + " " + CTime();
 
 	TPWrite "[R1] CommandListener started, entering Ready state";
 
@@ -4923,6 +4976,33 @@ PROC Rob1_CommandListener()
 		TPWrite "[R1] stCommand=" + stCommand;
 
 		TEST stCommand
+			CASE "MoveJgJ":
+				stReact{1} := "";
+				stReact{3} := "";
+				ExecMoveJgJ;
+				stReact{1} := "Ack";
+				stReact{3} := "Ack";
+				Write head_log, "MoveJgJ done";
+				WaitUntil stCommand = "";
+
+			CASE "MovePgJ":
+				stReact{1} := "";
+				stReact{3} := "";
+				ExecMovePgJ;
+				stReact{1} := "Ack";
+				stReact{3} := "Ack";
+				Write head_log, "MovePgJ done";
+				WaitUntil stCommand = "";
+
+			CASE "MovePgL":
+				stReact{1} := "";
+				stReact{3} := "";
+				ExecMovePgL;
+				stReact{1} := "Ack";
+				stReact{3} := "Ack";
+				Write head_log, "MovePgL done";
+				WaitUntil stCommand = "";
+
 			CASE "MoveHome":
 				stReact{1} := "";
 				stReact{3} := "";
@@ -5032,6 +5112,15 @@ PROC Rob1_CommandListener()
 				stReact{1} := "Ack";
 				stReact{3} := "Ack";
 				Write head_log, "TestMode2 done";
+				WaitUntil stCommand = "";
+
+			CASE "checkpos":
+				stReact{1} := "";
+				stReact{3} := "";
+				rT_ROB1check;
+				stReact{1} := "checkposok";
+				stReact{3} := "checkposok";
+				Write head_log, "checkpos done";
 				WaitUntil stCommand = "";
 
 			DEFAULT:
