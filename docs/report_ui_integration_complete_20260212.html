@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>B라인 PlanB UI 연동 완료 보고서 (260212)</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:'Malgun Gothic','맑은 고딕',sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;">
+<tr><td align="center" style="padding:20px 0;">
+<table width="700" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #ddd;border-radius:8px;overflow:hidden;">
+
+<!-- Header -->
+<tr>
+<td style="background:linear-gradient(135deg,#1a5276,#2980b9);padding:28px 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td style="color:#ffffff;font-size:22px;font-weight:bold;letter-spacing:-0.5px;">
+      B라인 PlanB UI 연동 완료 보고서
+    </td>
+  </tr>
+  <tr>
+    <td style="color:#aed6f1;font-size:13px;padding-top:8px;">
+      S25016 | 삼성중공업 거제조선소 34Bay 자동용접 로봇 시스템
+    </td>
+  </tr>
+  </table>
+</td>
+</tr>
+
+<!-- Status Banner -->
+<tr>
+<td style="background:#27ae60;padding:14px 32px;text-align:center;">
+  <span style="color:#ffffff;font-size:16px;font-weight:bold;">UI 연동 테스트 성공 (Fail 0건) - 2026-02-12 15:06</span>
+</td>
+</tr>
+
+<!-- Section 1: 개요 -->
+<tr>
+<td style="padding:28px 32px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-left:4px solid #2980b9;padding-left:16px;margin-bottom:20px;">
+  <tr><td style="font-size:17px;font-weight:bold;color:#1a5276;">1. 개요</td></tr>
+  </table>
+  <table width="100%" cellpadding="8" cellspacing="0" style="border:1px solid #ddd;border-radius:4px;font-size:13px;">
+  <tr style="background:#f8f9fa;">
+    <td style="width:140px;font-weight:bold;color:#555;border-bottom:1px solid #eee;">대상 시스템</td>
+    <td style="border-bottom:1px solid #eee;">B라인 PlanB IRC5 컨트롤러 (RobotWare 6.16.1028)</td>
+  </tr>
+  <tr>
+    <td style="font-weight:bold;color:#555;border-bottom:1px solid #eee;">UI 프로그램</td>
+    <td style="border-bottom:1px solid #eee;">DF.SubAssembly.MainGui.exe (디파인시스템 제공)</td>
+  </tr>
+  <tr style="background:#f8f9fa;">
+    <td style="font-weight:bold;color:#555;border-bottom:1px solid #eee;">통신 방식</td>
+    <td style="border-bottom:1px solid #eee;">ABB PC SDK - RAPID 변수 직접 접근 (T_BG.Static.*)</td>
+  </tr>
+  <tr>
+    <td style="font-weight:bold;color:#555;border-bottom:1px solid #eee;">작업 기간</td>
+    <td style="border-bottom:1px solid #eee;">2026-02-11 ~ 2026-02-12 (2일)</td>
+  </tr>
+  <tr style="background:#f8f9fa;">
+    <td style="font-weight:bold;color:#555;">최종 결과</td>
+    <td style="color:#27ae60;font-weight:bold;">연동 성공 (Fail 0건)</td>
+  </tr>
+  </table>
+</td>
+</tr>
+
+<!-- Section 2: 문제 현상 -->
+<tr>
+<td style="padding:28px 32px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-left:4px solid #e74c3c;padding-left:16px;margin-bottom:20px;">
+  <tr><td style="font-size:17px;font-weight:bold;color:#1a5276;">2. 최초 문제 현상</td></tr>
+  </table>
+  <p style="font-size:13px;color:#333;margin:0 0 12px;line-height:1.8;">
+    UI 프로그램에서 PlanB 컨트롤러 연동 시도 시 <strong>RapidInitFailReport</strong>에
+    아래 9개 RAPID 심볼 누락 오류가 발생하였습니다.
+  </p>
+  <table width="100%" cellpadding="6" cellspacing="0" style="border:1px solid #ddd;border-radius:4px;font-size:12px;">
+  <tr style="background:#e74c3c;color:#fff;">
+    <td style="font-weight:bold;width:30px;text-align:center;">No</td>
+    <td style="font-weight:bold;">UI Key</td>
+    <td style="font-weight:bold;">RAPID 경로</td>
+    <td style="font-weight:bold;">데이터 타입</td>
+  </tr>
+  <tr style="background:#fdf2f2;">
+    <td style="text-align:center;border-bottom:1px solid #eee;">1</td>
+    <td style="border-bottom:1px solid #eee;">MonRobs</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">T_BG.Static.MonitorPosition</td>
+    <td style="border-bottom:1px solid #eee;">UserRapidDataItem</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;border-bottom:1px solid #eee;">2</td>
+    <td style="border-bottom:1px solid #eee;">CurrentTorque</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">T_BG.Static.nTorques</td>
+    <td style="border-bottom:1px solid #eee;">ArrayRapidDataItem</td>
+  </tr>
+  <tr style="background:#fdf2f2;">
+    <td style="text-align:center;border-bottom:1px solid #eee;">3</td>
+    <td style="border-bottom:1px solid #eee;">WeldDataStatus</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">T_BG.Static.stWeld1</td>
+    <td style="border-bottom:1px solid #eee;">UserRapidDataItem</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;border-bottom:1px solid #eee;">4</td>
+    <td style="border-bottom:1px solid #eee;">WeldDataStatus2</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">T_BG.Static.stWeld2</td>
+    <td style="border-bottom:1px solid #eee;">UserRapidDataItem</td>
+  </tr>
+  <tr style="background:#fdf2f2;">
+    <td style="text-align:center;border-bottom:1px solid #eee;">5</td>
+    <td style="border-bottom:1px solid #eee;">WeldTarget1</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">T_BG.Static.Welds1</td>
+    <td style="border-bottom:1px solid #eee;">ArrayRapidDataItem</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;border-bottom:1px solid #eee;">6</td>
+    <td style="border-bottom:1px solid #eee;">WeldTarget2</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">T_BG.Static.Welds2</td>
+    <td style="border-bottom:1px solid #eee;">ArrayRapidDataItem</td>
+  </tr>
+  <tr style="background:#fdf2f2;">
+    <td style="text-align:center;border-bottom:1px solid #eee;">7</td>
+    <td style="border-bottom:1px solid #eee;">WeldTargetG</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">T_BG.Static.WeldsG</td>
+    <td style="border-bottom:1px solid #eee;">ArrayRapidDataItem</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;border-bottom:1px solid #eee;">8</td>
+    <td style="border-bottom:1px solid #eee;">MotionTotalStep</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">T_BG.Static.nMotionTotalStep</td>
+    <td style="border-bottom:1px solid #eee;">ArrayRapidDataItem</td>
+  </tr>
+  <tr style="background:#fdf2f2;">
+    <td style="text-align:center;">9</td>
+    <td>MotionStepCount</td>
+    <td style="font-family:monospace;">T_BG.Static.nMotionStepCount</td>
+    <td>ArrayRapidDataItem</td>
+  </tr>
+  </table>
+</td>
+</tr>
+
+<!-- Section 3: 근본 원인 -->
+<tr>
+<td style="padding:28px 32px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-left:4px solid #f39c12;padding-left:16px;margin-bottom:20px;">
+  <tr><td style="font-size:17px;font-weight:bold;color:#1a5276;">3. 근본 원인 분석</td></tr>
+  </table>
+  <p style="font-size:13px;color:#333;margin:0 0 16px;line-height:1.8;">
+    PlanA에서 PlanB로 컨트롤러를 변경하면서, UI가 참조하는 <strong>T_BG(Background Task)</strong>의
+    Static 모듈이 제대로 포팅되지 않았습니다.
+  </p>
+
+  <table width="100%" cellpadding="8" cellspacing="0" style="border:1px solid #ddd;border-radius:4px;font-size:12px;margin-bottom:16px;">
+  <tr style="background:#34495e;color:#fff;">
+    <td style="font-weight:bold;width:160px;">항목</td>
+    <td style="font-weight:bold;">PlanA (정상)</td>
+    <td style="font-weight:bold;">PlanB (문제)</td>
+  </tr>
+  <tr style="background:#f8f9fa;">
+    <td style="font-weight:bold;color:#555;border-bottom:1px solid #eee;">RobotWare</td>
+    <td style="border-bottom:1px solid #eee;">6.16.0025</td>
+    <td style="border-bottom:1px solid #eee;">6.16.1028</td>
+  </tr>
+  <tr>
+    <td style="font-weight:bold;color:#555;border-bottom:1px solid #eee;">Background Task</td>
+    <td style="border-bottom:1px solid #eee;">TASK9 / T_BG</td>
+    <td style="border-bottom:1px solid #eee;">TASK7 / T_BG</td>
+  </tr>
+  <tr style="background:#f8f9fa;">
+    <td style="font-weight:bold;color:#555;border-bottom:1px solid #eee;">Static.mod 크기</td>
+    <td style="border-bottom:1px solid #eee;">436줄 (완전한 모듈)</td>
+    <td style="border-bottom:1px solid #eee;color:#e74c3c;font-weight:bold;">48줄 (빈 껍데기)</td>
+  </tr>
+  <tr>
+    <td style="font-weight:bold;color:#555;border-bottom:1px solid #eee;">Mechanical Unit명</td>
+    <td style="border-bottom:1px solid #eee;">GantryRob_7</td>
+    <td style="border-bottom:1px solid #eee;">GantryRob</td>
+  </tr>
+  <tr style="background:#f8f9fa;">
+    <td style="font-weight:bold;color:#555;">UI 심볼 접근</td>
+    <td style="color:#27ae60;">정상</td>
+    <td style="color:#e74c3c;font-weight:bold;">9개 심볼 누락</td>
+  </tr>
+  </table>
+</td>
+</tr>
+
+<!-- Section 4: 작업 일지 -->
+<tr>
+<td style="padding:28px 32px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-left:4px solid #8e44ad;padding-left:16px;margin-bottom:20px;">
+  <tr><td style="font-size:17px;font-weight:bold;color:#1a5276;">4. 일자별 작업 내역</td></tr>
+  </table>
+
+  <!-- Day 1 -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+  <tr>
+    <td style="background:#2c3e50;color:#fff;padding:10px 16px;font-size:14px;font-weight:bold;border-radius:4px 4px 0 0;">
+      2026-02-11 (화) - 오류 분석 및 RAPID 코드 작성
+    </td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #ddd;border-top:none;padding:16px;border-radius:0 0 4px 4px;">
+      <table width="100%" cellpadding="6" cellspacing="0" style="font-size:12px;">
+      <tr>
+        <td style="width:80px;font-weight:bold;color:#8e44ad;vertical-align:top;border-bottom:1px solid #f0f0f0;">21:33</td>
+        <td style="border-bottom:1px solid #f0f0f0;">
+          <strong>Static.mod 완성본 작성</strong> (Git: 7773e0d8)<br>
+          <span style="color:#666;">
+          - PlanA TASK9의 Static.mod를 PlanB TASK7 구조에 맞게 포팅<br>
+          - 48줄 &rarr; 436줄로 확장<br>
+          - 4개 RECORD 정의: monRobs, StatusWeld, pointgroup, targetdata<br>
+          - UI 필수 PERS 변수 4개: MonitorPosition, nTorques{18}, stWeld1, stWeld2<br>
+          - 공유 PERS 변수 약 50개 + 유틸리티 함수 3개 + main() 루프
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#8e44ad;vertical-align:top;">22:53</td>
+        <td>
+          <strong>오류 분석 보고서 작성 및 메일 발송</strong> (Git: acfe248c, 27406a78)<br>
+          <span style="color:#666;">
+          - HTML 형식 상세 보고서 작성 (원인 분석, 수정 내역, 검증 방법)<br>
+          - 삼성중공업 보고용 메일 초안 작성
+          </span>
+        </td>
+      </tr>
+      </table>
+    </td>
+  </tr>
+  </table>
+
+  <!-- Day 2 -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+  <tr>
+    <td style="background:#2c3e50;color:#fff;padding:10px 16px;font-size:14px;font-weight:bold;border-radius:4px 4px 0 0;">
+      2026-02-12 (수) - RobotStudio 적용 및 검증
+    </td>
+  </tr>
+  <tr>
+    <td style="border:1px solid #ddd;border-top:none;padding:16px;border-radius:0 0 4px 4px;">
+      <table width="100%" cellpadding="6" cellspacing="0" style="font-size:12px;">
+      <tr>
+        <td style="width:80px;font-weight:bold;color:#8e44ad;vertical-align:top;border-bottom:1px solid #f0f0f0;">10:18</td>
+        <td style="border-bottom:1px solid #f0f0f0;">
+          <strong>보고서 가독성 개선 및 메일 재발송</strong> (Git: 1136d5b2)<br>
+          <span style="color:#666;">
+          - 메일 클라이언트에서 줄바꿈이 안 되는 문제 수정<br>
+          - CSS: white-space:pre-wrap, table-layout:fixed 적용<br>
+          - ASCII 다이어그램을 HTML 테이블로 변환
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#8e44ad;vertical-align:top;border-bottom:1px solid #f0f0f0;">11:00</td>
+        <td style="border-bottom:1px solid #f0f0f0;">
+          <strong style="color:#e74c3c;">오류 #1: VersionModule 구문 오류 14건</strong> (Git: 661eb8db)<br>
+          <span style="color:#666;">
+          - RobotStudio Check Program 시 T_ROB1/VersionModule에서 14개 Syntax Error<br>
+          - 원인: RAPID 파서는 ASCII만 지원 - 코멘트의 유니코드 문자 불가<br>
+          - 수정: &#x2194; &rarr; &lt;-&gt;, &#x2192; &rarr; -&gt;, &#x00B0; &rarr; deg<br>
+          - 결과: 모든 태스크 Check Program 통과
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#8e44ad;vertical-align:top;border-bottom:1px solid #f0f0f0;">11:30</td>
+        <td style="border-bottom:1px solid #f0f0f0;">
+          <strong>RobotStudio 파일 동기화</strong><br>
+          <span style="color:#666;">
+          - Git 레포의 수정본이 RobotStudio 가상 컨트롤러에 미반영 확인<br>
+          - WSL /mnt/c/ 경로를 통해 백업 전체 복사<br>
+          - Backups, Virtual Controllers RECOVERY 경로에 배포
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#8e44ad;vertical-align:top;border-bottom:1px solid #f0f0f0;">11:51</td>
+        <td style="border-bottom:1px solid #f0f0f0;">
+          <strong style="color:#e74c3c;">오류 #2: GantryRob_7 참조 오류</strong> (Git: 661eb8db)<br>
+          <span style="color:#666;">
+          - T_BG/Static(297)에서 GantryRob_7 unknown 오류<br>
+          - 원인: PlanA는 GantryRob_7, PlanB는 GantryRob (MOC.cfg 확인)<br>
+          - 수정: GetMotorTorque(\mecunit:=GantryRob_7,...) &rarr; GantryRob
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#8e44ad;vertical-align:top;border-bottom:1px solid #f0f0f0;">12:02</td>
+        <td style="border-bottom:1px solid #f0f0f0;">
+          <strong style="color:#e74c3c;">UI 연동 1차 시도 - Fail 4건</strong><br>
+          <span style="color:#666;">
+          - T_BG의 Static 모듈에 컴파일 에러가 남아 PERS 변수 접근 불가<br>
+          - MonitorPosition, nTorques, stWeld1, stWeld2 모두 symbol not found
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#8e44ad;vertical-align:top;border-bottom:1px solid #f0f0f0;">14:00</td>
+        <td style="border-bottom:1px solid #f0f0f0;">
+          <strong style="color:#e74c3c;">오류 #3: T_ROB1 targetdata 중복</strong><br>
+          <span style="color:#666;">
+          - Rob2_MainModule이 T_ROB1에 잘못 로드됨 (T_ROB2 전용 모듈)<br>
+          - targetdata RECORD 정의 충돌로 Name ambiguous 오류<br>
+          - 수정: T_ROB1에서 Rob2_MainModule 언로드
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#8e44ad;vertical-align:top;border-bottom:1px solid #f0f0f0;">14:05</td>
+        <td style="border-bottom:1px solid #f0f0f0;">
+          <strong style="color:#e74c3c;">오류 #4: T_BG Static 모듈 재로드</strong><br>
+          <span style="color:#666;">
+          - 디스크 파일은 수정 완료되었으나 RobotStudio 메모리에 구버전 로드 상태<br>
+          - Static.mod를 PROGMOD로 재로드 (SYSMOD가 아닌 프로그램 모듈로)<br>
+          - Check Program 5개 태스크 전체 No errors 확인
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#8e44ad;vertical-align:top;border-bottom:1px solid #f0f0f0;">15:05</td>
+        <td style="border-bottom:1px solid #f0f0f0;">
+          <strong style="color:#e74c3c;">오류 #5: T_BG main 심볼 미발견</strong><br>
+          <span style="color:#666;">
+          - Check Program 통과 후 실행 시 "RAPID symbol 'main' in 'T_BG' was not found"<br>
+          - 원인: Program Pointer(PP)가 main에 설정되지 않음<br>
+          - 수정: PP를 Main Routine으로 리셋
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;color:#27ae60;vertical-align:top;">15:06</td>
+        <td>
+          <strong style="color:#27ae60;font-size:13px;">UI 연동 성공 - Fail 0건</strong><br>
+          <span style="color:#666;">
+          - 프로그램 실행 후 UI 연동 테스트 성공<br>
+          - RapidInitFailReport 미갱신 (실패 없음)<br>
+          - 4개 UI 핵심 심볼 모두 정상 접근 확인
+          </span>
+        </td>
+      </tr>
+      </table>
+    </td>
+  </tr>
+  </table>
+</td>
+</tr>
+
+<!-- Section 5: 수정 파일 목록 -->
+<tr>
+<td style="padding:28px 32px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-left:4px solid #16a085;padding-left:16px;margin-bottom:20px;">
+  <tr><td style="font-size:17px;font-weight:bold;color:#1a5276;">5. 수정 파일 및 Git 이력</td></tr>
+  </table>
+  <table width="100%" cellpadding="6" cellspacing="0" style="border:1px solid #ddd;border-radius:4px;font-size:12px;">
+  <tr style="background:#34495e;color:#fff;">
+    <td style="font-weight:bold;">파일</td>
+    <td style="font-weight:bold;width:220px;">수정 내용</td>
+    <td style="font-weight:bold;width:80px;">Git 커밋</td>
+  </tr>
+  <tr style="background:#f8f9fa;">
+    <td style="border-bottom:1px solid #eee;font-family:monospace;font-size:11px;">TASK7/PROGMOD/Static.mod</td>
+    <td style="border-bottom:1px solid #eee;">48줄 &rarr; 436줄 완성본<br>GantryRob_7 &rarr; GantryRob</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">7773e0d8<br>661eb8db</td>
+  </tr>
+  <tr>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;font-size:11px;">TASK1/PROGMOD/VersionModule.mod</td>
+    <td style="border-bottom:1px solid #eee;">유니코드 문자 ASCII 대체<br>(14개 구문 오류 해결)</td>
+    <td style="border-bottom:1px solid #eee;font-family:monospace;">661eb8db</td>
+  </tr>
+  <tr style="background:#f8f9fa;">
+    <td style="font-family:monospace;font-size:11px;">RobotStudio 설정</td>
+    <td>Rob2_MainModule T_ROB1 제거<br>T_BG PP 리셋</td>
+    <td style="color:#999;">런타임 조치</td>
+  </tr>
+  </table>
+</td>
+</tr>
+
+<!-- Section 6: 발견된 이슈 및 교훈 -->
+<tr>
+<td style="padding:28px 32px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-left:4px solid #d35400;padding-left:16px;margin-bottom:20px;">
+  <tr><td style="font-size:17px;font-weight:bold;color:#1a5276;">6. 발견된 이슈 및 향후 주의사항</td></tr>
+  </table>
+  <table width="100%" cellpadding="10" cellspacing="0" style="font-size:12px;">
+  <tr>
+    <td style="background:#fef9e7;border:1px solid #f9e79f;border-radius:4px;padding:12px 16px;margin-bottom:8px;">
+      <strong style="color:#d35400;">1. PlanA/PlanB Mechanical Unit명 차이</strong><br>
+      <span style="color:#666;">PlanA는 GantryRob_7, PlanB는 GantryRob입니다.
+      향후 PlanA 코드를 PlanB로 포팅할 때 MOC.cfg를 반드시 확인하여
+      Mechanical Unit 이름을 변경해야 합니다.</span>
+    </td>
+  </tr>
+  <tr><td style="height:8px;"></td></tr>
+  <tr>
+    <td style="background:#fef9e7;border:1px solid #f9e79f;border-radius:4px;padding:12px 16px;">
+      <strong style="color:#d35400;">2. RAPID 파서 ASCII 제한</strong><br>
+      <span style="color:#666;">RAPID 파서는 ASCII 문자만 지원합니다. 코멘트에도 유니코드
+      특수문자(&#x2194;, &#x2192;, &#x00B0; 등)를 사용하면 구문 오류가 발생합니다.</span>
+    </td>
+  </tr>
+  <tr><td style="height:8px;"></td></tr>
+  <tr>
+    <td style="background:#fef9e7;border:1px solid #f9e79f;border-radius:4px;padding:12px 16px;">
+      <strong style="color:#d35400;">3. 모듈 로드 타입 구분 (PROGMOD vs SYSMOD)</strong><br>
+      <span style="color:#666;">main() 함수가 포함된 모듈은 반드시 Program Module(PROGMOD)로
+      로드해야 합니다. System Module(SYSMOD)로 로드 시 Check Program은
+      통과하나 런타임에 main을 찾지 못합니다.</span>
+    </td>
+  </tr>
+  <tr><td style="height:8px;"></td></tr>
+  <tr>
+    <td style="background:#fef9e7;border:1px solid #f9e79f;border-radius:4px;padding:12px 16px;">
+      <strong style="color:#d35400;">4. 태스크별 모듈 할당 주의</strong><br>
+      <span style="color:#666;">Rob2_MainModule(T_ROB2 전용)을 T_ROB1에 로드하면
+      targetdata RECORD 정의 충돌이 발생합니다. 백업 복원 후
+      각 태스크에 올바른 모듈만 로드되었는지 확인이 필요합니다.</span>
+    </td>
+  </tr>
+  </table>
+</td>
+</tr>
+
+<!-- Section 7: Check Program 최종 결과 -->
+<tr>
+<td style="padding:28px 32px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-left:4px solid #27ae60;padding-left:16px;margin-bottom:20px;">
+  <tr><td style="font-size:17px;font-weight:bold;color:#1a5276;">7. 최종 Check Program 결과</td></tr>
+  </table>
+  <table width="100%" cellpadding="8" cellspacing="0" style="border:1px solid #ddd;border-radius:4px;font-size:13px;">
+  <tr style="background:#27ae60;color:#fff;">
+    <td style="font-weight:bold;width:140px;">태스크</td>
+    <td style="font-weight:bold;width:80px;">결과</td>
+    <td style="font-weight:bold;">비고</td>
+  </tr>
+  <tr style="background:#eafaf1;">
+    <td style="border-bottom:1px solid #eee;font-weight:bold;">T_ROB1</td>
+    <td style="border-bottom:1px solid #eee;color:#27ae60;">No errors</td>
+    <td style="border-bottom:1px solid #eee;">Rob2_MainModule 제거 후 정상</td>
+  </tr>
+  <tr>
+    <td style="border-bottom:1px solid #eee;font-weight:bold;">T_ROB2</td>
+    <td style="border-bottom:1px solid #eee;color:#27ae60;">No errors</td>
+    <td style="border-bottom:1px solid #eee;">-</td>
+  </tr>
+  <tr style="background:#eafaf1;">
+    <td style="border-bottom:1px solid #eee;font-weight:bold;">T_BG</td>
+    <td style="border-bottom:1px solid #eee;color:#27ae60;">No errors</td>
+    <td style="border-bottom:1px solid #eee;">Static.mod 재로드 + PP 리셋</td>
+  </tr>
+  <tr>
+    <td style="border-bottom:1px solid #eee;font-weight:bold;">T_Head</td>
+    <td style="border-bottom:1px solid #eee;color:#27ae60;">No errors</td>
+    <td style="border-bottom:1px solid #eee;">-</td>
+  </tr>
+  <tr style="background:#eafaf1;">
+    <td style="font-weight:bold;">T_Teaching</td>
+    <td style="color:#27ae60;">No errors</td>
+    <td>-</td>
+  </tr>
+  </table>
+</td>
+</tr>
+
+<!-- Footer -->
+<tr>
+<td style="padding:28px 32px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="border-top:2px solid #eee;padding-top:20px;">
+  <tr>
+    <td style="font-size:12px;color:#888;line-height:1.6;">
+      <strong style="color:#555;">심태양</strong> / 에스피시스템스<br>
+      S25016 삼성중공업 거제조선소 34Bay 자동용접 로봇 시스템<br>
+      작성일: 2026-02-12
+    </td>
+  </tr>
+  </table>
+</td>
+</tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>
