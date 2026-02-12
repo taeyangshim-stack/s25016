@@ -168,13 +168,28 @@ MODULE Static
 
     FUNC robtarget CalcCurrentTcp(\switch R1|switch R2)
         VAR robtarget result:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+        VAR robtarget pR2;
+        VAR num gantryAngle;
+        VAR num nRotX;
+        VAR num nRotY;
 
         IF Present(R1)=TRUE THEN
             result:=CRobT(\taskname:="T_ROB1"\Tool:=tWeld1\WObj:=WobjFloor);
         ENDIF
 
         IF Present(R2)=TRUE THEN
-            result:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=WobjFloor);
+            ! R2 not configured with gantry - manual floor coordinate calculation
+            ! R2 base_frame_orient inverts Z axis, so Z sign must be corrected
+            pR2:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobj0);
+            gantryAngle:=MonitorPosition.monExt.eax_d;
+
+            nRotX:=(pR2.trans.x*Cos(gantryAngle))-(pR2.trans.y*Sin(gantryAngle));
+            nRotY:=(pR2.trans.x*Sin(gantryAngle))+(pR2.trans.y*Cos(gantryAngle));
+
+            result:=pR2;
+            result.trans.x:=MonitorPosition.monExt.eax_a+nRotX;
+            result.trans.y:=MonitorPosition.monExt.eax_b-nRotY;
+            result.trans.z:=MonitorPosition.monExt.eax_c+pR2.trans.z;
         ENDIF
 
         RETURN result;
