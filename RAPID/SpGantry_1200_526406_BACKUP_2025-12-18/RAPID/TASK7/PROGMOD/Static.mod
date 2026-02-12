@@ -123,6 +123,14 @@ MODULE Static
     PERS wobjdata wobjRotCtr1;
     PERS wobjdata wobjRotCtr2;
 
+    ! --- TCP Diagnostic Variables (temporary) ---
+    PERS robtarget pDiag_RotCtr_R1:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    PERS robtarget pDiag_wobj0_R1:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    PERS robtarget pDiag_Floor_R1:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    PERS robtarget pDiag_RotCtr_R2:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    PERS robtarget pDiag_wobj0_R2:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+    PERS robtarget pDiag_Floor_R2:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
+
     PERS num nclockCycleTime;
     PERS num nclockWeldTime{2};
     PERS targetdata Welds1{40};
@@ -287,6 +295,14 @@ MODULE Static
 
         MonitorPosition.monPose2.trans:=pct2.trans;
         MonitorPosition.monPose2.rot:=pct2.rot;
+
+        ! --- TCP Diagnostic: Compare 3 workobjects ---
+        pDiag_RotCtr_R1:=CRobT(\taskname:="T_ROB1"\Tool:=tWeld1\WObj:=wobjRotCtr1);
+        pDiag_wobj0_R1:=CRobT(\taskname:="T_ROB1"\Tool:=tWeld1\WObj:=wobj0);
+        pDiag_Floor_R1:=CRobT(\taskname:="T_ROB1"\Tool:=tWeld1\WObj:=WobjFloor);
+        pDiag_RotCtr_R2:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobjRotCtr2);
+        pDiag_wobj0_R2:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobj0);
+        pDiag_Floor_R2:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=WobjFloor);
 
         SetAO cgo05_AxisX_Current,Round(MonitorPosition.monExt.eax_a);
         RETURN ;
