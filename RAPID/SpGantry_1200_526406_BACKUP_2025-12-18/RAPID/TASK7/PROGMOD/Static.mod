@@ -123,14 +123,6 @@ MODULE Static
     PERS wobjdata wobjRotCtr1;
     PERS wobjdata wobjRotCtr2;
 
-    ! --- TCP Diagnostic Variables (temporary) ---
-    PERS robtarget pDiag_RotCtr_R1:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-    PERS robtarget pDiag_wobj0_R1:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-    PERS robtarget pDiag_Floor_R1:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-    PERS robtarget pDiag_RotCtr_R2:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-    PERS robtarget pDiag_wobj0_R2:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-    PERS robtarget pDiag_Floor_R2:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
-
     PERS num nclockCycleTime;
     PERS num nclockWeldTime{2};
     PERS targetdata Welds1{40};
@@ -175,35 +167,15 @@ MODULE Static
     ENDFUNC
 
     FUNC robtarget CalcCurrentTcp(\switch R1|switch R2)
-        VAR robtarget pRob;
-        VAR num nGantryX;
-        VAR num nGantryY;
-        VAR num nGantryZ;
-        VAR num nRobotX;
-        VAR num nRobotY;
-        VAR num gantryAngle;
         VAR robtarget result:=[[0,0,0],[1,0,0,0],[0,0,0,0],[0,0,0,0,0,0]];
 
-        nGantryX:=MonitorPosition.monExt.eax_a;
-        nGantryY:=MonitorPosition.monExt.eax_b;
-        nGantryZ:=MonitorPosition.monExt.eax_c;
-        gantryAngle:=MonitorPosition.monExt.eax_d;
-
         IF Present(R1)=TRUE THEN
-            pRob:=CRobT(\taskname:="T_Rob1"\Tool:=tWeld1\WObj:=wobjRotCtr1);
+            result:=CRobT(\taskname:="T_ROB1"\Tool:=tWeld1\WObj:=WobjFloor);
         ENDIF
 
         IF Present(R2)=TRUE THEN
-            pRob:=CRobT(\taskname:="T_Rob2"\Tool:=tWeld2\WObj:=wobjRotCtr2);
+            result:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=WobjFloor);
         ENDIF
-
-        nRobotX:=(pRob.trans.x*Cos(gantryAngle))-(pRob.trans.y*Sin(gantryAngle));
-        nRobotY:=(pRob.trans.x*Sin(gantryAngle))+(pRob.trans.y*Cos(gantryAngle));
-
-        result:=pRob;
-        result.trans.x:=nGantryX+nRobotX;
-        result.trans.y:=nGantryY+nRobotY;
-        result.trans.z:=nGantryZ-(-1*pRob.trans.z);
 
         RETURN result;
     ENDFUNC
@@ -295,14 +267,6 @@ MODULE Static
 
         MonitorPosition.monPose2.trans:=pct2.trans;
         MonitorPosition.monPose2.rot:=pct2.rot;
-
-        ! --- TCP Diagnostic: Compare 3 workobjects ---
-        pDiag_RotCtr_R1:=CRobT(\taskname:="T_ROB1"\Tool:=tWeld1\WObj:=wobjRotCtr1);
-        pDiag_wobj0_R1:=CRobT(\taskname:="T_ROB1"\Tool:=tWeld1\WObj:=wobj0);
-        pDiag_Floor_R1:=CRobT(\taskname:="T_ROB1"\Tool:=tWeld1\WObj:=WobjFloor);
-        pDiag_RotCtr_R2:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobjRotCtr2);
-        pDiag_wobj0_R2:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobj0);
-        pDiag_Floor_R2:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=WobjFloor);
 
         SetAO cgo05_AxisX_Current,Round(MonitorPosition.monExt.eax_a);
         RETURN ;
