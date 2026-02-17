@@ -2,14 +2,15 @@ MODULE ConfigModule
 ! ========================================
 ! S25016 SpGantry Configuration Module
 ! ========================================
-! Version: v1.9.40
-! Date: 2026-02-06
+! Version: v1.9.41
+! Date: 2026-02-18
 ! Purpose: Centralized configuration using PERS variables
 ! v1.9.0: Added weld sequence configuration
 ! v1.9.1: Fixed R-axis (X+=0°), added WObj positions, 45° torch
 ! v2.0.0: Added Edge points and Home/Limit configuration
 ! v2.1.0: Added PlanA-style command interface (nCmdInput/nCmdOutput)
 ! v2.2.0: Added PlanA data structures (edgedata, targetdata, corrorder)
+! v1.9.41: PlanC Phase 1 - nMotionStepCount default [6,6] for 40-segment path
 ! v1.9.40: PlanA-PlanB variable integration complete
 !   - Changed variable names to PlanA style (nLimitX_Negative, etc.)
 !   - Added dual HOME variables (internal + UI interface)
@@ -227,8 +228,8 @@ PERS num nWeldStepCount := 2;
 
 ! Motion control parameters
 PERS num nMotionStep := 5;              ! Current motion step index
-PERS num nMotionTotalStep{2} := [2, 2]; ! Total steps per robot
-PERS num nMotionStepCount{2} := [4, 4]; ! Step counter per robot
+PERS num nMotionTotalStep{2} := [6, 6]; ! Total steps per robot (PlanC: 40-segment capable)
+PERS num nMotionStepCount{2} := [6, 6]; ! Active step count per robot (PlanC: default 6)
 PERS num nRunningStep{2} := [4, 4];     ! Current running step
 
 ! Weld enable flags
