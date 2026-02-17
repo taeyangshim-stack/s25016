@@ -1,0 +1,121 @@
+%%%
+  VERSION: 1
+  LANGUAGE: ENGLISH
+%%%
+
+MODULE ppaUser (SYSMODULE)
+  !***********************************************************
+  !
+  ! Module: ppaUser
+  !
+  !
+  ! Description
+  !   This is the additional system module for a pick and 
+  !   place application. 
+  !
+  ! Copyright (c) ABB Automation Technology Products 2002.
+  ! All rights reserved
+  !
+  !***********************************************************
+
+  !
+  ! Record datatype to hold datas which is specific for one work area.
+  ! New data can be added to this record, but DO NOT delete any!
+  !
+  RECORD sourcedata
+    bool Used;
+    itmsrc ItemSource;
+    itmsrctype SourceType;
+    triggdata Ack;
+    triggdata Nack;
+    triggdata VacuumAct1;
+    triggdata VacuumAct2;
+    triggdata VacuumAct3;
+    triggdata VacuumAct4;
+    triggdata VacuumRev1;
+    triggdata VacuumRev2;
+    triggdata VacuumRev3;
+    triggdata VacuumRev4;
+    triggdata VacuumOff1;
+    triggdata VacuumOff2;
+    triggdata VacuumOff3;
+    triggdata VacuumOff4;
+    triggdata SimAttach1;
+    triggdata SimAttach2;
+    triggdata SimAttach3;
+    triggdata SimAttach4;
+    triggdata SimDetach1;
+    triggdata SimDetach2;
+    triggdata SimDetach3;
+    triggdata SimDetach4;
+    wobjdata Wobj;
+    num VacActDelay;
+    num VacRevDelay;
+    num VacOffDelay;
+    pos TunePos;
+    stoppointdata TrackPoint;
+    num OffsZ;
+  ENDRECORD
+  
+  !
+  ! Record datatype to hold indexed or fixed workarea datas which is
+  ! specific for a work area.
+  ! This is used instead of the baseframe calibrations for conveyors,
+  ! which is stored in cfg, when a indexed or fixed workarea is used.
+  !
+  RECORD noncnvwobjdata
+    bool Used;
+    string NonCnvWobjName;
+    wobjdata Wobj;
+  ENDRECORD
+  
+  !
+  ! Array for holding hold datas which is specific for the work areas.
+  !
+  VAR sourcedata ItmSrcData{MaxNoSources};
+  !
+  ! Array for holding the non conveyor workobject data i.e. this is
+  ! used instead of the baseframe configurations for the conveyors.
+  !
+  PERS noncnvwobjdata NonCnvWOData{MaxNoSources}:=[[FALSE,"IdxWobj1",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj2",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj3",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj4",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj5",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj6",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj7",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj8",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj9",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj10",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj11",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj12",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj13",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj14",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj15",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj16",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj17",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj18",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj19",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj20",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj21",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj22",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj23",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj24",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]],
+                                                   [FALSE,"IdxWobj25",[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]]];
+
+  !
+  ! Default gripper to use in application
+  !
+  TASK PERS tooldata Gripper:=[TRUE,[[0,0,0],[1,0,0,0]],[0.1,[0,0,0.001],[1,0,0,0],0,0,0]];                                                 
+  TASK PERS tooldata PickAct1:=[TRUE,[[0,0,0],[1,0,0,0]],[0.1,[0,0,0.001],[1,0,0,0],0,0,0]];                                                 
+  TASK PERS tooldata PickAct2:=[TRUE,[[0,0,0],[1,0,0,0]],[0.1,[0,0,0.001],[1,0,0,0],0,0,0]];                                                 
+  TASK PERS tooldata PickAct3:=[TRUE,[[0,0,0],[1,0,0,0]],[0.1,[0,0,0.001],[1,0,0,0],0,0,0]];                                                 
+  TASK PERS tooldata PickAct4:=[TRUE,[[0,0,0],[1,0,0,0]],[0.1,[0,0,0.001],[1,0,0,0],0,0,0]];                                                 
+  TASK PERS tooldata PlaceAll:=[TRUE,[[0,0,0],[1,0,0,0]],[0.1,[0,0,0.001],[1,0,0,0],0,0,0]];                                                 
+
+ENDMODULE
+
+
+
+
+

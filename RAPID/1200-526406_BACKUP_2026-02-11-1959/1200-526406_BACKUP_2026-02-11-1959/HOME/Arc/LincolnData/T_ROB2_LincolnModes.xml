@@ -1,0 +1,1118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LincolnWeldModes xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <CreationDate>2025-10-14T19:28:42.9109613+09:00</CreationDate>
+  <WeldSetCheckSum>29269220</WeldSetCheckSum>
+  <WeldSetFileName>Z245301</WeldSetFileName>
+  <WelderModelNumber>Power Wave R450</WelderModelNumber>
+  <WorkPointInAmps>false</WorkPointInAmps>
+  <TrimInVolts>false</TrimInVolts>
+  <SelectedWeldSet>0</SelectedWeldSet>
+  <AutoDriveFeederEnabled>false</AutoDriveFeederEnabled>
+  <AutoDriveFeederType>0</AutoDriveFeederType>
+  <List>
+    <WeldModeParameters>
+      <WeldMode>5</WeldMode>
+      <ProcessDescription>STD CV</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>104</WireType>
+      <WireSize>0</WireSize>
+      <GasType>0</GasType>
+      <SynergicWireFeedSpeed>false</SynergicWireFeedSpeed>
+      <PulseProcedure>false</PulseProcedure>
+      <TrimWorkPointDependent>true</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>30</MinimumValue>
+        <MaximumValue>1230</MaximumValue>
+        <NominalValue>630</NominalValue>
+        <WorkPoint>500</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>WorkPont</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>100</MinimumValue>
+        <MaximumValue>450</MaximumValue>
+        <NominalValue>275</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Workpoint</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Pinch</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>10</WeldMode>
+      <ProcessDescription>CV CO2</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>4</WireSize>
+      <GasType>32</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>false</PulseProcedure>
+      <TrimWorkPointDependent>true</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>50</MinimumValue>
+        <MaximumValue>1200</MaximumValue>
+        <NominalValue>625</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>true</Enabled>
+        <MinimumValue>110</MinimumValue>
+        <MaximumValue>229</MaximumValue>
+        <NominalValue>170</NominalValue>
+        <WorkPoint>50</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>179</MinimumValue>
+        <MaximumValue>372</MaximumValue>
+        <NominalValue>276</NominalValue>
+        <WorkPoint>625</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>true</Enabled>
+        <MinimumValue>234</MinimumValue>
+        <MaximumValue>486</MaximumValue>
+        <NominalValue>360</NominalValue>
+        <WorkPoint>1200</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Pinch</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>11</WeldMode>
+      <ProcessDescription>CV ArMix</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>4</WireSize>
+      <GasType>160</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>false</PulseProcedure>
+      <TrimWorkPointDependent>true</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>50</MinimumValue>
+        <MaximumValue>1055</MaximumValue>
+        <NominalValue>552</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>true</Enabled>
+        <MinimumValue>91</MinimumValue>
+        <MaximumValue>189</MaximumValue>
+        <NominalValue>140</NominalValue>
+        <WorkPoint>50</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>182</MinimumValue>
+        <MaximumValue>378</MaximumValue>
+        <NominalValue>280</NominalValue>
+        <WorkPoint>552</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>true</Enabled>
+        <MinimumValue>224</MinimumValue>
+        <MaximumValue>466</MaximumValue>
+        <NominalValue>345</NominalValue>
+        <WorkPoint>1055</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Pinch</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>12</WeldMode>
+      <ProcessDescription>Pulse ArMix</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>4</WireSize>
+      <GasType>160</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>true</PulseProcedure>
+      <TrimWorkPointDependent>false</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>60</MinimumValue>
+        <MaximumValue>1200</MaximumValue>
+        <NominalValue>630</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>50</MinimumValue>
+        <MaximumValue>150</MaximumValue>
+        <NominalValue>100</NominalValue>
+        <WorkPoint>630</WorkPoint>
+        <DecimalPlaces>2</DecimalPlaces>
+        <Name>Trim</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>UltimArc</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>13</WeldMode>
+      <ProcessDescription>RapidArc ArMix</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>4</WireSize>
+      <GasType>160</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>true</PulseProcedure>
+      <TrimWorkPointDependent>false</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>60</MinimumValue>
+        <MaximumValue>1200</MaximumValue>
+        <NominalValue>630</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>50</MinimumValue>
+        <MaximumValue>150</MaximumValue>
+        <NominalValue>100</NominalValue>
+        <WorkPoint>630</WorkPoint>
+        <DecimalPlaces>2</DecimalPlaces>
+        <Name>Trim</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>UltimArc</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>18</WeldMode>
+      <ProcessDescription>RapidArc  ArMix</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>5</WireSize>
+      <GasType>160</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>true</PulseProcedure>
+      <TrimWorkPointDependent>false</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>75</MinimumValue>
+        <MaximumValue>635</MaximumValue>
+        <NominalValue>355</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>50</MinimumValue>
+        <MaximumValue>150</MaximumValue>
+        <NominalValue>100</NominalValue>
+        <WorkPoint>355</WorkPoint>
+        <DecimalPlaces>2</DecimalPlaces>
+        <Name>Trim</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>UltimArc</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>20</WeldMode>
+      <ProcessDescription>CV CO2</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>5</WireSize>
+      <GasType>32</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>false</PulseProcedure>
+      <TrimWorkPointDependent>true</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>50</MinimumValue>
+        <MaximumValue>550</MaximumValue>
+        <NominalValue>300</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>true</Enabled>
+        <MinimumValue>113</MinimumValue>
+        <MaximumValue>236</MaximumValue>
+        <NominalValue>175</NominalValue>
+        <WorkPoint>50</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>156</MinimumValue>
+        <MaximumValue>324</MaximumValue>
+        <NominalValue>240</NominalValue>
+        <WorkPoint>300</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>true</Enabled>
+        <MinimumValue>214</MinimumValue>
+        <MaximumValue>445</MaximumValue>
+        <NominalValue>330</NominalValue>
+        <WorkPoint>550</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Pinch</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>21</WeldMode>
+      <ProcessDescription>CV ArMix</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>5</WireSize>
+      <GasType>160</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>false</PulseProcedure>
+      <TrimWorkPointDependent>true</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>50</MinimumValue>
+        <MaximumValue>490</MaximumValue>
+        <NominalValue>270</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>true</Enabled>
+        <MinimumValue>94</MinimumValue>
+        <MaximumValue>195</MaximumValue>
+        <NominalValue>145</NominalValue>
+        <WorkPoint>50</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>139</MinimumValue>
+        <MaximumValue>290</MaximumValue>
+        <NominalValue>215</NominalValue>
+        <WorkPoint>270</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>true</Enabled>
+        <MinimumValue>191</MinimumValue>
+        <MaximumValue>398</MaximumValue>
+        <NominalValue>295</NominalValue>
+        <WorkPoint>490</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Volts</Name>
+        <Type>Trim</Type>
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Pinch</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>22</WeldMode>
+      <ProcessDescription>Pulse ArMix</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>5</WireSize>
+      <GasType>160</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>true</PulseProcedure>
+      <TrimWorkPointDependent>false</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>50</MinimumValue>
+        <MaximumValue>550</MaximumValue>
+        <NominalValue>300</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>50</MinimumValue>
+        <MaximumValue>150</MaximumValue>
+        <NominalValue>100</NominalValue>
+        <WorkPoint>300</WorkPoint>
+        <DecimalPlaces>2</DecimalPlaces>
+        <Name>Trim</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>UltimArc</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>40</WeldMode>
+      <ProcessDescription>Power Mode</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>15</WireType>
+      <WireSize>0</WireSize>
+      <GasType>0</GasType>
+      <SynergicWireFeedSpeed>false</SynergicWireFeedSpeed>
+      <PulseProcedure>false</PulseProcedure>
+      <TrimWorkPointDependent>false</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>30</MinimumValue>
+        <MaximumValue>1230</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>500</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WorkPont</Name>
+        <Type>IPM</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>10</MinimumValue>
+        <MaximumValue>1100</MaximumValue>
+        <NominalValue>555</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>2</DecimalPlaces>
+        <Name>Power</Name>
+        <Type>Workpoint</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Pinch</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>411</WeldMode>
+      <ProcessDescription>PrecPulse ArMix</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>4</WireSize>
+      <GasType>160</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>true</PulseProcedure>
+      <TrimWorkPointDependent>true</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>100</MinimumValue>
+        <MaximumValue>600</MaximumValue>
+        <NominalValue>350</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>true</Enabled>
+        <MinimumValue>87</MinimumValue>
+        <MaximumValue>262</MaximumValue>
+        <NominalValue>175</NominalValue>
+        <WorkPoint>100</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Voltage</Name>
+        <Type>Trim</Type>
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>116</MinimumValue>
+        <MaximumValue>348</MaximumValue>
+        <NominalValue>232</NominalValue>
+        <WorkPoint>350</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Voltage</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>true</Enabled>
+        <MinimumValue>140</MinimumValue>
+        <MaximumValue>420</MaximumValue>
+        <NominalValue>280</NominalValue>
+        <WorkPoint>600</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Voltage</Name>
+        <Type>Trim</Type>
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Ultimarc</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+    <WeldModeParameters>
+      <WeldMode>413</WeldMode>
+      <ProcessDescription>PrecPulse ArMix</ProcessDescription>
+      <FileID>0</FileID>
+      <WeldProcessType>3</WeldProcessType>
+      <WireType>2</WireType>
+      <WireSize>5</WireSize>
+      <GasType>160</GasType>
+      <SynergicWireFeedSpeed>true</SynergicWireFeedSpeed>
+      <PulseProcedure>true</PulseProcedure>
+      <TrimWorkPointDependent>true</TrimWorkPointDependent>
+      <WorkPoint>
+        <Enabled>true</Enabled>
+        <MinimumValue>75</MinimumValue>
+        <MaximumValue>600</MaximumValue>
+        <NominalValue>337</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name>WFS</Name>
+        <Type>Workpoint</Type>
+      </WorkPoint>
+      <TrimMin>
+        <Enabled>true</Enabled>
+        <MinimumValue>90</MinimumValue>
+        <MaximumValue>270</MaximumValue>
+        <NominalValue>180</NominalValue>
+        <WorkPoint>75</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Voltage</Name>
+        <Type>Trim</Type>
+      </TrimMin>
+      <TrimNom>
+        <Enabled>true</Enabled>
+        <MinimumValue>122</MinimumValue>
+        <MaximumValue>368</MaximumValue>
+        <NominalValue>245</NominalValue>
+        <WorkPoint>337</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Voltage</Name>
+        <Type>Trim</Type>
+      </TrimNom>
+      <TrimMax>
+        <Enabled>true</Enabled>
+        <MinimumValue>147</MinimumValue>
+        <MaximumValue>442</MaximumValue>
+        <NominalValue>295</NominalValue>
+        <WorkPoint>600</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Voltage</Name>
+        <Type>Trim</Type>
+      </TrimMax>
+      <Wave1>
+        <Enabled>true</Enabled>
+        <MinimumValue>-100</MinimumValue>
+        <MaximumValue>100</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>1</DecimalPlaces>
+        <Name>Ultimarc</Name>
+        <Type>Wave1</Type>
+      </Wave1>
+      <Wave2>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave2>
+      <Wave3>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave3>
+      <Wave4>
+        <Enabled>false</Enabled>
+        <MinimumValue>0</MinimumValue>
+        <MaximumValue>0</MaximumValue>
+        <NominalValue>0</NominalValue>
+        <WorkPoint>0</WorkPoint>
+        <DecimalPlaces>0</DecimalPlaces>
+        <Name />
+        <Type />
+      </Wave4>
+    </WeldModeParameters>
+  </List>
+</LincolnWeldModes>

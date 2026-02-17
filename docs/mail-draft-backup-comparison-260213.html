@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[S25016] RAPID 백업 비교분석 (12/23 vs 02/11)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Malgun Gothic', 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%);
+            color: #fff;
+            padding: 22px 28px;
+        }
+        .header h1 { font-size: 1.2rem; margin-bottom: 5px; letter-spacing: -0.5px; }
+        .header .meta { font-size: 0.85rem; color: #8bb8e8; }
+
+        .content { padding: 28px; line-height: 1.8; font-size: 0.93rem; }
+
+        .section { margin-bottom: 26px; }
+        .section-title {
+            background: #f0f9ff;
+            border-left: 4px solid #2563eb;
+            padding: 9px 14px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            color: #1e40af;
+            font-size: 0.98rem;
+        }
+        .section-title.green { background: #f0fdf4; border-left-color: #16a34a; color: #166534; }
+        .section-title.orange { background: #fffbeb; border-left-color: #f59e0b; color: #92400e; }
+        .section-title.purple { background: #faf5ff; border-left-color: #8b5cf6; color: #5b21b6; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin: 8px 0 14px; }
+        th { background: #f1f5f9; padding: 7px 10px; border: 1px solid #e2e8f0; text-align: center; font-weight: 600; color: #475569; }
+        td { padding: 7px 10px; border: 1px solid #e2e8f0; }
+        tr:nth-child(even) { background: #f9fafb; }
+
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+        .badge-new { background: #dcfce7; color: #166534; }
+        .badge-mod { background: #fef3c7; color: #92400e; }
+        .badge-del { background: #fee2e2; color: #991b1b; }
+        .badge-cfg { background: #e0e7ff; color: #3730a3; }
+
+        .note-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            color: #0c4a6e;
+            margin: 12px 0;
+        }
+
+        .footer {
+            padding: 16px 28px;
+            background: #f8fafc;
+            border-top: 1px solid #eef0f5;
+        }
+        .footer .name { font-size: 0.9rem; font-weight: 700; color: #1a2030; }
+        .footer .company { font-size: 0.8rem; color: #94a3b8; margin-top: 3px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>S25016 RAPID 백업 비교분석</h1>
+        <div class="meta">1200-526406_BACKUP: 2025-12-23 vs 2026-02-11 (약 7주간 변경사항)</div>
+    </div>
+
+    <div class="content">
+
+        <!-- 1. New Files -->
+        <div class="section">
+            <div class="section-title green">1. 신규 추가 파일</div>
+            <table>
+                <tr>
+                    <th style="width:50px;">구분</th>
+                    <th style="text-align:left;">파일</th>
+                    <th style="text-align:left;">내용</th>
+                </tr>
+                <tr>
+                    <td style="text-align:center;"><span class="badge badge-new">NEW</span></td>
+                    <td><b>TASK10/CommSock.mod</b></td>
+                    <td>LDS(레이저 거리 센서) 소켓 통신 모듈 - CC_LINK 아날로그 입력으로 X/Z 에지 감지</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;"><span class="badge badge-new">NEW</span></td>
+                    <td><b>TASK7/T_Gantry_TeachingData.mod</b></td>
+                    <td>갠트리 티칭 데이터 - LDS 체크 포지션, R1/R2 노즐 클린 위치</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;"><span class="badge badge-new">NEW</span></td>
+                    <td><b>TASK8/Head_InspectMechanicalOrigin.mod</b></td>
+                    <td>기계 원점 검사 - LDS 기반 갠트리 위치 검사, 홀 카메라 센서 소켓 통신 (192.168.125.121/122)</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;"><span class="badge badge-del">DEL</span></td>
+                    <td><b>TASK7/testtt.mod</b></td>
+                    <td>임시 테스트 모듈 삭제 (MoveExtJ 1개만 포함)</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 2. Major Changes -->
+        <div class="section">
+            <div class="section-title orange">2. 주요 변경사항 (10대 항목)</div>
+            <table>
+                <tr>
+                    <th style="width:28px;">#</th>
+                    <th style="text-align:left;">영역</th>
+                    <th style="text-align:left;">변경 내용</th>
+                    <th style="width:100px;">관련 파일</th>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">1</td>
+                    <td><b>LDS 센서 통합</b></td>
+                    <td>LDS X/Z 센서 20+ 변수 추가, CC_LINK 아날로그 입력, 기계 원점 검증 기능 신규</td>
+                    <td style="font-size:0.78rem;">TASK7, TASK8, TASK10, EIO.cfg</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">2</td>
+                    <td><b>노즐 클린/스프레이</b></td>
+                    <td>R1/R2 각 8~9개 티칭 포지션 추가, CMD_WIRE_CLEAN_R1/R2 핸들러, I/O do17/18 &rarr; do15/16 이동</td>
+                    <td style="font-size:0.78rem;">TASK1/2 TeachingData, TASK8, EIO.cfg</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">3</td>
+                    <td><b>헤드 충격 안전 재설계</b></td>
+                    <td>QuickStop(개별 di17/di19) &rarr; MotorOff(통합 si_HeadShock) + 바이패스(ci016) + PLC 피드백</td>
+                    <td style="font-size:0.78rem;">EIO.cfg</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">4</td>
+                    <td><b>용접 데이터 정리</b></td>
+                    <td>R1/R2 미사용 wd5~wd40, Holdwd1~3 대량 삭제 (36+ 항목)</td>
+                    <td style="font-size:0.78rem;">TASK1/2 MainModule</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">5</td>
+                    <td><b>와이어컷 티칭 모드</b></td>
+                    <td>CMD_GotoTeachingToWirecut, R1/R2 개별 진입/복귀 명령 추가</td>
+                    <td style="font-size:0.78rem;">TASK8 MainModule</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">6</td>
+                    <td><b>갠트리 리밋 조정</b></td>
+                    <td>X: -9500&rarr;-9600 / +12300&rarr;+12400, Z: 2100&rarr;2095, 홈 포지션 연동 업데이트</td>
+                    <td style="font-size:0.78rem;">TASK8 Head_Data, MOC.cfg</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">7</td>
+                    <td><b>모터 설정 튜닝</b></td>
+                    <td>토크 한계 증가: M1DM3 25&rarr;30, M3DM3 30&rarr;40, ELM_X 25&rarr;30. 브레이크 딜레이 0.3s 추가</td>
+                    <td style="font-size:0.78rem;">MOC.cfg</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">8</td>
+                    <td><b>nMode 터치 센싱</b></td>
+                    <td>Mode 1=R1만, Mode 2=R2만, Mode 3=R1+R2 평균 (두께>25mm 시 Stop)</td>
+                    <td style="font-size:0.78rem;">TASK7, TASK8 MoveControl</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">9</td>
+                    <td><b>용접 억제 신호</b></td>
+                    <td>WeldInhib/WeaveInhib/TrackInhib 크로스커넥트 - Lincoln 양쪽 용접기</td>
+                    <td style="font-size:0.78rem;">PROC.cfg, EIO.cfg</td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;font-weight:700;">10</td>
+                    <td><b>홈 포지션 변경</b></td>
+                    <td>R1/R2 공통: axis3 -50&rarr;-45, axis5 0&rarr;20</td>
+                    <td style="font-size:0.78rem;">TASK1/2 user.sys</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 3. RAPID Module Detail -->
+        <div class="section">
+            <div class="section-title">3. RAPID 모듈별 변경 상세</div>
+
+            <p style="font-weight:700;color:#1e3a5f;margin:10px 0 6px;">TASK1 (T_ROB1)</p>
+            <table>
+                <tr>
+                    <th style="text-align:left;">파일</th>
+                    <th style="text-align:left;">변경 내용</th>
+                </tr>
+                <tr>
+                    <td>Rob1_MainModule.mod</td>
+                    <td>X_Init/Y_MoveCorrConnect/Z_MoveCorrConnect 필드 추가, vWeld[1] 400&rarr;10mm/s, wd5~wd40 삭제</td>
+                </tr>
+                <tr>
+                    <td>Rob1_TeachingData.mod</td>
+                    <td>jWireCut0 미세 조정, 노즐 클린 포지션 8개 추가 (jWorkingHome, jNozzle01~02, jSpray 등)</td>
+                </tr>
+                <tr>
+                    <td>user.sys</td>
+                    <td>home_pos1: axis3 -50&rarr;-45, axis5 0&rarr;20</td>
+                </tr>
+            </table>
+
+            <p style="font-weight:700;color:#1e3a5f;margin:10px 0 6px;">TASK2 (T_ROB2)</p>
+            <table>
+                <tr>
+                    <th style="text-align:left;">파일</th>
+                    <th style="text-align:left;">변경 내용</th>
+                </tr>
+                <tr>
+                    <td>Rob2_MainModule.mod</td>
+                    <td>TASK1과 동일 구조 변경, vWeld[11~22] 0&rarr;0.166667mm/s, wd5~wd40/Holdwd1~3 삭제</td>
+                </tr>
+                <tr>
+                    <td>Rob2_TeachingData.mod</td>
+                    <td>jWireCut0/1 미세 조정, 노즐 클린 포지션 9개 추가</td>
+                </tr>
+                <tr>
+                    <td>T_ROB2_Function.mod</td>
+                    <td>Routine1Copy() 삭제 (테스트 용접 루틴 제거)</td>
+                </tr>
+                <tr>
+                    <td>user.sys</td>
+                    <td>home_pos4: axis3 -50&rarr;-45, axis5 0&rarr;20</td>
+                </tr>
+            </table>
+
+            <p style="font-weight:700;color:#1e3a5f;margin:10px 0 6px;">TASK7 (T_Gantry)</p>
+            <table>
+                <tr>
+                    <th style="text-align:left;">파일</th>
+                    <th style="text-align:left;">변경 내용</th>
+                </tr>
+                <tr>
+                    <td>Gantry_MainModule.mod</td>
+                    <td>nMode 변수(=3) 추가, LDS 체크 변수 20+ 신규 (bEnableLdsX/Z, nLdsX/Z_*, bLDSCheckScss 등)</td>
+                </tr>
+                <tr>
+                    <td>T_Gantry_TeachingData.mod</td>
+                    <td><span class="badge badge-new">NEW</span> LDS 체크 타겟, 노즐 클린 위치</td>
+                </tr>
+            </table>
+
+            <p style="font-weight:700;color:#1e3a5f;margin:10px 0 6px;">TASK8 (T_Head)</p>
+            <table>
+                <tr>
+                    <th style="text-align:left;">파일</th>
+                    <th style="text-align:left;">변경 내용</th>
+                </tr>
+                <tr>
+                    <td>Head_Command.mod</td>
+                    <td>jRob1/jRob2 홈&rarr;작업 위치로 변경, jGantry 완전히 다른 위치로 이동</td>
+                </tr>
+                <tr>
+                    <td>Head_Data.mod</td>
+                    <td>TcpOrder RECORD 추가, corrStart/End 10&rarr;13요소 확장, WobjFloor X -9500&rarr;-9600, Z 2100&rarr;2095, wobjWeldLine1/2 Y 10/-10&rarr;50/-50</td>
+                </tr>
+                <tr>
+                    <td>Head_Function.mod</td>
+                    <td>0 나누기 방지 (diffVector X/Y/Z=0 시 0.1로 대체)</td>
+                </tr>
+                <tr>
+                    <td>Head_MainModule.mod</td>
+                    <td>rInit_PostCmdInput 분리, CMD 핸들러 10+ 추가 (TCP_Inspect, WIRE_CLEAN, Teaching, ManualOrigin 등), rNozzleClean/rHole_check/rLdsCheck 활성화</td>
+                </tr>
+                <tr>
+                    <td>Head_MoveControl.mod</td>
+                    <td>rConfOff/rConfOn 삭제, nMode 기반 터치 센싱 로직 (Mode1/2/3)</td>
+                </tr>
+                <tr>
+                    <td>Head_InspectMechanicalOrigin.mod</td>
+                    <td><span class="badge badge-new">NEW</span> LDS 기반 원점 검사, 홀 카메라 소켓 통신</td>
+                </tr>
+            </table>
+
+            <p style="font-weight:700;color:#1e3a5f;margin:10px 0 6px;">TASK9/TASK10</p>
+            <table>
+                <tr>
+                    <th style="text-align:left;">파일</th>
+                    <th style="text-align:left;">변경 내용</th>
+                </tr>
+                <tr>
+                    <td>TASK9/Static.mod</td>
+                    <td>nTorques 실측값 업데이트, stWeld1/2 위치/각도 값 변경</td>
+                </tr>
+                <tr>
+                    <td>TASK10/Teaching.mod</td>
+                    <td>LDSCheck 호출 추가</td>
+                </tr>
+                <tr>
+                    <td>TASK10/CommSock.mod</td>
+                    <td><span class="badge badge-new">NEW</span> LDS 소켓 통신 모듈</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 4. SYSPAR -->
+        <div class="section">
+            <div class="section-title purple">4. SYSPAR 설정 파일 변경</div>
+            <table>
+                <tr>
+                    <th style="text-align:left;">파일</th>
+                    <th style="text-align:left;">변경 내용</th>
+                </tr>
+                <tr>
+                    <td><b>EIO.cfg</b></td>
+                    <td>
+                        헤드 충격: QuickStop &rarr; MotorOff+바이패스 재설계<br>
+                        I/O 20+ 신규 (LDS, HeadShock, WeldInhib 등)<br>
+                        노즐 클린 do17/18 &rarr; do15/16 이동, di30 Invert 추가
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>MOC.cfg</b></td>
+                    <td>
+                        토크 한계: M1DM3 25&rarr;30, M3DM3 30&rarr;40, ELM_X 25&rarr;30<br>
+                        브레이크 딜레이 0.3s (M1DM3, ELM_X)<br>
+                        캘리브레이션 오프셋 미세 조정, 상한 12.31&rarr;12.48
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>PROC.cfg</b></td>
+                    <td>
+                        WeldGuide: 로그파일(WgLog_T_ROB1/2) + StopProcess 신호 추가<br>
+                        Lincoln: WeldInhib/WeaveInhib/TrackInhib 파라미터 추가
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>SYS.cfg</b></td>
+                    <td>T_Gantry에 awBase.sys (Arc weld base) 설치 추가</td>
+                </tr>
+                <tr>
+                    <td>MMC.cfg / SIO.cfg</td>
+                    <td>변경 없음</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 5. PlanB Implication -->
+        <div class="section">
+            <div class="section-title">5. PlanB 반영 시사점</div>
+            <div class="note-box">
+                현재 PlanB 작업 기준(12-18 백업)에서, 2/11 백업에 추가된 아래 항목들은 향후 PlanB에도 반영이 필요합니다.<br><br>
+                <b>우선 반영 대상 (하드웨어 관련):</b><br>
+                &bull; SYSPAR 변경 (EIO.cfg, MOC.cfg, PROC.cfg) - I/O 신호, 모터 토크, WeldGuide 설정<br>
+                &bull; 갠트리 리밋 및 홈 포지션 변경<br>
+                &bull; 홈 포지션 변경 (axis3: -50&rarr;-45, axis5: 0&rarr;20)<br><br>
+                <b>추후 반영 대상 (기능 관련):</b><br>
+                &bull; LDS 센서 통합 (TASK7/8/10 모듈)<br>
+                &bull; 노즐 클린/스프레이 티칭 데이터<br>
+                &bull; 헤드 충격 안전 재설계<br>
+                &bull; nMode 터치 센싱 로직
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <div class="name">심태양 / 에스피시스템스</div>
+        <div class="company">S25016 삼성중공업 거제조선소 34bay 자동용접 로봇 시스템</div>
+    </div>
+
+</div>
+</body>
+</html>
