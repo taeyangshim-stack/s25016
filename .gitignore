@@ -57,6 +57,28 @@ cloudinary-uploader/test-files/
 
 gha-creds-*.json
 
+# Binary documents
+*.pdf
+*.pptx
+*.xlsx
+*.xls
+*.doc
+*.docx
+
+# Images
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.ico
+*.svg
+
+# Compiled binaries
+*.dll
+*.exe
+*.so
+
 # Python
 __pycache__/
 *.pyc
