@@ -4945,8 +4945,28 @@ ENDPROC
 ! In PlanA, separate tasks moved each axis group. In PlanB, TASK1 moves both.
 PROC ExecMoveJgJ()
 	VAR jointtarget jMoveTarget;
+	VAR jointtarget jCurrent;
+	! Start from current position to fill all axis values
+	jCurrent := CJointT();
+	jMoveTarget := jCurrent;
+	! Override with T_Head values (skip 9E+09 = undefined)
 	jMoveTarget.robax := jRob1.robax;
-	jMoveTarget.extax := jGantry.extax;
+	IF jGantry.extax.eax_a < 9E+08 THEN
+		jMoveTarget.extax.eax_a := jGantry.extax.eax_a;
+	ENDIF
+	IF jGantry.extax.eax_b < 9E+08 THEN
+		jMoveTarget.extax.eax_b := jGantry.extax.eax_b;
+	ENDIF
+	IF jGantry.extax.eax_c < 9E+08 THEN
+		jMoveTarget.extax.eax_c := jGantry.extax.eax_c;
+	ENDIF
+	IF jGantry.extax.eax_d < 9E+08 THEN
+		jMoveTarget.extax.eax_d := jGantry.extax.eax_d;
+	ENDIF
+	IF jGantry.extax.eax_f < 9E+08 THEN
+		jMoveTarget.extax.eax_f := jGantry.extax.eax_f;
+	ENDIF
+	! eax_e: keep current value (not used by gantry)
 	MoveAbsJ jMoveTarget, vSync, zSync, tool0;
 	UpdateGantryWobj;
 ENDPROC
