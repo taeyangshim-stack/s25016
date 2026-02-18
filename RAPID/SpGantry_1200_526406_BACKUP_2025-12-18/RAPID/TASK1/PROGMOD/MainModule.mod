@@ -6,7 +6,7 @@ MODULE MainModule
 	! v2.2.0 (2026-02-18) - PlanC Phase 1
 	!   - TestWeldSequence() now routes to TestFullWeldSequence
 	!   - "Weld"/"WeldMotion" commands use full edge-based weld sequence
-	!   - TraceWeldLine v2.0.0: multi-segment path (40-segment capable)
+	!   - TraceWeldLine v2.1.0: multi-segment path (40-segment capable)
 	!   - GenerateWeldPath(): linear interpolation of weld path positions
 	!   - pWeldPosR1{40}/pWeldPosR2{40}/vWeldSpeed{40} path arrays
 	!   - nMotionStepCount{1} controls segments per pass (default 6)
@@ -4359,7 +4359,7 @@ ENDPROC
 !
 ! Output: pWeldPosR1{1..nMotionStepCount{1}}, vWeldSpeed{1..nMotionStepCount{1}}
 !
-! Phase 1: Simple linear interpolation (calcPosStart → calcPosEnd)
+! Phase 1: Simple linear interpolation (calcPosStart -> calcPosEnd)
 ! Phase 4+: Touch sensing correction will modify positions after generation
 PROC GenerateWeldPath(pos adjStart, pos adjEnd, robtarget refTarget, num nPass)
 	VAR num ratio;
@@ -4417,7 +4417,7 @@ ENDPROC
 !   nWeldPassCount: Number of active passes (1-10)
 !   WELD_ARC_ENABLED: FALSE=MoveL (simulation), TRUE=ArcL (Phase 3)
 !
-! Flow: Approach → MoveL(seg1) → MoveL(seg2) → ... → MoveL(segN) → Retract
+! Flow: Approach -> MoveL(seg1) -> MoveL(seg2) -> ... -> MoveL(segN) -> Retract
 PROC TraceWeldLine()
 	VAR robtarget current_floor;
 	VAR robtarget approach_pos;
@@ -4434,7 +4434,7 @@ PROC TraceWeldLine()
 	VAR num seg;
 	VAR num nSegs;
 
-	TPWrite "[TRACE] TraceWeldLine v2.0.0 (PlanC Phase 1)";
+	TPWrite "[TRACE] TraceWeldLine v2.1.0 (PlanC Phase 1)";
 
 	! Open own log file
 	Open "HOME:/trace_weld_line.txt", trace_log \Write;
@@ -4486,6 +4486,14 @@ PROC TraceWeldLine()
 		! Fills pWeldPosR1{1..nSegs} and vWeldSpeed{1..nSegs}
 		GenerateWeldPath adjStart, adjEnd, current_floor, pass;
 		Write trace_log, "GenerateWeldPath: " + NumToStr(nSegs,0) + " segments generated";
+		! Log all generated segment positions for verification
+		FOR seg FROM 1 TO nSegs DO
+			Write trace_log, "  Seg " + NumToStr(seg,0)
+				+ " cmd=[" + NumToStr(pWeldPosR1{seg}.trans.x,1)
+				+ "," + NumToStr(pWeldPosR1{seg}.trans.y,1)
+				+ "," + NumToStr(pWeldPosR1{seg}.trans.z,1) + "]"
+				+ " spd=" + NumToStr(vWeldSpeed{seg}.v_tcp,0) + "mm/s";
+		ENDFOR
 
 		! --- Approach: 100mm above first segment along tool Z ---
 		approach_pos := RelTool(pWeldPosR1{1}, 0, 0, -100);
@@ -4510,7 +4518,7 @@ PROC TraceWeldLine()
 
 		! --- Trace weld line: multi-segment MoveL loop ---
 		IF WELD_ARC_ENABLED = TRUE THEN
-			! Phase 3: ArcLStart → ArcL → ArcLEnd (placeholder)
+			! Phase 3: ArcLStart -> ArcL -> ArcLEnd (placeholder)
 			TPWrite "[TRACE] ARC WELD pass " + NumToStr(pass,0) + " (" + NumToStr(nSegs,0) + " segs)...";
 			Write trace_log, "ARC mode: V=" + NumToStr(macroStartBuffer1{pass}.Voltage,1)
 				+ "V A=" + NumToStr(macroStartBuffer1{pass}.Current,0)
@@ -4523,14 +4531,26 @@ PROC TraceWeldLine()
 					+ NumToStr(pWeldPosR1{seg}.trans.z,1) + "]";
 			ENDFOR
 		ELSE
-			! Simulation: MoveL only (no arc)
+			! Simulation: MoveL only (no arc) - with position verification
 			TPWrite "[TRACE] MoveL weld pass " + NumToStr(pass,0) + " (" + NumToStr(nSegs,0) + " segs)...";
 			FOR seg FROM 2 TO nSegs DO
-				MoveL pWeldPosR1{seg}, vWeldSpeed{seg}, z1, tool0 \WObj:=WobjFloor;
-				Write trace_log, "Seg " + NumToStr(seg,0) + " pos=["
-					+ NumToStr(pWeldPosR1{seg}.trans.x,1) + ","
-					+ NumToStr(pWeldPosR1{seg}.trans.y,1) + ","
-					+ NumToStr(pWeldPosR1{seg}.trans.z,1) + "]";
+				MoveL pWeldPosR1{seg}, vWeldSpeed{seg}, fine, tool0 \WObj:=WobjFloor;
+				! Verify actual position after each segment (fine zone = stopped)
+				actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+				err_x := actual_floor.trans.x - pWeldPosR1{seg}.trans.x;
+				err_y := actual_floor.trans.y - pWeldPosR1{seg}.trans.y;
+				err_z := actual_floor.trans.z - pWeldPosR1{seg}.trans.z;
+				err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
+				TPWrite "[TRACE] Seg " + NumToStr(seg,0) + "/" + NumToStr(nSegs,0)
+					+ " err=" + NumToStr(err_total,2) + "mm";
+				Write trace_log, "Seg " + NumToStr(seg,0)
+					+ " cmd=[" + NumToStr(pWeldPosR1{seg}.trans.x,1)
+					+ "," + NumToStr(pWeldPosR1{seg}.trans.y,1)
+					+ "," + NumToStr(pWeldPosR1{seg}.trans.z,1) + "]"
+					+ " act=[" + NumToStr(actual_floor.trans.x,1)
+					+ "," + NumToStr(actual_floor.trans.y,1)
+					+ "," + NumToStr(actual_floor.trans.z,1) + "]"
+					+ " err=" + NumToStr(err_total,2) + "mm";
 			ENDFOR
 		ENDIF
 
