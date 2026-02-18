@@ -365,7 +365,7 @@ MODULE MainModule
 	TASK PERS seamdata seam1:=[0.5,0.5,[5,0,24,120,0,0,0,0,0],0.5,1,10,0,5,[5,0,24,120,0,0,0,0,0],0,1,[5,0,24,120,0,0,0,0,0],0,0,[0,0,0,0,0,0,0,0,0],0];
 	TASK PERS welddata weld1:=[6,0,[5,0,24,120,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]];
 	TASK PERS weavedata weave1_rob1:=[1,0,3,4,0,0,0,0,0,0,0,0,0,0,0];
-    PERS tooldata tWeld1:=[TRUE,[[319.938,-6.311,330],[0.92587,0.003729,0.377818,-0.009129]],[3.1,[-71.4,3.8,173.2],[1,0,0,0],0.055,0.049,0.005]];
+    PERS tooldata tWeld1:=[TRUE,[[319.990,0,331.830],[0.92590,0,0.37784,0]],[3.1,[-71.4,3.8,173.2],[1,0,0,0],0.055,0.049,0.005]];
 	TASK PERS trackdata track1_rob1:=[0,FALSE,0,[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0]];
 	PERS tasks Alltask{2}:=[["T_ROB1"],["T_ROB2"]];
     VAR syncident Sync1;
@@ -1390,7 +1390,7 @@ PERS num debug_r2_floor_y_offset := 0;
 	! Purpose: Update Robot1 TCP position in Floor coordinate system
 	! Used for distance measurement between robots
 	PROC UpdateRobot1FloorPosition()
-		robot1_floor_pos_t1 := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+		robot1_floor_pos_t1 := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
 	ENDPROC
 
 	! ========================================
@@ -1654,12 +1654,12 @@ PERS num debug_r2_floor_y_offset := 0;
 		! extax preserves current gantry position
 		sync_pos := CJointT();
 		home_tcp := [[0, 0, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
-		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry;
+		MoveJ home_tcp, v100, fine, tWeld1\WObj:=WobjGantry;
 		! Iterative refinement to reach precise R-axis center (max 3 iterations)
 		WHILE iteration < max_iterations DO
 			iteration := iteration + 1;
-			! Read current position in wobj0
-			current_wobj0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+			! Read current position in wobj0 (tWeld1 TCP)
+			current_wobj0 := CRobT(\Tool:=tWeld1\WObj:=wobj0);
 			error_x := 0 - current_wobj0.trans.x;  ! Target X=0
 			error_y := 0 - current_wobj0.trans.y;  ! Target Y=0
 
@@ -1672,7 +1672,7 @@ PERS num debug_r2_floor_y_offset := 0;
 				UpdateGantryWobj;
 				sync_pos := CJointT();
 				home_tcp := [[error_x, error_y, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
-				MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry;
+				MoveL home_tcp, v50, fine, tWeld1\WObj:=WobjGantry;
 			ENDIF
 		ENDWHILE
 
@@ -3080,9 +3080,9 @@ PROC MoveRobot1ToWeldReady()
 	weld_target.extax := current_jt.extax;
 
 	TPWrite "[WELD] R1 Step2: MoveJ to WobjGantry [0, 111, -73]";
-	MoveJ weld_target, v100, fine, tool0\WObj:=WobjGantry;
+	MoveJ weld_target, v100, fine, tWeld1\WObj:=WobjGantry;
 
-	TPWrite "[WELD] Robot1 ready at weld position";
+	TPWrite "[WELD] Robot1 ready at weld position (tWeld1)";
 ENDPROC
 
 ! ----------------------------------------
@@ -3913,7 +3913,7 @@ PROC TestEdgeToWeld()
 
 	! Also read actual TCP in WobjGantry for reference
 	UpdateGantryWobj;
-	actual_tcp_gantry := CRobT(\Tool:=tool0\WObj:=WobjGantry);
+	actual_tcp_gantry := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
 	TPWrite "[TCP] Actual TCP (WobjGantry): [" + NumToStr(actual_tcp_gantry.trans.x,1) + ", "
 	        + NumToStr(actual_tcp_gantry.trans.y,1) + ", " + NumToStr(actual_tcp_gantry.trans.z,1) + "]";
 
@@ -4302,8 +4302,8 @@ PROC MoveRobotToWeldPosition()
 	UpdateGantryWobj;
 
 	! Get current TCP position - use this as base for weld_target
-	current_tcp := CRobT(\Tool:=tool0\WObj:=WobjGantry);
-	TPWrite "[ROB] Current TCP (WobjGantry): ["
+	current_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
+	TPWrite "[ROB] Current TCP tWeld1 (WobjGantry): ["
 		+ NumToStr(current_tcp.trans.x,1) + ", "
 		+ NumToStr(current_tcp.trans.y,1) + ", "
 		+ NumToStr(current_tcp.trans.z,1) + "]";
@@ -4328,10 +4328,10 @@ PROC MoveRobotToWeldPosition()
 
 	! Move robot to weld position (MoveJ for more forgiving joint interpolation)
 	TPWrite "[ROB] Moving robot...";
-	MoveJ weld_target, v100, fine, tool0 \WObj:=WobjGantry;
+	MoveJ weld_target, v100, fine, tWeld1 \WObj:=WobjGantry;
 
 	! Verify position
-	current_tcp := CRobT(\Tool:=tool0\WObj:=WobjGantry);
+	current_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
 	TPWrite "[ROB] Final TCP (WobjGantry): ["
 		+ NumToStr(current_tcp.trans.x,1) + ", "
 		+ NumToStr(current_tcp.trans.y,1) + ", "
@@ -4445,7 +4445,8 @@ PROC TraceWeldLine()
 		+ " bRobSwap=" + ValToStr(bRobSwap);
 
 	! Get current TCP in Floor coordinates (preserves robconf + extax)
-	current_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+	current_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
+	Write trace_log, "Tool=tWeld1 (design TCP)";
 	Write trace_log, "Current Floor TCP=["
 		+ NumToStr(current_floor.trans.x,1) + ","
 		+ NumToStr(current_floor.trans.y,1) + ","
@@ -4498,15 +4499,15 @@ PROC TraceWeldLine()
 		! --- Approach: 100mm above first segment along tool Z ---
 		approach_pos := RelTool(pWeldPosR1{1}, 0, 0, -100);
 		TPWrite "[TRACE] Approach (-100mm)...";
-		MoveJ approach_pos, v100, fine, tool0 \WObj:=WobjFloor;
+		MoveJ approach_pos, v100, fine, tWeld1 \WObj:=WobjFloor;
 		Write trace_log, "Approach (-100mm) OK";
 
 		! --- Move to first segment position ---
 		TPWrite "[TRACE] MoveL to seg 1...";
-		MoveL pWeldPosR1{1}, v100, fine, tool0 \WObj:=WobjFloor;
+		MoveL pWeldPosR1{1}, v100, fine, tWeld1 \WObj:=WobjFloor;
 
 		! --- Verify start position ---
-		actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+		actual_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
 		err_x := actual_floor.trans.x - pWeldPosR1{1}.trans.x;
 		err_y := actual_floor.trans.y - pWeldPosR1{1}.trans.y;
 		err_z := actual_floor.trans.z - pWeldPosR1{1}.trans.z;
@@ -4524,7 +4525,7 @@ PROC TraceWeldLine()
 				+ "V A=" + NumToStr(macroStartBuffer1{pass}.Current,0)
 				+ "A WFS=" + NumToStr(macroStartBuffer1{pass}.FeedingSpeed,0);
 			FOR seg FROM 2 TO nSegs DO
-				MoveL pWeldPosR1{seg}, vWeldSpeed{seg}, z1, tool0 \WObj:=WobjFloor;
+				MoveL pWeldPosR1{seg}, vWeldSpeed{seg}, z1, tWeld1 \WObj:=WobjFloor;
 				Write trace_log, "ARC seg " + NumToStr(seg,0) + " pos=["
 					+ NumToStr(pWeldPosR1{seg}.trans.x,1) + ","
 					+ NumToStr(pWeldPosR1{seg}.trans.y,1) + ","
@@ -4534,9 +4535,9 @@ PROC TraceWeldLine()
 			! Simulation: MoveL only (no arc) - with position verification
 			TPWrite "[TRACE] MoveL weld pass " + NumToStr(pass,0) + " (" + NumToStr(nSegs,0) + " segs)...";
 			FOR seg FROM 2 TO nSegs DO
-				MoveL pWeldPosR1{seg}, vWeldSpeed{seg}, fine, tool0 \WObj:=WobjFloor;
+				MoveL pWeldPosR1{seg}, vWeldSpeed{seg}, fine, tWeld1 \WObj:=WobjFloor;
 				! Verify actual position after each segment (fine zone = stopped)
-				actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+				actual_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
 				err_x := actual_floor.trans.x - pWeldPosR1{seg}.trans.x;
 				err_y := actual_floor.trans.y - pWeldPosR1{seg}.trans.y;
 				err_z := actual_floor.trans.z - pWeldPosR1{seg}.trans.z;
@@ -4555,10 +4556,10 @@ PROC TraceWeldLine()
 		ENDIF
 
 		! --- Final segment: MoveL to fine position ---
-		MoveL pWeldPosR1{nSegs}, vWeldSpeed{nSegs}, fine, tool0 \WObj:=WobjFloor;
+		MoveL pWeldPosR1{nSegs}, vWeldSpeed{nSegs}, fine, tWeld1 \WObj:=WobjFloor;
 
 		! --- Verify end position ---
-		actual_floor := CRobT(\Tool:=tool0\WObj:=WobjFloor);
+		actual_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
 		err_x := actual_floor.trans.x - pWeldPosR1{nSegs}.trans.x;
 		err_y := actual_floor.trans.y - pWeldPosR1{nSegs}.trans.y;
 		err_z := actual_floor.trans.z - pWeldPosR1{nSegs}.trans.z;
@@ -4571,7 +4572,7 @@ PROC TraceWeldLine()
 		! --- Retract: 50mm above last segment along tool Z ---
 		retract_pos := RelTool(pWeldPosR1{nSegs}, 0, 0, -50);
 		TPWrite "[TRACE] Retract (-50mm)...";
-		MoveL retract_pos, v100, fine, tool0 \WObj:=WobjFloor;
+		MoveL retract_pos, v100, fine, tWeld1 \WObj:=WobjFloor;
 		Write trace_log, "Retract (-50mm) OK";
 
 		! --- Inter-pass delay ---
@@ -4632,8 +4633,8 @@ PROC TestEdgeToWeldWithRobot()
 
 	! Step 6: Verify final position
 	UpdateGantryWobj;
-	actual_tcp := CRobT(\Tool:=tool0\WObj:=WobjGantry);
-	TPWrite "[VERIFY] Robot TCP (WobjGantry): ["
+	actual_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
+	TPWrite "[VERIFY] Robot TCP tWeld1 (WobjGantry): ["
 		+ NumToStr(actual_tcp.trans.x,1) + ", "
 		+ NumToStr(actual_tcp.trans.y,1) + ", "
 		+ NumToStr(actual_tcp.trans.z,1) + "]";
@@ -4714,8 +4715,8 @@ PROC TestFullWeldSequence()
 	TPWrite "[FULL] Step 5: Move Robot1 TCP...";
 	MoveRobotToWeldPosition;
 	UpdateGantryWobj;
-	actual_tcp := CRobT(\Tool:=tool0\WObj:=WobjGantry);
-	Write logfile, "Step 5: Robot1 TCP=[" + NumToStr(actual_tcp.trans.x,1) + "," + NumToStr(actual_tcp.trans.y,1) + "," + NumToStr(actual_tcp.trans.z,1) + "]";
+	actual_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
+	Write logfile, "Step 5: Robot1 TCP(tWeld1)=[" + NumToStr(actual_tcp.trans.x,1) + "," + NumToStr(actual_tcp.trans.y,1) + "," + NumToStr(actual_tcp.trans.z,1) + "]";
 
 	! Step 6: Signal TASK2 (Robot2)
 	TPWrite "[FULL] Step 6: Signal TASK2 (t1_weld_position_ready)...";
@@ -4976,7 +4977,7 @@ ENDPROC
 ! ========================================
 ! PlanB: MoveJ to robtarget pRob1 set by T_Head
 PROC ExecMovePgJ()
-	MoveJ pRob1, vSync, zSync, tool0;
+	MoveJ pRob1, vSync, zSync, tWeld1;
 	UpdateGantryWobj;
 ENDPROC
 
@@ -4985,7 +4986,7 @@ ENDPROC
 ! ========================================
 ! PlanB: MoveL to robtarget pRob1 set by T_Head
 PROC ExecMovePgL()
-	MoveL pRob1, vSync, zSync, tool0;
+	MoveL pRob1, vSync, zSync, tWeld1;
 	UpdateGantryWobj;
 ENDPROC
 
