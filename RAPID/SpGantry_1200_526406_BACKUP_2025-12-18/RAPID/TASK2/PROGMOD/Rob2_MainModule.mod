@@ -2461,6 +2461,15 @@ VAR robjoint robot2_offset_joints;
 		TPWrite "Robot2 init: Step2";
 		! Update WobjGantry_Rob2 to reflect current gantry position from TASK1
 		UpdateGantryWobj_Rob2;
+		gantry_joint := CJointT(\TaskName:="T_ROB1");
+		Write logfile, "GantryPos from TASK1: X=" + NumToStr(gantry_joint.extax.eax_a,1)
+			+ " Y=" + NumToStr(gantry_joint.extax.eax_b,1)
+			+ " Z=" + NumToStr(gantry_joint.extax.eax_c,1)
+			+ " R=" + NumToStr(gantry_joint.extax.eax_d,1);
+		Write logfile, "WobjGantry_Rob2.uframe=["
+			+ NumToStr(WobjGantry_Rob2.uframe.trans.x,1) + ","
+			+ NumToStr(WobjGantry_Rob2.uframe.trans.y,1) + ","
+			+ NumToStr(WobjGantry_Rob2.uframe.trans.z,1) + "]";
 		! TCP position: [0, 488, -1000] in WobjGantry_Rob2 (tracks gantry position)
 		! Robot2 needs to move +488mm from base to reach R-axis center
 		! Quaternion: [0.5, -0.5, -0.5, -0.5]
