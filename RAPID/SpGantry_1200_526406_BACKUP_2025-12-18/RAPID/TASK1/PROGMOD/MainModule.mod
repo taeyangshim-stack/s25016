@@ -1629,36 +1629,36 @@ PERS num debug_r2_floor_y_offset := 0;
 			Write logfile, "Using 9E9 for eax_f (let linked motor system handle X2)";
 		ENDIF
 
-		! Step 1: Move Robot1 joints to intermediate position (avoid configuration issue)
+		! Step 1: Move Robot1 joints to intermediate position (tWeld1 HOME config)
 		initial_joint := CJointT();
 		! v1.9.16: Set eax_f to match eax_a (linked motor requirement)
 		initial_joint.extax.eax_f := initial_joint.extax.eax_a;
-		! Robot1 joint angles: [0, -2.58, -11.88, 0, 14.47, 0]
+		! Joint angles taught for tWeld1 HOME (confdata [-1,-1,0,4])
 		initial_joint.robax.rax_1 := 0;
-		initial_joint.robax.rax_2 := -2.58;
-		initial_joint.robax.rax_3 := -11.88;
+		initial_joint.robax.rax_2 := -48.88;
+		initial_joint.robax.rax_3 := 6.22;
 		initial_joint.robax.rax_4 := 0;
-		initial_joint.robax.rax_5 := 14.47;
+		initial_joint.robax.rax_5 := 8.26;
 		initial_joint.robax.rax_6 := 0;
 		MoveAbsJ initial_joint, v100, fine, tool0;
 
-		! Step 2: Move Robot1 TCP to HOME position at R-axis center with iterative refinement
+		! Step 2: Move Robot1 tWeld1 TCP to HOME [0,0,1000] in WobjGantry
 		iteration := 0;
 		max_iterations := 3;
 		tolerance := 0.5;  ! mm
 
 		! Update WobjGantry to reflect current gantry position
 		UpdateGantryWobj;
-		! TCP position: [0, 0, 1000] in WobjGantry (tracks gantry position)
-		! Quaternion: [0.5, -0.5, 0.5, 0.5] (R-axis center orientation)
-		! extax preserves current gantry position
+		! tWeld1 TCP HOME: [0, 0, 1000] in WobjGantry
+		! Orientation: [0.45452,-0.54167,0.54167,0.45453] (taught for tWeld1)
+		! Confdata: [-1,-1,0,4] (taught - critical for tWeld1 config)
 		sync_pos := CJointT();
-		home_tcp := [[0, 0, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
+		home_tcp := [[0, 0, 1000], [0.45452, -0.54167, 0.54167, 0.45453], [-1, -1, 0, 4], sync_pos.extax];
 		MoveJ home_tcp, v100, fine, tWeld1\WObj:=WobjGantry;
 		! Iterative refinement to reach precise R-axis center (max 3 iterations)
 		WHILE iteration < max_iterations DO
 			iteration := iteration + 1;
-			! Read current position in wobj0 (tWeld1 TCP)
+			! Read current tWeld1 TCP position in wobj0
 			current_wobj0 := CRobT(\Tool:=tWeld1\WObj:=wobj0);
 			error_x := 0 - current_wobj0.trans.x;  ! Target X=0
 			error_y := 0 - current_wobj0.trans.y;  ! Target Y=0
@@ -1671,7 +1671,7 @@ PERS num debug_r2_floor_y_offset := 0;
 				! Apply correction in WobjGantry coordinates
 				UpdateGantryWobj;
 				sync_pos := CJointT();
-				home_tcp := [[error_x, error_y, 1000], [0.5, -0.5, 0.5, 0.5], [0, 0, 0, 0], sync_pos.extax];
+				home_tcp := [[error_x, error_y, 1000], [0.45452, -0.54167, 0.54167, 0.45453], [-1, -1, 0, 4], sync_pos.extax];
 				MoveL home_tcp, v50, fine, tWeld1\WObj:=WobjGantry;
 			ENDIF
 		ENDWHILE
@@ -1694,6 +1694,89 @@ PERS num debug_r2_floor_y_offset := 0;
 		TPWrite "ERROR in SetRobot1InitialPosition: " + NumToStr(ERRNO, 0);
 		Close logfile;
 		STOP;
+	ENDPROC
+
+	! ========================================
+	! Log Current Position (for HOME teaching)
+	! ========================================
+	! Purpose: Log current robtarget + jointtarget to file
+	! Usage: Jog robot to desired position -> Call this from FlexPendant
+	!        FlexPendant: ABB Menu -> Program Editor -> Debug -> Call Routine
+	! Output: HOME:/current_position.txt
+	PROC LogCurrentPosition()
+		VAR iodev logfile;
+		VAR robtarget rt_tool0;
+		VAR robtarget rt_tw1_wobj0;
+		VAR robtarget rt_tw1_gantry;
+		VAR jointtarget jt;
+
+		Open "HOME:/current_position.txt", logfile \Write;
+		Write logfile, "=== Position Log " + CDate() + " " + CTime() + " ===";
+
+		! --- JointTarget ---
+		jt := CJointT();
+		Write logfile, "";
+		Write logfile, "--- ROB_1 JointTarget ---";
+		Write logfile, "robax: [" + NumToStr(jt.robax.rax_1,3) + ", "
+			+ NumToStr(jt.robax.rax_2,3) + ", " + NumToStr(jt.robax.rax_3,3) + ", "
+			+ NumToStr(jt.robax.rax_4,3) + ", " + NumToStr(jt.robax.rax_5,3) + ", "
+			+ NumToStr(jt.robax.rax_6,3) + "]";
+		Write logfile, "extax: [" + NumToStr(jt.extax.eax_a,3) + ", "
+			+ NumToStr(jt.extax.eax_b,3) + ", " + NumToStr(jt.extax.eax_c,3) + ", "
+			+ NumToStr(jt.extax.eax_d,3) + ", " + NumToStr(jt.extax.eax_e,3) + ", "
+			+ NumToStr(jt.extax.eax_f,3) + "]";
+
+		! --- RobTarget tool0/wobj0 ---
+		rt_tool0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+		Write logfile, "";
+		Write logfile, "--- ROB_1 RobTarget (tool0, wobj0) ---";
+		Write logfile, "[[" + NumToStr(rt_tool0.trans.x,3) + ","
+			+ NumToStr(rt_tool0.trans.y,3) + ","
+			+ NumToStr(rt_tool0.trans.z,3) + "],["
+			+ NumToStr(rt_tool0.rot.q1,5) + ","
+			+ NumToStr(rt_tool0.rot.q2,5) + ","
+			+ NumToStr(rt_tool0.rot.q3,5) + ","
+			+ NumToStr(rt_tool0.rot.q4,5) + "],["
+			+ NumToStr(rt_tool0.robconf.cf1,0) + ","
+			+ NumToStr(rt_tool0.robconf.cf4,0) + ","
+			+ NumToStr(rt_tool0.robconf.cf6,0) + ","
+			+ NumToStr(rt_tool0.robconf.cfx,0) + "],extax]";
+
+		! --- RobTarget tWeld1/wobj0 ---
+		rt_tw1_wobj0 := CRobT(\Tool:=tWeld1\WObj:=wobj0);
+		Write logfile, "";
+		Write logfile, "--- ROB_1 RobTarget (tWeld1, wobj0) ---";
+		Write logfile, "[[" + NumToStr(rt_tw1_wobj0.trans.x,3) + ","
+			+ NumToStr(rt_tw1_wobj0.trans.y,3) + ","
+			+ NumToStr(rt_tw1_wobj0.trans.z,3) + "],["
+			+ NumToStr(rt_tw1_wobj0.rot.q1,5) + ","
+			+ NumToStr(rt_tw1_wobj0.rot.q2,5) + ","
+			+ NumToStr(rt_tw1_wobj0.rot.q3,5) + ","
+			+ NumToStr(rt_tw1_wobj0.rot.q4,5) + "],["
+			+ NumToStr(rt_tw1_wobj0.robconf.cf1,0) + ","
+			+ NumToStr(rt_tw1_wobj0.robconf.cf4,0) + ","
+			+ NumToStr(rt_tw1_wobj0.robconf.cf6,0) + ","
+			+ NumToStr(rt_tw1_wobj0.robconf.cfx,0) + "],extax]";
+
+		! --- RobTarget tWeld1/WobjGantry ---
+		UpdateGantryWobj;
+		rt_tw1_gantry := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
+		Write logfile, "";
+		Write logfile, "--- ROB_1 RobTarget (tWeld1, WobjGantry) ---";
+		Write logfile, "[[" + NumToStr(rt_tw1_gantry.trans.x,3) + ","
+			+ NumToStr(rt_tw1_gantry.trans.y,3) + ","
+			+ NumToStr(rt_tw1_gantry.trans.z,3) + "],["
+			+ NumToStr(rt_tw1_gantry.rot.q1,5) + ","
+			+ NumToStr(rt_tw1_gantry.rot.q2,5) + ","
+			+ NumToStr(rt_tw1_gantry.rot.q3,5) + ","
+			+ NumToStr(rt_tw1_gantry.rot.q4,5) + "],["
+			+ NumToStr(rt_tw1_gantry.robconf.cf1,0) + ","
+			+ NumToStr(rt_tw1_gantry.robconf.cf4,0) + ","
+			+ NumToStr(rt_tw1_gantry.robconf.cf6,0) + ","
+			+ NumToStr(rt_tw1_gantry.robconf.cfx,0) + "],extax]";
+
+		Close logfile;
+		TPWrite "Position saved to HOME:/current_position.txt";
 	ENDPROC
 
 	! ========================================
