@@ -2,14 +2,6 @@
   "version": 2,
   "buildCommand": null,
   "outputDirectory": ".",
-  "build": {
-    "env": {
-      "CLOUDINARY_CLOUD_NAME": "dmmjpofcc",
-      "CLOUDINARY_API_KEY": "763721125922284",
-      "CLOUDINARY_API_SECRET": "vU-nSXa-XQcdh27uyqejE6YBdxA",
-      "CLOUDINARY_UPLOAD_FOLDER": "s25016"
-    }
-  },
   "rewrites": [
     { "source": "/abb-spec-detailed", "destination": "/abb_spec_detailed.html" },
     { "source": "/abb-spec", "destination": "/abb_robot_programming_specification.html" },
