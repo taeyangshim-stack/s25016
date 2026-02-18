@@ -1520,8 +1520,8 @@ PERS num debug_r2_floor_y_offset := 0;
 		WobjRobot2Base_Dynamic.uframe.rot.q3 := 0;
 		WobjRobot2Base_Dynamic.uframe.rot.q4 := 0;
 
-		! Read Robot2 TCP position in wobj0 (from TASK2)
-		robot2_tcp_wobj0 := CRobT(\TaskName:="T_ROB2"\Tool:=tool0\WObj:=wobj0);
+		! Read Robot2 TCP position in wobj0 (from TASK2, using tWeld1 = same TCP as tWeld2)
+		robot2_tcp_wobj0 := CRobT(\TaskName:="T_ROB2"\Tool:=tWeld1\WObj:=wobj0);
 
 		! v1.8.61 DEBUG: Save intermediate values for debugging
 		debug_r2_wobj0_x := robot2_tcp_wobj0.trans.x;
