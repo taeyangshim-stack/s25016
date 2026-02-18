@@ -1,5 +1,5 @@
 MODULE Head_Data
-    RECORD breakpoint
+    RECORD bp_data
         pos Position;
         num Angle;
     ENDRECORD
@@ -252,7 +252,7 @@ MODULE Head_Data
     PERS pos posEndLast:=[19339.1,403.457,399.981];
     PERS num nEndThick:=12.0008;
 
-    PERS breakpoint BreakPoints{10}:=[[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0]];
+    PERS bp_data BreakPoints{10}:=[[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0]];
 
     ! data for z pos optimization [move,enter,exit]
     PERS num nMaxPartHeightNearArray{3}:=[1500,1500,600];

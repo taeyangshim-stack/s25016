@@ -26,7 +26,7 @@ MODULE ConfigModule
 ! ========================================
 
 ! Breakpoint Data Structure (PlanA)
-RECORD breakpoint
+RECORD bp_data
     pos Position;
     num Angle;
 ENDRECORD
@@ -664,7 +664,7 @@ PERS num nEntryRetryCount{2} := [0,0];
 PERS num nTouchRetryCount{2} := [0,0];
 
 ! Breakpoints
-PERS breakpoint BreakPoints{10} := [[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0]];
+PERS bp_data BreakPoints{10} := [[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0],[[0,0,0],0]];
 
 ! ========================================
 ! Auto/Manual Macro Arrays (v1.9.40 - PlanA)
