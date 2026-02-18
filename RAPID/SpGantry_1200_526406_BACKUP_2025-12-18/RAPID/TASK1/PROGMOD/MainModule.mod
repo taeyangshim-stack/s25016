@@ -5023,18 +5023,15 @@ PROC CommandLoop()
 ENDPROC
 
 ! ========================================
-! ExecMoveJgJ: Execute MoveJgJ from T_Head (v1.9.41)
+! ExecMoveJgJ: Execute MoveJgJ from T_Head (v1.9.42)
 ! ========================================
-! PlanB: Combines jRob1.robax (robot target) with jGantry.extax (gantry target)
-! In PlanA, separate tasks moved each axis group. In PlanB, TASK1 moves both.
+! PlanB: Move gantry to target, keep robot at current joints
+! T_Head jRob1.robax is calculated for tool0 - not compatible with tWeld1 HOME
+! Robot maintains current posture while gantry moves
 PROC ExecMoveJgJ()
 	VAR jointtarget jMoveTarget;
-	VAR jointtarget jCurrent;
-	! Start from current position to fill all axis values
-	jCurrent := CJointT();
-	jMoveTarget := jCurrent;
-	! Override with T_Head values (skip 9E+09 = undefined)
-	jMoveTarget.robax := jRob1.robax;
+	! Keep current robot joints, only update gantry axes
+	jMoveTarget := CJointT();
 	IF jGantry.extax.eax_a < 9E+08 THEN
 		jMoveTarget.extax.eax_a := jGantry.extax.eax_a;
 	ENDIF
