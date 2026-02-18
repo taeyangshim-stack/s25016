@@ -5030,8 +5030,22 @@ ENDPROC
 ! Robot maintains current posture while gantry moves
 PROC ExecMoveJgJ()
 	VAR jointtarget jMoveTarget;
+	VAR jointtarget jCurrent;
+	VAR iodev dbg_log;
+
+	Open "HOME:/debug_movejgj.txt", dbg_log \Write;
+	Write dbg_log, "ExecMoveJgJ (v1.9.43) " + CDate() + " " + CTime();
+
+	! Read current position
+	jCurrent := CJointT();
+	Write dbg_log, "Current robax: " + NumToStr(jCurrent.robax.rax_1,2) + "," + NumToStr(jCurrent.robax.rax_2,2) + "," + NumToStr(jCurrent.robax.rax_3,2) + "," + NumToStr(jCurrent.robax.rax_4,2) + "," + NumToStr(jCurrent.robax.rax_5,2) + "," + NumToStr(jCurrent.robax.rax_6,2);
+	Write dbg_log, "Current extax: a=" + NumToStr(jCurrent.extax.eax_a,1) + " b=" + NumToStr(jCurrent.extax.eax_b,1) + " c=" + NumToStr(jCurrent.extax.eax_c,1) + " d=" + NumToStr(jCurrent.extax.eax_d,1) + " f=" + NumToStr(jCurrent.extax.eax_f,1);
+
+	! Log jGantry from T_Head
+	Write dbg_log, "jGantry extax: a=" + NumToStr(jGantry.extax.eax_a,1) + " b=" + NumToStr(jGantry.extax.eax_b,1) + " c=" + NumToStr(jGantry.extax.eax_c,1) + " d=" + NumToStr(jGantry.extax.eax_d,1) + " f=" + NumToStr(jGantry.extax.eax_f,1);
+
 	! Keep current robot joints, only update gantry axes
-	jMoveTarget := CJointT();
+	jMoveTarget := jCurrent;
 	IF jGantry.extax.eax_a < 9E+08 THEN
 		jMoveTarget.extax.eax_a := jGantry.extax.eax_a;
 	ENDIF
@@ -5047,9 +5061,28 @@ PROC ExecMoveJgJ()
 	IF jGantry.extax.eax_f < 9E+08 THEN
 		jMoveTarget.extax.eax_f := jGantry.extax.eax_f;
 	ENDIF
-	! eax_e: keep current value (not used by gantry)
+
+	! Log final target
+	Write dbg_log, "Target extax: a=" + NumToStr(jMoveTarget.extax.eax_a,1) + " b=" + NumToStr(jMoveTarget.extax.eax_b,1) + " c=" + NumToStr(jMoveTarget.extax.eax_c,1) + " d=" + NumToStr(jMoveTarget.extax.eax_d,1) + " f=" + NumToStr(jMoveTarget.extax.eax_f,1);
+	Write dbg_log, "vSync: tcp=" + NumToStr(vSync.v_tcp,0) + " ext=" + NumToStr(vSync.v_leax,0);
+
+	Write dbg_log, "Starting MoveAbsJ...";
+	Close dbg_log;
+
+	TPWrite "[R1] MoveJgJ: MoveAbsJ starting...";
 	MoveAbsJ jMoveTarget, vSync, zSync, tool0;
+	TPWrite "[R1] MoveJgJ: MoveAbsJ done";
+
+	Open "HOME:/debug_movejgj.txt", dbg_log \Append;
+	Write dbg_log, "MoveAbsJ completed " + CTime();
+	Close dbg_log;
+
 	UpdateGantryWobj;
+
+	Open "HOME:/debug_movejgj.txt", dbg_log \Append;
+	Write dbg_log, "UpdateGantryWobj done " + CTime();
+	Write dbg_log, "ExecMoveJgJ completed OK";
+	Close dbg_log;
 ENDPROC
 
 ! ========================================
@@ -5137,7 +5170,7 @@ ENDPROC
 PROC Rob1_CommandListener()
 	VAR iodev head_log;
 	Open "HOME:/head_r1_listener.txt", head_log \Write;
-	Write head_log, "Rob1 CommandListener (v1.9.42) - " + CDate() + " " + CTime();
+	Write head_log, "Rob1 CommandListener (v1.9.43) - " + CDate() + " " + CTime();
 
 	TPWrite "[R1] CommandListener started, entering Ready state";
 
