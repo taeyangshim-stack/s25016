@@ -663,7 +663,7 @@ VAR robjoint robot2_offset_joints;
 
     !!!!jWireCut
     TASK PERS num nWireCutSpeed:=600;
-    PERS tooldata tWeld2:=[TRUE,[[319.938,-6.311,330],[0.92587,0.003729,0.377818,-0.009128]],[3.1,[-71.4,3.8,173.2],[1,0,0,0],0.055,0.049,0.005]];
+    PERS tooldata tWeld2:=[TRUE,[[319.990,0,331.830],[0.92590,0,0.37784,0]],[3.1,[-71.4,3.8,173.2],[1,0,0,0],0.055,0.049,0.005]];
     PERS tooldata tWeld2copy:=[TRUE,[[320.377,0,330.247],[0.92587,0,0.37784,0]],[3.1,[-71.4,3.8,173.2],[1,0,0,0],0.055,0.049,0.005]];
     PERS bool bEnableWeldSkip;
     PERS num nTrapCheck_2:=0;
@@ -2437,15 +2437,15 @@ VAR robjoint robot2_offset_joints;
 		Open "HOME:/robot2_init_position.txt", logfile \Write;
 		Write logfile, "Robot2 Init (" + TASK2_VERSION + ") Date=" + CDate() + " Time=" + CTime();
 
-		! Step 1: Move Robot2 joints to intermediate position (avoid configuration issue)
+		! Step 1: Move Robot2 joints to intermediate position (tWeld2 HOME config)
 		TPWrite "Robot2 init: Step1";
 		initial_joint := CJointT();
-		! Robot2 joint angles: [0, -2.58, -11.88, 0, 14.47, 0]
+		! Joint angles taught for tWeld2 HOME (confdata [0,0,0,4])
 		initial_joint.robax.rax_1 := 0;
-		initial_joint.robax.rax_2 := -2.58;
-		initial_joint.robax.rax_3 := -11.88;
+		initial_joint.robax.rax_2 := -48.88;
+		initial_joint.robax.rax_3 := 6.22;
 		initial_joint.robax.rax_4 := 0;
-		initial_joint.robax.rax_5 := 14.47;
+		initial_joint.robax.rax_5 := 8.26;
 		initial_joint.robax.rax_6 := 0;
 		! Keep current gantry position (DO NOT modify extax!)
 		! extax values already set by CJointT()
@@ -2453,7 +2453,7 @@ VAR robjoint robot2_offset_joints;
 		TPWrite "Robot2 init: Step1 done";
 		Write logfile, "Step1 done (intermediate joint)";
 
-		! Step 2: Move Robot2 TCP to HOME position at R-axis center with iterative refinement
+		! Step 2: Move Robot2 tWeld2 TCP to HOME [0,488,-1000] in WobjGantry_Rob2
 		iteration := 0;
 		max_iterations := 3;
 		tolerance := 0.5;  ! mm
@@ -2470,18 +2470,17 @@ VAR robjoint robot2_offset_joints;
 			+ NumToStr(WobjGantry_Rob2.uframe.trans.x,1) + ","
 			+ NumToStr(WobjGantry_Rob2.uframe.trans.y,1) + ","
 			+ NumToStr(WobjGantry_Rob2.uframe.trans.z,1) + "]";
-		! TCP position: [0, 488, -1000] in WobjGantry_Rob2 (tracks gantry position)
-		! Robot2 needs to move +488mm from base to reach R-axis center
-		! Quaternion: [0.5, -0.5, -0.5, -0.5]
-		! extax: use current gantry extax from TASK1
+		! tWeld2 TCP HOME: [0, 488, -1000] in WobjGantry_Rob2
+		! Orientation: [0.54167,-0.45453,-0.45453,-0.54167] (taught for tWeld2)
+		! Confdata: [0,0,0,4] (taught - critical for tWeld2 config)
 		gantry_joint := CJointT(\TaskName:="T_ROB1");
-		home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
-		MoveJ home_tcp, v100, fine, tool0\WObj:=WobjGantry_Rob2;  ! Using WobjGantry_Rob2 instead of wobj0!
+		home_tcp := [[0, 488, -1000], [0.54167, -0.45453, -0.45453, -0.54167], [0, 0, 0, 4], gantry_joint.extax];
+		MoveJ home_tcp, v100, fine, tWeld2\WObj:=WobjGantry_Rob2;
 		! Iterative refinement to reach precise R-axis center (max 3 iterations)
 		WHILE iteration < max_iterations DO
 			iteration := iteration + 1;
-			! Read current position in WobjGantry_Rob2 (same coordinate system as move target!)
-			current_wobj0 := CRobT(\Tool:=tool0\WObj:=WobjGantry_Rob2);
+			! Read current tWeld2 TCP position in WobjGantry_Rob2
+			current_wobj0 := CRobT(\Tool:=tWeld2\WObj:=WobjGantry_Rob2);
 			error_x := 0 - current_wobj0.trans.x;  ! Target X=0
 			error_y := 488 - current_wobj0.trans.y;  ! Target Y=488
 
@@ -2494,8 +2493,8 @@ VAR robjoint robot2_offset_joints;
 				! Apply correction: move to target position [0, 488, -1000] in WobjGantry_Rob2
 				UpdateGantryWobj_Rob2;
 				gantry_joint := CJointT(\TaskName:="T_ROB1");
-				home_tcp := [[0, 488, -1000], [0.5, -0.5, -0.5, -0.5], [0, 0, 0, 0], gantry_joint.extax];
-				MoveL home_tcp, v50, fine, tool0\WObj:=WobjGantry_Rob2;
+				home_tcp := [[0, 488, -1000], [0.54167, -0.45453, -0.45453, -0.54167], [0, 0, 0, 4], gantry_joint.extax];
+				MoveL home_tcp, v50, fine, tWeld2\WObj:=WobjGantry_Rob2;
 			ENDIF
 		ENDWHILE
 
@@ -2510,6 +2509,84 @@ VAR robjoint robot2_offset_joints;
 		TPWrite "ERROR in SetRobot2InitialPosition: " + NumToStr(ERRNO, 0);
 		Close logfile;
 		STOP;
+	ENDPROC
+
+	! ========================================
+	! Log Current Position (for HOME teaching)
+	! ========================================
+	! Usage: Jog Robot2 to desired position -> Call from FlexPendant
+	!        FlexPendant: ABB Menu -> Program Editor -> Debug -> Call Routine
+	! Output: HOME:/current_position_r2.txt
+	PROC LogCurrentPosition()
+		VAR iodev logfile;
+		VAR robtarget rt_tool0;
+		VAR robtarget rt_tw2_wobj0;
+		VAR robtarget rt_tw2_gantry;
+		VAR jointtarget jt;
+
+		Open "HOME:/current_position_r2.txt", logfile \Write;
+		Write logfile, "=== ROB_2 Position Log " + CDate() + " " + CTime() + " ===";
+
+		! --- JointTarget ---
+		jt := CJointT();
+		Write logfile, "";
+		Write logfile, "--- ROB_2 JointTarget ---";
+		Write logfile, "robax: [" + NumToStr(jt.robax.rax_1,3) + ", "
+			+ NumToStr(jt.robax.rax_2,3) + ", " + NumToStr(jt.robax.rax_3,3) + ", "
+			+ NumToStr(jt.robax.rax_4,3) + ", " + NumToStr(jt.robax.rax_5,3) + ", "
+			+ NumToStr(jt.robax.rax_6,3) + "]";
+
+		! --- RobTarget tool0/wobj0 ---
+		rt_tool0 := CRobT(\Tool:=tool0\WObj:=wobj0);
+		Write logfile, "";
+		Write logfile, "--- ROB_2 RobTarget (tool0, wobj0) ---";
+		Write logfile, "[[" + NumToStr(rt_tool0.trans.x,3) + ","
+			+ NumToStr(rt_tool0.trans.y,3) + ","
+			+ NumToStr(rt_tool0.trans.z,3) + "],["
+			+ NumToStr(rt_tool0.rot.q1,5) + ","
+			+ NumToStr(rt_tool0.rot.q2,5) + ","
+			+ NumToStr(rt_tool0.rot.q3,5) + ","
+			+ NumToStr(rt_tool0.rot.q4,5) + "],["
+			+ NumToStr(rt_tool0.robconf.cf1,0) + ","
+			+ NumToStr(rt_tool0.robconf.cf4,0) + ","
+			+ NumToStr(rt_tool0.robconf.cf6,0) + ","
+			+ NumToStr(rt_tool0.robconf.cfx,0) + "],extax]";
+
+		! --- RobTarget tWeld2/wobj0 ---
+		rt_tw2_wobj0 := CRobT(\Tool:=tWeld2\WObj:=wobj0);
+		Write logfile, "";
+		Write logfile, "--- ROB_2 RobTarget (tWeld2, wobj0) ---";
+		Write logfile, "[[" + NumToStr(rt_tw2_wobj0.trans.x,3) + ","
+			+ NumToStr(rt_tw2_wobj0.trans.y,3) + ","
+			+ NumToStr(rt_tw2_wobj0.trans.z,3) + "],["
+			+ NumToStr(rt_tw2_wobj0.rot.q1,5) + ","
+			+ NumToStr(rt_tw2_wobj0.rot.q2,5) + ","
+			+ NumToStr(rt_tw2_wobj0.rot.q3,5) + ","
+			+ NumToStr(rt_tw2_wobj0.rot.q4,5) + "],["
+			+ NumToStr(rt_tw2_wobj0.robconf.cf1,0) + ","
+			+ NumToStr(rt_tw2_wobj0.robconf.cf4,0) + ","
+			+ NumToStr(rt_tw2_wobj0.robconf.cf6,0) + ","
+			+ NumToStr(rt_tw2_wobj0.robconf.cfx,0) + "],extax]";
+
+		! --- RobTarget tWeld2/WobjGantry_Rob2 ---
+		UpdateGantryWobj_Rob2;
+		rt_tw2_gantry := CRobT(\Tool:=tWeld2\WObj:=WobjGantry_Rob2);
+		Write logfile, "";
+		Write logfile, "--- ROB_2 RobTarget (tWeld2, WobjGantry_Rob2) ---";
+		Write logfile, "[[" + NumToStr(rt_tw2_gantry.trans.x,3) + ","
+			+ NumToStr(rt_tw2_gantry.trans.y,3) + ","
+			+ NumToStr(rt_tw2_gantry.trans.z,3) + "],["
+			+ NumToStr(rt_tw2_gantry.rot.q1,5) + ","
+			+ NumToStr(rt_tw2_gantry.rot.q2,5) + ","
+			+ NumToStr(rt_tw2_gantry.rot.q3,5) + ","
+			+ NumToStr(rt_tw2_gantry.rot.q4,5) + "],["
+			+ NumToStr(rt_tw2_gantry.robconf.cf1,0) + ","
+			+ NumToStr(rt_tw2_gantry.robconf.cf4,0) + ","
+			+ NumToStr(rt_tw2_gantry.robconf.cf6,0) + ","
+			+ NumToStr(rt_tw2_gantry.robconf.cfx,0) + "],extax]";
+
+		Close logfile;
+		TPWrite "ROB_2 position saved to HOME:/current_position_r2.txt";
 	ENDPROC
 
 	! ========================================
