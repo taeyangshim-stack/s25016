@@ -5034,18 +5034,17 @@ PROC ExecMoveJgJ()
 	VAR iodev dbg_log;
 
 	Open "HOME:/debug_movejgj.txt", dbg_log \Write;
-	Write dbg_log, "ExecMoveJgJ (v1.9.45 eax_f=9E9) " + CDate() + " " + CTime();
+	Write dbg_log, "ExecMoveJgJ (v1.9.46 eax_f=eax_a) " + CDate() + " " + CTime();
 
 	! Read current position
 	jCurrent := CJointT();
 	Write dbg_log, "Current robax: " + NumToStr(jCurrent.robax.rax_1,2) + "," + NumToStr(jCurrent.robax.rax_2,2) + "," + NumToStr(jCurrent.robax.rax_3,2) + "," + NumToStr(jCurrent.robax.rax_4,2) + "," + NumToStr(jCurrent.robax.rax_5,2) + "," + NumToStr(jCurrent.robax.rax_6,2);
-	Write dbg_log, "Current extax: a=" + NumToStr(jCurrent.extax.eax_a,1) + " b=" + NumToStr(jCurrent.extax.eax_b,1) + " c=" + NumToStr(jCurrent.extax.eax_c,1) + " d=" + NumToStr(jCurrent.extax.eax_d,1) + " f=" + NumToStr(jCurrent.extax.eax_f,1);
+	Write dbg_log, "Current extax: a=" + NumToStr(jCurrent.extax.eax_a,1) + " b=" + NumToStr(jCurrent.extax.eax_b,1) + " c=" + NumToStr(jCurrent.extax.eax_c,1) + " d=" + NumToStr(jCurrent.extax.eax_d,1) + " e=" + NumToStr(jCurrent.extax.eax_e,1) + " f=" + NumToStr(jCurrent.extax.eax_f,1);
 
 	! Log jGantry from T_Head
 	Write dbg_log, "jGantry extax: a=" + NumToStr(jGantry.extax.eax_a,1) + " b=" + NumToStr(jGantry.extax.eax_b,1) + " c=" + NumToStr(jGantry.extax.eax_c,1) + " d=" + NumToStr(jGantry.extax.eax_d,1) + " f=" + NumToStr(jGantry.extax.eax_f,1);
 
-	! Keep current robot joints, only update gantry axes (X1, Y, Z, R)
-	! NOTE: eax_f (X2) is NOT set - X2 is synchronized to X1 by gantry controller
+	! Keep current robot joints, only update gantry axes (X1, Y, Z, R, X2)
 	jMoveTarget := jCurrent;
 	IF jGantry.extax.eax_a < 9E+08 THEN
 		jMoveTarget.extax.eax_a := jGantry.extax.eax_a;
@@ -5059,9 +5058,8 @@ PROC ExecMoveJgJ()
 	IF jGantry.extax.eax_d < 9E+08 THEN
 		jMoveTarget.extax.eax_d := jGantry.extax.eax_d;
 	ENDIF
-	! eax_f (X2): set 9E+09 to exclude from motion planning
-	! X2 is not controlled by T_ROB1 - synced by gantry hardware
-	jMoveTarget.extax.eax_f := 9E+09;
+	! eax_f (X2): sync with X1 target (eax_f = eax_a)
+	jMoveTarget.extax.eax_f := jMoveTarget.extax.eax_a;
 
 	! Log final target
 	Write dbg_log, "Target extax: a=" + NumToStr(jMoveTarget.extax.eax_a,1) + " b=" + NumToStr(jMoveTarget.extax.eax_b,1) + " c=" + NumToStr(jMoveTarget.extax.eax_c,1) + " d=" + NumToStr(jMoveTarget.extax.eax_d,1) + " f=" + NumToStr(jMoveTarget.extax.eax_f,1);
