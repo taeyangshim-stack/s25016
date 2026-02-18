@@ -5034,7 +5034,7 @@ PROC ExecMoveJgJ()
 	VAR iodev dbg_log;
 
 	Open "HOME:/debug_movejgj.txt", dbg_log \Write;
-	Write dbg_log, "ExecMoveJgJ (v1.9.44 no-eax_f) " + CDate() + " " + CTime();
+	Write dbg_log, "ExecMoveJgJ (v1.9.45 eax_f=9E9) " + CDate() + " " + CTime();
 
 	! Read current position
 	jCurrent := CJointT();
@@ -5059,7 +5059,9 @@ PROC ExecMoveJgJ()
 	IF jGantry.extax.eax_d < 9E+08 THEN
 		jMoveTarget.extax.eax_d := jGantry.extax.eax_d;
 	ENDIF
-	! eax_f (X2): keep CJointT() value - synced automatically by gantry hardware
+	! eax_f (X2): set 9E+09 to exclude from motion planning
+	! X2 is not controlled by T_ROB1 - synced by gantry hardware
+	jMoveTarget.extax.eax_f := 9E+09;
 
 	! Log final target
 	Write dbg_log, "Target extax: a=" + NumToStr(jMoveTarget.extax.eax_a,1) + " b=" + NumToStr(jMoveTarget.extax.eax_b,1) + " c=" + NumToStr(jMoveTarget.extax.eax_c,1) + " d=" + NumToStr(jMoveTarget.extax.eax_d,1) + " f=" + NumToStr(jMoveTarget.extax.eax_f,1);
