@@ -5045,7 +5045,7 @@ PROC ExecMoveJgJ()
 	Write dbg_log, "jGantry extax: a=" + NumToStr(jGantry.extax.eax_a,1) + " b=" + NumToStr(jGantry.extax.eax_b,1) + " c=" + NumToStr(jGantry.extax.eax_c,1) + " d=" + NumToStr(jGantry.extax.eax_d,1) + " f=" + NumToStr(jGantry.extax.eax_f,1);
 
 	! Keep current robot joints, only update gantry axes (X1, Y, Z, R)
-	! NOTE: eax_f (X2) is NOT set — X2 is synchronized to X1 by gantry controller
+	! NOTE: eax_f (X2) is NOT set - X2 is synchronized to X1 by gantry controller
 	jMoveTarget := jCurrent;
 	IF jGantry.extax.eax_a < 9E+08 THEN
 		jMoveTarget.extax.eax_a := jGantry.extax.eax_a;
@@ -5059,7 +5059,7 @@ PROC ExecMoveJgJ()
 	IF jGantry.extax.eax_d < 9E+08 THEN
 		jMoveTarget.extax.eax_d := jGantry.extax.eax_d;
 	ENDIF
-	! eax_f (X2): keep CJointT() value — synced automatically by gantry hardware
+	! eax_f (X2): keep CJointT() value - synced automatically by gantry hardware
 
 	! Log final target
 	Write dbg_log, "Target extax: a=" + NumToStr(jMoveTarget.extax.eax_a,1) + " b=" + NumToStr(jMoveTarget.extax.eax_b,1) + " c=" + NumToStr(jMoveTarget.extax.eax_c,1) + " d=" + NumToStr(jMoveTarget.extax.eax_d,1) + " f=" + NumToStr(jMoveTarget.extax.eax_f,1);
