@@ -3516,7 +3516,8 @@ PROC Rob2_CommandListener()
 
 			CASE "MoveJgJ":
 				stReact{2} := "";
-				MoveAbsJ jRob2, vSync, zSync, tool0;
+				! jRob2.robax has tool0-calculated joints from T_Head
+				! Robot2 should keep current tWeld2 posture during gantry move
 				stReact{2} := "Ack";
 				Write head_log, "MoveJgJ done";
 				WaitUntil stCommand = "";
