@@ -5032,9 +5032,10 @@ PROC ExecMoveJgJ()
 	VAR jointtarget jMoveTarget;
 	VAR jointtarget jCurrent;
 	VAR iodev dbg_log;
+	VAR speeddata vMove;
 
 	Open "HOME:/debug_movejgj.txt", dbg_log \Write;
-	Write dbg_log, "ExecMoveJgJ (v1.9.46 eax_f=eax_a) " + CDate() + " " + CTime();
+	Write dbg_log, "ExecMoveJgJ (v1.9.47 err_handler+v100) " + CDate() + " " + CTime();
 
 	! Read current position
 	jCurrent := CJointT();
@@ -5042,9 +5043,9 @@ PROC ExecMoveJgJ()
 	Write dbg_log, "Current extax: a=" + NumToStr(jCurrent.extax.eax_a,1) + " b=" + NumToStr(jCurrent.extax.eax_b,1) + " c=" + NumToStr(jCurrent.extax.eax_c,1) + " d=" + NumToStr(jCurrent.extax.eax_d,1) + " e=" + NumToStr(jCurrent.extax.eax_e,1) + " f=" + NumToStr(jCurrent.extax.eax_f,1);
 
 	! Log jGantry from T_Head
-	Write dbg_log, "jGantry extax: a=" + NumToStr(jGantry.extax.eax_a,1) + " b=" + NumToStr(jGantry.extax.eax_b,1) + " c=" + NumToStr(jGantry.extax.eax_c,1) + " d=" + NumToStr(jGantry.extax.eax_d,1) + " f=" + NumToStr(jGantry.extax.eax_f,1);
+	Write dbg_log, "jGantry extax: a=" + NumToStr(jGantry.extax.eax_a,1) + " b=" + NumToStr(jGantry.extax.eax_b,1) + " c=" + NumToStr(jGantry.extax.eax_c,1) + " d=" + NumToStr(jGantry.extax.eax_d,1) + " e=" + NumToStr(jGantry.extax.eax_e,1) + " f=" + NumToStr(jGantry.extax.eax_f,1);
 
-	! Keep current robot joints, only update gantry axes (X1, Y, Z, R, X2)
+	! Keep current robot joints, only update gantry axes (X1, Y, Z, R)
 	jMoveTarget := jCurrent;
 	IF jGantry.extax.eax_a < 9E+08 THEN
 		jMoveTarget.extax.eax_a := jGantry.extax.eax_a;
@@ -5062,14 +5063,16 @@ PROC ExecMoveJgJ()
 	jMoveTarget.extax.eax_f := jMoveTarget.extax.eax_a;
 
 	! Log final target
-	Write dbg_log, "Target extax: a=" + NumToStr(jMoveTarget.extax.eax_a,1) + " b=" + NumToStr(jMoveTarget.extax.eax_b,1) + " c=" + NumToStr(jMoveTarget.extax.eax_c,1) + " d=" + NumToStr(jMoveTarget.extax.eax_d,1) + " f=" + NumToStr(jMoveTarget.extax.eax_f,1);
-	Write dbg_log, "vSync: tcp=" + NumToStr(vSync.v_tcp,0) + " ext=" + NumToStr(vSync.v_leax,0);
+	Write dbg_log, "Target extax: a=" + NumToStr(jMoveTarget.extax.eax_a,1) + " b=" + NumToStr(jMoveTarget.extax.eax_b,1) + " c=" + NumToStr(jMoveTarget.extax.eax_c,1) + " d=" + NumToStr(jMoveTarget.extax.eax_d,1) + " e=" + NumToStr(jMoveTarget.extax.eax_e,1) + " f=" + NumToStr(jMoveTarget.extax.eax_f,1);
 
-	Write dbg_log, "Starting MoveAbsJ...";
+	! Use v100 for testing (vSync=400 may be too fast)
+	vMove := v100;
+	Write dbg_log, "vMove: tcp=" + NumToStr(vMove.v_tcp,0) + " ext=" + NumToStr(vMove.v_leax,0);
+	Write dbg_log, "Starting MoveAbsJ with v100, fine, tool0...";
 	Close dbg_log;
 
-	TPWrite "[R1] MoveJgJ: MoveAbsJ starting...";
-	MoveAbsJ jMoveTarget, vSync, zSync, tool0;
+	TPWrite "[R1] MoveJgJ: MoveAbsJ starting (v100)...";
+	MoveAbsJ jMoveTarget, vMove, fine, tool0;
 	TPWrite "[R1] MoveJgJ: MoveAbsJ done";
 
 	Open "HOME:/debug_movejgj.txt", dbg_log \Append;
@@ -5082,6 +5085,14 @@ PROC ExecMoveJgJ()
 	Write dbg_log, "UpdateGantryWobj done " + CTime();
 	Write dbg_log, "ExecMoveJgJ completed OK";
 	Close dbg_log;
+	RETURN;
+
+ERROR
+	Open "HOME:/debug_movejgj.txt", dbg_log \Append;
+	Write dbg_log, "ERROR in ExecMoveJgJ! ERRNO=" + NumToStr(ERRNO,0) + " at " + CTime();
+	Close dbg_log;
+	TPWrite "[R1] MoveJgJ ERROR: ERRNO=" + NumToStr(ERRNO,0);
+	STOP;
 ENDPROC
 
 ! ========================================
