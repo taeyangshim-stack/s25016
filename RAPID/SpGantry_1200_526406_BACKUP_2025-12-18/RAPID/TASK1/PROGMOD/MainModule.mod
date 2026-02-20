@@ -5023,29 +5023,33 @@ PROC CommandLoop()
 ENDPROC
 
 ! ========================================
-! ExecMoveJgJ: Execute MoveJgJ from T_Head (v1.9.42)
+! ExecMoveJgJ: Execute MoveJgJ from T_Head (v1.9.47)
 ! ========================================
 ! PlanB: Move gantry to target, keep robot at current joints
 ! T_Head jRob1.robax is calculated for tool0 - not compatible with tWeld1 HOME
 ! Robot maintains current posture while gantry moves
+! v1.9.47: Split large moves into segments (ABB 50050 workaround)
 PROC ExecMoveJgJ()
 	VAR jointtarget jMoveTarget;
 	VAR jointtarget jCurrent;
+	VAR jointtarget jStep;
 	VAR iodev dbg_log;
-	VAR speeddata vMove;
+	VAR num nSegments;
+	VAR num nMaxSegs;
+	VAR num da;
+	VAR num db;
+	VAR num dc;
+	VAR num dd;
+	VAR num i;
 
 	Open "HOME:/debug_movejgj.txt", dbg_log \Write;
-	Write dbg_log, "ExecMoveJgJ (v1.9.47 err_handler+v100) " + CDate() + " " + CTime();
+	Write dbg_log, "ExecMoveJgJ (v1.9.47 segmented) " + CDate() + " " + CTime();
 
 	! Read current position
 	jCurrent := CJointT();
-	Write dbg_log, "Current robax: " + NumToStr(jCurrent.robax.rax_1,2) + "," + NumToStr(jCurrent.robax.rax_2,2) + "," + NumToStr(jCurrent.robax.rax_3,2) + "," + NumToStr(jCurrent.robax.rax_4,2) + "," + NumToStr(jCurrent.robax.rax_5,2) + "," + NumToStr(jCurrent.robax.rax_6,2);
-	Write dbg_log, "Current extax: a=" + NumToStr(jCurrent.extax.eax_a,1) + " b=" + NumToStr(jCurrent.extax.eax_b,1) + " c=" + NumToStr(jCurrent.extax.eax_c,1) + " d=" + NumToStr(jCurrent.extax.eax_d,1) + " e=" + NumToStr(jCurrent.extax.eax_e,1) + " f=" + NumToStr(jCurrent.extax.eax_f,1);
+	Write dbg_log, "Current extax: a=" + NumToStr(jCurrent.extax.eax_a,1) + " b=" + NumToStr(jCurrent.extax.eax_b,1) + " c=" + NumToStr(jCurrent.extax.eax_c,1) + " d=" + NumToStr(jCurrent.extax.eax_d,1) + " f=" + NumToStr(jCurrent.extax.eax_f,1);
 
-	! Log jGantry from T_Head
-	Write dbg_log, "jGantry extax: a=" + NumToStr(jGantry.extax.eax_a,1) + " b=" + NumToStr(jGantry.extax.eax_b,1) + " c=" + NumToStr(jGantry.extax.eax_c,1) + " d=" + NumToStr(jGantry.extax.eax_d,1) + " e=" + NumToStr(jGantry.extax.eax_e,1) + " f=" + NumToStr(jGantry.extax.eax_f,1);
-
-	! Keep current robot joints, only update gantry axes (X1, Y, Z, R)
+	! Build final target: keep robot joints, update gantry axes
 	jMoveTarget := jCurrent;
 	IF jGantry.extax.eax_a < 9E+08 THEN
 		jMoveTarget.extax.eax_a := jGantry.extax.eax_a;
@@ -5059,24 +5063,57 @@ PROC ExecMoveJgJ()
 	IF jGantry.extax.eax_d < 9E+08 THEN
 		jMoveTarget.extax.eax_d := jGantry.extax.eax_d;
 	ENDIF
-	! eax_f (X2): sync with X1 target (eax_f = eax_a)
 	jMoveTarget.extax.eax_f := jMoveTarget.extax.eax_a;
 
-	! Log final target
-	Write dbg_log, "Target extax: a=" + NumToStr(jMoveTarget.extax.eax_a,1) + " b=" + NumToStr(jMoveTarget.extax.eax_b,1) + " c=" + NumToStr(jMoveTarget.extax.eax_c,1) + " d=" + NumToStr(jMoveTarget.extax.eax_d,1) + " e=" + NumToStr(jMoveTarget.extax.eax_e,1) + " f=" + NumToStr(jMoveTarget.extax.eax_f,1);
+	Write dbg_log, "Target extax: a=" + NumToStr(jMoveTarget.extax.eax_a,1) + " b=" + NumToStr(jMoveTarget.extax.eax_b,1) + " c=" + NumToStr(jMoveTarget.extax.eax_c,1) + " d=" + NumToStr(jMoveTarget.extax.eax_d,1) + " f=" + NumToStr(jMoveTarget.extax.eax_f,1);
 
-	! Use v100 for testing (vSync=400 may be too fast)
-	vMove := v100;
-	Write dbg_log, "vMove: tcp=" + NumToStr(vMove.v_tcp,0) + " ext=" + NumToStr(vMove.v_leax,0);
-	Write dbg_log, "Starting MoveAbsJ with v100, fine, tool0...";
+	! Calculate movement per axis
+	da := Abs(jMoveTarget.extax.eax_a - jCurrent.extax.eax_a);
+	db := Abs(jMoveTarget.extax.eax_b - jCurrent.extax.eax_b);
+	dc := Abs(jMoveTarget.extax.eax_c - jCurrent.extax.eax_c);
+	dd := Abs(jMoveTarget.extax.eax_d - jCurrent.extax.eax_d);
+
+	! Determine segments: linear max 2000mm, rotational max 45deg per segment
+	nSegments := 1;
+	nMaxSegs := Trunc(da / 2000) + 1;
+	IF nMaxSegs > nSegments nSegments := nMaxSegs;
+	nMaxSegs := Trunc(db / 2000) + 1;
+	IF nMaxSegs > nSegments nSegments := nMaxSegs;
+	nMaxSegs := Trunc(dc / 2000) + 1;
+	IF nMaxSegs > nSegments nSegments := nMaxSegs;
+	nMaxSegs := Trunc(dd / 45) + 1;
+	IF nMaxSegs > nSegments nSegments := nMaxSegs;
+
+	Write dbg_log, "Delta: a=" + NumToStr(da,0) + " b=" + NumToStr(db,0) + " c=" + NumToStr(dc,0) + " d=" + NumToStr(dd,0) + " segs=" + NumToStr(nSegments,0);
 	Close dbg_log;
 
-	TPWrite "[R1] MoveJgJ: MoveAbsJ starting (v100)...";
-	MoveAbsJ jMoveTarget, vMove, fine, tool0;
+	IF nSegments <= 1 THEN
+		! Single move - small distance
+		TPWrite "[R1] MoveJgJ: single move";
+		MoveAbsJ jMoveTarget, v100, fine, tool0;
+	ELSE
+		! Segmented move - split into steps
+		TPWrite "[R1] MoveJgJ: " + NumToStr(nSegments,0) + " segments";
+		FOR i FROM 1 TO nSegments DO
+			jStep := jCurrent;
+			! Linear interpolation for each axis
+			jStep.extax.eax_a := jCurrent.extax.eax_a + (jMoveTarget.extax.eax_a - jCurrent.extax.eax_a) * i / nSegments;
+			jStep.extax.eax_b := jCurrent.extax.eax_b + (jMoveTarget.extax.eax_b - jCurrent.extax.eax_b) * i / nSegments;
+			jStep.extax.eax_c := jCurrent.extax.eax_c + (jMoveTarget.extax.eax_c - jCurrent.extax.eax_c) * i / nSegments;
+			jStep.extax.eax_d := jCurrent.extax.eax_d + (jMoveTarget.extax.eax_d - jCurrent.extax.eax_d) * i / nSegments;
+			jStep.extax.eax_f := jStep.extax.eax_a;
+			IF i < nSegments THEN
+				MoveAbsJ jStep, v100, z50, tool0;
+			ELSE
+				MoveAbsJ jStep, v100, fine, tool0;
+			ENDIF
+		ENDFOR
+	ENDIF
+
 	TPWrite "[R1] MoveJgJ: MoveAbsJ done";
 
 	Open "HOME:/debug_movejgj.txt", dbg_log \Append;
-	Write dbg_log, "MoveAbsJ completed " + CTime();
+	Write dbg_log, "MoveAbsJ completed (segs=" + NumToStr(nSegments,0) + ") " + CTime();
 	Close dbg_log;
 
 	UpdateGantryWobj;
