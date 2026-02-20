@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>스마트랙(유연 적치) 개발 보고서 | 에스피시스템스</title>
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --panel:#121a2a;
+      --muted:#8aa0c2;
+      --text:#eaf1ff;
+      --accent:#4cc9f0;
+      --accent2:#a78bfa;
+      --ok:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --line:rgba(255,255,255,.08);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 800px at 20% -10%, rgba(76,201,240,.22), transparent 60%),
+        radial-gradient(900px 700px at 110% 10%, rgba(167,139,250,.18), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo","Noto Sans KR", Arial, "Helvetica Neue", sans-serif;
+      line-height:1.6;
+    }
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:1100px; margin:0 auto; padding:28px 18px 80px}
+
+    header{
+      padding:22px 18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .toprow{display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap}
+    .badge{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:7px 10px; border:1px solid var(--line);
+      border-radius:999px; background:rgba(255,255,255,.03); color:var(--muted);
+      font-size:12px;
+    }
+    .badge b{color:var(--text); font-weight:650}
+    h1{margin:8px 0 6px; font-size:28px; letter-spacing:-.3px}
+    .subtitle{margin:0; color:var(--muted)}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:14px; margin-top:16px;
+    }
+    @media (max-width: 960px){ .grid{grid-template-columns:1fr} }
+
+    .panel{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background:rgba(255,255,255,.03);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .hd{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .panel .hd h2{margin:0; font-size:16px}
+    .panel .bd{padding:14px 16px}
+
+    .kpi{
+      display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
+    }
+    @media (max-width: 700px){ .kpi{grid-template-columns:repeat(2, 1fr)} }
+    .kpi .box{
+      padding:12px; border-radius:14px; border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    }
+    .kpi .box .t{font-size:12px; color:var(--muted)}
+    .kpi .box .v{font-size:16px; font-weight:750; margin-top:2px}
+    .kpi .box .s{font-size:12px; color:var(--muted); margin-top:4px}
+
+    .toc{display:flex; flex-wrap:wrap; gap:8px;}
+    .toc a{
+      padding:8px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text); font-size:13px;
+    }
+    .toc a:hover{background:rgba(76,201,240,.08); text-decoration:none}
+
+    .cards{display:grid; gap:12px}
+    .card{
+      padding:14px 14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .card h3{margin:0 0 6px; font-size:15px}
+    .muted{color:var(--muted)}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px; font-size:12px;
+      border:1px solid var(--line); background:rgba(255,255,255,.03);
+      margin-right:6px; margin-bottom:6px;
+    }
+    .dot{width:9px; height:9px; border-radius:50%}
+    .dot.ok{background:var(--ok)}
+    .dot.warn{background:var(--warn)}
+    .dot.bad{background:var(--bad)}
+
+    .table{
+      width:100%; border-collapse:collapse; overflow:hidden;
+      border-radius: 14px; border:1px solid var(--line);
+    }
+    .table th, .table td{
+      text-align:left; padding:10px 10px; border-bottom:1px solid var(--line);
+      vertical-align:top;
+    }
+    .table th{font-size:12px; color:var(--muted); background:rgba(255,255,255,.03)}
+    .table tr:last-child td{border-bottom:none}
+
+    .kbd{font-family:var(--mono); font-size:12px; padding:2px 6px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.04)}
+
+    details{
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background:rgba(255,255,255,.02);
+      padding:12px 12px;
+    }
+    summary{cursor:pointer; font-weight:700}
+
+    .two{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    @media (max-width: 860px){ .two{grid-template-columns:1fr} }
+
+    .video{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      overflow:hidden;
+      background:#000;
+    }
+    .video iframe{
+      width:100%;
+      height:360px;
+      border:0;
+      display:block;
+      background:#000;
+    }
+    @media (max-width: 860px){
+      .video iframe{ height:220px; }
+    }
+
+    .video-fallback{
+      padding:10px 12px;
+      background:rgba(255,255,255,.03);
+      border-top:1px solid var(--line);
+      color:rgba(234,241,255,.9);
+      font-size:13px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .video-fallback span{color:var(--muted)}
+    .video-fallback a{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(76,201,240,.08);
+      color:var(--text);
+      font-size:13px;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .video-fallback a:hover{background:rgba(76,201,240,.16)}
+
+    .callout{
+      padding:12px 14px; border-radius: var(--radius);
+      border:1px solid var(--line);
+      background:rgba(76,201,240,.07);
+    }
+    .warnbox{ background:rgba(251,191,36,.08) }
+    .okbox{ background:rgba(52,211,153,.07) }
+    .badbox{ background:rgba(251,113,133,.08) }
+
+    .footer{
+      margin-top:18px; color:var(--muted); font-size:12px;
+      border-top:1px solid var(--line); padding-top:14px;
+    }
+    .mini{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+      color:var(--muted); font-size:12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header id="top">
+      <div class="toprow">
+        <div>
+          <div class="badge"><b>스마트랙(유연 적치)</b> 개발 보고서 · Kick-off 기반 + 아이디어 확장</div>
+          <h1>Shipbuilding Sub-Parts Smart Rack: 유연 적치(Free-Form Storage) 컨셉 보고서</h1>
+          <p class="subtitle">
+            소조립 공장 내 <b>절단 소재 입고·보관·공급</b> 및 <b>완성 소조블록 적재·출하</b>까지 연계되는
+            통합 물류 관점에서, "구역 고정형 랙"이 아닌 <b>부재가 랙을 정의하는 유연 적치</b> 구조를 제안합니다.
+          </p>
+          <div class="mini" style="margin-top:10px">
+            <span class="pill"><span class="dot ok"></span>목표: JIT 자재공급 + 고밀도 적치</span>
+            <span class="pill"><span class="dot warn"></span>핵심: 3D/CoG 인식 + 가변 지지 + 안전검증</span>
+            <span class="pill"><span class="dot ok"></span>연계: AMR/크레인 + 입출고 S/W + 디지털트윈</span>
+          </div>
+        </div>
+        <div class="badge">
+          문서 버전 <b>v1.1</b> · 작성일 <b>2026-02-20</b> · 조직 <b>에스피시스템스</b>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="panel">
+          <div class="hd">
+            <h2>바로가기(TOC)</h2>
+            <span class="badge">읽기 편하게 구성</span>
+          </div>
+          <div class="bd">
+            <div class="toc">
+              <a href="#scope">1. 과제 개요/범위</a>
+              <a href="#definition">2. 스마트랙 정의</a>
+              <a href="#ideas">3. 유연 적치 스마트랙 아이디어</a>
+              <a href="#mechanism">4. 랙 기구/모듈 제안</a>
+              <a href="#sensing">5. 인식/안전 알고리즘</a>
+              <a href="#interface">6. AMR·크레인 인터페이스</a>
+              <a href="#plan">7. 개발 수행 계획(1차년도)</a>
+              <a href="#videos">8. 참고 영상</a>
+              <a href="#next">9. 다음 단계(의사결정)</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="hd">
+            <h2>요약 KPI</h2>
+            <span class="badge">Kick-off 핵심만</span>
+          </div>
+          <div class="bd">
+            <div class="kpi">
+              <div class="box">
+                <div class="t">통합 관점</div>
+                <div class="v">소조립 공장 물류</div>
+                <div class="s">입고~출고 전 과정 연계</div>
+              </div>
+              <div class="box">
+                <div class="t">스마트랙 역할</div>
+                <div class="v">유연 적치 + 버퍼</div>
+                <div class="s">형상/무게 다양 대응</div>
+              </div>
+              <div class="box">
+                <div class="t">1차년도</div>
+                <div class="v">9개월</div>
+                <div class="s">개념·기구·제어·S/W 기초</div>
+              </div>
+              <div class="box">
+                <div class="t">예산/인력(가정)</div>
+                <div class="v">6억 / 6명</div>
+                <div class="s">기구2·제어2·S/W1·PM1</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 1. 범위 -->
+    <section id="scope" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>1. 과제 개요/범위</h2>
+          <span class="badge">RFP 해석 포인트 포함</span>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div class="card">
+              <h3>과제 프레이밍</h3>
+              <p class="muted">
+                중대형 선박 <b>유연생산시스템</b> 도입을 위한 지능형 물류 관리 기술개발 관점에서,
+                스마트랙은 "단일 장비"가 아니라 <b>소조립 공장 전체 물류 관리 시스템</b>의 핵심 노드로 정의합니다.
+              </p>
+              <div class="callout warnbox">
+                <b>RFP 모호점 정리</b><br/>
+                "원자재 입출고"와 "조립장 내 물류 이송"이 별도 시스템으로 기술되어
+                스마트랙의 범위가 <i>임시 보관 버퍼</i>인지, <i>통합 물류</i>인지 애매할 수 있음 →<br/>
+                <b>"조립장 내" + 입고~출고 전 과정 포괄</b> 문맥을 근거로 통합 물류로 해석.
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>4대 세부 시스템(상위 구조)</h3>
+              <table class="table">
+                <thead>
+                  <tr><th style="width:34%">세부 시스템</th><th>핵심 요소</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>지능형 원자재 입출고 관리</b></td>
+                    <td>지능형 랙 + 입출고 관리 S/W + 통합 연계</td>
+                  </tr>
+                  <tr>
+                    <td><b>조립장 내 물류 이송 자동화</b></td>
+                    <td>AMR H/W + 자율주행 + 입출고 시스템 연동</td>
+                  </tr>
+                  <tr>
+                    <td><b>완성품 품질관리 및 적재 자동화</b></td>
+                    <td>변형 계측 + 고중량 소조블록 + 지능형 적재 랙</td>
+                  </tr>
+                  <tr>
+                    <td><b>디지털트윈 통합 관리</b></td>
+                    <td>생산공정 관리 + 디지털트윈 + 모니터링</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="muted" style="margin-top:10px">
+                ※ 본 보고서는 그 중 <b>"지능형 랙(유연 적치)"</b>을 중심으로,
+                AMR/크레인 및 디지털트윈 연계를 고려해 확장 아이디어를 담습니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 정의 -->
+    <section id="definition" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>2. 스마트랙(Smart Rack) 정의</h2>
+          <span class="badge">Kick-off 정의 반영</span>
+        </div>
+        <div class="bd">
+          <div class="cards">
+            <div class="card">
+              <h3>정의(운영 관점)</h3>
+              <p>
+                스마트랙은 <b>소조립 공장 내 절단 소재의 입고·보관·공급</b> 및
+                <b>완성 소조블록의 적재·출하</b>까지를 관리하는 <b>공장 전체 물류 관리 시스템</b>이며,
+                AMR과 연계해 공장 내 자재 이동을 자동화하고 CAD/생산스케줄과 연동하여
+                <b>적시적소(JIT) 자재 공급</b>을 실현합니다.
+              </p>
+              <div class="mini">
+                <span class="pill"><span class="dot ok"></span>입고 → 적치 → 피킹 → 공정공급</span>
+                <span class="pill"><span class="dot ok"></span>완성 → 적재 → 출하</span>
+                <span class="pill"><span class="dot warn"></span>형상/무게/무게중심 다양</span>
+              </div>
+            </div>
+
+            <details>
+              <summary>왜 "구역 고정형 랙"이 아니라 "유연 적치(Free-Form)"여야 하나?</summary>
+              <div style="margin-top:10px" class="two">
+                <div class="card">
+                  <h3>현실 제약</h3>
+                  <ul>
+                    <li>소부재/소조블록은 <b>형상·길이·폭·두께·무게중심(CoG)</b>이 제각각</li>
+                    <li>공정 변동/우선순위 변경으로 <b>재배치(reshuffling)</b>가 빈번</li>
+                    <li>안전(전도/좌굴/국부변형) 요구가 높아 <b>경험 의존</b>이 큼</li>
+                  </ul>
+                </div>
+                <div class="card">
+                  <h3>유연 적치가 주는 이득</h3>
+                  <ul>
+                    <li><b>공간 효율</b>: "칸"이 아니라 "지지점" 기반으로 고밀도 적치</li>
+                    <li><b>운영 유연성</b>: 생산계획 변화 시 자동으로 적치 전략 변경</li>
+                    <li><b>안전 내재화</b>: 센서+모델 기반 안정성 검증으로 표준화</li>
+                  </ul>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 아이디어 -->
+    <section id="ideas" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>3. 유연 적치 스마트랙 아이디어 (핵심)</h2>
+          <span class="badge">"부재가 랙을 정의"</span>
+        </div>
+        <div class="bd">
+          <div class="callout okbox">
+            <b>핵심 문장</b><br/>
+            고정 구획(슬롯) 기반이 아니라, <b>3D 형상 + CoG + 허용 변형/지지 조건</b>에 따라
+            랙이 <b>지지점(서포트)</b>을 재구성하고,
+            시스템이 <b>안전·접근성·공정연계성</b>을 동시에 최적화합니다.
+          </div>
+
+          <div class="two" style="margin-top:12px">
+            <div class="card">
+              <h3>컨셉 A: "핀-그리드(다점 지지) + 빠른 수동 가변" (현실형 MVP)</h3>
+              <p class="muted">
+                구조는 단순하지만 성과가 빠릅니다. 자동화는 "완전 자동"이 아니라,
+                <b>추천 지지점 자동 계산</b> + <b>가이드(작업자/크레인)</b>로 시작합니다.
+              </p>
+              <ul>
+                <li>랙 면에 <b>촘촘한 홀 그리드</b> (예: 100~150mm 피치)</li>
+                <li>서포트 핀/받침을 <b>퀵 체인지</b>로 위치 변경</li>
+                <li>부재 스캔 → 시스템이 "권장 지지점"을 표시(LED/AR/라벨)</li>
+                <li>장점: <b>저비용·고신뢰</b> / 단점: 완전 무인 어려움</li>
+              </ul>
+              <div class="mini">
+                <span class="pill"><span class="dot ok"></span>TRL 빠르게 상승</span>
+                <span class="pill"><span class="dot warn"></span>인력 개입 일부</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>컨셉 B: "전동(Servo) 서포트 모듈 + 반자동 적치" (차별화 중간 단계)</h3>
+              <p class="muted">
+                서포트가 <b>높이/각도</b>를 자동으로 맞춰주고,
+                적치는 크레인/AMR이 수행(도킹/정렬은 센서로 보조)합니다.
+              </p>
+              <ul>
+                <li>서포트 모듈: <b>전동 스크류잭/리니어액추에이터</b></li>
+                <li>상단 패드: <b>회전(2축) + 미끄럼 방지</b> + 교체형(우레탄/강재)</li>
+                <li>센서: <b>하중(로드셀)</b>, <b>접촉 감지</b>, (선택) <b>변형 게이지</b></li>
+                <li>장점: 자동화 체감 큼 / 단점: 모듈 단가, 유지보수 설계 중요</li>
+              </ul>
+              <div class="mini">
+                <span class="pill"><span class="dot ok"></span>자동 정렬/수평화</span>
+                <span class="pill"><span class="dot warn"></span>모듈 신뢰성 관건</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="two" style="margin-top:12px">
+            <div class="card">
+              <h3>컨셉 C: "셀 기반 Self-Reconfiguring Rack" (세계 최초급 스토리)</h3>
+              <p class="muted">
+                랙 자체가 <b>셀(Cell)</b>로 구성되어, 부재가 들어오면 셀이 자동으로 올라오고(또는 내려가고),
+                <b>안정 자세</b>를 만든 후 적치합니다.
+              </p>
+              <ul>
+                <li>다점 셀(예: 10×N) 각각이 높이 제어(서보/유압)</li>
+                <li>부재 3D/CoG 기반으로 셀 높이/접촉점 최적화</li>
+                <li>하중 분포 실시간 모니터링 → 위험 시 재분배</li>
+                <li>장점: "형상 무관"의 정점 / 단점: 대형화·비용·안전 인증 난이도↑</li>
+              </ul>
+              <div class="mini">
+                <span class="pill"><span class="dot ok"></span>특허/논문화 강함</span>
+                <span class="pill"><span class="dot bad"></span>개발 난이도 높음</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>아이디어를 "조선형"으로 만드는 차별화 포인트</h3>
+              <ul>
+                <li><b>생산계획 연동 적치 전략</b>: 3일 내 투입품은 접근성 최우선, 2주 대기품은 고밀도</li>
+                <li><b>변형/품질 관점</b>: 단순 보관이 아니라 <b>허용 변형</b>을 지키는 지지 설계</li>
+                <li><b>야드/공장 두뇌</b>: 크레인 동선·재배치 비용까지 포함한 "AI Yard Brain" 확장</li>
+              </ul>
+              <div class="callout">
+                <b>추천 진행</b><br/>
+                1차년도에는 <b>컨셉 A→B</b>로 "성과/현장수용성"을 확보하고,<br/>
+                병렬로 컨셉 C의 핵심(셀 제어/안정성 검증/특허)을 PoC로 분리 개발하는 방식이 안전합니다.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 기구 -->
+    <section id="mechanism" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>4. 랙 기구/모듈 제안 (Free-Form Rack)</h2>
+          <span class="badge">모듈화 = 유지보수</span>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div class="card">
+              <h3>모듈 구성(권장)</h3>
+              <table class="table">
+                <thead>
+                  <tr><th style="width:28%">모듈</th><th>설명</th><th style="width:24%">비고</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>서포트 모듈</b></td>
+                    <td>높이/각도 조절, 상단 패드 교체, 하중 센싱</td>
+                    <td>컨셉 A/B/C 공통</td>
+                  </tr>
+                  <tr>
+                    <td><b>빔/프레임</b></td>
+                    <td>레일/슬라이딩 빔으로 지지점 간격 조절(옵션)</td>
+                    <td>공간 효율↑</td>
+                  </tr>
+                  <tr>
+                    <td><b>안전 모듈</b></td>
+                    <td>과하중, 편하중, 접촉 이상 감지 및 인터록</td>
+                    <td>필수</td>
+                  </tr>
+                  <tr>
+                    <td><b>도킹/정렬</b></td>
+                    <td>AMR/크레인 적치 위치 유도(마커, 비전, LiDAR)</td>
+                    <td>현장 조건에 맞춤</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="muted" style="margin-top:10px">
+                설계 원칙: <b>하드웨어는 단순·강건</b>, <b>지능은 소프트웨어로</b> (현장 유지보수/확장성 관점)
+              </p>
+            </div>
+
+            <div class="card">
+              <h3>서포트 상단 패드(예시)</h3>
+              <div class="mini">
+                <span class="pill"><span class="dot ok"></span>회전(2축) 패드</span>
+                <span class="pill"><span class="dot ok"></span>미끄럼 방지(우레탄)</span>
+                <span class="pill"><span class="dot warn"></span>국부압력 분산(넓은 면)</span>
+              </div>
+              <ul>
+                <li><b>회전 패드</b>: 부재의 미세 각도 차이를 흡수 → 편하중 감소</li>
+                <li><b>스페이서/새들(Saddle)</b>: 곡면/모서리 부재 대응</li>
+                <li><b>퀵 체인지</b>: 패드 마모/손상 시 빠른 교체</li>
+                <li><b>인덱싱</b>: "장착 ID"를 시스템이 인식(정확한 지지조건 기록)</li>
+              </ul>
+
+              <div class="card" style="margin-top:10px; background:rgba(0,0,0,.10)">
+                <h3 style="margin-bottom:8px">개념 스케치(SVG)</h3>
+                <svg viewBox="0 0 900 220" width="100%" height="auto" aria-label="smart rack concept">
+                  <defs>
+                    <linearGradient id="g1" x1="0" x2="1">
+                      <stop offset="0" stop-color="rgba(76,201,240,.9)"/>
+                      <stop offset="1" stop-color="rgba(167,139,250,.9)"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="40" y="40" width="820" height="140" rx="18" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.10)" />
+                  <g fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.18)">
+                    <rect x="120" y="120" width="50" height="50" rx="10"/>
+                    <rect x="250" y="90" width="50" height="80" rx="10"/>
+                    <rect x="380" y="130" width="50" height="40" rx="10"/>
+                    <rect x="510" y="100" width="50" height="70" rx="10"/>
+                    <rect x="640" y="120" width="50" height="50" rx="10"/>
+                  </g>
+                  <path d="M110 78 L710 60 L760 110 L160 128 Z" fill="rgba(255,255,255,.08)" stroke="url(#g1)" stroke-width="3"/>
+                  <text x="55" y="28" fill="rgba(234,241,255,.85)" font-size="14" font-family="ui-sans-serif">Free-Form Rack (서포트 가변)</text>
+                  <text x="120" y="205" fill="rgba(138,160,194,.95)" font-size="12" font-family="ui-sans-serif">서포트 모듈(높이/각도/하중)</text>
+                </svg>
+                <p class="muted" style="margin:8px 0 0">
+                  "칸"이 아니라 "지지점 배열"로 적치 자세를 만든다는 의미의 시각화입니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <details style="margin-top:12px">
+            <summary>구조 안전(전도/좌굴/국부변형) 체크를 시스템에 내장하는 방법</summary>
+            <div style="margin-top:10px" class="two">
+              <div class="card">
+                <h3>안정성 체크(빠른 규칙 기반)</h3>
+                <ul>
+                  <li><b>CoG 투영</b>이 지지 다각형 내부인지(전도 위험)</li>
+                  <li>지지점 간격/배치가 최소 조건 만족인지</li>
+                  <li>로드셀 하중 분포가 허용 편차 이내인지</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>정밀 체크(모델 기반)</h3>
+                <ul>
+                  <li>CAD 기반 단순화 모델로 <b>국부압력</b> 추정</li>
+                  <li>허용 변형/응력 기준(현장 표준)과 비교</li>
+                  <li>이상 시 지지점 재배치/높이 재조정</li>
+                </ul>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 인식/알고리즘 -->
+    <section id="sensing" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>5. 인식/안전 알고리즘 (형상→지지점→검증)</h2>
+          <span class="badge">SW가 차별화</span>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div class="card">
+              <h3>데이터 파이프라인(권장)</h3>
+              <ol>
+                <li><b>입고 시</b> 3D 스캔(또는 CAD 매칭) → 메쉬/포인트클라우드 생성</li>
+                <li>부재 <b>무게/CoG</b> 추정(실측 하중 + CAD 질량특성 결합)</li>
+                <li><b>적치 후보 자세</b> 생성(회전/뒤집기 제한 포함)</li>
+                <li><b>지지점 후보</b> 생성(접촉 가능한 면/리브/보강부 우선)</li>
+                <li>안전/변형/접근성 점수로 최적 조합 선택</li>
+                <li>실적치 후 로드셀/변형 센서로 <b>검증·학습</b></li>
+              </ol>
+              <div class="callout okbox">
+                <b>포인트</b><br/>
+                초기에는 "완벽한 AI"보다 <b>규칙+검증센서</b>로 현장 신뢰를 만든 뒤,
+                데이터가 쌓이면 최적화를 강화하는 흐름이 빠릅니다.
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>최적화 목표(3종)</h3>
+              <table class="table">
+                <thead>
+                  <tr><th style="width:30%">목표</th><th>설명</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>안전성</b></td>
+                    <td>전도/편하중/국부변형 최소화, 인터록 기반 자동 차단</td>
+                  </tr>
+                  <tr>
+                    <td><b>접근성</b></td>
+                    <td>향후 출고/공정투입 시 크레인/AMR 접근 경로 최소 이동</td>
+                  </tr>
+                  <tr>
+                    <td><b>공정 연계성</b></td>
+                    <td>생산스케줄 기반 우선순위 반영(JIT), 재배치 비용 포함</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <details style="margin-top:10px">
+                <summary>간단한 점수화 예시(설명용)</summary>
+                <div class="card" style="margin-top:10px">
+                  <p class="muted" style="margin:0">
+                    총점 = 0.50×안전 + 0.30×접근성 + 0.20×공정연계 (현장 합의로 가중치 조정)<br/>
+                    안전 점수는 CoG/하중분포/국부압력의 패널티 합으로 계산.
+                  </p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. 인터페이스 -->
+    <section id="interface" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>6. AMR·크레인 인터페이스(도킹/통신/이재)</h2>
+          <span class="badge">도킹/통신 규격</span>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div class="card">
+              <h3>도킹(정렬) 방식 옵션</h3>
+              <ul>
+                <li><b>패시브 마커</b>: QR/AprilTag + 카메라(저비용)</li>
+                <li><b>LiDAR 기반</b>: 반사판/형상 기준 정렬(분진·조명 대응)</li>
+                <li><b>기계 가이드</b>: 콘/레일로 최종 위치 결정(가장 강건)</li>
+              </ul>
+              <div class="callout warnbox">
+                <b>조선 환경 고려</b><br/>
+                분진/오염/조명 변화가 큰 경우가 많아 "<b>기계 가이드 + 센서 보조</b>" 조합이 안정적입니다.
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>통신/제어(권장 골격)</h3>
+              <ul>
+                <li>상위: WMS/WCS/입출고 S/W ↔ 스마트랙 제어(REST/MQTT 등)</li>
+                <li>하위: 스마트랙 PLC ↔ 서포트 모듈(필드버스)</li>
+                <li>안전: E-Stop, 인터록, 과하중/편하중 트립</li>
+              </ul>
+              <p class="muted">
+                인터페이스 규격은 "도킹 방식, 통신 프로토콜, 이재 방법"을 조기에 합의해
+                전체 시스템(AMR·입출고·디지털트윈)의 병렬 개발이 가능하도록 합니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. 계획 -->
+    <section id="plan" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>7. 개발 수행 계획 (1차년도 중심)</h2>
+          <span class="badge">9개월 프레임</span>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div class="card">
+              <h3>1차년도(9개월) 추천 마일스톤</h3>
+              <table class="table">
+                <thead>
+                  <tr><th style="width:20%">월</th><th>핵심 산출물</th><th style="width:28%">비고</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>M1~M2</b></td>
+                    <td>현장 조사/요구사항, 부재 분류체계, 안전 기준 합의</td>
+                    <td>실사/워크숍</td>
+                  </tr>
+                  <tr>
+                    <td><b>M3~M4</b></td>
+                    <td>컨셉 A MVP(핀-그리드) 시제품 + 추천 지지점 알고리즘 v0</td>
+                    <td>빠른 검증</td>
+                  </tr>
+                  <tr>
+                    <td><b>M5~M6</b></td>
+                    <td>컨셉 B 핵심 모듈(전동 서포트) 1~2식 PoC + 센서 검증</td>
+                    <td>로드셀/인터록</td>
+                  </tr>
+                  <tr>
+                    <td><b>M7~M8</b></td>
+                    <td>AMR/크레인 도킹 인터페이스 시연 + 데이터 모델(디지털트윈 기초)</td>
+                    <td>연계 중심</td>
+                  </tr>
+                  <tr>
+                    <td><b>M9</b></td>
+                    <td>통합 데모, 성능지표(안전/시간/공간) 리포트, 2차년도 계획</td>
+                    <td>TRL 상승</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <h3>리스크 & 대응</h3>
+              <div class="cards">
+                <div class="callout warnbox">
+                  <b>R1. 부재 다양성 폭발</b><br/>
+                  → "분류체계(패밀리)"를 먼저 만들고, 상위 20%가 물동량 80%를 커버하도록 우선 적용
+                </div>
+                <div class="callout warnbox">
+                  <b>R2. 센서 신뢰성(분진/충격)</b><br/>
+                  → 카메라 단독 지양, <b>기계 가이드</b> + <b>로드셀 검증</b>로 페일세이프
+                </div>
+                <div class="callout badbox">
+                  <b>R3. 모듈 단가/유지보수</b><br/>
+                  → 서포트 모듈을 "표준품"으로 설계, 교체형으로 MTTR 최소화
+                </div>
+                <div class="callout okbox">
+                  <b>R4. 현장 수용성</b><br/>
+                  → 자동화 강도는 단계적으로(A→B→C), UI는 "추천+검증" 중심으로 신뢰 확보
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. 영상 -->
+    <section id="videos" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>8. 참고 영상 (보고서 내 임베드)</h2>
+          <span class="badge">차단 대비 링크 포함</span>
+        </div>
+
+        <div class="bd">
+          <div class="two">
+            <div class="card">
+              <h3>Dematic: Multishuttle® 2 (AS/RS 셔틀 컨셉 참고)</h3>
+              <div class="video">
+                <iframe
+                  src="https://www.youtube.com/embed/7F2UrlPMDu4"
+                  title="Dematic Multishuttle 2"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen></iframe>
+                <div class="video-fallback">
+                  <span>임베드가 차단되면 링크로 열어주세요.</span>
+                  <a href="https://www.youtube.com/watch?v=7F2UrlPMDu4" target="_blank" rel="noreferrer">YouTube에서 열기</a>
+                </div>
+              </div>
+              <p class="muted" style="margin:8px 0 0">
+                구획형 랙은 아니지만, "랙 + 셔틀 + 제어" 구조 레퍼런스로 쓰기 좋습니다.
+              </p>
+            </div>
+
+            <div class="card">
+              <h3>RIEGL: 대형 환경 LiDAR/스캐닝(형상 인식 참고)</h3>
+              <div class="video">
+                <iframe
+                  src="https://www.youtube.com/embed/ian8XDKMlq0"
+                  title="RIEGL VZ-i Series Kinematic App"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen></iframe>
+                <div class="video-fallback">
+                  <span>임베드가 차단되면 링크로 열어주세요.</span>
+                  <a href="https://www.youtube.com/watch?v=ian8XDKMlq0" target="_blank" rel="noreferrer">YouTube에서 열기</a>
+                </div>
+              </div>
+              <p class="muted" style="margin:8px 0 0">
+                대형 부재/공간 스캔 → 포인트클라우드 기반 적치 판단 흐름을 이해하기 좋습니다.
+              </p>
+            </div>
+          </div>
+
+          <div class="two" style="margin-top:12px">
+            <div class="card">
+              <h3>SSI SCHAEFER: Exyz® AS/RS Pallet Crane(구조 레퍼런스)</h3>
+              <p class="muted" style="margin-top:0">
+                제조사 페이지 링크입니다. (환경에 따라 영상은 "쿠키 동의" 후 표시될 수 있음)
+              </p>
+              <div class="callout">
+                관련 자료(웹):
+                <a href="https://www.schaefershelving.com/t-warehouse-pallets-as-rs-pallet-crane.aspx" target="_blank" rel="noreferrer">
+                  Exyz® AS/RS Pallet Crane
+                </a>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>AMR Dock & Convey(도킹/이재 인터페이스 참고)</h3>
+              <p class="muted" style="margin-top:0">
+                도킹 + 컨베이어 이재 구조는 "AMR-스마트랙 인터페이스 규격" 논의에 참고가 됩니다.
+              </p>
+              <div class="callout">
+                관련 자료(웹):
+                <a href="https://hachidorirobotics.com/products/dock-convey/" target="_blank" rel="noreferrer">
+                  Dock & Convey
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <details style="margin-top:12px">
+            <summary>영상이 안 보일 때(사내망/보안 정책) 빠른 점검</summary>
+            <div class="card" style="margin-top:10px">
+              <ul>
+                <li>사내 보안정책에서 <b>YouTube iframe</b>이 차단될 수 있습니다.</li>
+                <li>확장프로그램(광고/추적 차단)이 iframe을 막을 수 있습니다.</li>
+                <li>이 문서는 <b>링크를 항상 표시</b>하므로, 임베드가 막혀도 링크로 재생 가능합니다.</li>
+              </ul>
+              <p class="muted" style="margin:0">
+                필요 시 <span class="kbd">www.youtube.com</span> 외 도메인도 허용 목록에 추가해야 할 수 있습니다.
+              </p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. 다음 단계 -->
+    <section id="next" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>9. 다음 단계 (의사결정 체크리스트)</h2>
+          <span class="badge">바로 회의용</span>
+        </div>
+        <div class="bd">
+          <div class="two">
+            <div class="card">
+              <h3>결정해야 할 5가지</h3>
+              <ol>
+                <li>대상 부재 범위: "절단소재" vs "완성 소조블록" 우선순위</li>
+                <li>자동화 강도: 컨셉 A(추천+수동) → B(전동 서포트) → C(셀 기반)</li>
+                <li>도킹 방식: 기계 가이드 중심 vs 비전/LiDAR 중심</li>
+                <li>안전 기준: 허용 변형/지지 조건(현장 표준) 확정</li>
+                <li>성능지표: 공간효율, 적치/피킹 시간, 재배치 비용, 안전 이벤트</li>
+              </ol>
+            </div>
+
+            <div class="card">
+              <h3>추천 결론(초안)</h3>
+              <div class="callout okbox">
+                <b>현장성과 + 세계 최초급 스토리</b>를 동시에 잡으려면<br/>
+                <b>컨셉 A로 빠르게 실증</b> → <b>컨셉 B로 차별화</b> → <b>컨셉 C는 PoC/특허 트랙</b>으로 병렬 추진이 가장 안전합니다.
+              </div>
+              <p class="muted">
+                "랙 구조" 자체보다, 결국 차별화는 <b>형상/CoG 기반 지지점 결정 + 안전 검증 + 생산계획 연계</b>에서 나옵니다.
+              </p>
+            </div>
+          </div>
+          <div class="footer">
+            본 문서는 Kick-off 자료 내용을 요약/확장한 HTML 예시입니다. (사내 공유 시 표준 서식/보안 정책에 맞춰 조정 권장)
+            <div style="margin-top:6px"><a href="#top">맨 위로 ↑</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
