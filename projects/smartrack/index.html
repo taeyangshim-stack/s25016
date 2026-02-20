@@ -385,13 +385,14 @@
   <a class="toc-item" href="#sec09">09 컨셉 B — 전동 서포트</a>
   <a class="toc-item" href="#sec10">10 컨셉 C — 셀 어레이</a>
   <a class="toc-item" href="#sec11">11 랙 모듈 + 안전</a>
-  <a class="toc-item" href="#sec12">12 시스템 아키텍처</a>
-  <a class="toc-item" href="#sec13">13 로드맵 + 결론</a>
+  <a class="toc-item" href="#sec12">12 AMR 도킹</a>
+  <a class="toc-item" href="#sec13">13 시스템 아키텍처</a>
+  <a class="toc-item" href="#sec14">14 로드맵 + 결론</a>
 </nav>
 
 <!-- NAV DOTS (PPT mode) -->
 <nav class="nav-dots" id="navDots"></nav>
-<div class="slide-counter" id="slideCounter">1 / 13</div>
+<div class="slide-counter" id="slideCounter">1 / 14</div>
 
 <div class="main-content">
 
@@ -1305,9 +1306,104 @@
   </div>
 </section>
 
-<!-- ===== SECTION 12: 시스템 아키텍처 ===== -->
-<section class="slide" id="sec12" data-title="시스템 아키텍처">
+<!-- ===== SECTION 12: AMR 도킹 개념 ===== -->
+<section class="slide" id="sec12" data-title="AMR 도킹">
   <span class="slide-num">12</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag tag-violet">AMR 연계</span>
+      <h2 style="margin-top:8px">AMR 도킹 — 자동 적재/하역 인터페이스</h2>
+      <p class="subtitle">AMR(자율이동로봇)이 부재를 싣고 스마트랙에 정밀 도킹하는 과정.</p>
+    </div>
+
+    <div class="row">
+      <div class="diagram-wrap col-2">
+        <svg viewBox="0 0 700 300" width="100%">
+          <text x="350" y="20" text-anchor="middle" fill="#18181B" font-size="13" font-weight="700">AMR ↔ 스마트랙 도킹 시퀀스</text>
+
+          <!-- 스마트랙 (고정) -->
+          <rect x="400" y="80" width="260" height="180" rx="12" fill="#F0FDF4" stroke="#0D6E51" stroke-width="2"/>
+          <text x="530" y="102" text-anchor="middle" fill="#0D6E51" font-size="12" font-weight="800">스마트랙</text>
+          <!-- 서포트 핀들 -->
+          <rect x="430" y="140" width="10" height="40" rx="2" fill="#0D6E51"/><circle cx="435" cy="136" r="5" fill="#34D399"/>
+          <rect x="470" y="130" width="10" height="50" rx="2" fill="#0D6E51"/><circle cx="475" cy="126" r="5" fill="#34D399"/>
+          <rect x="510" y="120" width="10" height="60" rx="2" fill="#0D6E51"/><circle cx="515" cy="116" r="5" fill="#34D399"/>
+          <rect x="550" y="128" width="10" height="52" rx="2" fill="#0D6E51"/><circle cx="555" cy="124" r="5" fill="#34D399"/>
+          <rect x="590" y="138" width="10" height="42" rx="2" fill="#0D6E51"/><circle cx="595" cy="134" r="5" fill="#34D399"/>
+          <rect x="630" y="148" width="10" height="32" rx="2" fill="#0D6E51"/><circle cx="635" cy="144" r="5" fill="#34D399"/>
+          <!-- 베이스 -->
+          <rect x="420" y="180" width="230" height="10" rx="3" fill="#D4D4D8"/>
+
+          <!-- 도킹 가이드 -->
+          <rect x="405" y="195" width="8" height="55" rx="2" fill="#D97706"/>
+          <rect x="647" y="195" width="8" height="55" rx="2" fill="#D97706"/>
+          <text x="530" y="262" text-anchor="middle" fill="#D97706" font-size="9" font-weight="600">기계식 가이드 레일 (V자 정렬)</text>
+
+          <!-- 센서 -->
+          <circle cx="420" cy="210" r="4" fill="#1D4ED8"/><text x="423" y="225" fill="#1D4ED8" font-size="7" font-weight="600">LiDAR</text>
+          <circle cx="640" cy="210" r="4" fill="#1D4ED8"/><text x="627" y="225" fill="#1D4ED8" font-size="7" font-weight="600">LiDAR</text>
+          <circle cx="530" y="205" r="4" fill="#BE123C"/><text x="540" y="210" fill="#BE123C" font-size="7" font-weight="600">비전</text>
+
+          <!-- AMR -->
+          <rect x="40" y="160" width="180" height="80" rx="14" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+          <text x="130" y="192" text-anchor="middle" fill="#5B21B6" font-size="14" font-weight="800">AMR</text>
+          <text x="130" y="210" text-anchor="middle" fill="#7C3AED" font-size="10">자율이동로봇</text>
+          <text x="130" y="226" text-anchor="middle" fill="#A1A1AA" font-size="9">부재 탑재 상태</text>
+          <!-- 바퀴 -->
+          <circle cx="70" cy="245" r="8" fill="#D8B4FE" stroke="#7C3AED"/>
+          <circle cx="190" cy="245" r="8" fill="#D8B4FE" stroke="#7C3AED"/>
+          <!-- 부재 (AMR 위) -->
+          <rect x="55" y="140" width="150" height="14" rx="3" fill="rgba(124,58,237,.15)" stroke="#7C3AED" stroke-width="1.5"/>
+          <text x="130" y="136" text-anchor="middle" fill="#5B21B6" font-size="9">부재</text>
+
+          <!-- 접근 화살표 -->
+          <line x1="230" y1="195" x2="390" y2="195" stroke="#7C3AED" stroke-width="2.5" stroke-dasharray="8 4" marker-end="url(#arr)"/>
+          <text x="310" y="185" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="600">접근 → 정렬 → 도킹</text>
+
+          <!-- 3단계 라벨 -->
+          <g font-size="9" font-weight="600">
+            <rect x="40" y="38" width="80" height="24" rx="6" fill="#F5F3FF" stroke="#7C3AED"/>
+            <text x="80" y="54" text-anchor="middle" fill="#5B21B6">① 접근</text>
+            <rect x="170" y="38" width="80" height="24" rx="6" fill="#EFF6FF" stroke="#1D4ED8"/>
+            <text x="210" y="54" text-anchor="middle" fill="#1D4ED8">② 정렬</text>
+            <rect x="300" y="38" width="80" height="24" rx="6" fill="#ECFDF5" stroke="#0D6E51"/>
+            <text x="340" y="54" text-anchor="middle" fill="#0D6E51">③ 도킹</text>
+            <rect x="430" y="38" width="80" height="24" rx="6" fill="#FFFBEB" stroke="#D97706"/>
+            <text x="470" y="54" text-anchor="middle" fill="#D97706">④ 적재</text>
+            <rect x="560" y="38" width="80" height="24" rx="6" fill="#ECFDF5" stroke="#0D6E51"/>
+            <text x="600" y="54" text-anchor="middle" fill="#0D6E51">⑤ 검증</text>
+          </g>
+        </svg>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="border-left:4px solid #7C3AED;padding:16px">
+          <h3 style="font-size:14px">도킹 5단계</h3>
+          <ol style="font-size:12px;line-height:1.9">
+            <li><b>접근</b>: AMR이 지정 랙 앞까지 자율 주행</li>
+            <li><b>정렬</b>: LiDAR/비전으로 랙 도킹부 인식, 미세 정렬</li>
+            <li><b>도킹</b>: 기계식 가이드에 삽입, 위치 고정</li>
+            <li><b>적재</b>: AMR → 랙 부재 이송 (리프트/슬라이드)</li>
+            <li><b>검증</b>: 로드셀·비전 확인 → 안전 OK → AMR 이탈</li>
+          </ol>
+        </div>
+        <div class="card" style="padding:16px">
+          <h3 style="font-size:14px">도킹 인터페이스</h3>
+          <ul style="font-size:12px">
+            <li><b>기계</b>: V자 가이드 레일 + 핀 정렬</li>
+            <li><b>센서</b>: LiDAR 거리, 비전 마커, 근접 SW</li>
+            <li><b>통신</b>: Wi-Fi/5G → WCS 연계</li>
+            <li><b>안전</b>: 광커튼, E-Stop, 인터록</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 13: 시스템 아키텍처 ===== -->
+<section class="slide" id="sec13" data-title="시스템 아키텍처">
+  <span class="slide-num">13</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">S/W 아키텍처</span>
@@ -1366,9 +1462,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 13: 로드맵 + 역량 + 결론 ===== -->
-<section class="slide" id="sec13" data-title="로드맵 + 결론">
-  <span class="slide-num">13</span>
+<!-- ===== SECTION 14: 로드맵 + 역량 + 결론 ===== -->
+<section class="slide" id="sec14" data-title="로드맵 + 결론">
+  <span class="slide-num">14</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-amber">개발 계획 + 결론</span>
