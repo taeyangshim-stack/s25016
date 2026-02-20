@@ -51,6 +51,8 @@
     { "source": "/light-curtain/external/pdf", "destination": "/projects/light-curtain/installation_plan_external.pdf" },
     { "source": "/lc-ext", "destination": "/projects/light-curtain/lc_ext_v2.pdf" },
     { "source": "/ext-pdf", "destination": "/projects/light-curtain/external_new.pdf" },
-    { "source": "/smartrack", "destination": "/projects/smartrack/index.html" }
+    { "source": "/smartrack", "destination": "/projects/smartrack/index.html" },
+    { "source": "/cost-review", "destination": "/projects/cost-review/index.html" },
+    { "source": "/cost-review/nara", "destination": "/projects/cost-review/nara-approval.html" }
   ]
 }
