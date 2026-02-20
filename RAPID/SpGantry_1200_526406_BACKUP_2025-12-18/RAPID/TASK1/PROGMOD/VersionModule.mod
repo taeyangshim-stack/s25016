@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.47";
-CONST string TASK2_VERSION := "v1.9.28";
+CONST string TASK1_VERSION := "v1.9.48";
+CONST string TASK2_VERSION := "v1.9.43";
 CONST string TASK_BG_VERSION := "v2.0.0";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
 CONST string TASK_TEACHING_VERSION := "v1.0.0";
@@ -24,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-11";
+CONST string BUILD_DATE := "2026-02-21";
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 

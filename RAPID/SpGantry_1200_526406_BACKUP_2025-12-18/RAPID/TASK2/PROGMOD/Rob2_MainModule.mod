@@ -3,6 +3,11 @@ MODULE Rob2_MainModule
 	! TASK2 (Robot2) - Rob2_MainModule
 	! Version History
 	!========================================
+	! v1.9.43 (2026-02-21) - Floor coordinate TCP logging
+	!   - Added CRobT(\Tool:=tWeld2\WObj:=WobjFloor) to SetRobot2InitialPosition
+	!   - Logs TCP_Floor position + orientation to robot2_init_position.txt
+	!   - For verifying Robot1/Robot2 TCP meeting point at R-axis center
+	!
 	! v1.9.42 (2026-02-19) - MoveJgJ fix for tWeld2
 	!   - Removed MoveAbsJ jRob2 from MoveJgJ case
 	!   - jRob2.robax is tool0-calculated (138deg J2 change from tWeld2 HOME)
@@ -309,7 +314,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.8.75";
+CONST string TASK2_VERSION := "v1.9.43";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -3499,14 +3504,14 @@ PROC Robot2_CommandLoop()
 ENDPROC
 
 ! ========================================
-! Rob2_CommandListener: T_Head stCommand handler (v1.9.42)
+! Rob2_CommandListener: T_Head stCommand handler (v1.9.43)
 ! ========================================
 ! Responds to stCommand from T_Head task
 ! Protocol: "Ready" -> receive command -> execute -> "Ack" -> wait clear -> "Ready"
 PROC Rob2_CommandListener()
 	VAR iodev head_log;
 	Open "HOME:/head_r2_listener.txt", head_log \Write;
-	Write head_log, "Rob2 CommandListener (v1.9.42) - " + CDate() + " " + CTime();
+	Write head_log, "Rob2 CommandListener (v1.9.43) - " + CDate() + " " + CTime();
 
 	TPWrite "[R2] CommandListener started, entering Ready state";
 

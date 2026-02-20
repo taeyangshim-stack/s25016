@@ -3,6 +3,11 @@ MODULE MainModule
 	! TASK1 (Robot1) - MainModule
 	! Version History
 	!========================================
+	! v1.9.48 (2026-02-21) - Floor coordinate TCP logging
+	!   - Added CRobT(\Tool:=tWeld1\WObj:=WobjFloor) to SetRobot1InitialPosition
+	!   - Logs TCP_Floor position + orientation to robot1_init_position.txt
+	!   - For verifying Robot1/Robot2 TCP meeting point at R-axis center
+	!
 	! v1.9.47 (2026-02-20) - ExecMoveJgJ segmented move
 	!   - FIX: Split large gantry moves into segments (ABB 50050 workaround)
 	!   - Linear axes: max 2000mm per segment, R-axis: max 45deg per segment
