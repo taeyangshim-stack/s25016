@@ -83,6 +83,3 @@ gha-creds-*.json
 # Python
 __pycache__/
 *.pyc
-
-# Allow smartrack images
-!projects/smartrack/macro_images/*.png
