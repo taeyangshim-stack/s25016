@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>스마트랙(유연 적치) 개발 보고서 | 에스피시스템스</title>
+  <title>스마트랙(유연 적치) 개발 보고서 v2.0 | 에스피시스템스</title>
   <style>
     :root{
       --bg:#0b0f19;
@@ -127,6 +127,7 @@
     }
     .table th{font-size:12px; color:var(--muted); background:rgba(255,255,255,.03)}
     .table tr:last-child td{border-bottom:none}
+    .table .hl{background:rgba(76,201,240,.06)}
 
     .kbd{font-family:var(--mono); font-size:12px; padding:2px 6px; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.04)}
 
@@ -140,6 +141,9 @@
 
     .two{display:grid; grid-template-columns:1fr 1fr; gap:12px}
     @media (max-width: 860px){ .two{grid-template-columns:1fr} }
+
+    .three{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px}
+    @media (max-width: 860px){ .three{grid-template-columns:1fr} }
 
     .video{
       width:100%;
@@ -204,6 +208,25 @@
       display:flex; gap:8px; flex-wrap:wrap; align-items:center;
       color:var(--muted); font-size:12px;
     }
+
+    /* 로드맵 바 */
+    .roadmap-bar{
+      display:flex; gap:2px; margin:10px 0; border-radius:10px; overflow:hidden;
+    }
+    .roadmap-bar .seg{
+      padding:8px 6px; text-align:center; font-size:11px; font-weight:600;
+      color:var(--text);
+    }
+    .seg-1{background:rgba(76,201,240,.25); flex:9}
+    .seg-2{background:rgba(167,139,250,.25); flex:12}
+    .seg-3{background:rgba(52,211,153,.25); flex:12}
+    .seg-4{background:rgba(251,191,36,.25); flex:12}
+    .seg-5{background:rgba(251,113,133,.25); flex:12}
+
+    /* stat 카드 */
+    .stat{text-align:center; padding:16px 8px}
+    .stat .num{font-size:28px; font-weight:800; color:var(--accent)}
+    .stat .lbl{font-size:12px; color:var(--muted); margin-top:4px}
   </style>
 </head>
 
@@ -225,7 +248,7 @@
           </div>
         </div>
         <div class="badge">
-          문서 버전 <b>v1.1</b> · 작성일 <b>2026-02-20</b> · 조직 <b>에스피시스템스</b>
+          문서 버전 <b>v2.0</b> · 작성일 <b>2026-02-20</b> · 조직 <b>에스피시스템스</b>
         </div>
       </div>
 
@@ -233,19 +256,21 @@
         <div class="panel">
           <div class="hd">
             <h2>바로가기(TOC)</h2>
-            <span class="badge">읽기 편하게 구성</span>
+            <span class="badge">11개 섹션</span>
           </div>
           <div class="bd">
             <div class="toc">
               <a href="#scope">1. 과제 개요/범위</a>
               <a href="#definition">2. 스마트랙 정의</a>
-              <a href="#ideas">3. 유연 적치 스마트랙 아이디어</a>
-              <a href="#mechanism">4. 랙 기구/모듈 제안</a>
+              <a href="#ideas">3. 유연 적치 아이디어</a>
+              <a href="#mechanism">4. 랙 기구/모듈</a>
               <a href="#sensing">5. 인식/안전 알고리즘</a>
-              <a href="#interface">6. AMR·크레인 인터페이스</a>
-              <a href="#plan">7. 개발 수행 계획(1차년도)</a>
-              <a href="#videos">8. 참고 영상</a>
-              <a href="#next">9. 다음 단계(의사결정)</a>
+              <a href="#interface">6. AMR·크레인 I/F</a>
+              <a href="#benchmark">7. 경쟁기술 벤치마킹</a>
+              <a href="#capability">8. SP시스템스 역량</a>
+              <a href="#plan">9. 개발 계획(5개년)</a>
+              <a href="#videos">10. 참고 영상</a>
+              <a href="#next">11. 다음 단계</a>
             </div>
           </div>
         </div>
@@ -253,14 +278,14 @@
         <div class="panel">
           <div class="hd">
             <h2>요약 KPI</h2>
-            <span class="badge">Kick-off 핵심만</span>
+            <span class="badge">핵심 수치</span>
           </div>
           <div class="bd">
             <div class="kpi">
               <div class="box">
-                <div class="t">통합 관점</div>
-                <div class="v">소조립 공장 물류</div>
-                <div class="s">입고~출고 전 과정 연계</div>
+                <div class="t">총 사업 규모</div>
+                <div class="v">200억 / 57개월</div>
+                <div class="s">SP시스템스 ~52억(26%)</div>
               </div>
               <div class="box">
                 <div class="t">스마트랙 역할</div>
@@ -269,13 +294,13 @@
               </div>
               <div class="box">
                 <div class="t">1차년도</div>
-                <div class="v">9개월</div>
+                <div class="v">6억 / 9개월</div>
                 <div class="s">개념·기구·제어·S/W 기초</div>
               </div>
               <div class="box">
-                <div class="t">예산/인력(가정)</div>
-                <div class="v">6억 / 6명</div>
-                <div class="s">기구2·제어2·S/W1·PM1</div>
+                <div class="t">TRL 목표</div>
+                <div class="v">3 → 8</div>
+                <div class="s">5개년 단계적 상승</div>
               </div>
             </div>
           </div>
@@ -283,12 +308,12 @@
       </div>
     </header>
 
-    <!-- 1. 범위 -->
+    <!-- ==================== 1. 범위 ==================== -->
     <section id="scope" style="margin-top:16px">
       <div class="panel">
         <div class="hd">
           <h2>1. 과제 개요/범위</h2>
-          <span class="badge">RFP 해석 포인트 포함</span>
+          <span class="badge">RFP 해석 + 물류 흐름도</span>
         </div>
         <div class="bd">
           <div class="two">
@@ -331,22 +356,111 @@
                   </tr>
                 </tbody>
               </table>
-              <p class="muted" style="margin-top:10px">
-                ※ 본 보고서는 그 중 <b>"지능형 랙(유연 적치)"</b>을 중심으로,
-                AMR/크레인 및 디지털트윈 연계를 고려해 확장 아이디어를 담습니다.
-              </p>
             </div>
+          </div>
+
+          <!-- 물류 흐름도 SVG -->
+          <div class="card" style="margin-top:12px; background:rgba(0,0,0,.10)">
+            <h3 style="margin-bottom:10px">소조립 공장 물류 흐름도 (스마트랙 범위)</h3>
+            <svg viewBox="0 0 960 310" width="100%" height="auto" aria-label="logistics flow">
+              <defs>
+                <linearGradient id="gflow" x1="0" x2="1">
+                  <stop offset="0" stop-color="rgba(76,201,240,.8)"/>
+                  <stop offset="1" stop-color="rgba(167,139,250,.8)"/>
+                </linearGradient>
+                <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="rgba(76,201,240,.7)"/></marker>
+              </defs>
+              <!-- 스마트랙 범위 박스 -->
+              <rect x="140" y="25" width="680" height="260" rx="16" fill="rgba(76,201,240,.04)" stroke="rgba(76,201,240,.2)" stroke-dasharray="6 3"/>
+              <text x="480" y="18" text-anchor="middle" fill="rgba(76,201,240,.7)" font-size="13" font-weight="700">SP시스템스 스마트랙 시스템 범위</text>
+
+              <!-- 절단공장 (외부) -->
+              <rect x="10" y="110" width="100" height="60" rx="12" fill="rgba(251,191,36,.12)" stroke="rgba(251,191,36,.4)"/>
+              <text x="60" y="137" text-anchor="middle" fill="var(--text)" font-size="12" font-weight="600">절단공장</text>
+              <text x="60" y="155" text-anchor="middle" fill="var(--muted)" font-size="10">소재 출하</text>
+
+              <!-- 화살표: 절단→입고스캔 -->
+              <line x1="110" y1="140" x2="155" y2="140" stroke="rgba(76,201,240,.5)" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- 입고 스캔 -->
+              <rect x="160" y="95" width="110" height="90" rx="12" fill="rgba(76,201,240,.10)" stroke="rgba(76,201,240,.3)"/>
+              <text x="215" y="128" text-anchor="middle" fill="var(--text)" font-size="12" font-weight="600">입고 스캔</text>
+              <text x="215" y="146" text-anchor="middle" fill="var(--muted)" font-size="10">3D/바코드/RFID</text>
+              <text x="215" y="162" text-anchor="middle" fill="var(--muted)" font-size="10">무게/CoG 추정</text>
+
+              <!-- 화살표: 입고→스마트랙입고 -->
+              <line x1="270" y1="140" x2="305" y2="140" stroke="rgba(76,201,240,.5)" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- 스마트랙(입고) -->
+              <rect x="310" y="70" width="120" height="120" rx="14" fill="rgba(52,211,153,.10)" stroke="rgba(52,211,153,.4)" stroke-width="2"/>
+              <text x="370" y="105" text-anchor="middle" fill="var(--ok)" font-size="13" font-weight="700">스마트랙</text>
+              <text x="370" y="122" text-anchor="middle" fill="var(--text)" font-size="11">(입고·적치)</text>
+              <text x="370" y="140" text-anchor="middle" fill="var(--muted)" font-size="10">유연 지지점 배치</text>
+              <text x="370" y="155" text-anchor="middle" fill="var(--muted)" font-size="10">안전검증·JIT 피킹</text>
+              <text x="370" y="172" text-anchor="middle" fill="var(--muted)" font-size="10">재고현황 관리</text>
+
+              <!-- 화살표: 스마트랙→AMR -->
+              <line x1="430" y1="130" x2="465" y2="130" stroke="rgba(76,201,240,.5)" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- AMR 이송 -->
+              <rect x="470" y="100" width="100" height="70" rx="12" fill="rgba(167,139,250,.10)" stroke="rgba(167,139,250,.3)"/>
+              <text x="520" y="128" text-anchor="middle" fill="var(--accent2)" font-size="12" font-weight="600">AMR 이송</text>
+              <text x="520" y="146" text-anchor="middle" fill="var(--muted)" font-size="10">자율주행·도킹</text>
+
+              <!-- 화살표: AMR→소조립 -->
+              <line x1="570" y1="135" x2="605" y2="135" stroke="rgba(76,201,240,.5)" stroke-width="2" marker-end="url(#arrow)"/>
+
+              <!-- 소조립 작업대 -->
+              <rect x="610" y="100" width="100" height="70" rx="12" fill="rgba(251,191,36,.10)" stroke="rgba(251,191,36,.3)"/>
+              <text x="660" y="128" text-anchor="middle" fill="var(--text)" font-size="12" font-weight="600">소조립</text>
+              <text x="660" y="146" text-anchor="middle" fill="var(--muted)" font-size="10">용접·조립 작업</text>
+
+              <!-- 화살표: 소조립→스마트랙출고 -->
+              <path d="M660 170 L660 230 L520 230 L520 250 L410 250 L410 230" stroke="rgba(76,201,240,.5)" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+              <!-- 스마트랙(출고) -->
+              <rect x="310" y="205" width="120" height="75" rx="14" fill="rgba(52,211,153,.10)" stroke="rgba(52,211,153,.4)" stroke-width="2"/>
+              <text x="370" y="233" text-anchor="middle" fill="var(--ok)" font-size="13" font-weight="700">스마트랙</text>
+              <text x="370" y="250" text-anchor="middle" fill="var(--text)" font-size="11">(완성품 적재)</text>
+              <text x="370" y="266" text-anchor="middle" fill="var(--muted)" font-size="10">품질검사·출하관리</text>
+
+              <!-- 화살표: 스마트랙출고→중조립 -->
+              <path d="M310 242 L260 242 L260 250 L110 250" stroke="rgba(76,201,240,.5)" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+              <!-- 중조립 (외부) -->
+              <rect x="10" y="225" width="100" height="50" rx="12" fill="rgba(251,113,133,.10)" stroke="rgba(251,113,133,.3)"/>
+              <text x="60" y="250" text-anchor="middle" fill="var(--text)" font-size="12" font-weight="600">중조립 이송</text>
+              <text x="60" y="265" text-anchor="middle" fill="var(--muted)" font-size="10">크레인/트레일러</text>
+
+              <!-- 디지털트윈 연계 -->
+              <rect x="730" y="40" width="110" height="70" rx="12" fill="rgba(167,139,250,.08)" stroke="rgba(167,139,250,.2)" stroke-dasharray="4 2"/>
+              <text x="785" y="68" text-anchor="middle" fill="var(--accent2)" font-size="11" font-weight="600">디지털트윈</text>
+              <text x="785" y="85" text-anchor="middle" fill="var(--muted)" font-size="10">실시간 모니터링</text>
+              <text x="785" y="98" text-anchor="middle" fill="var(--muted)" font-size="10">생산스케줄 연동</text>
+
+              <!-- WMS/WCS -->
+              <rect x="730" y="130" width="110" height="55" rx="12" fill="rgba(76,201,240,.08)" stroke="rgba(76,201,240,.2)" stroke-dasharray="4 2"/>
+              <text x="785" y="155" text-anchor="middle" fill="var(--accent)" font-size="11" font-weight="600">WMS/WCS</text>
+              <text x="785" y="172" text-anchor="middle" fill="var(--muted)" font-size="10">입출고 S/W</text>
+
+              <!-- 점선 연결 -->
+              <line x1="720" y1="75" x2="730" y2="75" stroke="rgba(167,139,250,.3)" stroke-width="1" stroke-dasharray="3 2"/>
+              <line x1="720" y1="157" x2="730" y2="157" stroke="rgba(76,201,240,.3)" stroke-width="1" stroke-dasharray="3 2"/>
+            </svg>
+            <p class="muted" style="margin:8px 0 0">
+              <b>녹색 박스</b>가 스마트랙 핵심 영역. 입고 스캔부터 완성품 출하까지 <b>SP시스템스</b> 담당 범위.
+            </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 2. 정의 -->
+    <!-- ==================== 2. 정의 + 부재 분류 ==================== -->
     <section id="definition" style="margin-top:16px">
       <div class="panel">
         <div class="hd">
-          <h2>2. 스마트랙(Smart Rack) 정의</h2>
-          <span class="badge">Kick-off 정의 반영</span>
+          <h2>2. 스마트랙(Smart Rack) 정의 + 대상 부재 분류</h2>
+          <span class="badge">부재 유형별 스펙 포함</span>
         </div>
         <div class="bd">
           <div class="cards">
@@ -362,6 +476,63 @@
                 <span class="pill"><span class="dot ok"></span>입고 → 적치 → 피킹 → 공정공급</span>
                 <span class="pill"><span class="dot ok"></span>완성 → 적재 → 출하</span>
                 <span class="pill"><span class="dot warn"></span>형상/무게/무게중심 다양</span>
+              </div>
+            </div>
+
+            <!-- 부재 분류 체계 (NEW) -->
+            <div class="card">
+              <h3>대상 부재 분류 체계</h3>
+              <p class="muted" style="margin-bottom:8px">스마트랙이 취급하는 부재를 4개 패밀리로 분류합니다. <b>상위 20%</b> 유형이 물동량의 <b>약 80%</b>를 차지합니다.</p>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width:14%">패밀리</th>
+                    <th style="width:22%">부재 유형</th>
+                    <th style="width:22%">크기 범위</th>
+                    <th style="width:14%">무게</th>
+                    <th style="width:14%">형상 특성</th>
+                    <th style="width:14%">물동량</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="hl">
+                    <td><b>판재류</b></td>
+                    <td>외판, 내판, 격벽판, 갑판판</td>
+                    <td>1.5~3.2m × 3~12m<br/>두께 6~50mm</td>
+                    <td>0.2~3.0 ton</td>
+                    <td>평판 / 곡판</td>
+                    <td><b>~40%</b></td>
+                  </tr>
+                  <tr class="hl">
+                    <td><b>보강재류</b></td>
+                    <td>T-bar, Flat bar, Angle bar, Bulb flat</td>
+                    <td>2~12m × 0.1~0.4m<br/>두께 8~25mm</td>
+                    <td>0.05~0.5 ton</td>
+                    <td>선형(직선/곡선)</td>
+                    <td><b>~30%</b></td>
+                  </tr>
+                  <tr>
+                    <td><b>브라켓류</b></td>
+                    <td>나비, 러그, 스티프너, 칼라플레이트</td>
+                    <td>0.1~0.8m × 0.1~0.6m<br/>두께 10~25mm</td>
+                    <td>0.01~0.1 ton</td>
+                    <td>소형 다양 형상</td>
+                    <td>~15%</td>
+                  </tr>
+                  <tr>
+                    <td><b>소조블록</b></td>
+                    <td>평블록, 곡블록, 입체블록(완성품)</td>
+                    <td>2~6m × 2~8m<br/>높이 0.3~2m</td>
+                    <td>2~15 ton</td>
+                    <td>3D 복합 구조</td>
+                    <td>~15%</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="callout" style="margin-top:10px">
+                <b>유연 적치의 핵심 도전</b>: 판재류+보강재류가 물동량 70%를 차지하지만, <b>소조블록</b>(완성품)은
+                형상/CoG가 가장 복잡하고 무게가 가장 크므로 <b>안전검증</b> 난이도가 높습니다.
+                → 1차년도는 <b>판재·보강재 중심 MVP</b>, 2차년도부터 소조블록 확장 권장.
               </div>
             </div>
 
@@ -391,7 +562,7 @@
       </div>
     </section>
 
-    <!-- 3. 아이디어 -->
+    <!-- ==================== 3. 아이디어 ==================== -->
     <section id="ideas" style="margin-top:16px">
       <div class="panel">
         <div class="hd">
@@ -481,7 +652,7 @@
       </div>
     </section>
 
-    <!-- 4. 기구 -->
+    <!-- ==================== 4. 기구 ==================== -->
     <section id="mechanism" style="margin-top:16px">
       <div class="panel">
         <div class="hd">
@@ -591,7 +762,7 @@
       </div>
     </section>
 
-    <!-- 5. 인식/알고리즘 -->
+    <!-- ==================== 5. 인식/알고리즘 ==================== -->
     <section id="sensing" style="margin-top:16px">
       <div class="panel">
         <div class="hd">
@@ -654,7 +825,7 @@
       </div>
     </section>
 
-    <!-- 6. 인터페이스 -->
+    <!-- ==================== 6. 인터페이스 ==================== -->
     <section id="interface" style="margin-top:16px">
       <div class="panel">
         <div class="hd">
@@ -693,17 +864,301 @@
       </div>
     </section>
 
-    <!-- 7. 계획 -->
+    <!-- ==================== 7. 경쟁기술 벤치마킹 (NEW) ==================== -->
+    <section id="benchmark" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>7. 경쟁기술 벤치마킹</h2>
+          <span class="badge">국내외 조선소 동향</span>
+        </div>
+        <div class="bd">
+          <div class="callout badbox" style="margin-bottom:12px">
+            <b>핵심 발견</b>: 국내 조선 3사 모두 <b>전용 스마트랙/자동창고 시스템 미보유</b>.
+            유일하게 Meyer Werft(독일)만 운영 중인 자동 물류센터 보유.
+            → <b>"조선소 전용 유연 적치 시스템"은 세계적으로 미개척 영역</b>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width:15%">조선소</th>
+                <th style="width:22%">스마트팩토리 수준</th>
+                <th style="width:25%">핵심 기술</th>
+                <th style="width:20%">물류/창고 자동화</th>
+                <th style="width:18%">투자 규모</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>HD현대중공업</b></td>
+                <td>고급 (개발중)<br/><span class="muted" style="font-size:11px">2030 Full Smart Yard 목표</span></td>
+                <td>Siemens 디지털트윈, 170+ 협동로봇, Plant Simulation, AI 용접</td>
+                <td>AMR 개발 MOU (HD현대로보틱스+LG CNS)<br/><span class="muted" style="font-size:11px">전용 스마트랙 없음</span></td>
+                <td>미공개<br/><span class="muted" style="font-size:11px">베트남 도크 1,000억+</span></td>
+              </tr>
+              <tr>
+                <td><b>삼성중공업</b></td>
+                <td>중급 (SYARD 운영중)<br/><span class="muted" style="font-size:11px">IoT/AI 기반 통합 모니터링</span></td>
+                <td>SYARD 플랫폼, Dassault 3DEXPERIENCE, S-EDP 설계자동화, XR 원격 품질</td>
+                <td>SYARD 내 IoT 자재추적<br/><span class="muted" style="font-size:11px">전용 스마트랙 없음</span></td>
+                <td>미공개<br/><span class="muted" style="font-size:11px">설계자동화 2배 목표(2030)</span></td>
+              </tr>
+              <tr>
+                <td><b>한화오션</b></td>
+                <td>중~고급 (3化 전략)<br/><span class="muted" style="font-size:11px">연결화·자동화·지능화</span></td>
+                <td>80+ 로봇(10종), 드론 야드관리, AR 원격제어, HS4 스마트십</td>
+                <td>드론 기반 블록 위치 파악<br/><span class="muted" style="font-size:11px">전용 스마트랙 없음</span></td>
+                <td>~1.5조원<br/><span class="muted" style="font-size:11px">70% 자동화 목표</span></td>
+              </tr>
+              <tr class="hl">
+                <td><b>Meyer Werft</b><br/><span class="muted" style="font-size:11px">(독일)</span></td>
+                <td>최고 (운영중)<br/><span class="muted" style="font-size:11px">조선업 Best-in-class</span></td>
+                <td>완전자동 고층 물류센터, 7대 자동 스태커 크레인, 자동 패널라인</td>
+                <td><b>25,000 스토리지 유닛</b><br/>30m 고층 자동창고<br/>시간당 250 입출고</td>
+                <td><b>3,500만 유로</b><br/><span class="muted" style="font-size:11px">(~500억원, 물류센터)</span></td>
+              </tr>
+              <tr>
+                <td><b>Fincantieri</b><br/><span class="muted" style="font-size:11px">(이탈리아)</span></td>
+                <td>개발중<br/><span class="muted" style="font-size:11px">Industry 4.0 로드맵</span></td>
+                <td>휴머노이드 용접로봇, 협동로봇, 드론 검사, 디지털트윈</td>
+                <td>개발 중<br/><span class="muted" style="font-size:11px">전용 스마트랙 없음</span></td>
+                <td>미공개<br/><span class="muted" style="font-size:11px">2030 생산성 25%↑</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="two" style="margin-top:12px">
+            <div class="card">
+              <h3>시사점: 왜 기회인가</h3>
+              <ol>
+                <li><b>Meyer Werft 모델은 고정 구획형</b> AS/RS(팔레트 기반) → 선박 부재의 비정형 형상에는 부적합</li>
+                <li>한국 3사는 <b>생산자동화(용접/로봇)</b>에 집중, <b>물류자동화는 초기 단계</b></li>
+                <li>"유연 적치"는 <b>조선 전용 스마트랙</b>으로서 세계적 선례가 없음 → <b>특허/논문 기회</b></li>
+                <li>삼성중공업 SYARD 플랫폼과 <b>데이터 연계 시너지</b> 가능</li>
+              </ol>
+            </div>
+            <div class="card">
+              <h3>참고: 일반 물류 기술 적용 가능성</h3>
+              <table class="table">
+                <thead>
+                  <tr><th>기술</th><th>조선 적용성</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>AutoStore</b> (큐브 자동창고)</td>
+                    <td>소형 부품(피팅, 소모품)에 적합. 대형 판재 불가.</td>
+                  </tr>
+                  <tr>
+                    <td><b>Dematic AS/RS</b></td>
+                    <td>팔레트 단위. 비정형 대형 부재 직접 적용 어려움.</td>
+                  </tr>
+                  <tr>
+                    <td><b>RFID 추적</b></td>
+                    <td>부재 추적에 활용 가능. 조선소 환경(고온/분진) 내구성 검증 필요.</td>
+                  </tr>
+                  <tr>
+                    <td><b>AMR (Amazon 모델)</b></td>
+                    <td>Goods-to-Person 컨셉 응용 가능. 무게/크기 한계 있음.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 8. SP시스템스 역량 (NEW) ==================== -->
+    <section id="capability" style="margin-top:16px">
+      <div class="panel">
+        <div class="hd">
+          <h2>8. 에스피시스템스 역량 (S25016 실적 기반)</h2>
+          <span class="badge">삼성중공업 거제 34bay 실적</span>
+        </div>
+        <div class="bd">
+          <div class="callout okbox" style="margin-bottom:12px">
+            <b>S25016 프로젝트</b>: 삼성중공업 거제조선소 34bay 소조립 자동용접 로봇 시스템.
+            3개 갠트리 × 2대 로봇 = 6대 로봇 통합 제어, A라인/B라인 동시 운영.
+          </div>
+
+          <!-- 실적 수치 -->
+          <div class="kpi" style="margin-bottom:12px">
+            <div class="box">
+              <div class="stat">
+                <div class="num">0.15mm</div>
+                <div class="lbl">TCP 정밀도 달성<br/>(전 R축 회전각)</div>
+              </div>
+            </div>
+            <div class="box">
+              <div class="stat">
+                <div class="num">6대</div>
+                <div class="lbl">ABB IRB 1200 동시 제어<br/>(3 갠트리 × 2 로봇)</div>
+              </div>
+            </div>
+            <div class="box">
+              <div class="stat">
+                <div class="num">10</div>
+                <div class="lbl">동시 실행 RAPID 태스크<br/>(멀티태스크 제어)</div>
+              </div>
+            </div>
+            <div class="box">
+              <div class="stat">
+                <div class="num">744건</div>
+                <div class="lbl">이벤트 로그 자동분석<br/>(61종 알람 분류)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="two">
+            <div class="card">
+              <h3>검증된 핵심 기술</h3>
+              <table class="table">
+                <thead>
+                  <tr><th style="width:35%">기술 영역</th><th>S25016 실적</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>산업용 통신</b></td>
+                    <td>EtherNet/IP (DSQC1030 I/O), TCP/IP Socket (센서 실시간 제어), 다중 프로토콜 통합</td>
+                  </tr>
+                  <tr>
+                    <td><b>정밀 로봇 제어</b></td>
+                    <td>듀얼 로봇 동기화, 갠트리 3축(X/Y/Z) 연동 모터 제어, 2mm 이내 동기 오차</td>
+                  </tr>
+                  <tr>
+                    <td><b>센서 통합</b></td>
+                    <td>듀얼 레이저 거리센서(LDS-X/Z), 에지 검출, Hexagon 레이저 트래커 검증</td>
+                  </tr>
+                  <tr>
+                    <td><b>안전 시스템</b></td>
+                    <td>충돌감지, E-Stop 인터록, 과부하 트립, 월드존 안전영역 설정</td>
+                  </tr>
+                  <tr>
+                    <td><b>소프트웨어</b></td>
+                    <td>멀티태스크 RAPID, 40-세그먼트 용접경로, 실시간 텔레메트리 대시보드</td>
+                  </tr>
+                  <tr>
+                    <td><b>데이터 관리</b></td>
+                    <td>자동 로그 분석, 500+ Punchlist 항목 추적, 백업 비교/변경 추적</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <h3>스마트랙 과제에 직접 활용 가능한 역량</h3>
+              <div class="cards">
+                <div class="callout okbox">
+                  <b>센서 + 실시간 제어</b><br/>
+                  LDS 에지 검출 → 부재 형상 인식 / 로드셀 하중 모니터링 → 안전 검증에 직접 적용 가능
+                </div>
+                <div class="callout okbox">
+                  <b>산업용 통신 통합</b><br/>
+                  EtherNet/IP + TCP/IP Socket 멀티 프로토콜 경험 → WMS/PLC/센서 계층간 통신 설계에 활용
+                </div>
+                <div class="callout okbox">
+                  <b>안전 인터록 설계</b><br/>
+                  충돌감지, 월드존, E-Stop 체계 구축 경험 → 과하중/편하중/전도 방지 인터록 설계에 활용
+                </div>
+                <div class="callout">
+                  <b>조선소 현장 경험</b><br/>
+                  삼성중공업 거제조선소 34bay에서의 실 운영 경험 → 현장 환경(분진, 진동, 고온)에 대한 이해
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 9. 개발 계획(5개년) (ENHANCED) ==================== -->
     <section id="plan" style="margin-top:16px">
       <div class="panel">
         <div class="hd">
-          <h2>7. 개발 수행 계획 (1차년도 중심)</h2>
-          <span class="badge">9개월 프레임</span>
+          <h2>9. 개발 수행 계획 (5개년 + 예산)</h2>
+          <span class="badge">52억 / 57개월</span>
         </div>
         <div class="bd">
+
+          <!-- 5개년 로드맵 바 -->
+          <div class="card" style="margin-bottom:12px">
+            <h3>5개년 로드맵 개요</h3>
+            <div class="roadmap-bar">
+              <div class="seg seg-1">1차(9M)<br/>6억</div>
+              <div class="seg seg-2">2차(12M)<br/>10억</div>
+              <div class="seg seg-3">3차(12M)<br/>12억</div>
+              <div class="seg seg-4">4차(12M)<br/>12억</div>
+              <div class="seg seg-5">5차(12M)<br/>12억</div>
+            </div>
+            <div class="roadmap-bar" style="margin-top:2px">
+              <div class="seg seg-1" style="font-size:10px">TRL 3→4<br/>개념·MVP</div>
+              <div class="seg seg-2" style="font-size:10px">TRL 4→5<br/>현장 시범</div>
+              <div class="seg seg-3" style="font-size:10px">TRL 5→6<br/>양산형·C PoC</div>
+              <div class="seg seg-4" style="font-size:10px">TRL 6→7<br/>현장운영·DT</div>
+              <div class="seg seg-5" style="font-size:10px">TRL 7→8<br/>상용화·확산</div>
+            </div>
+          </div>
+
+          <!-- 5개년 상세 테이블 -->
+          <table class="table" style="margin-bottom:12px">
+            <thead>
+              <tr>
+                <th style="width:10%">연차</th>
+                <th style="width:8%">예산</th>
+                <th style="width:10%">TRL</th>
+                <th style="width:20%">컨셉 진행</th>
+                <th style="width:30%">핵심 산출물</th>
+                <th style="width:22%">성과지표(KPI)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="hl">
+                <td><b>1차</b><br/>9개월</td>
+                <td><b>6억</b></td>
+                <td>3→4</td>
+                <td>컨셉 A MVP<br/>컨셉 B 모듈 PoC</td>
+                <td>부재 분류체계, 핀-그리드 시제품, 추천 알고리즘 v0, 전동 서포트 1~2식</td>
+                <td>안전검증 정확도 80%+<br/>판재 적치 시연</td>
+              </tr>
+              <tr>
+                <td><b>2차</b><br/>12개월</td>
+                <td><b>10억</b></td>
+                <td>4→5</td>
+                <td>컨셉 B 실증<br/>현장 시범 설치</td>
+                <td>전동 서포트 랙 1식 현장설치, AMR 도킹 시연, 입출고 S/W v1</td>
+                <td>적치 시간 30%↓<br/>공간효율 20%↑</td>
+              </tr>
+              <tr>
+                <td><b>3차</b><br/>12개월</td>
+                <td><b>12억</b></td>
+                <td>5→6</td>
+                <td>컨셉 B 양산형<br/>컨셉 C PoC 시작</td>
+                <td>양산형 서포트 모듈, 소조블록 적재 확장, 셀 기반 PoC 1식, 특허 출원</td>
+                <td>보강재+판재 통합운영<br/>특허 2건+</td>
+              </tr>
+              <tr>
+                <td><b>4차</b><br/>12개월</td>
+                <td><b>12억</b></td>
+                <td>6→7</td>
+                <td>통합 시스템<br/>디지털트윈 연계</td>
+                <td>멀티 랙 통합운영, 디지털트윈 실시간 연동, AI 적치 최적화 v1</td>
+                <td>무중단 운영 1개월+<br/>재배치 비용 40%↓</td>
+              </tr>
+              <tr>
+                <td><b>5차</b><br/>12개월</td>
+                <td><b>12억</b></td>
+                <td>7→8</td>
+                <td>상용화<br/>타 조선소 확산</td>
+                <td>상용 제품화, 운영 매뉴얼, 타 조선소 적용 설계, 기술이전</td>
+                <td>상용 판매 1건+<br/>논문/특허 누적 5건+</td>
+              </tr>
+            </tbody>
+          </table>
+
           <div class="two">
+            <!-- 1차년도 상세 -->
             <div class="card">
-              <h3>1차년도(9개월) 추천 마일스톤</h3>
+              <h3>1차년도(9개월) 상세 마일스톤</h3>
               <table class="table">
                 <thead>
                   <tr><th style="width:20%">월</th><th>핵심 산출물</th><th style="width:28%">비고</th></tr>
@@ -712,7 +1167,7 @@
                   <tr>
                     <td><b>M1~M2</b></td>
                     <td>현장 조사/요구사항, 부재 분류체계, 안전 기준 합의</td>
-                    <td>실사/워크숍</td>
+                    <td>거제 현장 실사/워크숍</td>
                   </tr>
                   <tr>
                     <td><b>M3~M4</b></td>
@@ -731,15 +1186,72 @@
                   </tr>
                   <tr>
                     <td><b>M9</b></td>
-                    <td>통합 데모, 성능지표(안전/시간/공간) 리포트, 2차년도 계획</td>
-                    <td>TRL 상승</td>
+                    <td>통합 데모, 성능지표 리포트, 2차년도 계획</td>
+                    <td>TRL 상승 확인</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
+            <!-- 1차년도 예산 상세 -->
             <div class="card">
-              <h3>리스크 & 대응</h3>
+              <h3>1차년도 예산 상세 (6억원)</h3>
+              <table class="table">
+                <thead>
+                  <tr><th style="width:35%">항목</th><th style="width:20%">금액</th><th style="width:15%">비중</th><th>내역</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>연구인건비</b></td>
+                    <td>2.4억</td>
+                    <td>40%</td>
+                    <td>기구2·제어2·S/W1·PM1 (6명)</td>
+                  </tr>
+                  <tr>
+                    <td><b>기구설계/시제품</b></td>
+                    <td>1.5억</td>
+                    <td>25%</td>
+                    <td>핀-그리드 MVP, 전동 서포트 모듈 PoC, 프레임 제작</td>
+                  </tr>
+                  <tr>
+                    <td><b>제어/센서</b></td>
+                    <td>0.8억</td>
+                    <td>13%</td>
+                    <td>로드셀, LiDAR/3D 스캐너, PLC, 인터록 모듈</td>
+                  </tr>
+                  <tr>
+                    <td><b>S/W 개발</b></td>
+                    <td>0.5억</td>
+                    <td>9%</td>
+                    <td>지지점 추천 알고리즘, UI 프로토타입, 데이터 모델</td>
+                  </tr>
+                  <tr>
+                    <td><b>현장조사/출장</b></td>
+                    <td>0.4억</td>
+                    <td>7%</td>
+                    <td>거제 현장 실사(3회+), 워크숍, 벤치마킹</td>
+                  </tr>
+                  <tr>
+                    <td><b>간접비/관리비</b></td>
+                    <td>0.4억</td>
+                    <td>6%</td>
+                    <td>시험장비, 소모품, 특허출원 준비, 보험</td>
+                  </tr>
+                  <tr style="background:rgba(76,201,240,.06)">
+                    <td><b>합계</b></td>
+                    <td><b>6.0억</b></td>
+                    <td><b>100%</b></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 리스크 -->
+          <details style="margin-top:12px">
+            <summary>리스크 & 대응 (4건)</summary>
+            <div style="margin-top:10px" class="two">
               <div class="cards">
                 <div class="callout warnbox">
                   <b>R1. 부재 다양성 폭발</b><br/>
@@ -749,6 +1261,8 @@
                   <b>R2. 센서 신뢰성(분진/충격)</b><br/>
                   → 카메라 단독 지양, <b>기계 가이드</b> + <b>로드셀 검증</b>로 페일세이프
                 </div>
+              </div>
+              <div class="cards">
                 <div class="callout badbox">
                   <b>R3. 모듈 단가/유지보수</b><br/>
                   → 서포트 모듈을 "표준품"으로 설계, 교체형으로 MTTR 최소화
@@ -759,16 +1273,16 @@
                 </div>
               </div>
             </div>
-          </div>
+          </details>
         </div>
       </div>
     </section>
 
-    <!-- 8. 영상 -->
+    <!-- ==================== 10. 영상 ==================== -->
     <section id="videos" style="margin-top:16px">
       <div class="panel">
         <div class="hd">
-          <h2>8. 참고 영상 (보고서 내 임베드)</h2>
+          <h2>10. 참고 영상 (보고서 내 임베드)</h2>
           <span class="badge">차단 대비 링크 포함</span>
         </div>
 
@@ -858,11 +1372,11 @@
       </div>
     </section>
 
-    <!-- 9. 다음 단계 -->
+    <!-- ==================== 11. 다음 단계 ==================== -->
     <section id="next" style="margin-top:16px">
       <div class="panel">
         <div class="hd">
-          <h2>9. 다음 단계 (의사결정 체크리스트)</h2>
+          <h2>11. 다음 단계 (의사결정 체크리스트)</h2>
           <span class="badge">바로 회의용</span>
         </div>
         <div class="bd">
@@ -890,7 +1404,7 @@
             </div>
           </div>
           <div class="footer">
-            본 문서는 Kick-off 자료 내용을 요약/확장한 HTML 예시입니다. (사내 공유 시 표준 서식/보안 정책에 맞춰 조정 권장)
+            에스피시스템스 | 스마트랙(유연 적치) 개발 보고서 v2.0 | 2026-02-20
             <div style="margin-top:6px"><a href="#top">맨 위로 ↑</a></div>
           </div>
         </div>

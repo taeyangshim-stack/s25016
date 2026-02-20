@@ -3,6 +3,44 @@ MODULE MainModule
 	! TASK1 (Robot1) - MainModule
 	! Version History
 	!========================================
+	! v1.9.47 (2026-02-20) - ExecMoveJgJ segmented move
+	!   - FIX: Split large gantry moves into segments (ABB 50050 workaround)
+	!   - Linear axes: max 2000mm per segment, R-axis: max 45deg per segment
+	!   - Changed speed to v100, zone to fine/z50 for stability
+	!   - Added ERROR handler with ERRNO logging to debug_movejgj.txt
+	!   - Added eax_e logging for complete axis diagnostics
+	!
+	! v1.9.46 (2026-02-19) - ExecMoveJgJ eax_f sync
+	!   - FIX: eax_f explicitly synced to eax_a (X2=X1)
+	!   - Added file-based debug logging (HOME:/debug_movejgj.txt)
+	!   - Confirmed: eax_f must be valid value, not 9E+09 (40512 error)
+	!   - Confirmed: eax_f must equal eax_a (desync causes 10125)
+	!
+	! v1.9.45 (2026-02-19) - eax_f=9E+09 test (reverted)
+	!   - TEST: Set eax_f=9E+09 to exclude from motion planning
+	!   - RESULT: 40512 Missing External Axis Value - eax_f is required axis
+	!
+	! v1.9.44 (2026-02-19) - eax_f=CJointT test (reverted)
+	!   - TEST: Keep eax_f from CJointT (current value 0)
+	!   - RESULT: 10125 Program stopped - X1/X2 desync when eax_a != eax_f
+	!
+	! v1.9.43 (2026-02-19) - ExecMoveJgJ debug logging
+	!   - Added debug file output (HOME:/debug_movejgj.txt)
+	!   - Rob1_CommandListener header updated to v1.9.43
+	!   - Logs current/target extax values, vSync, MoveAbsJ start/completion
+	!
+	! v1.9.42 (2026-02-18) - ExecMoveJgJ for tWeld1
+	!   - NEW: ExecMoveJgJ procedure - keeps robot joints from CJointT()
+	!   - T_Head jRob1.robax is tool0-calculated, not compatible with tWeld1
+	!   - Only overrides gantry extax (X1, Y, Z, R) from jGantry
+	!   - Rob2_MainModule: Removed MoveAbsJ jRob2 from MoveJgJ case
+	!     (Robot2 keeps tWeld2 posture during gantry move)
+	!
+	! v1.9.41 (2026-02-18) - T_Head command interface
+	!   - Rob1_CommandListener: stCommand handler for T_Head
+	!   - Supports MoveJgJ, MovePgJ, MovePgL, checkpos commands
+	!   - Manages stReact{1} (robot) and stReact{3} (gantry)
+	!
 	! v2.2.0 (2026-02-18) - PlanC Phase 1
 	!   - TestWeldSequence() now routes to TestFullWeldSequence
 	!   - "Weld"/"WeldMotion" commands use full edge-based weld sequence
@@ -5210,7 +5248,7 @@ PROC rT_ROB1check()
 ENDPROC
 
 ! ========================================
-! Rob1_CommandListener: T_Head stCommand handler (v1.9.41)
+! Rob1_CommandListener: T_Head stCommand handler (v1.9.43)
 ! ========================================
 ! Responds to stCommand from T_Head task
 ! Protocol: "Ready" -> receive command -> execute -> "Ack" -> wait clear -> "Ready"

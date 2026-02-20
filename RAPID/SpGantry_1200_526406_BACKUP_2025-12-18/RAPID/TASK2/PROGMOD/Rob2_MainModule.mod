@@ -3,6 +3,12 @@ MODULE Rob2_MainModule
 	! TASK2 (Robot2) - Rob2_MainModule
 	! Version History
 	!========================================
+	! v1.9.42 (2026-02-19) - MoveJgJ fix for tWeld2
+	!   - Removed MoveAbsJ jRob2 from MoveJgJ case
+	!   - jRob2.robax is tool0-calculated (138deg J2 change from tWeld2 HOME)
+	!   - Robot2 now immediately Acks without moving during gantry move
+	!   - Prevents concurrent MoveAbsJ conflict with Robot1
+	!
 	! v2.1.0 (2026-02-03)
 	!   - Added PlanA-style command monitoring loop
 	!   - Robot2_CommandLoop() monitors nCmdInput from ConfigModule
