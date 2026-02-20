@@ -22,879 +22,1193 @@
             if (sessionStorage.getItem(STORAGE_KEY) === TOKEN) {
                 return;
             }
-            document.documentElement.innerHTML = '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><title>접근 제한</title><style>body{margin:0;padding:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;font-family:\'Segoe UI\',sans-serif;text-align:center;} .box{max-width:420px;padding:32px;background:rgba(15,23,42,0.85);border-radius:16px;box-shadow:0 25px 70px rgba(15,23,42,0.35);} h1{font-size:1.8rem;margin-bottom:12px;} p{line-height:1.6;font-size:1rem;color:#94a3b8;} code{display:inline-block;margin-top:18px;padding:8px 14px;border-radius:999px;background:rgba(96,165,250,0.12);color:#bfdbfe;font-size:0.95rem;}</style></head><body><div class=\"box\"><h1>접근이 제한된 페이지입니다</h1><p>유효한 인증 토큰이 확인되지 않았습니다.<br>지정된 공유 링크로 다시 접속해 주세요.</p><code>문의: 내부 담당자</code></div></body></html>';
+            document.documentElement.innerHTML = '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><title>접근 제한</title><style>body{margin:0;padding:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0a0e1a;color:#e2e8f0;font-family:\'Segoe UI\',sans-serif;text-align:center;} .box{max-width:420px;padding:32px;background:rgba(15,23,42,0.85);border-radius:16px;box-shadow:0 25px 70px rgba(0,0,0,0.5);border:1px solid rgba(0,212,255,0.15);} h1{font-size:1.8rem;margin-bottom:12px;color:#00d4ff;} p{line-height:1.6;font-size:1rem;color:#94a3b8;} code{display:inline-block;margin-top:18px;padding:8px 14px;border-radius:999px;background:rgba(0,212,255,0.08);color:#67e8f9;font-size:0.95rem;}</style></head><body><div class=\"box\"><h1>접근이 제한된 페이지입니다</h1><p>유효한 인증 토큰이 확인되지 않았습니다.<br>지정된 공유 링크로 다시 접속해 주세요.</p><code>문의: 내부 담당자</code></div></body></html>';
         })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #f1f5f9;
-            --surface: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --accent: #6366f1;
-            --accent-light: #e0e7ff;
-            --accent-hover: #4f46e5;
-            --border: #e2e8f0;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
-            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-deep: #060a14;
+            --bg: #0a0e1a;
+            --bg-elevated: #0f1526;
+            --surface: #141c2e;
+            --surface-hover: #1a2440;
+            --border: rgba(0, 212, 255, 0.08);
+            --border-active: rgba(0, 212, 255, 0.25);
+            --text-primary: #e8ecf4;
+            --text-secondary: #8892a8;
+            --text-muted: #5a6478;
+            --cyan: #00d4ff;
+            --cyan-dim: rgba(0, 212, 255, 0.12);
+            --cyan-glow: rgba(0, 212, 255, 0.06);
+            --green: #00ff88;
+            --green-dim: rgba(0, 255, 136, 0.1);
+            --red: #ff3366;
+            --red-dim: rgba(255, 51, 102, 0.1);
+            --amber: #ffb800;
+            --amber-dim: rgba(255, 184, 0, 0.1);
+            --violet: #a78bfa;
+            --violet-dim: rgba(167, 139, 250, 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+            --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg);
+            font-family: var(--font-body);
+            background: var(--bg-deep);
             min-height: 100vh;
-            padding: 24px;
             color: var(--text-primary);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1440px;
+        /* ── Dot Grid Background ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(0,212,255,0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 1;
+            max-width: 1560px;
             margin: 0 auto;
-            background: var(--surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
+            padding: 16px;
         }
 
         /* ── Header ── */
         .header {
-            background: var(--surface);
-            color: var(--text-primary);
-            padding: 48px 48px 32px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 32px 8px 24px;
             border-bottom: 1px solid var(--border);
+            margin-bottom: 0;
+        }
+
+        .header-left { display: flex; flex-direction: column; gap: 4px; }
+
+        .header-tag {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+            opacity: 0.8;
         }
 
         .header h1 {
-            font-size: 2em;
+            font-family: var(--font-mono);
+            font-size: 1.6em;
             font-weight: 700;
-            margin-bottom: 6px;
+            color: var(--text-primary);
             letter-spacing: -0.02em;
         }
 
-        .header p {
-            font-size: 1.05em;
+        .header-sub {
+            font-size: 0.88em;
             color: var(--text-secondary);
-            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            color: var(--green);
+            padding: 6px 14px;
+            background: var(--green-dim);
+            border-radius: 999px;
+            border: 1px solid rgba(0,255,136,0.15);
+            white-space: nowrap;
+        }
+
+        .header-status .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse-dot 2s ease infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,136,0.5); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(0,255,136,0); }
         }
 
         /* ── Tab Navigation ── */
         .nav-tabs {
             display: flex;
-            background: var(--surface);
+            background: var(--bg);
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
-            padding: 0 32px;
-            gap: 4px;
+            padding: 0;
+            gap: 2px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
+        .nav-tabs::-webkit-scrollbar { display: none; }
 
         .nav-tab {
-            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 20px;
             cursor: pointer;
             background: transparent;
             border: none;
-            font-size: 0.92em;
+            font-size: 0.84em;
             font-weight: 600;
             color: var(--text-muted);
-            transition: all var(--transition);
+            transition: all 0.2s var(--ease);
             flex-shrink: 0;
-            min-width: auto;
-            text-align: center;
-            border-bottom: 2px solid transparent;
-            border-radius: 0;
-            font-family: inherit;
+            font-family: var(--font-body);
             position: relative;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-tab svg {
+            width: 16px; height: 16px;
+            flex-shrink: 0;
+            opacity: 0.5;
+            transition: opacity 0.2s;
         }
 
         .nav-tab:hover {
             color: var(--text-secondary);
-            background: var(--accent-light);
-            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            background: var(--cyan-glow);
         }
+        .nav-tab:hover svg { opacity: 0.8; }
 
         .nav-tab.active {
-            color: var(--accent);
-            border-bottom: 2px solid var(--accent);
+            color: var(--cyan);
+            border-bottom-color: var(--cyan);
             background: transparent;
         }
+        .nav-tab.active svg { opacity: 1; }
 
         /* ── Tab Content ── */
         .tab-content {
             display: none;
-            padding: 40px 48px;
+            padding: 28px 8px;
+            animation: tab-in 0.35s var(--ease);
+        }
+        .tab-content.active { display: block; }
+
+        @keyframes tab-in {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .tab-content.active {
-            display: block;
+        /* ── Section Groups ── */
+        .section-group {
+            margin-bottom: 36px;
         }
 
-        /* ── Dashboard Grid ── */
-        .dashboard-grid {
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--text-muted);
+            padding: 0 4px 12px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label .sl-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── Grid Layouts ── */
+        .grid-3 {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        /* ── Stat Blocks ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .stat-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 16px;
+            text-align: center;
+            transition: border-color 0.25s, transform 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-block::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--cyan);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .stat-block:hover {
+            border-color: var(--border-active);
+            transform: translateY(-2px);
+        }
+        .stat-block:hover::before { opacity: 1; }
+
+        .stat-block .stat-val {
+            font-family: var(--font-mono);
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+
+        .stat-block .stat-lbl {
+            font-size: 0.76em;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .stat-block.stat-green .stat-val { color: var(--green); }
+        .stat-block.stat-green::before { background: var(--green); }
+        .stat-block.stat-amber .stat-val { color: var(--amber); }
+        .stat-block.stat-amber::before { background: var(--amber); }
+        .stat-block.stat-red .stat-val { color: var(--red); }
+        .stat-block.stat-red::before { background: var(--red); }
+        .stat-block.stat-violet .stat-val { color: var(--violet); }
+        .stat-block.stat-violet::before { background: var(--violet); }
 
         /* ── Cards ── */
         .card {
             background: var(--surface);
-            border-radius: var(--radius);
-            padding: 28px;
-            box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
-            border-left: 4px solid var(--accent);
-            transition: all var(--transition);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+            position: relative;
         }
 
         .card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .card h3 {
-            color: var(--text-primary);
-            margin-bottom: 18px;
-            font-size: 1.15em;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: -0.01em;
-        }
-
-        .card-devicenet { border-left-color: #10b981; }
-        .card-robot { border-left-color: #f43f5e; }
-        .card-hexagon { border-left-color: #8b5cf6; }
-
-        /* ── Project Links ── */
-        .project-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 18px;
-            background: var(--accent-light);
-            color: var(--accent);
-            text-decoration: none;
-            border-radius: var(--radius-sm);
-            margin: 8px 0;
-            font-weight: 600;
-            font-size: 0.9em;
-            transition: all var(--transition);
-            text-align: left;
-            border: 1px solid transparent;
-        }
-
-        .project-link:hover {
-            background: var(--accent);
-            color: white;
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(99,102,241,0.25);
-        }
-
-        .project-link-devicenet {
-            background: #ecfdf5;
-            color: #059669;
-        }
-        .project-link-devicenet:hover {
-            background: #10b981;
-            color: white;
-            box-shadow: 0 4px 12px rgba(16,185,129,0.25);
-        }
-
-        .project-link-robot {
-            background: #fff1f2;
-            color: #e11d48;
-        }
-        .project-link-robot:hover {
-            background: #f43f5e;
-            color: white;
-            box-shadow: 0 4px 12px rgba(244,63,94,0.25);
-        }
-
-        .project-link-amber {
-            background: #fffbeb; color: #d97706;
-        }
-        .project-link-amber:hover {
-            background: #f59e0b; color: white;
-            box-shadow: 0 4px 12px rgba(245,158,11,0.25);
-        }
-
-        .project-link-violet {
-            background: #f5f3ff; color: #7c3aed;
-        }
-        .project-link-violet:hover {
-            background: #8b5cf6; color: white;
-            box-shadow: 0 4px 12px rgba(139,92,246,0.25);
-        }
-
-        .project-link-sky {
-            background: #f0f9ff; color: #0284c7;
-        }
-        .project-link-sky:hover {
-            background: #0ea5e9; color: white;
-            box-shadow: 0 4px 12px rgba(14,165,233,0.25);
-        }
-
-        .project-link-teal {
-            background: #f0fdfa; color: #0d9488;
-        }
-        .project-link-teal:hover {
-            background: #14b8a6; color: white;
-            box-shadow: 0 4px 12px rgba(20,184,166,0.25);
-        }
-
-        .project-link-pink {
-            background: #fdf2f8; color: #db2777;
-        }
-        .project-link-pink:hover {
-            background: #ec4899; color: white;
-            box-shadow: 0 4px 12px rgba(236,72,153,0.25);
-        }
-
-        /* ── Folder Structure ── */
-        .folder-structure {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .folder-structure li {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: background var(--transition);
-            font-size: 0.92em;
-            border-radius: 6px;
-        }
-
-        .folder-structure li:last-child {
-            border-bottom: none;
-        }
-
-        .folder-structure li:hover {
-            background: var(--accent-light);
-        }
-
-        .folder-icon {
-            font-size: 1.15em;
-        }
-
-        /* ── Info Box ── */
-        .info-box {
-            background: #f8fafc;
-            padding: 18px;
-            border-radius: var(--radius-sm);
-            border-left: 3px solid var(--accent);
-            margin: 16px 0;
-        }
-
-        .info-box h4 {
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            font-size: 0.95em;
-            font-weight: 700;
-        }
-
-        .info-box p {
-            line-height: 1.8;
-            color: var(--text-secondary);
-            font-size: 0.9em;
-        }
-
-        /* ── Stats Grid ── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            padding: 24px 20px;
-            border-radius: var(--radius);
-            text-align: center;
-            border: 1px solid var(--border);
-            transition: all var(--transition);
-        }
-
-        .stat-card:hover {
-            box-shadow: var(--shadow-md);
+            border-color: var(--border-active);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,212,255,0.05);
             transform: translateY(-2px);
         }
 
-        .stat-number {
-            font-size: 2.2em;
-            font-weight: 800;
-            color: var(--accent);
-            letter-spacing: -0.03em;
-        }
-
-        .stat-label {
-            font-size: 0.82em;
-            color: var(--text-muted);
-            margin-top: 4px;
-            font-weight: 500;
-        }
-
-        /* ── File Links ── */
-        .file-link {
-            display: inline-block;
-            padding: 7px 14px;
-            background: var(--accent-light);
-            color: var(--accent);
-            text-decoration: none;
-            border-radius: 8px;
-            margin: 4px;
-            transition: all var(--transition);
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-
-        .file-link:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        .emoji {
-            font-size: 1.3em;
-        }
-
-        /* ── Highlight Box ── */
-        .highlight-box {
-            background: #fffbeb;
-            padding: 18px;
-            border-radius: var(--radius-sm);
-            border-left: 3px solid #f59e0b;
-            margin: 16px 0;
-        }
-
-        /* ── Timeline ── */
-        .timeline {
-            position: relative;
-            padding-left: 32px;
-            margin-top: 28px;
-        }
-
-        .timeline::before {
-            content: '';
+        .card-accent {
             position: absolute;
-            left: 15px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(180deg, var(--accent) 0%, #a5b4fc 100%);
+            top: 0; left: 24px; right: 24px;
+            height: 1px;
         }
 
-        .timeline-item {
-            position: relative;
-            margin-bottom: 20px;
-            background: var(--surface);
-            padding: 18px 20px;
-            border-radius: var(--radius-sm);
+        .card-accent-cyan { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+        .card-accent-green { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+        .card-accent-red { background: linear-gradient(90deg, transparent, var(--red), transparent); }
+        .card-accent-violet { background: linear-gradient(90deg, transparent, var(--violet), transparent); }
+        .card-accent-amber { background: linear-gradient(90deg, transparent, var(--amber), transparent); }
+
+        .card-title {
+            font-family: var(--font-mono);
+            font-size: 0.92em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .ct-icon {
+            width: 32px; height: 32px;
+            border-radius: var(--radius-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+
+        .ct-cyan { background: var(--cyan-dim); }
+        .ct-green { background: var(--green-dim); }
+        .ct-red { background: var(--red-dim); }
+        .ct-violet { background: var(--violet-dim); }
+        .ct-amber { background: var(--amber-dim); }
+
+        /* ── Info Panel ── */
+        .info-panel {
+            background: var(--bg-elevated);
             border: 1px solid var(--border);
-            transition: all var(--transition);
-        }
-
-        .timeline-item:hover {
-            box-shadow: var(--shadow-sm);
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -24px;
-            top: 20px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--accent);
-            border: 3px solid var(--surface);
-            box-shadow: 0 0 0 2px var(--accent);
-        }
-
-        /* ── Badges ── */
-        .badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.75em;
-            font-weight: 700;
-            margin-left: 8px;
-            letter-spacing: 0.02em;
-        }
-
-        .badge-new { background: #fee2e2; color: #dc2626; }
-        .badge-update { background: #fef3c7; color: #d97706; }
-        .badge-complete { background: #dcfce7; color: #16a34a; }
-
-        /* ── Utility Classes ── */
-        .detail-note {
-            margin-top: 14px;
+            border-radius: var(--radius-sm);
             padding: 14px 16px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border-left: 3px solid var(--border);
-            font-size: 0.88em;
+            margin-bottom: 14px;
+        }
+
+        .info-panel h4 {
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            font-weight: 600;
             color: var(--text-secondary);
-            line-height: 1.8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
 
-        .detail-note strong { color: var(--text-primary); }
-
-        .detail-text {
-            margin: 0;
-            font-size: 0.88em;
-            color: var(--text-secondary);
-            line-height: 1.8;
-        }
-
-        .section-extra { margin-top: 16px; }
-
-        .small-note {
-            margin-top: 8px;
-            font-size: 0.75em;
-            color: var(--text-muted);
-        }
-
-        .text-muted {
-            margin-top: 14px;
-            font-size: 0.82em;
-            color: var(--text-muted);
-            text-align: center;
-        }
-
-        .text-green { color: #10b981; }
-
-        .code-block {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 14px 16px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin-top: 10px;
-            font-size: 0.88em;
-            line-height: 1.6;
-        }
-
-        .code-tree {
-            background: #f8fafc;
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin-top: 14px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
+        .info-panel p {
             font-size: 0.85em;
+            color: var(--text-secondary);
             line-height: 1.8;
+        }
+
+        .info-panel strong { color: var(--text-primary); }
+
+        /* ── Alert Panel ── */
+        .alert-panel {
+            background: rgba(255, 184, 0, 0.04);
+            border: 1px solid rgba(255, 184, 0, 0.12);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 14px;
+        }
+
+        .alert-panel h4 {
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            font-weight: 600;
+            color: var(--amber);
+            margin-bottom: 6px;
+        }
+
+        .alert-panel p {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .alert-panel strong { color: var(--text-primary); }
+
+        /* ── Project Links ── */
+        .link-list { display: flex; flex-direction: column; gap: 6px; }
+
+        .plink {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-xs);
+            font-size: 0.84em;
+            font-weight: 500;
+            transition: all 0.2s var(--ease);
+        }
+
+        .plink:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-active);
+            color: var(--text-primary);
+            transform: translateX(3px);
+        }
+
+        .plink .plink-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .plink-cyan .plink-dot { background: var(--cyan); }
+        .plink-green .plink-dot { background: var(--green); }
+        .plink-red .plink-dot { background: var(--red); }
+        .plink-violet .plink-dot { background: var(--violet); }
+        .plink-amber .plink-dot { background: var(--amber); }
+
+        .plink-cyan:hover { color: var(--cyan); border-color: rgba(0,212,255,0.2); }
+        .plink-green:hover { color: var(--green); border-color: rgba(0,255,136,0.2); }
+        .plink-red:hover { color: var(--red); border-color: rgba(255,51,102,0.2); }
+        .plink-violet:hover { color: var(--violet); border-color: rgba(167,139,250,0.2); }
+        .plink-amber:hover { color: var(--amber); border-color: rgba(255,184,0,0.2); }
+
+        /* ── Collapsible Links ── */
+        .link-more {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .link-more.open { display: flex; }
+
+        .toggle-more {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: transparent;
+            border: 1px dashed var(--border);
+            color: var(--text-muted);
+            border-radius: var(--radius-xs);
+            font-size: 0.8em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-body);
+        }
+
+        .toggle-more:hover {
+            border-color: var(--border-active);
             color: var(--text-secondary);
         }
 
-        .tree-indent { padding-left: 20px; }
+        .toggle-more svg {
+            width: 14px; height: 14px;
+            transition: transform 0.25s;
+        }
+        .toggle-more.open svg { transform: rotate(180deg); }
+
+        /* ── Timeline (Horizontal Ticker) ── */
+        .timeline-strip {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 4px 0 12px;
+            margin-bottom: 28px;
+            scrollbar-width: none;
+        }
+        .timeline-strip::-webkit-scrollbar { display: none; }
+
+        .tl-item {
+            flex-shrink: 0;
+            width: 300px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .tl-item:hover { border-color: var(--border-active); }
+
+        .tl-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tl-date {
+            font-family: var(--font-mono);
+            font-size: 0.75em;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .tl-badge {
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            letter-spacing: 0.05em;
+        }
+
+        .tl-badge-complete { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,255,136,0.15); }
+        .tl-badge-new { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,51,102,0.15); }
+        .tl-badge-urgent { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(255,184,0,0.15); }
+
+        .tl-text {
+            font-size: 0.84em;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .tl-sub {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── Folder List ── */
+        .folder-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 6px;
+        }
+
+        .folder-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: var(--radius-xs);
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            transition: background 0.2s;
+        }
+
+        .folder-list li:hover { background: var(--bg-elevated); }
+
+        /* ── Detail Note ── */
+        .dnote {
+            background: var(--bg-elevated);
+            border-left: 2px solid var(--border);
+            border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+            padding: 12px 14px;
+            margin-top: 12px;
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .dnote strong { color: var(--text-primary); }
+        .dnote-cyan { border-left-color: rgba(0,212,255,0.3); }
+        .dnote-green { border-left-color: rgba(0,255,136,0.3); }
+        .dnote-red { border-left-color: rgba(255,51,102,0.3); }
+        .dnote-amber { border-left-color: rgba(255,184,0,0.3); }
+
+        /* ── Code Block ── */
+        .code-block {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            line-height: 1.6;
+            color: var(--cyan);
+            overflow-x: auto;
+            margin: 10px 0;
+        }
 
         .inline-code {
-            background: var(--accent-light);
+            font-family: var(--font-mono);
+            background: var(--cyan-dim);
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 0.88em;
+            color: var(--cyan);
         }
 
-        .card-full { grid-column: 1 / -1; }
-
-        .list-padded {
-            padding-left: 20px;
-            margin-top: 10px;
+        /* ── File Link chips ── */
+        .file-chip {
+            display: inline-block;
+            padding: 5px 12px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-xs);
+            margin: 3px;
+            transition: all 0.2s;
+            font-size: 0.8em;
+            font-weight: 500;
         }
 
-        .link-accent {
-            color: var(--accent);
-            font-weight: 600;
+        .file-chip:hover {
+            border-color: var(--border-active);
+            color: var(--cyan);
         }
+
+        /* ── Section intro ── */
+        .section-intro {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+
+        .section-intro h2 {
+            font-family: var(--font-mono);
+            font-size: 1.05em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .section-intro p {
+            font-size: 0.88em;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ── Feature List ── */
+        .feat-list {
+            list-style: none;
+        }
+
+        .feat-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feat-list li:last-child { border-bottom: none; }
+
+        .feat-list .feat-icon {
+            width: 24px; height: 24px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-elevated);
+            border-radius: var(--radius-xs);
+            font-size: 0.85em;
+            flex-shrink: 0;
+        }
+
+        /* ── Step indicator ── */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 14px;
+            position: relative;
+        }
+
+        .step-rail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 20px;
+            flex-shrink: 0;
+        }
+
+        .step-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--cyan);
+            border: 2px solid var(--surface);
+            box-shadow: 0 0 0 2px rgba(0,212,255,0.2);
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .step-line {
+            width: 1px;
+            flex: 1;
+            background: linear-gradient(180deg, rgba(0,212,255,0.2), transparent);
+            min-height: 20px;
+        }
+
+        .step-body {
+            padding: 0 0 20px;
+        }
+
+        .step-body strong {
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            color: var(--text-primary);
+        }
+
+        .step-body p {
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .step-body small {
+            font-size: 0.78em;
+            color: var(--text-muted);
+        }
+
+        /* ── Tree View ── */
+        .tree-view {
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            padding: 12px 14px;
+            background: var(--bg-elevated);
+            border-radius: var(--radius-sm);
+        }
+
+        .tree-view .tv-indent { padding-left: 20px; }
+        .tree-view .tv-hl { color: var(--green); }
 
         /* ── Responsive ── */
+        @media (max-width: 1024px) {
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+
         @media (max-width: 768px) {
-            body { padding: 12px; }
+            .shell { padding: 8px; }
+            .header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px 8px 16px; }
+            .header h1 { font-size: 1.2em; }
+            .tab-content { padding: 16px 4px; }
+            .grid-3, .grid-2, .grid-4 { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .nav-tab { padding: 12px 14px; font-size: 0.78em; }
+            .nav-tab span.tab-text-full { display: none; }
+            .nav-tab span.tab-text-short { display: inline; }
+            .card { padding: 18px; }
+            .tl-item { width: 260px; }
+            .folder-list { grid-template-columns: 1fr; }
+        }
 
-            .header { padding: 28px 20px 20px; }
-            .header h1 { font-size: 1.5em; }
+        @media (min-width: 769px) {
+            .nav-tab span.tab-text-short { display: none; }
+        }
 
-            .tab-content { padding: 24px 20px; }
+        /* ── Load Animation ── */
+        .card, .stat-block, .tl-item {
+            opacity: 0;
+            transform: translateY(12px);
+        }
 
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-tabs {
-                padding: 0 12px;
-                gap: 0;
-            }
-
-            .nav-tab {
-                padding: 12px 16px;
-                font-size: 0.82em;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .card { padding: 20px; }
+        .card.visible, .stat-block.visible, .tl-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="shell">
+        <!-- Header -->
         <div class="header">
-            <h1>S25016 프로젝트 통합 대시보드</h1>
-            <p>로봇 시스템 개발 · DeviceNet 통신 · 정밀 측정 솔루션</p>
+            <div class="header-left">
+                <div class="header-tag">S25016 // Geoje Shipyard</div>
+                <h1>프로젝트 통합 대시보드</h1>
+                <div class="header-sub">34bay 자동용접 로봇 시스템 &middot; DeviceNet 통신 &middot; 정밀 측정</div>
+            </div>
+            <div class="header-status">
+                <span class="dot"></span>
+                SYSTEM ONLINE
+            </div>
         </div>
 
+        <!-- Tab Navigation -->
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('overview')">전체 개요</button>
-            <button class="nav-tab" onclick="showTab('punchlist')">펀치리스트</button>
-            <button class="nav-tab" onclick="showTab('eventlog')">이벤트 로그</button>
-            <button class="nav-tab" onclick="showTab('work-manage')">근무관리</button>
-            <button class="nav-tab" onclick="showTab('documents')">문서 자료</button>
-            <button class="nav-tab" onclick="showTab('planb-motion')">Plan B & 모션</button>
+            <button class="nav-tab active" onclick="showTab('overview', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <span class="tab-text-full">전체 개요</span><span class="tab-text-short">개요</span>
+            </button>
+            <button class="nav-tab" onclick="showTab('punchlist', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                <span class="tab-text-full">펀치리스트</span><span class="tab-text-short">펀치</span>
+            </button>
+            <button class="nav-tab" onclick="showTab('eventlog', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span class="tab-text-full">이벤트 로그</span><span class="tab-text-short">로그</span>
+            </button>
+            <button class="nav-tab" onclick="showTab('work-manage', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                <span class="tab-text-full">근무관리</span><span class="tab-text-short">근무</span>
+            </button>
+            <button class="nav-tab" onclick="showTab('documents', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+                <span class="tab-text-full">문서 자료</span><span class="tab-text-short">문서</span>
+            </button>
+            <button class="nav-tab" onclick="showTab('planb-motion', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg>
+                <span class="tab-text-full">Plan B &amp; 모션</span><span class="tab-text-short">PlanB</span>
+            </button>
         </div>
 
-        <!-- 전체 개요 탭 -->
+        <!-- ═══════════════════════════════════ 전체 개요 탭 ═══════════════════════════════════ -->
         <div id="overview" class="tab-content active">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">5</div>
-                    <div class="stat-label">진행 중 프로젝트</div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-block">
+                    <div class="stat-val">5</div>
+                    <div class="stat-lbl">진행 중 프로젝트</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">158</div>
-                    <div class="stat-label">DeviceNet 신호</div>
+                <div class="stat-block stat-green">
+                    <div class="stat-val">158</div>
+                    <div class="stat-lbl">DeviceNet 신호</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">14</div>
-                    <div class="stat-label">용접 시퀀스 상태</div>
+                <div class="stat-block stat-amber">
+                    <div class="stat-val">14</div>
+                    <div class="stat-lbl">용접 시퀀스 상태</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">☁️</div>
-                    <div class="stat-label">파일 업로더</div>
+                <div class="stat-block stat-violet">
+                    <div class="stat-val">744</div>
+                    <div class="stat-lbl">이벤트 로그</div>
                 </div>
             </div>
 
-            <div class="dashboard-grid">
-                <div class="card card-devicenet">
-                    <h3><span class="emoji">🔌</span> 용접기 DeviceNet 인터페이스</h3>
-                    <div class="info-box">
-                        <h4>Lincoln Electric Power Wave</h4>
-                        <p>
-                            <strong>문서:</strong> Y50031-21 DeviceNet Interface Specification<br>
-                            <strong>날짜:</strong> 2010년 4월 20일<br>
-                            <strong>분량:</strong> 76페이지 기술 사양서
-                        </p>
+            <!-- Timeline Strip -->
+            <div class="section-label">최근 활동 <span class="sl-line"></span></div>
+            <div class="timeline-strip">
+                <div class="tl-item">
+                    <div class="tl-head">
+                        <span class="tl-date">2024.10.04</span>
+                        <span class="tl-badge tl-badge-complete">COMPLETE</span>
                     </div>
-                    <div class="highlight-box">
-                        <h4>🚨 통신 문제 해결 현황</h4>
-                        <p>
-                            <strong>📅 기간:</strong> 10/2 ~ 10/9 (진행 중)<br>
-                            <strong>⚡ 상태:</strong> 10/9 ABB+Lincoln 현장 작업 완료<br>
-                            <strong>📍 최신:</strong> 1~2호기 파라미터 최적화, 3호기 리빌딩
-                        </p>
-                    </div>
-                    <a href="projects/devicenet/docs/251009_작업진행_세부내용.html" class="project-link" target="_blank">
-                        📋 10/9 작업 진행 세부내용 (최신)
-                    </a>
-                    <a href="projects/devicenet/index.html" class="project-link" target="_blank">
-                        🔧 통신 문제 해결 진행 현황 보고
-                    </a>
-                    <a href="projects/devicenet/signals.html" class="project-link project-link-devicenet" target="_blank">
-                        📋 DeviceNet 신호 테이블 보기
-                    </a>
-                    <a href="projects/devicenet/docs/ABB_Lincoln_DeviceNet_체크리스트.html" class="project-link project-link-devicenet" target="_blank">
-                        ✅ ABB-Lincoln 연결 체크리스트
-                    </a>
-                    <a href="projects/devicenet/specs/Y50031_DeviceNetInterfaceSpecification-21.pdf" class="project-link project-link-devicenet" target="_blank">
-                        📄 원본 PDF 문서 보기
-                    </a>
+                    <div class="tl-text">ROBOT&harr;UI 테스트 통합 결과 완료</div>
+                    <div class="tl-sub">총 31개 항목 (완료 13 | 개선 11 | 보류 7)<br>다음: 10/11 UI 개선 및 에러 핸들링</div>
                 </div>
-
-                <div class="card card-robot">
-                    <h3><span class="emoji">🤖</span> 갠트리 로봇 상하축 이슈</h3>
-                    <div class="info-box">
-                        <h4>시운전 단계 긴급 대응</h4>
-                        <p>
-                            <strong>발견:</strong> 2024년 9월 17일<br>
-                            <strong>위험도:</strong> 매우 높음 (★★★★★)<br>
-                            <strong>팀 구성:</strong> 3명 협업 체제
-                        </p>
+                <div class="tl-item">
+                    <div class="tl-head">
+                        <span class="tl-date">2024.10.03</span>
+                        <span class="tl-badge tl-badge-new">NEW</span>
                     </div>
-                    <div class="highlight-box">
-                        <h4>🧪 UI 테스트 현황</h4>
-                        <p>
-                            <strong>✅ 통합 결과:</strong> 10/3-10/4 완료 (31개 항목)<br>
-                            <strong>📊 현황:</strong> 완료 13 | 개선 11 | 보류 7<br>
-                            <strong>📅 다음:</strong> 10/11 UI 개선 및 에러 핸들링
-                        </p>
-                    </div>
-                    <a href="projects/robot-vertical-axis/dashboard.html" class="project-link project-link-robot" target="_blank">
-                        🎯 상하축 이슈 대시보드
-                    </a>
-                    <a href="robot_sync_issue_report.html" class="project-link" target="_blank">
-                        🚨 로봇 동기화 이슈 보고서 (긴급)
-                    </a>
-                    <a href="robot_backup_comparison.html" class="project-link project-link-robot" target="_blank">
-                        📊 로봇 백업 비교 보고서 (실용적 분석)
-                    </a>
-                    <a href="robot_backup_history.html" class="project-link project-link-robot" target="_blank">
-                        📚 ABB 로봇 백업 변경 이력 (Git 기반)
-                    </a>
-                    <a href="setting_planb_comparison.html" class="project-link project-link-robot" target="_blank">
-                        🧭 Setting Plan B 전·후 비교 (3호기)
-                    </a>
-                    <a href="projects/robot-backup/report-20251015-9c3f7bd2.html" class="project-link project-link-robot" target="_blank">
-                        🗂️ 로봇 백업 업데이트 인덱스 (2025-10-15)
-                    </a>
-                    <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
-                        🧪 ROBOT↔UI 테스트 통합 결과 (10/3-10/4)
-                    </a>
-                    <a href="planb_specification.html" class="project-link" target="_blank">
-                        📋 Plan B 시스템 재구성 사양서
-                    </a>
-                    <a href="abb_robot_programming_specification.html" class="project-link" target="_blank">
-                        📄 ABB 로봇 프로그래밍 발주 사양서 (기본)
-                    </a>
-                    <a href="abb_spec_detailed.html" class="project-link" target="_blank">
-                        📑 ABB 로봇 프로그래밍 견적 사양서
-                    </a>
+                    <div class="tl-text">DeviceNet 신호 테이블 문서 완료</div>
+                    <div class="tl-sub">Lincoln Electric Power Wave 76페이지 전체 분석</div>
                 </div>
-
-                <div class="card card-hexagon">
-                    <h3><span class="emoji">📐</span> Hexagon 정밀 측정</h3>
-                    <div class="info-box">
-                        <h4>로봇 정밀도 검증 프로젝트</h4>
-                        <p>
-                            <strong>목적:</strong> 로봇 정확도 측정 및 분석<br>
-                            <strong>일정:</strong> 프로젝트 관리 시스템 운영<br>
-                            <strong>문서:</strong> 펀치리스트 및 일정표
-                        </p>
+                <div class="tl-item">
+                    <div class="tl-head">
+                        <span class="tl-date">2024.09.29</span>
+                        <span class="tl-badge tl-badge-complete">COMPLETE</span>
                     </div>
-                    <a href="projects/hexagon/index.html" class="project-link" target="_blank">
-                        🏠 Hexagon 메인 페이지
-                    </a>
-                    <a href="projects/hexagon/robot-accuracy.html" class="project-link" target="_blank">
-                        📊 로봇 정확도 분석
-                    </a>
+                    <div class="tl-text">Hexagon 프로젝트 문서화 완료</div>
+                    <div class="tl-sub">로봇 정확도 측정 시스템 구축</div>
                 </div>
-
-                <div class="card">
-                    <h3><span class="emoji">☁️</span> Cloudinary 파일 업로더</h3>
-                    <div class="info-box">
-                        <h4>드래그 앤 드롭 업로드</h4>
-                        <p>
-                            <strong>기능:</strong> 이미지/PDF/문서 일괄 업로드<br>
-                            <strong>지원:</strong> 드래그 앤 드롭, 멀티 파일, URL 자동 복사<br>
-                            <strong>저장소:</strong> Cloudinary Cloud Storage
-                        </p>
+                <div class="tl-item">
+                    <div class="tl-head">
+                        <span class="tl-date">2024.09.17</span>
+                        <span class="tl-badge tl-badge-urgent">URGENT</span>
                     </div>
-                    <a href="cloudinary-uploader/dashboard.html" class="project-link" target="_blank">
-                        ☁️ Cloudinary 업로더 열기
-                    </a>
+                    <div class="tl-text">갠트리 로봇 상하축 간섭 문제 발견</div>
+                    <div class="tl-sub">시운전 중 안전 위험 요소 확인 및 긴급 대응</div>
                 </div>
+            </div>
 
-                <div class="card">
-                    <h3><span class="emoji">🏭</span> 근무관리 시스템</h3>
-                    <div class="info-box">
-                        <h4>현장 출입 및 근무 시간 관리</h4>
-                        <p>
-                            <strong>기능:</strong> 출퇴근 기록, 통계, 조회<br>
-                            <strong>저장:</strong> Google Sheets 연동<br>
-                            <strong>알림:</strong> 자동 메일 발송
-                        </p>
+            <!-- Section: 핵심 시스템 -->
+            <div class="section-group">
+                <div class="section-label">핵심 시스템 <span class="sl-line"></span></div>
+                <div class="grid-3">
+                    <!-- DeviceNet -->
+                    <div class="card">
+                        <div class="card-accent card-accent-green"></div>
+                        <div class="card-title">
+                            <div class="ct-icon ct-green">🔌</div>
+                            용접기 DeviceNet
+                        </div>
+                        <div class="info-panel">
+                            <h4>Lincoln Electric Power Wave</h4>
+                            <p>
+                                <strong>문서:</strong> Y50031-21 DeviceNet Interface Specification<br>
+                                <strong>날짜:</strong> 2010년 4월 20일<br>
+                                <strong>분량:</strong> 76페이지 기술 사양서
+                            </p>
+                        </div>
+                        <div class="alert-panel">
+                            <h4>통신 문제 해결 현황</h4>
+                            <p>
+                                <strong>기간:</strong> 10/2 ~ 10/9 (진행 중)<br>
+                                <strong>상태:</strong> 10/9 ABB+Lincoln 현장 작업 완료<br>
+                                <strong>최신:</strong> 1~2호기 파라미터 최적화, 3호기 리빌딩
+                            </p>
+                        </div>
+                        <div class="link-list">
+                            <a href="projects/devicenet/docs/251009_작업진행_세부내용.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>10/9 작업 진행 세부내용 (최신)</a>
+                            <a href="projects/devicenet/index.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>통신 문제 해결 진행 현황 보고</a>
+                            <a href="projects/devicenet/signals.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>DeviceNet 신호 테이블 보기</a>
+                            <div class="link-more" id="links-devicenet">
+                                <a href="projects/devicenet/docs/ABB_Lincoln_DeviceNet_체크리스트.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>ABB-Lincoln 연결 체크리스트</a>
+                                <a href="projects/devicenet/specs/Y50031_DeviceNetInterfaceSpecification-21.pdf" class="plink plink-green" target="_blank"><span class="plink-dot"></span>원본 PDF 문서 보기</a>
+                            </div>
+                            <button class="toggle-more" onclick="toggleMore('links-devicenet', this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                                2개 더 보기
+                            </button>
+                        </div>
                     </div>
-                    <a href="projects/work-management/index.html" class="project-link" target="_blank">
-                        🏭 근무관리 대시보드
-                    </a>
-                    <a href="projects/work-management/pages/input.html" class="project-link" target="_blank">
-                        📝 출입 기록 입력
-                    </a>
-                </div>
 
-                <div class="card">
-                    <h3><span class="emoji">✈️</span> 출장신청서 관리</h3>
-                    <div class="info-box">
-                        <h4>출장 신청 및 승인 시스템</h4>
-                        <p>
-                            <strong>기능:</strong> 출장 신청, 상태 관리, 일정 추적<br>
-                            <strong>연동:</strong> Notion 데이터베이스, 펀치리스트 링크<br>
-                            <strong>규정:</strong> 평일 45,000원, 휴일 50,000원
-                        </p>
+                    <!-- 로봇 상하축 -->
+                    <div class="card">
+                        <div class="card-accent card-accent-red"></div>
+                        <div class="card-title">
+                            <div class="ct-icon ct-red">🤖</div>
+                            갠트리 로봇 상하축 이슈
+                        </div>
+                        <div class="info-panel">
+                            <h4>시운전 단계 긴급 대응</h4>
+                            <p>
+                                <strong>발견:</strong> 2024년 9월 17일<br>
+                                <strong>위험도:</strong> 매우 높음 (★★★★★)<br>
+                                <strong>팀 구성:</strong> 3명 협업 체제
+                            </p>
+                        </div>
+                        <div class="alert-panel">
+                            <h4>UI 테스트 현황</h4>
+                            <p>
+                                <strong>통합 결과:</strong> 10/3-10/4 완료 (31개 항목)<br>
+                                <strong>현황:</strong> 완료 13 | 개선 11 | 보류 7<br>
+                                <strong>다음:</strong> 10/11 UI 개선 및 에러 핸들링
+                            </p>
+                        </div>
+                        <div class="link-list">
+                            <a href="projects/robot-vertical-axis/dashboard.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>상하축 이슈 대시보드</a>
+                            <a href="robot_sync_issue_report.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>로봇 동기화 이슈 보고서 (긴급)</a>
+                            <a href="robot_backup_comparison.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>로봇 백업 비교 보고서</a>
+                            <div class="link-more" id="links-robot">
+                                <a href="robot_backup_history.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>ABB 로봇 백업 변경 이력 (Git 기반)</a>
+                                <a href="setting_planb_comparison.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>Setting Plan B 전·후 비교 (3호기)</a>
+                                <a href="projects/robot-backup/report-20251015-9c3f7bd2.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>로봇 백업 업데이트 인덱스 (2025-10-15)</a>
+                                <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>ROBOT&harr;UI 테스트 통합 결과 (10/3-10/4)</a>
+                                <a href="planb_specification.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>Plan B 시스템 재구성 사양서</a>
+                                <a href="abb_robot_programming_specification.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>ABB 로봇 프로그래밍 발주 사양서</a>
+                                <a href="abb_spec_detailed.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>ABB 로봇 프로그래밍 견적 사양서</a>
+                            </div>
+                            <button class="toggle-more" onclick="toggleMore('links-robot', this)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                                7개 더 보기
+                            </button>
+                        </div>
                     </div>
-                    <a href="projects/business-trip/index.html" class="project-link" target="_blank">
-                        ✈️ 출장신청서 대시보드
-                    </a>
-                    <a href="projects/business-trip/pages/create.html" class="project-link" target="_blank">
-                        📝 신규 출장 신청
-                    </a>
-                </div>
 
-                <div class="card">
-                    <h3><span class="emoji">🎬</span> 듀얼 토치 모션 뷰어</h3>
-                    <div class="info-box">
-                        <h4>용접 모션 시각화 및 분석</h4>
-                        <p>
-                            <strong>기능:</strong> TCP 경로 3D 시각화, 타임라인 재생<br>
-                            <strong>뷰:</strong> 평면도(XY), 측면도(XZ), 정면도(YZ)<br>
-                            <strong>분석:</strong> T바 형상, R축 회전, 위빙, 토치 벡터, 비전 포인트
-                        </p>
-                    </div>
-                    <a href="advanced_motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="project-link" target="_blank">
-                        🏭 고급 모션 뷰어 (XYZR + T바)
-                    </a>
-                    <a href="motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="project-link" target="_blank">
-                        🎬 간단 모션 뷰어
-                    </a>
-                    <a href="motion_viewer_index.html" class="project-link" target="_blank">
-                        📚 모션 뷰어 인덱스 & 샘플 데이터
-                    </a>
-                    <div class="section-extra">
-                        <h4>샘플 데이터 (웹 각도별):</h4>
-                        <a href="sample_data/welding_case_web00deg.csv" class="file-link" download>📊 웹 0° (R=90°)</a>
-                        <a href="sample_data/welding_case_web15deg.csv" class="file-link" download>📊 웹 15° (R=105°) ⚠️</a>
-                        <a href="sample_data/welding_case_web30deg.csv" class="file-link" download>📊 웹 30° (R=120°) ⚠️</a>
-                        <a href="sample_data/welding_case_web45deg.csv" class="file-link" download>📊 웹 45° (R=135°) ⚠️</a>
-                        <a href="sample_data/welding_case_web60deg.csv" class="file-link" download>📊 웹 60° (R=150°) ⚠️</a>
-                        <a href="sample_data/welding_case_web90deg.csv" class="file-link" download>📊 웹 90° (R=180°) ⚠️</a>
-                        <a href="sample_data/welding_case_web100deg.csv" class="file-link" download>📊 웹 100° (R=190°) ⚠️</a>
-                        <div class="small-note">
-                            ⚠️ = R축 제한(±100°) 초과 - 참고용
+                    <!-- Hexagon -->
+                    <div class="card">
+                        <div class="card-accent card-accent-violet"></div>
+                        <div class="card-title">
+                            <div class="ct-icon ct-violet">📐</div>
+                            Hexagon 정밀 측정
+                        </div>
+                        <div class="info-panel">
+                            <h4>로봇 정밀도 검증 프로젝트</h4>
+                            <p>
+                                <strong>목적:</strong> 로봇 정확도 측정 및 분석<br>
+                                <strong>일정:</strong> 프로젝트 관리 시스템 운영<br>
+                                <strong>문서:</strong> 펀치리스트 및 일정표
+                            </p>
+                        </div>
+                        <div class="link-list">
+                            <a href="projects/hexagon/index.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>Hexagon 메인 페이지</a>
+                            <a href="projects/hexagon/robot-accuracy.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>로봇 정확도 분석</a>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="card">
-                    <h3><span class="emoji">📁</span> 프로젝트 폴더 구조</h3>
-                    <ul class="folder-structure">
-                        <li><span class="folder-icon">🔌</span> 251003_용접기_디바이스넷</li>
-                        <li><span class="folder-icon">🤖</span> 250917_상하축이슈</li>
-                        <li><span class="folder-icon">📐</span> hexagon</li>
-                        <li><span class="folder-icon">☁️</span> cloudinary-uploader</li>
-                        <li><span class="folder-icon">🏭</span> 근무관리</li>
-                        <li><span class="folder-icon">📋</span> AGENTS.md</li>
-                        <li><span class="folder-icon">📘</span> CLAUDE.md</li>
-                        <li><span class="folder-icon">⚙️</span> vercel.json</li>
-                    </ul>
-                </div>
-
-                <div class="card">
-                    <h3><span class="emoji">📋</span> Plan B 로봇 시스템 재구성</h3>
-                    <div class="info-box">
-                        <h4>외부축 통합 방식 사양서</h4>
-                        <p>
-                            <strong>목표:</strong> 3-Task 소프트웨어 동기 → 외부축 하드웨어 동기<br>
-                            <strong>기간:</strong> 2주 (2025-11-04 ~ 11-15)<br>
-                            <strong>담당:</strong> 황동호 팀장, 유대영 차장
-                        </p>
+            <!-- Section: 운영 도구 -->
+            <div class="section-group">
+                <div class="section-label">운영 도구 <span class="sl-line"></span></div>
+                <div class="grid-3">
+                    <!-- Cloudinary -->
+                    <div class="card">
+                        <div class="card-accent card-accent-cyan"></div>
+                        <div class="card-title">
+                            <div class="ct-icon ct-cyan">☁️</div>
+                            Cloudinary 파일 업로더
+                        </div>
+                        <div class="info-panel">
+                            <h4>드래그 앤 드롭 업로드</h4>
+                            <p>
+                                <strong>기능:</strong> 이미지/PDF/문서 일괄 업로드<br>
+                                <strong>지원:</strong> 드래그 앤 드롭, 멀티 파일, URL 자동 복사<br>
+                                <strong>저장소:</strong> Cloudinary Cloud Storage
+                            </p>
+                        </div>
+                        <div class="link-list">
+                            <a href="cloudinary-uploader/dashboard.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>Cloudinary 업로더 열기</a>
+                        </div>
                     </div>
-                    <a href="planb_specification.html" class="project-link" target="_blank">
-                        📋 Plan B 사양서 보기
-                    </a>
-                    <a href="robot_system_review.html" class="project-link" target="_blank">
-                        📊 현행 시스템 검토 (Plan A)
-                    </a>
+
+                    <!-- 근무관리 -->
+                    <div class="card">
+                        <div class="card-accent card-accent-amber"></div>
+                        <div class="card-title">
+                            <div class="ct-icon ct-amber">🏭</div>
+                            근무관리 시스템
+                        </div>
+                        <div class="info-panel">
+                            <h4>현장 출입 및 근무 시간 관리</h4>
+                            <p>
+                                <strong>기능:</strong> 출퇴근 기록, 통계, 조회<br>
+                                <strong>저장:</strong> Google Sheets 연동<br>
+                                <strong>알림:</strong> 자동 메일 발송
+                            </p>
+                        </div>
+                        <div class="link-list">
+                            <a href="projects/work-management/index.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>근무관리 대시보드</a>
+                            <a href="projects/work-management/pages/input.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>출입 기록 입력</a>
+                        </div>
+                    </div>
+
+                    <!-- 출장신청서 -->
+                    <div class="card">
+                        <div class="card-accent card-accent-cyan"></div>
+                        <div class="card-title">
+                            <div class="ct-icon ct-cyan">✈️</div>
+                            출장신청서 관리
+                        </div>
+                        <div class="info-panel">
+                            <h4>출장 신청 및 승인 시스템</h4>
+                            <p>
+                                <strong>기능:</strong> 출장 신청, 상태 관리, 일정 추적<br>
+                                <strong>연동:</strong> Notion 데이터베이스, 펀치리스트 링크<br>
+                                <strong>규정:</strong> 평일 45,000원, 휴일 50,000원
+                            </p>
+                        </div>
+                        <div class="link-list">
+                            <a href="projects/business-trip/index.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>출장신청서 대시보드</a>
+                            <a href="projects/business-trip/pages/create.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>신규 출장 신청</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="timeline">
-                <h3>📅 최근 프로젝트 타임라인</h3>
-                <div class="timeline-item">
-                    <strong>2024.10.04</strong>
-                    <span class="badge badge-complete">COMPLETE</span>
-                    <p>ROBOT↔UI 테스트 통합 결과 완료 (10/3-10/4)</p>
-                    <small>
-                        총 31개 항목 테스트 (✅완료 13 | ⚠️개선 11 | ⏸️보류 7)<br>
-                        <strong>✅ 주요 완료:</strong> 충돌검사 구현, 속도 제어, 안전 기능<br>
-                        <strong>📅 다음 일정:</strong> 10/11 UI 개선 및 에러 핸들링
-                    </small>
+            <!-- Section: 모션 & 기술 -->
+            <div class="section-group">
+                <div class="section-label">모션 &amp; 기술 <span class="sl-line"></span></div>
+                <div class="grid-2">
+                    <!-- 듀얼 토치 모션 뷰어 -->
+                    <div class="card">
+                        <div class="card-accent card-accent-cyan"></div>
+                        <div class="card-title">
+                            <div class="ct-icon ct-cyan">🎬</div>
+                            듀얼 토치 모션 뷰어
+                        </div>
+                        <div class="info-panel">
+                            <h4>용접 모션 시각화 및 분석</h4>
+                            <p>
+                                <strong>기능:</strong> TCP 경로 3D 시각화, 타임라인 재생<br>
+                                <strong>뷰:</strong> 평면도(XY), 측면도(XZ), 정면도(YZ)<br>
+                                <strong>분석:</strong> T바 형상, R축 회전, 위빙, 토치 벡터, 비전 포인트
+                            </p>
+                        </div>
+                        <div class="link-list">
+                            <a href="advanced_motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>고급 모션 뷰어 (XYZR + T바)</a>
+                            <a href="motion_viewer.html?auth=c49d872f-4bf0-4721-a5c6-5efb8fa9d8e1" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>간단 모션 뷰어</a>
+                            <a href="motion_viewer_index.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>모션 뷰어 인덱스 &amp; 샘플 데이터</a>
+                        </div>
+                        <div style="margin-top: 14px;">
+                            <h4 style="font-family:var(--font-mono);font-size:0.78em;color:var(--text-muted);margin-bottom:8px;">샘플 데이터 (웹 각도별)</h4>
+                            <div>
+                                <a href="sample_data/welding_case_web00deg.csv" class="file-chip" download>웹 0° (R=90°)</a>
+                                <a href="sample_data/welding_case_web15deg.csv" class="file-chip" download>웹 15° (R=105°) ⚠</a>
+                                <a href="sample_data/welding_case_web30deg.csv" class="file-chip" download>웹 30° (R=120°) ⚠</a>
+                                <a href="sample_data/welding_case_web45deg.csv" class="file-chip" download>웹 45° (R=135°) ⚠</a>
+                                <a href="sample_data/welding_case_web60deg.csv" class="file-chip" download>웹 60° (R=150°) ⚠</a>
+                                <a href="sample_data/welding_case_web90deg.csv" class="file-chip" download>웹 90° (R=180°) ⚠</a>
+                                <a href="sample_data/welding_case_web100deg.csv" class="file-chip" download>웹 100° (R=190°) ⚠</a>
+                            </div>
+                            <div style="margin-top:6px;font-size:0.72em;color:var(--text-muted);">⚠ = R축 제한(±100°) 초과 - 참고용</div>
+                        </div>
+                    </div>
+
+                    <!-- Plan B -->
+                    <div class="card">
+                        <div class="card-accent card-accent-amber"></div>
+                        <div class="card-title">
+                            <div class="ct-icon ct-amber">📋</div>
+                            Plan B 로봇 시스템 재구성
+                        </div>
+                        <div class="info-panel">
+                            <h4>외부축 통합 방식 사양서</h4>
+                            <p>
+                                <strong>목표:</strong> 3-Task 소프트웨어 동기 → 외부축 하드웨어 동기<br>
+                                <strong>기간:</strong> 2주 (2025-11-04 ~ 11-15)<br>
+                                <strong>담당:</strong> 황동호 팀장, 유대영 차장
+                            </p>
+                        </div>
+                        <div class="link-list">
+                            <a href="planb_specification.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>Plan B 사양서 보기</a>
+                            <a href="robot_system_review.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>현행 시스템 검토 (Plan A)</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="timeline-item">
-                    <strong>2024.10.03</strong>
-                    <span class="badge badge-new">NEW</span>
-                    <p>DeviceNet 신호 테이블 HTML 문서 작성 완료</p>
-                    <small>Lincoln Electric Power Wave 사양서 76페이지 전체 분석</small>
-                </div>
-                <div class="timeline-item">
-                    <strong>2024.09.29</strong>
-                    <span class="badge badge-complete">COMPLETE</span>
-                    <p>Hexagon 프로젝트 문서화 완료</p>
-                    <small>로봇 정확도 측정 시스템 구축</small>
-                </div>
-                <div class="timeline-item">
-                    <strong>2024.09.17</strong>
-                    <span class="badge badge-new">URGENT</span>
-                    <p>갠트리 로봇 상하축 간섭 문제 발견</p>
-                    <small>시운전 중 안전 위험 요소 확인 및 긴급 대응 시작</small>
+            </div>
+
+            <!-- Section: 프로젝트 구조 -->
+            <div class="section-group">
+                <div class="section-label">프로젝트 구조 <span class="sl-line"></span></div>
+                <div class="card">
+                    <div class="card-title">
+                        <div class="ct-icon ct-cyan">📁</div>
+                        프로젝트 폴더 구조
+                    </div>
+                    <ul class="folder-list">
+                        <li>🔌 251003_용접기_디바이스넷</li>
+                        <li>🤖 250917_상하축이슈</li>
+                        <li>📐 hexagon</li>
+                        <li>☁️ cloudinary-uploader</li>
+                        <li>🏭 근무관리</li>
+                        <li>📋 AGENTS.md</li>
+                        <li>📘 CLAUDE.md</li>
+                        <li>⚙️ vercel.json</li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <!-- 펀치리스트 탭 -->
+        <!-- ═══════════════════════════════════ 펀치리스트 탭 ═══════════════════════════════════ -->
         <div id="punchlist" class="tab-content">
-            <div class="highlight-box">
-                <h2>📋 S25016 펀치리스트 관리</h2>
-                <p>
-                    프로젝트 이슈를 체계적으로 추적하고 관리하는 펀치리스트 시스템입니다.
-                    기계/전기/제어 분류별로 이슈를 등록하고, 담당자, 일정, 조치 내용을 관리합니다.
-                </p>
+            <div class="section-intro">
+                <h2>펀치리스트 관리</h2>
+                <p>프로젝트 이슈를 체계적으로 추적하고 관리하는 펀치리스트 시스템입니다. 기계/전기/제어 분류별로 이슈를 등록하고, 담당자, 일정, 조치 내용을 관리합니다.</p>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">전체 이슈</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">진행중</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">보류</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">완료</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">지연</div>
-                </div>
+            <div class="stats-row">
+                <div class="stat-block"><div class="stat-val">0</div><div class="stat-lbl">전체 이슈</div></div>
+                <div class="stat-block stat-amber"><div class="stat-val">0</div><div class="stat-lbl">진행중</div></div>
+                <div class="stat-block"><div class="stat-val">0</div><div class="stat-lbl">보류</div></div>
+                <div class="stat-block stat-green"><div class="stat-val">0</div><div class="stat-lbl">완료</div></div>
+                <div class="stat-block stat-red"><div class="stat-val">0</div><div class="stat-lbl">지연</div></div>
             </div>
 
-            <div class="dashboard-grid">
+            <div class="grid-3">
                 <div class="card">
-                    <h3><span class="emoji">📋</span> 이슈 분류 체계</h3>
-                    <div class="info-box">
+                    <div class="card-title">
+                        <div class="ct-icon ct-cyan">📋</div>
+                        이슈 분류 체계
+                    </div>
+                    <div class="info-panel">
                         <h4>3가지 주요 분류</h4>
-                        <ul class="folder-structure">
-                            <li><span class="folder-icon">🔧</span> 기계 (구조물, 프레임, 이송장치)</li>
-                            <li><span class="folder-icon">⚡</span> 전기 (배선, 센서, 모터, 전원)</li>
-                            <li><span class="folder-icon">💻</span> 제어 (로봇, UI/HMI, 계측, PLC)</li>
+                        <ul class="feat-list">
+                            <li><span class="feat-icon">🔧</span> 기계 (구조물, 프레임, 이송장치)</li>
+                            <li><span class="feat-icon">⚡</span> 전기 (배선, 센서, 모터, 전원)</li>
+                            <li><span class="feat-icon">💻</span> 제어 (로봇, UI/HMI, 계측, PLC)</li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3><span class="emoji">📊</span> 이슈 관리 항목</h3>
-                    <div class="detail-note">
+                    <div class="card-title">
+                        <div class="ct-icon ct-cyan">📊</div>
+                        이슈 관리 항목
+                    </div>
+                    <div class="dnote dnote-cyan">
                         <p><strong>기본:</strong> ID, 제목, 분류, 우선순위, 상태</p>
                         <p><strong>내용:</strong> 문제상황, 원인분석, 조치계획, 조치결과</p>
                         <p><strong>담당:</strong> 담당자, 협의자, 승인자</p>
@@ -904,39 +1218,46 @@
                 </div>
 
                 <div class="card">
-                    <h3><span class="emoji">🎯</span> 주요 기능</h3>
-                    <ul class="folder-structure">
-                        <li><span class="folder-icon">➕</span> 이슈 생성 및 수정</li>
-                        <li><span class="folder-icon">🔍</span> 필터링 및 검색</li>
-                        <li><span class="folder-icon">📊</span> 통계 및 현황 분석</li>
-                        <li><span class="folder-icon">📧</span> 이메일 알림</li>
-                        <li><span class="folder-icon">💾</span> Google Sheets 연동</li>
-                        <li><span class="folder-icon">💬</span> 댓글 및 히스토리</li>
+                    <div class="card-title">
+                        <div class="ct-icon ct-cyan">🎯</div>
+                        주요 기능
+                    </div>
+                    <ul class="feat-list">
+                        <li><span class="feat-icon">➕</span> 이슈 생성 및 수정</li>
+                        <li><span class="feat-icon">🔍</span> 필터링 및 검색</li>
+                        <li><span class="feat-icon">📊</span> 통계 및 현황 분석</li>
+                        <li><span class="feat-icon">📧</span> 이메일 알림</li>
+                        <li><span class="feat-icon">💾</span> Google Sheets 연동</li>
+                        <li><span class="feat-icon">💬</span> 댓글 및 히스토리</li>
                     </ul>
                 </div>
 
                 <div class="card">
-                    <h3><span class="emoji">🚀</span> 빠른 시작</h3>
-                    <a href="punchlist/index.html" class="project-link" target="_blank">
-                        📋 펀치리스트 대시보드
-                    </a>
-                    <a href="punchlist/pages/create.html" class="project-link" target="_blank">
-                        ➕ 새 이슈 등록
-                    </a>
-                    <a href="punchlist/README.md" class="project-link" target="_blank">
-                        📖 사용 가이드
-                    </a>
-                    <a href="punchlist/docs/punchlist_a_line_251112.html" class="project-link" target="_blank">
-                        🅰️ A라인 운영SW 진행상황 (251112)
-                    </a>
-                    <a href="punchlist/docs/punchlist_b_line_251112.html" class="project-link" target="_blank">
-                        🅱️ B라인 운영SW 진행상황 (251112)
-                    </a>
+                    <div class="card-title">
+                        <div class="ct-icon ct-green">🚀</div>
+                        빠른 시작
+                    </div>
+                    <div class="link-list">
+                        <a href="punchlist/index.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>펀치리스트 대시보드</a>
+                        <a href="punchlist/pages/create.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>새 이슈 등록</a>
+                        <a href="punchlist/README.md" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>사용 가이드</a>
+                        <div class="link-more" id="links-punchlist-quick">
+                            <a href="punchlist/docs/punchlist_a_line_251112.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>A라인 운영SW 진행상황 (251112)</a>
+                            <a href="punchlist/docs/punchlist_b_line_251112.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>B라인 운영SW 진행상황 (251112)</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-punchlist-quick', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            2개 더 보기
+                        </button>
+                    </div>
                 </div>
 
                 <div class="card">
-                    <h3><span class="emoji">⚙️</span> Google Sheets 설정</h3>
-                    <div class="info-box">
+                    <div class="card-title">
+                        <div class="ct-icon ct-amber">⚙️</div>
+                        Google Sheets 설정
+                    </div>
+                    <div class="info-panel">
                         <h4>초기 설정 필요</h4>
                         <p>
                             펀치리스트를 사용하려면 Google Sheets 연동이 필요합니다.<br>
@@ -946,128 +1267,129 @@
                             <strong>4.</strong> Script URL 설정
                         </p>
                     </div>
-                    <a href="punchlist/scripts/GoogleAppsScript.js" class="file-link" target="_blank">
-                        📄 Apps Script 코드
-                    </a>
+                    <a href="punchlist/scripts/GoogleAppsScript.js" class="file-chip" target="_blank">Apps Script 코드</a>
                 </div>
 
                 <div class="card">
-                    <h3><span class="emoji">📈</span> 워크플로우</h3>
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <strong>1단계</strong>
-                            <p>이슈 발견 및 등록</p>
-                            <small>분류 선택 → 문제 상황 작성 → 담당자 지정</small>
+                    <div class="card-title">
+                        <div class="ct-icon ct-violet">📈</div>
+                        워크플로우
+                    </div>
+                    <div class="steps">
+                        <div class="step-item">
+                            <div class="step-rail"><div class="step-dot"></div><div class="step-line"></div></div>
+                            <div class="step-body">
+                                <strong>1단계: 이슈 발견 및 등록</strong>
+                                <p>분류 선택 → 문제 상황 작성 → 담당자 지정</p>
+                            </div>
                         </div>
-                        <div class="timeline-item">
-                            <strong>2단계</strong>
-                            <p>조치 계획 수립</p>
-                            <small>원인 분석 → 해결 방안 수립 → 일정 설정</small>
+                        <div class="step-item">
+                            <div class="step-rail"><div class="step-dot"></div><div class="step-line"></div></div>
+                            <div class="step-body">
+                                <strong>2단계: 조치 계획 수립</strong>
+                                <p>원인 분석 → 해결 방안 수립 → 일정 설정</p>
+                            </div>
                         </div>
-                        <div class="timeline-item">
-                            <strong>3단계</strong>
-                            <p>조치 실행 및 결과</p>
-                            <small>상태 업데이트 → 조치 결과 기록 → 완료 확인</small>
+                        <div class="step-item">
+                            <div class="step-rail"><div class="step-dot"></div></div>
+                            <div class="step-body">
+                                <strong>3단계: 조치 실행 및 결과</strong>
+                                <p>상태 업데이트 → 조치 결과 기록 → 완료 확인</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 이벤트 로그 탭 -->
+        <!-- ═══════════════════════════════════ 이벤트 로그 탭 ═══════════════════════════════════ -->
         <div id="eventlog" class="tab-content">
-            <div class="highlight-box">
-                <h2>📊 B_Line EventMessage 로그 분석</h2>
-                <p><strong>로봇 시스템 이벤트 로그 통합 분석</strong></p>
-                <p>1호기, 2호기, 3호기의 EventMessage 로그를 자동 분석하여 에러 패턴, 활동 통계, 데이터 품질을 시각화합니다.</p>
+            <div class="section-intro">
+                <h2>B_Line EventMessage 로그 분석</h2>
+                <p><strong>로봇 시스템 이벤트 로그 통합 분석</strong> &mdash; 1호기, 2호기, 3호기의 EventMessage 로그를 자동 분석하여 에러 패턴, 활동 통계, 데이터 품질을 시각화합니다.</p>
             </div>
 
-            <div class="dashboard-grid">
+            <div class="grid-2">
                 <div class="card">
-                    <h3>📈 로그 분석 대시보드</h3>
-                    <p>실시간 로그 통계 및 시각화</p>
-                    <p>
-                        <a href="B_Line_EventMessage_Report.html" class="file-link">
-                            🔗 분석 리포트 열기
-                        </a>
-                    </p>
-                    <div class="info-box">
+                    <div class="card-accent card-accent-cyan"></div>
+                    <div class="card-title">
+                        <div class="ct-icon ct-cyan">📈</div>
+                        로그 분석 대시보드
+                    </div>
+                    <p style="font-size:0.85em;color:var(--text-secondary);margin-bottom:14px;">실시간 로그 통계 및 시각화</p>
+                    <a href="B_Line_EventMessage_Report.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>분석 리포트 열기</a>
+                    <div class="info-panel" style="margin-top:14px;">
                         <h4>주요 기능</h4>
-                        <ul class="list-padded">
-                            <li>호기별 로그 통계 (에러/정보)</li>
-                            <li>날짜별 활동 타임라인</li>
-                            <li>데이터 품질 분석</li>
-                            <li>빈 파일 비율 통계</li>
+                        <ul class="feat-list">
+                            <li><span class="feat-icon">📊</span> 호기별 로그 통계 (에러/정보)</li>
+                            <li><span class="feat-icon">📅</span> 날짜별 활동 타임라인</li>
+                            <li><span class="feat-icon">🔍</span> 데이터 품질 분석</li>
+                            <li><span class="feat-icon">📁</span> 빈 파일 비율 통계</li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>🔍 로그 분석 스크립트</h3>
-                    <p>Python 자동 분석 도구</p>
-                    <div class="info-box">
+                    <div class="card-accent card-accent-green"></div>
+                    <div class="card-title">
+                        <div class="ct-icon ct-green">🔍</div>
+                        로그 분석 스크립트
+                    </div>
+                    <p style="font-size:0.85em;color:var(--text-secondary);margin-bottom:12px;">Python 자동 분석 도구</p>
+                    <div class="info-panel">
                         <h4>실행 방법</h4>
                         <pre class="code-block">cd B_Line_EventMessage
 python3 log_analyzer.py</pre>
-                        <p class="text-muted">
-                            분석 결과는 <code class="inline-code">analysis/log_analysis_latest.json</code>에 저장됩니다.
-                        </p>
+                        <p style="margin-top:8px;font-size:0.82em;color:var(--text-muted);">분석 결과는 <code class="inline-code">analysis/log_analysis_latest.json</code>에 저장됩니다.</p>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>📂 로그 폴더 구조</h3>
-                    <div class="detail-note">
+                    <div class="card-title">
+                        <div class="ct-icon ct-amber">📂</div>
+                        로그 폴더 구조
+                    </div>
+                    <div class="tree-view">
                         <div>📁 B_Line_EventMessage/</div>
-                        <div class="tree-indent">├── 1호기 EventMessage/</div>
-                        <div class="tree-indent">├── 2호기 EventMessage/</div>
-                        <div class="tree-indent">├── 3호기 EventMessage/</div>
-                        <div class="tree-indent">├── analysis/ <span class="text-green">← JSON 통계</span></div>
-                        <div class="tree-indent">└── log_analyzer.py <span class="text-green">← 분석 스크립트</span></div>
+                        <div class="tv-indent">├── 1호기 EventMessage/</div>
+                        <div class="tv-indent">├── 2호기 EventMessage/</div>
+                        <div class="tv-indent">├── 3호기 EventMessage/</div>
+                        <div class="tv-indent">├── analysis/ <span class="tv-hl">← JSON 통계</span></div>
+                        <div class="tv-indent">└── log_analyzer.py <span class="tv-hl">← 분석 스크립트</span></div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>📊 최근 통계 (요약)</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number">744</div>
-                            <div class="stat-label">총 로그 파일</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">443</div>
-                            <div class="stat-label">데이터 파일</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">301</div>
-                            <div class="stat-label">빈 파일</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">117.6</div>
-                            <div class="stat-label">MB</div>
-                        </div>
+                    <div class="card-title">
+                        <div class="ct-icon ct-violet">📊</div>
+                        최근 통계 (요약)
                     </div>
-                    <p class="text-muted">
-                        최종 업데이트: 2025-10-23 (18일간 로그)
-                    </p>
+                    <div class="stats-row" style="margin-bottom:12px;">
+                        <div class="stat-block"><div class="stat-val">744</div><div class="stat-lbl">총 로그 파일</div></div>
+                        <div class="stat-block stat-green"><div class="stat-val">443</div><div class="stat-lbl">데이터 파일</div></div>
+                        <div class="stat-block stat-red"><div class="stat-val">301</div><div class="stat-lbl">빈 파일</div></div>
+                        <div class="stat-block stat-amber"><div class="stat-val">117.6</div><div class="stat-lbl">MB</div></div>
+                    </div>
+                    <p style="font-size:0.78em;color:var(--text-muted);text-align:center;">최종 업데이트: 2025-10-23 (18일간 로그)</p>
                 </div>
             </div>
         </div>
 
-        <!-- 근무관리 탭 -->
+        <!-- ═══════════════════════════════════ 근무관리 탭 ═══════════════════════════════════ -->
         <div id="work-manage" class="tab-content">
-            <div class="highlight-box">
-                <h2>🏭 현장 출입 및 근무 시간 관리</h2>
-                <p>
-                    S25016 프로젝트 팀원들의 현장 출입 기록과 근무 시간을 관리하는 시스템입니다.
-                    Google Sheets와 연동하여 실시간으로 기록을 저장하고, 자동으로 이메일을 발송합니다.
-                </p>
+            <div class="section-intro">
+                <h2>현장 출입 및 근무 시간 관리</h2>
+                <p>S25016 프로젝트 팀원들의 현장 출입 기록과 근무 시간을 관리하는 시스템입니다. Google Sheets와 연동하여 실시간으로 기록을 저장하고, 자동으로 이메일을 발송합니다.</p>
             </div>
 
-            <div class="dashboard-grid">
+            <div class="grid-2">
                 <div class="card">
-                    <h3>📝 빠른 입력</h3>
-                    <div class="info-box">
+                    <div class="card-accent card-accent-green"></div>
+                    <div class="card-title">
+                        <div class="ct-icon ct-green">📝</div>
+                        빠른 입력
+                    </div>
+                    <div class="info-panel">
                         <h4>출입 기록 작성</h4>
                         <p>
                             <strong>기능:</strong> 출근/퇴근 원클릭 기록<br>
@@ -1075,14 +1397,16 @@ python3 log_analyzer.py</pre>
                             <strong>작업:</strong> 작업 내용 및 비고
                         </p>
                     </div>
-                    <a href="projects/work-management/pages/input.html" class="project-link" target="_blank">
-                        📝 출입 기록 입력하기
-                    </a>
+                    <a href="projects/work-management/pages/input.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>출입 기록 입력하기</a>
                 </div>
 
                 <div class="card">
-                    <h3>📊 대시보드</h3>
-                    <div class="info-box">
+                    <div class="card-accent card-accent-cyan"></div>
+                    <div class="card-title">
+                        <div class="ct-icon ct-cyan">📊</div>
+                        대시보드
+                    </div>
+                    <div class="info-panel">
                         <h4>통계 및 조회</h4>
                         <p>
                             <strong>통계:</strong> 일/주/월별 현황<br>
@@ -1090,14 +1414,16 @@ python3 log_analyzer.py</pre>
                             <strong>필터:</strong> 날짜/인원별 검색
                         </p>
                     </div>
-                    <a href="projects/work-management/index.html" class="project-link" target="_blank">
-                        📊 근무관리 대시보드
-                    </a>
+                    <a href="projects/work-management/index.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>근무관리 대시보드</a>
                 </div>
 
                 <div class="card">
-                    <h3>⚙️ Google Sheets 연동</h3>
-                    <div class="info-box">
+                    <div class="card-accent card-accent-amber"></div>
+                    <div class="card-title">
+                        <div class="ct-icon ct-amber">⚙️</div>
+                        Google Sheets 연동
+                    </div>
+                    <div class="info-panel">
                         <h4>자동 저장 및 메일 발송</h4>
                         <p>
                             <strong>저장:</strong> Google Sheets 자동 기록<br>
@@ -1105,29 +1431,30 @@ python3 log_analyzer.py</pre>
                             <strong>공유:</strong> 팀원 실시간 공유
                         </p>
                     </div>
-                    <a href="projects/work-management/docs/deployment-checklist.html" class="project-link" target="_blank">
-                        ⚙️ Google Sheets 설정 가이드
-                    </a>
+                    <a href="projects/work-management/docs/deployment-checklist.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>Google Sheets 설정 가이드</a>
                 </div>
 
                 <div class="card">
-                    <h3>✨ 주요 기능</h3>
-                    <ul class="folder-structure">
-                        <li><span class="folder-icon">⚡</span> 출근/퇴근 원클릭 입력</li>
-                        <li><span class="folder-icon">📊</span> 실시간 통계 대시보드</li>
-                        <li><span class="folder-icon">📧</span> 자동 이메일 발송</li>
-                        <li><span class="folder-icon">💾</span> Google Sheets 자동 저장</li>
-                        <li><span class="folder-icon">📱</span> 모바일 최적화</li>
-                        <li><span class="folder-icon">🔍</span> 날짜/인원별 필터링</li>
-                        <li><span class="folder-icon">📈</span> 근무 시간 자동 계산</li>
+                    <div class="card-title">
+                        <div class="ct-icon ct-violet">✨</div>
+                        주요 기능
+                    </div>
+                    <ul class="feat-list">
+                        <li><span class="feat-icon">⚡</span> 출근/퇴근 원클릭 입력</li>
+                        <li><span class="feat-icon">📊</span> 실시간 통계 대시보드</li>
+                        <li><span class="feat-icon">📧</span> 자동 이메일 발송</li>
+                        <li><span class="feat-icon">💾</span> Google Sheets 자동 저장</li>
+                        <li><span class="feat-icon">📱</span> 모바일 최적화</li>
+                        <li><span class="feat-icon">🔍</span> 날짜/인원별 필터링</li>
+                        <li><span class="feat-icon">📈</span> 근무 시간 자동 계산</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="info-box">
-                <h4>💡 사용 방법</h4>
+            <div class="dnote dnote-cyan" style="margin-top:20px;">
                 <p>
-                    <strong>1단계:</strong> <a href="projects/work-management/docs/deployment-checklist.html" class="link-accent">Google Sheets 설정 가이드</a>를 따라 Google Apps Script 설정<br>
+                    <strong>사용 방법:</strong><br>
+                    <strong>1단계:</strong> <a href="projects/work-management/docs/deployment-checklist.html" style="color:var(--cyan);font-weight:600;">Google Sheets 설정 가이드</a>를 따라 Google Apps Script 설정<br>
                     <strong>2단계:</strong> 입력 페이지에서 Script URL 업데이트<br>
                     <strong>3단계:</strong> 출입 기록 입력 시작<br>
                     <strong>4단계:</strong> 대시보드에서 통계 확인 및 기록 조회
@@ -1135,14 +1462,17 @@ python3 log_analyzer.py</pre>
             </div>
         </div>
 
-        <!-- 문서 자료 탭 -->
+        <!-- ═══════════════════════════════════ 문서 자료 탭 ═══════════════════════════════════ -->
         <div id="documents" class="tab-content">
-            <h2>📚 프로젝트 문서 자료</h2>
+            <div class="section-intro">
+                <h2>프로젝트 문서 자료</h2>
+                <p>S25016 프로젝트의 전체 문서를 카테고리별로 정리한 아카이브입니다.</p>
+            </div>
 
-            <div class="dashboard-grid">
+            <div class="grid-3">
                 <div class="card">
-                    <h3>📋 배포 정보</h3>
-                    <div class="info-box">
+                    <div class="card-title"><div class="ct-icon ct-cyan">📋</div>배포 정보</div>
+                    <div class="info-panel">
                         <h4>Vercel 배포 설정</h4>
                         <p>
                             <strong>URL:</strong> https://your-project.vercel.app<br>
@@ -1150,349 +1480,324 @@ python3 log_analyzer.py</pre>
                             <strong>설정 파일:</strong> vercel.json
                         </p>
                     </div>
-                    <a href="VERCEL_DEPLOYMENT_GUIDE.md" class="file-link" target="_blank">📘 배포 가이드 보기</a>
+                    <a href="VERCEL_DEPLOYMENT_GUIDE.md" class="file-chip" target="_blank">배포 가이드 보기</a>
                 </div>
 
                 <div class="card">
-                    <h3>🔌 DeviceNet 문서</h3>
-                    <a href="projects/devicenet/docs/251010_시운전현황보고.html" class="project-link" target="_blank">
-                        📊 10/10 시운전 현황 및 10/11 계획 (최신)
-                    </a>
-                    <a href="projects/devicenet/docs/251009_작업진행_세부내용.html" class="project-link" target="_blank">
-                        📋 10/9 작업 진행 세부내용
-                    </a>
-                    <a href="projects/devicenet/index.html" class="project-link" target="_blank">
-                        🔧 통신 문제 해결 진행 현황 보고
-                    </a>
-                    <a href="projects/devicenet/docs/251009_아크불량_체크리스트.html" class="project-link project-link-devicenet" target="_blank">
-                        ⚡ 아크 불량 체크리스트
-                    </a>
-                    <a href="projects/devicenet/docs/251009_예상원인점검_이더넷통신.html" class="project-link project-link-devicenet" target="_blank">
-                        🔍 예상 원인 점검 (이더넷 통신)
-                    </a>
-                    <a href="projects/devicenet/docs/ABB_Lincoln_DeviceNet_체크리스트.html" class="project-link project-link-devicenet" target="_blank">
-                        ✅ ABB-Lincoln 연결 체크리스트
-                    </a>
-                    <a href="projects/devicenet/signals.html" class="project-link project-link-devicenet" target="_blank">
-                        📋 DeviceNet 신호 테이블
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>✅ 10/9 작업:</strong> ABB+Lincoln 현장 지원 완료<br>
-                            <strong>📊 진행:</strong> 1~2호기 파라미터 최적화, 3호기 리빌딩<br>
-                            <strong>📄 원본 사양서:</strong> Y50031-21 (76 pages)
+                    <div class="card-accent card-accent-green"></div>
+                    <div class="card-title"><div class="ct-icon ct-green">🔌</div>DeviceNet 문서</div>
+                    <div class="link-list">
+                        <a href="projects/devicenet/docs/251010_시운전현황보고.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>10/10 시운전 현황 및 10/11 계획 (최신)</a>
+                        <a href="projects/devicenet/docs/251009_작업진행_세부내용.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>10/9 작업 진행 세부내용</a>
+                        <a href="projects/devicenet/index.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>통신 문제 해결 진행 현황 보고</a>
+                        <div class="link-more" id="links-doc-devicenet">
+                            <a href="projects/devicenet/docs/251009_아크불량_체크리스트.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>아크 불량 체크리스트</a>
+                            <a href="projects/devicenet/docs/251009_예상원인점검_이더넷통신.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>예상 원인 점검 (이더넷 통신)</a>
+                            <a href="projects/devicenet/docs/ABB_Lincoln_DeviceNet_체크리스트.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>ABB-Lincoln 연결 체크리스트</a>
+                            <a href="projects/devicenet/signals.html" class="plink plink-green" target="_blank"><span class="plink-dot"></span>DeviceNet 신호 테이블</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-doc-devicenet', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            4개 더 보기
+                        </button>
+                    </div>
+                    <div class="dnote dnote-green">
+                        <p>
+                            <strong>10/9 작업:</strong> ABB+Lincoln 현장 지원 완료<br>
+                            <strong>진행:</strong> 1~2호기 파라미터 최적화, 3호기 리빌딩<br>
+                            <strong>원본 사양서:</strong> Y50031-21 (76 pages)
                         </p>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>🤖 로봇 시스템 문서</h3>
-                    <a href="planb_specification.html" class="project-link" target="_blank">
-                        📋 Plan B 시스템 재구성 사양서
-                    </a>
-                    <a href="robot_system_review.html" class="project-link" target="_blank">
-                        📊 현행 시스템 검토 (Plan A)
-                    </a>
-                    <a href="상하축이슈_대시보드.html" class="project-link project-link-robot" target="_blank">
-                        🎯 상하축 이슈 종합 대시보드
-                    </a>
-                    <a href="projects/robot-vertical-axis/dashboard.html" class="project-link project-link-robot" target="_blank">
-                        📋 상하축 프로젝트 대시보드
-                    </a>
-                    <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link project-link-robot" target="_blank">
-                        🧪 ROBOT↔UI 테스트 통합 결과 (10/3-10/4)
-                    </a>
-                    <a href="robot_comparison_report.html" class="project-link project-link-robot" target="_blank">
-                        📊 로봇 비교 보고서
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>🚨 긴급 이슈:</strong> 충돌검사 미작동<br>
-                            <strong>📅 다음 테스트:</strong> 2024.10.09 (에러핸들링 집중)
+                    <div class="card-accent card-accent-red"></div>
+                    <div class="card-title"><div class="ct-icon ct-red">🤖</div>로봇 시스템 문서</div>
+                    <div class="link-list">
+                        <a href="planb_specification.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>Plan B 시스템 재구성 사양서</a>
+                        <a href="robot_system_review.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>현행 시스템 검토 (Plan A)</a>
+                        <a href="상하축이슈_대시보드.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>상하축 이슈 종합 대시보드</a>
+                        <div class="link-more" id="links-doc-robot">
+                            <a href="projects/robot-vertical-axis/dashboard.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>상하축 프로젝트 대시보드</a>
+                            <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>ROBOT&harr;UI 테스트 통합 결과 (10/3-10/4)</a>
+                            <a href="robot_comparison_report.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>로봇 비교 보고서</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-doc-robot', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            3개 더 보기
+                        </button>
+                    </div>
+                    <div class="dnote dnote-red">
+                        <p>
+                            <strong>긴급 이슈:</strong> 충돌검사 미작동<br>
+                            <strong>다음 테스트:</strong> 2024.10.09 (에러핸들링 집중)
                         </p>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>🗂️ 로봇 백업 분석</h3>
-                    <a href="projects/robot-backup/robot_backup_detailed_report.html" class="project-link" target="_blank">
-                        📄 로봇 백업 상세 분석 보고서
-                    </a>
-                    <a href="projects/robot-backup/robot_backup_comparison_report.html" class="project-link" target="_blank">
-                        📊 로봇 백업 비교 리포트
-                    </a>
-                    <a href="projects/robot-backup/report-20251015-9c3f7bd2.html" class="project-link" target="_blank">
-                        🗂️ 로봇 백업 업데이트 인덱스 (2025-10-15)
-                    </a>
-                    <a href="robot_backup_history.html" class="project-link" target="_blank">
-                        📚 ABB 로봇 백업 변경 이력 (Git 기반)
-                    </a>
-                    <a href="robot_backup_comparison.html" class="project-link" target="_blank">
-                        📋 로봇 백업 비교 보고서 (실용적 분석)
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>📌 최신 업데이트:</strong> 2025-10-15<br>
-                            <strong>🔧 대상:</strong> 1호기, 2호기, 3호기 컨트롤러<br>
-                            <strong>📊 내용:</strong> 용접 파라미터 최적화, I/O 세팅 통일
+                    <div class="card-title"><div class="ct-icon ct-amber">🗂️</div>로봇 백업 분석</div>
+                    <div class="link-list">
+                        <a href="projects/robot-backup/robot_backup_detailed_report.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>로봇 백업 상세 분석 보고서</a>
+                        <a href="projects/robot-backup/robot_backup_comparison_report.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>로봇 백업 비교 리포트</a>
+                        <a href="projects/robot-backup/report-20251015-9c3f7bd2.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>로봇 백업 업데이트 인덱스 (2025-10-15)</a>
+                        <div class="link-more" id="links-doc-backup">
+                            <a href="robot_backup_history.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>ABB 로봇 백업 변경 이력 (Git 기반)</a>
+                            <a href="robot_backup_comparison.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>로봇 백업 비교 보고서 (실용적 분석)</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-doc-backup', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            2개 더 보기
+                        </button>
+                    </div>
+                    <div class="dnote dnote-amber">
+                        <p>
+                            <strong>최신 업데이트:</strong> 2025-10-15<br>
+                            <strong>대상:</strong> 1호기, 2호기, 3호기 컨트롤러<br>
+                            <strong>내용:</strong> 용접 파라미터 최적화, I/O 세팅 통일
                         </p>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>📋 상하축 이슈 상세 문서</h3>
-                    <a href="250917_상하축이슈/05_문서자료/251013_Codex_리포지터리_리뷰.html" class="project-link" target="_blank">
-                        📂 251013 Codex 리포지터리 리뷰
-                    </a>
-                    <a href="250917_상하축이슈/05_문서자료/251018_Codex_3호기_Arc에러_복구점검.html" class="project-link" target="_blank">
-                        ⚡ 251018 3호기 Arc 에러 복구 점검
-                    </a>
-                    <a href="250917_상하축이슈/05_문서자료/251021_3호기_Arc재시작_멍때림_문제분석.html" class="project-link" target="_blank">
-                        🔍 251021 3호기 Arc 재시작 멍때림 분석
-                    </a>
-                    <a href="250917_상하축이슈/05_문서자료/251021_3호기_터치센싱_멍때림_문제분석.html" class="project-link" target="_blank">
-                        📊 251021 3호기 터치센싱 멍때림 분석
-                    </a>
-                    <a href="250917_상하축이슈/05_문서자료/251021_CrossStop신호_초기화_문제.html" class="project-link" target="_blank">
-                        🚨 251021 CrossStop 신호 초기화 문제
-                    </a>
-                    <a href="250917_상하축이슈/05_문서자료/251013_SP_로봇백업비교.html" class="project-link" target="_blank">
-                        📄 251013 로봇 백업 비교 보고서
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>🚨 중요:</strong> 3호기 관련 주요 이슈 문서<br>
-                            <strong>📅 기간:</strong> 2024.10.13 ~ 10.21<br>
-                            <strong>🔧 내용:</strong> Arc 에러, 터치센싱, CrossStop 신호 분석
+                    <div class="card-accent card-accent-red"></div>
+                    <div class="card-title"><div class="ct-icon ct-red">📋</div>상하축 이슈 상세 문서</div>
+                    <div class="link-list">
+                        <a href="250917_상하축이슈/05_문서자료/251013_Codex_리포지터리_리뷰.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>251013 Codex 리포지터리 리뷰</a>
+                        <a href="250917_상하축이슈/05_문서자료/251018_Codex_3호기_Arc에러_복구점검.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>251018 3호기 Arc 에러 복구 점검</a>
+                        <a href="250917_상하축이슈/05_문서자료/251021_3호기_Arc재시작_멍때림_문제분석.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>251021 3호기 Arc 재시작 멍때림 분석</a>
+                        <div class="link-more" id="links-doc-vertical">
+                            <a href="250917_상하축이슈/05_문서자료/251021_3호기_터치센싱_멍때림_문제분석.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>251021 3호기 터치센싱 멍때림 분석</a>
+                            <a href="250917_상하축이슈/05_문서자료/251021_CrossStop신호_초기화_문제.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>251021 CrossStop 신호 초기화 문제</a>
+                            <a href="250917_상하축이슈/05_문서자료/251013_SP_로봇백업비교.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>251013 로봇 백업 비교 보고서</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-doc-vertical', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            3개 더 보기
+                        </button>
+                    </div>
+                    <div class="dnote dnote-red">
+                        <p>
+                            <strong>중요:</strong> 3호기 관련 주요 이슈 문서<br>
+                            <strong>기간:</strong> 2024.10.13 ~ 10.21<br>
+                            <strong>내용:</strong> Arc 에러, 터치센싱, CrossStop 신호 분석
                         </p>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>📧 ABB 기술 지원</h3>
-                    <a href="email_to_abb_technical_support.html" class="project-link" target="_blank">
-                        📧 ABB 기술 지원 이메일
-                    </a>
-                    <a href="robot_sync_issue_report.html" class="project-link" target="_blank">
-                        🚨 로봇 동기화 이슈 보고서 (긴급)
-                    </a>
-                    <a href="setting_planb_comparison.html" class="project-link" target="_blank">
-                        🧭 Setting Plan B 전·후 비교 (3호기)
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>📌 용도:</strong> ABB 기술팀 지원 요청 문서<br>
-                            <strong>🔧 내용:</strong> 동기화 이슈, Plan B 설정 비교<br>
-                            <strong>📊 상태:</strong> 진행 중
+                    <div class="card-title"><div class="ct-icon ct-cyan">📧</div>ABB 기술 지원</div>
+                    <div class="link-list">
+                        <a href="email_to_abb_technical_support.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>ABB 기술 지원 이메일</a>
+                        <a href="robot_sync_issue_report.html" class="plink plink-red" target="_blank"><span class="plink-dot"></span>로봇 동기화 이슈 보고서 (긴급)</a>
+                        <a href="setting_planb_comparison.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>Setting Plan B 전·후 비교 (3호기)</a>
+                    </div>
+                    <div class="dnote dnote-cyan">
+                        <p>
+                            <strong>용도:</strong> ABB 기술팀 지원 요청 문서<br>
+                            <strong>내용:</strong> 동기화 이슈, Plan B 설정 비교<br>
+                            <strong>상태:</strong> 진행 중
                         </p>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>🧪 ROBOT↔UI 통합 테스트</h3>
-                    <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="project-link" target="_blank">
-                        📋 통합 테스트 결과 상세 보기 (10/3-10/4)
-                    </a>
-                    <a href="projects/robot-ui-integration-test/test-results/251004_고객발송_테스트결과.html" class="project-link" target="_blank">
-                        📤 고객 발송용 보고서
-                    </a>
-                    <a href="projects/robot-ui-integration-test/test-results/251004_테스트결과_메신저보고.txt" class="project-link" target="_blank">
-                        💬 메신저 보고용 텍스트
-                    </a>
-                    <a href="projects/robot-ui-integration-test/test-results/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="project-link" target="_blank">
-                        📄 1차 결과 백업 (10/3)
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>📊 테스트 현황:</strong> 총 31개 항목<br>
-                            <strong>✅ 완료:</strong> 13개 | <strong>⚠️ 개선:</strong> 11개 | <strong>⏸️ 보류:</strong> 7개<br>
-                            <strong>📅 기간:</strong> 2024.10.03 ~ 10.04<br>
-                            <strong>🔜 다음:</strong> 2024.10.11 (에러 핸들링 집중)
+                    <div class="card-accent card-accent-violet"></div>
+                    <div class="card-title"><div class="ct-icon ct-violet">🧪</div>ROBOT&harr;UI 통합 테스트</div>
+                    <div class="link-list">
+                        <a href="projects/robot-ui-integration-test/test-results/251004_에이전트_ROBOT-UI_테스트_통합결과.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>통합 테스트 결과 상세 보기 (10/3-10/4)</a>
+                        <a href="projects/robot-ui-integration-test/test-results/251004_고객발송_테스트결과.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>고객 발송용 보고서</a>
+                        <a href="projects/robot-ui-integration-test/test-results/251004_테스트결과_메신저보고.txt" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>메신저 보고용 텍스트</a>
+                        <div class="link-more" id="links-doc-test">
+                            <a href="projects/robot-ui-integration-test/test-results/251003_에이전트_ROBOT-UI_테스트_1차결과.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>1차 결과 백업 (10/3)</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-doc-test', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            1개 더 보기
+                        </button>
+                    </div>
+                    <div class="dnote dnote-violet">
+                        <p>
+                            <strong>테스트 현황:</strong> 총 31개 항목<br>
+                            <strong>완료:</strong> 13개 | <strong>개선:</strong> 11개 | <strong>보류:</strong> 7개<br>
+                            <strong>기간:</strong> 2024.10.03 ~ 10.04<br>
+                            <strong>다음:</strong> 2024.10.11 (에러 핸들링 집중)
                         </p>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>📐 Hexagon 로봇 정밀도 측정</h3>
-                    <a href="projects/hexagon/index.html" class="project-link" target="_blank">
-                        🏠 Hexagon 메인 대시보드
-                    </a>
-                    <a href="projects/hexagon/robot-accuracy.html" class="project-link" target="_blank">
-                        📊 로봇 정확도 분석
-                    </a>
-                    <a href="projects/hexagon/schedule.html" class="project-link" target="_blank">
-                        📅 프로젝트 일정표
-                    </a>
-                    <a href="projects/hexagon/punchlist.html" class="project-link" target="_blank">
-                        ✅ 펀치리스트
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>🎯 목적:</strong> 로봇 시스템 정확도 검증 및 측정<br>
-                            <strong>📐 방법:</strong> Hexagon 정밀 측정 장비 활용<br>
-                            <strong>📊 관리:</strong> 일정, 펀치리스트, 정확도 분석<br>
-                            <strong>📁 위치:</strong> projects/hexagon/
+                    <div class="card-accent card-accent-violet"></div>
+                    <div class="card-title"><div class="ct-icon ct-violet">📐</div>Hexagon 로봇 정밀도 측정</div>
+                    <div class="link-list">
+                        <a href="projects/hexagon/index.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>Hexagon 메인 대시보드</a>
+                        <a href="projects/hexagon/robot-accuracy.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>로봇 정확도 분석</a>
+                        <a href="projects/hexagon/schedule.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>프로젝트 일정표</a>
+                        <div class="link-more" id="links-doc-hexagon">
+                            <a href="projects/hexagon/punchlist.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>펀치리스트</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-doc-hexagon', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            1개 더 보기
+                        </button>
+                    </div>
+                    <div class="dnote dnote-violet">
+                        <p>
+                            <strong>목적:</strong> 로봇 시스템 정확도 검증 및 측정<br>
+                            <strong>방법:</strong> Hexagon 정밀 측정 장비 활용<br>
+                            <strong>관리:</strong> 일정, 펀치리스트, 정확도 분석<br>
+                            <strong>위치:</strong> projects/hexagon/
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div class="info-box">
-                <h4>📌 문서 관리 가이드</h4>
+            <div class="dnote dnote-cyan" style="margin-top:20px;">
                 <p>
-                    • 파일명 규칙: YYMMDD_작성자_제목.확장자<br>
-                    • 수정 시 원본 백업 필수<br>
-                    • 99_공유폴더에서 검토 후 해당 폴더로 이동<br>
-                    • 일일 진행상황 업데이트<br>
-                    • 긴급사항 즉시 공유
+                    <strong>문서 관리 가이드</strong><br>
+                    &bull; 파일명 규칙: YYMMDD_작성자_제목.확장자<br>
+                    &bull; 수정 시 원본 백업 필수<br>
+                    &bull; 99_공유폴더에서 검토 후 해당 폴더로 이동<br>
+                    &bull; 일일 진행상황 업데이트<br>
+                    &bull; 긴급사항 즉시 공유
                 </p>
             </div>
         </div>
 
-        <!-- Plan B & 모션 뷰어 탭 -->
+        <!-- ═══════════════════════════════════ Plan B & 모션 탭 ═══════════════════════════════════ -->
         <div id="planb-motion" class="tab-content">
-            <h2>🤖 Plan B 로봇 시스템 고도화 & XYZR 갠트리 모션</h2>
+            <div class="section-intro">
+                <h2>Plan B 로봇 시스템 고도화 &amp; XYZR 갠트리 모션</h2>
+                <p>로봇 시스템 아키텍처 재구성 및 갠트리 모션 시각화 프로젝트</p>
+            </div>
 
-            <div class="dashboard-grid">
-                <!-- XYZR 갠트리 모션 시스템 -->
+            <div class="grid-2">
+                <!-- XYZR 갠트리 모션 -->
                 <div class="card">
-                    <h3>📐 XYZR 갠트리 + 듀얼 로봇 모션 시스템</h3>
-                    <a href="advanced_motion_viewer.html" class="project-link" target="_blank">
-                        🎬 고급 용접 모션 뷰어 (XYZR 갠트리 + 듀얼 로봇)
-                    </a>
-                    <a href="motion_viewer_index.html" class="project-link" target="_blank">
-                        📋 듀얼 토치 모션 뷰어 인덱스
-                    </a>
-                    <a href="motion_viewer.html" class="project-link" target="_blank">
-                        📊 기본 모션 뷰어
-                    </a>
-                    <a href="punchlist/docs/251113_codex_갠트리XYZR시각화요구사항.md" class="project-link" target="_blank">
-                        📝 갠트리 XYZR 시각화 상세 요구사항
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>🎯 시스템:</strong> XYZ 선형축 + R축 회전 갠트리<br>
-                            <strong>🤖 구성:</strong> R축 바디에 2대 로봇 부착 (±488mm)<br>
-                            <strong>🔧 용도:</strong> T-bar 웹 양면 동시/교대 용접<br>
-                            <strong>📊 회전:</strong> ±100° 범위, 용접선 수직 유지
+                    <div class="card-accent card-accent-cyan"></div>
+                    <div class="card-title"><div class="ct-icon ct-cyan">📐</div>XYZR 갠트리 + 듀얼 로봇 모션 시스템</div>
+                    <div class="link-list">
+                        <a href="advanced_motion_viewer.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>고급 용접 모션 뷰어 (XYZR 갠트리 + 듀얼 로봇)</a>
+                        <a href="motion_viewer_index.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>듀얼 토치 모션 뷰어 인덱스</a>
+                        <a href="motion_viewer.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>기본 모션 뷰어</a>
+                        <div class="link-more" id="links-planb-xyzr">
+                            <a href="punchlist/docs/251113_codex_갠트리XYZR시각화요구사항.md" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>갠트리 XYZR 시각화 상세 요구사항</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-planb-xyzr', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            1개 더 보기
+                        </button>
+                    </div>
+                    <div class="dnote dnote-cyan">
+                        <p>
+                            <strong>시스템:</strong> XYZ 선형축 + R축 회전 갠트리<br>
+                            <strong>구성:</strong> R축 바디에 2대 로봇 부착 (±488mm)<br>
+                            <strong>용도:</strong> T-bar 웹 양면 동시/교대 용접<br>
+                            <strong>회전:</strong> ±100° 범위, 용접선 수직 유지
                         </p>
                     </div>
                 </div>
 
-                <!-- Plan B 로봇 시스템 재구성 -->
+                <!-- Plan B -->
                 <div class="card">
-                    <h3>📘 Plan B 로봇 시스템 재구성</h3>
-                    <a href="planb_specification.html" class="project-link" target="_blank">
-                        📋 Plan B 시스템 재구성 사양서 (메인)
-                    </a>
-                    <a href="setting_planb_comparison.html" class="project-link" target="_blank">
-                        ⚖️ Plan A vs Plan B 설정 비교
-                    </a>
-                    <a href="ppt_slides/index.html" class="project-link" target="_blank">
-                        🎬 PPT 슬라이드 인덱스 (17개 슬라이드)
-                    </a>
-                    <a href="ppt_slides/Plan_B_Accurate.pptx" class="project-link" download>
-                        📥 PowerPoint 다운로드 (Plan_B_Accurate.pptx - 38슬라이드)
-                    </a>
-                    <a href="Plan_B_Robot_Reconfiguration_Spec.pptx" class="project-link" download>
-                        📥 PowerPoint 다운로드 (Plan_B_Robot_Reconfiguration_Spec.pptx)
-                    </a>
-                    <a href="RAPID/PlanB_ToolControl2/docs/index.html" class="project-link" target="_blank">
-                        🤖 RAPID 개발 문서화 프로젝트 (Plan B ToolControl2)
-                    </a>
-                    <a href="RAPID/SpGantry_1200_526406_BACKUP_2025-11-18/RAPID/README.md" class="project-link" target="_blank">
-                        📐 SpGantry 백업 & CoordTransform 모듈 (2025-11-18)
-                    </a>
-                    <a href="251122_로봇좌표변환_중간보고.html" class="project-link" target="_blank">
-                        📊 로봇 좌표 변환 시스템 - 중간 진행 보고 (2025-11-22)
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>📅 최신:</strong> 2025-11-22 좌표 변환 테스트 PASSED<br>
-                            <strong>✅ 성과:</strong> 목표 976mm vs 실측 982.21mm (오차 6.21mm)<br>
-                            <strong>🔧 진행:</strong> TestMoveToWorldOrigin Z=500 테스트 대기<br>
-                            <strong>🎯 다음:</strong> 시스템 지오메트리 분석 및 검증 완료
+                    <div class="card-accent card-accent-amber"></div>
+                    <div class="card-title"><div class="ct-icon ct-amber">📘</div>Plan B 로봇 시스템 재구성</div>
+                    <div class="link-list">
+                        <a href="planb_specification.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>Plan B 시스템 재구성 사양서 (메인)</a>
+                        <a href="setting_planb_comparison.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>Plan A vs Plan B 설정 비교</a>
+                        <a href="ppt_slides/index.html" class="plink plink-amber" target="_blank"><span class="plink-dot"></span>PPT 슬라이드 인덱스 (17개 슬라이드)</a>
+                        <div class="link-more" id="links-planb-main">
+                            <a href="ppt_slides/Plan_B_Accurate.pptx" class="plink plink-amber" download><span class="plink-dot"></span>PowerPoint 다운로드 (Plan_B_Accurate.pptx - 38슬라이드)</a>
+                            <a href="Plan_B_Robot_Reconfiguration_Spec.pptx" class="plink plink-amber" download><span class="plink-dot"></span>PowerPoint 다운로드 (Reconfiguration_Spec.pptx)</a>
+                            <a href="RAPID/PlanB_ToolControl2/docs/index.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>RAPID 개발 문서화 프로젝트 (Plan B ToolControl2)</a>
+                            <a href="RAPID/SpGantry_1200_526406_BACKUP_2025-11-18/RAPID/README.md" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>SpGantry 백업 &amp; CoordTransform 모듈 (2025-11-18)</a>
+                            <a href="251122_로봇좌표변환_중간보고.html" class="plink plink-cyan" target="_blank"><span class="plink-dot"></span>로봇 좌표 변환 시스템 - 중간 진행 보고 (2025-11-22)</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-planb-main', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            5개 더 보기
+                        </button>
+                    </div>
+                    <div class="dnote dnote-green">
+                        <p>
+                            <strong>최신:</strong> 2025-11-22 좌표 변환 테스트 PASSED<br>
+                            <strong>성과:</strong> 목표 976mm vs 실측 982.21mm (오차 6.21mm)<br>
+                            <strong>진행:</strong> TestMoveToWorldOrigin Z=500 테스트 대기
                         </p>
                     </div>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>📅 개발:</strong> 2025-11-18 CoordTransform.mod v1.2<br>
-                            <strong>🎯 기능:</strong> 로봇2 TCP → 갠트리 좌표계 변환<br>
-                            <strong>🤖 시스템:</strong> R축 회전 적용 (±488mm 오프셋)<br>
-                            <strong>✅ 상태:</strong> RAPID 문법 검증 완료, RobotStudio 테스트 대기
+                    <div class="dnote dnote-cyan">
+                        <p>
+                            <strong>개발:</strong> 2025-11-18 CoordTransform.mod v1.2<br>
+                            <strong>기능:</strong> 로봇2 TCP → 갠트리 좌표계 변환<br>
+                            <strong>시스템:</strong> R축 회전 적용 (±488mm 오프셋)<br>
+                            <strong>상태:</strong> RAPID 문법 검증 완료, RobotStudio 테스트 대기
                         </p>
                     </div>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>🎯 목표:</strong> 3-Task → 2-Task 구조 단순화<br>
-                            <strong>⚡ 개선:</strong> 좌표 변환 함수 제거, 자동 동기화<br>
-                            <strong>📅 프로젝트:</strong> S25016 - 34bay 자동용접 A/B라인<br>
-                            <strong>👥 담당:</strong> ABB 코리아 (황동호, 유대영)
+                    <div class="dnote dnote-amber">
+                        <p>
+                            <strong>목표:</strong> 3-Task → 2-Task 구조 단순화<br>
+                            <strong>개선:</strong> 좌표 변환 함수 제거, 자동 동기화<br>
+                            <strong>프로젝트:</strong> S25016 - 34bay 자동용접 A/B라인<br>
+                            <strong>담당:</strong> ABB 코리아 (황동호, 유대영)
                         </p>
                     </div>
                 </div>
 
                 <!-- 관련 기술 문서 -->
                 <div class="card">
-                    <h3>📚 관련 기술 문서</h3>
-                    <a href="robot_system_review.html" class="project-link" target="_blank">
-                        📊 로봇 시스템 리뷰 (현행 분석)
-                    </a>
-                    <a href="robot_system_review_ko.html" class="project-link" target="_blank">
-                        📋 로봇 시스템 리뷰 (한글)
-                    </a>
-                    <a href="robot_backup_comparison.html" class="project-link" target="_blank">
-                        🗂️ 로봇 백업 비교 분석
-                    </a>
-                    <a href="robot_backup_history.html" class="project-link" target="_blank">
-                        📚 ABB 로봇 백업 변경 이력
-                    </a>
-                    <a href="abb_robot_programming_specification.html" class="project-link" target="_blank">
-                        📖 ABB 로봇 프로그래밍 사양서
-                    </a>
-                    <a href="abb_spec_detailed.html" class="project-link" target="_blank">
-                        📄 ABB 상세 사양
-                    </a>
-                    <div class="detail-note">
-                        <p class="detail-text">
-                            <strong>📌 참고:</strong> 시스템 전환 및 고도화를 위한 기술 문서<br>
-                            <strong>🔧 범위:</strong> 로봇 설정, 백업, 프로그래밍 가이드<br>
-                            <strong>✅ 활용:</strong> Plan B 구현 및 모션 시스템 개발
+                    <div class="card-title"><div class="ct-icon ct-violet">📚</div>관련 기술 문서</div>
+                    <div class="link-list">
+                        <a href="robot_system_review.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>로봇 시스템 리뷰 (현행 분석)</a>
+                        <a href="robot_system_review_ko.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>로봇 시스템 리뷰 (한글)</a>
+                        <a href="robot_backup_comparison.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>로봇 백업 비교 분석</a>
+                        <div class="link-more" id="links-planb-tech">
+                            <a href="robot_backup_history.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>ABB 로봇 백업 변경 이력</a>
+                            <a href="abb_robot_programming_specification.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>ABB 로봇 프로그래밍 사양서</a>
+                            <a href="abb_spec_detailed.html" class="plink plink-violet" target="_blank"><span class="plink-dot"></span>ABB 상세 사양</a>
+                        </div>
+                        <button class="toggle-more" onclick="toggleMore('links-planb-tech', this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+                            3개 더 보기
+                        </button>
+                    </div>
+                    <div class="dnote dnote-violet">
+                        <p>
+                            <strong>참고:</strong> 시스템 전환 및 고도화를 위한 기술 문서<br>
+                            <strong>범위:</strong> 로봇 설정, 백업, 프로그래밍 가이드<br>
+                            <strong>활용:</strong> Plan B 구현 및 모션 시스템 개발
                         </p>
                     </div>
                 </div>
 
-                <!-- 프로젝트 정보 카드 -->
+                <!-- 프로젝트 개요 -->
                 <div class="card">
-                    <h3>📊 프로젝트 개요</h3>
-                    <div class="dashboard-grid">
-                        <div class="info-box">
-                            <h4>🎯 Plan B 시스템 재구성</h4>
-                            <p>
-                                <strong>목적:</strong> 로봇 시스템 아키텍처 단순화<br>
-                                <strong>주요 변경:</strong> 3-Task → 2-Task 구조<br>
-                                <strong>효과:</strong> 유지보수 간소화, 안정성 향상<br>
-                                <strong>일정:</strong> Phase 1-4 (4주 계획)
-                            </p>
-                        </div>
-                        <div class="info-box">
-                            <h4>🎬 XYZR 갠트리 모션</h4>
-                            <p>
-                                <strong>목적:</strong> 용접 모션 시각화 및 시뮬레이션<br>
-                                <strong>구성:</strong> XYZ 선형축 + R축 회전 + 듀얼 로봇<br>
-                                <strong>기능:</strong> TCP 경로, 위빙, R축 회전 표현<br>
-                                <strong>대상:</strong> T-bar 웹 양면 동시 용접
-                            </p>
-                        </div>
-                        <div class="info-box">
-                            <h4>👥 프로젝트 담당자</h4>
-                            <p>
-                                <strong>총괄:</strong> 황동호 팀장 (ABB 코리아)<br>
-                                &nbsp;&nbsp;📞 010-6479-5340<br>
-                                <strong>프로그래밍:</strong> 유대영 차장 (ABB 코리아)<br>
-                                &nbsp;&nbsp;📞 010-3278-9779
-                            </p>
-                        </div>
+                    <div class="card-title"><div class="ct-icon ct-cyan">📊</div>프로젝트 개요</div>
+                    <div class="info-panel">
+                        <h4>Plan B 시스템 재구성</h4>
+                        <p>
+                            <strong>목적:</strong> 로봇 시스템 아키텍처 단순화<br>
+                            <strong>주요 변경:</strong> 3-Task → 2-Task 구조<br>
+                            <strong>효과:</strong> 유지보수 간소화, 안정성 향상<br>
+                            <strong>일정:</strong> Phase 1-4 (4주 계획)
+                        </p>
+                    </div>
+                    <div class="info-panel">
+                        <h4>XYZR 갠트리 모션</h4>
+                        <p>
+                            <strong>목적:</strong> 용접 모션 시각화 및 시뮬레이션<br>
+                            <strong>구성:</strong> XYZ 선형축 + R축 회전 + 듀얼 로봇<br>
+                            <strong>기능:</strong> TCP 경로, 위빙, R축 회전 표현<br>
+                            <strong>대상:</strong> T-bar 웹 양면 동시 용접
+                        </p>
+                    </div>
+                    <div class="info-panel">
+                        <h4>프로젝트 담당자</h4>
+                        <p>
+                            <strong>총괄:</strong> 황동호 팀장 (ABB 코리아)<br>
+                            &nbsp;&nbsp;010-6479-5340<br>
+                            <strong>프로그래밍:</strong> 유대영 차장 (ABB 코리아)<br>
+                            &nbsp;&nbsp;010-3278-9779
+                        </p>
                     </div>
                 </div>
             </div>
@@ -1500,33 +1805,37 @@ python3 log_analyzer.py</pre>
     </div>
 
     <script>
-        function showTab(tabName) {
-            // 모든 탭 숨기기
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(tab => tab.classList.remove('active'));
-
-            // 모든 탭 버튼 비활성화
-            const tabButtons = document.querySelectorAll('.nav-tab');
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-
-            // 선택된 탭 표시
+        function showTab(tabName, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+            btn.classList.add('active');
+            // Re-trigger entrance animations for newly visible tab
+            requestAnimationFrame(() => animateElements());
         }
 
-        // 페이지 로드 시 애니메이션
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 50);
-            });
-        });
+        function toggleMore(id, btn) {
+            const el = document.getElementById(id);
+            const isOpen = el.classList.toggle('open');
+            btn.classList.toggle('open', isOpen);
+            const count = el.children.length;
+            btn.childNodes[btn.childNodes.length - 1].textContent = isOpen ? ' 접기' : ` ${count}개 더 보기`;
+        }
+
+        function animateElements() {
+            const els = document.querySelectorAll('.card:not(.visible), .stat-block:not(.visible), .tl-item:not(.visible)');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, i) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => entry.target.classList.add('visible'), i * 40);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.05 });
+            els.forEach(el => observer.observe(el));
+        }
+
+        document.addEventListener('DOMContentLoaded', animateElements);
     </script>
 </body>
 </html>
