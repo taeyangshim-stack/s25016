@@ -281,6 +281,78 @@
     /* Report mode: all visible immediately */
     body.mode-report .slide-inner > * { opacity: 1; transform: none; transition: none; }
     body.mode-report .slide { overflow: visible; }
+
+    /* ===== VERSION BADGE ===== */
+    .ver-badge {
+      position: fixed; bottom: 16px; left: 16px; z-index: 200;
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px 5px 8px; border-radius: 100px;
+      background: var(--surface); border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      font-size: 11px; font-weight: 600; color: var(--text-sub);
+      cursor: pointer; transition: all .2s;
+    }
+    .ver-badge:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 12px rgba(13,110,81,.12); }
+    .ver-badge-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--accent-mid);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ===== CHANGELOG PANEL ===== */
+    .changelog-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,.3); backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .changelog-overlay.open { opacity: 1; pointer-events: auto; }
+    .changelog-panel {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 310;
+      max-height: 80vh; background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -8px 40px rgba(0,0,0,.12);
+      transform: translateY(100%); transition: transform .35s cubic-bezier(.22,1,.36,1);
+      display: flex; flex-direction: column;
+    }
+    .changelog-overlay.open .changelog-panel { transform: translateY(0); }
+    .changelog-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px 12px; border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .changelog-header h3 { font-size: 16px; font-weight: 800; }
+    .changelog-close {
+      width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--bg); cursor: pointer; font-size: 16px; color: var(--muted);
+      display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .changelog-close:hover { background: var(--rose-soft); color: var(--rose); border-color: var(--rose); }
+    .changelog-body { padding: 16px 28px 28px; overflow-y: auto; flex: 1; }
+
+    /* Version entry */
+    .ver-entry { padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .ver-entry:last-child { border-bottom: none; }
+    .ver-entry-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .ver-tag {
+      padding: 3px 10px; border-radius: 100px; font-size: 12px; font-weight: 800;
+      background: var(--accent); color: #fff;
+    }
+    .ver-tag-minor { background: var(--blue); }
+    .ver-tag-patch { background: var(--muted); }
+    .ver-date { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .ver-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .ver-changes { padding-left: 16px; font-size: 13px; line-height: 1.8; color: var(--text-sub); }
+    .ver-changes li { margin-bottom: 2px; }
+    .ver-changes code {
+      background: var(--bg); padding: 1px 5px; border-radius: 4px;
+      font-size: 11px; font-family: monospace; color: var(--accent);
+    }
+
+    body.mode-report .ver-badge { left: 256px; }
+    @media (max-width: 900px) {
+      body.mode-report .ver-badge { left: 16px; }
+    }
   </style>
 </head>
 <body class="mode-ppt">
@@ -300,17 +372,18 @@
   <a class="toc-item" href="#sec04">04 물류 흐름도</a>
   <a class="toc-item" href="#sec05">05 핵심 아이디어</a>
   <a class="toc-item" href="#sec06">06 유연성 시연</a>
-  <a class="toc-item" href="#sec07">07 컨셉 A — 핀-그리드</a>
-  <a class="toc-item" href="#sec08">08 컨셉 B — 전동 서포트</a>
-  <a class="toc-item" href="#sec09">09 컨셉 C — 셀 어레이</a>
-  <a class="toc-item" href="#sec10">10 랙 모듈 + 안전</a>
-  <a class="toc-item" href="#sec11">11 시스템 아키텍처</a>
-  <a class="toc-item" href="#sec12">12 로드맵 + 결론</a>
+  <a class="toc-item" href="#sec07">07 벤치마킹</a>
+  <a class="toc-item" href="#sec08">08 컨셉 A — 핀-그리드</a>
+  <a class="toc-item" href="#sec09">09 컨셉 B — 전동 서포트</a>
+  <a class="toc-item" href="#sec10">10 컨셉 C — 셀 어레이</a>
+  <a class="toc-item" href="#sec11">11 랙 모듈 + 안전</a>
+  <a class="toc-item" href="#sec12">12 시스템 아키텍처</a>
+  <a class="toc-item" href="#sec13">13 로드맵 + 결론</a>
 </nav>
 
 <!-- NAV DOTS (PPT mode) -->
 <nav class="nav-dots" id="navDots"></nav>
-<div class="slide-counter" id="slideCounter">1 / 12</div>
+<div class="slide-counter" id="slideCounter">1 / 13</div>
 
 <div class="main-content">
 
@@ -779,9 +852,126 @@
   </div>
 </section>
 
-<!-- ===== SECTION 07: 컨셉 A ===== -->
-<section class="slide" id="sec07" data-title="컨셉 A">
+<!-- ===== SECTION 07: 벤치마킹 / 참고 사례 ===== -->
+<section class="slide" id="sec07" data-title="벤치마킹">
   <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag tag-blue">벤치마킹</span>
+      <h2 style="margin-top:8px">유사 기술 — 글로벌 참고 사례</h2>
+      <p class="subtitle">핀-베드, 유니버설 홀딩 픽스처(UHF), 조선 자동화 라인 등 스마트랙과 유사한 원리의 글로벌 기술.</p>
+    </div>
+
+    <div class="row">
+      <!-- ADAPA -->
+      <div class="card" style="padding:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span class="slide-tag tag-green" style="font-size:10px">핵심 참고</span>
+          <span style="font-size:11px;color:var(--muted)">덴마크</span>
+        </div>
+        <h3 style="font-size:15px">ADAPA — Adaptive Mould</h3>
+        <p style="font-size:12px;color:var(--text-sub);line-height:1.6;margin-bottom:12px">
+          <b>핀-베드 + 스테퍼모터</b> 기반 재구성형 몰드. 수백 개의 리니어 액추에이터가 개별 높이를 조절하여 곡면을 형성. 두바이 미래박물관 패널 230장 제작 실적.
+        </p>
+        <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000">
+          <iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" src="https://www.youtube.com/embed/alkMxv93zT0" title="ADAPA Adaptive Mould" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--accent)">
+          <b>스마트랙 연관</b>: 핀-베드 원리가 동일 (핀 높이 자동 제어 → 형상 추종)
+        </div>
+      </div>
+
+      <!-- Pemamek -->
+      <div class="card" style="padding:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span class="slide-tag tag-amber" style="font-size:10px">조선 자동화</span>
+          <span style="font-size:11px;color:var(--muted)">핀란드</span>
+        </div>
+        <h3 style="font-size:15px">Pemamek — PEMA Panel Line</h3>
+        <p style="font-size:12px;color:var(--text-sub);line-height:1.6;margin-bottom:12px">
+          조선소 전용 <b>패널 라인 자동화</b> 세계 1위. 가동식 포탈 + 로봇 용접 갠트리. 50년+ 실적. Irving/Babcock 조선소 등 다수 납품.
+        </p>
+        <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000">
+          <iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" src="https://www.youtube.com/embed/ZBk4dZvq0T4" title="Pemamek Panel Line" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--amber)">
+          <b>스마트랙 연관</b>: 조선 현장 자동화 + AMR/크레인 연동 벤치마크
+        </div>
+      </div>
+    </div>
+
+    <!-- Report-only: 상세 비교표 + 추가 회사 -->
+    <div class="report-only" style="display:flex;flex-direction:column;gap:16px;margin-top:8px">
+      <div class="row">
+        <!-- ONExia -->
+        <div class="card" style="padding:16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span class="slide-tag tag-violet" style="font-size:10px">UHF</span>
+            <span style="font-size:11px;color:var(--muted)">미국 · ONExia</span>
+          </div>
+          <h3 style="font-size:14px">Universal Holding Fixture</h3>
+          <p style="font-size:12px;color:var(--text-sub);line-height:1.6">
+            서보 구동 로드가 <b>부재 형상에 맞춰 자동 배치</b>. 항공우주 복합재 가공 표준. 수평/수직/틸팅/멀티축 구성. 수초 내 형상 변경.
+          </p>
+          <div style="margin-top:8px;font-size:11px;color:var(--violet)">
+            <b>참고</b>: <a href="https://onexia.com/aerospace/uhf/" target="_blank" style="color:var(--violet)">onexia.com/aerospace/uhf</a>
+          </div>
+        </div>
+        <!-- CMS/SCM -->
+        <div class="card" style="padding:16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span class="slide-tag tag-violet" style="font-size:10px">UHF</span>
+            <span style="font-size:11px;color:var(--muted)">이탈리아 · CMS/SCM</span>
+          </div>
+          <h3 style="font-size:14px">UHF Tables (5축)</h3>
+          <p style="font-size:12px;color:var(--text-sub);line-height:1.6">
+            특허 <b>5축 NC 제어 진공컵</b> 시스템. 모듈형·플러그앤플레이. 항공기 복합재 부품 클램핑. 분 단위 재구성. 밀폐형(분진/습기) 옵션.
+          </p>
+          <div style="margin-top:8px;font-size:11px;color:var(--violet)">
+            <b>참고</b>: <a href="https://www.cms.it/en/advancedmaterials/news-events/news/uhf_tables.n154289.html" target="_blank" style="color:var(--violet)">cms.it — UHF Tables</a>
+          </div>
+        </div>
+        <!-- KRANENDONK -->
+        <div class="card" style="padding:16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span class="slide-tag tag-amber" style="font-size:10px">조선</span>
+            <span style="font-size:11px;color:var(--muted)">네덜란드 · KRANENDONK</span>
+          </div>
+          <h3 style="font-size:14px">Panel Welding Gantry</h3>
+          <p style="font-size:12px;color:var(--text-sub);line-height:1.6">
+            <b>6축 로봇 2대+ 동시 운영</b> 갠트리. RinasWeld S/W로 3D CAD → 자동 프로그래밍. 사이클타임 80%↓, 재작업 90%↓ 실적.
+          </p>
+          <div style="margin-top:8px;font-size:11px;color:var(--amber)">
+            <b>참고</b>: <a href="https://kranendonk.com/applications/panel-welding-gantry/" target="_blank" style="color:var(--amber)">kranendonk.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-accent">
+        <h3>글로벌 기술 비교 — 스마트랙 포지셔닝</h3>
+        <table>
+          <thead><tr><th>회사</th><th>국가</th><th>기술</th><th>적용 분야</th><th>스마트랙과의 차이점</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td><b>ADAPA</b></td><td>덴마크</td><td>핀-베드 Adaptive Mould</td><td>복합재 패널</td><td>몰드 목적 (적치X), 경하중</td></tr>
+            <tr class="hl"><td><b>ONExia</b></td><td>미국</td><td>서보 UHF</td><td>항공 복합재</td><td>가공 지그 (적치/물류 X)</td></tr>
+            <tr><td><b>CMS/SCM</b></td><td>이탈리아</td><td>5축 NC UHF</td><td>항공 복합재</td><td>진공컵 기반 (중하중 X)</td></tr>
+            <tr><td><b>Kostyrka</b></td><td>독일</td><td>유압 UHF</td><td>자동차/항공</td><td>정밀 계측용 (공장물류 X)</td></tr>
+            <tr><td><b>Pemamek</b></td><td>핀란드</td><td>PEMA Panel Line</td><td>조선</td><td>용접 자동화 (적치 시스템 X)</td></tr>
+            <tr><td><b>KRANENDONK</b></td><td>네덜란드</td><td>Panel Welding Gantry</td><td>조선</td><td>용접 갠트리 (지지대 X)</td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout-green" style="margin-top:12px">
+          <b>스마트랙의 차별점</b>: 기존 기술은 "가공/용접 지그"이거나 "경량 복합재 몰드"입니다.
+          <b>중하중(0.2~15t) 조선 부재의 적치·물류·안전을 통합 관리</b>하는 시스템은 전 세계적으로 사례가 없습니다.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 08: 컨셉 A ===== -->
+<section class="slide" id="sec08" data-title="컨셉 A">
+  <span class="slide-num">08</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">컨셉 A · MVP</span>
@@ -878,9 +1068,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 08: 컨셉 B ===== -->
-<section class="slide" id="sec08" data-title="컨셉 B">
-  <span class="slide-num">08</span>
+<!-- ===== SECTION 09: 컨셉 B ===== -->
+<section class="slide" id="sec09" data-title="컨셉 B">
+  <span class="slide-num">09</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">컨셉 B · 차별화</span>
@@ -1001,9 +1191,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 09: 컨셉 C ===== -->
-<section class="slide" id="sec09" data-title="컨셉 C">
-  <span class="slide-num">09</span>
+<!-- ===== SECTION 10: 컨셉 C ===== -->
+<section class="slide" id="sec10" data-title="컨셉 C">
+  <span class="slide-num">10</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-violet">컨셉 C · 세계 최초급</span>
@@ -1063,9 +1253,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 10: 랙 모듈 + 안전 ===== -->
-<section class="slide" id="sec10" data-title="랙 모듈">
-  <span class="slide-num">10</span>
+<!-- ===== SECTION 11: 랙 모듈 + 안전 ===== -->
+<section class="slide" id="sec11" data-title="랙 모듈">
+  <span class="slide-num">11</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">기구 설계</span>
@@ -1112,9 +1302,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 11: 시스템 아키텍처 ===== -->
-<section class="slide" id="sec11" data-title="시스템 아키텍처">
-  <span class="slide-num">11</span>
+<!-- ===== SECTION 12: 시스템 아키텍처 ===== -->
+<section class="slide" id="sec12" data-title="시스템 아키텍처">
+  <span class="slide-num">12</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">S/W 아키텍처</span>
@@ -1173,9 +1363,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 12: 로드맵 + 역량 + 결론 ===== -->
-<section class="slide" id="sec12" data-title="로드맵 + 결론">
-  <span class="slide-num">12</span>
+<!-- ===== SECTION 13: 로드맵 + 역량 + 결론 ===== -->
+<section class="slide" id="sec13" data-title="로드맵 + 결론">
+  <span class="slide-num">13</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-amber">개발 계획 + 결론</span>
@@ -1270,6 +1460,99 @@
 </section>
 
 </div><!-- /main-content -->
+
+<!-- VERSION BADGE -->
+<div class="ver-badge" onclick="document.getElementById('changelogOverlay').classList.add('open')">
+  <span class="ver-badge-dot"></span>
+  v3.1
+</div>
+
+<!-- CHANGELOG PANEL -->
+<div class="changelog-overlay" id="changelogOverlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="changelog-panel">
+    <div class="changelog-header">
+      <h3>변경 이력</h3>
+      <button class="changelog-close" onclick="document.getElementById('changelogOverlay').classList.remove('open')">&times;</button>
+    </div>
+    <div class="changelog-body">
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag">v3.1</span>
+          <span class="ver-date">2026-02-21</span>
+        </div>
+        <div class="ver-title">벤치마킹 섹션 + 버전 이력 패널 추가</div>
+        <ul class="ver-changes">
+          <li><b>벤치마킹 섹션 신규</b>: ADAPA, Pemamek, ONExia, CMS, KRANENDONK 등 글로벌 참고 사례</li>
+          <li><b>YouTube 영상 2건</b>: ADAPA Adaptive Mould, Pemamek PEMA Panel Line 인라인 삽입</li>
+          <li><b>보고서 모드 상세</b>: 6개 회사 비교표, 스마트랙 차별점 분석</li>
+          <li><b>버전 관리</b>: 좌하단 버전 뱃지 + 변경 이력 패널 (현재 보고 있는 것)</li>
+          <li>13섹션으로 확장 (벤치마킹 섹션 삽입)</li>
+        </ul>
+      </div>
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag">v3.0</span>
+          <span class="ver-date">2026-02-21</span>
+        </div>
+        <div class="ver-title">듀얼 모드 + 강화 도식화 전면 재작성</div>
+        <ul class="ver-changes">
+          <li><b>듀얼 모드</b>: <code>프레젠테이션</code> / <code>보고서</code> 토글 (우상단)</li>
+          <li><b>12섹션 확장</b>: 문제정의, 대상부재, 핵심아이디어, 유연성시연 섹션 신규 추가</li>
+          <li><b>신규 SVG 4종</b>: Before/After 비교, 4-State 시퀀스, 3패널 유연성, 핀 단면도</li>
+          <li><b>참고 이미지 4장</b>: T-bar·드레인홀·복합보강재·B Line 사진 + CSS 오버레이 주석</li>
+          <li><b>보고서 모드</b>: 좌측 TOC 사이드바, <code>.report-only</code> 상세 콘텐츠 (테이블·단면도)</li>
+          <li><b>PPT 모드</b>: scroll-snap, 키보드(←→) 전환, 네비 닷</li>
+          <li><b>버전 관리</b>: 좌하단 버전 뱃지 + 변경 이력 패널 추가</li>
+        </ul>
+      </div>
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag ver-tag-minor">v2.0</span>
+          <span class="ver-date">2026-02-20</span>
+        </div>
+        <div class="ver-title">SmarTrack 리뉴얼 — 10섹션 PPT 구성</div>
+        <ul class="ver-changes">
+          <li>10개 슬라이드 PPT 형식 전환 (scroll-snap, 100vh)</li>
+          <li>물류 흐름도 SVG, 컨셉 A/B/C SVG 다이어그램 추가</li>
+          <li>시스템 아키텍처 SVG, 로드맵 바 차트 추가</li>
+          <li>SP역량 + 결론 슬라이드 통합</li>
+          <li>키보드(←→) 슬라이드 전환 + 네비게이션 닷</li>
+          <li>fade-up 애니메이션 적용</li>
+        </ul>
+      </div>
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag ver-tag-minor">v1.5</span>
+          <span class="ver-date">2026-02-20</span>
+        </div>
+        <div class="ver-title">품의서/시방서 문서 추가 및 구조 정리</div>
+        <ul class="ver-changes">
+          <li>프로젝트 디렉토리 <code>projects/smartrack/</code> 구성</li>
+          <li>매크로 이미지 10장 추출 및 정리</li>
+          <li>Vercel rewrite 경로 <code>/smartrack</code> 등록</li>
+        </ul>
+      </div>
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag ver-tag-patch">v1.0</span>
+          <span class="ver-date">2026-02-19</span>
+        </div>
+        <div class="ver-title">초기 보고서 작성</div>
+        <ul class="ver-changes">
+          <li>스마트랙 유연 적치 시스템 초기 컨셉 정리</li>
+          <li>11개 섹션 HTML 보고서 형식</li>
+          <li>접이식(details/summary) 콘텐츠 구성</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
