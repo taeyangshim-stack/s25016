@@ -1640,6 +1640,7 @@ PERS num debug_r2_floor_y_offset := 0;
 
 		! Step 2: Iterative refinement variables
 		VAR robtarget current_wobj0;
+		VAR robtarget tcp_floor;
 		VAR num error_x;
 		VAR num error_y;
 		VAR num iteration;
@@ -1726,6 +1727,10 @@ PERS num debug_r2_floor_y_offset := 0;
 		MoveAbsJ home_pos, v100, fine, tool0;
 		TPWrite "Robot1 init: done";
 		Write logfile, "Done errX=" + NumToStr(error_x, 2) + " errY=" + NumToStr(error_y, 2) + " iter=" + NumToStr(iteration, 0) + " at " + CTime();
+		! TCP verification in Floor coordinates
+		tcp_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
+		Write logfile, "TCP_Floor tWeld1: X=" + NumToStr(tcp_floor.trans.x, 3) + " Y=" + NumToStr(tcp_floor.trans.y, 3) + " Z=" + NumToStr(tcp_floor.trans.z, 3);
+		Write logfile, "TCP_Floor orient: [" + NumToStr(tcp_floor.rot.q1, 5) + "," + NumToStr(tcp_floor.rot.q2, 5) + "," + NumToStr(tcp_floor.rot.q3, 5) + "," + NumToStr(tcp_floor.rot.q4, 5) + "]";
 		Close logfile;
 	
 	ERROR

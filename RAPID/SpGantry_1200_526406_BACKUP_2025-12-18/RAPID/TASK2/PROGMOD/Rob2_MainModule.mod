@@ -2433,6 +2433,7 @@ VAR robjoint robot2_offset_joints;
 
 		! Step 2: Iterative refinement variables
 		VAR robtarget current_wobj0;
+		VAR robtarget tcp_floor;
 		VAR num error_x;
 		VAR num error_y;
 		VAR num iteration;
@@ -2506,6 +2507,10 @@ VAR robjoint robot2_offset_joints;
 
 		TPWrite "Robot2 init: done";
 		Write logfile, "Step2 done errX=" + NumToStr(error_x, 2) + " errY=" + NumToStr(error_y, 2) + " iter=" + NumToStr(iteration, 0);
+		! TCP verification in Floor coordinates
+		tcp_floor := CRobT(\Tool:=tWeld2\WObj:=WobjFloor);
+		Write logfile, "TCP_Floor tWeld2: X=" + NumToStr(tcp_floor.trans.x, 3) + " Y=" + NumToStr(tcp_floor.trans.y, 3) + " Z=" + NumToStr(tcp_floor.trans.z, 3);
+		Write logfile, "TCP_Floor orient: [" + NumToStr(tcp_floor.rot.q1, 5) + "," + NumToStr(tcp_floor.rot.q2, 5) + "," + NumToStr(tcp_floor.rot.q3, 5) + "," + NumToStr(tcp_floor.rot.q4, 5) + "]";
 		Write logfile, "Setup completed at " + CTime();
 		Close logfile;
 
