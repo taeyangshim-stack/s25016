@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자동용접 갠트리 로봇시스템 전장 공사 시방서</title>
+
+<style>
+:root{
+    --primary:#1f4e79;
+    --light:#f4f7fb;
+    --border:#d9dee7;
+    --text:#222;
+}
+
+body{
+    margin:0;
+    font-family:"Malgun Gothic", Arial, sans-serif;
+    background:#f5f7fa;
+    color:var(--text);
+    line-height:1.7;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+header{
+    background:var(--primary);
+    color:white;
+    padding:30px 20px;
+    border-radius:10px;
+    margin-bottom:30px;
+}
+
+h1{margin:0;font-size:28px;}
+h2{color:var(--primary);margin-top:50px;}
+h3{margin-top:25px;}
+
+.card{
+    background:white;
+    padding:25px;
+    margin-bottom:25px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* ===== 표 기본 설정 ===== */
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+    table-layout: auto;
+}
+
+th, td{
+    border:1px solid var(--border);
+    padding:10px;
+    text-align:left;
+    vertical-align:top;
+    word-break: keep-all;
+}
+
+th{
+    background:var(--light);
+}
+
+/* ===== 첫 번째 열 확장 + 줄바꿈 방지 ===== */
+table th:first-child,
+table td:first-child{
+    width:180px;
+    white-space:nowrap;
+    font-weight:600;
+    text-align:center;
+}
+
+
+/* ===== 합계 강조 ===== */
+.summary{
+    font-weight:bold;
+    background:#e8f1fb;
+    font-size:15px;
+}
+
+.footer{
+    margin-top:50px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+    font-size:14px;
+}
+
+/* ===== 모바일 대응 ===== */
+@media (max-width:768px){
+table, thead, tbody, th, td, tr{ display:block; }
+thead{ display:none; }
+tr{
+    margin-bottom:15px;
+    background:white;
+    border-radius:8px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    padding:10px;
+}
+td{
+    border:none;
+    padding-left:50%;
+    position:relative;
+}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+<h1>자동용접 갠트리 로봇시스템<br>전장 공사 시방서</h1>
+</header>
+
+<!-- 1 -->
+<div class="card">
+<h2>1. 과업 개요</h2>
+
+<h3>1.1 과업명</h3>
+<p>자동용접 갠트리 로봇시스템 전장 배선 공사</p>
+
+<h3>1.2 과업 범위</h3>
+<p>&nbsp;SPsystems 어곡 A공장에 설치된 자동용접 갠트리 로봇시스템을 부산 녹산 지정공장으로 이설하는 전후 과정에서 이루어지는 전장 배선과 관련된 공사로, <br>다음 작업을 포함한다.</p>
+<ul>
+<li>철거 및 포장 작업: 기존 설치 장비의 배선 철거 및 포장<br>
+- 배선 미진행 사항 관련 자재 파악 및 포장</li>
+<li>배선 작업: 갠트리 로봇 설치 관련 배선 작업<br>
+- 기구부 축 설치 작업 중 필요 시 협업 진행</li>
+</ul>
+
+<h3>1.3 이설 장소</h3>
+<table>
+<tr><th>구분</th><th>기존 설치 장소</th><th>이설 장소</th></tr>
+<tr><td>위치</td><td>에스시스템스 어곡 A공장</td><td>부산 녹산 지정공장</td></tr>
+<tr><td>주소</td><td>경남 양산시 어곡동단로 123</td><td>부산광역시 강서구 녹산산업중로 293</td></tr>
+</table>
+
+<h3>1.4 대상 장비 사양</h3>
+<table>
+<tr><th>항목</th><th>사양</th></tr>
+<tr><td>장비 명칭</td><td>자동용접 갠트리 로봇시스템 (Dual Gantry)</td></tr>
+<tr><td>주설비 구성</td><td>ABB 로봇(R-1200)-용접기-피더기-용접토치(Master + Slave)(2SET), 냉각기(2SET), 비전 카메라(ABB, 위드포인츠 각각2SET), <br>로봇 컨트롤러(IRC5 + Drive(2SET))(2SET), 갠트리 컨트롤러(2SET), PLC Box, 분전반, 변압기</td></tr>
+<tr><td>축 구성</td><td>X-AXIS (Rail LH+RH), Y-AXIS (2SET), Z+R-AXIS (2SET)</td></tr>
+<tr><td>주행 방식</td><td>랙-피니언 구동</td></tr>
+<tr><td>케이블 처리</td><td>케이블베이어 (CABLEVEYOR) 및 WORK WAY</td></tr>
+</table>
+</div>
+
+<!-- 2 -->
+<div class="card">
+<h2>2. 공사 일정</h2>
+
+<h3>2.1 전체 일정 개요</h3>
+<h4>2026.02.26 ~ 2026.04.02</h4>
+
+<table>
+<tr><th>단계</th><th>작업 내용</th><th>기간</th><th>일수</th><th>비고</th></tr>
+<tr><td>1</td><td>어곡 현장 배선 철거</td><td>02/26 ~ 03/02</td><td>4일</td><td>현장 작업 속도에 따른 세부 일정 변동 가능</td></tr>
+<tr><td>2</td><td>어곡 현장 자재 포장</td><td>03/03</td><td>1일</td><td></td></tr>
+<tr><td>3</td><td>녹산 현장Z축 세팅 협업</td><td>03/09</td><td>1일</td><td>기구부 병행 작업</td></tr>
+<tr><td>4</td><td>녹산 현장Y축 세팅 협업</td><td>03/26</td><td>1일</td><td>기구부 병행 작업</td></tr>
+<tr><td>5</td><td>녹산 현장R축 세팅 협업</td><td>03/27</td><td>1일</td><td>기구부 병행 작업</td></tr>
+<tr><td>6</td><td>녹산 현장 하부 배선</td><td>03/28 ~ 04/02</td><td>6일</td><td>현장 작업 속도에 따른 세부 일정 변동 가능</td></tr>
+</table>
+
+<h3>2.2 기계/전기 업무 분장</h3>
+<table>
+<tr><th>구분</th><th>전장 (나라오토텍)</th><th>PM 및 전기 (에스피시스템스)</th></tr>
+<tr><td>철거</td><td>전장 분리, 케이블 철거, 라벨링, 자재 포장</td><td>현장 이슈 파악 및 대처(변압기 내부 교체 등)</td></tr>
+<tr><td>설치</td><td>전장 배선, 제어반 연결</td><td>IO체크</td></tr>
+<tr><td>시운전</td><td>검증 중 배선 점검 관련 이상 해결</td><td>프로그램 검증, 안전 테스트</td></tr>
+</table>
+</div>
+
+<!-- 3 -->
+<div class="card">
+<h2>3. 세부 작업 내역</h2>
+
+<h3>3.1 어곡 현장 철거 작업</h3>
+<table>
+<tr><th>번호</th><th>작업 항목</th><th>규격</th><th>수량</th><th>비고</th></tr>
+<tr><td>1</td><td>어곡 현장 공장 Z축 및 상부 배선 철거</td><td>2인×2일</td><td>4M/D</td><td></td></tr>
+<tr><td>2</td><td>어곡 현장 공장 X축 및 하부 배선 철거</td><td>3인×2일</td><td>6M/D</td><td></td></tr>
+<tr><td>3</td><td>자재 포장</td><td>2인×1일</td><td>2M/D</td><td></td></tr>
+<tr class="summary"><td colspan="3">철거 소계</td><td>12 M/D</td><td></td></tr>
+</table>
+
+<h3>3.2 녹산 현장 설치 작업</h3>
+<table>
+<tr><th>번호</th><th>작업 항목</th><th>규격</th><th>수량</th><th>비고</th></tr>
+<tr><td>1</td><td>녹산 현장Z-AXIS 배선 협업</td><td>2인×1일</td><td>2 M/D</td><td></td></tr>
+<tr><td>2</td><td>녹산 현장Y-AXIS 배선 협업</td><td>2인×1일</td><td>2 M/D</td><td></td></tr>
+<tr><td>3</td><td>녹산 현장R-AXIS 배선 협업 및 이후 배선</td><td>4인×7일</td><td>28 M/D</td><td></td></tr>
+<tr class="summary"><td colspan="3">설치 소계</td><td>32 M/D</td><td></td></tr>
+</table>
+</div>
+
+<!-- 4 -->
+<div class="card">
+<h2>4. 품질 및 성능 기준</h2>
+
+<ul>
+<li>전기적 검수: IO 점검 완료, 비상정지 테스트</li>
+<li>기능 검수: UI 프로그램 활용 용접 모션 테스트, 실제 용접 기능 테스트</li>
+</ul>
+
+<table>
+<tr><th>항목</th><th>검수 방법</th><th>비고</th></tr>
+<tr><td>분전반 관련</td><td>전원 확인(각 컨트롤러 및 PLC Box HUB 등)</td><td></td></tr>
+<tr><td>PLC Box 관련</td><td>IO 및 UI 프로그램 확인</td><td>설치 완료 후 협업체 협업 필요(디파인시스템 등)</td></tr>
+<tr><td>조작 관련</td><td>갠트리 및 용접로봇 수동 및 자동 작동 확인</td><td>설치 완료 후 협업체 협업 필요(ABB 등)</td></tr>
+</table>
+</div>
+
+<!-- 5 -->
+<div class="card">
+<h2>5. 업무 분장 및 제공 범위</h2>
+
+<h3>5.1 나라오토텍 수행 범위</h3>
+<ul>
+<li>갠트리로봇 전장 배선 철거 및 포장 (12 M/D)</li>
+<li>갠트리로봇 기구 설치 시 협업 및 전장 배선 설치 (32 M/D)</li>
+<li>시운전 및 검증 시 전장 관련 사항 지원</li>
+</ul>
+
+<h3>5.2 에스피시스템스 제공 범위</h3>
+<table>
+<tr><th>번호</th><th>항목</th><th>상세 내용</th></tr>
+<tr><td>1</td><td>크레인 및 중장비</td><td>철거/설치 작업용 크레인 제공</td></tr>
+<tr><td>2</td><td>안전관리</td><td>산업안전 관리요원 배치, 신호수 제공</td></tr>
+<tr><td>3</td><td>현장설치용 작업대(족장)</td><td>정밀도 조정 작업용 (신규 제작/설치)</td></tr>
+<tr><td>4</td><td>정밀도 측정</td><td>레이저 트래커 장비 및 측정 인력</td></tr>
+<tr><td>5</td><td>유틸리티</td><td>공압, 전원 공급</td></tr>
+<tr><td>6</td><td>운송</td><td>장비 운송 (어곡 → 녹산)</td></tr>
+<tr><td>7</td><td>전장 작업 검수</td><td>전장 배선 확인 : IO 및 UI 프로그램, 로봇 운전, 용접 기능 확인 등</td></tr>
+</table>
+</div>
+
+<!-- 6 -->
+<div class="card">
+<h2>6. 견적 요약</h2>
+<table>
+<tr><th>번호</th><th>항목</th><th>금액</th><th>비고</th></tr>
+<tr><td>1</td><td>어곡 현장 철거 (12 M/D × 220,000원)</td><td>2,640,000</td><td></td></tr>
+<tr><td>2</td><td>녹산 현장 설치 (32 M/D × 250,000원)</td><td>8,000,000</td><td></td></tr>
+<tr><td>3</td><td>자재비</td><td>300,000</td><td></td></tr>
+<tr><td>4</td><td>경비</td><td>1,000,000</td><td></td></tr>
+<tr class="summary"><td></td><td>소계</td><td>11,940,000</td><td></td></tr>
+<tr><td>5</td><td>일반관리비 및 기업이윤 (10%)</td><td>1,194,000</td><td></td></tr>
+<tr class="summary"><td></td><td>합계 (VAT 별도)</td><td>13,134,000</td><td></td></tr>
+</table>
+</div>
+
+<!-- 7 -->
+<div class="card">
+<h2>7. 첨부 서류</h2>
+<ol>
+<li>이설 견적서 (에스피 선박소부재갠트리철거이설.pdf)</li>
+<li>3세부 일정표 (2026년 선박소부재 3세부 일정표_260127.xlsx)</li>
+<li>기존 설치시방서 ([D25003]용접갠트리설치시방.pdf)</li>
+</ol>
+</div>
+
+<div class="footer">
+㈜SP시스템스 | 경남 양산시 어곡공단로 123 | TEL: 055-371-5600
+</div>
+
+</div>
+</body>
+</html>
