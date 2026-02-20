@@ -52,6 +52,7 @@ cloudinary-uploader/test-files/
 *~
 
 # AI working files
+.claude/
 .gemini/
 .sisyphus/
 
