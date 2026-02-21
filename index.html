@@ -1605,10 +1605,10 @@
                     </div>
                     <div class="dnote dnote-green">
                         <p>
-                            <strong>최신:</strong> 2026-02-21 Robot2 TCP Y=488mm 오프셋 수정 완료<br>
-                            <strong>원인:</strong> TASK7 CalcCurrentTcp에서 LOCKED_EAW_11(488mm) 미보정<br>
-                            <strong>수정:</strong> pR2.y - 488 보정 → R-축 중심 기준 회전 계산<br>
-                            <strong>검증:</strong> R=0°/30°/90°/-45° 전 각도 PASS (오차 0.04mm 이내)
+                            <strong>최신:</strong> 2026-02-21 Robot2 TCP 위치+회전 보정 완료 (v2.0.2)<br>
+                            <strong>위치:</strong> pR2.y - 488 보정 → Y=5300 정상 (전 각도 0.04mm 이내)<br>
+                            <strong>회전:</strong> EulerZYX(\Z) - gantryAngle → Rx 대칭 보정 완료<br>
+                            <strong>검증:</strong> R=±30° — Robot1 Rx=60/-120, Robot2 Rx=-60/-120, Rz=0
                         </p>
                     </div>
                     <div class="dnote dnote-amber">
@@ -1633,7 +1633,7 @@
                             <strong>시스템:</strong> XYZ 선형축 + R축 회전 갠트리<br>
                             <strong>구성:</strong> R축 바디에 2대 로봇 부착 (±488mm, LOCKED_EAW_11)<br>
                             <strong>핵심:</strong> Robot1=갠트리 조정, Robot2=독립 (수동 좌표 변환)<br>
-                            <strong>해결:</strong> Robot2 TCP 계산 시 488mm 베이스-R축 오프셋 보정 완료
+                            <strong>해결:</strong> Robot2 TCP 위치(488mm)+회전(EulerZYX) 보정 완료 (v2.0.2)
                         </p>
                     </div>
                 </div>

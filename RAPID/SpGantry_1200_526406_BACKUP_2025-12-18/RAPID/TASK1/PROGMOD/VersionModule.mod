@@ -11,7 +11,7 @@ MODULE VersionModule
 ! ========================================
 CONST string TASK1_VERSION := "v1.9.48";
 CONST string TASK2_VERSION := "v1.9.43";
-CONST string TASK_BG_VERSION := "v2.0.0";
+CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
 CONST string TASK_TEACHING_VERSION := "v1.0.0";
 
@@ -24,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-21";
+CONST string BUILD_DATE := "2026-02-22";
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -46,6 +46,14 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v2.0.1 (2026-02-22) - Robot2 TCP Floor Coordinate Fix
+!   - FIX: CalcCurrentTcp R2 position - 488mm Y offset subtracted before rotation
+!   - FIX: CalcCurrentTcp R2 orientation - EulerZYX(\Z)-gantryAngle compensation
+!   - ADD: T_BG startup version logging to HOME:/t_bg_version.txt
+!   - ROOT CAUSE: Robot2 base is 488mm from R-axis center (LOCKED_EAW_11)
+!     Position: pR2.y included 488mm offset, must subtract before R-axis rotation
+!     Orientation: Robot2 not gantry-coordinated, must compensate R rotation manually
+!
 ! UI-FIX (2026-02-11) - Upper Control UI Integration Fix
 !   - FIX: 9 RAPID symbol not found errors resolved (UI<->Controller)
 !   - TASK7(T_BG) Static.mod v2.0.0: Full PlanA TASK9 monitoring code ported

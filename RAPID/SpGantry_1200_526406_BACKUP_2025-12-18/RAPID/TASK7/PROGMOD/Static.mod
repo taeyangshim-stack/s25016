@@ -56,6 +56,9 @@ MODULE Static
         num Bias;
     ENDRECORD
 
+    ! --- Version ---
+    CONST string BG_VERSION := "v2.0.2";
+
     ! --- UI-Required PERS Variables ---
     PERS monRobs MonitorPosition;
     PERS num nTorques{18}:=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9E+09,0];
@@ -179,7 +182,6 @@ MODULE Static
 
         IF Present(R2)=TRUE THEN
             ! R2 not configured with gantry - manual floor coordinate calculation
-            ! R2 base_frame_orient inverts Z axis, so Z sign must be corrected
             ! pR2.y includes 488mm base-to-R-axis offset (LOCKED_EAW_11)
             ! Subtract before rotation to use R-axis center as rotation origin
             pR2:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobj0);
@@ -192,6 +194,13 @@ MODULE Static
             result.trans.x:=MonitorPosition.monExt.eax_a+nRotX;
             result.trans.y:=MonitorPosition.monExt.eax_b-nRotY;
             result.trans.z:=MonitorPosition.monExt.eax_c+pR2.trans.z;
+
+            ! Apply R-axis rotation to orientation (R2 not coordinated, must compensate)
+            ! EulerZYX(\Z) maps to UI Rx display, so subtract gantryAngle from Z component
+            result.rot:=OrientZYX(
+                EulerZYX(\Z,pR2.rot)-gantryAngle,
+                EulerZYX(\Y,pR2.rot),
+                EulerZYX(\X,pR2.rot));
         ENDIF
 
         RETURN result;
@@ -214,9 +223,20 @@ MODULE Static
 
     ! --- Main Loop ---
     PROC main()
+        VAR iodev bg_logfile;
+        VAR bool bDiagLogged:=FALSE;
+
+        ! Version logging at T_BG startup (with error handler)
+        rLogVersion;
+        TPWrite "T_BG: " + BG_VERSION + " started";
+
         WHILE TRUE DO
             rReadMotorTorque;
             rUpdateCurrentPosition;
+            IF bDiagLogged=FALSE THEN
+                bDiagLogged:=TRUE;
+                rLogDiag;
+            ENDIF
             rDigtalSignalPC;
             rWireTouch1;
             rWireTouch2;
@@ -429,5 +449,45 @@ MODULE Static
             bRqMoveG_PosHold:=FALSE;
             bRqMoveG_PosHoldComp:=FALSE;
         ENDIF
+    ENDPROC
+
+    ! --- Version Logging (error-safe) ---
+    PROC rLogVersion()
+        VAR iodev vf;
+        Open "HOME:/t_bg_version.txt", vf \Write;
+        Write vf, "T_BG Static (" + BG_VERSION + ") Date=" + CDate() + " Time=" + CTime();
+        Write vf, "CalcCurrentTcp R2: 488mm offset + rotation orient fix";
+        Close vf;
+    ERROR
+        SkipWarn;
+        TRYNEXT;
+    ENDPROC
+
+    ! --- Diagnostic Logging (one-shot) ---
+    PROC rLogDiag()
+        VAR iodev df;
+        VAR robtarget pDiag;
+        VAR num ga;
+        VAR num ezZ;
+        VAR num ezY;
+        VAR num ezX;
+
+        pDiag:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobj0);
+        ga:=MonitorPosition.monExt.eax_d;
+        ezZ:=EulerZYX(\Z,pDiag.rot);
+        ezY:=EulerZYX(\Y,pDiag.rot);
+        ezX:=EulerZYX(\X,pDiag.rot);
+
+        Open "HOME:/t_bg_diag.txt", df \Write;
+        Write df, "T_BG Diagnostic (" + BG_VERSION + ") " + CTime();
+        Write df, "pR2.rot=[" + NumToStr(pDiag.rot.q1,5) + "," + NumToStr(pDiag.rot.q2,5) + "," + NumToStr(pDiag.rot.q3,5) + "," + NumToStr(pDiag.rot.q4,5) + "]";
+        Write df, "gantryAngle=" + NumToStr(ga,2);
+        Write df, "EulerZYX: Z=" + NumToStr(ezZ,4) + " Y=" + NumToStr(ezY,4) + " X=" + NumToStr(ezX,4);
+        Write df, "monPose1.rot=[" + NumToStr(MonitorPosition.monPose1.rot.q1,5) + "," + NumToStr(MonitorPosition.monPose1.rot.q2,5) + "," + NumToStr(MonitorPosition.monPose1.rot.q3,5) + "," + NumToStr(MonitorPosition.monPose1.rot.q4,5) + "]";
+        Write df, "monPose2.rot=[" + NumToStr(MonitorPosition.monPose2.rot.q1,5) + "," + NumToStr(MonitorPosition.monPose2.rot.q2,5) + "," + NumToStr(MonitorPosition.monPose2.rot.q3,5) + "," + NumToStr(MonitorPosition.monPose2.rot.q4,5) + "]";
+        Close df;
+    ERROR
+        SkipWarn;
+        TRYNEXT;
     ENDPROC
 ENDMODULE
