@@ -104,7 +104,7 @@ MODULE Head_Data
     PERS wobjdata wobjWeldLine1:=[FALSE,TRUE,"",[[488,10,1620],[0,0.707107,-0.707107,0]],[[0,0,0],[1,0,0,0]]];
     PERS wobjdata wobjWeldLine2:=[FALSE,TRUE,"",[[488,-10,1620],[0,0.707107,0.707107,0]],[[0,0,0],[1,0,0,0]]];
     PERS wobjdata wobjRotCtr1:=[FALSE,TRUE,"",[[488,0,0],[0,0.707107,-0.707107,0]],[[0,0,0],[1,0,0,0]]];
-    PERS wobjdata wobjRotCtr2:=[FALSE,TRUE,"",[[488,0,0],[0,0.707107,0.707107,0]],[[0,0,0],[1,0,0,0]]];
+    PERS wobjdata wobjRotCtr2:=[FALSE,TRUE,"",[[0,0,0],[0,0.707107,0.707107,0]],[[0,0,0],[1,0,0,0]]];
 
     !!! Mechanical Geometry !!!
     PERS num nLimitX_Negative:=-9500;
