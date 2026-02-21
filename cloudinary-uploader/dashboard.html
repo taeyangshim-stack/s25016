@@ -3,345 +3,638 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloudinary 업로드 대시보드</title>
+    <title>Cloudinary Upload — S25016</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #f0f2f5;
+            --bg: #f7f8fa;
+            --bg-elevated: #ffffff;
+            --surface: #ffffff;
+            --surface-hover: #f0f4ff;
+            --border: #e2e6ef;
+            --border-active: #b0c4ff;
+            --text-primary: #1a2035;
+            --text-secondary: #5a6580;
+            --text-muted: #8892a8;
+            --cyan: #2563eb;
+            --cyan-dim: rgba(37, 99, 235, 0.07);
+            --cyan-glow: rgba(37, 99, 235, 0.04);
+            --green: #16a34a;
+            --green-dim: rgba(22, 163, 74, 0.07);
+            --red: #dc2626;
+            --red-dim: rgba(220, 38, 38, 0.06);
+            --amber: #d97706;
+            --amber-dim: rgba(217, 119, 6, 0.07);
+            --violet: #7c3aed;
+            --violet-dim: rgba(124, 58, 237, 0.07);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+            --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: var(--font-body);
+            background: var(--bg-deep);
             min-height: 100vh;
-            padding: 20px;
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 1600px;
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(37,99,235,0.04) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+            padding: 16px;
         }
-        
+
+        /* ── Header ── */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 32px 8px 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
         }
-        
+
+        .header-left { display: flex; flex-direction: column; gap: 4px; }
+
+        .header-tag {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-family: var(--font-mono);
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
         }
-        
-        .upload-section {
-            padding: 30px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e0e0e0;
+
+        .header-sub {
+            font-size: 0.88em;
+            color: var(--text-secondary);
+            margin-top: 2px;
         }
-        
+
+        .back-link {
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            color: var(--cyan);
+            text-decoration: none;
+            padding: 6px 14px;
+            background: var(--cyan-dim);
+            border-radius: 999px;
+            border: 1px solid rgba(37,99,235,0.15);
+            transition: all 0.2s var(--ease);
+            white-space: nowrap;
+        }
+        .back-link:hover { background: rgba(37,99,235,0.12); border-color: var(--cyan); }
+
+        /* ── Upload Area ── */
         .upload-area {
-            border: 3px dashed #667eea;
-            border-radius: 10px;
-            padding: 40px;
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 48px 32px;
             text-align: center;
-            background: white;
-            transition: all 0.3s ease;
             cursor: pointer;
+            transition: all 0.25s var(--ease);
+            margin-bottom: 20px;
+            position: relative;
         }
-        
-        .upload-area:hover { border-color: #764ba2; background: #f8f9ff; }
-        .upload-area.dragover { border-color: #27ae60; background: #e8f8f5; }
-        
-        #fileInput { display: none; }
-        
-        .controls {
-            padding: 30px;
-            background: white;
-            display: grid;
-            grid-template-columns: 1fr 1fr auto auto;
-            gap: 20px;
-            align-items: end;
+
+        .upload-area:hover {
+            border-color: var(--cyan);
+            background: var(--surface-hover);
         }
-        
-        .control-group label {
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 0.95em;
-            display: block;
-            margin-bottom: 8px;
+
+        .upload-area.dragover {
+            border-color: var(--green);
+            background: var(--green-dim);
         }
-        
-        .control-group input {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            width: 100%;
+
+        .upload-area.clipboard-flash {
+            border-color: var(--violet);
+            background: var(--violet-dim);
         }
-        
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-secondary { background: #95a5a6; color: white; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .stats {
-            padding: 30px;
-            background: #f8f9fa;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-left: 5px solid #667eea;
-        }
-        
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        
-        .preview-grid {
-            padding: 30px;
-            background: white;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .preview-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .preview-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        
-        .preview-image {
-            width: 100%;
-            height: 200px;
-            background: #ecf0f1;
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            background: var(--cyan-dim);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3em;
+        }
+
+        .upload-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--cyan);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .upload-title {
+            font-family: var(--font-mono);
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .upload-desc {
+            font-size: 0.88em;
+            color: var(--text-secondary);
+        }
+
+        .upload-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 14px;
+            padding: 5px 12px;
+            background: var(--violet-dim);
+            border-radius: 999px;
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--violet);
+            font-weight: 500;
+        }
+
+        .upload-hint kbd {
+            display: inline-block;
+            padding: 1px 6px;
+            background: rgba(124, 58, 237, 0.12);
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 1em;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        #fileInput { display: none; }
+
+        /* ── Controls ── */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto auto;
+            gap: 12px;
+            align-items: end;
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+
+        .control-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            color: var(--text-primary);
+            background: var(--surface);
+            transition: border-color 0.2s var(--ease);
+        }
+
+        .control-group input:focus {
+            outline: none;
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px var(--cyan-dim);
+        }
+
+        .control-group input[readonly] {
+            background: var(--bg);
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s var(--ease);
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--cyan);
+            color: #fff;
+            border-color: var(--cyan);
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-secondary);
+            border-color: var(--border);
+        }
+        .btn-secondary:hover {
+            border-color: var(--border-active);
+            color: var(--text-primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ── Stats ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s var(--ease);
+        }
+
+        .stat-block::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--cyan);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .stat-block:hover {
+            border-color: var(--border-active);
+            transform: translateY(-2px);
+        }
+        .stat-block:hover::before { opacity: 1; }
+
+        .stat-block .stat-val {
+            font-family: var(--font-mono);
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--cyan);
+            line-height: 1;
+        }
+
+        .stat-block .stat-lbl {
+            font-size: 0.76em;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .stat-block.stat-green .stat-val { color: var(--green); }
+        .stat-block.stat-green::before { background: var(--green); }
+        .stat-block.stat-amber .stat-val { color: var(--amber); }
+        .stat-block.stat-amber::before { background: var(--amber); }
+        .stat-block.stat-red .stat-val { color: var(--red); }
+        .stat-block.stat-red::before { background: var(--red); }
+        .stat-block.stat-violet .stat-val { color: var(--violet); }
+        .stat-block.stat-violet::before { background: var(--violet); }
+
+        /* ── Progress ── */
+        .progress-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .progress-section.active { display: block; }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-title {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .progress-pct {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--cyan);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg);
+            border-radius: 4px;
             overflow: hidden;
         }
-        
+
+        .progress-fill {
+            height: 100%;
+            background: var(--cyan);
+            border-radius: 4px;
+            transition: width 0.3s var(--ease);
+            width: 0%;
+        }
+
+        /* ── Preview Grid ── */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .preview-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.25s var(--ease);
+        }
+
+        .preview-card:hover {
+            border-color: var(--border-active);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 180px;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+        }
+
         .preview-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
-        .preview-info { padding: 15px; }
-        
+
+        .preview-info { padding: 16px; }
+
         .preview-name {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            word-break: break-all;
-            font-size: 0.95em;
-        }
-        
-        .preview-size {
-            color: #7f8c8d;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-        
-        .preview-url {
-            background: #ecf0f1;
-            padding: 8px;
-            border-radius: 5px;
+            font-family: var(--font-mono);
+            font-weight: 600;
             font-size: 0.85em;
-            color: #667eea;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        .preview-size {
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            font-size: 0.78em;
+            margin-bottom: 10px;
+        }
+
+        .preview-url {
+            background: var(--bg);
+            padding: 8px 10px;
+            border-radius: var(--radius-xs);
+            font-family: var(--font-mono);
+            font-size: 0.75em;
+            color: var(--cyan);
             word-break: break-all;
             margin-bottom: 10px;
-            max-height: 60px;
+            max-height: 52px;
             overflow: auto;
+            border: 1px solid var(--border);
         }
-        
+
         .preview-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
-        
+
         .btn-small {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            background: #667eea;
-            color: white;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: all 0.3s ease;
             flex: 1;
+            padding: 7px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            background: var(--surface);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            font-weight: 500;
+            transition: all 0.2s var(--ease);
         }
-        
-        .btn-small:hover { background: #764ba2; }
-        
+
+        .btn-small:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            background: var(--cyan-dim);
+        }
+
+        /* ── Status Badges ── */
         .status-badge {
             display: inline-block;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            font-weight: bold;
-            margin-bottom: 10px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
-        
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-uploading { background: #cfe2ff; color: #084298; }
-        .status-success { background: #d1e7dd; color: #0f5132; }
-        .status-error { background: #f8d7da; color: #842029; }
-        
-        .progress-section {
-            padding: 30px;
-            background: white;
-            border-top: 2px solid #e0e0e0;
-            display: none;
-        }
-        
-        .progress-section.active { display: block; }
-        
-        .progress-bar {
-            width: 100%;
-            height: 30px;
-            background: #ecf0f1;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-        
+
+        .status-pending { background: var(--amber-dim); color: var(--amber); }
+        .status-uploading { background: var(--cyan-dim); color: var(--cyan); }
+        .status-success { background: var(--green-dim); color: var(--green); }
+        .status-error { background: var(--red-dim); color: var(--red); }
+
+        /* ── Toast ── */
         .toast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: #27ae60;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            font-weight: 500;
+            color: #fff;
+            background: var(--green);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
+            transform: translateY(12px);
+            transition: all 0.3s var(--ease);
             z-index: 1000;
         }
-        
+
         .toast.show {
             opacity: 1;
             transform: translateY(0);
         }
-        
+
+        /* ── Empty State ── */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+            font-size: 0.92em;
+        }
+
+        /* ── Load animation ── */
+        .shell > * {
+            animation: fadeUp 0.4s var(--ease) both;
+        }
+        .shell > *:nth-child(2) { animation-delay: 0.05s; }
+        .shell > *:nth-child(3) { animation-delay: 0.10s; }
+        .shell > *:nth-child(4) { animation-delay: 0.15s; }
+        .shell > *:nth-child(5) { animation-delay: 0.20s; }
+        .shell > *:nth-child(6) { animation-delay: 0.25s; }
+        .shell > *:nth-child(7) { animation-delay: 0.30s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Responsive ── */
         @media (max-width: 768px) {
+            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
             .controls { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
             .preview-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="shell">
+        <!-- Header -->
         <div class="header">
-            <h1>☁️ Cloudinary 업로드 대시보드</h1>
-            <p>S25016 프로젝트 파일 관리 시스템</p>
-        </div>
-
-        <div class="upload-section">
-            <div class="upload-area" id="uploadArea">
-                <div style="font-size: 4em; margin-bottom: 20px;">📁</div>
-                <div style="font-size: 1.3em; color: #2c3e50; margin-bottom: 10px;">
-                    파일을 드래그하거나 클릭하여 선택
-                </div>
-                <div style="color: #7f8c8d; font-size: 0.95em;">
-                    여러 파일 동시 업로드 가능 (이미지, PDF, 문서 등)
-                </div>
+            <div class="header-left">
+                <span class="header-tag">S25016 // File Manager</span>
+                <h1>Cloudinary Upload</h1>
+                <span class="header-sub">Drag &amp; Drop, Browse, or Clipboard Paste</span>
             </div>
-            <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.txt">
+            <a class="back-link" href="/">&larr; Dashboard</a>
         </div>
 
+        <!-- Upload Area -->
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="upload-title">Drop files here or click to browse</div>
+            <div class="upload-desc">Images, PDF, documents — multiple files supported</div>
+            <div class="upload-hint"><kbd>Ctrl</kbd>+<kbd>V</kbd> Clipboard paste supported</div>
+        </div>
+        <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.txt">
+
+        <!-- Controls -->
         <div class="controls">
             <div class="control-group">
-                <label for="folderInput">📂 Cloudinary 폴더</label>
+                <label for="folderInput">Folder</label>
                 <input type="text" id="folderInput" placeholder="s25016" value="s25016">
             </div>
             <div class="control-group">
-                <label>📊 선택된 파일</label>
-                <input type="text" id="fileCountDisplay" value="0개" readonly>
+                <label>Selected</label>
+                <input type="text" id="fileCountDisplay" value="0 files" readonly>
             </div>
-            <button class="btn btn-primary" id="uploadBtn" disabled>🚀 업로드 시작</button>
-            <button class="btn btn-secondary" id="clearBtn">🗑️ 초기화</button>
+            <button class="btn btn-primary" id="uploadBtn" disabled>Upload</button>
+            <button class="btn btn-secondary" id="clearBtn">Clear</button>
         </div>
 
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalFiles">0</div>
-                <div class="stat-label">선택된 파일</div>
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-block">
+                <div class="stat-val" id="totalFiles">0</div>
+                <div class="stat-lbl">Selected</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="uploadedFiles">0</div>
-                <div class="stat-label">업로드 완료</div>
+            <div class="stat-block stat-green">
+                <div class="stat-val" id="uploadedFiles">0</div>
+                <div class="stat-lbl">Uploaded</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="failedFiles">0</div>
-                <div class="stat-label">업로드 실패</div>
+            <div class="stat-block stat-red">
+                <div class="stat-val" id="failedFiles">0</div>
+                <div class="stat-lbl">Failed</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalSize">0 MB</div>
-                <div class="stat-label">총 파일 크기</div>
+            <div class="stat-block stat-violet">
+                <div class="stat-val" id="totalSize">0 MB</div>
+                <div class="stat-lbl">Total Size</div>
             </div>
         </div>
 
+        <!-- Progress -->
         <div class="progress-section" id="progressSection">
-            <h3 style="margin-bottom: 15px;">업로드 진행 중...</h3>
+            <div class="progress-header">
+                <span class="progress-title">Uploading...</span>
+                <span class="progress-pct" id="progressPct">0%</span>
+            </div>
             <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+                <div class="progress-fill" id="progressFill"></div>
             </div>
         </div>
 
+        <!-- Preview Grid -->
         <div class="preview-grid" id="previewGrid"></div>
     </div>
 
