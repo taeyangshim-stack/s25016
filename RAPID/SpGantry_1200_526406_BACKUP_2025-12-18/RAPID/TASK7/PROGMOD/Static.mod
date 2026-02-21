@@ -180,11 +180,13 @@ MODULE Static
         IF Present(R2)=TRUE THEN
             ! R2 not configured with gantry - manual floor coordinate calculation
             ! R2 base_frame_orient inverts Z axis, so Z sign must be corrected
+            ! pR2.y includes 488mm base-to-R-axis offset (LOCKED_EAW_11)
+            ! Subtract before rotation to use R-axis center as rotation origin
             pR2:=CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobj0);
             gantryAngle:=MonitorPosition.monExt.eax_d;
 
-            nRotX:=(pR2.trans.x*Cos(gantryAngle))-(pR2.trans.y*Sin(gantryAngle));
-            nRotY:=(pR2.trans.x*Sin(gantryAngle))+(pR2.trans.y*Cos(gantryAngle));
+            nRotX:=(pR2.trans.x*Cos(gantryAngle))-((pR2.trans.y-488)*Sin(gantryAngle));
+            nRotY:=(pR2.trans.x*Sin(gantryAngle))+((pR2.trans.y-488)*Cos(gantryAngle));
 
             result:=pR2;
             result.trans.x:=MonitorPosition.monExt.eax_a+nRotX;
