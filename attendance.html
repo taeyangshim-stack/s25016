@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>52-Hour Monitor — S25016</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #f0f2f5;
+            --bg: #f7f8fa;
+            --surface: #ffffff;
+            --surface-hover: #f0f4ff;
+            --border: #e2e6ef;
+            --border-active: #b0c4ff;
+            --text-primary: #1a2035;
+            --text-secondary: #5a6580;
+            --text-muted: #8892a8;
+            --cyan: #2563eb;
+            --cyan-dim: rgba(37, 99, 235, 0.07);
+            --green: #16a34a;
+            --green-dim: rgba(22, 163, 74, 0.07);
+            --red: #dc2626;
+            --red-dim: rgba(220, 38, 38, 0.06);
+            --amber: #d97706;
+            --amber-dim: rgba(217, 119, 6, 0.07);
+            --violet: #7c3aed;
+            --violet-dim: rgba(124, 58, 237, 0.07);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+            --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-deep);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(37,99,235,0.04) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* ── Header ── */
+        .header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 32px 8px 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        .header-left { display: flex; flex-direction: column; gap: 4px; }
+        .header-tag { font-family: var(--font-mono); font-size: 0.72em; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600; opacity: 0.8; }
+        .header h1 { font-family: var(--font-mono); font-size: 1.6em; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        .header-sub { font-size: 0.88em; color: var(--text-secondary); margin-top: 2px; }
+        .back-link { font-family: var(--font-mono); font-size: 0.82em; color: var(--cyan); text-decoration: none; padding: 6px 14px; background: var(--cyan-dim); border-radius: 999px; border: 1px solid rgba(37,99,235,0.15); transition: all 0.2s var(--ease); white-space: nowrap; }
+        .back-link:hover { background: rgba(37,99,235,0.12); border-color: var(--cyan); }
+
+        /* ── Week Selector ── */
+        .week-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .week-nav {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 14px;
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s var(--ease);
+        }
+        .week-nav:hover { border-color: var(--cyan); color: var(--cyan); }
+        .week-label {
+            font-family: var(--font-mono);
+            font-size: 0.92em;
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 260px;
+            text-align: center;
+        }
+
+        /* ── Stats ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s var(--ease);
+        }
+        .stat-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--cyan); opacity: 0; transition: opacity 0.25s; }
+        .stat-block:hover { border-color: var(--border-active); transform: translateY(-2px); }
+        .stat-block:hover::before { opacity: 1; }
+        .stat-block .stat-val { font-family: var(--font-mono); font-size: 1.8em; font-weight: 700; color: var(--cyan); line-height: 1; }
+        .stat-block .stat-unit { font-size: 0.45em; color: var(--text-muted); font-weight: 500; margin-left: 2px; }
+        .stat-block .stat-lbl { font-size: 0.76em; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
+
+        .stat-block.stat-green .stat-val { color: var(--green); }
+        .stat-block.stat-green::before { background: var(--green); }
+        .stat-block.stat-amber .stat-val { color: var(--amber); }
+        .stat-block.stat-amber::before { background: var(--amber); }
+        .stat-block.stat-red .stat-val { color: var(--red); }
+        .stat-block.stat-red::before { background: var(--red); }
+
+        /* ── Person Cards ── */
+        .person-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .person-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.25s var(--ease);
+        }
+        .person-card:hover { border-color: var(--border-active); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+
+        .person-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .person-name { font-family: var(--font-mono); font-size: 0.95em; font-weight: 700; color: var(--text-primary); }
+        .person-badge {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+        .badge-safe { background: var(--green-dim); color: var(--green); }
+        .badge-warn { background: var(--amber-dim); color: var(--amber); }
+        .badge-over { background: var(--red-dim); color: var(--red); }
+
+        .person-body { padding: 20px; }
+
+        /* Bar */
+        .hour-bar-wrap {
+            margin-bottom: 14px;
+        }
+        .hour-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.78em;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .hour-bar-label .val { color: var(--text-primary); }
+        .hour-bar-label .limit { color: var(--text-muted); }
+
+        .hour-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--bg);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        .hour-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s var(--ease);
+        }
+        .hour-bar-fill.safe { background: var(--green); }
+        .hour-bar-fill.warn { background: var(--amber); }
+        .hour-bar-fill.over { background: var(--red); }
+
+        /* 52h marker line */
+        .hour-bar .marker-52 {
+            position: absolute;
+            top: -2px;
+            bottom: -2px;
+            width: 2px;
+            background: var(--red);
+            opacity: 0.4;
+        }
+
+        /* Day detail */
+        .day-list { list-style: none; }
+        .day-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85em;
+        }
+        .day-list li:last-child { border-bottom: none; }
+        .day-date { font-family: var(--font-mono); color: var(--text-secondary); font-weight: 500; }
+        .day-hours { font-family: var(--font-mono); font-weight: 600; }
+        .day-hours.zero { color: var(--text-muted); }
+
+        /* ── Card ── */
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .card-title { font-family: var(--font-mono); font-size: 0.92em; font-weight: 600; color: var(--text-primary); }
+
+        .summary-table { width: 100%; border-collapse: collapse; }
+        .summary-table th {
+            padding: 10px 16px; text-align: left; font-family: var(--font-mono); font-size: 0.72em; font-weight: 600;
+            color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; background: var(--bg); border-bottom: 1px solid var(--border);
+        }
+        .summary-table td { padding: 11px 16px; font-size: 0.88em; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+        .summary-table tbody tr:hover { background: var(--surface-hover); }
+        .summary-table tbody tr:last-child td { border-bottom: none; }
+
+        .hours-cell { font-family: var(--font-mono); font-weight: 600; }
+        .hours-cell.safe { color: var(--green); }
+        .hours-cell.warn { color: var(--amber); }
+        .hours-cell.over { color: var(--red); }
+
+        .no-data { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 0.88em; }
+
+        /* ── Animation ── */
+        .shell > * { animation: fadeUp 0.4s var(--ease) both; }
+        .shell > *:nth-child(2) { animation-delay: 0.05s; }
+        .shell > *:nth-child(3) { animation-delay: 0.10s; }
+        .shell > *:nth-child(4) { animation-delay: 0.15s; }
+        .shell > *:nth-child(5) { animation-delay: 0.20s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .person-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <span class="header-tag">S25016 // 52-Hour Monitor</span>
+                <h1>Weekly Hours</h1>
+                <span class="header-sub">주 52시간 근무현황 모니터링</span>
+            </div>
+            <a class="back-link" href="/projects/work-management/index.html">&larr; Work Mgmt</a>
+        </div>
+
+        <!-- Week Selector -->
+        <div class="week-selector">
+            <button class="week-nav" onclick="changeWeek(-1)">&larr; Prev</button>
+            <span class="week-label" id="weekLabel">--</span>
+            <button class="week-nav" onclick="changeWeek(1)">Next &rarr;</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-block stat-green">
+                <div class="stat-val" id="statTotal">0<span class="stat-unit">명</span></div>
+                <div class="stat-lbl">Total Personnel</div>
+            </div>
+            <div class="stat-block stat-green">
+                <div class="stat-val" id="statSafe">0<span class="stat-unit">명</span></div>
+                <div class="stat-lbl">Safe (&lt;45h)</div>
+            </div>
+            <div class="stat-block stat-amber">
+                <div class="stat-val" id="statWarn">0<span class="stat-unit">명</span></div>
+                <div class="stat-lbl">Warning (45-52h)</div>
+            </div>
+            <div class="stat-block stat-red">
+                <div class="stat-val" id="statOver">0<span class="stat-unit">명</span></div>
+                <div class="stat-lbl">Over (&gt;52h)</div>
+            </div>
+        </div>
+
+        <!-- Person Cards -->
+        <div class="person-grid" id="personGrid">
+            <div class="no-data">Loading records...</div>
+        </div>
+
+        <!-- Summary Table -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Weekly Summary</span>
+            </div>
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                        <th>Sun</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody">
+                    <tr><td colspan="10" class="no-data">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var SCRIPT_URL = '/api/work-records';
+        var allRecords = [];
+        var currentWeekOffset = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRecords();
+        });
+
+        async function loadRecords() {
+            try {
+                var response = await fetch(SCRIPT_URL + '?action=getAllRecords');
+                var data = await response.json();
+                if (data.error) throw new Error(data.error);
+
+                allRecords = data.map(function(row) {
+                    return {
+                        date: row['날짜'] || '',
+                        name: row['인원'] || '',
+                        checkIn: row['입실시간'] || '-',
+                        checkOut: row['퇴실시간'] || '-'
+                    };
+                });
+            } catch (e) {
+                // fallback: localStorage
+                var saved = JSON.parse(localStorage.getItem('workRecords') || '[]');
+                allRecords = saved.map(function(r) {
+                    return { date: r.date, name: r.name, checkIn: r.checkIn || '-', checkOut: r.checkOut || '-' };
+                });
+            }
+            render();
+        }
+
+        function getWeekRange(offset) {
+            var now = new Date();
+            var day = now.getDay(); // 0=Sun
+            var mondayOffset = day === 0 ? -6 : 1 - day;
+            var monday = new Date(now);
+            monday.setDate(now.getDate() + mondayOffset + (offset * 7));
+            monday.setHours(0, 0, 0, 0);
+
+            var sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            var dates = [];
+            for (var i = 0; i < 7; i++) {
+                var d = new Date(monday);
+                d.setDate(monday.getDate() + i);
+                dates.push(formatDate(d));
+            }
+
+            return { monday: monday, sunday: sunday, dates: dates };
+        }
+
+        function formatDate(d) {
+            return d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+        }
+
+        function formatShortDate(dateStr) {
+            var parts = dateStr.split('-');
+            return parts[1] + '/' + parts[2];
+        }
+
+        function calcHours(checkIn, checkOut) {
+            if (!checkIn || !checkOut || checkIn === '-' || checkOut === '-') return 0;
+            var inParts = checkIn.split(':');
+            var outParts = checkOut.split(':');
+            var inMin = parseInt(inParts[0]) * 60 + parseInt(inParts[1]);
+            var outMin = parseInt(outParts[0]) * 60 + parseInt(outParts[1]);
+            var diff = outMin - inMin;
+            if (diff < 0) diff += 24 * 60; // overnight
+            return diff / 60;
+        }
+
+        function getStatus(hours) {
+            if (hours > 52) return 'over';
+            if (hours >= 45) return 'warn';
+            return 'safe';
+        }
+
+        function getStatusLabel(status) {
+            if (status === 'over') return 'OVER';
+            if (status === 'warn') return 'WARN';
+            return 'SAFE';
+        }
+
+        var DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        function changeWeek(dir) {
+            currentWeekOffset += dir;
+            render();
+        }
+
+        function render() {
+            var week = getWeekRange(currentWeekOffset);
+
+            // Update week label
+            document.getElementById('weekLabel').textContent =
+                formatShortDate(week.dates[0]) + ' — ' + formatShortDate(week.dates[6]) +
+                (currentWeekOffset === 0 ? '  (This Week)' : '');
+
+            // Filter records for this week
+            var weekRecords = allRecords.filter(function(r) {
+                return r.date >= week.dates[0] && r.date <= week.dates[6];
+            });
+
+            // Group by person
+            var peopleMap = {};
+            weekRecords.forEach(function(r) {
+                if (!r.name) return;
+                if (!peopleMap[r.name]) {
+                    peopleMap[r.name] = {};
+                    week.dates.forEach(function(d) { peopleMap[r.name][d] = 0; });
+                }
+                var hours = calcHours(r.checkIn, r.checkOut);
+                peopleMap[r.name][r.date] = (peopleMap[r.name][r.date] || 0) + hours;
+            });
+
+            var people = Object.keys(peopleMap).sort();
+
+            // Stats
+            var safe = 0, warn = 0, over = 0;
+            people.forEach(function(name) {
+                var total = week.dates.reduce(function(s, d) { return s + (peopleMap[name][d] || 0); }, 0);
+                var status = getStatus(total);
+                if (status === 'safe') safe++;
+                else if (status === 'warn') warn++;
+                else over++;
+            });
+
+            document.getElementById('statTotal').innerHTML = people.length + '<span class="stat-unit">명</span>';
+            document.getElementById('statSafe').innerHTML = safe + '<span class="stat-unit">명</span>';
+            document.getElementById('statWarn').innerHTML = warn + '<span class="stat-unit">명</span>';
+            document.getElementById('statOver').innerHTML = over + '<span class="stat-unit">명</span>';
+
+            // Person cards
+            var grid = document.getElementById('personGrid');
+            if (people.length === 0) {
+                grid.innerHTML = '<div class="no-data">No records for this week.</div>';
+            } else {
+                grid.innerHTML = people.map(function(name) {
+                    var dayData = peopleMap[name];
+                    var total = week.dates.reduce(function(s, d) { return s + (dayData[d] || 0); }, 0);
+                    var status = getStatus(total);
+                    var pct = Math.min((total / 60) * 100, 100);
+                    var marker52pct = (52 / 60) * 100;
+
+                    var dayListHTML = week.dates.map(function(d, i) {
+                        var h = dayData[d] || 0;
+                        return '<li>' +
+                            '<span class="day-date">' + DAY_NAMES[i] + ' ' + formatShortDate(d) + '</span>' +
+                            '<span class="day-hours' + (h === 0 ? ' zero' : '') + '">' + h.toFixed(1) + 'h</span>' +
+                        '</li>';
+                    }).join('');
+
+                    return '<div class="person-card">' +
+                        '<div class="person-header">' +
+                            '<span class="person-name">' + name + '</span>' +
+                            '<span class="person-badge badge-' + status + '">' + getStatusLabel(status) + '</span>' +
+                        '</div>' +
+                        '<div class="person-body">' +
+                            '<div class="hour-bar-wrap">' +
+                                '<div class="hour-bar-label">' +
+                                    '<span class="val">' + total.toFixed(1) + 'h</span>' +
+                                    '<span class="limit">/ 52h</span>' +
+                                '</div>' +
+                                '<div class="hour-bar">' +
+                                    '<div class="hour-bar-fill ' + status + '" style="width:' + pct + '%"></div>' +
+                                    '<div class="marker-52" style="left:' + marker52pct + '%"></div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<ul class="day-list">' + dayListHTML + '</ul>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+            }
+
+            // Summary table
+            var tbody = document.getElementById('summaryBody');
+            if (people.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="no-data">No data.</td></tr>';
+            } else {
+                tbody.innerHTML = people.map(function(name) {
+                    var dayData = peopleMap[name];
+                    var total = week.dates.reduce(function(s, d) { return s + (dayData[d] || 0); }, 0);
+                    var status = getStatus(total);
+
+                    var dayCells = week.dates.map(function(d) {
+                        var h = dayData[d] || 0;
+                        return '<td class="hours-cell' + (h === 0 ? '' : ' safe') + '">' + (h > 0 ? h.toFixed(1) : '-') + '</td>';
+                    }).join('');
+
+                    return '<tr>' +
+                        '<td style="font-weight:600;">' + name + '</td>' +
+                        dayCells +
+                        '<td class="hours-cell ' + status + '">' + total.toFixed(1) + 'h</td>' +
+                        '<td><span class="person-badge badge-' + status + '">' + getStatusLabel(status) + '</span></td>' +
+                    '</tr>';
+                }).join('');
+            }
+        }
+    </script>
+</body>
+</html>
