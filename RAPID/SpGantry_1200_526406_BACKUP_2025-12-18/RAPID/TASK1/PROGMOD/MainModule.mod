@@ -1698,12 +1698,14 @@ PERS num debug_r2_floor_y_offset := 0;
 
 		! Update WobjGantry to reflect current gantry position
 		UpdateGantryWobj;
-		! tWeld1 TCP HOME: [0, 0, 1000] in WobjGantry
-		! Orientation: [0.45452,-0.54167,0.54167,0.45453] (taught for tWeld1)
-		! Confdata: [-1,-1,0,4] (taught - critical for tWeld1 config)
-		sync_pos := CJointT();
-		home_tcp := [[0, 0, 1000], [0.45452, -0.54167, 0.54167, 0.45453], [-1, -1, 0, 4], sync_pos.extax];
-		MoveJ home_tcp, v100, fine, tWeld1\WObj:=WobjGantry;
+		! v1.9.51: Use current orientation from Step 1 joints (not hardcoded)
+		! At R!=0, hardcoded orient requires different joint config -> abnormal posture
+		! CRobT gives orientation matching current (correct) joints
+		home_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
+		home_tcp.trans.x := 0;
+		home_tcp.trans.y := 0;
+		home_tcp.trans.z := 1000;
+		MoveL home_tcp, v100, fine, tWeld1\WObj:=WobjGantry;
 		! Iterative refinement to reach precise R-axis center (max 3 iterations)
 		WHILE iteration < max_iterations DO
 			iteration := iteration + 1;
@@ -1719,10 +1721,12 @@ PERS num debug_r2_floor_y_offset := 0;
 				! Force loop exit by setting iteration >= max_iterations (BREAK has issues)
 				iteration := max_iterations;
 			ELSE
-				! Apply correction in WobjGantry coordinates
+				! v1.9.51: Use current orientation (preserve joint config)
 				UpdateGantryWobj;
-				sync_pos := CJointT();
-				home_tcp := [[error_x, error_y, 1000], [0.45452, -0.54167, 0.54167, 0.45453], [-1, -1, 0, 4], sync_pos.extax];
+				home_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
+				home_tcp.trans.x := home_tcp.trans.x + error_x;
+				home_tcp.trans.y := home_tcp.trans.y + error_y;
+				home_tcp.trans.z := 1000;
 				MoveL home_tcp, v50, fine, tWeld1\WObj:=WobjGantry;
 			ENDIF
 		ENDWHILE
@@ -2745,6 +2749,111 @@ ERROR
 ENDPROC
 
 ! ========================================
+! TestInitNonHome - Automated Non-HOME Init Verification (v1.9.50)
+! ========================================
+! Purpose: Verify SetRobot1InitialPosition works correctly when gantry
+!          starts at non-HOME positions (4 scenarios: HOME, R=30, XYZ, XYZ+R=30)
+! Output:  HOME:/test_init_nonhome.txt
+PROC TestInitNonHome()
+    VAR iodev test_logfile;
+    VAR jointtarget gantry_pos;
+    VAR robtarget tcp_gantry;
+    VAR robtarget tcp_floor;
+    VAR num test_floor_x{4};
+    VAR num test_floor_y{4};
+    VAR num test_floor_z{4};
+    VAR num test_floor_r{4};
+    VAR string test_name{4};
+    VAR num pass_count;
+    VAR num err_x;
+    VAR num err_y;
+    VAR num err_z;
+    VAR bool scenario_pass;
+    VAR string result_str;
+    VAR jointtarget jt_after;
+
+    ! Define 4 test scenarios (Floor coordinates)
+    test_name{1} := "A:HOME";        test_floor_x{1}:=9500; test_floor_y{1}:=5300; test_floor_z{1}:=2100; test_floor_r{1}:=0;
+    test_name{2} := "B:R=30";        test_floor_x{2}:=9500; test_floor_y{2}:=5300; test_floor_z{2}:=2100; test_floor_r{2}:=30;
+    test_name{3} := "C:XYZ";         test_floor_x{3}:=8500; test_floor_y{3}:=5000; test_floor_z{3}:=1900; test_floor_r{3}:=0;
+    test_name{4} := "D:XYZ+R=30";    test_floor_x{4}:=8500; test_floor_y{4}:=5000; test_floor_z{4}:=1900; test_floor_r{4}:=30;
+
+    Open "HOME:/test_init_nonhome.txt", test_logfile \Write;
+    Write test_logfile, "=== TestInitNonHome (" + TASK1_VERSION + ") ===";
+    Write test_logfile, "Date=" + CDate() + " Time=" + CTime();
+    Write test_logfile, "";
+    WaitTime 0.3;
+
+    pass_count := 0;
+
+    FOR i FROM 1 TO 4 DO
+        TPWrite "--- Scenario " + test_name{i} + " ---";
+        Write test_logfile, "========================================";
+        Write test_logfile, "Scenario " + test_name{i};
+        Write test_logfile, "  Floor: X=" + NumToStr(test_floor_x{i},0) + " Y=" + NumToStr(test_floor_y{i},0) + " Z=" + NumToStr(test_floor_z{i},0) + " R=" + NumToStr(test_floor_r{i},0);
+
+        ! Convert Floor -> Physical and move gantry
+        gantry_pos := CJointT();
+        gantry_pos.extax.eax_a := test_floor_x{i} - 9500;
+        gantry_pos.extax.eax_b := 5300 - test_floor_y{i};
+        gantry_pos.extax.eax_c := 2100 - test_floor_z{i};
+        gantry_pos.extax.eax_d := 0 - test_floor_r{i};
+        gantry_pos.extax.eax_f := test_floor_x{i} - 9500;  ! X2=X1
+        MoveAbsJ gantry_pos, v200, fine, tool0;
+        WaitTime 0.5;
+
+        Write test_logfile, "  Phys: eax_a=" + NumToStr(gantry_pos.extax.eax_a,1) + " b=" + NumToStr(gantry_pos.extax.eax_b,1) + " c=" + NumToStr(gantry_pos.extax.eax_c,1) + " d=" + NumToStr(gantry_pos.extax.eax_d,1);
+        Write test_logfile, "  Calling SetRobot1InitialPosition...";
+        WaitTime 0.2;
+
+        ! Call init (this moves gantry back to HOME internally at Step 3)
+        SetRobot1InitialPosition;
+
+        ! After init: gantry is at HOME, robot TCP should be correct
+        ! Read TCP in WobjGantry (should be near [0, 0, 1000])
+        UpdateGantryWobj;
+        tcp_gantry := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
+        ! Read TCP in WobjFloor (should be consistent across all scenarios)
+        tcp_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
+
+        err_x := Abs(tcp_gantry.trans.x - 0);
+        err_y := Abs(tcp_gantry.trans.y - 0);
+        err_z := Abs(tcp_gantry.trans.z - 1000);
+        scenario_pass := (err_x < 1) AND (err_y < 1) AND (err_z < 1);
+
+        IF scenario_pass THEN
+            pass_count := pass_count + 1;
+            result_str := "PASS";
+        ELSE
+            result_str := "FAIL";
+        ENDIF
+
+        ! Read joint angles after init
+        jt_after := CJointT();
+
+        Write test_logfile, "  Result: " + result_str;
+        Write test_logfile, "  TCP_Gantry: [" + NumToStr(tcp_gantry.trans.x,3) + ", " + NumToStr(tcp_gantry.trans.y,3) + ", " + NumToStr(tcp_gantry.trans.z,3) + "]";
+        Write test_logfile, "  TCP_Gantry orient: [" + NumToStr(tcp_gantry.rot.q1,5) + ", " + NumToStr(tcp_gantry.rot.q2,5) + ", " + NumToStr(tcp_gantry.rot.q3,5) + ", " + NumToStr(tcp_gantry.rot.q4,5) + "]";
+        Write test_logfile, "  TCP_Floor: [" + NumToStr(tcp_floor.trans.x,1) + ", " + NumToStr(tcp_floor.trans.y,1) + ", " + NumToStr(tcp_floor.trans.z,1) + "]";
+        Write test_logfile, "  Joints: [" + NumToStr(jt_after.robax.rax_1,2) + ", " + NumToStr(jt_after.robax.rax_2,2) + ", " + NumToStr(jt_after.robax.rax_3,2) + ", " + NumToStr(jt_after.robax.rax_4,2) + ", " + NumToStr(jt_after.robax.rax_5,2) + ", " + NumToStr(jt_after.robax.rax_6,2) + "]";
+        Write test_logfile, "  Error: dX=" + NumToStr(err_x,3) + " dY=" + NumToStr(err_y,3) + " dZ=" + NumToStr(err_z,3);
+        Write test_logfile, "";
+        WaitTime 0.3;
+
+        TPWrite test_name{i} + ": " + result_str + " dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2);
+    ENDFOR
+
+    ! Summary
+    Write test_logfile, "========================================";
+    Write test_logfile, "SUMMARY: " + NumToStr(pass_count,0) + "/4 PASSED";
+    Write test_logfile, "========================================";
+    Close test_logfile;
+
+    TPWrite "TestInitNonHome: " + NumToStr(pass_count,0) + "/4 passed";
+    TPWrite "Log: HOME:/test_init_nonhome.txt";
+ENDPROC
+
+! ========================================
 ! Test Menu System (v1.9.2)
 ! ========================================
 ! Purpose: TP-based menu for test selection
@@ -2765,7 +2874,7 @@ PROC TestMenu()
 		! Display menu
 		TPErase;
 		TPWrite "========================================";
-		TPWrite "  S25016 SpGantry Test Menu (v2.6.0)";
+		TPWrite "  S25016 SpGantry Test Menu (v2.7.0)";
 		TPWrite "========================================";
 		TPWrite "";
 		TPWrite "  1. Sync X1/X2 (Check + Auto-fix)";
@@ -2779,12 +2888,13 @@ PROC TestMenu()
 		TPWrite "  9. Edge to Weld + Robot1 Move";
 		TPWrite " 10. Multi-Position Test (5 locations)";
 		TPWrite " 11. Full Weld Seq (Gantry+R1+R2 sync)";
+		TPWrite " 12. Init Non-HOME Test (4 scenarios)";
 		TPWrite "  0. Exit";
 		TPWrite "";
 		TPWrite "----------------------------------------";
 
 		! Numeric selection
-		TPReadNum menu_sel, "Select (0-11): ";
+		TPReadNum menu_sel, "Select (0-12): ";
 
 		TEST menu_sel
 		CASE 1:
@@ -2874,13 +2984,21 @@ PROC TestMenu()
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
+		CASE 12:
+			TPErase;
+			TPWrite "[Menu] Init Non-HOME Test (v1.9.49 verification)...";
+			TestInitNonHome;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
 		CASE 0:
 			TPErase;
 			TPWrite "[Menu] Exiting Test Menu...";
 			menu_loop := FALSE;
 
 		DEFAULT:
-			TPWrite "[Menu] Invalid selection (0-11)";
+			TPWrite "[Menu] Invalid selection (0-12)";
 			WaitTime 1;
 		ENDTEST
 	ENDWHILE

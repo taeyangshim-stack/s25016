@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.49";
+CONST string TASK1_VERSION := "v1.9.51";
 CONST string TASK2_VERSION := "v1.9.43";
 CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
@@ -24,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-21";
+CONST string BUILD_DATE := "2026-02-22";
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -46,6 +46,21 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.51 (2026-02-22) - Robot1 Init: Fix abnormal posture at R!=0
+!   - FIX: Step 2 uses CRobT current orient instead of hardcoded orient
+!   - ROOT CAUSE: Hardcoded orient [0.45452,-0.54167,...] taught at R=0
+!     At R!=0, same orient in WobjGantry requires different joint config
+!     ConfJ Off allows robot to choose abnormal posture (e.g. rax_5=-94.59)
+!   - SOLUTION: Read current orient after Step 1 (correct joints) via CRobT
+!     Position-only correction with MoveL preserves joint configuration
+!   - MoveJ -> MoveL (small distance from Step 1, config-safe)
+!
+! v1.9.50 (2026-02-22) - TestInitNonHome: Non-HOME Init Verification
+!   - ADD: TestInitNonHome PROC - 4 scenarios automated test
+!   - Scenarios: A:HOME, B:R=30, C:XYZ offset, D:XYZ+R=30 combined
+!   - Logs to HOME:/test_init_nonhome.txt with PASS/FAIL per scenario
+!   - TestMenu v2.7.0: Option 12 added
+!
 ! v1.9.49 (2026-02-21) - Robot1 Init Fix: Non-Home Gantry Position
 !   - FIX: CRobT wobj0 -> WobjGantry in iterative refinement (Step 2)
 !   - ROOT CAUSE: wobj0 gives world coords, gantry XYZ!=0 causes huge error -> unreachable
