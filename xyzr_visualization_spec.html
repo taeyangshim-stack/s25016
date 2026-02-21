@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XYZR 갠트리 시각화 요구사항 — S25016</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg-deep: #f0f2f5;
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface-hover: #f0f4ff;
+    --border: #e2e6ef;
+    --border-active: #b0c4ff;
+    --text-primary: #1a2035;
+    --text-secondary: #5a6580;
+    --text-muted: #8892a8;
+    --cyan: #2563eb;
+    --cyan-dim: rgba(37, 99, 235, 0.07);
+    --green: #16a34a;
+    --green-dim: rgba(22, 163, 74, 0.07);
+    --red: #dc2626;
+    --red-dim: rgba(220, 38, 38, 0.06);
+    --amber: #d97706;
+    --amber-dim: rgba(217, 119, 6, 0.07);
+    --violet: #7c3aed;
+    --violet-dim: rgba(124, 58, 237, 0.07);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-xs: 6px;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+    --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-deep);
+    min-height: 100vh;
+    color: var(--text-primary);
+    line-height: 1.7;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(37,99,235,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.shell {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+/* ── Header ── */
+.header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 32px 8px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+}
+.header-left { display: flex; flex-direction: column; gap: 4px; }
+.header-tag { font-family: var(--font-mono); font-size: 0.72em; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600; opacity: 0.8; }
+.header h1 { font-family: var(--font-mono); font-size: 1.45em; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+.header-sub { font-size: 0.85em; color: var(--text-secondary); margin-top: 2px; }
+.back-link { font-family: var(--font-mono); font-size: 0.82em; color: var(--cyan); text-decoration: none; padding: 6px 14px; background: var(--cyan-dim); border-radius: 999px; border: 1px solid rgba(37,99,235,0.15); transition: all 0.2s var(--ease); white-space: nowrap; }
+.back-link:hover { background: rgba(37,99,235,0.12); border-color: var(--cyan); }
+
+/* ── Section Title ── */
+.section-title {
+    font-family: var(--font-mono);
+    font-size: 1.05em;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 32px 0 16px;
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan);
+    border-radius: var(--radius-sm);
+}
+.section-title.amber { border-left-color: var(--amber); }
+.section-title.green { border-left-color: var(--green); }
+.section-title.red { border-left-color: var(--red); }
+.section-title.violet { border-left-color: var(--violet); }
+
+/* ── Card ── */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+.card-body { padding: 20px 24px; }
+.card-body p { font-size: 0.92em; margin-bottom: 10px; color: var(--text-primary); }
+.card-body ul { padding-left: 20px; margin: 8px 0; }
+.card-body li { font-size: 0.92em; margin-bottom: 6px; color: var(--text-primary); }
+.card-body li strong { color: var(--text-primary); }
+
+/* ── Code ── */
+code {
+    background: var(--cyan-dim);
+    color: var(--cyan);
+    padding: 2px 7px;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    font-weight: 500;
+}
+pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    line-height: 1.6;
+    margin: 12px 0;
+}
+pre code { background: none; color: inherit; padding: 0; font-size: 1em; }
+
+/* ── Note boxes ── */
+.note {
+    padding: 14px 18px;
+    margin: 12px 0;
+    border-radius: var(--radius-sm);
+    font-size: 0.92em;
+    line-height: 1.7;
+}
+.note-green { background: var(--green-dim); border-left: 3px solid var(--green); }
+.note-amber { background: var(--amber-dim); border-left: 3px solid var(--amber); }
+.note-red { background: var(--red-dim); border-left: 3px solid var(--red); }
+.note-cyan { background: var(--cyan-dim); border-left: 3px solid var(--cyan); }
+.note-violet { background: var(--violet-dim); border-left: 3px solid var(--violet); }
+
+/* ── Checklist ── */
+.checklist { list-style: none; padding-left: 0; }
+.checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.92em;
+}
+.checklist li:last-child { border-bottom: none; }
+.check-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    font-weight: 700;
+    margin-top: 2px;
+}
+.check-pending { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
+
+/* ── Spec Grid ── */
+.spec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0;
+}
+.spec-item {
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+.spec-label {
+    font-family: var(--font-mono);
+    font-size: 0.72em;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+}
+.spec-value {
+    font-family: var(--font-mono);
+    font-size: 0.95em;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ── Rotation Table ── */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.88em;
+}
+th {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.88em;
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+}
+td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+tr:nth-child(even) { background: var(--bg); }
+
+/* ── Animation ── */
+.shell > * { animation: fadeUp 0.4s var(--ease) both; }
+.shell > *:nth-child(2) { animation-delay: 0.05s; }
+.shell > *:nth-child(3) { animation-delay: 0.10s; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .spec-grid { grid-template-columns: 1fr; }
+    .shell { padding: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <span class="header-tag">S25016 // XYZR Gantry</span>
+            <h1>갠트리 XYZ-R T-bar 용접 시각화 요구사항</h1>
+            <span class="header-sub">시각화/시뮬레이션 플랫폼 구축 요구사항 정의서 | 2025-11-13</span>
+        </div>
+        <a class="back-link" href="index.html">&larr; Back</a>
+    </div>
+
+    <!-- 1. 시스템 개요 -->
+    <div class="section-title">1. 시스템 개요</div>
+    <div class="card">
+        <div class="card-body">
+            <ul>
+                <li>XYZ 선형축 위에 R축이 설치된 갠트리 구조이며, R축 바디에 두 대의 로봇이 부착되어 각자 한 개의 토치를 운용한다.</li>
+                <li>목적은 다양한 용접 모션 케이스를 여러 이해관계자가 직관적으로 검토할 수 있는 <strong>시각화/시뮬레이션 플랫폼</strong>을 구축하는 것이다.</li>
+                <li>주요 용접 대상은 Z축 방향으로 세워진 T-bar(ㅗ 형태)이며, 용접선은 X축 진행방향을 따른다. 갠트리 이동(X/Y/Z)과 R축 회전이 결합되어 용접을 수행한다.</li>
+            </ul>
+            <div class="spec-grid">
+                <div class="spec-item">
+                    <div class="spec-label">구조</div>
+                    <div class="spec-value">XYZ 선형축 + R축 회전</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">로봇</div>
+                    <div class="spec-value">듀얼 로봇 (2대)</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">용접 대상</div>
+                    <div class="spec-value">T-bar (ㅗ 형태)</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">용접선 방향</div>
+                    <div class="spec-value">X축 진행</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 좌표계 및 기준 -->
+    <div class="section-title">2. 좌표계 및 기준</div>
+    <div class="card">
+        <div class="card-body">
+            <ul>
+                <li>T-bar가 놓인 <strong>정반 좌표계</strong>를 절대 기준으로 사용하며 오른손 좌표계를 따른다. 이 좌표계의 X축, Y축은 각각 갠트리 X, Y축과 일치하며 Z 성분도 존재할 수 있다.</li>
+                <li>R축 중심 좌표 = <code>(Gantry_X, Gantry_Y, Gantry_Z)</code>이며, R축은 용접선(웹)과 항상 수직으로 정렬된 상태에서 회전한다.</li>
+                <li>터치 센싱으로 XYZ 오차를 보정할 수 있으며, 시퀀스 상 <strong>R축이 먼저 정렬</strong>되고 이어서 갠트리가 따라간다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 3. 로봇·바디 배치 -->
+    <div class="section-title amber">3. 로봇·바디 배치</div>
+    <div class="card">
+        <div class="card-body">
+            <ul>
+                <li>R축 하단에 하나의 바디가 있고, 이 바디 양쪽에 로봇이 설치된다.</li>
+            </ul>
+<pre><code>├─ Robot1 (R축 중심에서 +488 mm)
+└─ Robot2 (R축 중심에서 -488 mm)</code></pre>
+            <ul>
+                <li>바디를 선 또는 박스로 표현하면 직관성이 높아지며, R축 회전에 따라 바디 전체와 두 로봇이 동일한 각도로 기울어진 상태를 유지한다.</li>
+                <li>R축 회전 범위는 <strong>&pm;100&deg;</strong>이며 기본적으로 직선 용접 동안 한 번만 회전한다. 회전 후에는 갠트리 XYZ 이동이 주 모션이 되고 로봇은 위빙 및 ABB WeldGuide 보정만 수행한다.</li>
+            </ul>
+            <div class="spec-grid">
+                <div class="spec-item">
+                    <div class="spec-label">Robot1 오프셋</div>
+                    <div class="spec-value">+488 mm</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Robot2 오프셋</div>
+                    <div class="spec-value">-488 mm</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">R축 회전 범위</div>
+                    <div class="spec-value">&pm;100&deg;</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">R축 높이</div>
+                    <div class="spec-value">FL+1200 mm</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 용접 시나리오 -->
+    <div class="section-title green">4. 용접 시나리오</div>
+    <div class="card">
+        <div class="card-body">
+            <ul>
+                <li>두 로봇은 T-bar 웹의 양쪽 면을 <strong>'동시 또는 교대'</strong> 방식으로 용접한다.</li>
+                <li><strong>Option A (기본 패턴):</strong> 웹 두께 12T 기준으로 각 로봇이 한쪽 모서리에서 6mm 이동 후 1500mm 직선 용접, 다시 6mm 마감 구간을 진행한다.</li>
+                <li><strong>Option B:</strong> T-bar 좌우 대칭 소재에도 대응하며 일반적으로 교차 용접을 채택한다.</li>
+                <li>초기 구간과 종료 구간에서는 로봇이 추가 자세 제어를 하고, 본 용접 구간에서는 갠트리 이동이 주된 진행축이다.</li>
+            </ul>
+            <div class="note note-green">
+                <strong>용접 구간:</strong> 시작 6mm (자세 제어) &rarr; 본 용접 1500mm (갠트리 이동) &rarr; 마감 6mm (자세 제어)
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. R축 회전 및 스왑 조건 -->
+    <div class="section-title red">5. R축 회전 및 스왑 조건</div>
+    <div class="card">
+        <div class="card-body">
+            <p>R축은 용접선에 수직한 구조물로 유지되어야 하며, 평면도 기준 T-bar 웹 중심에 위치한다.</p>
+
+            <table>
+                <tr><th>R축 각도</th><th>웹 방향</th><th>설명</th></tr>
+                <tr><td><strong>R = 0&deg;</strong></td><td>Y축과 수직</td><td>기본 자세</td></tr>
+                <tr><td><strong>R = 45&deg;</strong></td><td>45&deg; 회전</td><td>대각선 용접</td></tr>
+                <tr><td><strong>R = 90&deg;</strong></td><td>X축과 평행</td><td>횡방향 용접</td></tr>
+            </table>
+
+            <div class="note note-red">
+                <strong>스왑 조건:</strong> R축 회전이 &pm;100&deg; 제한을 초과할 위험이 있는 경우 로봇 담당 면을 스왑한다.<br>
+                <strong>실무 조건:</strong> 스타트 포인트의 X값이 엔드 포인트 X값보다 큰 경우 스왑이 필요하다.
+            </div>
+
+            <div class="note note-cyan">
+                <strong>스왑 후 논리:</strong> 로봇1은 웹 기준 좌측, 로봇2는 우측이라는 논리를 유지해야 하며, 회전각이 커져도 R축 구조물과 용접선은 수직 관계를 유지해야 한다.
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. 시각화 요구사항 -->
+    <div class="section-title violet">6. 시각화 요구사항</div>
+    <div class="card">
+        <div class="card-body">
+            <ul class="checklist">
+                <li><span class="check-icon check-pending">!</span><span>TCP 경로 표기</span></li>
+                <li><span class="check-icon check-pending">!</span><span>R축 회전각도 및 방향 표기</span></li>
+                <li><span class="check-icon check-pending">!</span><span>갠트리 이동 vs 로봇 자체 모션 구분</span></li>
+                <li><span class="check-icon check-pending">!</span><span>위빙 경로 가시화</span></li>
+                <li><span class="check-icon check-pending">!</span><span>비전으로 얻는 4개 포인트(스타트/엔드 각각 2개) 하이라이트</span></li>
+                <li><span class="check-icon check-pending">!</span><span>T-bar 형상(평판 + 세워진 웹) 오버레이, ㅗ 형태 유지</span></li>
+                <li><span class="check-icon check-pending">!</span><span>토치 자세를 방향 벡터로 표현</span></li>
+                <li><span class="check-icon check-pending">!</span><span>R축 바디와 두 로봇이 함께 회전하는 모습을 전체 뷰에서 확인 가능하도록 카메라 구성 개선 (현재 Robot2가 자주 화면에서 잘림)</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 7. 비전·데이터 입력 -->
+    <div class="section-title">7. 비전·데이터 입력</div>
+    <div class="card">
+        <div class="card-body">
+            <ul>
+                <li>비전 계측으로 T-bar의 <strong>네 개 포인트</strong>(스타트 2개, 엔드 2개)를 입력받으며, 각 포인트는 XYZ 성분을 가진다.</li>
+                <li>CSV 등 데이터 소스에 이 네 포인트를 기록하고, 중간 경로는 알고리즘으로 자동 계산한다.</li>
+                <li>R축 센서는 T-bar 벽 중심에 위치하도록 계획되어 있으며, 해당 센싱 정보로 용접선 방향을 정의한다.</li>
+            </ul>
+            <div class="note note-cyan">
+                <strong>데이터 플로우:</strong> 비전 센서 &rarr; 4개 포인트(XYZ) &rarr; CSV 기록 &rarr; 중간 경로 자동 계산 &rarr; 시각화
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. 추가 설계 메모 -->
+    <div class="section-title amber">8. 추가 설계 메모</div>
+    <div class="card">
+        <div class="card-body">
+            <ul>
+                <li>R축 높이는 지면에서 약 <strong>1200mm</strong>이며 항상 용접선에 수직으로 초기 정렬한다.</li>
+                <li>평면도에서는 모든 요소가 표시되도록 배치/스케일을 조정하고, 정면도에서는 웹이 바닥 아래로 과도하게 내려가지 않도록 ㅗ형상 비율을 유지한다.</li>
+                <li>바닥면(FL)과 평판 상면, 그리고 웹의 상대적 위치가 명확히 드러나야 시각적으로 혼동이 없다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 9. 열려 있는 확인 항목 -->
+    <div class="section-title red">9. 열려 있는 확인 항목</div>
+    <div class="card">
+        <div class="card-body">
+            <ul class="checklist">
+                <li><span class="check-icon check-pending">!</span><span>시각화 구현이 위 요구사항을 충족하는지 검증 필요 (현재 미충족)</span></li>
+                <li><span class="check-icon check-pending">!</span><span>회전 스왑 로직이 실제 시뮬레이션 상에서 R축 구조물과 용접선의 수직 조건을 지키는지 재확인</span></li>
+                <li><span class="check-icon check-pending">!</span><span>CSV 입력 포맷, 중간 포인트 계산식, 터치 센싱 보정 적용 방식 도출 필요</span></li>
+            </ul>
+            <div class="note note-amber">
+                위 내용을 기준으로 플랫폼 요구사항 및 시뮬레이션 가이드를 계속 보완한다.
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
