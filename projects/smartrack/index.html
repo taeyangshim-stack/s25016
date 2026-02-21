@@ -387,16 +387,19 @@
   <a class="toc-item" href="#sec02">02 문제 정의</a>
   <a class="toc-item" href="#sec03">03 대상 부재 형상</a>
   <a class="toc-item" href="#sec04">04 물류 흐름도</a>
-  <a class="toc-item" href="#sec05">05 핵심 아이디어</a>
-  <a class="toc-item" href="#sec06">06 유연성 시연</a>
-  <a class="toc-item" href="#sec07">07 벤치마킹</a>
-  <a class="toc-item" href="#sec08">08 컨셉 A — 핀-그리드</a>
-  <a class="toc-item" href="#sec09">09 컨셉 B — 전동 서포트</a>
-  <a class="toc-item" href="#sec10">10 컨셉 C — 셀 어레이</a>
-  <a class="toc-item" href="#sec11">11 랙 모듈 + 안전</a>
-  <a class="toc-item" href="#sec12">12 AMR 도킹</a>
-  <a class="toc-item" href="#sec13">13 시스템 아키텍처</a>
-  <a class="toc-item" href="#sec14">14 로드맵 + 결론</a>
+  <a class="toc-item" href="#sec05">05 다중 랙 배치</a>
+  <a class="toc-item" href="#sec06">06 핵심 아이디어</a>
+  <a class="toc-item" href="#sec07">07 유연성 시연</a>
+  <a class="toc-item" href="#sec08">08 벤치마킹</a>
+  <a class="toc-item" href="#sec09">09 벤치마킹 브릿지</a>
+  <a class="toc-item" href="#sec10">10 컨셉 A — 핀-그리드</a>
+  <a class="toc-item" href="#sec11">11 컨셉 B — 전동 서포트</a>
+  <a class="toc-item" href="#sec12">12 컨셉 C — 셀 어레이</a>
+  <a class="toc-item" href="#sec13">13 랙 모듈 + 안전</a>
+  <a class="toc-item" href="#sec14">14 AMR 도킹</a>
+  <a class="toc-item" href="#sec15">15 시스템 아키텍처</a>
+  <a class="toc-item" href="#sec16">16 입출고 시퀀스</a>
+  <a class="toc-item" href="#sec17">17 로드맵 + 결론</a>
 </nav>
 
 <!-- NAV DOTS (PPT mode) -->
@@ -686,80 +689,77 @@
       <div class="callout callout-amber" style="flex:1"><b>주황 경로</b>: 소조립 완료 후 크레인/AMR으로 스마트랙 출고 영역에 반송</div>
     </div>
 
-    <!-- ===== 다중 랙 배치 + 슬롯 관리 (report-only) ===== -->
-    <div class="report-only" style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+  </div>
+</section>
 
-      <!-- 야드 레이아웃 SVG -->
-      <div class="diagram-wrap">
-        <svg viewBox="0 0 960 340" width="100%" style="display:block">
-          <text x="480" y="22" text-anchor="middle" fill="#18181B" font-size="14" font-weight="700">소조립 공장 내 다중 랙 배치도</text>
+<!-- ===== SECTION 05: 다중 랙 배치 + 슬롯 관리 ===== -->
+<section class="slide" id="sec05" data-title="다중 랙 배치">
+  <span class="slide-num">05</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag tag-blue">야드 배치</span>
+      <h2 style="margin-top:8px">다중 랙 배치 + 슬롯 관리</h2>
+      <p class="subtitle">입고존 → 보관존(N개 랙) → 출고존 — 랙 → 베이 → 슬롯 계층 관리</p>
+    </div>
 
-          <!-- 공장 외곽 -->
-          <rect x="30" y="36" width="900" height="290" rx="12" fill="#FAFAFA" stroke="#D4D4D8" stroke-width="1.5"/>
-          <text x="480" y="55" text-anchor="middle" fill="#A1A1AA" font-size="10" letter-spacing="2">소조립 공장 (BAY AREA)</text>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 960 300" width="100%" style="display:block">
+        <text x="480" y="18" text-anchor="middle" fill="#18181B" font-size="13" font-weight="700">소조립 공장 내 다중 랙 배치도</text>
+        <!-- 공장 외곽 -->
+        <rect x="30" y="30" width="900" height="250" rx="12" fill="#FAFAFA" stroke="#D4D4D8" stroke-width="1.5"/>
+        <!-- 입고존 -->
+        <rect x="50" y="48" width="170" height="220" rx="10" fill="#ECFDF5" stroke="#34D399" stroke-width="2" stroke-dasharray="6 3"/>
+        <text x="135" y="68" text-anchor="middle" fill="#065F46" font-size="11" font-weight="700">입고존</text>
+        <rect x="65" y="80" width="140" height="36" rx="6" fill="#fff" stroke="#0D6E51"/><text x="135" y="103" text-anchor="middle" fill="#0D6E51" font-size="10" font-weight="600">스캔 스테이션</text>
+        <rect x="65" y="126" width="140" height="30" rx="6" fill="#F0FDF4" stroke="#86EFAC"/><text x="135" y="146" text-anchor="middle" fill="#065F46" font-size="9">입고 대기 랙 #0</text>
+        <!-- 보관존 -->
+        <rect x="250" y="48" width="400" height="220" rx="10" fill="#EFF6FF" stroke="#93C5FD" stroke-width="2" stroke-dasharray="6 3"/>
+        <text x="450" y="68" text-anchor="middle" fill="#1D4ED8" font-size="11" font-weight="700">보관존 — 다중 랙</text>
+        <g>
+          <rect x="270" y="82" width="100" height="170" rx="8" fill="#fff" stroke="#1D4ED8" stroke-width="1.5"/>
+          <text x="320" y="100" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">랙 #1</text>
+          <rect x="278" y="108" width="84" height="18" rx="3" fill="#DBEAFE"/><text x="320" y="121" text-anchor="middle" fill="#1E40AF" font-size="8">Bay A · 4슬롯</text>
+          <rect x="278" y="130" width="84" height="18" rx="3" fill="#DBEAFE"/><text x="320" y="143" text-anchor="middle" fill="#1E40AF" font-size="8">Bay B · 4슬롯</text>
+          <rect x="278" y="152" width="84" height="18" rx="3" fill="#DBEAFE"/><text x="320" y="165" text-anchor="middle" fill="#1E40AF" font-size="8">Bay C · 4슬롯</text>
+          <rect x="278" y="174" width="84" height="18" rx="3" fill="#DBEAFE"/><text x="320" y="187" text-anchor="middle" fill="#1E40AF" font-size="8">Bay D · 4슬롯</text>
+          <text x="320" y="232" text-anchor="middle" fill="#A1A1AA" font-size="8">16 슬롯</text>
+        </g>
+        <g>
+          <rect x="390" y="82" width="100" height="170" rx="8" fill="#fff" stroke="#1D4ED8" stroke-width="1.5"/>
+          <text x="440" y="100" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">랙 #2</text>
+          <rect x="398" y="108" width="84" height="18" rx="3" fill="#DBEAFE"/><text x="440" y="121" text-anchor="middle" fill="#1E40AF" font-size="8">Bay A · 4슬롯</text>
+          <rect x="398" y="130" width="84" height="18" rx="3" fill="#DBEAFE"/><text x="440" y="143" text-anchor="middle" fill="#1E40AF" font-size="8">Bay B · 4슬롯</text>
+          <rect x="398" y="152" width="84" height="18" rx="3" fill="#DBEAFE"/><text x="440" y="165" text-anchor="middle" fill="#1E40AF" font-size="8">Bay C · 4슬롯</text>
+          <rect x="398" y="174" width="84" height="18" rx="3" fill="#DBEAFE"/><text x="440" y="187" text-anchor="middle" fill="#1E40AF" font-size="8">Bay D · 4슬롯</text>
+          <text x="440" y="232" text-anchor="middle" fill="#A1A1AA" font-size="8">16 슬롯</text>
+        </g>
+        <g>
+          <rect x="510" y="82" width="100" height="170" rx="8" fill="#fff" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="4 2"/>
+          <text x="560" y="100" text-anchor="middle" fill="#60A5FA" font-size="10" font-weight="600">랙 #N</text>
+          <text x="560" y="155" text-anchor="middle" fill="#A1A1AA" font-size="10">확장</text>
+          <text x="560" y="232" text-anchor="middle" fill="#A1A1AA" font-size="8">N × 16 슬롯</text>
+        </g>
+        <!-- 출고존 -->
+        <rect x="680" y="48" width="230" height="220" rx="10" fill="#FFFBEB" stroke="#FCD34D" stroke-width="2" stroke-dasharray="6 3"/>
+        <text x="795" y="68" text-anchor="middle" fill="#92400E" font-size="11" font-weight="700">출고존</text>
+        <rect x="700" y="82" width="190" height="36" rx="6" fill="#fff" stroke="#F59E0B"/><text x="795" y="105" text-anchor="middle" fill="#92400E" font-size="10" font-weight="600">출고 검사 스테이션</text>
+        <rect x="700" y="128" width="190" height="30" rx="6" fill="#FEF3C7" stroke="#F59E0B"/><text x="795" y="148" text-anchor="middle" fill="#92400E" font-size="9">→ 소조립 / 중조립</text>
+        <!-- 화살표 -->
+        <line x1="220" y1="158" x2="250" y2="158" stroke="#0D6E51" stroke-width="2" marker-end="url(#arr)"/>
+        <line x1="650" y1="158" x2="680" y2="158" stroke="#F59E0B" stroke-width="2" marker-end="url(#arr-a)"/>
+        <!-- AMR 경로 -->
+        <path d="M135 170 L135 270 L795 270 L795 170" stroke="#7C3AED" stroke-width="1.5" fill="none" stroke-dasharray="5 3"/>
+        <text x="465" y="265" text-anchor="middle" fill="#5B21B6" font-size="9" font-weight="600">AMR / 크레인 이송 경로</text>
+      </svg>
+    </div>
 
-          <!-- 입고존 -->
-          <rect x="50" y="70" width="180" height="240" rx="10" fill="#ECFDF5" stroke="#34D399" stroke-width="2" stroke-dasharray="6 3"/>
-          <text x="140" y="90" text-anchor="middle" fill="#065F46" font-size="12" font-weight="700">입고존 (Receiving)</text>
-          <rect x="70" y="102" width="140" height="44" rx="6" fill="#fff" stroke="#0D6E51" stroke-width="1.5"/>
-          <text x="140" y="120" text-anchor="middle" fill="#0D6E51" font-size="11" font-weight="600">입고 스캔 스테이션</text>
-          <text x="140" y="138" text-anchor="middle" fill="#A1A1AA" font-size="9">3D/바코드/RFID/저울</text>
-          <rect x="70" y="158" width="140" height="36" rx="6" fill="#F0FDF4" stroke="#86EFAC"/>
-          <text x="140" y="181" text-anchor="middle" fill="#065F46" font-size="10">입고 대기 랙 #0</text>
+    <div class="row" style="margin-top:8px">
+      <div class="callout callout-green" style="flex:1"><b>계층 구조</b>: Zone → Rack → Bay(4) → Slot(4) = 랙당 16슬롯</div>
+      <div class="callout callout-amber" style="flex:1"><b>슬롯 배정</b>: FIFO + 공정순서 기반 자동 배정 → MES 연동 JIT 출고</div>
+    </div>
 
-          <!-- 보관존 (3개 랙) -->
-          <rect x="260" y="70" width="420" height="240" rx="10" fill="#EFF6FF" stroke="#93C5FD" stroke-width="2" stroke-dasharray="6 3"/>
-          <text x="470" y="90" text-anchor="middle" fill="#1D4ED8" font-size="12" font-weight="700">보관존 (Storage) — 다중 랙</text>
-
-          <g>
-            <rect x="280" y="104" width="120" height="190" rx="8" fill="#fff" stroke="#1D4ED8" stroke-width="1.5"/>
-            <text x="340" y="124" text-anchor="middle" fill="#1D4ED8" font-size="11" font-weight="700">랙 #1</text>
-            <rect x="290" y="134" width="100" height="22" rx="4" fill="#DBEAFE"/><text x="340" y="149" text-anchor="middle" fill="#1E40AF" font-size="9">Bay A — 4슬롯</text>
-            <rect x="290" y="162" width="100" height="22" rx="4" fill="#DBEAFE"/><text x="340" y="177" text-anchor="middle" fill="#1E40AF" font-size="9">Bay B — 4슬롯</text>
-            <rect x="290" y="190" width="100" height="22" rx="4" fill="#DBEAFE"/><text x="340" y="205" text-anchor="middle" fill="#1E40AF" font-size="9">Bay C — 4슬롯</text>
-            <rect x="290" y="218" width="100" height="22" rx="4" fill="#DBEAFE"/><text x="340" y="233" text-anchor="middle" fill="#1E40AF" font-size="9">Bay D — 4슬롯</text>
-            <text x="340" y="266" text-anchor="middle" fill="#A1A1AA" font-size="9">16 슬롯</text>
-          </g>
-
-          <g>
-            <rect x="420" y="104" width="120" height="190" rx="8" fill="#fff" stroke="#1D4ED8" stroke-width="1.5"/>
-            <text x="480" y="124" text-anchor="middle" fill="#1D4ED8" font-size="11" font-weight="700">랙 #2</text>
-            <rect x="430" y="134" width="100" height="22" rx="4" fill="#DBEAFE"/><text x="480" y="149" text-anchor="middle" fill="#1E40AF" font-size="9">Bay A — 4슬롯</text>
-            <rect x="430" y="162" width="100" height="22" rx="4" fill="#DBEAFE"/><text x="480" y="177" text-anchor="middle" fill="#1E40AF" font-size="9">Bay B — 4슬롯</text>
-            <rect x="430" y="190" width="100" height="22" rx="4" fill="#DBEAFE"/><text x="480" y="205" text-anchor="middle" fill="#1E40AF" font-size="9">Bay C — 4슬롯</text>
-            <rect x="430" y="218" width="100" height="22" rx="4" fill="#DBEAFE"/><text x="480" y="233" text-anchor="middle" fill="#1E40AF" font-size="9">Bay D — 4슬롯</text>
-            <text x="480" y="266" text-anchor="middle" fill="#A1A1AA" font-size="9">16 슬롯</text>
-          </g>
-
-          <g>
-            <rect x="560" y="104" width="100" height="190" rx="8" fill="#fff" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="4 2"/>
-            <text x="610" y="124" text-anchor="middle" fill="#60A5FA" font-size="11" font-weight="600">랙 #N</text>
-            <text x="610" y="180" text-anchor="middle" fill="#A1A1AA" font-size="10">확장 가능</text>
-            <text x="610" y="266" text-anchor="middle" fill="#A1A1AA" font-size="9">N × 16 슬롯</text>
-          </g>
-
-          <!-- 출고존 -->
-          <rect x="710" y="70" width="200" height="240" rx="10" fill="#FFFBEB" stroke="#FCD34D" stroke-width="2" stroke-dasharray="6 3"/>
-          <text x="810" y="90" text-anchor="middle" fill="#92400E" font-size="12" font-weight="700">출고존 (Shipping)</text>
-          <rect x="730" y="104" width="160" height="44" rx="6" fill="#fff" stroke="#F59E0B" stroke-width="1.5"/>
-          <text x="810" y="123" text-anchor="middle" fill="#92400E" font-size="11" font-weight="600">출고 검사 스테이션</text>
-          <text x="810" y="140" text-anchor="middle" fill="#A1A1AA" font-size="9">품질검사/중량확인</text>
-          <rect x="730" y="160" width="160" height="36" rx="6" fill="#FFFBEB" stroke="#FCD34D"/>
-          <text x="810" y="183" text-anchor="middle" fill="#92400E" font-size="10">출고 대기 버퍼</text>
-          <rect x="730" y="210" width="160" height="36" rx="6" fill="#FEF3C7" stroke="#F59E0B"/>
-          <text x="810" y="233" text-anchor="middle" fill="#92400E" font-size="10">→ 소조립 / 중조립</text>
-
-          <!-- 화살표 -->
-          <line x1="230" y1="175" x2="260" y2="175" stroke="#0D6E51" stroke-width="2" marker-end="url(#arr)"/>
-          <line x1="680" y1="175" x2="710" y2="175" stroke="#F59E0B" stroke-width="2" marker-end="url(#arr-a)"/>
-
-          <!-- AMR 경로 -->
-          <path d="M140 210 L140 310 L810 310 L810 260" stroke="#7C3AED" stroke-width="2" fill="none" stroke-dasharray="6 3" marker-end="url(#arr)"/>
-          <text x="480" y="305" text-anchor="middle" fill="#5B21B6" font-size="10" font-weight="600">AMR / 크레인 이송 경로</text>
-        </svg>
-      </div>
-
-      <!-- 슬롯 관리 계층 구조표 -->
+    <!-- Report-only: 슬롯 관리 상세표 -->
+    <div class="report-only" style="margin-top:12px">
       <div class="card">
         <h3>슬롯 관리 계층 구조 — 랙 → 베이(Bay) → 슬롯(Slot)</h3>
         <table style="font-size:12px;width:100%">
@@ -774,18 +774,13 @@
           </tbody>
         </table>
       </div>
-
-      <div class="callout callout-green">
-        <b>슬롯 배정 원칙</b>: 부재별 최적 위치 자동 배정 → <b>FIFO / 공정순서 기반 출고</b> — 생산계획(MES) 연동 시 JIT 출고까지 자동화
-      </div>
     </div>
-
   </div>
 </section>
 
-<!-- ===== SECTION 05: 핵심 아이디어 — "핀 아트" ===== -->
-<section class="slide" id="sec05" data-title="핵심 아이디어">
-  <span class="slide-num">05</span>
+<!-- ===== SECTION 06: 핵심 아이디어 — "핀 아트" ===== -->
+<section class="slide" id="sec06" data-title="핵심 아이디어">
+  <span class="slide-num">06</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">핵심 아이디어</span>
@@ -894,9 +889,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 06: 유연성 시연 — 3패널 ===== -->
-<section class="slide" id="sec06" data-title="유연성 시연">
-  <span class="slide-num">06</span>
+<!-- ===== SECTION 07: 유연성 시연 — 3패널 ===== -->
+<section class="slide" id="sec07" data-title="유연성 시연">
+  <span class="slide-num">07</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">유연성 증명</span>
@@ -986,9 +981,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 07: 벤치마킹 / 참고 사례 ===== -->
-<section class="slide" id="sec07" data-title="벤치마킹">
-  <span class="slide-num">07</span>
+<!-- ===== SECTION 08: 벤치마킹 / 참고 사례 ===== -->
+<section class="slide" id="sec08" data-title="벤치마킹">
+  <span class="slide-num">08</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">벤치마킹</span>
@@ -1476,57 +1471,64 @@
       </div>
     </div>
 
-    <!-- ===== 브릿지: 벤치마킹 → 스마트랙 전환 (report-only) ===== -->
-    <div class="report-only" style="margin-top:20px">
-      <div style="background:linear-gradient(135deg,#EFF6FF,#ECFDF5);border:2px solid #1D4ED8;border-radius:14px;padding:24px 28px;position:relative">
-        <div style="position:absolute;top:-14px;left:24px;background:linear-gradient(135deg,#1D4ED8,#0D6E51);color:#fff;font-size:13px;font-weight:800;padding:4px 16px;border-radius:20px;letter-spacing:.5px">그래서 스마트랙은?</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:12px">
-          <!-- 컬럼 1: 기존 기술의 한계 -->
-          <div style="background:#FFF1F2;border-radius:10px;padding:16px;border:1px solid #FECDD3">
-            <div style="font-size:13px;font-weight:700;color:#9F1239;margin-bottom:10px">기존 기술의 한계</div>
-            <ul style="font-size:12px;color:#52525B;line-height:1.8;padding-left:16px;margin:0">
-              <li>핀-베드: 경하중·복합재 전용 → <b>철강 중하중 불가</b></li>
-              <li>UHF: 항공 가공 지그 → <b>적치·물류 기능 없음</b></li>
-              <li>패널라인: 평판 용접 특화 → <b>부정형 부재 미대응</b></li>
-              <li>한국 조선소: 용접·조립 자동화 → <b>적치 영역 미개척</b></li>
-              <li>AGV/AMR: 이송 자동화 → <b>지지점 최적화 연계 부재</b></li>
-            </ul>
-          </div>
-          <!-- 컬럼 2: 스마트랙의 해답 -->
-          <div style="background:#ECFDF5;border-radius:10px;padding:16px;border:1px solid #A7F3D0">
-            <div style="font-size:13px;font-weight:700;color:#065F46;margin-bottom:10px">스마트랙의 해답</div>
-            <ul style="font-size:12px;color:#065F46;line-height:1.8;padding-left:16px;margin:0">
-              <li><b>0.2~15t 중하중</b> 조선 부재 전용 설계</li>
-              <li><b>유연 지지점</b>: 부정형 형상에 맞춘 자동 배치</li>
-              <li><b>적치 + 물류 + 안전</b> 3가지 통합 관리</li>
-              <li><b>WMS 연계</b>: 입고·보관·출고 전 과정 추적</li>
-              <li><b>AI 최적화</b>: 형상/CoG 기반 지지점 자동 결정</li>
-            </ul>
-          </div>
-          <!-- 컬럼 3: 구현 과제 -->
-          <div style="background:#EFF6FF;border-radius:10px;padding:16px;border:1px solid #BFDBFE">
-            <div style="font-size:13px;font-weight:700;color:#1D4ED8;margin-bottom:10px">핵심 구현 과제</div>
-            <ul style="font-size:12px;color:#1E40AF;line-height:1.8;padding-left:16px;margin:0">
-              <li><b>핀/서포트 메커니즘</b>: 하중·진동 내구성 확보</li>
-              <li><b>3D 인식</b>: LiDAR/비전 기반 형상·무게중심 추정</li>
-              <li><b>안전 검증</b>: FEA 기반 전도/슬립 실시간 판정</li>
-              <li><b>AMR 도킹</b>: 크레인/자율이송 정밀 연계</li>
-              <li><b>MES 연동</b>: 생산계획 기반 JIT 출고</li>
-            </ul>
-          </div>
-        </div>
-        <div style="text-align:center;margin-top:16px;font-size:13px;color:#1D4ED8;font-weight:600">
-          ▼ 다음 섹션에서 <b>컨셉 A → B → C</b> 단계별 구현 전략을 제시합니다
-        </div>
-      </div>
-    </div>
-
   </div>
 </section>
 
-<!-- ===== SECTION 08: 컨셉 A ===== -->
-<section class="slide" id="sec08" data-title="컨셉 A">
-  <span class="slide-num">08</span>
+<!-- ===== SECTION 09: 벤치마킹 → 스마트랙 브릿지 ===== -->
+<section class="slide" id="sec09" data-title="벤치마킹 브릿지">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag" style="background:linear-gradient(135deg,#1D4ED8,#0D6E51);color:#fff">전환</span>
+      <h2 style="margin-top:8px">그래서 스마트랙은?</h2>
+      <p class="subtitle">벤치마킹 결론 → 스마트랙이 채워야 할 빈자리</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <!-- 컬럼 1: 기존 기술의 한계 -->
+      <div style="background:#FFF1F2;border-radius:12px;padding:20px;border:1px solid #FECDD3">
+        <div style="font-size:14px;font-weight:700;color:#9F1239;margin-bottom:12px">기존 기술의 한계</div>
+        <ul style="font-size:12px;color:#52525B;line-height:1.9;padding-left:16px;margin:0">
+          <li>핀-베드: 경하중·복합재 전용 → <b>철강 중하중 불가</b></li>
+          <li>UHF: 항공 가공 지그 → <b>적치·물류 기능 없음</b></li>
+          <li>패널라인: 평판 용접 특화 → <b>부정형 부재 미대응</b></li>
+          <li>한국 조선소 → <b>적치 영역 미개척</b></li>
+          <li>AGV/AMR → <b>지지점 최적화 연계 부재</b></li>
+        </ul>
+      </div>
+      <!-- 컬럼 2: 스마트랙의 해답 -->
+      <div style="background:#ECFDF5;border-radius:12px;padding:20px;border:2px solid #0D6E51">
+        <div style="font-size:14px;font-weight:700;color:#065F46;margin-bottom:12px">스마트랙의 해답</div>
+        <ul style="font-size:12px;color:#065F46;line-height:1.9;padding-left:16px;margin:0">
+          <li><b>0.2~15t 중하중</b> 조선 부재 전용</li>
+          <li><b>유연 지지점</b>: 부정형 형상 자동 배치</li>
+          <li><b>적치 + 물류 + 안전</b> 통합 관리</li>
+          <li><b>WMS 연계</b>: 전 과정 추적</li>
+          <li><b>AI 최적화</b>: CoG 기반 자동 결정</li>
+        </ul>
+      </div>
+      <!-- 컬럼 3: 구현 과제 -->
+      <div style="background:#EFF6FF;border-radius:12px;padding:20px;border:1px solid #BFDBFE">
+        <div style="font-size:14px;font-weight:700;color:#1D4ED8;margin-bottom:12px">핵심 구현 과제</div>
+        <ul style="font-size:12px;color:#1E40AF;line-height:1.9;padding-left:16px;margin:0">
+          <li><b>핀/서포트</b>: 하중·진동 내구성</li>
+          <li><b>3D 인식</b>: 형상·무게중심 추정</li>
+          <li><b>안전 검증</b>: 전도/슬립 실시간 판정</li>
+          <li><b>AMR 도킹</b>: 정밀 연계</li>
+          <li><b>MES 연동</b>: JIT 출고</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout" style="background:linear-gradient(135deg,#EFF6FF,#ECFDF5);border:2px solid #1D4ED8;text-align:center;margin-top:12px;padding:14px;border-radius:10px">
+      <span style="font-size:14px;font-weight:700;color:#1D4ED8">▼ 다음: <b>컨셉 A → B → C</b> 단계별 구현 전략</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 10: 컨셉 A ===== -->
+<section class="slide" id="sec10" data-title="컨셉 A">
+  <span class="slide-num">10</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">컨셉 A · MVP</span>
@@ -1623,9 +1625,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 09: 컨셉 B ===== -->
-<section class="slide" id="sec09" data-title="컨셉 B">
-  <span class="slide-num">09</span>
+<!-- ===== SECTION 11: 컨셉 B ===== -->
+<section class="slide" id="sec11" data-title="컨셉 B">
+  <span class="slide-num">11</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">컨셉 B · 차별화</span>
@@ -1746,9 +1748,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 10: 컨셉 C ===== -->
-<section class="slide" id="sec10" data-title="컨셉 C">
-  <span class="slide-num">10</span>
+<!-- ===== SECTION 12: 컨셉 C ===== -->
+<section class="slide" id="sec12" data-title="컨셉 C">
+  <span class="slide-num">12</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-violet">컨셉 C · 세계 최초급</span>
@@ -1808,9 +1810,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 11: 랙 모듈 + 안전 ===== -->
-<section class="slide" id="sec11" data-title="랙 모듈">
-  <span class="slide-num">11</span>
+<!-- ===== SECTION 13: 랙 모듈 + 안전 ===== -->
+<section class="slide" id="sec13" data-title="랙 모듈">
+  <span class="slide-num">13</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">기구 설계</span>
@@ -1857,9 +1859,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 12: AMR 도킹 개념 ===== -->
-<section class="slide" id="sec12" data-title="AMR 도킹">
-  <span class="slide-num">12</span>
+<!-- ===== SECTION 14: AMR 도킹 개념 ===== -->
+<section class="slide" id="sec14" data-title="AMR 도킹">
+  <span class="slide-num">14</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-violet">AMR 연계</span>
@@ -1952,9 +1954,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 13: 시스템 아키텍처 ===== -->
-<section class="slide" id="sec13" data-title="시스템 아키텍처">
-  <span class="slide-num">13</span>
+<!-- ===== SECTION 15: 시스템 아키텍처 ===== -->
+<section class="slide" id="sec15" data-title="시스템 아키텍처">
+  <span class="slide-num">15</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">S/W 아키텍처</span>
@@ -2011,53 +2013,59 @@
       <div class="callout callout-amber" style="flex:1"><b>통신</b>: 상위 REST/MQTT · 하위 필드버스(PLC) · 안전 하드와이어 인터록</div>
     </div>
 
-    <!-- ===== 입고→출고 6단계 시퀀스 + WMS 테이블 (report-only) ===== -->
-    <div class="report-only" style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+  </div>
+</section>
 
-      <!-- 6단계 시퀀스 플로우 카드 -->
-      <div style="background:#F9FAFB;border-radius:12px;padding:20px 24px;border:1px solid #E4E4E7">
-        <div style="font-size:14px;font-weight:700;color:#18181B;margin-bottom:16px">입고 → 출고 6단계 시퀀스</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
-          <!-- Step 1 -->
-          <div style="background:#ECFDF5;border-radius:10px;padding:14px;border:1px solid #A7F3D0;position:relative">
-            <div style="position:absolute;top:-8px;left:12px;background:#0D6E51;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">1</div>
-            <div style="font-size:12px;font-weight:700;color:#065F46;margin-top:6px">입고 스캔</div>
-            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">바코드 / RFID / 3D 스캔<br>부재 ID 등록, 도면 매칭</div>
-          </div>
-          <!-- Step 2 -->
-          <div style="background:#ECFDF5;border-radius:10px;padding:14px;border:1px solid #A7F3D0;position:relative">
-            <div style="position:absolute;top:-8px;left:12px;background:#0D6E51;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">2</div>
-            <div style="font-size:12px;font-weight:700;color:#065F46;margin-top:6px">형상·CoG 분석</div>
-            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">3D 점군 → 형상 분류<br>무게중심·하중분포 추정</div>
-          </div>
-          <!-- Step 3 -->
-          <div style="background:#EFF6FF;border-radius:10px;padding:14px;border:1px solid #BFDBFE;position:relative">
-            <div style="position:absolute;top:-8px;left:12px;background:#1D4ED8;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">3</div>
-            <div style="font-size:12px;font-weight:700;color:#1D4ED8;margin-top:6px">슬롯 배정 (AI 최적화)</div>
-            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">랙 가용성 + 하중 밸런스<br>공정순서·FIFO 기반 위치 결정</div>
-          </div>
-          <!-- Step 4 -->
-          <div style="background:#F5F3FF;border-radius:10px;padding:14px;border:1px solid #DDD6FE;position:relative">
-            <div style="position:absolute;top:-8px;left:12px;background:#7C3AED;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">4</div>
-            <div style="font-size:12px;font-weight:700;color:#5B21B6;margin-top:6px">핀 높이 조정 + 적치</div>
-            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">서포트 핀 자동/수동 세팅<br>크레인 또는 AMR로 적치 실행</div>
-          </div>
-          <!-- Step 5 -->
-          <div style="background:#FFFBEB;border-radius:10px;padding:14px;border:1px solid #FDE68A;position:relative">
-            <div style="position:absolute;top:-8px;left:12px;background:#D97706;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">5</div>
-            <div style="font-size:12px;font-weight:700;color:#92400E;margin-top:6px">보관 중 실시간 추적</div>
-            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">재고 현황 대시보드<br>하중 모니터링, 이상 알림</div>
-          </div>
-          <!-- Step 6 -->
-          <div style="background:#FFF1F2;border-radius:10px;padding:14px;border:1px solid #FECDD3;position:relative">
-            <div style="position:absolute;top:-8px;left:12px;background:#E11D48;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">6</div>
-            <div style="font-size:12px;font-weight:700;color:#9F1239;margin-top:6px">출고 → 피킹 → 출하</div>
-            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">MES 출고 요청 수신<br>피킹 순서 결정 → 출하 실행</div>
-          </div>
-        </div>
+<!-- ===== SECTION 16: 입출고 시퀀스 ===== -->
+<section class="slide" id="sec16" data-title="입출고 시퀀스">
+  <span class="slide-num">16</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag tag-green">물류 운영</span>
+      <h2 style="margin-top:8px">입고 → 출고 6단계 시퀀스</h2>
+      <p class="subtitle">부재 입고부터 JIT 출고까지 — WMS 기반 전 과정 자동화</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px">
+      <div style="background:#ECFDF5;border-radius:10px;padding:14px 10px;border:1px solid #A7F3D0;text-align:center">
+        <div style="background:#0D6E51;color:#fff;font-size:18px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px">1</div>
+        <div style="font-size:12px;font-weight:700;color:#065F46">입고 스캔</div>
+        <div style="font-size:10px;color:#52525B;margin-top:4px;line-height:1.5">바코드/RFID/3D<br>부재 ID 등록</div>
       </div>
+      <div style="background:#ECFDF5;border-radius:10px;padding:14px 10px;border:1px solid #A7F3D0;text-align:center">
+        <div style="background:#0D6E51;color:#fff;font-size:18px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px">2</div>
+        <div style="font-size:12px;font-weight:700;color:#065F46">형상·CoG 분석</div>
+        <div style="font-size:10px;color:#52525B;margin-top:4px;line-height:1.5">3D 점군 분류<br>무게중심 추정</div>
+      </div>
+      <div style="background:#EFF6FF;border-radius:10px;padding:14px 10px;border:1px solid #BFDBFE;text-align:center">
+        <div style="background:#1D4ED8;color:#fff;font-size:18px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px">3</div>
+        <div style="font-size:12px;font-weight:700;color:#1D4ED8">슬롯 배정</div>
+        <div style="font-size:10px;color:#52525B;margin-top:4px;line-height:1.5">AI 최적화<br>FIFO/공정순서</div>
+      </div>
+      <div style="background:#F5F3FF;border-radius:10px;padding:14px 10px;border:1px solid #DDD6FE;text-align:center">
+        <div style="background:#7C3AED;color:#fff;font-size:18px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px">4</div>
+        <div style="font-size:12px;font-weight:700;color:#5B21B6">핀 조정 + 적치</div>
+        <div style="font-size:10px;color:#52525B;margin-top:4px;line-height:1.5">서포트 세팅<br>크레인/AMR</div>
+      </div>
+      <div style="background:#FFFBEB;border-radius:10px;padding:14px 10px;border:1px solid #FDE68A;text-align:center">
+        <div style="background:#D97706;color:#fff;font-size:18px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px">5</div>
+        <div style="font-size:12px;font-weight:700;color:#92400E">실시간 추적</div>
+        <div style="font-size:10px;color:#52525B;margin-top:4px;line-height:1.5">재고 대시보드<br>하중 모니터링</div>
+      </div>
+      <div style="background:#FFF1F2;border-radius:10px;padding:14px 10px;border:1px solid #FECDD3;text-align:center">
+        <div style="background:#E11D48;color:#fff;font-size:18px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px">6</div>
+        <div style="font-size:12px;font-weight:700;color:#9F1239">출고 → 출하</div>
+        <div style="font-size:10px;color:#52525B;margin-top:4px;line-height:1.5">MES 연동<br>피킹 → 출하</div>
+      </div>
+    </div>
 
-      <!-- WMS 연계 테이블 -->
+    <div class="row" style="margin-top:12px">
+      <div class="callout callout-green" style="flex:1"><b>핵심</b>: 생산계획(MES) 연동 → JIT 출고 → 공정 대기시간 최소화</div>
+      <div class="callout callout-amber" style="flex:1"><b>슬롯 배정</b>: 하중 밸런스 + 공정순서 + FIFO 복합 알고리즘</div>
+    </div>
+
+    <!-- Report-only: WMS 테이블 상세 (기존 report-only 콘텐츠 유지) -->
+    <div class="report-only" style="margin-top:16px">
       <div class="card">
         <h3>WMS 슬롯 상태 관리 테이블 (예시)</h3>
         <table style="font-size:11px;width:100%">
@@ -2074,19 +2082,13 @@
           </tbody>
         </table>
       </div>
-
-      <div class="callout" style="background:linear-gradient(135deg,#ECFDF5,#EFF6FF);border:2px solid var(--accent);padding:16px 20px;border-radius:10px">
-        <b style="color:#065F46">생산계획(MES) 연동 → JIT 출고 → 공정 대기 최소화</b>
-        <span style="font-size:12px;color:#52525B;margin-left:8px">— 출고 예정일 기준 자동 피킹 순서 결정, 크레인/AMR 스케줄링까지 통합</span>
-      </div>
     </div>
-
   </div>
 </section>
 
-<!-- ===== SECTION 14: 로드맵 + 역량 + 결론 ===== -->
-<section class="slide" id="sec14" data-title="로드맵 + 결론">
-  <span class="slide-num">14</span>
+<!-- ===== SECTION 17: 로드맵 + 역량 + 결론 ===== -->
+<section class="slide" id="sec17" data-title="로드맵 + 결론">
+  <span class="slide-num">17</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-amber">개발 계획 + 결론</span>
@@ -2202,12 +2204,13 @@
           <span class="ver-tag">v3.4</span>
           <span class="ver-date">2026-02-22</span>
         </div>
-        <div class="ver-title">스토리 보완: 다중 랙 배치, 입출고 시퀀스, 벤치마킹 브릿지</div>
+        <div class="ver-title">14→17슬라이드 확장: 다중 랙 배치, 벤치마킹 브릿지, 입출고 시퀀스</div>
         <ul class="ver-changes">
-          <li><b>벤치마킹 브릿지</b>: sec07 "그래서 스마트랙은?" 3컬럼 전환 블록 — 기존 한계 → 스마트랙 해답 → 구현 과제</li>
-          <li><b>다중 랙 배치</b>: sec04 야드 레이아웃 SVG (입고존/보관존/출고존) + 슬롯 관리 계층 구조표</li>
-          <li><b>입출고 시퀀스</b>: sec13 입고→출고 6단계 플로우 카드 + WMS 슬롯 상태 관리 테이블</li>
-          <li><b>이미지 CDN</b>: 벤치마킹 이미지 19장 Cloudinary CDN 전환 (v3.3에서 실행)</li>
+          <li><b>신규 슬라이드 3장</b>: PPT 모드 14→17 슬라이드 확장</li>
+          <li><b>sec05 다중 랙 배치</b>: 야드 레이아웃 SVG (입고존/보관존/출고존) + 슬롯 계층 관리</li>
+          <li><b>sec09 벤치마킹 브릿지</b>: "그래서 스마트랙은?" 3컬럼 전환 — 기존 한계 → 해답 → 구현 과제</li>
+          <li><b>sec16 입출고 시퀀스</b>: 입고→출고 6단계 플로우 + WMS 슬롯 상태 테이블</li>
+          <li><b>전체 재번호</b>: sec05~sec17 + TOC 사이드바 업데이트</li>
         </ul>
       </div>
 
