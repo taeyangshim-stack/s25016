@@ -377,6 +377,33 @@
                     return { date: r.date, name: r.name, checkIn: r.checkIn || '-', checkOut: r.checkOut || '-' };
                 });
             }
+
+            // 데이터가 있는 가장 최근 주로 자동 이동
+            if (allRecords.length > 0) {
+                var latestDate = allRecords.reduce(function(max, r) {
+                    return r.date > max ? r.date : max;
+                }, '');
+                if (latestDate) {
+                    var latest = new Date(latestDate + 'T00:00:00');
+                    var now = new Date();
+                    var diffDays = Math.floor((now - latest) / (1000 * 60 * 60 * 24));
+                    if (diffDays > 7) {
+                        // 최근 데이터가 이번 주가 아니면 해당 주로 이동
+                        var nowDay = now.getDay();
+                        var nowMonday = new Date(now);
+                        nowMonday.setDate(now.getDate() - (nowDay === 0 ? 6 : nowDay - 1));
+                        nowMonday.setHours(0, 0, 0, 0);
+
+                        var latDay = latest.getDay();
+                        var latMonday = new Date(latest);
+                        latMonday.setDate(latest.getDate() - (latDay === 0 ? 6 : latDay - 1));
+                        latMonday.setHours(0, 0, 0, 0);
+
+                        currentWeekOffset = Math.round((latMonday - nowMonday) / (7 * 24 * 60 * 60 * 1000));
+                    }
+                }
+            }
+
             render();
         }
 
@@ -487,7 +514,8 @@
             // Person cards
             var grid = document.getElementById('personGrid');
             if (people.length === 0) {
-                grid.innerHTML = '<div class="no-data">No records for this week.</div>';
+                grid.innerHTML = '<div class="no-data">No records for this week.<br><span style="font-size:0.85em;margin-top:8px;display:inline-block;">' +
+                    'Total ' + allRecords.length + ' records loaded. Use arrows to navigate.</span></div>';
             } else {
                 grid.innerHTML = people.map(function(name) {
                     var dayData = peopleMap[name];
