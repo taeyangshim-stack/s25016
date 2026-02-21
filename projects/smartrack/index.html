@@ -2010,6 +2010,77 @@
       <div class="callout callout-green" style="flex:1"><b>데이터 파이프</b>: 입고 스캔 → 형상/CoG 추정 → 적치 후보 생성 → 안전 검증 → 최적 배치 → 실적치 후 검증·학습</div>
       <div class="callout callout-amber" style="flex:1"><b>통신</b>: 상위 REST/MQTT · 하위 필드버스(PLC) · 안전 하드와이어 인터록</div>
     </div>
+
+    <!-- ===== 입고→출고 6단계 시퀀스 + WMS 테이블 (report-only) ===== -->
+    <div class="report-only" style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+
+      <!-- 6단계 시퀀스 플로우 카드 -->
+      <div style="background:#F9FAFB;border-radius:12px;padding:20px 24px;border:1px solid #E4E4E7">
+        <div style="font-size:14px;font-weight:700;color:#18181B;margin-bottom:16px">입고 → 출고 6단계 시퀀스</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <!-- Step 1 -->
+          <div style="background:#ECFDF5;border-radius:10px;padding:14px;border:1px solid #A7F3D0;position:relative">
+            <div style="position:absolute;top:-8px;left:12px;background:#0D6E51;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">1</div>
+            <div style="font-size:12px;font-weight:700;color:#065F46;margin-top:6px">입고 스캔</div>
+            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">바코드 / RFID / 3D 스캔<br>부재 ID 등록, 도면 매칭</div>
+          </div>
+          <!-- Step 2 -->
+          <div style="background:#ECFDF5;border-radius:10px;padding:14px;border:1px solid #A7F3D0;position:relative">
+            <div style="position:absolute;top:-8px;left:12px;background:#0D6E51;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">2</div>
+            <div style="font-size:12px;font-weight:700;color:#065F46;margin-top:6px">형상·CoG 분석</div>
+            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">3D 점군 → 형상 분류<br>무게중심·하중분포 추정</div>
+          </div>
+          <!-- Step 3 -->
+          <div style="background:#EFF6FF;border-radius:10px;padding:14px;border:1px solid #BFDBFE;position:relative">
+            <div style="position:absolute;top:-8px;left:12px;background:#1D4ED8;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">3</div>
+            <div style="font-size:12px;font-weight:700;color:#1D4ED8;margin-top:6px">슬롯 배정 (AI 최적화)</div>
+            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">랙 가용성 + 하중 밸런스<br>공정순서·FIFO 기반 위치 결정</div>
+          </div>
+          <!-- Step 4 -->
+          <div style="background:#F5F3FF;border-radius:10px;padding:14px;border:1px solid #DDD6FE;position:relative">
+            <div style="position:absolute;top:-8px;left:12px;background:#7C3AED;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">4</div>
+            <div style="font-size:12px;font-weight:700;color:#5B21B6;margin-top:6px">핀 높이 조정 + 적치</div>
+            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">서포트 핀 자동/수동 세팅<br>크레인 또는 AMR로 적치 실행</div>
+          </div>
+          <!-- Step 5 -->
+          <div style="background:#FFFBEB;border-radius:10px;padding:14px;border:1px solid #FDE68A;position:relative">
+            <div style="position:absolute;top:-8px;left:12px;background:#D97706;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">5</div>
+            <div style="font-size:12px;font-weight:700;color:#92400E;margin-top:6px">보관 중 실시간 추적</div>
+            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">재고 현황 대시보드<br>하중 모니터링, 이상 알림</div>
+          </div>
+          <!-- Step 6 -->
+          <div style="background:#FFF1F2;border-radius:10px;padding:14px;border:1px solid #FECDD3;position:relative">
+            <div style="position:absolute;top:-8px;left:12px;background:#E11D48;color:#fff;font-size:10px;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center">6</div>
+            <div style="font-size:12px;font-weight:700;color:#9F1239;margin-top:6px">출고 → 피킹 → 출하</div>
+            <div style="font-size:11px;color:#52525B;margin-top:4px;line-height:1.6">MES 출고 요청 수신<br>피킹 순서 결정 → 출하 실행</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WMS 연계 테이블 -->
+      <div class="card">
+        <h3>WMS 슬롯 상태 관리 테이블 (예시)</h3>
+        <table style="font-size:11px;width:100%">
+          <thead>
+            <tr><th>슬롯 ID</th><th>상태</th><th>부재 ID</th><th>부재 유형</th><th>중량(t)</th><th>입고 일시</th><th>출고 예정</th><th>우선순위</th></tr>
+          </thead>
+          <tbody>
+            <tr class="hl"><td>R1-A-01</td><td style="color:#065F46;font-weight:600">● 사용</td><td>BLK-2026-0147</td><td>T-bar</td><td>3.2</td><td>02-22 08:30</td><td>02-23 14:00</td><td style="color:#E11D48;font-weight:700">긴급</td></tr>
+            <tr><td>R1-A-02</td><td style="color:#065F46;font-weight:600">● 사용</td><td>BLK-2026-0148</td><td>보강재</td><td>1.8</td><td>02-22 09:15</td><td>02-24 10:00</td><td>보통</td></tr>
+            <tr class="hl"><td>R1-A-03</td><td style="color:#D97706;font-weight:600">◐ 예약</td><td>BLK-2026-0152</td><td>곡판</td><td>5.1</td><td>(입고 대기)</td><td>02-25 09:00</td><td>보통</td></tr>
+            <tr><td>R1-A-04</td><td style="color:#A1A1AA">○ 빈</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr class="hl"><td>R1-B-01</td><td style="color:#065F46;font-weight:600">● 사용</td><td>BLK-2026-0143</td><td>스캘럽</td><td>0.4</td><td>02-21 16:00</td><td>02-22 11:00</td><td style="color:#E11D48;font-weight:700">긴급</td></tr>
+            <tr><td>R2-A-01</td><td style="color:#A1A1AA">○ 빈</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout" style="background:linear-gradient(135deg,#ECFDF5,#EFF6FF);border:2px solid var(--accent);padding:16px 20px;border-radius:10px">
+        <b style="color:#065F46">생산계획(MES) 연동 → JIT 출고 → 공정 대기 최소화</b>
+        <span style="font-size:12px;color:#52525B;margin-left:8px">— 출고 예정일 기준 자동 피킹 순서 결정, 크레인/AMR 스케줄링까지 통합</span>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -2114,7 +2185,7 @@
 <!-- VERSION BADGE -->
 <div class="ver-badge" onclick="document.getElementById('changelogOverlay').classList.add('open')">
   <span class="ver-badge-dot"></span>
-  v3.3
+  v3.4
 </div>
 
 <!-- CHANGELOG PANEL -->
@@ -2125,6 +2196,20 @@
       <button class="changelog-close" onclick="document.getElementById('changelogOverlay').classList.remove('open')">&times;</button>
     </div>
     <div class="changelog-body">
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag">v3.4</span>
+          <span class="ver-date">2026-02-22</span>
+        </div>
+        <div class="ver-title">스토리 보완: 다중 랙 배치, 입출고 시퀀스, 벤치마킹 브릿지</div>
+        <ul class="ver-changes">
+          <li><b>벤치마킹 브릿지</b>: sec07 "그래서 스마트랙은?" 3컬럼 전환 블록 — 기존 한계 → 스마트랙 해답 → 구현 과제</li>
+          <li><b>다중 랙 배치</b>: sec04 야드 레이아웃 SVG (입고존/보관존/출고존) + 슬롯 관리 계층 구조표</li>
+          <li><b>입출고 시퀀스</b>: sec13 입고→출고 6단계 플로우 카드 + WMS 슬롯 상태 관리 테이블</li>
+          <li><b>이미지 CDN</b>: 벤치마킹 이미지 19장 Cloudinary CDN 전환 (v3.3에서 실행)</li>
+        </ul>
+      </div>
 
       <div class="ver-entry">
         <div class="ver-entry-head">
