@@ -3,546 +3,414 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>인원/장소 설정 - S25016 근무관리</title>
+    <title>Settings — S25016</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #f0f2f5;
+            --bg: #f7f8fa;
+            --surface: #ffffff;
+            --surface-hover: #f0f4ff;
+            --border: #e2e6ef;
+            --border-active: #b0c4ff;
+            --text-primary: #1a2035;
+            --text-secondary: #5a6580;
+            --text-muted: #8892a8;
+            --cyan: #2563eb;
+            --cyan-dim: rgba(37, 99, 235, 0.07);
+            --green: #16a34a;
+            --green-dim: rgba(22, 163, 74, 0.07);
+            --red: #dc2626;
+            --red-dim: rgba(220, 38, 38, 0.06);
+            --amber: #d97706;
+            --amber-dim: rgba(217, 119, 6, 0.07);
+            --violet: #7c3aed;
+            --violet-dim: rgba(124, 58, 237, 0.07);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+            --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            padding: 20px;
+            font-family: var(--font-body);
+            background: var(--bg-deep);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
         }
 
-        .container {
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(37,99,235,0.04) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 16px;
         }
 
+        /* ── Header ── */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 32px 8px 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
         }
+        .header-left { display: flex; flex-direction: column; gap: 4px; }
+        .header-tag { font-family: var(--font-mono); font-size: 0.72em; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600; opacity: 0.8; }
+        .header h1 { font-family: var(--font-mono); font-size: 1.6em; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        .header-sub { font-size: 0.88em; color: var(--text-secondary); margin-top: 2px; }
+        .back-link { font-family: var(--font-mono); font-size: 0.82em; color: var(--cyan); text-decoration: none; padding: 6px 14px; background: var(--cyan-dim); border-radius: 999px; border: 1px solid rgba(37,99,235,0.15); transition: all 0.2s var(--ease); white-space: nowrap; }
+        .back-link:hover { background: rgba(37,99,235,0.12); border-color: var(--cyan); }
 
-        .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            font-weight: 500;
+            color: #fff;
+            background: var(--green);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.3s var(--ease);
+            z-index: 1000;
         }
+        .toast.show { opacity: 1; transform: translateY(0); }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 16px;
-        }
-
+        /* ── Settings Grid ── */
         .settings-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .settings-card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .settings-card h2 {
-            color: #333;
+            gap: 16px;
             margin-bottom: 20px;
-            font-size: 22px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
         }
+        .card-title { font-family: var(--font-mono); font-size: 0.92em; font-weight: 600; color: var(--text-primary); }
+        .card-badge { font-family: var(--font-mono); font-size: 0.72em; font-weight: 600; color: var(--text-muted); padding: 3px 10px; background: var(--bg); border-radius: 999px; border: 1px solid var(--border); }
+        .card-body { padding: 20px; }
 
-        .item-list {
-            list-style: none;
-            margin-bottom: 20px;
-        }
+        /* ── Item List ── */
+        .item-list { list-style: none; }
 
         .item-list li {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            transition: all 0.3s;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s var(--ease);
         }
-
-        .item-list li:hover {
-            background: #e9ecef;
-        }
+        .item-list li:last-child { border-bottom: none; }
+        .item-list li:hover { background: var(--surface-hover); }
 
         .item-name {
             flex: 1;
+            font-size: 0.92em;
             font-weight: 500;
-            color: #333;
+            color: var(--text-primary);
         }
 
-        .item-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-delete {
-            padding: 6px 12px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .btn-del {
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            background: var(--surface);
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--red);
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s;
+            transition: all 0.2s var(--ease);
+        }
+        .btn-del:hover { border-color: var(--red); background: var(--red-dim); }
+
+        .empty-state {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-muted);
+            font-size: 0.88em;
         }
 
-        .btn-delete:hover {
-            background: #c0392b;
-        }
-
+        /* ── Add Section ── */
         .add-section {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
         }
 
         .add-input {
             flex: 1;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: all 0.3s;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.92em;
+            color: var(--text-primary);
+            transition: border-color 0.2s var(--ease);
         }
-
-        .add-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
+        .add-input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px var(--cyan-dim); }
 
         .btn-add {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
+            padding: 10px 20px;
+            background: var(--cyan);
+            color: #fff;
+            border: 1px solid var(--cyan);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s var(--ease);
+            white-space: nowrap;
         }
+        .btn-add:hover { background: #1d4ed8; }
 
-        .btn-add:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-        }
-
-        .info-box {
-            background: #fff3cd;
-            border-left: 5px solid #ffc107;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-
-        .info-box h3 {
-            color: #856404;
-            margin-bottom: 10px;
-        }
-
-        .info-box p {
-            color: #856404;
-            line-height: 1.6;
-        }
-
-        .success-box {
-            background: #d4edda;
-            border-left: 5px solid #28a745;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .success-box.show {
-            display: block;
-        }
-
-        .success-box p {
-            color: #155724;
-            font-weight: 600;
-        }
-
-        .back-link {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .back-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .back-link a:hover {
-            text-decoration: underline;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-            font-style: italic;
-        }
-
-        .action-buttons {
+        /* ── Action Buttons ── */
+        .action-row {
             display: flex;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 12px;
         }
 
-        .btn-save {
+        .btn {
             flex: 1;
-            padding: 16px;
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 12px;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s var(--ease);
+            text-align: center;
         }
+        .btn-green { background: var(--green); color: #fff; border-color: var(--green); }
+        .btn-green:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
+        .btn-secondary { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+        .btn-secondary:hover { border-color: var(--border-active); color: var(--text-primary); }
 
-        .btn-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
-        }
+        /* ── Animation ── */
+        .shell > * { animation: fadeUp 0.4s var(--ease) both; }
+        .shell > *:nth-child(2) { animation-delay: 0.05s; }
+        .shell > *:nth-child(3) { animation-delay: 0.10s; }
+        .shell > *:nth-child(4) { animation-delay: 0.15s; }
 
-        .btn-reset {
-            flex: 1;
-            padding: 16px;
-            background: #e0e0e0;
-            color: #333;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-reset:hover {
-            background: #d0d0d0;
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 768px) {
-            .settings-grid {
-                grid-template-columns: 1fr;
-            }
+            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .settings-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="shell">
+        <!-- Header -->
         <div class="header">
-            <h1>⚙️ 인원 및 장소 설정</h1>
-            <p>출입 기록에 사용할 인원과 장소를 관리합니다</p>
+            <div class="header-left">
+                <span class="header-tag">S25016 // Settings</span>
+                <h1>Personnel &amp; Locations</h1>
+                <span class="header-sub">출입 인원 및 장소 관리</span>
+            </div>
+            <a class="back-link" href="../index.html">&larr; Back</a>
         </div>
 
-        <div id="successMessage" class="success-box">
-            <p>✅ 설정이 저장되었습니다!</p>
-        </div>
-
-        <div class="info-box">
-            <h3>ℹ️ 사용 방법</h3>
-            <p>
-                • 새 인원/장소를 추가하려면 입력창에 이름을 입력하고 "추가" 버튼을 클릭하세요.<br>
-                • 삭제하려면 항목 옆의 "삭제" 버튼을 클릭하세요.<br>
-                • 모든 변경사항은 즉시 저장되며, 입력/조회 페이지에 자동으로 반영됩니다.
-            </p>
-        </div>
-
-        <div class="info-box" style="background: #d4edda; border-left-color: #28a745;">
-            <h3 style="color: #155724;">✅ Google Sheets 동기화 구현 완료!</h3>
-            <p style="color: #155724;">
-                PC와 핸드폰에서 동일한 인원/장소 목록을 사용할 수 있습니다.<br>
-                <a href="설정가이드_동기화구현.html" style="color: #667eea; font-weight: bold;">📘 설정 방법 보기</a> |
-                <a href="설정_동기화_가이드.html" style="color: #667eea; font-weight: bold;">🔄 동기화 가이드</a>
-            </p>
-        </div>
-
+        <!-- Settings Grid -->
         <div class="settings-grid">
-            <!-- 인원 관리 -->
-            <div class="settings-card">
-                <h2>👥 출입 인원 관리</h2>
-                <ul class="item-list" id="employeeList">
-                    <!-- JavaScript로 동적 생성 -->
-                </ul>
+            <!-- Employees -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Personnel</span>
+                    <span class="card-badge" id="empCount">0</span>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <ul class="item-list" id="employeeList"></ul>
+                </div>
                 <div class="add-section">
-                    <input type="text"
-                           class="add-input"
-                           id="newEmployee"
-                           placeholder="새 인원 이름 입력..."
-                           onkeypress="if(event.key==='Enter') addEmployee()">
-                    <button class="btn-add" onclick="addEmployee()">➕ 추가</button>
+                    <input type="text" class="add-input" id="newEmployee" placeholder="New name..." onkeypress="if(event.key==='Enter') addEmployee()">
+                    <button class="btn-add" onclick="addEmployee()">Add</button>
                 </div>
             </div>
 
-            <!-- 장소 관리 -->
-            <div class="settings-card">
-                <h2>🏭 현장 위치 관리</h2>
-                <ul class="item-list" id="locationList">
-                    <!-- JavaScript로 동적 생성 -->
-                </ul>
+            <!-- Locations -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Locations</span>
+                    <span class="card-badge" id="locCount">0</span>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <ul class="item-list" id="locationList"></ul>
+                </div>
                 <div class="add-section">
-                    <input type="text"
-                           class="add-input"
-                           id="newLocation"
-                           placeholder="새 장소 이름 입력..."
-                           onkeypress="if(event.key==='Enter') addLocation()">
-                    <button class="btn-add" onclick="addLocation()">➕ 추가</button>
+                    <input type="text" class="add-input" id="newLocation" placeholder="New location..." onkeypress="if(event.key==='Enter') addLocation()">
+                    <button class="btn-add" onclick="addLocation()">Add</button>
                 </div>
             </div>
         </div>
 
-        <div class="action-buttons">
-            <button class="btn-save" onclick="updatePages()">💾 페이지 업데이트 안내</button>
-            <button class="btn-reset" onclick="resetToDefault()">🔄 기본값으로 초기화</button>
-        </div>
-
-        <div class="back-link">
-            <a href="/index.html">← 대시보드로 돌아가기</a>
+        <!-- Actions -->
+        <div class="action-row">
+            <button class="btn btn-green" onclick="updatePages()">Page Update Guide</button>
+            <button class="btn btn-secondary" onclick="resetToDefault()">Reset to Default</button>
         </div>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
-        // 기본 데이터
-        const DEFAULT_EMPLOYEES = ['심태양', '김철수', '이영희', '박민수'];
-        const DEFAULT_LOCATIONS = ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실'];
+        var DEFAULT_EMPLOYEES = ['심태양', '김철수', '이영희', '박민수'];
+        var DEFAULT_LOCATIONS = ['34bay A라인', '34bay B라인', '35bay A라인', '35bay B라인', '사무실', '회의실'];
+        var STORAGE_KEY_EMPLOYEES = 'workManagement_employees';
+        var STORAGE_KEY_LOCATIONS = 'workManagement_locations';
+        var employees = [];
+        var locations = [];
 
-        // 로컬 스토리지 키
-        const STORAGE_KEY_EMPLOYEES = 'workManagement_employees';
-        const STORAGE_KEY_LOCATIONS = 'workManagement_locations';
-
-        let employees = [];
-        let locations = [];
-
-        // 초기 로드
         document.addEventListener('DOMContentLoaded', function() {
             loadSettings();
             renderEmployees();
             renderLocations();
         });
 
-        // 설정 로드
         function loadSettings() {
-            const savedEmployees = localStorage.getItem(STORAGE_KEY_EMPLOYEES);
-            const savedLocations = localStorage.getItem(STORAGE_KEY_LOCATIONS);
-
-            employees = savedEmployees ? JSON.parse(savedEmployees) : [...DEFAULT_EMPLOYEES];
-            locations = savedLocations ? JSON.parse(savedLocations) : [...DEFAULT_LOCATIONS];
+            var savedEmp = localStorage.getItem(STORAGE_KEY_EMPLOYEES);
+            var savedLoc = localStorage.getItem(STORAGE_KEY_LOCATIONS);
+            employees = savedEmp ? JSON.parse(savedEmp) : DEFAULT_EMPLOYEES.slice();
+            locations = savedLoc ? JSON.parse(savedLoc) : DEFAULT_LOCATIONS.slice();
         }
 
-        // 설정 저장
         function saveSettings() {
             localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(employees));
             localStorage.setItem(STORAGE_KEY_LOCATIONS, JSON.stringify(locations));
-            showSuccess();
+            showToast('Settings saved');
         }
 
-        // 성공 메시지 표시
-        function showSuccess() {
-            const msg = document.getElementById('successMessage');
-            msg.classList.add('show');
-            setTimeout(() => {
-                msg.classList.remove('show');
-            }, 3000);
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 3000);
         }
 
-        // 인원 목록 렌더링
         function renderEmployees() {
-            const list = document.getElementById('employeeList');
-
+            var list = document.getElementById('employeeList');
+            document.getElementById('empCount').textContent = employees.length;
             if (employees.length === 0) {
-                list.innerHTML = '<li class="empty-state">등록된 인원이 없습니다.</li>';
+                list.innerHTML = '<li class="empty-state">No personnel registered.</li>';
                 return;
             }
-
-            list.innerHTML = employees.map((emp, index) => `
-                <li>
-                    <span class="item-name">${emp}</span>
-                    <div class="item-actions">
-                        <button class="btn-delete" onclick="deleteEmployee(${index})">🗑️ 삭제</button>
-                    </div>
-                </li>
-            `).join('');
+            list.innerHTML = employees.map(function(emp, i) {
+                return '<li><span class="item-name">' + emp + '</span><button class="btn-del" onclick="deleteEmployee(' + i + ')">Delete</button></li>';
+            }).join('');
         }
 
-        // 장소 목록 렌더링
         function renderLocations() {
-            const list = document.getElementById('locationList');
-
+            var list = document.getElementById('locationList');
+            document.getElementById('locCount').textContent = locations.length;
             if (locations.length === 0) {
-                list.innerHTML = '<li class="empty-state">등록된 장소가 없습니다.</li>';
+                list.innerHTML = '<li class="empty-state">No locations registered.</li>';
                 return;
             }
-
-            list.innerHTML = locations.map((loc, index) => `
-                <li>
-                    <span class="item-name">${loc}</span>
-                    <div class="item-actions">
-                        <button class="btn-delete" onclick="deleteLocation(${index})">🗑️ 삭제</button>
-                    </div>
-                </li>
-            `).join('');
+            list.innerHTML = locations.map(function(loc, i) {
+                return '<li><span class="item-name">' + loc + '</span><button class="btn-del" onclick="deleteLocation(' + i + ')">Delete</button></li>';
+            }).join('');
         }
 
-        // 인원 추가
         function addEmployee() {
-            const input = document.getElementById('newEmployee');
-            const name = input.value.trim();
-
-            if (!name) {
-                alert('⚠️ 인원 이름을 입력해주세요.');
-                return;
-            }
-
-            if (employees.includes(name)) {
-                alert('⚠️ 이미 존재하는 인원입니다.');
-                return;
-            }
-
+            var input = document.getElementById('newEmployee');
+            var name = input.value.trim();
+            if (!name) { alert('Enter a name.'); return; }
+            if (employees.indexOf(name) >= 0) { alert('Already exists.'); return; }
             employees.push(name);
             saveSettings();
             renderEmployees();
             input.value = '';
         }
 
-        // 인원 삭제
         function deleteEmployee(index) {
-            const name = employees[index];
-
-            if (!confirm(`"${name}"을(를) 삭제하시겠습니까?`)) {
-                return;
-            }
-
+            if (!confirm('Delete "' + employees[index] + '"?')) return;
             employees.splice(index, 1);
             saveSettings();
             renderEmployees();
         }
 
-        // 장소 추가
         function addLocation() {
-            const input = document.getElementById('newLocation');
-            const name = input.value.trim();
-
-            if (!name) {
-                alert('⚠️ 장소 이름을 입력해주세요.');
-                return;
-            }
-
-            if (locations.includes(name)) {
-                alert('⚠️ 이미 존재하는 장소입니다.');
-                return;
-            }
-
+            var input = document.getElementById('newLocation');
+            var name = input.value.trim();
+            if (!name) { alert('Enter a location.'); return; }
+            if (locations.indexOf(name) >= 0) { alert('Already exists.'); return; }
             locations.push(name);
             saveSettings();
             renderLocations();
             input.value = '';
         }
 
-        // 장소 삭제
         function deleteLocation(index) {
-            const name = locations[index];
-
-            if (!confirm(`"${name}"을(를) 삭제하시겠습니까?`)) {
-                return;
-            }
-
+            if (!confirm('Delete "' + locations[index] + '"?')) return;
             locations.splice(index, 1);
             saveSettings();
             renderLocations();
         }
 
-        // 기본값으로 초기화
         function resetToDefault() {
-            if (!confirm('⚠️ 모든 설정을 기본값으로 초기화하시겠습니까?\n\n기본 인원: 심태양, 김철수, 이영희, 박민수\n기본 장소: 34bay A/B라인, 35bay A/B라인, 사무실, 회의실')) {
-                return;
-            }
-
-            employees = [...DEFAULT_EMPLOYEES];
-            locations = [...DEFAULT_LOCATIONS];
+            if (!confirm('Reset all settings to default?')) return;
+            employees = DEFAULT_EMPLOYEES.slice();
+            locations = DEFAULT_LOCATIONS.slice();
             saveSettings();
             renderEmployees();
             renderLocations();
-
-            alert('✅ 기본값으로 초기화되었습니다.');
         }
 
-        // 페이지 업데이트 안내
         function updatePages() {
-            const employeeOptions = employees.map(emp =>
-                `                        <option value="${emp}">${emp}</option>`
-            ).join('\n');
-
-            const locationOptions = locations.map(loc =>
-                `                        <option value="${loc}">${loc}</option>`
-            ).join('\n');
-
-            const message = `
-📋 입력.html 파일 업데이트 방법:
-
-1. 근무관리/입력.html 파일을 엽니다.
-
-2. "인원" 선택박스 부분을 찾아서 다음과 같이 수정합니다:
-
-<select id="name" name="name" required>
-    <option value="">선택하세요</option>
-${employeeOptions}
-    <option value="기타">기타 (직접입력)</option>
-</select>
-
-3. "현장 위치" 선택박스 부분을 찾아서 다음과 같이 수정합니다:
-
-<select id="location" name="location" required>
-    <option value="">선택하세요</option>
-${locationOptions}
-    <option value="기타">기타</option>
-</select>
-
-4. 조회.html 파일에도 동일하게 적용합니다.
-
-5. Git 커밋 및 푸시하면 완료됩니다!
-
-💡 Tip: 이 내용을 복사하여 참고하세요.
-            `;
-
-            alert(message);
-            console.log('=== 복사용 인원 옵션 ===');
-            console.log(employeeOptions);
-            console.log('\n=== 복사용 장소 옵션 ===');
-            console.log(locationOptions);
+            var empOpts = employees.map(function(e) { return '  <option value="' + e + '">' + e + '</option>'; }).join('\n');
+            var locOpts = locations.map(function(l) { return '  <option value="' + l + '">' + l + '</option>'; }).join('\n');
+            alert('Copy these options to input.html & query.html select elements:\n\n[Personnel]\n' + empOpts + '\n\n[Locations]\n' + locOpts);
+            console.log('Personnel options:', empOpts);
+            console.log('Location options:', locOpts);
         }
 
-        // 전역 함수로 데이터 접근 가능하게
         window.getEmployees = function() {
             return JSON.parse(localStorage.getItem(STORAGE_KEY_EMPLOYEES)) || DEFAULT_EMPLOYEES;
         };
-
         window.getLocations = function() {
             return JSON.parse(localStorage.getItem(STORAGE_KEY_LOCATIONS)) || DEFAULT_LOCATIONS;
         };

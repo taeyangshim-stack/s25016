@@ -3,184 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>기록 일괄 관리 - S25016 근무관리</title>
+    <title>Bulk Management — S25016</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; padding: 20px; }
-        .container { max-width: 1600px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 20px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .header h1 { font-size: 32px; margin-bottom: 10px; }
-        .header p { opacity: 0.9; font-size: 16px; }
-        .section { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        .section h2 { font-size: 24px; margin-bottom: 20px; color: #333; }
-        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4); }
-        .btn-danger { background: #e74c3c; color: white; }
-        .btn-danger:hover { background: #c0392b; }
-        .btn-secondary { background: #e0e0e0; color: #333; }
-        .btn-secondary:hover { background: #d0d0d0; }
-        .table-wrapper { overflow-x: auto; }
-        .records-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .records-table th, .records-table td { padding: 12px 10px; border: 1px solid #e0e0e0; text-align: center; font-size: 14px; }
-        .records-table thead { background: #f8f9fa; }
-        .records-table th { font-weight: 600; color: #666; }
-        .records-table tbody tr:hover { background: #f1f3f5; }
-        .records-table input, .records-table select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; background: transparent; }
-        .records-table input:focus, .records-table select:focus { background: white; outline: 2px solid #667eea; }
-        .records-table .action-cell { width: 50px; }
-        .back-link { text-align: center; margin-top: 30px; }
-        .back-link a { color: #667eea; text-decoration: none; font-size: 16px; font-weight: 600; }
-        .status-message { padding: 15px; border-radius: 8px; margin-top: 20px; display: none; }
-        .status-message.success { background: #d4edda; color: #155724; }
-        .status-message.error { background: #f8d7da; color: #721c24; }
-        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .toolbar .actions { display: flex; gap: 10px; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* 정렬 기능 스타일 */
-        .sortable { cursor: pointer; user-select: none; position: relative; }
-        .sortable:hover { background: #e9ecef; }
-        .sort-icon { display: inline-block; margin-left: 5px; font-size: 12px; opacity: 0.3; }
-        .sort-icon.active { opacity: 1; color: #667eea; font-weight: bold; }
+        :root {
+            --bg-deep: #f0f2f5;
+            --bg: #f7f8fa;
+            --surface: #ffffff;
+            --surface-hover: #f0f4ff;
+            --border: #e2e6ef;
+            --border-active: #b0c4ff;
+            --text-primary: #1a2035;
+            --text-secondary: #5a6580;
+            --text-muted: #8892a8;
+            --cyan: #2563eb;
+            --cyan-dim: rgba(37, 99, 235, 0.07);
+            --green: #16a34a;
+            --green-dim: rgba(22, 163, 74, 0.07);
+            --red: #dc2626;
+            --red-dim: rgba(220, 38, 38, 0.06);
+            --amber: #d97706;
+            --amber-dim: rgba(217, 119, 6, 0.07);
+            --violet: #7c3aed;
+            --violet-dim: rgba(124, 58, 237, 0.07);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-xs: 6px;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
+            --font-body: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-deep);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(37,99,235,0.04) 1px, transparent 1px);
+            background-size: 32px 32px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* ── Header ── */
+        .header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 32px 8px 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        .header-left { display: flex; flex-direction: column; gap: 4px; }
+        .header-tag { font-family: var(--font-mono); font-size: 0.72em; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.15em; font-weight: 600; opacity: 0.8; }
+        .header h1 { font-family: var(--font-mono); font-size: 1.6em; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+        .header-sub { font-size: 0.88em; color: var(--text-secondary); margin-top: 2px; }
+        .back-link { font-family: var(--font-mono); font-size: 0.82em; color: var(--cyan); text-decoration: none; padding: 6px 14px; background: var(--cyan-dim); border-radius: 999px; border: 1px solid rgba(37,99,235,0.15); transition: all 0.2s var(--ease); white-space: nowrap; }
+        .back-link:hover { background: rgba(37,99,235,0.12); border-color: var(--cyan); }
+
+        /* ── Card ── */
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 18px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .card-title { font-family: var(--font-mono); font-size: 0.92em; font-weight: 600; color: var(--text-primary); }
+
+        /* ── Toolbar ── */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+        .toolbar .actions { display: flex; gap: 8px; }
+
+        .btn {
+            padding: 8px 18px;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s var(--ease);
+            white-space: nowrap;
+        }
+        .btn-primary { background: var(--cyan); color: #fff; border-color: var(--cyan); }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-secondary { background: var(--surface); color: var(--text-secondary); border-color: var(--border); }
+        .btn-secondary:hover { border-color: var(--border-active); color: var(--text-primary); }
+
+        /* ── Status ── */
+        .status-message {
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            margin: 0 24px 0;
+            display: none;
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            font-weight: 500;
+        }
+        .status-message.success { background: var(--green-dim); color: var(--green); display: block; }
+        .status-message.error { background: var(--red-dim); color: var(--red); display: block; }
+        .status-message.info { background: var(--cyan-dim); color: var(--cyan); display: block; }
+
+        /* ── Table ── */
+        .table-wrapper { overflow-x: auto; }
+
+        .records-table { width: 100%; border-collapse: collapse; }
+        .records-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+        .records-table td {
+            padding: 6px 8px;
+            font-size: 0.88em;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+        .records-table tbody tr { transition: background 0.15s var(--ease); }
+        .records-table tbody tr:hover { background: var(--surface-hover); }
+
+        .records-table input, .records-table select {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            font-family: var(--font-body);
+            font-size: 0.88em;
+            color: var(--text-primary);
+            background: transparent;
+            transition: border-color 0.2s var(--ease);
+        }
+        .records-table input:focus, .records-table select:focus {
+            outline: none;
+            border-color: var(--cyan);
+            background: var(--surface);
+            box-shadow: 0 0 0 2px var(--cyan-dim);
+        }
+
+        .records-table input[type="checkbox"] { width: auto; }
+        .action-cell { width: 44px; text-align: center; }
+
+        .del-row-btn {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            padding: 4px 8px;
+            font-size: 0.78em;
+            color: var(--red);
+            cursor: pointer;
+            transition: all 0.2s var(--ease);
+        }
+        .del-row-btn:hover { border-color: var(--red); background: var(--red-dim); }
+
+        /* ── Sort ── */
+        .sortable { cursor: pointer; user-select: none; }
+        .sortable:hover { color: var(--cyan); }
+        .sort-icon { display: inline-block; margin-left: 4px; font-size: 0.9em; opacity: 0.3; }
+        .sort-icon.active { opacity: 1; color: var(--cyan); }
+
+        /* ── Animation ── */
+        .shell > * { animation: fadeUp 0.4s var(--ease) both; }
+        .shell > *:nth-child(2) { animation-delay: 0.05s; }
+        .shell > *:nth-child(3) { animation-delay: 0.10s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .toolbar { flex-direction: column; gap: 10px; align-items: flex-start; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="shell">
+        <!-- Header -->
         <div class="header">
-            <h1>📊 기록 일괄 관리</h1>
-            <p>여러 출입 기록을 한 번에 등록, 수정, 삭제합니다.</p>
+            <div class="header-left">
+                <span class="header-tag">S25016 // Bulk Management</span>
+                <h1>Batch Records</h1>
+                <span class="header-sub">여러 출입 기록을 한 번에 등록, 수정, 삭제</span>
+            </div>
+            <a class="back-link" href="../index.html">&larr; Back</a>
         </div>
 
-        <!-- 일괄 등록 섹션 -->
-        <div class="section">
-            <h2>📝 신규 기록 일괄 등록</h2>
+        <!-- Bulk Add -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">New Records</span>
+            </div>
             <div class="toolbar">
-                <div>
-                    <button class="btn btn-secondary" onclick="addBulkRecordRow()">➕ 행 추가</button>
-                </div>
+                <button class="btn btn-secondary" onclick="addBulkRecordRow()">+ Add Row</button>
                 <div class="actions">
-                    <button class="btn btn-primary" onclick="saveBulkRecords()">💾 일괄 저장</button>
+                    <button class="btn btn-primary" onclick="saveBulkRecords()">Save All</button>
                 </div>
             </div>
             <div class="table-wrapper">
                 <table class="records-table" id="bulkAddTable">
                     <thead>
                         <tr>
-                            <th>날짜</th>
-                            <th>인원</th>
-                            <th>위치</th>
-                            <th>입실</th>
-                            <th>퇴실</th>
-                            <th>작업내용</th>
-                            <th>비고</th>
-                            <th class="action-cell">삭제</th>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Location</th>
+                            <th>In</th>
+                            <th>Out</th>
+                            <th>Task</th>
+                            <th>Notes</th>
+                            <th class="action-cell">Del</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- 행이 동적으로 추가됩니다 -->
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 기존 기록 수정/삭제 섹션 -->
-        <div class="section">
-            <h2>✏️ 기존 기록 수정 및 삭제</h2>
+        <!-- Bulk Edit -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Existing Records</span>
+            </div>
             <div class="toolbar">
-                <div>
-                    <button class="btn btn-secondary" onclick="loadAllRecords()">🔄 새로고침</button>
-                </div>
+                <button class="btn btn-secondary" onclick="loadAllRecords()">Refresh</button>
                 <div class="actions">
-                    <button class="btn btn-danger" onclick="deleteSelectedRecords()">🗑️ 선택 삭제</button>
-                    <button class="btn btn-primary" onclick="updateAllRecords()">💾 모든 변경사항 저장</button>
+                    <button class="btn btn-danger" onclick="deleteSelectedRecords()">Delete Selected</button>
+                    <button class="btn btn-primary" onclick="updateAllRecords()">Save Changes</button>
                 </div>
             </div>
-            <div id="statusMessage" class="status-message"></div>
+            <div id="statusMessage" class="status-message" style="margin: 12px 24px;"></div>
             <div class="table-wrapper">
                 <table class="records-table" id="bulkEditTable">
                     <thead>
                         <tr>
                             <th class="action-cell"><input type="checkbox" onchange="toggleAllCheckboxes(this)"></th>
-                            <th class="sortable" onclick="sortRecords('날짜')">날짜 <span class="sort-icon"></span></th>
-                            <th class="sortable" onclick="sortRecords('인원')">인원 <span class="sort-icon"></span></th>
-                            <th class="sortable" onclick="sortRecords('위치')">위치 <span class="sort-icon"></span></th>
-                            <th class="sortable" onclick="sortRecords('입실시간')">입실 <span class="sort-icon"></span></th>
-                            <th class="sortable" onclick="sortRecords('퇴실시간')">퇴실 <span class="sort-icon"></span></th>
-                            <th>작업내용</th>
-                            <th>비고</th>
+                            <th class="sortable" onclick="sortRecords('날짜')">Date <span class="sort-icon"></span></th>
+                            <th class="sortable" onclick="sortRecords('인원')">Name <span class="sort-icon"></span></th>
+                            <th class="sortable" onclick="sortRecords('위치')">Location <span class="sort-icon"></span></th>
+                            <th class="sortable" onclick="sortRecords('입실시간')">In <span class="sort-icon"></span></th>
+                            <th class="sortable" onclick="sortRecords('퇴실시간')">Out <span class="sort-icon"></span></th>
+                            <th>Task</th>
+                            <th>Notes</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td colspan="8">불러오는 중...</td></tr>
+                        <tr><td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <div class="back-link">
-            <a href="../index.html">← 대시보드로 돌아가기</a>
-        </div>
     </div>
 
     <script>
-        // ==================================================================
-        // 초기 설정 및 데이터 로드
-        // ==================================================================
-        const SCRIPT_URL = '/api/work-records';
-        let employees = [];
-        let locations = [];
-        let allRecords = []; // 전체 기록 저장
-        let sortColumn = null; // 현재 정렬 컬럼
-        let sortDirection = 'asc'; // 정렬 방향 ('asc' 또는 'desc')
+        var SCRIPT_URL = '/api/work-records';
+        var employees = [];
+        var locations = [];
+        var allRecords = [];
+        var sortColumn = null;
+        var sortDirection = 'asc';
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            [employees, locations] = await Promise.all([
+        document.addEventListener('DOMContentLoaded', async function() {
+            var results = await Promise.all([
                 fetchDataFromSheet('getEmployees', ['심태양', '김철수']),
                 fetchDataFromSheet('getLocations', ['34bay A라인', '사무실'])
             ]);
-
-            addBulkRecordRow(); // 일괄 등록 테이블에 기본 한 행 추가
-            loadAllRecords(); // 기존 기록 불러오기
+            employees = results[0];
+            locations = results[1];
+            addBulkRecordRow();
+            loadAllRecords();
         });
 
         async function fetchDataFromSheet(action, fallback) {
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=${action}`);
-                const data = await response.json();
-                if (data.error) {
-                    console.warn(`Sheet '${action}' 로드 실패, fallback 사용:`, data.error);
-                    return data.fallback || fallback;
-                }
+                var response = await fetch(SCRIPT_URL + '?action=' + action);
+                var data = await response.json();
+                if (data.error) return data.fallback || fallback;
                 return data;
             } catch (error) {
-                console.error(`${action} 로드 실패:`, error);
                 return fallback;
             }
         }
 
-        // ==================================================================
-        // 일괄 등록 관련 함수
-        // ==================================================================
+        // ── Bulk Add ──
         function addBulkRecordRow() {
-            const tbody = document.getElementById('bulkAddTable').querySelector('tbody');
-            const newRow = tbody.insertRow();
-            newRow.innerHTML = `
-                <td><input type="date" value="${new Date().toISOString().split('T')[0]}"></td>
-                <td>${createSelectHTML(employees)}</td>
-                <td>${createSelectHTML(locations)}</td>
-                <td><input type="time"></td>
-                <td><input type="time"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-                <td class="action-cell"><button onclick="this.closest('tr').remove()">❌</button></td>
-            `;
+            var tbody = document.getElementById('bulkAddTable').querySelector('tbody');
+            var newRow = tbody.insertRow();
+            newRow.innerHTML =
+                '<td><input type="date" value="' + new Date().toISOString().split('T')[0] + '"></td>' +
+                '<td>' + createSelectHTML(employees) + '</td>' +
+                '<td>' + createSelectHTML(locations) + '</td>' +
+                '<td><input type="time"></td>' +
+                '<td><input type="time"></td>' +
+                '<td><input type="text"></td>' +
+                '<td><input type="text"></td>' +
+                '<td class="action-cell"><button class="del-row-btn" onclick="this.closest(\'tr\').remove()">X</button></td>';
         }
 
         async function saveBulkRecords() {
-            const tbody = document.getElementById('bulkAddTable').querySelector('tbody');
-            const rows = Array.from(tbody.rows);
-            const recordsToSave = rows.map(row => {
-                const cells = row.cells;
+            var tbody = document.getElementById('bulkAddTable').querySelector('tbody');
+            var rows = Array.from(tbody.rows);
+            var recordsToSave = rows.map(function(row) {
+                var cells = row.cells;
                 return {
                     date: cells[0].querySelector('input').value,
                     name: cells[1].querySelector('select').value,
@@ -191,97 +345,79 @@
                     notes: cells[6].querySelector('input').value || '-',
                     timestamp: new Date().toISOString()
                 };
-            }).filter(r => r.date && r.name && r.location && (r.checkIn !== '-' || r.checkOut !== '-'));
+            }).filter(function(r) { return r.date && r.name && r.location && (r.checkIn !== '-' || r.checkOut !== '-'); });
 
-            if (recordsToSave.length === 0) {
-                alert('저장할 유효한 기록이 없습니다.');
-                return;
-            }
-
-            if (!confirm(`${recordsToSave.length}개의 기록을 저장하시겠습니까?`)) return;
+            if (recordsToSave.length === 0) { alert('No valid records to save.'); return; }
+            if (!confirm(recordsToSave.length + ' records will be saved. Proceed?')) return;
 
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=bulkCreate`, {
+                var response = await fetch(SCRIPT_URL + '?action=bulkCreate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(recordsToSave)
                 });
-                const result = await response.json();
+                var result = await response.json();
                 if (result.status !== 'success') throw new Error(result.message || 'Unknown error');
-
-                alert(`✅ ${result.message || '일괄 저장이 완료되었습니다.'}`);
-                tbody.innerHTML = ''; // 테이블 비우기
-                addBulkRecordRow(); // 새 행 추가
-                loadAllRecords(); // 아래 테이블 새로고침
+                alert(result.message || 'Bulk save complete.');
+                tbody.innerHTML = '';
+                addBulkRecordRow();
+                loadAllRecords();
             } catch (error) {
-                alert(`❌ 저장 실패: ${error.message}`);
+                alert('Save failed: ' + error.message);
             }
         }
 
-        // ==================================================================
-        // 기존 기록 수정/삭제 관련 함수
-        // ==================================================================
+        // ── Bulk Edit ──
         async function loadAllRecords() {
-            const tbody = document.getElementById('bulkEditTable').querySelector('tbody');
-            tbody.innerHTML = '<tr><td colspan="8">기록을 불러오는 중...</td></tr>';
+            var tbody = document.getElementById('bulkEditTable').querySelector('tbody');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);">Loading...</td></tr>';
 
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=getAllRecords`);
-                const records = await response.json();
+                var response = await fetch(SCRIPT_URL + '?action=getAllRecords');
+                var records = await response.json();
                 if (records.error) throw new Error(records.error);
 
-                const enrichedRecords = records.map((record, index) => {
-                    if (!record.rowNumber) {
-                        record.rowNumber = index + 2;
-                    }
-                    if (!record.timestamp && record['타임스탬프']) {
-                        record.timestamp = record['타임스탬프'];
-                    }
+                allRecords = records.map(function(record, index) {
+                    if (!record.rowNumber) record.rowNumber = index + 2;
+                    if (!record.timestamp && record['타임스탬프']) record.timestamp = record['타임스탬프'];
                     return record;
-                });
+                }).sort(function(a, b) { return (b.rowNumber || 0) - (a.rowNumber || 0); });
 
-                allRecords = enrichedRecords.sort((a, b) => (b.rowNumber || 0) - (a.rowNumber || 0));
-                sortColumn = null; // 정렬 초기화
+                sortColumn = null;
                 sortDirection = 'asc';
                 renderRecords();
-
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="8" style="color: red;">기록 로드 실패: ${error.message}</td></tr>`;
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--red);">Load failed: ' + error.message + '</td></tr>';
             }
         }
 
         function renderRecords() {
-            const tbody = document.getElementById('bulkEditTable').querySelector('tbody');
-
+            var tbody = document.getElementById('bulkEditTable').querySelector('tbody');
             if (allRecords.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8">표시할 기록이 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);">No records.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = allRecords.map(record => {
-                // timestamp를 안전하게 처리
-                const timestamp = record.timestamp || record['타임스탬프'] || '';
-                const safeTimestamp = (timestamp && timestamp !== 'undefined') ? timestamp : '';
+            tbody.innerHTML = allRecords.map(function(record) {
+                var timestamp = record.timestamp || record['타임스탬프'] || '';
+                var safeTimestamp = (timestamp && timestamp !== 'undefined') ? timestamp : '';
 
-                return `
-                    <tr data-row-number="${record.rowNumber}" data-timestamp="${safeTimestamp}">
-                        <td class="action-cell"><input type="checkbox"></td>
-                        <td><input type="date" value="${record['날짜'] || ''}"></td>
-                        <td>${createSelectHTML(employees, record['인원'])}</td>
-                        <td>${createSelectHTML(locations, record['위치'])}</td>
-                        <td><input type="time" value="${record['입실시간'] === '-' ? '' : record['입실시간']}"></td>
-                        <td><input type="time" value="${record['퇴실시간'] === '-' ? '' : record['퇴실시간']}"></td>
-                        <td><input type="text" value="${record['작업내용'] === '-' ? '' : record['작업내용']}"></td>
-                        <td><input type="text" value="${record['비고'] === '-' ? '' : record['비고']}"></td>
-                    </tr>
-                `;
+                return '<tr data-row-number="' + record.rowNumber + '" data-timestamp="' + safeTimestamp + '">' +
+                    '<td class="action-cell"><input type="checkbox"></td>' +
+                    '<td><input type="date" value="' + (record['날짜'] || '') + '"></td>' +
+                    '<td>' + createSelectHTML(employees, record['인원']) + '</td>' +
+                    '<td>' + createSelectHTML(locations, record['위치']) + '</td>' +
+                    '<td><input type="time" value="' + (record['입실시간'] === '-' ? '' : record['입실시간']) + '"></td>' +
+                    '<td><input type="time" value="' + (record['퇴실시간'] === '-' ? '' : record['퇴실시간']) + '"></td>' +
+                    '<td><input type="text" value="' + (record['작업내용'] === '-' ? '' : record['작업내용']) + '"></td>' +
+                    '<td><input type="text" value="' + (record['비고'] === '-' ? '' : record['비고']) + '"></td>' +
+                '</tr>';
             }).join('');
 
             updateSortIcons();
         }
 
         function sortRecords(column) {
-            // 같은 컬럼 클릭 시 방향 토글, 다른 컬럼 클릭 시 오름차순
             if (sortColumn === column) {
                 sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
             } else {
@@ -289,65 +425,41 @@
                 sortDirection = 'asc';
             }
 
-            // 데이터 정렬
-            allRecords.sort((a, b) => {
-                let valA = a[column] || '';
-                let valB = b[column] || '';
-
-                // 날짜/시간 비교
+            allRecords.sort(function(a, b) {
+                var valA = a[column] || '';
+                var valB = b[column] || '';
                 if (column === '날짜' || column === '입실시간' || column === '퇴실시간') {
                     valA = valA === '-' ? '' : valA;
                     valB = valB === '-' ? '' : valB;
-                    if (sortDirection === 'asc') {
-                        return valA.localeCompare(valB);
-                    } else {
-                        return valB.localeCompare(valA);
-                    }
+                    return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
                 }
-
-                // 문자열 비교 (인원, 위치)
-                if (sortDirection === 'asc') {
-                    return String(valA).localeCompare(String(valB), 'ko');
-                } else {
-                    return String(valB).localeCompare(String(valA), 'ko');
-                }
+                return sortDirection === 'asc' ? String(valA).localeCompare(String(valB), 'ko') : String(valB).localeCompare(String(valA), 'ko');
             });
-
             renderRecords();
         }
 
         function updateSortIcons() {
-            // 모든 정렬 아이콘 초기화
-            document.querySelectorAll('.sort-icon').forEach(icon => {
+            document.querySelectorAll('.sort-icon').forEach(function(icon) {
                 icon.textContent = '';
                 icon.classList.remove('active');
             });
-
-            // 현재 정렬 컬럼의 아이콘 업데이트
             if (sortColumn) {
-                const headers = {
-                    '날짜': 0,
-                    '인원': 1,
-                    '위치': 2,
-                    '입실시간': 3,
-                    '퇴실시간': 4
-                };
-                const headerIndex = headers[sortColumn];
+                var headers = { '날짜': 0, '인원': 1, '위치': 2, '입실시간': 3, '퇴실시간': 4 };
+                var headerIndex = headers[sortColumn];
                 if (headerIndex !== undefined) {
-                    const th = document.querySelectorAll('#bulkEditTable th.sortable')[headerIndex];
-                    const icon = th.querySelector('.sort-icon');
+                    var th = document.querySelectorAll('#bulkEditTable th.sortable')[headerIndex];
+                    var icon = th.querySelector('.sort-icon');
                     icon.classList.add('active');
-                    icon.textContent = sortDirection === 'asc' ? '▲' : '▼';
+                    icon.textContent = sortDirection === 'asc' ? '\u25B2' : '\u25BC';
                 }
             }
         }
 
         async function updateAllRecords() {
-            const rows = document.querySelectorAll('#bulkEditTable tbody tr');
-            const recordsToUpdate = Array.from(rows).map(row => {
-                const cells = row.cells;
-                const timestamp = row.dataset.timestamp;
-
+            var rows = document.querySelectorAll('#bulkEditTable tbody tr');
+            var recordsToUpdate = Array.from(rows).map(function(row) {
+                var cells = row.cells;
+                var timestamp = row.dataset.timestamp;
                 return {
                     rowNumber: row.dataset.rowNumber,
                     timestamp: (timestamp && timestamp !== 'undefined') ? timestamp : '',
@@ -359,97 +471,76 @@
                     workType: cells[6].querySelector('input').value || '-',
                     notes: cells[7].querySelector('input').value || '-',
                 };
-            }).filter(record => record.rowNumber); // rowNumber가 있는 것만 필터링
+            }).filter(function(r) { return r.rowNumber; });
 
-            if (recordsToUpdate.length === 0) {
-                alert('수정할 기록이 없습니다.');
-                return;
-            }
+            if (recordsToUpdate.length === 0) { alert('No records to update.'); return; }
+            if (!confirm(recordsToUpdate.length + ' records will be saved. This cannot be undone.')) return;
 
-            if (!confirm(`${recordsToUpdate.length}개의 기록을 저장하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
-
-            showStatus(`저장 중... (${recordsToUpdate.length}개)`, 'info');
+            showStatus('Saving ' + recordsToUpdate.length + ' records...', 'info');
 
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=bulkUpdate`, {
+                var response = await fetch(SCRIPT_URL + '?action=bulkUpdate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(recordsToUpdate)
                 });
-
-                const result = await response.json();
-
-                console.log('서버 응답:', result);
-
+                var result = await response.json();
                 if (result.status !== 'success') throw new Error(result.message || 'Unknown error');
-
-                showStatus(`✅ ${result.message || '모든 변경사항이 성공적으로 저장되었습니다.'}`, 'success');
+                showStatus(result.message || 'All changes saved.', 'success');
                 await loadAllRecords();
             } catch (error) {
-                console.error('일괄 수정 실패:', error);
-                showStatus(`❌ 저장 실패: ${error.message}`, 'error');
+                showStatus('Save failed: ' + error.message, 'error');
             }
         }
 
         async function deleteSelectedRecords() {
-            const selectedRows = Array.from(document.querySelectorAll('#bulkEditTable tbody input[type="checkbox"]:checked'))
-                .map(cb => cb.closest('tr'));
-            
-            if (selectedRows.length === 0) {
-                alert('삭제할 기록을 선택하세요.');
-                return;
-            }
+            var selectedRows = Array.from(document.querySelectorAll('#bulkEditTable tbody input[type="checkbox"]:checked'))
+                .map(function(cb) { return cb.closest('tr'); });
 
-            if (!confirm(`${selectedRows.length}개의 기록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
+            if (selectedRows.length === 0) { alert('Select records to delete.'); return; }
+            if (!confirm(selectedRows.length + ' records will be deleted. This cannot be undone.')) return;
 
-            const recordsToDelete = selectedRows.map(row => ({
-                rowNumber: row.dataset.rowNumber,
-                timestamp: row.dataset.timestamp
-            }));
+            var recordsToDelete = selectedRows.map(function(row) {
+                return { rowNumber: row.dataset.rowNumber, timestamp: row.dataset.timestamp };
+            });
 
-            showStatus('삭제 중...', 'info');
+            showStatus('Deleting...', 'info');
 
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=bulkDelete`, {
+                var response = await fetch(SCRIPT_URL + '?action=bulkDelete', {
                     method: 'POST',
                     mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(recordsToDelete)
                 });
-                const result = await response.json();
+                var result = await response.json();
                 if (result.status !== 'success') throw new Error(result.message);
-
-                showStatus('✅ 선택한 기록이 삭제되었습니다.', 'success');
+                showStatus('Selected records deleted.', 'success');
                 loadAllRecords();
             } catch (error) {
-                showStatus(`❌ 삭제 실패: ${error.message}`, 'error');
+                showStatus('Delete failed: ' + error.message, 'error');
             }
         }
 
-        // ==================================================================
-        // 유틸리티 함수
-        // ==================================================================
+        // ── Utilities ──
         function createSelectHTML(options, selectedValue) {
-            return `
-                <select>
-                    ${options.map(opt => `<option value="${opt}" ${opt === selectedValue ? 'selected' : ''}>${opt}</option>`).join('')}
-                </select>
-            `;
+            return '<select>' + options.map(function(opt) {
+                return '<option value="' + opt + '"' + (opt === selectedValue ? ' selected' : '') + '>' + opt + '</option>';
+            }).join('') + '</select>';
         }
 
         function toggleAllCheckboxes(source) {
-            const checkboxes = document.querySelectorAll('#bulkEditTable tbody input[type="checkbox"]');
-            checkboxes.forEach(checkbox => checkbox.checked = source.checked);
+            document.querySelectorAll('#bulkEditTable tbody input[type="checkbox"]').forEach(function(cb) {
+                cb.checked = source.checked;
+            });
         }
 
         function showStatus(message, type) {
-            const statusDiv = document.getElementById('statusMessage');
+            var statusDiv = document.getElementById('statusMessage');
             statusDiv.textContent = message;
-            statusDiv.className = `status-message ${type}`;
-            statusDiv.style.display = 'block';
-            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+            statusDiv.className = 'status-message ' + type;
+            setTimeout(function() { statusDiv.style.display = 'none'; statusDiv.className = 'status-message'; }, 5000);
         }
-
     </script>
 </body>
 </html>
