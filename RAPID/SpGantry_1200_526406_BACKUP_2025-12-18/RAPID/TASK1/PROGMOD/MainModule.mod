@@ -1691,6 +1691,11 @@ PERS num debug_r2_floor_y_offset := 0;
 		max_iterations := 3;
 		tolerance := 0.5;  ! mm
 
+		! v1.9.49: Disable config supervision for non-home gantry init
+		! When R!=0, hardcoded confdata [-1,-1,0,4] may not match optimal joint config
+		ConfJ \Off;
+		ConfL \Off;
+
 		! Update WobjGantry to reflect current gantry position
 		UpdateGantryWobj;
 		! tWeld1 TCP HOME: [0, 0, 1000] in WobjGantry
@@ -1702,10 +1707,12 @@ PERS num debug_r2_floor_y_offset := 0;
 		! Iterative refinement to reach precise R-axis center (max 3 iterations)
 		WHILE iteration < max_iterations DO
 			iteration := iteration + 1;
-			! Read current tWeld1 TCP position in wobj0
-			current_wobj0 := CRobT(\Tool:=tWeld1\WObj:=wobj0);
-			error_x := 0 - current_wobj0.trans.x;  ! Target X=0
-			error_y := 0 - current_wobj0.trans.y;  ! Target Y=0
+			! v1.9.49: Read TCP in WobjGantry (not wobj0!) to avoid unreachable error
+			! When gantry XYZ!=0, wobj0 gives large coords -> huge correction -> unreachable
+			UpdateGantryWobj;
+			current_wobj0 := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
+			error_x := 0 - current_wobj0.trans.x;  ! Target X=0 in WobjGantry
+			error_y := 0 - current_wobj0.trans.y;  ! Target Y=0 in WobjGantry
 
 			! Check if within tolerance
 			IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
@@ -1719,6 +1726,10 @@ PERS num debug_r2_floor_y_offset := 0;
 				MoveL home_tcp, v50, fine, tWeld1\WObj:=WobjGantry;
 			ENDIF
 		ENDWHILE
+
+		! v1.9.49: Restore config supervision after init positioning
+		ConfJ \On;
+		ConfL \On;
 
 		! Step 3: Move gantry to HOME position (physical origin)
 		home_pos := CJointT();  ! Read current position

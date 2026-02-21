@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.48";
+CONST string TASK1_VERSION := "v1.9.49";
 CONST string TASK2_VERSION := "v1.9.43";
 CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
@@ -24,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-22";
+CONST string BUILD_DATE := "2026-02-21";
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -46,6 +46,14 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.49 (2026-02-21) - Robot1 Init Fix: Non-Home Gantry Position
+!   - FIX: CRobT wobj0 -> WobjGantry in iterative refinement (Step 2)
+!   - ROOT CAUSE: wobj0 gives world coords, gantry XYZ!=0 causes huge error -> unreachable
+!   - FIX: ConfJ \Off / ConfL \Off before Step 2 MoveJ
+!   - ROOT CAUSE: Hardcoded confdata [-1,-1,0,4] invalid when R!=0 -> abnormal motion
+!   - ConfJ/ConfL restored \On after Step 2 ENDWHILE
+!   - Reference: Robot2 (Rob2_MainModule) already uses WobjGantry_Rob2 correctly
+!
 ! v2.0.1 (2026-02-22) - Robot2 TCP Floor Coordinate Fix
 !   - FIX: CalcCurrentTcp R2 position - 488mm Y offset subtracted before rotation
 !   - FIX: CalcCurrentTcp R2 orientation - EulerZYX(\Z)-gantryAngle compensation
