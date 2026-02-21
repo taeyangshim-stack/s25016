@@ -1605,9 +1605,10 @@
                     </div>
                     <div class="dnote dnote-green">
                         <p>
-                            <strong>최신:</strong> 2025-11-22 좌표 변환 테스트 PASSED<br>
-                            <strong>성과:</strong> 목표 976mm vs 실측 982.21mm (오차 6.21mm)<br>
-                            <strong>진행:</strong> TestMoveToWorldOrigin Z=500 테스트 대기
+                            <strong>최신:</strong> 2026-02-21 Robot2 TCP Y=488mm 오프셋 수정 완료<br>
+                            <strong>원인:</strong> TASK7 CalcCurrentTcp에서 LOCKED_EAW_11(488mm) 미보정<br>
+                            <strong>수정:</strong> pR2.y - 488 보정 → R-축 중심 기준 회전 계산<br>
+                            <strong>검증:</strong> R=0°/30°/90°/-45° 전 각도 PASS (오차 0.04mm 이내)
                         </p>
                     </div>
                     <div class="dnote dnote-amber">
@@ -1630,9 +1631,9 @@
                     <div class="dnote dnote-cyan">
                         <p>
                             <strong>시스템:</strong> XYZ 선형축 + R축 회전 갠트리<br>
-                            <strong>구성:</strong> R축 바디에 2대 로봇 부착 (±488mm)<br>
-                            <strong>용도:</strong> T-bar 웹 양면 동시/교대 용접<br>
-                            <strong>회전:</strong> ±100° 범위, 용접선 수직 유지
+                            <strong>구성:</strong> R축 바디에 2대 로봇 부착 (±488mm, LOCKED_EAW_11)<br>
+                            <strong>핵심:</strong> Robot1=갠트리 조정, Robot2=독립 (수동 좌표 변환)<br>
+                            <strong>해결:</strong> Robot2 TCP 계산 시 488mm 베이스-R축 오프셋 보정 완료
                         </p>
                     </div>
                 </div>

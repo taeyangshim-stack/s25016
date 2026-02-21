@@ -232,15 +232,89 @@ R축 회전 시에도 정상 동작하는지 추가 검증 필요 (R=45&deg;, R=
 </div>
 </div>
 
-<h2>6. UI 표시값 현황</h2>
+<h2>6. 488mm 오프셋 문제 — 원인 및 수정 (2026-02-21)</h2>
+<div class="card">
+<div class="card-title">문제: UI에서 Robot2 Y = 4812 (정상값 5300에서 488mm 부족)</div>
+
+<h3>원인 추적</h3>
+<p>UI에 TCP 값을 제공하는 실제 코드는 <strong>TASK7</strong>의 <code>CalcCurrentTcp(\R2)</code> (Static.mod):</p>
+<pre>
+! TASK7 Static.mod — UI 데이터 소스 (TASK8 아님!)
+pR2 := CRobT(\taskname:="T_ROB2"\Tool:=tWeld2\WObj:=wobj0);
+gantryAngle := MonitorPosition.monExt.eax_d;
+
+nRotX := (pR2.trans.x * Cos(gantryAngle)) - (pR2.trans.y * Sin(gantryAngle));
+nRotY := (pR2.trans.x * Sin(gantryAngle)) + (pR2.trans.y * Cos(gantryAngle));
+
+result.trans.x := GantryX + nRotX;
+result.trans.y := GantryY - nRotY;    &larr; 여기서 문제 발생
+result.trans.z := GantryZ + pR2.trans.z;
+</pre>
+
+<div class="critical">
+<strong>근본 원인:</strong><br>
+<code>CRobT(T_ROB2, tWeld2, wobj0)</code>의 <code>pR2.y = 488</code>은
+Robot2 베이스에서 R-축 중심까지의 거리(LOCKED_EAW_11 = 488mm).<br>
+이 값을 <strong>R-축 중심 기준으로 변환하지 않고</strong> 그대로 회전 계산에 사용하여,<br>
+<code>result.y = 5300 - 488 = 4812</code>가 됨.
+</div>
+
+<h3>수정 내용</h3>
+<pre>
+! 수정 전 (오류)
+nRotX := (pR2.trans.x * Cos(R)) - (pR2.trans.y * Sin(R));
+nRotY := (pR2.trans.x * Sin(R)) + (pR2.trans.y * Cos(R));
+
+! 수정 후 (정상) — pR2.y에서 488mm 차감하여 R-축 중심 기준으로 변환
+nRotX := (pR2.trans.x * Cos(R)) - ((pR2.trans.y - 488) * Sin(R));
+nRotY := (pR2.trans.x * Sin(R)) + ((pR2.trans.y - 488) * Cos(R));
+</pre>
+
+<div class="highlight">
+<strong>왜 488을 빼는가?</strong><br>
+pR2.y에는 Robot2 베이스→R축 중심 거리 488mm가 포함됨.<br>
+회전 공식은 R-축 중심을 기준으로 해야 하므로, 488mm를 빼서<br>
+"R-축 중심 기준 오프셋"으로 변환한 뒤 회전을 적용해야 정확함.<br>
+<br>
+<strong>Robot1은 왜 정상?</strong><br>
+Robot1은 <code>WobjFloor</code>로 직접 CRobT를 호출하며, 갠트리 조정(coordinated)이므로<br>
+ABB 컨트롤러가 LOCKED_EAW_11 오프셋을 자동 처리함.
+</div>
+</div>
+
+<h2>7. 수정 후 검증 결과 (2026-02-21)</h2>
+<div class="card">
+<div class="card-title">R-축 회전 각도별 TCP 비교</div>
+<table>
+<tr><th>R-축</th><th>Robot1 X</th><th>Robot1 Y</th><th>Robot2 X</th><th>Robot2 Y</th><th>XY 차이</th><th>상태</th></tr>
+<tr><td><strong>0&deg;</strong></td><td>9500.00</td><td>5300.04</td><td>9500.00</td><td>5300.00</td><td>0.04mm</td><td class="ok">PASS</td></tr>
+<tr><td><strong>30&deg;</strong></td><td>9499.99</td><td>5300.03</td><td>9500.00</td><td>5300.00</td><td>0.03mm</td><td class="ok">PASS</td></tr>
+<tr><td><strong>90&deg;</strong></td><td>9499.97</td><td>5300.00</td><td>9500.00</td><td>5300.00</td><td>0.03mm</td><td class="ok">PASS</td></tr>
+<tr><td><strong>-45&deg;</strong></td><td>9500.03</td><td>5300.03</td><td>9500.00</td><td>5300.00</td><td>0.04mm</td><td class="ok">PASS</td></tr>
+</table>
+
+<div class="highlight">
+<strong>검증 완료:</strong> 모든 R-축 각도에서 Robot1/Robot2 TCP가 <strong>0.04mm 이내</strong>로 일치.<br>
+TCP가 R-축 중심 (9500, 5300)에 고정되어, 회전해도 위치 변동 없음 확인.
+</div>
+
+<h3>수정 파일 목록</h3>
+<table>
+<tr><th>파일</th><th>변경</th><th>커밋</th></tr>
+<tr><td>TASK7/PROGMOD/Static.mod</td><td>CalcCurrentTcp: pR2.y - 488 보정 추가</td><td><code>5d106a6</code></td></tr>
+<tr><td>TASK8/PROGMOD/Head_Data.mod</td><td>wobjRotCtr2 origin [488,0,0]&rarr;[0,0,0]</td><td><code>c865acc</code></td></tr>
+</table>
+</div>
+
+<h2>8. UI 표시값 현황 (수정 후)</h2>
 <div class="card">
 <div class="card-title">상위 시스템(UI)에서 수신하는 TCP 값</div>
 <table>
 <tr><th></th><th>Robot1</th><th>Robot2</th><th>상태</th></tr>
 <tr><td><strong>X (mm)</strong></td><td>9500.00</td><td>9500.00</td><td class="ok">정상</td></tr>
-<tr><td><strong>Y (mm)</strong></td><td>5300.03</td><td>4812.00</td><td class="ng">488mm 차이 (보정 필요)</td></tr>
-<tr><td><strong>Z (mm)</strong></td><td>1100.03</td><td>1100.00</td><td class="ok">정상</td></tr>
-<tr><td><strong>Rx (&deg;)</strong></td><td>90.00</td><td>-90.00</td><td class="warn">부호 반전 (물리적 반전 반영)</td></tr>
+<tr><td><strong>Y (mm)</strong></td><td>5300.04</td><td>5300.00</td><td class="ok">정상 (수정 완료)</td></tr>
+<tr><td><strong>Z (mm)</strong></td><td>1100.02</td><td>1100.00</td><td class="ok">정상</td></tr>
+<tr><td><strong>Rx (&deg;)</strong></td><td>90.00</td><td>-90.00</td><td class="warn">부호 반전 (물리적 반전 반영, 정상)</td></tr>
 <tr><td><strong>Ry (&deg;)</strong></td><td>-80.00</td><td>-80.00</td><td class="ok">동일</td></tr>
 <tr><td><strong>Rz (&deg;)</strong></td><td>-0.00</td><td>0.00</td><td class="ok">동일</td></tr>
 </table>
