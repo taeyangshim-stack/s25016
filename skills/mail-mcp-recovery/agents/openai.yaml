@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mail MCP Recovery"
+  short_description: "Diagnose and recover NATE/NAVER mail MCP issues"
+  default_prompt: "Use $mail-mcp-recovery to diagnose and recover NATE/NAVER mail MCP transport and auth failures."
