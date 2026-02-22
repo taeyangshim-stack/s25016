@@ -83,3 +83,12 @@ gha-creds-*.json
 # Python
 __pycache__/
 *.pyc
+
+# Local MCP/mail tooling (contains local configs, deps, and temp artifacts)
+.mcp-tools/
+.mail-check/
+.audit-imap/
+.audit-mail/
+
+# Local secret files
+*.pass
