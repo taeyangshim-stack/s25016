@@ -585,13 +585,14 @@ PERS bool WELD_ARC_ENABLED := FALSE; ! TRUE=ArcLStart/ArcL, FALSE=MoveJ/MoveL (s
 ! NOTE (v1.9.38): Individual weld parameters moved to torchmotion macroStartBuffer
 ! WELD_TRAVEL_ANGLE -> macroStartBuffer1{pass}.TravelAngle
 ! WELD_WORKING_ANGLE -> macroStartBuffer1{pass}.WorkingAngle
-! WELD_ARC_VOLTAGE -> macroStartBuffer1{pass}.Voltage
-! WELD_ARC_CURRENT -> macroStartBuffer1{pass}.Current
-! WELD_ARC_WIRE_FEED -> macroStartBuffer1{pass}.FeedingSpeed
+! WELD_ARC_VOLTAGE -> macroStartBuffer1{pass}.Voltage     -> weld_heat.par3
+! WELD_ARC_WIRE_FEED -> macroStartBuffer1{pass}.FeedingSpeed -> weld_heat.par4
+! WELD_ARC_CURRENT -> macroStartBuffer1{pass}.Current      -> weld_heat.par6
 ! WELD_ARC_SPEED -> macroStartBuffer1{pass}.WeldingSpeed
 ! WELD_WEAVE_WIDTH -> macroStartBuffer1{pass}.WeaveWidth
 ! WELD_WEAVE_LENGTH -> macroStartBuffer1{pass}.WeaveLength
 ! WELD_USE_ORIENT -> removed (RelTool with TravelAngle/WorkingAngle replaces quaternion)
+! v1.9.53: par4/par6 mapping fixed - par4=FeedingSpeed(wfs), par6=Current (matches PlanA)
 
 ! ========================================
 ! PlanA Additional Variables (v1.9.40)

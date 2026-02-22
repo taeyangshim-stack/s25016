@@ -4666,38 +4666,48 @@ ENDPROC
 
 ! ----------------------------------------
 ! BuildArcParams: Convert torchmotion buffer → ABB arc weld data types
-! v1.9.52: Maps macroStartBuffer1/macroEndBuffer1 to seam1/weld1/weave1_rob1
+! v1.9.53: Maps macroStartBuffer1/macroEndBuffer1 to seam1/weld1/weave1_rob1
+! v1.9.53 FIX: par4=FeedingSpeed, par6=Current (was reversed in v1.9.52)
+! v1.9.53 FIX: weavedata pos5=height(0), pos6=dwellL, pos7=dir(0), pos8=dwellR
 ! ----------------------------------------
 PROC BuildArcParams(num pass)
 	! welddata: [weld_speed, weld_joint_speed, weld_heat{9}, weld_cool{9}]
-	! weld_heat: par1=process(MIG=5), par3=voltage, par4=current, par6=wire_feed
+	! weld_heat: par1=process(MIG=5), par3=voltage, par4=wire_feed, par6=current
+	! v1.9.53: Fixed par4/par6 mapping to match PlanA (LincolnArcLink-XT)
+	!          PlanA ref: Rob1_MainModule.mod L708
+	!          par4=wfs(wire_feed_speed), par6=Current
 	weld1.weld_heat.par1 := 5;
 	weld1.weld_heat.par3 := macroStartBuffer1{pass}.Voltage;
-	weld1.weld_heat.par4 := macroStartBuffer1{pass}.Current;
-	weld1.weld_heat.par6 := macroStartBuffer1{pass}.FeedingSpeed;
+	weld1.weld_heat.par4 := macroStartBuffer1{pass}.FeedingSpeed;
+	weld1.weld_heat.par6 := macroStartBuffer1{pass}.Current;
 
-	! seamdata: start heat parameters
+	! seamdata: start heat parameters (same par4/par6 mapping as welddata)
 	seam1.s_heat.par3 := macroStartBuffer1{pass}.Voltage;
-	seam1.s_heat.par4 := macroStartBuffer1{pass}.Current;
-	seam1.s_heat.par6 := macroStartBuffer1{pass}.FeedingSpeed;
+	seam1.s_heat.par4 := macroStartBuffer1{pass}.FeedingSpeed;
+	seam1.s_heat.par6 := macroStartBuffer1{pass}.Current;
 	! seamdata: end heat parameters (from macroEndBuffer1)
 	seam1.e_heat.par3 := macroEndBuffer1{pass}.Voltage;
-	seam1.e_heat.par4 := macroEndBuffer1{pass}.Current;
-	seam1.e_heat.par6 := macroEndBuffer1{pass}.FeedingSpeed;
+	seam1.e_heat.par4 := macroEndBuffer1{pass}.FeedingSpeed;
+	seam1.e_heat.par6 := macroEndBuffer1{pass}.Current;
 
-	! weavedata: [shape, type, length, width, dwellL, dwellR, 0x9]
+	! weavedata: [shape, type, length, width, height, dwell_left, dir, dwell_right, 0x7]
+	! v1.9.53: Fixed field positions to match ABB weavedata structure
+	!          PlanA ref: Rob1_MainModule.mod L720
+	!          pos5=height(0), pos6=dwell_left, pos7=dir(0), pos8=dwell_right
 	weave1_rob1 := [
 		macroStartBuffer1{pass}.WeaveShape,
 		macroStartBuffer1{pass}.WeaveType,
 		macroStartBuffer1{pass}.WeaveLength,
 		macroStartBuffer1{pass}.WeaveWidth,
+		0,
 		macroStartBuffer1{pass}.WeaveDwellLeft,
+		0,
 		macroStartBuffer1{pass}.WeaveDwellRight,
-		0,0,0,0,0,0,0,0,0];
+		0,0,0,0,0,0,0];
 
 	TPWrite "[ARC] Pass " + NumToStr(pass,0) + " V=" + NumToStr(weld1.weld_heat.par3,1)
-		+ " A=" + NumToStr(weld1.weld_heat.par4,0)
-		+ " WFS=" + NumToStr(weld1.weld_heat.par6,0);
+		+ " WFS=" + NumToStr(weld1.weld_heat.par4,0)
+		+ " A=" + NumToStr(weld1.weld_heat.par6,0);
 ENDPROC
 
 ! ----------------------------------------
@@ -4815,7 +4825,7 @@ PROC TraceWeldLine()
 
 		! --- Trace weld line: multi-segment MoveL loop ---
 		IF WELD_ARC_ENABLED = TRUE THEN
-			! v1.9.52: Actual ArcL welding with torchmotion → ABB param conversion
+			! v1.9.53: Actual ArcL welding with torchmotion → ABB param conversion
 			BuildArcParams pass;
 			TPWrite "[TRACE] ARC WELD pass " + NumToStr(pass,0)
 				+ " (" + NumToStr(nSegs,0) + " segs)...";

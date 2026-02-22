@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.52";
+CONST string TASK1_VERSION := "v1.9.53";
 CONST string TASK2_VERSION := "v1.9.43";
 CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
@@ -46,6 +46,15 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.53 (2026-02-23) - BuildArcParams field mapping bugfix
+!   - FIX: welddata par4/par6 swapped — par4=FeedingSpeed(wfs), par6=Current
+!     Previously par4=Current, par6=FeedingSpeed (reversed from PlanA/LincolnArcLink-XT)
+!   - FIX: seamdata s_heat/e_heat same par4/par6 correction applied
+!   - FIX: weavedata field positions corrected to ABB standard
+!     [shape,type,length,width,height(0),dwellL,dir(0),dwellR,0x7]
+!     Previously dwellL/dwellR were at pos5/pos6 instead of pos6/pos8
+!   - REF: PlanA Rob1_MainModule.mod L708(welddata), L720(weavedata)
+!
 ! v1.9.52 (2026-02-23) - Weld condition swap: ArcL implementation
 !   - NEW: BuildArcParams proc (torchmotion → seamdata/welddata/weavedata)
 !   - IMPL: TraceWeldLine WELD_ARC_ENABLED=TRUE branch
