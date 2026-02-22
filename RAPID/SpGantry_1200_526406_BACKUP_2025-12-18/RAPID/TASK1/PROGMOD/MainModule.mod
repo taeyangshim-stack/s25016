@@ -4665,6 +4665,42 @@ PROC GenerateWeldPath(pos adjStart, pos adjEnd, robtarget refTarget, num nPass)
 ENDPROC
 
 ! ----------------------------------------
+! BuildArcParams: Convert torchmotion buffer → ABB arc weld data types
+! v1.9.52: Maps macroStartBuffer1/macroEndBuffer1 to seam1/weld1/weave1_rob1
+! ----------------------------------------
+PROC BuildArcParams(num pass)
+	! welddata: [weld_speed, weld_joint_speed, weld_heat{9}, weld_cool{9}]
+	! weld_heat: par1=process(MIG=5), par3=voltage, par4=current, par6=wire_feed
+	weld1.weld_heat.par1 := 5;
+	weld1.weld_heat.par3 := macroStartBuffer1{pass}.Voltage;
+	weld1.weld_heat.par4 := macroStartBuffer1{pass}.Current;
+	weld1.weld_heat.par6 := macroStartBuffer1{pass}.FeedingSpeed;
+
+	! seamdata: start heat parameters
+	seam1.s_heat.par3 := macroStartBuffer1{pass}.Voltage;
+	seam1.s_heat.par4 := macroStartBuffer1{pass}.Current;
+	seam1.s_heat.par6 := macroStartBuffer1{pass}.FeedingSpeed;
+	! seamdata: end heat parameters (from macroEndBuffer1)
+	seam1.e_heat.par3 := macroEndBuffer1{pass}.Voltage;
+	seam1.e_heat.par4 := macroEndBuffer1{pass}.Current;
+	seam1.e_heat.par6 := macroEndBuffer1{pass}.FeedingSpeed;
+
+	! weavedata: [shape, type, length, width, dwellL, dwellR, 0x9]
+	weave1_rob1 := [
+		macroStartBuffer1{pass}.WeaveShape,
+		macroStartBuffer1{pass}.WeaveType,
+		macroStartBuffer1{pass}.WeaveLength,
+		macroStartBuffer1{pass}.WeaveWidth,
+		macroStartBuffer1{pass}.WeaveDwellLeft,
+		macroStartBuffer1{pass}.WeaveDwellRight,
+		0,0,0,0,0,0,0,0,0];
+
+	TPWrite "[ARC] Pass " + NumToStr(pass,0) + " V=" + NumToStr(weld1.weld_heat.par3,1)
+		+ " A=" + NumToStr(weld1.weld_heat.par4,0)
+		+ " WFS=" + NumToStr(weld1.weld_heat.par6,0);
+ENDPROC
+
+! ----------------------------------------
 ! Trace Weld Line: Multi-pass weld with Approach/Retract (v2.0.0 PlanC)
 ! ----------------------------------------
 ! Moves Robot1 TCP from calcPosStart to calcPosEnd in Floor coordinates
@@ -4779,18 +4815,37 @@ PROC TraceWeldLine()
 
 		! --- Trace weld line: multi-segment MoveL loop ---
 		IF WELD_ARC_ENABLED = TRUE THEN
-			! Phase 3: ArcLStart -> ArcL -> ArcLEnd (placeholder)
-			TPWrite "[TRACE] ARC WELD pass " + NumToStr(pass,0) + " (" + NumToStr(nSegs,0) + " segs)...";
+			! v1.9.52: Actual ArcL welding with torchmotion → ABB param conversion
+			BuildArcParams pass;
+			TPWrite "[TRACE] ARC WELD pass " + NumToStr(pass,0)
+				+ " (" + NumToStr(nSegs,0) + " segs)...";
 			Write trace_log, "ARC mode: V=" + NumToStr(macroStartBuffer1{pass}.Voltage,1)
 				+ "V A=" + NumToStr(macroStartBuffer1{pass}.Current,0)
 				+ "A WFS=" + NumToStr(macroStartBuffer1{pass}.FeedingSpeed,0);
-			FOR seg FROM 2 TO nSegs DO
-				MoveL pWeldPosR1{seg}, vWeldSpeed{seg}, z1, tWeld1 \WObj:=WobjFloor;
-				Write trace_log, "ARC seg " + NumToStr(seg,0) + " pos=["
-					+ NumToStr(pWeldPosR1{seg}.trans.x,1) + ","
-					+ NumToStr(pWeldPosR1{seg}.trans.y,1) + ","
-					+ NumToStr(pWeldPosR1{seg}.trans.z,1) + "]";
-			ENDFOR
+
+			IF nSegs < 2 THEN
+				! Edge case: single segment - cannot do ArcL sequence, fallback to MoveL
+				TPWrite "[TRACE] WARNING: nSegs=" + NumToStr(nSegs,0) + " < 2, MoveL fallback";
+				Write trace_log, "WARNING: nSegs < 2, ArcL requires min 2 segments, using MoveL";
+				MoveL pWeldPosR1{1}, vWeldSpeed{1}, fine, tWeld1 \WObj:=WobjFloor;
+			ELSE
+				! ArcLStart: first segment (fine zone = precise arc start)
+				ArcLStart pWeldPosR1{1}, vWeldSpeed{1}, seam1, weld1\Weave:=weave1_rob1,
+					fine, tWeld1\WObj:=WobjFloor;
+				Write trace_log, "ArcLStart seg 1 OK";
+
+				! ArcL: intermediate segments (z1 zone = continuous path)
+				FOR seg FROM 2 TO nSegs-1 DO
+					ArcL pWeldPosR1{seg}, vWeldSpeed{seg}, seam1, weld1\Weave:=weave1_rob1,
+						z1, tWeld1\WObj:=WobjFloor;
+					Write trace_log, "ArcL seg " + NumToStr(seg,0) + " OK";
+				ENDFOR
+
+				! ArcLEnd: last segment (fine zone = precise arc end)
+				ArcLEnd pWeldPosR1{nSegs}, vWeldSpeed{nSegs}, seam1, weld1\Weave:=weave1_rob1,
+					fine, tWeld1\WObj:=WobjFloor;
+				Write trace_log, "ArcLEnd seg " + NumToStr(nSegs,0) + " OK";
+			ENDIF
 		ELSE
 			! Simulation: MoveL only (no arc) - with position verification
 			TPWrite "[TRACE] MoveL weld pass " + NumToStr(pass,0) + " (" + NumToStr(nSegs,0) + " segs)...";

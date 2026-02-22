@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.51";
+CONST string TASK1_VERSION := "v1.9.52";
 CONST string TASK2_VERSION := "v1.9.43";
 CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
@@ -24,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-22";
+CONST string BUILD_DATE := "2026-02-23";
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -46,6 +46,15 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.52 (2026-02-23) - Weld condition swap: ArcL implementation
+!   - NEW: BuildArcParams proc (torchmotion → seamdata/welddata/weavedata)
+!   - IMPL: TraceWeldLine WELD_ARC_ENABLED=TRUE branch
+!     ArcLStart/ArcL/ArcLEnd with dynamic weld parameters
+!   - macroStartBuffer1 → seam1/weld1 voltage/current/WFS mapping
+!   - macroStartBuffer1 → weave1_rob1 shape/type/length/width mapping
+!   - macroEndBuffer1 → seam1.e_heat end parameters mapping
+!   - GUARD: nSegs < 2 fallback to MoveL (single segment edge case)
+!
 ! v1.9.51 (2026-02-22) - Robot1 Init: Fix abnormal posture at R!=0
 !   - FIX: Step 2 uses CRobT current orient instead of hardcoded orient
 !   - ROOT CAUSE: Hardcoded orient [0.45452,-0.54167,...] taught at R=0
