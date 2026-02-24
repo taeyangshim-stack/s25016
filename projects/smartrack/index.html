@@ -388,18 +388,19 @@
   <a class="toc-item" href="#sec03">03 대상 부재 형상</a>
   <a class="toc-item" href="#sec04">04 물류 흐름도</a>
   <a class="toc-item" href="#sec05">05 다중 랙 배치</a>
-  <a class="toc-item" href="#sec06">06 핵심 아이디어</a>
-  <a class="toc-item" href="#sec07">07 유연성 시연</a>
-  <a class="toc-item" href="#sec08">08 벤치마킹</a>
-  <a class="toc-item" href="#sec09">09 벤치마킹 브릿지</a>
-  <a class="toc-item" href="#sec10">10 컨셉 A — 핀-그리드</a>
-  <a class="toc-item" href="#sec11">11 컨셉 B — 전동 서포트</a>
-  <a class="toc-item" href="#sec12">12 컨셉 C — 셀 어레이</a>
-  <a class="toc-item" href="#sec13">13 랙 모듈 + 안전</a>
-  <a class="toc-item" href="#sec14">14 AMR 도킹</a>
-  <a class="toc-item" href="#sec15">15 시스템 아키텍처</a>
-  <a class="toc-item" href="#sec16">16 입출고 시퀀스</a>
-  <a class="toc-item" href="#sec17">17 로드맵 + 결론</a>
+  <a class="toc-item" href="#sec06">06 랙장 컨셉</a>
+  <a class="toc-item" href="#sec07">07 핵심 아이디어</a>
+  <a class="toc-item" href="#sec08">08 유연성 시연</a>
+  <a class="toc-item" href="#sec09">09 벤치마킹</a>
+  <a class="toc-item" href="#sec10">10 벤치마킹 브릿지</a>
+  <a class="toc-item" href="#sec11">11 컨셉 A — 핀-그리드</a>
+  <a class="toc-item" href="#sec12">12 컨셉 B — 전동 서포트</a>
+  <a class="toc-item" href="#sec13">13 컨셉 C — 셀 어레이</a>
+  <a class="toc-item" href="#sec14">14 랙 모듈 + 안전</a>
+  <a class="toc-item" href="#sec15">15 AMR 도킹</a>
+  <a class="toc-item" href="#sec16">16 시스템 아키텍처</a>
+  <a class="toc-item" href="#sec17">17 입출고 시퀀스</a>
+  <a class="toc-item" href="#sec18">18 로드맵 + 결론</a>
 </nav>
 
 <!-- NAV DOTS (PPT mode) -->
@@ -778,9 +779,288 @@
   </div>
 </section>
 
-<!-- ===== SECTION 06: 핵심 아이디어 — "핀 아트" ===== -->
-<section class="slide" id="sec06" data-title="핵심 아이디어">
+<!-- ===== SECTION 06: 랙장 컨셉 — 다단 적재 구조 ===== -->
+<section class="slide" id="sec06" data-title="랙장 컨셉">
   <span class="slide-num">06</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag tag-blue">랙장 구조</span>
+      <h2 style="margin-top:8px">랙장 컨셉 — 부재별 최적 적재 구조</h2>
+      <p class="subtitle">대형·중형·소형 부재를 한 야드에서 효율적으로 적재하기 위한 하이브리드 3존 전략</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+      <!-- A존: 대형 -->
+      <div style="background:#FFF1F2;border-radius:12px;padding:16px;border:2px solid #FECDD3">
+        <div style="font-size:11px;font-weight:800;color:#9F1239;letter-spacing:1px;margin-bottom:6px">A존 · 대형 중량</div>
+        <div style="font-size:15px;font-weight:700;color:#18181B;margin-bottom:8px">단층 / 2단 슬라이딩</div>
+        <svg viewBox="0 0 220 120" width="100%" style="display:block;margin-bottom:8px">
+          <rect x="10" y="10" width="200" height="100" rx="6" fill="#FFF1F2" stroke="#FECDD3"/>
+          <!-- 프레임 -->
+          <rect x="20" y="20" width="180" height="80" rx="4" fill="none" stroke="#9F1239" stroke-width="1.5"/>
+          <!-- 2단 -->
+          <line x1="20" y1="58" x2="200" y2="58" stroke="#9F1239" stroke-width="1" stroke-dasharray="4 2"/>
+          <!-- 상단 부재 -->
+          <rect x="30" y="26" width="160" height="26" rx="3" fill="rgba(159,18,57,.12)" stroke="#9F1239"/>
+          <text x="110" y="43" text-anchor="middle" fill="#9F1239" font-size="9" font-weight="600">소조블록 (2~15t)</text>
+          <!-- 하단 부재 -->
+          <rect x="30" y="64" width="160" height="26" rx="3" fill="rgba(159,18,57,.08)" stroke="#FB7185"/>
+          <text x="110" y="81" text-anchor="middle" fill="#9F1239" font-size="9" font-weight="600">대형 판재 (1~5t)</text>
+          <!-- 슬라이드 화살표 -->
+          <text x="205" y="42" fill="#9F1239" font-size="10">→</text>
+          <text x="205" y="80" fill="#9F1239" font-size="10">→</text>
+          <text x="110" y="108" text-anchor="middle" fill="#A1A1AA" font-size="8">슬라이드 아웃 → 크레인 리프팅</text>
+        </svg>
+        <div style="font-size:11px;color:#52525B;line-height:1.7">
+          <b>1~2단</b> · 크레인 직접 적재<br>
+          베드 슬라이드로 <b>임의 접근</b><br>
+          <span style="color:#9F1239;font-weight:600">안전 최우선 설계</span>
+        </div>
+      </div>
+
+      <!-- B존: 중형 -->
+      <div style="background:#EFF6FF;border-radius:12px;padding:16px;border:2px solid #BFDBFE">
+        <div style="font-size:11px;font-weight:800;color:#1D4ED8;letter-spacing:1px;margin-bottom:6px">B존 · 중형</div>
+        <div style="font-size:15px;font-weight:700;color:#18181B;margin-bottom:8px">2~3단 슬라이딩 베드</div>
+        <svg viewBox="0 0 220 120" width="100%" style="display:block;margin-bottom:8px">
+          <rect x="10" y="10" width="200" height="100" rx="6" fill="#EFF6FF" stroke="#BFDBFE"/>
+          <rect x="20" y="16" width="180" height="88" rx="4" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+          <!-- 3단 -->
+          <line x1="20" y1="46" x2="200" y2="46" stroke="#1D4ED8" stroke-width="1" stroke-dasharray="4 2"/>
+          <line x1="20" y1="74" x2="200" y2="74" stroke="#1D4ED8" stroke-width="1" stroke-dasharray="4 2"/>
+          <!-- 부재 3개 -->
+          <rect x="30" y="22" width="160" height="18" rx="3" fill="rgba(29,78,216,.12)" stroke="#1D4ED8"/>
+          <text x="110" y="35" text-anchor="middle" fill="#1D4ED8" font-size="8" font-weight="600">판재 (0.5~2t)</text>
+          <rect x="30" y="50" width="160" height="18" rx="3" fill="rgba(29,78,216,.08)" stroke="#60A5FA"/>
+          <text x="110" y="63" text-anchor="middle" fill="#1D4ED8" font-size="8" font-weight="600">보강재 대형 (0.2~1t)</text>
+          <rect x="30" y="78" width="160" height="18" rx="3" fill="rgba(29,78,216,.06)" stroke="#93C5FD"/>
+          <text x="110" y="91" text-anchor="middle" fill="#1D4ED8" font-size="8" font-weight="600">곡판 (0.3~2t)</text>
+          <text x="205" y="34" fill="#1D4ED8" font-size="10">→</text>
+          <text x="205" y="62" fill="#1D4ED8" font-size="10">→</text>
+          <text x="205" y="90" fill="#1D4ED8" font-size="10">→</text>
+          <text x="110" y="110" text-anchor="middle" fill="#A1A1AA" font-size="8">공간 효율 2~3배</text>
+        </svg>
+        <div style="font-size:11px;color:#52525B;line-height:1.7">
+          <b>2~3단</b> · 레일 슬라이드<br>
+          각 단 핀-지그 독립 구동<br>
+          <span style="color:#1D4ED8;font-weight:600">공간 효율 극대화</span>
+        </div>
+      </div>
+
+      <!-- C존: 소형 -->
+      <div style="background:#ECFDF5;border-radius:12px;padding:16px;border:2px solid #A7F3D0">
+        <div style="font-size:11px;font-weight:800;color:#065F46;letter-spacing:1px;margin-bottom:6px">C존 · 소형 경량</div>
+        <div style="font-size:15px;font-weight:700;color:#18181B;margin-bottom:8px">카세트 트레이 (3~5단)</div>
+        <svg viewBox="0 0 220 120" width="100%" style="display:block;margin-bottom:8px">
+          <rect x="10" y="10" width="200" height="100" rx="6" fill="#ECFDF5" stroke="#A7F3D0"/>
+          <rect x="20" y="16" width="140" height="88" rx="4" fill="none" stroke="#0D6E51" stroke-width="1.5"/>
+          <!-- 5단 카세트 -->
+          <rect x="28" y="20" width="124" height="12" rx="2" fill="#D1FAE5" stroke="#34D399"/><text x="90" y="30" text-anchor="middle" fill="#065F46" font-size="7">#5</text>
+          <rect x="28" y="36" width="124" height="12" rx="2" fill="#D1FAE5" stroke="#34D399"/><text x="90" y="46" text-anchor="middle" fill="#065F46" font-size="7">#4</text>
+          <rect x="28" y="52" width="124" height="12" rx="2" fill="#D1FAE5" stroke="#34D399"/><text x="90" y="62" text-anchor="middle" fill="#065F46" font-size="7">#3</text>
+          <rect x="28" y="68" width="124" height="12" rx="2" fill="#D1FAE5" stroke="#34D399"/><text x="90" y="78" text-anchor="middle" fill="#065F46" font-size="7">#2</text>
+          <rect x="28" y="84" width="124" height="12" rx="2" fill="#A7F3D0" stroke="#0D6E51"/><text x="90" y="94" text-anchor="middle" fill="#065F46" font-size="7">#1 인출</text>
+          <!-- 인출 화살표 -->
+          <path d="M152 90 L195 90" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr)"/>
+          <text x="180" y="80" fill="#0D6E51" font-size="7" font-weight="600">AMR</text>
+          <text x="110" y="110" text-anchor="middle" fill="#A1A1AA" font-size="8">카세트 = 작업대</text>
+        </svg>
+        <div style="font-size:11px;color:#52525B;line-height:1.7">
+          <b>3~5단</b> · 카세트 통째 인출<br>
+          AMR 이송 → <b>작업대 직결</b><br>
+          <span style="color:#065F46;font-weight:600">이중 핸들링 제거</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="background:linear-gradient(135deg,#ECFDF5,#EFF6FF);border:2px solid var(--accent);padding:12px 16px;border-radius:10px;margin-top:10px;text-align:center">
+      <b style="color:#065F46">입고 스캔 → AI 부재 분류 → 최적 존/랙 자동 배정</b>
+      <span style="font-size:12px;color:#52525B;margin-left:8px">— 대형은 안전 우선, 중형은 공간 효율, 소형은 작업 연계</span>
+    </div>
+
+    <!-- ===== Report-only: 상세 비교표 + AI 배정 로직 + 구조 설계 ===== -->
+    <div class="report-only" style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+
+      <!-- 3안 상세 비교표 -->
+      <div class="card">
+        <h3>랙장 컨셉 3안 상세 비교</h3>
+        <table style="font-size:11px;width:100%">
+          <thead>
+            <tr><th>구분</th><th>A존: 단층/2단 슬라이딩</th><th>B존: 다단 슬라이딩 베드</th><th>C존: 카세트 트레이</th></tr>
+          </thead>
+          <tbody>
+            <tr class="hl"><td><b>적합 부재</b></td><td>소조블록, 대형 판재</td><td>판재류, 대형 보강재, 곡판</td><td>브라켓, 소부재, 스캘럽</td></tr>
+            <tr><td><b>크기 범위</b></td><td>2~8m × 2~12m</td><td>1.5~6m × 0.1~3m</td><td>0.1~1.5m × 0.1~0.8m</td></tr>
+            <tr class="hl"><td><b>중량 범위</b></td><td>2~15t</td><td>0.2~3t</td><td>0.01~0.5t</td></tr>
+            <tr><td><b>적재 단수</b></td><td>1~2단</td><td>2~3단</td><td>3~5단</td></tr>
+            <tr class="hl"><td><b>공간 효율</b></td><td>1~2배 (기존 대비)</td><td>2~3배</td><td>3~5배</td></tr>
+            <tr><td><b>적재/인출 방식</b></td><td>크레인 직접 리프팅</td><td>레일 슬라이드 → 크레인</td><td>카세트 인출 → AMR 이송</td></tr>
+            <tr class="hl"><td><b>접근 방식</b></td><td>Random Access (슬라이드)</td><td>Random Access (슬라이드)</td><td>Sequential (카세트 단위)</td></tr>
+            <tr><td><b>핀-지그 타입</b></td><td>컨셉 A/B (고정/전동)</td><td>컨셉 A/B (핀-그리드/전동)</td><td>컨셉 A 경량형 (핀-그리드)</td></tr>
+            <tr class="hl"><td><b>프레임 구조</b></td><td>H형강 중량 프레임 (30t급)</td><td>H형강 중형 프레임 (15t급)</td><td>경량 프레임 + 레일 (5t급)</td></tr>
+            <tr><td><b>안전 요구</b></td><td>과하중/편하중 트립, 전도 방지</td><td>레일 락, 과하중 센서</td><td>카세트 락, 이탈 방지</td></tr>
+            <tr class="hl"><td><b>참고 사례</b></td><td>중공업 금형 창고, 프레스 금형 랙</td><td>철강 판재 저장, 자동 창고</td><td>반도체 FOUP, 판금 타워</td></tr>
+            <tr><td><b>도입 시기</b></td><td>1차년도 (MVP)</td><td>2~3차년도</td><td>2차년도~</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- AI 자동 배정 로직 -->
+      <div style="background:#F9FAFB;border-radius:12px;padding:20px 24px;border:1px solid #E4E4E7">
+        <div style="font-size:14px;font-weight:700;color:#18181B;margin-bottom:14px">AI 랙 타입 자동 배정 로직</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+          <div style="background:#ECFDF5;border-radius:8px;padding:12px;text-align:center;border:1px solid #A7F3D0">
+            <div style="font-size:18px;font-weight:800;color:#0D6E51;margin-bottom:4px">1</div>
+            <div style="font-size:11px;font-weight:700;color:#065F46">입고 스캔</div>
+            <div style="font-size:10px;color:#52525B;margin-top:4px">3D 형상 취득<br>중량 측정</div>
+          </div>
+          <div style="background:#EFF6FF;border-radius:8px;padding:12px;text-align:center;border:1px solid #BFDBFE">
+            <div style="font-size:18px;font-weight:800;color:#1D4ED8;margin-bottom:4px">2</div>
+            <div style="font-size:11px;font-weight:700;color:#1D4ED8">패밀리 분류</div>
+            <div style="font-size:10px;color:#52525B;margin-top:4px">크기·중량 기준<br>4개 패밀리 판정</div>
+          </div>
+          <div style="background:#F5F3FF;border-radius:8px;padding:12px;text-align:center;border:1px solid #DDD6FE">
+            <div style="font-size:18px;font-weight:800;color:#7C3AED;margin-bottom:4px">3</div>
+            <div style="font-size:11px;font-weight:700;color:#5B21B6">존 결정</div>
+            <div style="font-size:10px;color:#52525B;margin-top:4px">A/B/C존<br>랙 타입 매칭</div>
+          </div>
+          <div style="background:#FFFBEB;border-radius:8px;padding:12px;text-align:center;border:1px solid #FDE68A">
+            <div style="font-size:18px;font-weight:800;color:#D97706;margin-bottom:4px">4</div>
+            <div style="font-size:11px;font-weight:700;color:#92400E">슬롯 탐색</div>
+            <div style="font-size:10px;color:#52525B;margin-top:4px">가용 슬롯 확인<br>하중 밸런스 평가</div>
+          </div>
+          <div style="background:#FFF1F2;border-radius:8px;padding:12px;text-align:center;border:1px solid #FECDD3">
+            <div style="font-size:18px;font-weight:800;color:#E11D48;margin-bottom:4px">5</div>
+            <div style="font-size:11px;font-weight:700;color:#9F1239">최적 배정</div>
+            <div style="font-size:10px;color:#52525B;margin-top:4px">출고순서 고려<br>핀 세팅 지시</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 부재 패밀리별 배정 기준 -->
+      <div class="card">
+        <h3>부재 패밀리별 자동 배정 기준</h3>
+        <table style="font-size:11px;width:100%">
+          <thead>
+            <tr><th>패밀리</th><th>크기 기준</th><th>중량 기준</th><th>물동량</th><th>배정 존</th><th>랙 타입</th><th>적재 단수</th></tr>
+          </thead>
+          <tbody>
+            <tr class="hl"><td><b>소조블록</b></td><td>2~6m × 2~8m</td><td>2~15t</td><td>~15%</td><td style="color:#9F1239;font-weight:700">A존</td><td>단층 핀-그리드</td><td>1단</td></tr>
+            <tr><td><b>대형 판재</b></td><td>1.5~3.2m × 3~12m</td><td>0.5~3t</td><td>~25%</td><td style="color:#9F1239;font-weight:700">A존 / B존</td><td>단층 or 2단 슬라이딩</td><td>1~2단</td></tr>
+            <tr class="hl"><td><b>중형 판재·곡판</b></td><td>1~3m × 1~6m</td><td>0.2~2t</td><td>~20%</td><td style="color:#1D4ED8;font-weight:700">B존</td><td>2~3단 슬라이딩 베드</td><td>2~3단</td></tr>
+            <tr><td><b>보강재류</b></td><td>2~12m × 0.1~0.4m</td><td>0.05~0.5t</td><td>~20%</td><td style="color:#1D4ED8;font-weight:700">B존</td><td>2~3단 슬라이딩 베드</td><td>2~3단</td></tr>
+            <tr class="hl"><td><b>브라켓·소부재</b></td><td>0.1~0.8m</td><td>0.01~0.2t</td><td>~15%</td><td style="color:#065F46;font-weight:700">C존</td><td>카세트 트레이</td><td>3~5단</td></tr>
+            <tr><td><b>스캘럽·가공재</b></td><td>0.1~0.5m</td><td>0.01~0.1t</td><td>~5%</td><td style="color:#065F46;font-weight:700">C존</td><td>카세트 트레이</td><td>3~5단</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 슬라이딩 베드 구조 상세 -->
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 900 280" width="100%" style="display:block">
+          <text x="450" y="22" text-anchor="middle" fill="#18181B" font-size="14" font-weight="700">다단 슬라이딩 베드 상세 구조 (B존 기준)</text>
+
+          <!-- 정면도 -->
+          <text x="225" y="48" text-anchor="middle" fill="#52525B" font-size="11" font-weight="600">정면도</text>
+          <!-- 프레임 -->
+          <rect x="50" y="55" width="350" height="200" rx="4" fill="none" stroke="#1D4ED8" stroke-width="2"/>
+          <rect x="50" y="55" width="12" height="200" fill="#1D4ED8" opacity=".2"/><rect x="388" y="55" width="12" height="200" fill="#1D4ED8" opacity=".2"/>
+          <text x="36" y="160" text-anchor="middle" fill="#A1A1AA" font-size="8" transform="rotate(-90 36 160)">H형강 프레임</text>
+
+          <!-- 3단 레일 -->
+          <rect x="65" y="68" width="320" height="8" rx="2" fill="#BFDBFE"/><text x="415" y="76" fill="#60A5FA" font-size="8">레일 3단</text>
+          <rect x="65" y="134" width="320" height="8" rx="2" fill="#BFDBFE"/><text x="415" y="142" fill="#60A5FA" font-size="8">레일 2단</text>
+          <rect x="65" y="200" width="320" height="8" rx="2" fill="#BFDBFE"/><text x="415" y="208" fill="#60A5FA" font-size="8">레일 1단</text>
+
+          <!-- 핀-베드 + 부재 -->
+          <rect x="75" y="80" width="300" height="44" rx="4" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1"/>
+          <circle cx="110" cy="98" r="4" fill="#1D4ED8"/><circle cx="160" cy="98" r="4" fill="#1D4ED8"/><circle cx="210" cy="98" r="4" fill="#1D4ED8"/><circle cx="260" cy="98" r="4" fill="#1D4ED8"/><circle cx="310" cy="98" r="4" fill="#1D4ED8"/>
+          <text x="225" y="118" text-anchor="middle" fill="#1E40AF" font-size="9">핀-베드 + 부재 (3단)</text>
+
+          <rect x="75" y="146" width="300" height="44" rx="4" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1"/>
+          <circle cx="110" cy="164" r="4" fill="#1D4ED8"/><circle cx="160" cy="164" r="4" fill="#1D4ED8"/><circle cx="210" cy="164" r="4" fill="#1D4ED8"/><circle cx="260" cy="164" r="4" fill="#1D4ED8"/><circle cx="310" cy="164" r="4" fill="#1D4ED8"/>
+          <text x="225" y="184" text-anchor="middle" fill="#1E40AF" font-size="9">핀-베드 + 부재 (2단)</text>
+
+          <rect x="75" y="212" width="300" height="36" rx="4" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+          <circle cx="110" cy="228" r="4" fill="#1D4ED8"/><circle cx="160" cy="228" r="4" fill="#1D4ED8"/><circle cx="210" cy="228" r="4" fill="#1D4ED8"/><circle cx="260" cy="228" r="4" fill="#1D4ED8"/><circle cx="310" cy="228" r="4" fill="#1D4ED8"/>
+          <text x="225" y="244" text-anchor="middle" fill="#1E40AF" font-size="9" font-weight="600">핀-베드 + 부재 (1단) — 슬라이드 아웃 중</text>
+          <path d="M375 230 L420 230" stroke="#1D4ED8" stroke-width="2" marker-end="url(#arr)"/>
+
+          <!-- 측면도 -->
+          <text x="680" y="48" text-anchor="middle" fill="#52525B" font-size="11" font-weight="600">측면도 (슬라이드 동작)</text>
+          <rect x="530" y="55" width="300" height="200" rx="4" fill="none" stroke="#A1A1AA" stroke-width="1" stroke-dasharray="4 2"/>
+
+          <!-- 프레임 기둥 -->
+          <rect x="540" y="55" width="16" height="200" rx="2" fill="#1D4ED8" opacity=".3"/>
+          <rect x="804" y="55" width="16" height="200" rx="2" fill="#1D4ED8" opacity=".3"/>
+
+          <!-- 3단 (격납 상태) -->
+          <rect x="558" y="70" width="240" height="40" rx="4" fill="#EFF6FF" stroke="#1D4ED8"/>
+          <text x="678" y="94" text-anchor="middle" fill="#1E40AF" font-size="9">3단 — 격납 상태</text>
+          <!-- 2단 (격납 상태) -->
+          <rect x="558" y="120" width="240" height="40" rx="4" fill="#EFF6FF" stroke="#1D4ED8"/>
+          <text x="678" y="144" text-anchor="middle" fill="#1E40AF" font-size="9">2단 — 격납 상태</text>
+          <!-- 1단 (슬라이드 아웃) -->
+          <rect x="558" y="170" width="240" height="40" rx="4" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="6 3"/>
+          <rect x="620" y="180" width="240" height="40" rx="4" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2"/>
+          <text x="740" y="204" text-anchor="middle" fill="#1D4ED8" font-size="9" font-weight="600">1단 — 슬라이드 아웃</text>
+          <path d="M558 190 L620 190" stroke="#1D4ED8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+          <!-- 크레인 표시 -->
+          <path d="M740 170 L740 60 L770 60" stroke="#D97706" stroke-width="1.5" stroke-dasharray="4 2"/>
+          <text x="780" y="64" fill="#D97706" font-size="9" font-weight="600">크레인↑</text>
+
+          <!-- 치수 -->
+          <text x="225" y="268" text-anchor="middle" fill="#A1A1AA" font-size="9">단 간격: 500~800mm (부재 높이 + 여유)</text>
+          <text x="680" y="268" text-anchor="middle" fill="#A1A1AA" font-size="9">슬라이드 거리: 베드 폭의 100% (완전 인출)</text>
+        </svg>
+      </div>
+
+      <!-- 카세트 트레이 상세 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card card-accent">
+          <h3>카세트 트레이 핵심 개념</h3>
+          <ul style="font-size:12px;line-height:1.8">
+            <li><b>카세트 = 작업대</b>: 소조립 라인에 카세트 통째 AMR 이송 → 별도 하역 불필요</li>
+            <li><b>핀-지그 내장</b>: 카세트 상면에 경량 핀-그리드 → 소부재 고정</li>
+            <li><b>RFID 태깅</b>: 카세트 자체에 ID → 재고 자동 추적</li>
+            <li><b>표준화</b>: 카세트 외형 규격 통일 → 프레임 호환, AMR 도킹 표준화</li>
+            <li><b>반도체 FOUP에서 영감</b>: 웨이퍼 카세트 → 조선 부재 카세트로 스케일업</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>카세트 사양 (예상)</h3>
+          <table style="font-size:11px;width:100%">
+            <thead><tr><th>항목</th><th>사양</th></tr></thead>
+            <tbody>
+              <tr class="hl"><td>외형 크기</td><td>1,500 × 1,000 × 150mm (L×W×H)</td></tr>
+              <tr><td>자체 중량</td><td>~80kg (알루미늄 프레임)</td></tr>
+              <tr class="hl"><td>허용 하중</td><td>500kg/카세트</td></tr>
+              <tr><td>핀 그리드</td><td>100mm 피치, 최대 150개 홀</td></tr>
+              <tr class="hl"><td>적재 단수</td><td>3~5단 (프레임 높이 2.5~4m)</td></tr>
+              <tr><td>인출 방식</td><td>전동 롤러 + AMR 도킹 자동 인출</td></tr>
+              <tr class="hl"><td>식별</td><td>RFID + 바코드 (카세트 ID + 부재 목록)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 단계별 도입 전략 -->
+      <div class="callout" style="background:linear-gradient(135deg,#EFF6FF,#ECFDF5);border:2px solid var(--accent);padding:16px 20px;border-radius:10px">
+        <div style="font-size:13px;font-weight:700;color:#065F46;margin-bottom:8px">단계별 도입 전략</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:12px;color:#52525B">
+          <div><b style="color:#9F1239">1차년도</b>: A존 단층 핀-그리드 MVP 실증 → 대형 부재 안전 적재 검증</div>
+          <div><b style="color:#1D4ED8">2~3차년도</b>: B존 슬라이딩 베드 + C존 카세트 트레이 도입 → 공간 효율 3배 달성</div>
+          <div><b style="color:#7C3AED">4~5차년도</b>: AI 자동 배정 + 디지털트윈 통합 → 완전 자동화 야드 운영</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 07: 핵심 아이디어 — "핀 아트" ===== -->
+<section class="slide" id="sec07" data-title="핵심 아이디어">
+  <span class="slide-num">07</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">핵심 아이디어</span>
@@ -889,9 +1169,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 07: 유연성 시연 — 3패널 ===== -->
-<section class="slide" id="sec07" data-title="유연성 시연">
-  <span class="slide-num">07</span>
+<!-- ===== SECTION 08: 유연성 시연 — 3패널 ===== -->
+<section class="slide" id="sec08" data-title="유연성 시연">
+  <span class="slide-num">08</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">유연성 증명</span>
@@ -981,9 +1261,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 08: 벤치마킹 / 참고 사례 ===== -->
-<section class="slide" id="sec08" data-title="벤치마킹">
-  <span class="slide-num">08</span>
+<!-- ===== SECTION 09: 벤치마킹 / 참고 사례 ===== -->
+<section class="slide" id="sec09" data-title="벤치마킹">
+  <span class="slide-num">09</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">벤치마킹</span>
@@ -1474,9 +1754,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 09: 벤치마킹 → 스마트랙 브릿지 ===== -->
-<section class="slide" id="sec09" data-title="벤치마킹 브릿지">
-  <span class="slide-num">09</span>
+<!-- ===== SECTION 10: 벤치마킹 → 스마트랙 브릿지 ===== -->
+<section class="slide" id="sec10" data-title="벤치마킹 브릿지">
+  <span class="slide-num">10</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag" style="background:linear-gradient(135deg,#1D4ED8,#0D6E51);color:#fff">전환</span>
@@ -1526,9 +1806,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 10: 컨셉 A ===== -->
-<section class="slide" id="sec10" data-title="컨셉 A">
-  <span class="slide-num">10</span>
+<!-- ===== SECTION 11: 컨셉 A ===== -->
+<section class="slide" id="sec11" data-title="컨셉 A">
+  <span class="slide-num">11</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">컨셉 A · MVP</span>
@@ -1625,9 +1905,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 11: 컨셉 B ===== -->
-<section class="slide" id="sec11" data-title="컨셉 B">
-  <span class="slide-num">11</span>
+<!-- ===== SECTION 12: 컨셉 B ===== -->
+<section class="slide" id="sec12" data-title="컨셉 B">
+  <span class="slide-num">12</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">컨셉 B · 차별화</span>
@@ -1748,9 +2028,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 12: 컨셉 C ===== -->
-<section class="slide" id="sec12" data-title="컨셉 C">
-  <span class="slide-num">12</span>
+<!-- ===== SECTION 13: 컨셉 C ===== -->
+<section class="slide" id="sec13" data-title="컨셉 C">
+  <span class="slide-num">13</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-violet">컨셉 C · 세계 최초급</span>
@@ -1810,9 +2090,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 13: 랙 모듈 + 안전 ===== -->
-<section class="slide" id="sec13" data-title="랙 모듈">
-  <span class="slide-num">13</span>
+<!-- ===== SECTION 14: 랙 모듈 + 안전 ===== -->
+<section class="slide" id="sec14" data-title="랙 모듈">
+  <span class="slide-num">14</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">기구 설계</span>
@@ -1859,9 +2139,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 14: AMR 도킹 개념 ===== -->
-<section class="slide" id="sec14" data-title="AMR 도킹">
-  <span class="slide-num">14</span>
+<!-- ===== SECTION 15: AMR 도킹 개념 ===== -->
+<section class="slide" id="sec15" data-title="AMR 도킹">
+  <span class="slide-num">15</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-violet">AMR 연계</span>
@@ -1954,9 +2234,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 15: 시스템 아키텍처 ===== -->
-<section class="slide" id="sec15" data-title="시스템 아키텍처">
-  <span class="slide-num">15</span>
+<!-- ===== SECTION 16: 시스템 아키텍처 ===== -->
+<section class="slide" id="sec16" data-title="시스템 아키텍처">
+  <span class="slide-num">16</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">S/W 아키텍처</span>
@@ -2016,9 +2296,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 16: 입출고 시퀀스 ===== -->
-<section class="slide" id="sec16" data-title="입출고 시퀀스">
-  <span class="slide-num">16</span>
+<!-- ===== SECTION 17: 입출고 시퀀스 ===== -->
+<section class="slide" id="sec17" data-title="입출고 시퀀스">
+  <span class="slide-num">17</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">물류 운영</span>
@@ -2086,9 +2366,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 17: 로드맵 + 역량 + 결론 ===== -->
-<section class="slide" id="sec17" data-title="로드맵 + 결론">
-  <span class="slide-num">17</span>
+<!-- ===== SECTION 18: 로드맵 + 역량 + 결론 ===== -->
+<section class="slide" id="sec18" data-title="로드맵 + 결론">
+  <span class="slide-num">18</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-amber">개발 계획 + 결론</span>
@@ -2187,7 +2467,7 @@
 <!-- VERSION BADGE -->
 <div class="ver-badge" onclick="document.getElementById('changelogOverlay').classList.add('open')">
   <span class="ver-badge-dot"></span>
-  v3.4
+  v3.5
 </div>
 
 <!-- CHANGELOG PANEL -->
@@ -2198,6 +2478,20 @@
       <button class="changelog-close" onclick="document.getElementById('changelogOverlay').classList.remove('open')">&times;</button>
     </div>
     <div class="changelog-body">
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag">v3.5</span>
+          <span class="ver-date">2026-02-24</span>
+        </div>
+        <div class="ver-title">랙장 컨셉 신규: 하이브리드 3존 (슬라이딩 베드 + 카세트 트레이)</div>
+        <ul class="ver-changes">
+          <li><b>sec06 랙장 컨셉</b>: A존(대형·단층/2단 슬라이딩) · B존(중형·다단 슬라이딩 베드) · C존(소형·카세트 트레이) 3안 비교</li>
+          <li><b>Report 모드</b>: 3안 상세 비교표, AI 자동 배정 5단계 로직, 부재 패밀리별 배정 기준표</li>
+          <li><b>Report 모드</b>: 다단 슬라이딩 베드 정면/측면 구조 SVG, 카세트 사양표, 단계별 도입 전략</li>
+          <li><b>17→18슬라이드</b> 확장 + 전체 재번호 + TOC 18항목</li>
+        </ul>
+      </div>
 
       <div class="ver-entry">
         <div class="ver-entry-head">
