@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.61";
-CONST string TASK2_VERSION := "v1.9.44";
+CONST string TASK1_VERSION := "v1.9.62";
+CONST string TASK2_VERSION := "v1.9.46";
 CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
 CONST string TASK_TEACHING_VERSION := "v1.0.0";
@@ -24,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-24";
+CONST string BUILD_DATE := "2026-02-25";
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -46,6 +46,19 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.62 (2026-02-25) - FIX: Init 50050 when gantry at non-home + robot at jgHomeJoint
+!   - ROOT CAUSE: Robot2 Step2 Cartesian motion (MoveL/MoveJ) with WobjGantry_Rob2
+!     Robot2 is NOT gantry-configured - controller thinks base is fixed
+!     At non-home gantry (R!=0), WobjGantry_Rob2 target -> world coords -> unreachable
+!     Robot2 50050 triggers system-wide MotorsOff, stopping Robot1 init too
+!   - FIX TASK2 (v1.9.46): Remove Step2 Cartesian refinement entirely
+!     Step1 MoveAbsJ sets exact HOME joints - no Cartesian refinement needed
+!     Joint-space motion is gantry-position-independent (always works)
+!     v1.9.45 attempt (ConfJ Off + CRobT + MoveL) still failed at R=-45
+!   - FIX TASK1: Intermediate waypoint when J2>45deg (jgHomeJoint = [90,90,-50])
+!     Splits 139deg J2 swing into two smaller moves for safety
+!     Midpoint: [45, 20, -20, 0, 4, 0] at v50
+!
 ! v1.9.61 (2026-02-24) - FIX: MoveJgJ now moves robot joints (home return fix)
 !   - ROOT CAUSE: ExecMoveJgJ (v1.9.47) ignored jRob1.robax, only moved gantry extax
 !     Rob2_MainModule MoveJgJ case (v1.9.42) immediately Acked without any motion

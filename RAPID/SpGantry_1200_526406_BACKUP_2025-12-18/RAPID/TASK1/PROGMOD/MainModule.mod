@@ -1632,6 +1632,7 @@ PERS num debug_r2_floor_y_offset := 0;
 	!   - Reduced TPWrite output and file logging to 1-line summary
 	PROC SetRobot1InitialPosition()
 		VAR jointtarget initial_joint;
+		VAR jointtarget intermediate_joint;
 		VAR jointtarget sync_pos;
 		VAR jointtarget home_pos;
 		VAR robtarget home_tcp;
@@ -1677,6 +1678,23 @@ PERS num debug_r2_floor_y_offset := 0;
 		initial_joint := CJointT();
 		! v1.9.16: Set eax_f to match eax_a (linked motor requirement)
 		initial_joint.extax.eax_f := initial_joint.extax.eax_a;
+
+		! v1.9.62: Intermediate waypoint when starting from jgHomeJoint [90,90,-50]
+		! J2: 90 -> -48.88 = 139deg swing causes TCP to sweep wide arc
+		! Split into two smaller moves for safety
+		IF initial_joint.robax.rax_2 > 45 THEN
+			Write logfile, "Step1 intermediate: J2=" + NumToStr(initial_joint.robax.rax_2, 1) + " >45, inserting waypoint";
+			intermediate_joint := initial_joint;
+			intermediate_joint.robax.rax_1 := 45;
+			intermediate_joint.robax.rax_2 := 20;
+			intermediate_joint.robax.rax_3 := -20;
+			intermediate_joint.robax.rax_4 := 0;
+			intermediate_joint.robax.rax_5 := 4;
+			intermediate_joint.robax.rax_6 := 0;
+			MoveAbsJ intermediate_joint, v50, fine, tool0;
+			Write logfile, "Step1 intermediate done";
+		ENDIF
+
 		! Joint angles taught for tWeld1 HOME (confdata [-1,-1,0,4])
 		initial_joint.robax.rax_1 := 0;
 		initial_joint.robax.rax_2 := -48.88;
@@ -1685,6 +1703,7 @@ PERS num debug_r2_floor_y_offset := 0;
 		initial_joint.robax.rax_5 := 8.26;
 		initial_joint.robax.rax_6 := 0;
 		MoveAbsJ initial_joint, v100, fine, tool0;
+		Write logfile, "Step1 done (target joints)";
 
 		! Step 2: Move Robot1 tWeld1 TCP to HOME [0,0,1000] in WobjGantry
 		iteration := 0;

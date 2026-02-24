@@ -322,7 +322,7 @@ MODULE Rob2_MainModule
 	!   - Version synchronized with TASK1 (jumped from v1.8.0)
 	!
 ! Version constant for logging (v1.8.39+)
-CONST string TASK2_VERSION := "v1.9.43";
+CONST string TASK2_VERSION := "v1.9.46";
 
 ! Synchronization flag for TASK1/TASK2 initialization
 ! TASK2 sets this to TRUE when Robot2 initialization is complete
@@ -2441,17 +2441,7 @@ VAR robjoint robot2_offset_joints;
 	PROC SetRobot2InitialPosition()
 		VAR jointtarget initial_joint;
 		VAR jointtarget gantry_joint;
-		VAR robtarget home_tcp;
 		VAR iodev logfile;
-
-		! Step 2: Iterative refinement variables
-		VAR robtarget current_wobj0;
-		VAR robtarget tcp_floor;
-		VAR num error_x;
-		VAR num error_y;
-		VAR num iteration;
-		VAR num max_iterations;
-		VAR num tolerance;
 
 		! Open log file (summary logging)
 		Open "HOME:/robot2_init_position.txt", logfile \Write;
@@ -2473,58 +2463,29 @@ VAR robjoint robot2_offset_joints;
 		TPWrite "Robot2 init: Step1 done";
 		Write logfile, "Step1 done (intermediate joint)";
 
-		! Step 2: Move Robot2 tWeld2 TCP to HOME [0,488,-1000] in WobjGantry_Rob2
-		iteration := 0;
-		max_iterations := 3;
-		tolerance := 0.5;  ! mm
+		! v1.9.46: Step2 Cartesian refinement REMOVED
+		! Robot2 is NOT gantry-configured - controller thinks base is fixed
+		! At non-home gantry (especially R!=0), any Cartesian motion (MoveL/MoveJ)
+		! converts WobjGantry_Rob2 target to world coords using fixed base -> 50050
+		! Step1 MoveAbsJ already sets exact HOME joints - no refinement needed
+		! Joint-space motion is gantry-position-independent (always works)
 
-		TPWrite "Robot2 init: Step2";
-		! Update WobjGantry_Rob2 to reflect current gantry position from TASK1
-		UpdateGantryWobj_Rob2;
+		! Log gantry position for reference
 		gantry_joint := CJointT(\TaskName:="T_ROB1");
 		Write logfile, "GantryPos from TASK1: X=" + NumToStr(gantry_joint.extax.eax_a,1)
 			+ " Y=" + NumToStr(gantry_joint.extax.eax_b,1)
 			+ " Z=" + NumToStr(gantry_joint.extax.eax_c,1)
 			+ " R=" + NumToStr(gantry_joint.extax.eax_d,1);
-		Write logfile, "WobjGantry_Rob2.uframe=["
-			+ NumToStr(WobjGantry_Rob2.uframe.trans.x,1) + ","
-			+ NumToStr(WobjGantry_Rob2.uframe.trans.y,1) + ","
-			+ NumToStr(WobjGantry_Rob2.uframe.trans.z,1) + "]";
-		! tWeld2 TCP HOME: [0, 488, -1000] in WobjGantry_Rob2
-		! Orientation: [0.54167,-0.45453,-0.45453,-0.54167] (taught for tWeld2)
-		! Confdata: [0,0,0,4] (taught - critical for tWeld2 config)
-		gantry_joint := CJointT(\TaskName:="T_ROB1");
-		home_tcp := [[0, 488, -1000], [0.54167, -0.45453, -0.45453, -0.54167], [0, 0, 0, 4], gantry_joint.extax];
-		MoveJ home_tcp, v100, fine, tWeld2\WObj:=WobjGantry_Rob2;
-		! Iterative refinement to reach precise R-axis center (max 3 iterations)
-		WHILE iteration < max_iterations DO
-			iteration := iteration + 1;
-			! Read current tWeld2 TCP position in WobjGantry_Rob2
-			current_wobj0 := CRobT(\Tool:=tWeld2\WObj:=WobjGantry_Rob2);
-			error_x := 0 - current_wobj0.trans.x;  ! Target X=0
-			error_y := 488 - current_wobj0.trans.y;  ! Target Y=488
 
-			! Check if within tolerance
-			IF Abs(error_x) < tolerance AND Abs(error_y) < tolerance THEN
-				TPWrite "Robot2 init: refined";
-				! Force loop exit by setting iteration >= max_iterations (BREAK has issues)
-				iteration := max_iterations;
-			ELSE
-				! Apply correction: move to target position [0, 488, -1000] in WobjGantry_Rob2
-				UpdateGantryWobj_Rob2;
-				gantry_joint := CJointT(\TaskName:="T_ROB1");
-				home_tcp := [[0, 488, -1000], [0.54167, -0.45453, -0.45453, -0.54167], [0, 0, 0, 4], gantry_joint.extax];
-				MoveL home_tcp, v50, fine, tWeld2\WObj:=WobjGantry_Rob2;
-			ENDIF
-		ENDWHILE
+		! Log current joint angles for verification
+		initial_joint := CJointT();
+		Write logfile, "Final joints: J1=" + NumToStr(initial_joint.robax.rax_1, 2)
+			+ " J2=" + NumToStr(initial_joint.robax.rax_2, 2)
+			+ " J3=" + NumToStr(initial_joint.robax.rax_3, 2)
+			+ " J5=" + NumToStr(initial_joint.robax.rax_5, 2);
 
 		TPWrite "Robot2 init: done";
-		Write logfile, "Step2 done errX=" + NumToStr(error_x, 2) + " errY=" + NumToStr(error_y, 2) + " iter=" + NumToStr(iteration, 0);
-		! TCP verification in Floor coordinates
-		tcp_floor := CRobT(\Tool:=tWeld2\WObj:=WobjFloor);
-		Write logfile, "TCP_Floor tWeld2: X=" + NumToStr(tcp_floor.trans.x, 3) + " Y=" + NumToStr(tcp_floor.trans.y, 3) + " Z=" + NumToStr(tcp_floor.trans.z, 3);
-		Write logfile, "TCP_Floor orient: [" + NumToStr(tcp_floor.rot.q1, 5) + "," + NumToStr(tcp_floor.rot.q2, 5) + "," + NumToStr(tcp_floor.rot.q3, 5) + "," + NumToStr(tcp_floor.rot.q4, 5) + "]";
-		Write logfile, "Setup completed at " + CTime();
+		Write logfile, "Init done (joint-space only) at " + CTime();
 		Close logfile;
 
 		! Initialize robot2_floor_pos_t1 for cross-task measurement (v1.7.43)
