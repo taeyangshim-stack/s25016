@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[S25016] 라이트커튼 추가설치 견적서 — (주)에스피시스템스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0b1929;--navy:#122b4a;--steel:#1e3a5f;--slate:#2c5282;
+  --mid:#4a7ab5;--sky:#6fa3d8;--ice:#b8d4ef;--mist:#e3edf7;
+  --cloud:#f0f5fa;--white:#fafcfe;
+  --orange:#e8752a;--orange-soft:#fef3ec;
+  --green:#1d8348;--green-soft:#eafaf1;
+  --red:#c0392b;--red-soft:#fdecea;
+  --gold:#b7950b;--gold-soft:#fef9e7;
+  --font-display:'Plus Jakarta Sans','Noto Sans KR',sans-serif;
+  --font-body:'Noto Sans KR',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --shadow-sm:0 1px 3px rgba(11,25,41,.06);
+  --shadow-md:0 4px 16px rgba(11,25,41,.08);
+  --radius:10px;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--cloud);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased}
+
+.top-bar{position:sticky;top:0;z-index:100;background:var(--navy);border-bottom:3px solid var(--orange);padding:0 2rem;display:flex;align-items:center;gap:1.5rem;height:52px;font-family:var(--font-display);font-size:.78rem;font-weight:600;color:var(--ice);letter-spacing:.03em}
+.top-bar .logo{font-size:.85rem;font-weight:800;color:white;white-space:nowrap;padding-right:1.5rem;border-right:1px solid rgba(255,255,255,.15)}
+.top-bar a{color:var(--ice);text-decoration:none;padding:0 .5rem;transition:color .2s}
+.top-bar a:hover{color:white}
+.top-bar .spacer{flex:1}
+.top-bar .date-badge{background:rgba(255,255,255,.1);border-radius:20px;padding:4px 14px;font-size:.72rem;font-weight:400;color:var(--ice)}
+.top-bar .status-badge{background:var(--orange);color:white;border-radius:20px;padding:4px 14px;font-size:.72rem;font-weight:700}
+
+.hero{background:linear-gradient(135deg,var(--steel) 0%,var(--navy) 60%,#0a1f38 100%);position:relative;overflow:hidden;padding:3rem 2rem 2.5rem;color:white}
+.hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(255,255,255,.02) 60px,rgba(255,255,255,.02) 61px),repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,255,255,.02) 60px,rgba(255,255,255,.02) 61px)}
+.hero-inner{position:relative;max-width:1200px;margin:auto}
+.hero .tag{display:inline-block;background:var(--orange);color:white;font-family:var(--font-mono);font-size:.7rem;font-weight:600;padding:3px 12px;border-radius:4px;margin-bottom:1rem;letter-spacing:.05em}
+.hero h1{font-family:var(--font-display);font-size:1.8rem;font-weight:800;line-height:1.3;margin-bottom:.5rem}
+.hero .subtitle{font-size:.9rem;font-weight:300;color:rgba(255,255,255,.85);line-height:1.6}
+
+.container{max-width:1200px;margin:0 auto;padding:2rem}
+
+.section{margin-bottom:2.5rem}
+.section-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:2px solid var(--navy)}
+.section-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--orange);color:white;font-family:var(--font-display);font-size:.85rem;font-weight:800;border-radius:6px;flex-shrink:0}
+.section-title{font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--navy)}
+
+.card{background:white;border-radius:var(--radius);box-shadow:var(--shadow-sm);border:1px solid var(--mist);padding:1.8rem;margin-bottom:1.2rem;transition:box-shadow .2s}
+.card:hover{box-shadow:var(--shadow-md)}
+.card-title{font-family:var(--font-display);font-size:.92rem;font-weight:700;color:var(--steel);margin-bottom:1rem}
+
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{padding:.6rem .8rem;text-align:left;border-bottom:1px solid var(--mist);vertical-align:top}
+th{background:var(--cloud);font-weight:600;font-size:.78rem;color:var(--steel);letter-spacing:.03em;white-space:nowrap}
+.text-right{text-align:right}.text-center{text-align:center}
+.text-mono{font-family:var(--font-mono);font-size:.82rem}
+.text-bold{font-weight:600}.text-navy{color:var(--navy)}.text-orange{color:var(--orange)}.text-green{color:var(--green)}.text-slate{color:var(--slate)}
+tr.row-total{background:var(--navy);color:white;font-weight:700}
+tr.row-total td{border-bottom-color:var(--navy);color:white}
+tr.row-subtotal{background:var(--cloud);font-weight:600}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.02em}
+.badge-ok{background:var(--green-soft);color:var(--green)}
+.badge-warn{background:var(--gold-soft);color:var(--gold)}
+.badge-info{background:var(--mist);color:var(--steel)}
+.badge-orange{background:var(--orange-soft);color:var(--orange)}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+@media(max-width:860px){.two-col{grid-template-columns:1fr}}
+
+.info-grid{display:grid;grid-template-columns:120px 1fr;gap:0;font-size:.85rem}
+.info-grid dt{padding:.5rem .8rem;background:var(--cloud);font-weight:600;color:var(--steel);border-bottom:1px solid var(--mist)}
+.info-grid dd{padding:.5rem .8rem;border-bottom:1px solid var(--mist)}
+
+.callout{padding:1rem 1.2rem;border-radius:8px;font-size:.85rem;line-height:1.7;margin:1rem 0}
+.callout-green{background:var(--green-soft);border-left:4px solid var(--green)}
+.callout-orange{background:var(--orange-soft);border-left:4px solid var(--orange)}
+.callout-navy{background:var(--mist);border-left:4px solid var(--navy)}
+.callout-red{background:var(--red-soft);border-left:4px solid var(--red)}
+
+.summary-box{background:linear-gradient(135deg,var(--navy),var(--steel));color:white;border-radius:var(--radius);padding:2rem;margin-top:1rem}
+.summary-box h3{font-family:var(--font-display);font-size:1.1rem;font-weight:800;margin-bottom:1rem}
+.summary-item{display:flex;gap:1rem;padding:.8rem 0;border-top:1px solid rgba(255,255,255,.1)}
+.summary-item:first-of-type{border-top:none}
+.summary-label{width:100px;flex-shrink:0;font-weight:700;font-size:.82rem;color:var(--ice)}
+.summary-text{font-size:.85rem;line-height:1.65;color:rgba(255,255,255,.9)}
+
+.amount-highlight{font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--orange)}
+
+.report-footer{margin-top:3rem;padding:1.5rem 0;border-top:2px solid var(--navy);display:flex;justify-content:space-between;font-size:.75rem;color:var(--slate)}
+
+.internal-only{border:2px dashed var(--red);border-radius:var(--radius);padding:.5rem;margin-top:2rem}
+.internal-only .internal-label{display:inline-block;background:var(--red);color:white;font-size:.7rem;font-weight:700;padding:2px 10px;border-radius:4px;margin-bottom:.8rem;letter-spacing:.05em}
+
+@media print{
+  body{background:white;font-size:12px}
+  .top-bar{display:none}
+  .hero{padding:2rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .container{padding:1rem}
+  .card{box-shadow:none;border:1px solid #ddd;break-inside:avoid}
+  .section{break-inside:avoid}
+  .summary-box{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .internal-only{display:none}
+  tr.row-total{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+.fade-in{opacity:0;transform:translateY(12px);transition:opacity .5s,transform .5s}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<nav class="top-bar">
+  <span class="logo">SP SYSTEMS</span>
+  <a href="/cost-review">&larr; 검토보고서</a>
+  <a href="#header-info">견적정보</a>
+  <a href="#items">견적내역</a>
+  <a href="#notes">비고</a>
+  <span class="spacer"></span>
+  <span class="status-badge">견적서 초안</span>
+  <span class="date-badge">2026.02.24 작성</span>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="tag">S25016 &middot; 견적서</span>
+    <h1>라이트커튼(미러타입) 추가설치<br>견적서</h1>
+    <p class="subtitle">
+      삼성중공업 거제조선소 34bay 소조립 자동용접 로봇시스템 &mdash; 안전방호장치 라이트커튼 사양변경(미러타입) 추가설치 견적
+    </p>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- 1. 견적 정보 -->
+<section class="section fade-in" id="header-info">
+  <div class="section-header">
+    <span class="section-num">1</span>
+    <h2 class="section-title">견적 정보</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">공급자</div>
+      <dl class="info-grid">
+        <dt>회사명</dt><dd><strong>(주)에스피시스템스</strong></dd>
+        <dt>대표이사</dt><dd>심효준, 심상균 (각자대표)</dd>
+        <dt>사업자번호</dt><dd class="text-mono">617-81-16288</dd>
+        <dt>법인번호</dt><dd class="text-mono">180111-0078534</dd>
+        <dt>주소</dt><dd>경상남도 양산시 어곡공단로 123 (어곡동)</dd>
+        <dt>업태/종목</dt><dd>제조업 / 기타 기계 및 장비, 산업용 로봇 제조업</dd>
+        <dt>담당자</dt><dd>송은민</dd>
+        <dt>TEL / FAX</dt><dd class="text-mono">055-371-5661 / 055-371-5606</dd>
+        <dt>E-MAIL</dt><dd class="text-mono">taeyang@spsystems.kr</dd>
+      </dl>
+    </div>
+
+    <div class="card">
+      <div class="card-title">수신</div>
+      <dl class="info-grid">
+        <dt>회사명</dt><dd><strong>삼성중공업(주)</strong></dd>
+        <dt>현장</dt><dd>거제조선소 34bay 소조립 자동용접</dd>
+        <dt>담당자</dt><dd>이무림 프로</dd>
+        <dt>E-MAIL</dt><dd class="text-mono">mulim80.lee@samsung.com</dd>
+      </dl>
+      <dl class="info-grid" style="margin-top:1rem">
+        <dt>견적일</dt><dd class="text-bold">2026.02.24</dd>
+        <dt>유효기간</dt><dd>견적일로부터 30일</dd>
+        <dt>납기</dt><dd>발주 후 장비 3일 + 설치 3일 (약 1주일)</dd>
+        <dt>결제조건</dt><dd>협의</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center;padding:1.5rem">
+    <div style="font-size:.85rem;color:var(--slate);margin-bottom:.5rem">견적 금액</div>
+    <div class="amount-highlight" style="font-size:1.8rem">
+      &won;4,945,050
+    </div>
+    <div style="font-size:.9rem;color:var(--slate);margin-top:.3rem">
+      일금 사백구십사만오천오십원 정 (VAT 포함)
+    </div>
+    <div style="font-size:.8rem;color:var(--mid);margin-top:.2rem">
+      공급가액 &won;4,495,500 + VAT &won;449,550
+    </div>
+  </div>
+</section>
+
+<!-- 2. 견적 내역 -->
+<section class="section fade-in" id="items">
+  <div class="section-header">
+    <span class="section-num">2</span>
+    <h2 class="section-title">견적 내역</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-title">공급 품목 및 작업 내역</div>
+    <table>
+      <thead>
+        <tr>
+          <th class="text-center" style="width:50px">순번</th>
+          <th>품목 / 작업 내용</th>
+          <th class="text-center" style="width:70px">수량</th>
+          <th class="text-center" style="width:60px">단위</th>
+          <th class="text-right" style="width:110px">단가</th>
+          <th class="text-right" style="width:120px">공급가액</th>
+          <th style="width:80px">비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- A. 장비 -->
+        <tr style="background:var(--cloud)">
+          <td colspan="7" class="text-bold" style="color:var(--steel);font-size:.8rem;letter-spacing:.05em">A. 안전방호장치 (라이트커튼 미러타입)</td>
+        </tr>
+        <tr>
+          <td class="text-center text-mono">1</td>
+          <td>
+            <strong>반사식 방호장치</strong><br>
+            <span style="font-size:.78rem;color:var(--slate)">KCS6000QD-B + 연장케이블 SK-RF6-4</span><br>
+            <span style="font-size:.75rem;color:var(--mid)">제조: 선광전자(주) / 고용노동부 의무안전인증</span>
+          </td>
+          <td class="text-center text-mono">4</td>
+          <td class="text-center">SET</td>
+          <td class="text-right text-mono">418,500</td>
+          <td class="text-right text-mono text-bold">1,674,000</td>
+          <td><span class="badge badge-info">A/B라인</span></td>
+        </tr>
+
+        <!-- B. 전기 작업 -->
+        <tr style="background:var(--cloud)">
+          <td colspan="7" class="text-bold" style="color:var(--steel);font-size:.8rem;letter-spacing:.05em">B. 전기 설치 작업</td>
+        </tr>
+        <tr>
+          <td class="text-center text-mono">2</td>
+          <td>
+            <strong>라이트커튼 전기 설치 작업</strong><br>
+            <span style="font-size:.78rem;color:var(--slate)">OP룸 단자대 박스 교체, 스위치 결선 변경, 라이트커튼 결선 (A/B라인)</span>
+          </td>
+          <td class="text-center text-mono">1</td>
+          <td class="text-center">식</td>
+          <td class="text-right text-mono">1,930,500</td>
+          <td class="text-right text-mono text-bold">1,930,500</td>
+          <td><span class="badge badge-info">A/B라인</span></td>
+        </tr>
+
+        <!-- C. 기계 작업 -->
+        <tr style="background:var(--cloud)">
+          <td colspan="7" class="text-bold" style="color:var(--steel);font-size:.8rem;letter-spacing:.05em">C. 기계 설치 작업</td>
+        </tr>
+        <tr>
+          <td class="text-center text-mono">3</td>
+          <td>
+            <strong>브라켓/보호커버 기계 설치 작업</strong><br>
+            <span style="font-size:.78rem;color:var(--slate)">본체+미러 브라켓 제작 설치, 보호커버 설치 (A/B라인 4개소)</span><br>
+            <span style="font-size:.75rem;color:var(--mid)">잡자재(볼트, 너트, 앵커 등) 포함</span>
+          </td>
+          <td class="text-center text-mono">1</td>
+          <td class="text-center">식</td>
+          <td class="text-right text-mono">891,000</td>
+          <td class="text-right text-mono text-bold">891,000</td>
+          <td><span class="badge badge-info">A/B라인</span></td>
+        </tr>
+
+        <!-- 합계 -->
+        <tr class="row-subtotal">
+          <td colspan="5">공급가액 합계</td>
+          <td class="text-right text-mono" style="font-size:.9rem">&won;4,495,500</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td colspan="5">부가가치세 (10%)</td>
+          <td class="text-right text-mono">449,550</td>
+          <td></td>
+        </tr>
+        <tr class="row-total">
+          <td colspan="5" style="font-size:.95rem">견적 총액 (VAT 포함)</td>
+          <td class="text-right text-mono" style="font-size:1.05rem">&won;4,945,050</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 3. 비고 -->
+<section class="section fade-in" id="notes">
+  <div class="section-header">
+    <span class="section-num">3</span>
+    <h2 class="section-title">비고 및 특기사항</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-title">사양 변경 배경</div>
+    <div style="font-size:.85rem;line-height:1.8">
+      <p>외부 안전점검기관 시정조치에 따라, 기존 투과형 라이트커튼에서 <strong>미러타입(반사식)</strong>으로 사양을 변경하여 설치합니다.</p>
+      <table style="margin-top:1rem">
+        <thead>
+          <tr><th>구분</th><th>당초 (투과형)</th><th>변경 (미러타입)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-bold">설치방식</td>
+            <td>송신기+수신기 양쪽 분리 설치<br><span style="color:var(--red);font-size:.8em">바닥시공/정반개조 필요</span></td>
+            <td class="text-bold text-navy">본체+미러 한쪽 설치<br><span style="color:var(--green);font-size:.8em">바닥시공/정반개조 불필요</span></td>
+          </tr>
+          <tr>
+            <td class="text-bold">장비</td>
+            <td>SLC-0918NUI-Y</td>
+            <td class="text-bold text-navy">KCS6000QD-B + SK-RF6-4</td>
+          </tr>
+          <tr>
+            <td class="text-bold">인증</td>
+            <td colspan="2">고용노동부 의무안전인증 (KCS 시리즈)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">납기 및 설치 일정</div>
+    <table>
+      <tbody>
+        <tr>
+          <td class="text-bold" style="width:140px">장비 납기</td>
+          <td>발주일 기준 <strong>3일 이내</strong> 현장 도착</td>
+        </tr>
+        <tr>
+          <td class="text-bold">설치 소요</td>
+          <td>전기 + 기계 작업 <strong>약 3일</strong> (현장 일정 협의)</td>
+        </tr>
+        <tr>
+          <td class="text-bold">총 소요기간</td>
+          <td class="text-bold text-navy">발주 후 약 1주일</td>
+        </tr>
+        <tr>
+          <td class="text-bold">설치 범위</td>
+          <td>A라인 투입부/배출부 (2개소) + B라인 투입부/배출부 (2개소) = <strong>총 4개소</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">포함/불포함 사항</div>
+    <div class="two-col">
+      <div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--green);margin-bottom:.5rem">포함 사항</div>
+        <ul style="font-size:.82rem;line-height:2;padding-left:1.2rem;color:var(--ink)">
+          <li>라이트커튼 본체 + 미러(반사판) + 연장케이블</li>
+          <li>설치 브라켓 및 보호커버 제작/설치</li>
+          <li>전기 결선 작업 (배선, 단자대, 스위치)</li>
+          <li>기계 설치 작업 (볼트, 너트, 앵커 등 잡자재)</li>
+          <li>설치 후 동작 확인 및 시운전</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:.82rem;font-weight:700;color:var(--red);margin-bottom:.5rem">불포함 사항</div>
+        <ul style="font-size:.82rem;line-height:2;padding-left:1.2rem;color:var(--ink)">
+          <li>PLC 프로그램 변경 (기존 로직 활용)</li>
+          <li>현장 바닥시공 / 정반개조 (미러타입 불필요)</li>
+          <li>고객사 내부 안전점검 비용</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 종합 -->
+<div class="summary-box fade-in">
+  <h3>견적 요약</h3>
+
+  <div class="summary-item">
+    <div class="summary-label">건명</div>
+    <div class="summary-text">
+      S25016 소조립 자동용접 로봇시스템 &mdash; 라이트커튼(미러타입) 추가설치
+    </div>
+  </div>
+
+  <div class="summary-item">
+    <div class="summary-label">견적 금액</div>
+    <div class="summary-text">
+      <strong style="color:var(--orange);font-family:var(--font-mono);font-size:1.2rem">&won;4,495,500</strong>
+      <span style="font-size:.8rem;color:var(--ice)">(공급가액, VAT 별도)</span><br>
+      <span style="font-size:.85rem;color:rgba(255,255,255,.7)">VAT 포함 &won;4,945,050</span>
+    </div>
+  </div>
+
+  <div class="summary-item">
+    <div class="summary-label">공급 범위</div>
+    <div class="summary-text">
+      장비 4SET + 전기설치 + 기계설치 + 시운전 (A/B라인 4개소 일괄)
+    </div>
+  </div>
+
+  <div class="summary-item">
+    <div class="summary-label">납기</div>
+    <div class="summary-text">
+      발주 후 약 1주일 (장비 3일 + 설치 3일)
+    </div>
+  </div>
+</div>
+
+<!-- 내부용 원가분석 (인쇄 시 숨김) -->
+<div class="internal-only fade-in">
+  <span class="internal-label">INTERNAL USE ONLY &mdash; 사내용 원가분석 (인쇄 시 제외)</span>
+  <div class="card" style="margin:0;border:none;box-shadow:none">
+    <div class="card-title" style="color:var(--red)">원가 vs 매출가 비교 (기업이윤 35%)</div>
+    <table>
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th>공급업체</th>
+          <th class="text-right">원가 (공급가액)</th>
+          <th class="text-right">이윤 (35%)</th>
+          <th class="text-right">매출가 (공급가액)</th>
+          <th class="text-right">이윤율</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-bold">A. 장비 구매</td>
+          <td>(주)피에프에이</td>
+          <td class="text-right text-mono">1,240,000</td>
+          <td class="text-right text-mono text-green">434,000</td>
+          <td class="text-right text-mono text-bold">1,674,000</td>
+          <td class="text-right text-mono">35.0%</td>
+        </tr>
+        <tr>
+          <td class="text-bold">B. 전기 작업</td>
+          <td>나라오토텍</td>
+          <td class="text-right text-mono">1,430,000</td>
+          <td class="text-right text-mono text-green">500,500</td>
+          <td class="text-right text-mono text-bold">1,930,500</td>
+          <td class="text-right text-mono">35.0%</td>
+        </tr>
+        <tr>
+          <td class="text-bold">C. 기계 작업</td>
+          <td>추정 (자체/외주)</td>
+          <td class="text-right text-mono">660,000</td>
+          <td class="text-right text-mono text-green">231,000</td>
+          <td class="text-right text-mono text-bold">891,000</td>
+          <td class="text-right text-mono">35.0%</td>
+        </tr>
+        <tr class="row-subtotal">
+          <td colspan="2">합계 (공급가액)</td>
+          <td class="text-right text-mono">&won;3,330,000</td>
+          <td class="text-right text-mono text-green">&won;1,165,500</td>
+          <td class="text-right text-mono" style="font-size:.95rem">&won;4,495,500</td>
+          <td class="text-right text-mono text-bold">35.0%</td>
+        </tr>
+        <tr class="row-total">
+          <td colspan="2">합계 (VAT 포함)</td>
+          <td class="text-right text-mono">&won;3,663,000</td>
+          <td class="text-right text-mono">&won;1,282,050</td>
+          <td class="text-right text-mono" style="font-size:.95rem">&won;4,945,050</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-navy" style="margin-top:1rem">
+      <strong>이윤 분석:</strong><br>
+      &bull; 총 매입원가: &won;3,330,000 (공급가액 기준)<br>
+      &bull; 기업이윤 (35%): &won;1,165,500<br>
+      &bull; 매출가 (공급가액): &won;4,495,500<br>
+      &bull; 당초 고객 예상 견적(&won;5,400,000) 대비 <strong style="color:var(--green)">&minus;16.8%</strong> 수준으로, 고객사 수용 가능성 높음
+    </div>
+  </div>
+</div>
+
+<footer class="report-footer">
+  <div>
+    <strong>&#12828;에스피시스템스</strong> 연구소 &middot; 심태양 부장<br>
+    경남 양산시 어곡동 858-2 산업단지 3-2 &middot; TEL 055-371-5661
+  </div>
+  <div style="text-align:right">
+    문서번호: S25016-QT-001<br>
+    견적일: 2026.02.24<br>
+    유효기간: 30일
+  </div>
+</footer>
+
+</div>
+
+<script>
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible') });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>
