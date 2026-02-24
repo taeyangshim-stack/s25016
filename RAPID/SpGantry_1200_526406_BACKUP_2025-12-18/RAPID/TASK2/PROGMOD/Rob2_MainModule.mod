@@ -3,12 +3,20 @@ MODULE Rob2_MainModule
 	! TASK2 (Robot2) - Rob2_MainModule
 	! Version History
 	!========================================
+	! v1.9.44 (2026-02-24) - FIX: Restore MoveAbsJ in MoveJgJ for home return
+	!   - ROOT CAUSE: v1.9.42 removed robot motion from MoveJgJ
+	!     T_Head rMoveToRobotHome sends robot joint targets via jRob2 PERS
+	!     but Robot2 ignored them, causing home return to not move robots
+	!   - FIX: MoveAbsJ jRob2, vSync, fine, tool0 restored
+	!     MoveAbsJ is joint-space; tool0 vs tWeld2 does not affect joint angles
+	!     MergeJgWith() defaults to CJointT for unspecified axes (backward compatible)
+	!
 	! v1.9.43 (2026-02-21) - Floor coordinate TCP logging
 	!   - Added CRobT(\Tool:=tWeld2\WObj:=WobjFloor) to SetRobot2InitialPosition
 	!   - Logs TCP_Floor position + orientation to robot2_init_position.txt
 	!   - For verifying Robot1/Robot2 TCP meeting point at R-axis center
 	!
-	! v1.9.42 (2026-02-19) - MoveJgJ fix for tWeld2
+	! v1.9.42 (2026-02-19) - MoveJgJ fix for tWeld2 [REVERTED in v1.9.44]
 	!   - Removed MoveAbsJ jRob2 from MoveJgJ case
 	!   - jRob2.robax is tool0-calculated (138deg J2 change from tWeld2 HOME)
 	!   - Robot2 now immediately Acks without moving during gantry move
@@ -3532,8 +3540,8 @@ PROC Rob2_CommandListener()
 
 			CASE "MoveJgJ":
 				stReact{2} := "";
-				! jRob2.robax has tool0-calculated joints from T_Head
-				! Robot2 should keep current tWeld2 posture during gantry move
+				! v1.9.44: Move Robot2 to target joint position from T_Head
+				MoveAbsJ jRob2, vSync, fine, tool0;
 				stReact{2} := "Ack";
 				Write head_log, "MoveJgJ done";
 				WaitUntil stCommand = "";

@@ -9,8 +9,8 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.60";
-CONST string TASK2_VERSION := "v1.9.43";
+CONST string TASK1_VERSION := "v1.9.61";
+CONST string TASK2_VERSION := "v1.9.44";
 CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
 CONST string TASK_TEACHING_VERSION := "v1.0.0";
@@ -24,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-23";
+CONST string BUILD_DATE := "2026-02-24";
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -46,6 +46,15 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.61 (2026-02-24) - FIX: MoveJgJ now moves robot joints (home return fix)
+!   - ROOT CAUSE: ExecMoveJgJ (v1.9.47) ignored jRob1.robax, only moved gantry extax
+!     Rob2_MainModule MoveJgJ case (v1.9.42) immediately Acked without any motion
+!     Result: T_Head rMoveToRobotHome sent correct joint targets but both robots stayed
+!   - FIX TASK1: ExecMoveJgJ applies jRob1.robax + interpolates robot joints in segments
+!   - FIX TASK2: MoveAbsJ jRob2 restored in MoveJgJ case (v1.9.44)
+!   - SAFE: MoveAbsJ is joint-space, tool parameter only affects TCP speed monitoring
+!     MergeJgWith() defaults to CJointT() when no override -> backward compatible
+!
 ! v1.9.60 (2026-02-23) - ClearPath before each scenario motion
 !   - FIX: 50426 "Out of interpolation objects" at Scenario 5
 !     4 scenarios x ~10 motion commands accumulated interpolation objects
