@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[S25016] 라이트커튼 미러타입 변경 — 품의 초안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0b1929;--navy:#122b4a;--steel:#1e3a5f;--slate:#2c5282;
+  --mid:#4a7ab5;--sky:#6fa3d8;--ice:#b8d4ef;--mist:#e3edf7;
+  --cloud:#f0f5fa;--white:#fafcfe;
+  --orange:#e8752a;--orange-soft:#fef3ec;
+  --green:#1d8348;--green-soft:#eafaf1;
+  --red:#c0392b;--red-soft:#fdecea;
+  --gold:#b7950b;--gold-soft:#fef9e7;
+  --font-display:'Plus Jakarta Sans','Noto Sans KR',sans-serif;
+  --font-body:'Noto Sans KR',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --shadow-sm:0 1px 3px rgba(11,25,41,.06);
+  --shadow-md:0 4px 16px rgba(11,25,41,.08);
+  --radius:10px;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--cloud);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased}
+
+.top-bar{position:sticky;top:0;z-index:100;background:var(--navy);border-bottom:3px solid var(--orange);padding:0 2rem;display:flex;align-items:center;gap:1.5rem;height:52px;font-family:var(--font-display);font-size:.78rem;font-weight:600;color:var(--ice);letter-spacing:.03em}
+.top-bar .logo{font-size:.85rem;font-weight:800;color:white;white-space:nowrap;padding-right:1.5rem;border-right:1px solid rgba(255,255,255,.15)}
+.top-bar a{color:var(--ice);text-decoration:none;padding:0 .5rem;transition:color .2s}
+.top-bar a:hover{color:white}
+.top-bar .spacer{flex:1}
+.top-bar .date-badge{background:rgba(255,255,255,.1);border-radius:20px;padding:4px 14px;font-size:.72rem;font-weight:400;color:var(--ice)}
+.top-bar .status-badge{background:var(--orange);color:white;border-radius:20px;padding:4px 14px;font-size:.72rem;font-weight:700}
+
+.hero{background:linear-gradient(135deg,var(--steel) 0%,var(--navy) 60%,#0a1f38 100%);position:relative;overflow:hidden;padding:3rem 2rem 2.5rem;color:white}
+.hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(255,255,255,.02) 60px,rgba(255,255,255,.02) 61px),repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,255,255,.02) 60px,rgba(255,255,255,.02) 61px)}
+.hero-inner{position:relative;max-width:1200px;margin:auto}
+.hero .tag{display:inline-block;background:var(--orange);color:white;font-family:var(--font-mono);font-size:.7rem;font-weight:600;padding:3px 12px;border-radius:4px;margin-bottom:1rem;letter-spacing:.05em}
+.hero h1{font-family:var(--font-display);font-size:1.8rem;font-weight:800;line-height:1.3;margin-bottom:.5rem}
+.hero .subtitle{font-size:.9rem;font-weight:300;color:rgba(255,255,255,.85);line-height:1.6}
+
+.container{max-width:1200px;margin:0 auto;padding:2rem}
+
+.section{margin-bottom:2.5rem}
+.section-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:2px solid var(--navy)}
+.section-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--orange);color:white;font-family:var(--font-display);font-size:.85rem;font-weight:800;border-radius:6px;flex-shrink:0}
+.section-title{font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--navy)}
+
+.card{background:white;border-radius:var(--radius);box-shadow:var(--shadow-sm);border:1px solid var(--mist);padding:1.8rem;margin-bottom:1.2rem;transition:box-shadow .2s}
+.card:hover{box-shadow:var(--shadow-md)}
+.card-title{font-family:var(--font-display);font-size:.92rem;font-weight:700;color:var(--steel);margin-bottom:1rem}
+
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{padding:.6rem .8rem;text-align:left;border-bottom:1px solid var(--mist);vertical-align:top}
+th{background:var(--cloud);font-weight:600;font-size:.78rem;color:var(--steel);letter-spacing:.03em;white-space:nowrap}
+.text-right{text-align:right}.text-center{text-align:center}
+.text-mono{font-family:var(--font-mono);font-size:.82rem}
+.text-bold{font-weight:600}.text-navy{color:var(--navy)}.text-orange{color:var(--orange)}.text-green{color:var(--green)}.text-slate{color:var(--slate)}
+tr.row-total{background:var(--navy);color:white;font-weight:700}
+tr.row-total td{border-bottom-color:var(--navy);color:white}
+tr.row-subtotal{background:var(--cloud);font-weight:600}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.02em}
+.badge-ok{background:var(--green-soft);color:var(--green)}
+.badge-warn{background:var(--gold-soft);color:var(--gold)}
+.badge-info{background:var(--mist);color:var(--steel)}
+.badge-orange{background:var(--orange-soft);color:var(--orange)}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+@media(max-width:860px){.two-col{grid-template-columns:1fr}}
+
+.info-grid{display:grid;grid-template-columns:120px 1fr;gap:0;font-size:.85rem}
+.info-grid dt{padding:.5rem .8rem;background:var(--cloud);font-weight:600;color:var(--steel);border-bottom:1px solid var(--mist)}
+.info-grid dd{padding:.5rem .8rem;border-bottom:1px solid var(--mist)}
+
+.callout{padding:1rem 1.2rem;border-radius:8px;font-size:.85rem;line-height:1.7;margin:1rem 0}
+.callout-green{background:var(--green-soft);border-left:4px solid var(--green)}
+.callout-orange{background:var(--orange-soft);border-left:4px solid var(--orange)}
+.callout-navy{background:var(--mist);border-left:4px solid var(--navy)}
+.callout-red{background:var(--red-soft);border-left:4px solid var(--red)}
+
+.summary-box{background:linear-gradient(135deg,var(--navy),var(--steel));color:white;border-radius:var(--radius);padding:2rem;margin-top:1rem}
+.summary-box h3{font-family:var(--font-display);font-size:1.1rem;font-weight:800;margin-bottom:1rem}
+.summary-item{display:flex;gap:1rem;padding:.8rem 0;border-top:1px solid rgba(255,255,255,.1)}
+.summary-item:first-of-type{border-top:none}
+.summary-label{width:100px;flex-shrink:0;font-weight:700;font-size:.82rem;color:var(--ice)}
+.summary-text{font-size:.85rem;line-height:1.65;color:rgba(255,255,255,.9)}
+
+.amount-highlight{font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--orange)}
+
+.report-footer{margin-top:3rem;padding:1.5rem 0;border-top:2px solid var(--navy);display:flex;justify-content:space-between;font-size:.75rem;color:var(--slate)}
+
+@media print{
+  body{background:white;font-size:12px}
+  .top-bar{display:none}
+  .hero{padding:2rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .container{padding:1rem}
+  .card{box-shadow:none;border:1px solid #ddd;break-inside:avoid}
+  .section{break-inside:avoid}
+  .summary-box{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+.fade-in{opacity:0;transform:translateY(12px);transition:opacity .5s,transform .5s}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<nav class="top-bar">
+  <span class="logo">SP SYSTEMS</span>
+  <a href="/cost-review">&larr; 검토보고서</a>
+  <a href="#overview">개요</a>
+  <a href="#cost">비용내역</a>
+  <a href="#customer">고객확인</a>
+  <a href="#action">진행요청</a>
+  <span class="spacer"></span>
+  <span class="status-badge">품의 초안</span>
+  <span class="date-badge">2026.02.23 작성</span>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="tag">S25016 &middot; 품의</span>
+    <h1>라이트커튼 미러타입 변경<br>추가비용 품의 <span style="font-size:.6em;color:var(--orange);background:rgba(255,255,255,.15);padding:2px 10px;border-radius:4px;vertical-align:middle">긴급</span></h1>
+    <p class="subtitle">
+      삼성중공업 거제조선소 34bay 소조립 용접시스템 &mdash; 외부 안전점검기관 시정조치에 따른 라이트커튼 긴급 보완 및 추가비용 집행 품의
+    </p>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- 1. 품의 개요 -->
+<section class="section fade-in" id="overview">
+  <div class="section-header">
+    <span class="section-num">1</span>
+    <h2 class="section-title">품의 개요</h2>
+  </div>
+
+  <div class="card">
+    <dl class="info-grid">
+      <dt>프로젝트</dt><dd><strong>S25016</strong> &mdash; 삼성중공업 거제조선소 34bay 소조립 자동용접 로봇시스템</dd>
+      <dt>건명</dt><dd>라이트커튼 사양 변경(투과형 &rarr; 미러타입) 추가비용 집행</dd>
+      <dt>긴급사유</dt><dd style="color:var(--red);font-weight:700">외부 안전점검기관 시정조치 &mdash; 미이행 시 라인 생산중지 통보</dd>
+      <dt>품의 금액</dt><dd class="amount-highlight">&won;2,937,000 <span style="font-size:.75rem;font-weight:400;color:var(--slate)">(VAT 포함)</span></dd>
+      <dt>발주번호</dt><dd class="text-mono">PO2602030001</dd>
+      <dt>PM담당</dt><dd>PM사업부4팀 / 정예희</dd>
+      <dt>기안자</dt><dd>연구소 / 심태양 부장</dd>
+    </dl>
+  </div>
+
+  <div class="card" style="border-left:4px solid var(--red)">
+    <div class="card-title" style="color:var(--red)">긴급 진행 배경</div>
+    <div style="font-size:.85rem;line-height:1.8">
+      <p>삼성중공업 거제조선소에 대한 <strong>외부 안전점검기관의 점검</strong> 결과, 현재 자동용접 로봇시스템의 안전방호장치(라이트커튼) 보완이 요구되었습니다.</p>
+      <div class="callout callout-red" style="margin:1rem 0">
+        <strong>핵심 사안:</strong> 라이트커튼 보완이 이루어지지 않을 경우 <strong>라인 생산중지 명령</strong>이 내려질 수 있다는 통보를 받은 상황이며,
+        이에 따라 삼성중공업 측에서 <strong>긴급히 진행을 요청</strong>하고 있습니다.
+      </div>
+      <table>
+        <tbody>
+          <tr>
+            <td class="text-bold" style="width:120px;color:var(--red)">리스크</td>
+            <td>미이행 시 외부 점검기관에 의한 <strong>라인 생산중지 명령</strong> &rarr; 삼성중공업 생산 차질</td>
+          </tr>
+          <tr>
+            <td class="text-bold">고객 요청</td>
+            <td>삼성중공업에서 긴급/간곡히 빠른 진행 요청 &mdash; 사양 확정 후 즉시 발주 필요</td>
+          </tr>
+          <tr>
+            <td class="text-bold">현재 상태</td>
+            <td>미러타입 사양 확정 완료, 설치계획서 VER.3.0 작성 완료, 고객 안내 메일 발송 완료 (2026.02.23)</td>
+          </tr>
+          <tr>
+            <td class="text-bold">요청사항</td>
+            <td class="text-bold" style="color:var(--red)">긴급 품의 승인 및 즉시 발주 진행 요청</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">사양 변경 경위</div>
+    <table>
+      <thead>
+        <tr><th>구분</th><th>당초 (투과형)</th><th>변경 (미러타입)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-bold">장비 모델</td>
+          <td>SLC-0918NUI-Y</td>
+          <td class="text-bold text-navy">KCS6000QD-B + SK-RF6-4</td>
+        </tr>
+        <tr>
+          <td class="text-bold">공급업체</td>
+          <td>(주)피에프에이</td>
+          <td class="text-bold text-navy">더원시스템 <span style="font-size:.8em;font-weight:400;color:var(--slate)">(구매: 피에프에이 경유)</span></td>
+        </tr>
+        <tr>
+          <td class="text-bold">설치방식</td>
+          <td>송신기+수신기 양쪽 분리 설치<br><span style="color:var(--red);font-size:.8em">바닥시공/정반개조 필요</span></td>
+          <td>본체+미러 한쪽 설치<br><span style="color:var(--green);font-size:.8em">바닥시공/정반개조 불필요</span></td>
+        </tr>
+        <tr>
+          <td class="text-bold">변경 사유</td>
+          <td colspan="2">현장 설치 여건 검토 결과, 미러타입이 <strong>설치 공기 단축</strong> 및 <strong>현장 시공성</strong> 측면에서 유리하다고 판단. 바닥시공/정반개조 공정이 삭제되어 현장 간섭 최소화.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 2. 비용 내역 -->
+<section class="section fade-in" id="cost">
+  <div class="section-header">
+    <span class="section-num">2</span>
+    <h2 class="section-title">비용 내역</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">A. 장비 구매비 (라이트커튼)</div>
+      <dl class="info-grid">
+        <dt>공급업체</dt><dd>(주)피에프에이 (PFA) / 담당: 황태호</dd>
+        <dt>제조사</dt><dd>선광전자(주) — 유통: 더원시스템 → 구매: (주)피에프에이</dd>
+        <dt>품목</dt><dd>반사식 방호장치 KCS6000QD-B + 연장케이블 SK-RF6-4</dd>
+        <dt>수량</dt><dd>4 SET (A라인 2 + B라인 2)</dd>
+        <dt>견적일</dt><dd>2026.02.05 (유효기간 1개월)</dd>
+        <dt>납기</dt><dd>발주일 기준 3일 이내</dd>
+      </dl>
+      <table style="margin-top:1rem">
+        <thead>
+          <tr><th>품목</th><th class="text-center">수량</th><th class="text-right">단가</th><th class="text-right">금액</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>KCS6000QD-B + SK-RF6-4</td>
+            <td class="text-center text-mono">4 SET</td>
+            <td class="text-right text-mono">310,000</td>
+            <td class="text-right text-mono text-bold">1,240,000</td>
+          </tr>
+          <tr class="row-subtotal">
+            <td colspan="3">공급가액</td>
+            <td class="text-right text-mono">1,240,000</td>
+          </tr>
+          <tr>
+            <td colspan="3">부가세 (10%)</td>
+            <td class="text-right text-mono">124,000</td>
+          </tr>
+          <tr class="row-total">
+            <td colspan="3">소계 (VAT 포함)</td>
+            <td class="text-right text-mono">&won;1,364,000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">B. 전기 작업비</div>
+      <dl class="info-grid">
+        <dt>시공업체</dt><dd>나라오토텍 (대표: 공선애)</dd>
+        <dt>작업범위</dt><dd>라이트커튼 추가 설치 전기 작업 (A/B라인)</dd>
+        <dt>견적일</dt><dd>2026.02.23</dd>
+        <dt>근거</dt><dd>이상주 대리 메일 (2026.02.23 14:09) / 첨부 견적서 참조</dd>
+      </dl>
+      <table style="margin-top:1rem">
+        <thead>
+          <tr><th>작업 내용</th><th class="text-right">비고</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>OP룸 상단부 단자대 박스 교체 (A라인)</td><td class="text-right">기존 설비 연동</td></tr>
+          <tr><td>OP룸 스위치 박스 내부 램프 스위치 결선 변경 (A/B라인)</td><td class="text-right">기존 설비 연동</td></tr>
+          <tr><td>라이트커튼 결선 (A/B라인)</td><td class="text-right">신규 설치</td></tr>
+        </tbody>
+      </table>
+      <table style="margin-top:.8rem">
+        <thead>
+          <tr><th>항목</th><th class="text-right">금액</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>라이트커튼 추가 설치 전기 작업</td>
+            <td class="text-right text-mono text-bold">1,430,000</td>
+          </tr>
+          <tr class="row-subtotal">
+            <td>공급가액</td>
+            <td class="text-right text-mono">1,430,000</td>
+          </tr>
+          <tr>
+            <td>부가세 (10%)</td>
+            <td class="text-right text-mono">143,000</td>
+          </tr>
+          <tr class="row-total">
+            <td>소계 (VAT 포함)</td>
+            <td class="text-right text-mono">&won;1,573,000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="border-left:3px solid var(--slate)">
+      <div class="card-title" style="color:var(--slate)">C. 기계 작업 (별도 견적 미확보 &mdash; 초기 검토자료 기반 추정)</div>
+      <p style="font-size:.82rem;color:var(--slate);margin-bottom:1rem">
+        초기 설치계획서(VER.1.0, 260203) 기계부 항목을 기반으로, 미러타입 변경에 따른 공정 삭제분을 반영하여 추정한 내역입니다.
+      </p>
+
+      <!-- 당초 vs 변경 비교 -->
+      <table>
+        <thead>
+          <tr><th>작업 항목</th><th class="text-center">당초 (투과형)</th><th class="text-center">변경 (미러타입)</th><th class="text-center">비고</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-bold">바닥 시공</td>
+            <td class="text-center">센서 설치 위한 기초 작업</td>
+            <td class="text-center" style="color:var(--green);font-weight:600">삭제</td>
+            <td class="text-center"><span style="font-size:.8em">미러타입은 기초 불필요</span></td>
+          </tr>
+          <tr>
+            <td class="text-bold">정반 개조</td>
+            <td class="text-center">라이트커튼 설치 영역 확보</td>
+            <td class="text-center" style="color:var(--green);font-weight:600">삭제</td>
+            <td class="text-center"><span style="font-size:.8em">미러타입은 정반개조 불필요</span></td>
+          </tr>
+          <tr>
+            <td class="text-bold">브라켓 설치</td>
+            <td class="text-center">설치 브라켓 (8 EA)</td>
+            <td class="text-center text-bold">브라켓/보호커버 설치 (4개소)</td>
+            <td class="text-center"><span style="font-size:.8em">미러 본체+반사판 브라켓</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 추정 원가 -->
+      <table style="margin-top:1rem">
+        <thead>
+          <tr><th>항목</th><th class="text-center">산출 근거</th><th class="text-right">추정 금액</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-bold">인건비</td>
+            <td class="text-center text-mono">기계 기술자 2명 &times; 1일 = 2 M/D &times; 250,000원</td>
+            <td class="text-right text-mono">500,000</td>
+          </tr>
+          <tr>
+            <td class="text-bold">잡자재</td>
+            <td class="text-center">볼트, 너트, 앵커 등 (1 LOT)</td>
+            <td class="text-right text-mono">100,000</td>
+          </tr>
+          <tr class="row-subtotal">
+            <td>소계</td>
+            <td></td>
+            <td class="text-right text-mono">600,000</td>
+          </tr>
+          <tr>
+            <td>이윤 (10%)</td>
+            <td></td>
+            <td class="text-right text-mono">60,000</td>
+          </tr>
+          <tr class="row-total">
+            <td>추정 합계 (VAT 별도)</td>
+            <td></td>
+            <td class="text-right text-mono">&won;660,000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-navy" style="margin-top:.8rem">
+        <strong>M/D 단가 근거:</strong> 250,000원/M/D &mdash; D25003 프로젝트 나라오토텍 전장공사 실적 기준 (현장설치 M/D 단가).<br>
+        <strong>공정 삭제 효과:</strong> 미러타입 변경으로 바닥시공/정반개조가 삭제되어, 당초 기계부(2명&times;2일 = 4 M/D) 대비 <strong>50% 감소(2명&times;1일 = 2 M/D)</strong>.
+      </div>
+      <div class="callout callout-orange" style="margin-top:.5rem">
+        <strong>유의:</strong> 상기 금액은 초기 검토자료 기반 추정치이며, 별도 견적을 확보하지 않았습니다. 실제 시공 시 별도 정산 또는 자체 진행 예정.
+      </div>
+    </div>
+  </div>
+
+  <!-- 합계 -->
+  <div class="card">
+    <div class="card-title">비용 합계</div>
+    <table>
+      <thead>
+        <tr><th>구분</th><th>업체</th><th class="text-right">공급가액</th><th class="text-right">VAT</th><th class="text-right">합계</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-bold">A. 장비 구매</td>
+          <td>(주)피에프에이</td>
+          <td class="text-right text-mono">1,240,000</td>
+          <td class="text-right text-mono">124,000</td>
+          <td class="text-right text-mono">1,364,000</td>
+        </tr>
+        <tr>
+          <td class="text-bold">B. 전기 작업</td>
+          <td>나라오토텍</td>
+          <td class="text-right text-mono">1,430,000</td>
+          <td class="text-right text-mono">143,000</td>
+          <td class="text-right text-mono">1,573,000</td>
+        </tr>
+        <tr style="color:var(--slate);font-style:italic">
+          <td class="text-bold">C. 기계 작업 (추정)</td>
+          <td>미확보</td>
+          <td class="text-right text-mono">660,000</td>
+          <td class="text-right text-mono">66,000</td>
+          <td class="text-right text-mono">726,000</td>
+        </tr>
+        <tr class="row-subtotal">
+          <td colspan="2">품의 총액 (A+B, 견적 확보분)</td>
+          <td class="text-right text-mono">&won;2,670,000</td>
+          <td class="text-right text-mono">&won;267,000</td>
+          <td class="text-right text-mono" style="font-size:1rem">&won;2,937,000</td>
+        </tr>
+        <tr class="row-total">
+          <td colspan="2">예상 총액 (A+B+C, 추정 포함)</td>
+          <td class="text-right text-mono">&won;3,330,000</td>
+          <td class="text-right text-mono">&won;333,000</td>
+          <td class="text-right text-mono" style="font-size:1rem">&won;3,663,000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 당초 견적 대비 비교 -->
+  <div class="card">
+    <div class="card-title">당초 예상 견적 대비 비교</div>
+    <p style="font-size:.82rem;color:var(--slate);margin-bottom:1rem">초기 설치계획서(VER.1.0, 2025.02.03) 기준 예상 견적과 실제 확정 비용을 비교합니다.</p>
+    <table>
+      <thead>
+        <tr><th>구분</th><th class="text-center">당초 (투과형, VER.1.0)</th><th class="text-center">변경 (미러타입, VER.3.0)</th><th class="text-center">증감</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-bold">장비비</td>
+          <td class="text-center">라이트커튼 4SET + 브라켓 + 잡자재</td>
+          <td class="text-center">라이트커튼 4SET + 브라켓 + 잡자재</td>
+          <td class="text-center"><span class="badge badge-info">유사</span></td>
+        </tr>
+        <tr>
+          <td class="text-bold">전기공사비</td>
+          <td class="text-center">배선, 박스 교체, 결선</td>
+          <td class="text-center">배선, 박스 교체, 결선</td>
+          <td class="text-center"><span class="badge badge-info">동일</span></td>
+        </tr>
+        <tr>
+          <td class="text-bold">기계공사비</td>
+          <td class="text-center"><strong style="color:var(--red)">바닥시공 + 정반개조</strong><br>+ 브라켓 설치</td>
+          <td class="text-center">브라켓/보호커버 설치<br><span style="font-size:.8em;color:var(--green)">바닥시공/정반개조 삭제</span></td>
+          <td class="text-center"><span class="badge badge-ok" style="font-size:.75rem">대폭 감소</span></td>
+        </tr>
+        <tr>
+          <td class="text-bold">투입 인력</td>
+          <td class="text-center text-mono">전기 2명&times;2일 + 기계 2명&times;2일<br>= 8 M/D</td>
+          <td class="text-center text-mono">기계 2명&times;1일 = 2 M/D<br><span style="font-size:.8em">(전기 별도)</span></td>
+          <td class="text-center"><span class="badge badge-ok">감소</span></td>
+        </tr>
+        <tr style="background:var(--cloud)">
+          <td class="text-bold">예상 견적 총액<br><span style="font-size:.75em;font-weight:400">(VAT 별도)</span></td>
+          <td class="text-center text-mono" style="font-size:1.1rem;color:var(--red)"><strong>&won;5,400,000</strong></td>
+          <td class="text-center text-mono" style="font-size:1.1rem;color:var(--green)"><strong>&won;3,330,000</strong><br><span style="font-size:.7rem;font-weight:400;color:var(--slate)">견적 &won;2,670,000 + 기계 추정 &won;660,000</span></td>
+          <td class="text-center text-mono text-green" style="font-size:1.1rem"><strong>&minus;38.3%</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-green" style="margin-top:1rem">
+      <strong>비용 절감 효과:</strong> 미러타입 변경으로 바닥시공/정반개조 공정이 삭제되어, 당초 예상 견적(5,400,000원) 대비 <strong>약 38% 절감된 3,330,000원</strong>(기계 추정 포함, VAT 별도)으로 산출되었습니다.<br>
+      장비 견적은 2개 업체(피에프에이, 더원시스템) 비교 후 경쟁력 있는 <strong>피에프에이 견적(310,000원/SET)</strong>을 채택하였습니다.
+    </div>
+  </div>
+</section>
+
+<!-- 3. 고객사 비용처리 확인 -->
+<section class="section fade-in" id="customer">
+  <div class="section-header">
+    <span class="section-num">3</span>
+    <h2 class="section-title">고객사 비용처리 확인</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-title">삼성중공업 비용 정산 합의</div>
+    <dl class="info-grid">
+      <dt>고객사</dt><dd>삼성중공업 거제조선소</dd>
+      <dt>담당자</dt><dd>이무림 프로 (mulim80.lee@samsung.com)</dd>
+      <dt>합의 내용</dt><dd class="text-bold">라이트커튼 사양 변경에 따른 비용분은 별도 정산 처리</dd>
+      <dt>근거</dt><dd>메일 회신 (2026.02.XX) &mdash; 첨부 참조</dd>
+    </dl>
+
+    <div class="callout callout-green" style="margin-top:1rem">
+      <strong>고객 확인 경위:</strong><br>
+      2026.02.23 삼성중공업 이무림 프로에게 사양 변경 안내 메일 발송 (설치계획서 VER.3.0 첨부).<br>
+      메일 본문에서 <em>"상기 사양 변경에 따른 비용분은 이후 별도 정산 처리 예정이라는 내용으로 회신 요청"</em> 하였으며,<br>
+      이무림 프로로부터 <strong>비용 별도 정산 처리를 확인하는 회신</strong>을 수령함.
+    </div>
+
+    <div class="callout callout-orange">
+      <strong>비용 정산 방식:</strong> 당사 선집행 후, 고객사(삼성중공업)에 별도 정산 청구 예정.<br>
+      본 품의는 <strong>선집행 승인</strong>을 요청하는 건이며, 정산 완료 시까지 해당 비용은 프로젝트 원가에 반영합니다.
+    </div>
+  </div>
+</section>
+
+<!-- 4. 진행 요청 -->
+<section class="section fade-in" id="action">
+  <div class="section-header">
+    <span class="section-num">4</span>
+    <h2 class="section-title">품의 요청사항</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-title">구매팀 요청사항</div>
+    <table>
+      <thead>
+        <tr><th class="text-center">순번</th><th>발주 대상</th><th>업체</th><th class="text-right">금액 (VAT포함)</th><th>비고</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center text-bold">1</td>
+          <td>반사식 방호장치 KCS6000QD-B + SK-RF6-4 (4SET)</td>
+          <td>(주)피에프에이</td>
+          <td class="text-right text-mono text-bold">&won;1,364,000</td>
+          <td>납기 3일 이내</td>
+        </tr>
+        <tr>
+          <td class="text-center text-bold">2</td>
+          <td>라이트커튼 추가 설치 전기 작업</td>
+          <td>나라오토텍</td>
+          <td class="text-right text-mono text-bold">&won;1,573,000</td>
+          <td>현장 설치일 기준 협의</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">재무팀 요청사항</div>
+    <div style="font-size:.85rem;line-height:1.8">
+      <table>
+        <tbody>
+          <tr>
+            <td class="text-bold" style="width:120px">프로젝트</td>
+            <td>S25016 (삼성중공업 거제조선소 34bay 소조립 자동용접)</td>
+          </tr>
+          <tr>
+            <td class="text-bold">집행 총액</td>
+            <td class="text-mono text-bold text-orange" style="font-size:1rem">&won;2,937,000 (VAT 포함)</td>
+          </tr>
+          <tr>
+            <td class="text-bold">정산 계획</td>
+            <td>고객사(삼성중공업) 별도 정산 &mdash; 이무림 프로 메일 회신에 의거</td>
+          </tr>
+          <tr>
+            <td class="text-bold">비용 성격</td>
+            <td>프로젝트 사양변경에 따른 추가비용 (선집행 후 정산)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 종합 -->
+  <div class="summary-box">
+    <h3>품의 요약</h3>
+
+    <div class="summary-item">
+      <div class="summary-label">건명</div>
+      <div class="summary-text">
+        S25016 라이트커튼 사양 변경(투과형 &rarr; 미러타입) 추가비용 집행
+      </div>
+    </div>
+
+    <div class="summary-item">
+      <div class="summary-label">품의 금액</div>
+      <div class="summary-text">
+        <strong style="color:var(--orange);font-family:var(--font-mono);font-size:1.1rem">&won;2,937,000</strong>
+        <span style="font-size:.8rem;color:var(--ice)">(공급가 &won;2,670,000 + VAT &won;267,000)</span>
+      </div>
+    </div>
+
+    <div class="summary-item">
+      <div class="summary-label">고객 확인</div>
+      <div class="summary-text">
+        삼성중공업 이무림 프로 메일 회신으로 <strong style="color:var(--orange)">별도 정산 처리 확인</strong> 완료
+      </div>
+    </div>
+
+    <div class="summary-item">
+      <div class="summary-label">요청사항</div>
+      <div class="summary-text">
+        1) 장비 구매 발주 ((주)피에프에이, &won;1,364,000) 및 전기작업 발주 (나라오토텍, &won;1,573,000) 승인 요청<br>
+        2) 프로젝트 원가 반영 후 고객사 정산 시 상계 처리
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 첨부 목록 -->
+<section class="section fade-in">
+  <div class="section-header">
+    <span class="section-num" style="background:var(--slate)">+</span>
+    <h2 class="section-title">첨부 서류</h2>
+  </div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th class="text-center">No.</th><th>서류명</th><th>비고</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center">1</td>
+          <td>삼성중공업 이무림 프로 회신 메일</td>
+          <td>비용 별도 정산 확인</td>
+        </tr>
+        <tr>
+          <td class="text-center">2</td>
+          <td>(주)피에프에이 견적서 (KCS6000QD-B)</td>
+          <td>장비 구매 견적 — 2개 업체 비교 후 채택</td>
+        </tr>
+        <tr>
+          <td class="text-center">3</td>
+          <td>나라오토텍 전기 작업 견적서</td>
+          <td>이상주 대리 메일 (2026.02.23) 첨부</td>
+        </tr>
+        <tr>
+          <td class="text-center">4</td>
+          <td>라이트커튼 설치계획서 VER.3.0 (미러타입)</td>
+          <td>사양 변경 반영 완료</td>
+        </tr>
+        <tr>
+          <td class="text-center">5</td>
+          <td>라이트커튼 설치계획서 VER.1.0 (투과형, 260203)</td>
+          <td>당초 예상 견적 5,400,000원 근거</td>
+        </tr>
+        <tr>
+          <td class="text-center">6</td>
+          <td>KCS 안전인증서 (SK-KCS-QA,QD)</td>
+          <td>고용노동부 의무안전인증</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer class="report-footer">
+  <div>
+    <strong>&#12828;에스피시스템스</strong> 연구소 &middot; 심태양 부장<br>
+    경남 양산시 어곡동 858-2 산업단지 3-2 &middot; TEL 055-371-5661
+  </div>
+  <div style="text-align:right">
+    문서번호: S25016-APR-001<br>
+    작성일: 2026.02.23<br>
+    분류: 품의서 (초안)
+  </div>
+</footer>
+
+</div>
+
+<script>
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible') });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>

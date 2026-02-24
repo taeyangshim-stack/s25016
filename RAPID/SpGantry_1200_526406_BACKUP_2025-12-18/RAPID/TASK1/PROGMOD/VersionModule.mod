@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.53";
+CONST string TASK1_VERSION := "v1.9.60";
 CONST string TASK2_VERSION := "v1.9.43";
 CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
@@ -46,8 +46,72 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.60 (2026-02-23) - ClearPath before each scenario motion
+!   - FIX: 50426 "Out of interpolation objects" at Scenario 5
+!     4 scenarios x ~10 motion commands accumulated interpolation objects
+!   - ADD: ClearPath + StartMove before MoveGantryToWeldPosition per scenario
+!     Forces interpolation object pool reset between scenarios
+!
+! v1.9.59 (2026-02-23) - ConfL Off + approach/retract distance reduction
+!   - FIX: 50436 Robot configuration error during TraceWeldLine segment MoveL
+!     GenerateWeldPath changes orientation from current_floor -> config boundary
+!   - ADD: ConfJ Off + ConfL Off before approach, ConfJ On + ConfL On after pass loop
+!   - FIX: 50050 Position outside reach at R=-90 approach (Scenario 3)
+!     Approach 100mm -> 50mm, Retract 50mm -> 30mm
+!     bRobSwap=TRUE orientation tool Z pushes approach further from gantry center
+!
+! v1.9.58 (2026-02-23) - TCP_Z_OFFSET restore + motion-enabled swap test
+!   - FIX: WELD_R1_TCP_Z_OFFSET restored 500->1000, R2 restored 500->-1000
+!     Original values from v1.9.6 (actual robot reach based on Mode2 test)
+!   - FIX: CalcGantryFromFloor uses R1 offset only (not avg of R1+R2)
+!     R1=1000 + R2=-1000 averaged to 0, nullifying TCP offset entirely
+!     TASK1 controls Robot1 only, so R1 offset is correct
+!   - EFFECT: Floor Z=500 -> Gantry Z=600mm (was 1100mm with offset=500)
+!     Resolves "Position outside reach (50050)" on TraceWeldLine approach
+!   - UPD: TestSwapScenarios v2.0 - motion enabled
+!     CheckLinkedMotorSync + MoveGantryToWeldPosition + MoveRobotToWeldPosition
+!     + TraceWeldLine (MoveL mode) + ReturnGantryToHome per scenario
+!     Calculation-only BreadthOffset logging retained alongside motion
+!
+! v1.9.57 (2026-02-23) - Automated test procedures for RobotStudio verification
+!   - ADD: TestGuardVerification - #8 guard TC T1~T5 auto verification
+!     HOME:/guard_test.txt read, range check, guard_test_result.txt output
+!   - ADD: TestSwapScenarios - Scenario A~E swap auto simulation
+!     HOME:/swap_test.txt coord read, DefineWeldLine->TraceWeldLine sequence
+!     BreadthOffset=50mm, Buffer1/Buffer2 select + sign reversal verify
+!   - UPD: TestMenu v2.8.0 - Option 13(Guard Test), 14(Swap Scenarios) added
+!   - REF: C-team request - #8 verify + Scenario A~E result table
+!
+! v1.9.56 (2026-02-23) - Phase 1 error handling (#6 C-team advice: PlanA rArcError port)
+!   - ADD: TraceWeldLine ERROR handler - StopMove -> ClearPath -> StartMove
+!     Motion buffer immediate clear (same as PlanA rArcError L2365-2367)
+!   - ADD: Error position capture - CRobT(\Tool:=tWeld1\WObj:=WobjFloor)
+!     TCP position log at error occurrence
+!   - ADD: Torch retract -10mm - MoveL RelTool(pErrPos, 0, 0, -10)
+!     Same as PlanA L2379 - torch retract to prevent workpiece contact
+!   - ADD: Stop - program halt, wait for operator intervention
+!   - NOTE: Phase 2 planned - DO signals(po36/37), error pos PERS save
+!   - NOTE: Phase 3(v1.9.58+) planned - WaitSyncTask cross-task sync
+!
+! v1.9.55 (2026-02-23) - Swap-aware buffer exchange + BreadthOffset sign reversal
+!   - ADD: TraceWeldLine - bRobSwap=TRUE selects Buffer2 (same as PlanA)
+!     macroStartBuffer2/macroEndBuffer2 used, BreadthOffset sign reversed(-1x)
+!   - ADD: GenerateWeldPath - curMacro local var for swap-based buffer ref
+!     TravelAngle/WorkingAngle/WeldingSpeed read from selected buffer
+!   - ADD: BuildArcParams - curStart/curEnd local var for swap-based buffer ref
+!     welddata/seamdata/weavedata built from selected buffer
+!   - REF: C-team additional check request - buffer exchange + BreadthOffset PlanA match
+!
+! v1.9.54 (2026-02-24) - Hard guard for weld pass count (#8 C-team advice)
+!   - ADD: MAX_WELD_PASSES=10 CONST in ConfigModule
+!   - ADD: TraceWeldLine guard - nWeldPassCount range check (1~10)
+!     Rejects with ERR_ARGVALERR + TPWrite + log before FOR loop
+!   - ADD: BuildArcParams guard - pass index range check (1~10)
+!     Prevents array out-of-bounds on macroStartBuffer1/macroEndBuffer1
+!   - REF: C-team 1st reply - reject immediately when exceeding 10
+!
 ! v1.9.53 (2026-02-23) - BuildArcParams field mapping bugfix
-!   - FIX: welddata par4/par6 swapped — par4=FeedingSpeed(wfs), par6=Current
+!   - FIX: welddata par4/par6 swapped - par4=FeedingSpeed(wfs), par6=Current
 !     Previously par4=Current, par6=FeedingSpeed (reversed from PlanA/LincolnArcLink-XT)
 !   - FIX: seamdata s_heat/e_heat same par4/par6 correction applied
 !   - FIX: weavedata field positions corrected to ABB standard
@@ -56,12 +120,12 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 !   - REF: PlanA Rob1_MainModule.mod L708(welddata), L720(weavedata)
 !
 ! v1.9.52 (2026-02-23) - Weld condition swap: ArcL implementation
-!   - NEW: BuildArcParams proc (torchmotion → seamdata/welddata/weavedata)
+!   - NEW: BuildArcParams proc (torchmotion -> seamdata/welddata/weavedata)
 !   - IMPL: TraceWeldLine WELD_ARC_ENABLED=TRUE branch
 !     ArcLStart/ArcL/ArcLEnd with dynamic weld parameters
-!   - macroStartBuffer1 → seam1/weld1 voltage/current/WFS mapping
-!   - macroStartBuffer1 → weave1_rob1 shape/type/length/width mapping
-!   - macroEndBuffer1 → seam1.e_heat end parameters mapping
+!   - macroStartBuffer1 -> seam1/weld1 voltage/current/WFS mapping
+!   - macroStartBuffer1 -> weave1_rob1 shape/type/length/width mapping
+!   - macroEndBuffer1 -> seam1.e_heat end parameters mapping
 !   - GUARD: nSegs < 2 fallback to MoveL (single segment edge case)
 !
 ! v1.9.51 (2026-02-22) - Robot1 Init: Fix abnormal posture at R!=0

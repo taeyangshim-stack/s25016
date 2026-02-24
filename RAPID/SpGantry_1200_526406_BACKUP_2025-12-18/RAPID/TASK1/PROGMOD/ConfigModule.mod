@@ -6,7 +6,7 @@ MODULE ConfigModule
 ! Date: 2026-02-18
 ! Purpose: Centralized configuration using PERS variables
 ! v1.9.0: Added weld sequence configuration
-! v1.9.1: Fixed R-axis (X+=0°), added WObj positions, 45° torch
+! v1.9.1: Fixed R-axis (X+=0deg), added WObj positions, 45deg torch
 ! v2.0.0: Added Edge points and Home/Limit configuration
 ! v2.1.0: Added PlanA-style command interface (nCmdInput/nCmdOutput)
 ! v2.2.0: Added PlanA data structures (edgedata, targetdata, corrorder)
@@ -186,6 +186,8 @@ PERS torchmotion macroEndBuffer2{10} := [
 
 ! Number of active weld passes (upper system sets this)
 PERS num nWeldPassCount := 1;
+! v1.9.54: Hard guard - maximum allowed weld passes (array size limit)
+CONST num MAX_WELD_PASSES := 10;
 
 ! ========================================
 ! Edge Data Arrays (v2.2.0)
@@ -326,19 +328,19 @@ PERS num MODE2_NUM_POS := 10;
 ! offset_X = floor_X - 9500, offset_Y = floor_Y - 5300, offset_Z = floor_Z - 2100
 !
 ! Gantry limits (Physical):
-!   X: [-9510, 12310] mm, Y: [-50, 5350] mm, Z: [-50, 1050] mm, R: [-100, 100]°
+!   X: [-9510, 12310] mm, Y: [-50, 5350] mm, Z: [-50, 1050] mm, R: [-100, 100]deg
 !
 ! Test positions (Floor coords):
-!   1. [5000, 5000, 2100] R=0°   - Center, no rotation
-!   2. [5000, 5000, 2100] R=45°  - Center, 45° CCW
-!   3. [5000, 5000, 2100] R=-45° - Center, 45° CW
-!   4. [5000, 5000, 2100] R=90°  - Center, 90° CCW
-!   5. [5000, 5000, 2100] R=-90° - Center, 90° CW
-!   6. [3000, 4000, 2000] R=30°  - Different XYZ, 30° CCW
-!   7. [7000, 5200, 2100] R=-30° - Different XYZ, 30° CW
-!   8. [2000, 3500, 1800] R=60°  - Low Z, 60° CCW
-!   9. [8000, 4500, 2050] R=-60° - Different XYZ, 60° CW
-!  10. [4500, 5000, 1900] R=15°  - Small angle test
+!   1. [5000, 5000, 2100] R=0deg   - Center, no rotation
+!   2. [5000, 5000, 2100] R=45deg  - Center, 45deg CCW
+!   3. [5000, 5000, 2100] R=-45deg - Center, 45deg CW
+!   4. [5000, 5000, 2100] R=90deg  - Center, 90deg CCW
+!   5. [5000, 5000, 2100] R=-90deg - Center, 90deg CW
+!   6. [3000, 4000, 2000] R=30deg  - Different XYZ, 30deg CCW
+!   7. [7000, 5200, 2100] R=-30deg - Different XYZ, 30deg CW
+!   8. [2000, 3500, 1800] R=60deg  - Low Z, 60deg CCW
+!   9. [8000, 4500, 2050] R=-60deg - Different XYZ, 60deg CW
+!  10. [4500, 5000, 1900] R=15deg  - Small angle test
 PERS num MODE2_POS_X{10} := [-4500, -4500, -4500, -4500, -4500, -6500, -2500, -7500, -1500, -5000];
 PERS num MODE2_POS_Y{10} := [-300, -300, -300, -300, -300, -1300, -100, -1800, -800, -300];
 PERS num MODE2_POS_Z{10} := [0, 0, 0, 0, 0, -100, 0, -300, -50, -200];
@@ -352,8 +354,8 @@ PERS num MODE2_POS_R{10} := [0, 45, -45, 90, -90, 30, -30, 60, -60, 15];
 ! Used to calculate gantry Z from Floor weld Z
 ! Gantry_Z = 2100 - Floor_Z - TCP_OFFSET
 ! v1.9.6: Changed from 1600 to 1000 (actual robot reach based on Mode2 test)
-PERS num WELD_R1_TCP_Z_OFFSET := 500;   ! Robot1 (TEST: 1000->500 for Z limit)
-PERS num WELD_R2_TCP_Z_OFFSET := 500;   ! Robot2 (TEST: 1000->500 for Z limit)
+PERS num WELD_R1_TCP_Z_OFFSET := 1000;   ! Robot1 (R-center to TCP, downward)
+PERS num WELD_R2_TCP_Z_OFFSET := -1000;  ! Robot2 (R-center to TCP, upward/inverted)
 
 ! Robot1 Weld Line (Floor TCP coordinates, mm)
 ! Floor Z = (2100 - Gantry_Z) - TCP_OFFSET
@@ -426,11 +428,11 @@ PERS num EDGE_START2_Z := 1200;    ! Robot2 side (valid range: 600-1600)
 
 ! Edge End Points - Robot1/Robot2 end positions
 ! TEST: 45 deg diagonal weld line (dx=354, dy=354, ATan2=45 deg)
-PERS num EDGE_END1_X := 5354;      ! Robot1 side (5000+354 for 45° test)
-PERS num EDGE_END1_Y := 5454;      ! Robot1 side (5100+354 for 45° test)
+PERS num EDGE_END1_X := 5354;      ! Robot1 side (5000+354 for 45deg test)
+PERS num EDGE_END1_Y := 5454;      ! Robot1 side (5100+354 for 45deg test)
 PERS num EDGE_END1_Z := 1200;      ! Robot1 side (valid range: 600-1600)
-PERS num EDGE_END2_X := 5354;      ! Robot2 side (5000+354 for 45° test)
-PERS num EDGE_END2_Y := 5254;      ! Robot2 side (4900+354 for 45° test)
+PERS num EDGE_END2_X := 5354;      ! Robot2 side (5000+354 for 45deg test)
+PERS num EDGE_END2_Y := 5254;      ! Robot2 side (4900+354 for 45deg test)
 PERS num EDGE_END2_Z := 1200;      ! Robot2 side (valid range: 600-1600)
 
 ! ========================================

@@ -2874,7 +2874,7 @@ PROC TestMenu()
 		! Display menu
 		TPErase;
 		TPWrite "========================================";
-		TPWrite "  S25016 SpGantry Test Menu (v2.7.0)";
+		TPWrite "  S25016 SpGantry Test Menu (v2.8.0)";
 		TPWrite "========================================";
 		TPWrite "";
 		TPWrite "  1. Sync X1/X2 (Check + Auto-fix)";
@@ -2889,12 +2889,14 @@ PROC TestMenu()
 		TPWrite " 10. Multi-Position Test (5 locations)";
 		TPWrite " 11. Full Weld Seq (Gantry+R1+R2 sync)";
 		TPWrite " 12. Init Non-HOME Test (4 scenarios)";
+		TPWrite " 13. Guard Test (#8 TC T1~T5)";
+		TPWrite " 14. Swap Scenarios (A~E auto)";
 		TPWrite "  0. Exit";
 		TPWrite "";
 		TPWrite "----------------------------------------";
 
 		! Numeric selection
-		TPReadNum menu_sel, "Select (0-12): ";
+		TPReadNum menu_sel, "Select (0-14): ";
 
 		TEST menu_sel
 		CASE 1:
@@ -2992,13 +2994,29 @@ PROC TestMenu()
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
+		CASE 13:
+			TPErase;
+			TPWrite "[Menu] Guard Verification (#8 TC T1~T5)...";
+			TestGuardVerification;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 14:
+			TPErase;
+			TPWrite "[Menu] Swap Scenarios (A~E auto)...";
+			TestSwapScenarios;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
 		CASE 0:
 			TPErase;
 			TPWrite "[Menu] Exiting Test Menu...";
 			menu_loop := FALSE;
 
 		DEFAULT:
-			TPWrite "[Menu] Invalid selection (0-12)";
+			TPWrite "[Menu] Invalid selection (0-14)";
 			WaitTime 1;
 		ENDTEST
 	ENDWHILE
@@ -3140,7 +3158,7 @@ PROC CalcCenterLine()
 	! Calculate weld length
 	weld_length := Sqrt(dx*dx + dy*dy + dz*dz);
 
-	! Calculate R-axis angle (Floor X+ = R=0°)
+	! Calculate R-axis angle (Floor X+ = R=0deg)
 	! atan2(dy, dx) gives angle from X-axis
 	weld_center_angle := ATan2(dy, dx);
 
@@ -3162,21 +3180,21 @@ ENDPROC
 ! Gantry_Z = 2100 - Floor_Z - TCP_Z_OFFSET
 FUNC pos CalcGantryFromFloor(pos floor_pos)
 	VAR pos gantry_pos;
-	VAR num avg_tcp_offset;
 
-	! Average TCP offset (both robots should be at similar Z)
-	avg_tcp_offset := (WELD_R1_TCP_Z_OFFSET + WELD_R2_TCP_Z_OFFSET) / 2;
+	! v1.9.58: Use Robot1 TCP offset only (TASK1 controls Robot1)
+	! Robot1=1000mm (downward), Robot2=-1000mm (inverted) - averaging cancels out
+	! Gantry Z positions R-center so Robot1 TCP reaches Floor Z target
 
 	! Floor -> Physical conversion
 	! gantry_x = floor_x - 9500
 	! gantry_y = 5300 - floor_y
-	! gantry_z = 2100 - floor_z - tcp_offset
+	! gantry_z = 2100 - floor_z - R1_tcp_offset
 	gantry_pos.x := floor_pos.x - 9500;
 	gantry_pos.y := 5300 - floor_pos.y;
-	gantry_pos.z := 2100 - floor_pos.z - avg_tcp_offset;
+	gantry_pos.z := 2100 - floor_pos.z - WELD_R1_TCP_Z_OFFSET;
 
-	TPWrite "[WELD] Floor->Gantry: TCP offset=" + NumToStr(avg_tcp_offset, 0) + "mm";
-	TPWrite "[WELD] Gantry Z = 2100 - " + NumToStr(floor_pos.z, 0) + " - " + NumToStr(avg_tcp_offset, 0) + " = " + NumToStr(gantry_pos.z, 0);
+	TPWrite "[WELD] Floor->Gantry: R1 TCP offset=" + NumToStr(WELD_R1_TCP_Z_OFFSET, 0) + "mm";
+	TPWrite "[WELD] Gantry Z = 2100 - " + NumToStr(floor_pos.z, 0) + " - " + NumToStr(WELD_R1_TCP_Z_OFFSET, 0) + " = " + NumToStr(gantry_pos.z, 0);
 
 	RETURN gantry_pos;
 ENDFUNC
@@ -4216,7 +4234,7 @@ PROC TestEdgeToWeld()
 ENDPROC
 
 ! ----------------------------------------
-! Test Multi-Angle: Test 0°, 45°, 90°, -45° (v2.4.0)
+! Test Multi-Angle: Test 0deg, 45deg, 90deg, -45deg (v2.4.0)
 ! ----------------------------------------
 ! Tests 4 different weld line angles to verify calculation accuracy
 ! Temporarily changes EDGE points, runs test, and logs results
@@ -4255,10 +4273,10 @@ PROC TestMultiAngle()
 	orig_end2_y := EDGE_END2_Y;
 
 	! Define test angles (degrees) and corresponding dx, dy for 500mm weld line
-	! 0°:   dx=500, dy=0    (horizontal X+)
-	! 45°:  dx=354, dy=354  (diagonal)
-	! 90°:  dx=0,   dy=500  (vertical Y+)
-	! -45°: dx=354, dy=-354 (diagonal X+, Y-)
+	! 0deg:   dx=500, dy=0    (horizontal X+)
+	! 45deg:  dx=354, dy=354  (diagonal)
+	! 90deg:  dx=0,   dy=500  (vertical Y+)
+	! -45deg: dx=354, dy=-354 (diagonal X+, Y-)
 	test_angles{1} := 0;
 	test_dx{1} := 500;
 	test_dy{1} := 0;
@@ -4367,7 +4385,7 @@ ENDPROC
 ! Test Multi-Position: Test various Floor positions (v2.5.0)
 ! ----------------------------------------
 ! Tests multiple Floor positions to verify coordinate transformation
-! Uses 45° angle for all tests (consistent with TestMultiAngle)
+! Uses 45deg angle for all tests (consistent with TestMultiAngle)
 PROC TestMultiPosition()
 	VAR num orig_start1_x;
 	VAR num orig_start1_y;
@@ -4458,7 +4476,7 @@ PROC TestMultiPosition()
 		TPWrite "[POS] Floor: [" + NumToStr(test_x{i},0) + ", " + NumToStr(test_y{i},0) + ", " + NumToStr(test_z{i},0) + "]";
 		TPWrite "----------------------------------------";
 
-		! Set edge points for this position (45° angle, 500mm weld line)
+		! Set edge points for this position (45deg angle, 500mm weld line)
 		! Robot1 side: center Y + 100
 		! Robot2 side: center Y - 100
 		EDGE_START1_X := test_x{i};
@@ -4467,7 +4485,7 @@ PROC TestMultiPosition()
 		EDGE_START2_X := test_x{i};
 		EDGE_START2_Y := test_y{i} - 100;
 		EDGE_START2_Z := test_z{i};
-		! End points: 45° diagonal (dx=354, dy=354)
+		! End points: 45deg diagonal (dx=354, dy=354)
 		EDGE_END1_X := test_x{i} + 354;
 		EDGE_END1_Y := test_y{i} + 100 + 354;
 		EDGE_END2_X := test_x{i} + 354;
@@ -4625,10 +4643,19 @@ PROC GenerateWeldPath(pos adjStart, pos adjEnd, robtarget refTarget, num nPass)
 	VAR num ratio;
 	VAR num i;
 	VAR num nSegs;
+	VAR torchmotion curMacro;
+
+	! v1.9.55: Select buffer based on robot swap (PlanA convention)
+	IF bRobSwap = FALSE THEN
+		curMacro := macroStartBuffer1{nPass};
+	ELSE
+		curMacro := macroStartBuffer2{nPass};
+	ENDIF
 
 	nSegs := nMotionStepCount{1};
 	TPWrite "[PATH] Generating " + NumToStr(nSegs,0) + " segments"
-		+ " len=" + NumToStr(calcLengthWeldLine,1) + "mm";
+		+ " len=" + NumToStr(calcLengthWeldLine,1) + "mm"
+		+ " swap=" + ValToStr(bRobSwap);
 
 	FOR i FROM 1 TO nSegs DO
 		! Linear interpolation: midpoint of each segment
@@ -4647,17 +4674,17 @@ PROC GenerateWeldPath(pos adjStart, pos adjEnd, robtarget refTarget, num nPass)
 		IF bRobSwap = FALSE THEN
 			pWeldPosR1{i}.rot := [0.5, 0.5, -0.5, 0.5];
 			pWeldPosR1{i} := RelTool(pWeldPosR1{i}, 0, 0, 0
-				\Rx:=-1*macroStartBuffer1{nPass}.TravelAngle
-				\Ry:=-1*macroStartBuffer1{nPass}.WorkingAngle);
+				\Rx:=-1*curMacro.TravelAngle
+				\Ry:=-1*curMacro.WorkingAngle);
 		ELSE
 			pWeldPosR1{i}.rot := [0.5, -0.5, -0.5, -0.5];
 			pWeldPosR1{i} := RelTool(pWeldPosR1{i}, 0, 0, 0
-				\Rx:=macroStartBuffer1{nPass}.TravelAngle
-				\Ry:=-1*macroStartBuffer1{nPass}.WorkingAngle);
+				\Rx:=curMacro.TravelAngle
+				\Ry:=-1*curMacro.WorkingAngle);
 		ENDIF
 
 		! Set weld speed for this segment
-		vWeldSpeed{i}.v_tcp := macroStartBuffer1{nPass}.WeldingSpeed;
+		vWeldSpeed{i}.v_tcp := curMacro.WeldingSpeed;
 		vWeldSpeed{i}.v_ori := 500;
 		vWeldSpeed{i}.v_leax := 5000;
 		vWeldSpeed{i}.v_reax := 1000;
@@ -4665,49 +4692,60 @@ PROC GenerateWeldPath(pos adjStart, pos adjEnd, robtarget refTarget, num nPass)
 ENDPROC
 
 ! ----------------------------------------
-! BuildArcParams: Convert torchmotion buffer → ABB arc weld data types
+! BuildArcParams: Convert torchmotion buffer -> ABB arc weld data types
 ! v1.9.53: Maps macroStartBuffer1/macroEndBuffer1 to seam1/weld1/weave1_rob1
 ! v1.9.53 FIX: par4=FeedingSpeed, par6=Current (was reversed in v1.9.52)
 ! v1.9.53 FIX: weavedata pos5=height(0), pos6=dwellL, pos7=dir(0), pos8=dwellR
 ! ----------------------------------------
 PROC BuildArcParams(num pass)
-	! welddata: [weld_speed, weld_joint_speed, weld_heat{9}, weld_cool{9}]
-	! weld_heat: par1=process(MIG=5), par3=voltage, par4=wire_feed, par6=current
-	! v1.9.53: Fixed par4/par6 mapping to match PlanA (LincolnArcLink-XT)
-	!          PlanA ref: Rob1_MainModule.mod L708
-	!          par4=wfs(wire_feed_speed), par6=Current
-	weld1.weld_heat.par1 := 5;
-	weld1.weld_heat.par3 := macroStartBuffer1{pass}.Voltage;
-	weld1.weld_heat.par4 := macroStartBuffer1{pass}.FeedingSpeed;
-	weld1.weld_heat.par6 := macroStartBuffer1{pass}.Current;
+	VAR torchmotion curStart;
+	VAR torchmotion curEnd;
 
-	! seamdata: start heat parameters (same par4/par6 mapping as welddata)
-	seam1.s_heat.par3 := macroStartBuffer1{pass}.Voltage;
-	seam1.s_heat.par4 := macroStartBuffer1{pass}.FeedingSpeed;
-	seam1.s_heat.par6 := macroStartBuffer1{pass}.Current;
-	! seamdata: end heat parameters (from macroEndBuffer1)
-	seam1.e_heat.par3 := macroEndBuffer1{pass}.Voltage;
-	seam1.e_heat.par4 := macroEndBuffer1{pass}.FeedingSpeed;
-	seam1.e_heat.par6 := macroEndBuffer1{pass}.Current;
+	! v1.9.54: Guard - validate pass index before array access
+	IF pass < 1 OR pass > MAX_WELD_PASSES THEN
+		ErrWrite \W, "BuildArcParams guard", "pass=" + NumToStr(pass,0)
+			+ " out of range (1-" + NumToStr(MAX_WELD_PASSES,0) + ")";
+		RAISE ERR_ARGVALERR;
+	ENDIF
+
+	! v1.9.55: Select buffer based on robot swap (PlanA convention)
+	IF bRobSwap = FALSE THEN
+		curStart := macroStartBuffer1{pass};
+		curEnd := macroEndBuffer1{pass};
+	ELSE
+		curStart := macroStartBuffer2{pass};
+		curEnd := macroEndBuffer2{pass};
+	ENDIF
+
+	! welddata: [heat, joint_speed, heat_params{9}, cool_params{9}]
+	! heat_params: [process(MIG=5), 0, voltage, wfs, 0, current, 0, 0, 0]
+	! v1.9.53: par4=wfs(wire_feed_speed), par6=Current (PlanA L708)
+	weld1 := [6, 0,
+		[5, 0, curStart.Voltage, curStart.FeedingSpeed, 0, curStart.Current, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0]];
+
+	! seamdata: use PERS default (PlanA uses fixed seam_TRob1)
+	! weld params (V/A/WFS) are in welddata, seamdata controls start/end sequence
 
 	! weavedata: [shape, type, length, width, height, dwell_left, dir, dwell_right, 0x7]
 	! v1.9.53: Fixed field positions to match ABB weavedata structure
 	!          PlanA ref: Rob1_MainModule.mod L720
 	!          pos5=height(0), pos6=dwell_left, pos7=dir(0), pos8=dwell_right
 	weave1_rob1 := [
-		macroStartBuffer1{pass}.WeaveShape,
-		macroStartBuffer1{pass}.WeaveType,
-		macroStartBuffer1{pass}.WeaveLength,
-		macroStartBuffer1{pass}.WeaveWidth,
+		curStart.WeaveShape,
+		curStart.WeaveType,
+		curStart.WeaveLength,
+		curStart.WeaveWidth,
 		0,
-		macroStartBuffer1{pass}.WeaveDwellLeft,
+		curStart.WeaveDwellLeft,
 		0,
-		macroStartBuffer1{pass}.WeaveDwellRight,
+		curStart.WeaveDwellRight,
 		0,0,0,0,0,0,0];
 
-	TPWrite "[ARC] Pass " + NumToStr(pass,0) + " V=" + NumToStr(weld1.weld_heat.par3,1)
-		+ " WFS=" + NumToStr(weld1.weld_heat.par4,0)
-		+ " A=" + NumToStr(weld1.weld_heat.par6,0);
+	TPWrite "[ARC] Pass " + NumToStr(pass,0) + " V=" + NumToStr(curStart.Voltage,1)
+		+ " WFS=" + NumToStr(curStart.FeedingSpeed,0)
+		+ " A=" + NumToStr(curStart.Current,0)
+		+ " swap=" + ValToStr(bRobSwap);
 ENDPROC
 
 ! ----------------------------------------
@@ -4739,8 +4777,11 @@ PROC TraceWeldLine()
 	VAR num pass;
 	VAR num seg;
 	VAR num nSegs;
+	VAR torchmotion curStart;
+	VAR torchmotion curEnd;
+	VAR robtarget pErrPos;
 
-	TPWrite "[TRACE] TraceWeldLine v2.1.0 (PlanC Phase 1)";
+	TPWrite "[TRACE] TraceWeldLine v2.2.0 (PlanC Phase 1)";
 
 	! Open own log file
 	Open "HOME:/trace_weld_line.txt", trace_log \Write;
@@ -4760,6 +4801,19 @@ PROC TraceWeldLine()
 
 	nSegs := nMotionStepCount{1};
 
+	! v1.9.54: Hard guard - reject pass count exceeding array bounds
+	IF nWeldPassCount < 1 OR nWeldPassCount > MAX_WELD_PASSES THEN
+		TPWrite "[TRACE] ERROR: nWeldPassCount=" + NumToStr(nWeldPassCount,0)
+			+ " out of range (1-" + NumToStr(MAX_WELD_PASSES,0) + ")";
+		Write trace_log, "ABORT: nWeldPassCount=" + NumToStr(nWeldPassCount,0)
+			+ " exceeds MAX_WELD_PASSES=" + NumToStr(MAX_WELD_PASSES,0);
+		Close trace_log;
+		ErrWrite \W, "Pass count guard", "nWeldPassCount="
+			+ NumToStr(nWeldPassCount,0) + " exceeds limit "
+			+ NumToStr(MAX_WELD_PASSES,0);
+		RAISE ERR_ARGVALERR;
+	ENDIF
+
 	! === Multi-Pass Loop ===
 	FOR pass FROM 1 TO nWeldPassCount DO
 		TPWrite "[TRACE] === Pass " + NumToStr(pass,0) + "/" + NumToStr(nWeldPassCount,0)
@@ -4768,26 +4822,49 @@ PROC TraceWeldLine()
 		Write trace_log, "=== Pass " + NumToStr(pass,0) + "/" + NumToStr(nWeldPassCount,0)
 			+ " (" + NumToStr(nSegs,0) + " segments) ===";
 
+		! v1.9.55: Select buffer based on robot swap (PlanA convention)
+		IF bRobSwap = FALSE THEN
+			curStart := macroStartBuffer1{pass};
+			curEnd := macroEndBuffer1{pass};
+		ELSE
+			curStart := macroStartBuffer2{pass};
+			curEnd := macroEndBuffer2{pass};
+		ENDIF
+
 		! --- Calculate macro-adjusted start/end positions ---
-		adjStart.x := calcPosStart.x + macroStartBuffer1{pass}.LengthOffset;
-		adjStart.y := calcPosStart.y + macroStartBuffer1{pass}.BreadthOffset;
-		adjStart.z := calcPosStart.z + macroStartBuffer1{pass}.HeightOffset;
+		adjStart.x := calcPosStart.x + curStart.LengthOffset;
+		adjStart.z := calcPosStart.z + curStart.HeightOffset;
 
-		adjEnd.x := calcPosEnd.x + macroEndBuffer1{pass}.LengthOffset;
-		adjEnd.y := calcPosEnd.y + macroEndBuffer1{pass}.BreadthOffset;
-		adjEnd.z := calcPosEnd.z + macroEndBuffer1{pass}.HeightOffset;
+		adjEnd.x := calcPosEnd.x + curEnd.LengthOffset;
+		adjEnd.z := calcPosEnd.z + curEnd.HeightOffset;
 
+		! v1.9.55: BreadthOffset sign reversal on swap (PlanA convention)
+		! bRobSwap=FALSE: Robot1 on A-side -> +BreadthOffset
+		! bRobSwap=TRUE:  Robot1 on B-side -> -BreadthOffset (side reversed)
+		IF bRobSwap = FALSE THEN
+			adjStart.y := calcPosStart.y + curStart.BreadthOffset;
+			adjEnd.y := calcPosEnd.y + curEnd.BreadthOffset;
+		ELSE
+			adjStart.y := calcPosStart.y - curStart.BreadthOffset;
+			adjEnd.y := calcPosEnd.y - curEnd.BreadthOffset;
+		ENDIF
+
+		IF bRobSwap = FALSE THEN
+			Write trace_log, "Buffer=Buffer1 (bRobSwap=FALSE)";
+		ELSE
+			Write trace_log, "Buffer=Buffer2 (bRobSwap=TRUE)";
+		ENDIF
 		Write trace_log, "AdjStart=[" + NumToStr(adjStart.x,1) + ","
 			+ NumToStr(adjStart.y,1) + "," + NumToStr(adjStart.z,1) + "]"
-			+ " TA=" + NumToStr(macroStartBuffer1{pass}.TravelAngle,1)
-			+ " WA=" + NumToStr(macroStartBuffer1{pass}.WorkingAngle,1);
+			+ " TA=" + NumToStr(curStart.TravelAngle,1)
+			+ " WA=" + NumToStr(curStart.WorkingAngle,1);
 		Write trace_log, "AdjEnd=[" + NumToStr(adjEnd.x,1) + ","
 			+ NumToStr(adjEnd.y,1) + "," + NumToStr(adjEnd.z,1) + "]"
 			+ " len=" + NumToStr(calcLengthWeldLine,1) + "mm";
-		Write trace_log, "Speed=" + NumToStr(macroStartBuffer1{pass}.WeldingSpeed,0)
-			+ "mm/s V=" + NumToStr(macroStartBuffer1{pass}.Voltage,1)
-			+ "V A=" + NumToStr(macroStartBuffer1{pass}.Current,0)
-			+ "A WFS=" + NumToStr(macroStartBuffer1{pass}.FeedingSpeed,0);
+		Write trace_log, "Speed=" + NumToStr(curStart.WeldingSpeed,0)
+			+ "mm/s V=" + NumToStr(curStart.Voltage,1)
+			+ "V A=" + NumToStr(curStart.Current,0)
+			+ "A WFS=" + NumToStr(curStart.FeedingSpeed,0);
 
 		! --- Generate multi-segment path ---
 		! Fills pWeldPosR1{1..nSegs} and vWeldSpeed{1..nSegs}
@@ -4802,11 +4879,15 @@ PROC TraceWeldLine()
 				+ " spd=" + NumToStr(vWeldSpeed{seg}.v_tcp,0) + "mm/s";
 		ENDFOR
 
-		! --- Approach: 100mm above first segment along tool Z ---
-		approach_pos := RelTool(pWeldPosR1{1}, 0, 0, -100);
-		TPWrite "[TRACE] Approach (-100mm)...";
+		! --- Config check OFF for weld motion (orientation changes cause config boundary) ---
+		ConfJ \Off;
+		ConfL \Off;
+
+		! --- Approach: 50mm above first segment along tool Z ---
+		approach_pos := RelTool(pWeldPosR1{1}, 0, 0, -50);
+		TPWrite "[TRACE] Approach (-50mm)...";
 		MoveJ approach_pos, v100, fine, tWeld1 \WObj:=WobjFloor;
-		Write trace_log, "Approach (-100mm) OK";
+		Write trace_log, "Approach (-50mm) OK";
 
 		! --- Move to first segment position ---
 		TPWrite "[TRACE] MoveL to seg 1...";
@@ -4825,13 +4906,13 @@ PROC TraceWeldLine()
 
 		! --- Trace weld line: multi-segment MoveL loop ---
 		IF WELD_ARC_ENABLED = TRUE THEN
-			! v1.9.53: Actual ArcL welding with torchmotion → ABB param conversion
+			! v1.9.53: Actual ArcL welding with torchmotion -> ABB param conversion
 			BuildArcParams pass;
 			TPWrite "[TRACE] ARC WELD pass " + NumToStr(pass,0)
 				+ " (" + NumToStr(nSegs,0) + " segs)...";
-			Write trace_log, "ARC mode: V=" + NumToStr(macroStartBuffer1{pass}.Voltage,1)
-				+ "V A=" + NumToStr(macroStartBuffer1{pass}.Current,0)
-				+ "A WFS=" + NumToStr(macroStartBuffer1{pass}.FeedingSpeed,0);
+			Write trace_log, "ARC mode: V=" + NumToStr(curStart.Voltage,1)
+				+ "V A=" + NumToStr(curStart.Current,0)
+				+ "A WFS=" + NumToStr(curStart.FeedingSpeed,0);
 
 			IF nSegs < 2 THEN
 				! Edge case: single segment - cannot do ArcL sequence, fallback to MoveL
@@ -4894,11 +4975,11 @@ PROC TraceWeldLine()
 			+ " dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2)
 			+ " dZ=" + NumToStr(err_z,2);
 
-		! --- Retract: 50mm above last segment along tool Z ---
-		retract_pos := RelTool(pWeldPosR1{nSegs}, 0, 0, -50);
-		TPWrite "[TRACE] Retract (-50mm)...";
+		! --- Retract: 30mm above last segment along tool Z ---
+		retract_pos := RelTool(pWeldPosR1{nSegs}, 0, 0, -30);
+		TPWrite "[TRACE] Retract (-30mm)...";
 		MoveL retract_pos, v100, fine, tWeld1 \WObj:=WobjFloor;
-		Write trace_log, "Retract (-50mm) OK";
+		Write trace_log, "Retract (-30mm) OK";
 
 		! --- Inter-pass delay ---
 		IF pass < nWeldPassCount THEN
@@ -4907,15 +4988,336 @@ PROC TraceWeldLine()
 		ENDIF
 	ENDFOR
 
+	! --- Restore config check ---
+	ConfJ \On;
+	ConfL \On;
+
 	Write trace_log, "";
 	Write trace_log, "TraceWeldLine complete at " + CTime();
 	Close trace_log;
 	TPWrite "[TRACE] TraceWeldLine complete (" + NumToStr(nWeldPassCount,0) + " passes, "
 		+ NumToStr(nSegs,0) + " segs/pass)";
 ERROR
-	TPWrite "[TRACE] ERROR: " + NumToStr(ERRNO,0);
-	Write trace_log, "TraceWeldLine ERROR " + NumToStr(ERRNO,0);
+	! v1.9.56: Phase 1 error handling (PlanA rArcError pattern)
+	! Sequence: StopMove -> ClearPath -> StartMove -> torch retract -10mm -> Stop
+	TPWrite "[TRACE] ERROR: ERRNO=" + NumToStr(ERRNO,0);
+	Write trace_log, "ERROR ERRNO=" + NumToStr(ERRNO,0) + " at " + CTime();
+
+	! Step 1: Motion safety stop - clear motion buffer
+	StopMove;
+	ClearPath;
+	StartMove;
+	TPWrite "[TRACE] StopMove->ClearPath->StartMove OK";
+	Write trace_log, "StopMove->ClearPath->StartMove OK";
+
+	! Step 2: Capture error position
+	pErrPos := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
+	Write trace_log, "Error pos=["
+		+ NumToStr(pErrPos.trans.x,1) + ","
+		+ NumToStr(pErrPos.trans.y,1) + ","
+		+ NumToStr(pErrPos.trans.z,1) + "]";
+
+	! Step 3: Torch retract -10mm along tool Z (PlanA: RelTool 0,0,-10)
+	MoveL RelTool(pErrPos, 0, 0, -10), v100, z0, tWeld1\WObj:=WobjFloor;
+	TPWrite "[TRACE] Torch retract -10mm OK";
+	Write trace_log, "Torch retract -10mm OK";
+
+	Write trace_log, "Phase 1 error handling complete at " + CTime();
 	Close trace_log;
+	Stop;
+ENDPROC
+
+! ----------------------------------------
+! v1.9.57: Guard Verification (#8 TC T1~T5)
+! ----------------------------------------
+! Reads test values from HOME:/guard_test.txt
+! Tests nWeldPassCount boundary conditions against MAX_WELD_PASSES
+! Results logged to HOME:/guard_test_result.txt
+PROC TestGuardVerification()
+	VAR iodev cfg_file;
+	VAR iodev res_file;
+	VAR string line;
+	VAR num nTests;
+	VAR num testVal;
+	VAR bool ok;
+	VAR num i;
+	VAR num nPass;
+	VAR num nFail;
+
+	nPass := 0;
+	nFail := 0;
+
+	TPWrite "========================================";
+	TPWrite "[GUARD] Guard Verification v1.0";
+	TPWrite "  MAX_WELD_PASSES=" + NumToStr(MAX_WELD_PASSES,0);
+	TPWrite "========================================";
+
+	Open "HOME:/guard_test.txt", cfg_file \Read;
+	Open "HOME:/guard_test_result.txt", res_file \Write;
+	Write res_file, "Guard Test Results - " + CDate() + " " + CTime();
+	Write res_file, "MAX_WELD_PASSES=" + NumToStr(MAX_WELD_PASSES,0);
+	Write res_file, "Version=" + TASK1_VERSION;
+
+	! Read number of tests
+	line := ReadStr(cfg_file);
+	ok := StrToVal(line, nTests);
+
+	FOR i FROM 1 TO nTests DO
+		line := ReadStr(cfg_file);
+		ok := StrToVal(line, testVal);
+
+		Write res_file, "";
+		Write res_file, "TC" + NumToStr(i,0) + ": nWeldPassCount=" + NumToStr(testVal,0);
+		TPWrite "[GUARD] TC" + NumToStr(i,0) + " val=" + NumToStr(testVal,0);
+
+		! Check guard condition (same logic as TraceWeldLine L4795)
+		IF testVal < 1 OR testVal > MAX_WELD_PASSES THEN
+			Write res_file, "  Result: REJECT (out of range)";
+			Write res_file, "  Guard: " + NumToStr(testVal,0) + " not in [1,"
+				+ NumToStr(MAX_WELD_PASSES,0) + "]";
+			TPWrite "[GUARD] TC" + NumToStr(i,0) + " -> REJECT (expected)";
+			nFail := nFail + 1;
+		ELSE
+			Write res_file, "  Result: PASS (in range)";
+			Write res_file, "  Guard: " + NumToStr(testVal,0) + " in [1,"
+				+ NumToStr(MAX_WELD_PASSES,0) + "]";
+			TPWrite "[GUARD] TC" + NumToStr(i,0) + " -> PASS (expected)";
+			nPass := nPass + 1;
+		ENDIF
+	ENDFOR
+
+	Close cfg_file;
+	Write res_file, "";
+	Write res_file, "========================================";
+	Write res_file, "SUMMARY: PASS=" + NumToStr(nPass,0)
+		+ " REJECT=" + NumToStr(nFail,0)
+		+ " TOTAL=" + NumToStr(nTests,0);
+	Write res_file, "========================================";
+	Close res_file;
+
+	TPWrite "[GUARD] Complete: PASS=" + NumToStr(nPass,0)
+		+ " REJECT=" + NumToStr(nFail,0);
+	TPWrite "[GUARD] Results: HOME:/guard_test_result.txt";
+ERROR
+	TPWrite "[GUARD] ERROR: " + NumToStr(ERRNO,0);
+	Close cfg_file;
+	Close res_file;
+ENDPROC
+
+! ----------------------------------------
+! v1.9.57: Swap Scenario Test (A~E)
+! ----------------------------------------
+! Reads scenario coordinates from HOME:/swap_test.txt
+! Sets calcPosStart/calcPosEnd -> DefineWeldLine -> TraceWeldLine
+! BreadthOffset=50mm for clear Buffer1/Buffer2 distinction
+! Results logged to HOME:/swap_test_result.txt
+PROC TestSwapScenarios()
+	VAR iodev cfg_file;
+	VAR iodev res_file;
+	VAR string line;
+	VAR num nScenarios;
+	VAR num sx;
+	VAR num sy;
+	VAR num sz;
+	VAR num ex;
+	VAR num ey;
+	VAR num ez;
+	VAR bool ok;
+	VAR num i;
+	CONST num BREADTH_OFFSET_TEST := 50;
+	VAR num adjStartY;
+	VAR num adjEndY;
+	VAR string bufName;
+	VAR jointtarget dbg_jt;
+	VAR robtarget dbg_tcp;
+	VAR robtarget dbg_tcp_gantry;
+
+	TPWrite "========================================";
+	TPWrite "[SWAP] Swap Scenario Test v2.0 (motion enabled)";
+	TPWrite "  BreadthOffset=" + NumToStr(BREADTH_OFFSET_TEST,0) + "mm";
+	TPWrite "========================================";
+
+	! Check linked motor sync before any gantry movement
+	CheckLinkedMotorSync;
+
+	! Set test conditions
+	macroStartBuffer1{1}.BreadthOffset := BREADTH_OFFSET_TEST;
+	macroEndBuffer1{1}.BreadthOffset := BREADTH_OFFSET_TEST;
+	macroStartBuffer2{1}.BreadthOffset := BREADTH_OFFSET_TEST;
+	macroEndBuffer2{1}.BreadthOffset := BREADTH_OFFSET_TEST;
+	nWeldPassCount := 1;
+	WELD_ARC_ENABLED := FALSE;
+
+	Open "HOME:/swap_test.txt", cfg_file \Read;
+	Open "HOME:/swap_test_result.txt", res_file \Write;
+	Write res_file, "Swap Scenario Test Results - " + CDate() + " " + CTime();
+	Write res_file, "Version=" + TASK1_VERSION;
+	Write res_file, "BreadthOffset=" + NumToStr(BREADTH_OFFSET_TEST,0) + "mm";
+	Write res_file, "nWeldPassCount=1, WELD_ARC_ENABLED=FALSE";
+
+	! Read number of scenarios
+	line := ReadStr(cfg_file);
+	ok := StrToVal(line, nScenarios);
+
+	FOR i FROM 1 TO nScenarios DO
+		! Read 6 lines: sx, sy, sz, ex, ey, ez
+		line := ReadStr(cfg_file);
+		ok := StrToVal(line, sx);
+		line := ReadStr(cfg_file);
+		ok := StrToVal(line, sy);
+		line := ReadStr(cfg_file);
+		ok := StrToVal(line, sz);
+		line := ReadStr(cfg_file);
+		ok := StrToVal(line, ex);
+		line := ReadStr(cfg_file);
+		ok := StrToVal(line, ey);
+		line := ReadStr(cfg_file);
+		ok := StrToVal(line, ez);
+
+		! Set weld line coordinates
+		calcPosStart.x := sx;
+		calcPosStart.y := sy;
+		calcPosStart.z := sz;
+		calcPosEnd.x := ex;
+		calcPosEnd.y := ey;
+		calcPosEnd.z := ez;
+
+		Write res_file, "";
+		Write res_file, "=== Scenario " + NumToStr(i,0) + "/" + NumToStr(nScenarios,0) + " ===";
+		Write res_file, "Start=[" + NumToStr(sx,0) + ","
+			+ NumToStr(sy,0) + "," + NumToStr(sz,0) + "]";
+		Write res_file, "End=[" + NumToStr(ex,0) + ","
+			+ NumToStr(ey,0) + "," + NumToStr(ez,0) + "]";
+		TPWrite "[SWAP] === Scenario " + NumToStr(i,0) + "/"
+			+ NumToStr(nScenarios,0) + " ===";
+
+		! DefineWeldLine computes bRobSwap via ATan2
+		DefineWeldLine;
+
+		Write res_file, "Angle=" + NumToStr(nAngleRzStore,1) + " deg";
+		Write res_file, "bRobSwap=" + ValToStr(bRobSwap);
+		IF bRobSwap = FALSE THEN
+			Write res_file, "Buffer=Buffer1, BreadthOffset=+"
+				+ NumToStr(BREADTH_OFFSET_TEST,0) + "mm";
+		ELSE
+			Write res_file, "Buffer=Buffer2, BreadthOffset=-"
+				+ NumToStr(BREADTH_OFFSET_TEST,0) + "mm";
+		ENDIF
+
+		TPWrite "[SWAP] Angle=" + NumToStr(nAngleRzStore,1)
+			+ " bRobSwap=" + ValToStr(bRobSwap);
+
+		! Calculation-only verification (no robot motion)
+		! Replicate BreadthOffset sign logic from TraceWeldLine
+		IF bRobSwap = FALSE THEN
+			adjStartY := sy + BREADTH_OFFSET_TEST;
+			adjEndY := ey + BREADTH_OFFSET_TEST;
+			bufName := "Buffer1";
+		ELSE
+			adjStartY := sy - BREADTH_OFFSET_TEST;
+			adjEndY := ey - BREADTH_OFFSET_TEST;
+			bufName := "Buffer2";
+		ENDIF
+
+		Write res_file, "adjStart.y=" + NumToStr(adjStartY,1)
+			+ " (calc.y=" + NumToStr(sy,0)
+			+ " offset=" + NumToStr(adjStartY - sy,0) + ")";
+		Write res_file, "adjEnd.y=" + NumToStr(adjEndY,1)
+			+ " (calc.y=" + NumToStr(ey,0)
+			+ " offset=" + NumToStr(adjEndY - ey,0) + ")";
+		TPWrite "[SWAP] " + bufName + " adjY.offset="
+			+ NumToStr(adjStartY - sy,0) + "mm";
+
+		! v1.9.58: Motion enabled - gantry move + robot weld path
+		! --- Debug: before gantry move ---
+		dbg_jt := CJointT();
+		Write res_file, "DBG pre-gantry: J1=" + NumToStr(dbg_jt.robax.rax_1,1)
+			+ " J2=" + NumToStr(dbg_jt.robax.rax_2,1)
+			+ " J3=" + NumToStr(dbg_jt.robax.rax_3,1)
+			+ " J4=" + NumToStr(dbg_jt.robax.rax_4,1)
+			+ " J5=" + NumToStr(dbg_jt.robax.rax_5,1)
+			+ " J6=" + NumToStr(dbg_jt.robax.rax_6,1);
+		Write res_file, "DBG pre-gantry: X1=" + NumToStr(dbg_jt.extax.eax_a,1)
+			+ " Y=" + NumToStr(dbg_jt.extax.eax_b,1)
+			+ " Z=" + NumToStr(dbg_jt.extax.eax_c,1)
+			+ " R=" + NumToStr(dbg_jt.extax.eax_d,1);
+
+		! v1.9.60: Clear interpolation objects before each scenario motion
+		! Prevents 50426 "Out of interpolation objects" after multiple scenarios
+		ClearPath;
+		StartMove;
+
+		TPWrite "[SWAP] Step 1: Move gantry...";
+		Write res_file, "Motion: MoveGantryToWeldPosition...";
+		MoveGantryToWeldPosition;
+
+		! --- Debug: after gantry move ---
+		dbg_jt := CJointT();
+		dbg_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
+		Write res_file, "DBG post-gantry: X1=" + NumToStr(dbg_jt.extax.eax_a,1)
+			+ " Y=" + NumToStr(dbg_jt.extax.eax_b,1)
+			+ " Z=" + NumToStr(dbg_jt.extax.eax_c,1)
+			+ " R=" + NumToStr(dbg_jt.extax.eax_d,1);
+		Write res_file, "DBG post-gantry TCP(Floor): ["
+			+ NumToStr(dbg_tcp.trans.x,1) + ","
+			+ NumToStr(dbg_tcp.trans.y,1) + ","
+			+ NumToStr(dbg_tcp.trans.z,1) + "]";
+		Write res_file, "Motion: Gantry positioned OK";
+
+		TPWrite "[SWAP] Step 2: Move robot TCP...";
+		Write res_file, "Motion: MoveRobotToWeldPosition...";
+		MoveRobotToWeldPosition;
+
+		! --- Debug: after robot move ---
+		dbg_jt := CJointT();
+		dbg_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
+		Write res_file, "DBG post-robot: J1=" + NumToStr(dbg_jt.robax.rax_1,1)
+			+ " J2=" + NumToStr(dbg_jt.robax.rax_2,1)
+			+ " J3=" + NumToStr(dbg_jt.robax.rax_3,1)
+			+ " J4=" + NumToStr(dbg_jt.robax.rax_4,1)
+			+ " J5=" + NumToStr(dbg_jt.robax.rax_5,1)
+			+ " J6=" + NumToStr(dbg_jt.robax.rax_6,1);
+		Write res_file, "DBG post-robot TCP(Floor): ["
+			+ NumToStr(dbg_tcp.trans.x,1) + ","
+			+ NumToStr(dbg_tcp.trans.y,1) + ","
+			+ NumToStr(dbg_tcp.trans.z,1) + "]";
+		Write res_file, "DBG post-robot orient: ["
+			+ NumToStr(dbg_tcp.rot.q1,5) + ","
+			+ NumToStr(dbg_tcp.rot.q2,5) + ","
+			+ NumToStr(dbg_tcp.rot.q3,5) + ","
+			+ NumToStr(dbg_tcp.rot.q4,5) + "]";
+		Write res_file, "Motion: Robot positioned OK";
+
+		TPWrite "[SWAP] Step 3: TraceWeldLine (MoveL mode)...";
+		Write res_file, "Motion: TraceWeldLine...";
+		TraceWeldLine;
+		Write res_file, "Motion: TraceWeldLine OK";
+
+		Write res_file, "Scenario " + NumToStr(i,0) + " COMPLETE (motion OK)";
+		TPWrite "[SWAP] Scenario " + NumToStr(i,0) + " DONE";
+
+		! Return gantry to HOME between scenarios
+		TPWrite "[SWAP] Returning gantry to HOME...";
+		ReturnGantryToHome;
+
+		IF i < nScenarios THEN
+			WaitTime 2.0;
+		ENDIF
+	ENDFOR
+
+	Close cfg_file;
+	Write res_file, "";
+	Write res_file, "========================================";
+	Write res_file, "ALL " + NumToStr(nScenarios,0) + " SCENARIOS COMPLETE";
+	Write res_file, "========================================";
+	Close res_file;
+
+	TPWrite "[SWAP] All " + NumToStr(nScenarios,0) + " scenarios complete";
+	TPWrite "[SWAP] Results: HOME:/swap_test_result.txt";
+ERROR
+	TPWrite "[SWAP] ERROR: " + NumToStr(ERRNO,0);
+	Close cfg_file;
+	Close res_file;
 ENDPROC
 
 ! ----------------------------------------
