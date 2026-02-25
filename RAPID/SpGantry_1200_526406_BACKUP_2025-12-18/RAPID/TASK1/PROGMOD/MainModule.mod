@@ -3786,13 +3786,17 @@ PROC MoveGantryToWeldPosition()
 	! Calculate R-axis first (needed for X/Y offset rotation)
 	target_r := HOME_GANTRY_R - nAngleRzStore;
 
-	! Apply R limits first (needed for offset calculation)
-	IF target_r < nLimitR_Negative THEN
-		target_r := nLimitR_Negative;
-	ENDIF
+	! v1.9.63: Normalize angle to ±180° then fold into ±90° R-axis limits
+	! Scenario E (200°): target_r=+160.1 -> still ±180 -> fold: 160.1-180=-19.9 -> OK
+	WHILE target_r > 180 DO target_r := target_r - 360; ENDWHILE
+	WHILE target_r < -180 DO target_r := target_r + 360; ENDWHILE
+	! If outside R-axis limits, flip 180° (equivalent weld direction for fillet welds)
 	IF target_r > nLimitR_Positive THEN
-		target_r := nLimitR_Positive;
+		target_r := target_r - 180;
+	ELSEIF target_r < nLimitR_Negative THEN
+		target_r := target_r + 180;
 	ENDIF
+	TPWrite "[WELD] R-axis normalized: " + NumToStr(target_r,1) + " deg (raw=" + NumToStr(HOME_GANTRY_R - nAngleRzStore,1) + ")";
 
 	! Calculate TCP X/Y offsets rotated by gantry R-axis angle
 	! TCP offset is relative to robot base which rotates with gantry R-axis
@@ -3992,8 +3996,11 @@ PROC TestEdgeToWeldCalcOnly()
 
 	! Calculate R-axis first (needed for X/Y offset rotation)
 	target_r := HOME_GANTRY_R - nAngleRzStore;
-	IF target_r < nLimitR_Negative THEN target_r := nLimitR_Negative; ENDIF
-	IF target_r > nLimitR_Positive THEN target_r := nLimitR_Positive; ENDIF
+	! v1.9.63: Normalize angle to ±180° then fold into ±90° R-axis limits
+	WHILE target_r > 180 DO target_r := target_r - 360; ENDWHILE
+	WHILE target_r < -180 DO target_r := target_r + 360; ENDWHILE
+	IF target_r > nLimitR_Positive THEN target_r := target_r - 180; ENDIF
+	IF target_r < nLimitR_Negative THEN target_r := target_r + 180; ENDIF
 
 	! Calculate X/Y TCP offsets rotated by gantry R-axis angle
 	Write logfile, "--- X/Y TCP Offset Calculation ---";

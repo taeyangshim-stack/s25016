@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:'맑은 고딕','Malgun Gothic',sans-serif; font-size:10pt; color:#333; line-height:1.7; max-width:900px; margin:0 auto;">
+
+<div style="border-bottom:3px solid #1a5276; padding-bottom:10px; margin-bottom:20px;">
+  <h2 style="color:#1a5276; margin:0;">[S25016] PlanB v1.9.62 — C팀 요청 항목 회신</h2>
+  <p style="margin:5px 0 0 0; font-size:9pt; color:#666;">보완 4건 + 미완결 과제 S25-6~S25-13 상태 회신</p>
+</div>
+
+<table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:9.5pt;">
+  <tr><td style="width:60px; padding:4px 8px; background:#f0f4f8; font-weight:bold;">수신</td><td style="padding:4px 8px;">C팀</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">참조</td><td style="padding:4px 8px;">이마룬</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">발신</td><td style="padding:4px 8px;">심태양 / 에스피시스템스</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">일자</td><td style="padding:4px 8px;">2026년 2월 25일</td></tr>
+</table>
+
+<p>안녕하십니까, 에스피시스템스 심태양입니다.</p>
+<p>요청하신 보완 항목 및 미완결 과제 상태를 회신드립니다.</p>
+
+<!-- ============================== -->
+<!-- Part A: 보완 요청 4건 -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  Part A. 보완 요청 항목 (4건)
+</h3>
+
+<table style="width:100%; border-collapse:collapse; font-size:9pt; margin:10px 0;">
+  <tr style="background:#eaecee;">
+    <th style="padding:6px 8px; text-align:left; width:180px;">항목</th>
+    <th style="padding:6px 8px; text-align:left;">내용</th>
+  </tr>
+
+  <tr>
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">1. 백업 링크</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      v1.9.62/v1.9.46 적용본 백업 zip 별도 첨부 예정<br>
+      <span style="font-size:8.5pt; color:#666;">소스 경로: RAPID/SpGantry_1200_526406_BACKUP_2025-12-18/</span>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">2. 원본 증적<br>(로그/캡처)</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      아래 RobotStudio 시뮬레이션 로그 첨부합니다.<br>
+      <b>테스트 조건:</b> 비원점 갠트리 X=316.1, Y=635.5, Z=635.5, R=-28.6&deg;<br><br>
+
+      <div style="background:#f8f9fa; border:1px solid #ddd; border-radius:4px; padding:10px; font-family:monospace; font-size:8.5pt;">
+        <b>[robot1_init_position.txt]</b> (v1.9.62)<br>
+        Init X1=316.1 X2=316.1 diff=0.0<br>
+        Step1 done (target joints)<br>
+        Done errX=0.33 errY=-0.20 iter=3<br>
+        TCP_Floor tWeld1: X=9499.772 Y=5299.654 Z=1099.778
+      </div>
+      <br>
+      <div style="background:#f8f9fa; border:1px solid #ddd; border-radius:4px; padding:10px; font-family:monospace; font-size:8.5pt;">
+        <b>[robot2_init_position.txt]</b> (v1.9.46)<br>
+        Step1 done (intermediate joint)<br>
+        GantryPos from TASK1: X=316.1 Y=635.5 Z=635.5 R=-28.6<br>
+        Final joints: J1=0.00 J2=-48.88 J3=6.22 J5=8.26<br>
+        Init done (joint-space only)
+      </div>
+      <br>
+      <div style="background:#f8f9fa; border:1px solid #ddd; border-radius:4px; padding:10px; font-family:monospace; font-size:8.5pt;">
+        <b>[head_r1_listener.txt]</b> (v1.9.43 — T_Head)<br>
+        6&times; MoveJgJ done + 1&times; checkpos done &rarr; 홈 복귀 시퀀스 정상 완료
+      </div>
+      <br>
+      <div style="background:#f8f9fa; border:1px solid #ddd; border-radius:4px; padding:10px; font-family:monospace; font-size:8.5pt;">
+        <b>[task2_main_process.txt]</b> (v1.9.46)<br>
+        TEST_MODE=11 (from TASK1) &rarr; Step1 done &rarr; Flag set &rarr; T_Head Listener mode 진입
+      </div>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">3. A~E 시나리오<br>전체 결과표</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      아래 <b>Part C</b>에 상세 결과표 포함 (swap_test_result.txt 기반)
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">4. 버전 매핑<br>(모듈별)</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      <table style="width:100%; border-collapse:collapse; font-size:8.5pt;">
+        <tr style="background:#d5f5e3;">
+          <th style="padding:3px 6px; text-align:left;">Task</th>
+          <th style="padding:3px 6px; text-align:left;">모듈</th>
+          <th style="padding:3px 6px; text-align:left;">버전</th>
+          <th style="padding:3px 6px; text-align:left;">주요 변경</th>
+        </tr>
+        <tr>
+          <td style="padding:3px 6px; border:1px solid #ddd;" rowspan="3">TASK1</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">MainModule.mod</td>
+          <td style="padding:3px 6px; border:1px solid #ddd; font-weight:bold;">v1.9.62</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">Init 중간경유점, MoveJgJ robax 복원, ArcL 에러핸들링, 가드, 스왑</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 6px; border:1px solid #ddd;">ConfigModule.mod</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">v1.9.54</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">MAX_WELD_PASSES=10 상수 추가</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 6px; border:1px solid #ddd;">VersionModule.mod</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">v1.9.62</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">버전 이력 관리</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 6px; border:1px solid #ddd;">TASK2</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">Rob2_MainModule.mod</td>
+          <td style="padding:3px 6px; border:1px solid #ddd; font-weight:bold;">v1.9.46</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">Step2 Cartesian 제거, MoveAbsJ 복원</td>
+        </tr>
+        <tr>
+          <td style="padding:3px 6px; border:1px solid #ddd;">TASK8</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">Head_*.mod (4개)</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">변경 없음</td>
+          <td style="padding:3px 6px; border:1px solid #ddd;">T_Head 코드 미변경</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- ============================== -->
+<!-- Part B: 미완결 과제 S25-6~S25-13 -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  Part B. 미완결 과제 상태표 (S25-6 ~ S25-13)
+</h3>
+
+<table style="width:100%; border-collapse:collapse; font-size:9pt; margin:10px 0;">
+  <tr style="background:#1a5276; color:#fff;">
+    <th style="padding:6px 8px; text-align:left; width:70px;">항목</th>
+    <th style="padding:6px 8px; text-align:left; width:200px;">내용</th>
+    <th style="padding:6px 8px; text-align:center; width:70px;">상태</th>
+    <th style="padding:6px 8px; text-align:left;">근거</th>
+    <th style="padding:6px 8px; text-align:center; width:70px;">목표버전</th>
+    <th style="padding:6px 8px; text-align:center; width:80px;">ETA</th>
+  </tr>
+
+  <!-- S25-6 -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">S25-6</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">ArcL 에러핸들링 전략</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">완료</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      MainModule.mod L5019-5046<br>
+      <span style="font-size:8.5pt;">StopMove &rarr; ClearPath &rarr; StartMove &rarr; CRobT &rarr; RelTool -10mm 후퇴 &rarr; Stop</span><br>
+      <span style="font-size:8.5pt; color:#666;">PlanA rArcError 패턴 준용</span>
+    </td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">v1.9.56</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">-</td>
+  </tr>
+
+  <!-- S25-7 -->
+  <tr style="background:#fef9e7;">
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">S25-7</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">Robot2 ArcL 적용 범위</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center; color:#e67e22; font-weight:bold;">보류</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      Robot2 NOT gantry-configured &mdash; Cartesian 모션 불가<br>
+      <span style="font-size:8.5pt;">현재 MoveAbsJ(joint-space)만 사용 가능</span><br>
+      <span style="font-size:8.5pt; color:#c0392b;">ArcL 적용 시 MultiMove 또는 custom IK 필요 &rarr; 구조 변경 협의 필요</span>
+    </td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">미정</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">협의 필요</td>
+  </tr>
+
+  <!-- S25-8 -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">S25-8</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">BuildArcParams pass 가드</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">완료</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      MainModule.mod L4724-4728 + ConfigModule.mod L190<br>
+      <span style="font-size:8.5pt;">IF pass &lt; 1 OR pass &gt; MAX_WELD_PASSES(10) &rarr; ErrWrite + RAISE ERR_ARGVALERR</span><br>
+      <span style="font-size:8.5pt; color:#666;">guard_test_result.txt: TC1(1)&rarr;PASS, TC2(10)&rarr;PASS, TC3(0)&rarr;REJECT, TC4(11)&rarr;REJECT, TC5(-1)&rarr;REJECT</span>
+    </td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">v1.9.54</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">-</td>
+  </tr>
+
+  <!-- S25-9 -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">S25-9</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">macroAutoStartB 스왑 동등성</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">완료</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      MainModule.mod L4667-4672, L4730-4737<br>
+      <span style="font-size:8.5pt;">bRobSwap=FALSE &rarr; Buffer1 / bRobSwap=TRUE &rarr; Buffer2</span><br>
+      <span style="font-size:8.5pt; color:#666;">GenerateWeldPath, BuildArcParams, TraceWeldLine 3곳 일관 적용</span>
+    </td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">v1.9.55</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">-</td>
+  </tr>
+
+  <!-- S25-10 -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">S25-10</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">BreadthOffset 부호 반전 동등성</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">완료</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      MainModule.mod L4860-4869<br>
+      <span style="font-size:8.5pt;">bRobSwap=FALSE &rarr; +BreadthOffset (A-side) / bRobSwap=TRUE &rarr; -BreadthOffset (B-side)</span><br>
+      <span style="font-size:8.5pt; color:#666;">시나리오 A~E 로그에서 부호 반전 확인 (아래 Part C 참조)</span>
+    </td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">v1.9.55</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">-</td>
+  </tr>
+
+  <!-- S25-11 -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">S25-11</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">RobotStudio A~E 전체 결과표</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">완료</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      swap_test_result.txt (v1.9.59, 2026-02-23)<br>
+      <span style="font-size:8.5pt;">시나리오 1~4: 모션 완료 / 시나리오 5(200&deg;): 갠트리 포지셔닝 중 로그 종료</span><br>
+      <span style="font-size:8.5pt; color:#666;">아래 Part C 상세 결과표 참조</span>
+    </td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">v1.9.59</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">-</td>
+  </tr>
+
+  <!-- S25-12 -->
+  <tr style="background:#fef9e7;">
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">S25-12</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">v1.9.53 백업/코드 검증 증적</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center; color:#2980b9; font-weight:bold;">진행</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      v1.9.53 이후 v1.9.54~v1.9.62까지 누적 반영 완료<br>
+      <span style="font-size:8.5pt;">백업 zip (v1.9.62 적용본) 별도 첨부 예정</span>
+    </td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">v1.9.62</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">02-25</td>
+  </tr>
+
+  <!-- S25-13 -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:5px 8px; border:1px solid #ddd; font-weight:bold;">S25-13</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">v1.9.62/v1.9.46 재현 검증 증적</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">완료</td>
+    <td style="padding:5px 8px; border:1px solid #ddd;">
+      본 메일 Part A-2 로그 참조<br>
+      <span style="font-size:8.5pt;">robot1_init_position.txt (errX=0.33, errY=-0.20)</span><br>
+      <span style="font-size:8.5pt;">robot2_init_position.txt (joints 정확, R=-28.6&deg;)</span><br>
+      <span style="font-size:8.5pt;">head_r1/r2_listener.txt (홈 복귀 시퀀스 완료)</span><br>
+      <span style="font-size:8.5pt;">task2_main_process.txt (T_Head Listener 진입 확인)</span>
+    </td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">v1.9.62</td>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">-</td>
+  </tr>
+</table>
+
+<p style="font-size:9pt; color:#666; margin:5px 0;">
+  상태: <span style="color:#27ae60; font-weight:bold;">완료</span> (6건) /
+  <span style="color:#2980b9; font-weight:bold;">진행</span> (1건) /
+  <span style="color:#e67e22; font-weight:bold;">보류</span> (1건)
+</p>
+
+<!-- ============================== -->
+<!-- Part C: A~E 시나리오 결과표 -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  Part C. 시나리오 A~E 시뮬레이션 결과표 (S25-11)
+</h3>
+
+<p style="margin-bottom:5px; font-size:9.5pt;">
+  <b>실행 조건:</b> v1.9.59, BreadthOffset=50mm, nWeldPassCount=1, ARC=FALSE (MoveL 모드)
+</p>
+
+<table style="width:100%; border-collapse:collapse; font-size:8.5pt; margin:10px 0;">
+  <tr style="background:#1a5276; color:#fff;">
+    <th style="padding:5px 6px;">시나리오</th>
+    <th style="padding:5px 6px;">각도</th>
+    <th style="padding:5px 6px;">bRobSwap</th>
+    <th style="padding:5px 6px;">버퍼</th>
+    <th style="padding:5px 6px;">Offset</th>
+    <th style="padding:5px 6px;">adjStart.y</th>
+    <th style="padding:5px 6px;">adjEnd.y</th>
+    <th style="padding:5px 6px;">갠트리 R</th>
+    <th style="padding:5px 6px; width:70px;">판정</th>
+  </tr>
+
+  <!-- Scenario A: 0° -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:4px 6px; border:1px solid #ddd; font-weight:bold;">A (0&deg;)</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">0.0&deg;</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">FALSE</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">Buffer1</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">+50</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">5050</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">5050</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">0.0&deg;</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">PASS</td>
+  </tr>
+
+  <!-- Scenario B: 45° -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:4px 6px; border:1px solid #ddd; font-weight:bold;">B (45&deg;)</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">45.0&deg;</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">FALSE</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">Buffer1</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">+50</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">5050</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">5191</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">-45.0&deg;</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">PASS</td>
+  </tr>
+
+  <!-- Scenario C: 90° -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:4px 6px; border:1px solid #ddd; font-weight:bold;">C (90&deg;)</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">90.0&deg;</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">TRUE</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">Buffer2</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">-50</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">4950</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">5150</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">-90.0&deg;</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">PASS</td>
+  </tr>
+
+  <!-- Scenario D: 135° -->
+  <tr style="background:#eafaf1;">
+    <td style="padding:4px 6px; border:1px solid #ddd; font-weight:bold;">D (135&deg;)</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">135.0&deg;</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">TRUE</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">Buffer2</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">-50</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">4950</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">5091</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">-90.0&deg;</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">PASS</td>
+  </tr>
+
+  <!-- Scenario E: 200° -->
+  <tr style="background:#fef9e7;">
+    <td style="padding:4px 6px; border:1px solid #ddd; font-weight:bold;">E (200&deg;)</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">-160.1&deg;</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">TRUE</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">Buffer2</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">-50</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">4950</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">4882</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center;">-</td>
+    <td style="padding:4px 6px; border:1px solid #ddd; text-align:center; color:#e67e22; font-weight:bold;">미완료<br><span style="font-size:7.5pt;">(갠트리 포지셔닝 중 로그 종료)</span></td>
+  </tr>
+</table>
+
+<p style="font-size:9pt;">
+  <b>검증 요약:</b><br>
+  &bull; 시나리오 A,B (0&deg;,45&deg;): bRobSwap=FALSE &rarr; Buffer1, BreadthOffset=<b>+50</b> &check;<br>
+  &bull; 시나리오 C,D,E (90&deg;,135&deg;,200&deg;): bRobSwap=TRUE &rarr; Buffer2, BreadthOffset=<b>-50</b> &check;<br>
+  &bull; 시나리오 E: 스왑/오프셋 논리는 정상이나, 갠트리 포지셔닝 단계에서 로그 종료 &mdash; 재검증 예정
+</p>
+
+<!-- ============================== -->
+<!-- Part D: 가드 테스트 결과 -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  Part D. #8 가드 검증 결과 (S25-8)
+</h3>
+
+<table style="width:100%; border-collapse:collapse; font-size:9pt; margin:10px 0;">
+  <tr style="background:#eaecee;">
+    <th style="padding:5px 8px; text-align:left; width:80px;">TC</th>
+    <th style="padding:5px 8px; text-align:center; width:120px;">nWeldPassCount</th>
+    <th style="padding:5px 8px; text-align:center; width:100px;">기대</th>
+    <th style="padding:5px 8px; text-align:center; width:100px;">결과</th>
+    <th style="padding:5px 8px; text-align:center; width:80px;">판정</th>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">TC1</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">1</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">PASS</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#27ae60;">PASS</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">OK</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">TC2</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">10</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">PASS</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#27ae60;">PASS</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">OK</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">TC3</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">0</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">REJECT</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#c0392b;">REJECT</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">OK</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">TC4</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">11</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">REJECT</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#c0392b;">REJECT</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">OK</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">TC5</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">-1</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">REJECT</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#c0392b;">REJECT</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold;">OK</td>
+  </tr>
+</table>
+<p style="font-size:9pt; color:#666;">PASS=2, REJECT=3, 전체 5/5 OK (MAX_WELD_PASSES=10)</p>
+
+<!-- ============================== -->
+<!-- 마무리 -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  향후 일정
+</h3>
+
+<table style="width:100%; border-collapse:collapse; font-size:9pt; margin:10px 0;">
+  <tr style="background:#eaecee;">
+    <th style="padding:5px 8px; text-align:left;">항목</th>
+    <th style="padding:5px 8px; text-align:left;">내용</th>
+    <th style="padding:5px 8px; text-align:center;">ETA</th>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd;">S25-12</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">v1.9.62 백업 zip 첨부 발송</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">02-25</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd;">시나리오 E</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">200&deg; 시나리오 갠트리 포지셔닝 재검증</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">02-26</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd;">S25-7</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">Robot2 ArcL 적용 범위 — 구조 변경 협의</td>
+    <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">협의 후 결정</td>
+  </tr>
+</table>
+
+<br>
+<p>확인 부탁드립니다. 감사합니다.</p>
+
+<div style="margin-top:30px; padding-top:15px; border-top:1px solid #ddd; font-size:9pt; color:#666;">
+  심태양 부장 / 에스피시스템스<br>
+  taeyang@spsystems.kr
+</div>
+
+</body>
+</html>

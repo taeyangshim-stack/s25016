@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S25-7 Robot2 ArcL 기술 의사결정안</title>
+<style>
+  /* ===== Reset & Base ===== */
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: '맑은 고딕', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    font-size: 10pt;
+    color: #2d3748;
+    line-height: 1.75;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 30px 24px 60px;
+    background: #fff;
+  }
+
+  /* ===== Print ===== */
+  @media print {
+    body { padding: 0; font-size: 9pt; }
+    .no-print { display: none !important; }
+    .page-break { page-break-before: always; }
+    h2, h3 { page-break-after: avoid; }
+    table { page-break-inside: avoid; }
+  }
+
+  /* ===== Document Header ===== */
+  .doc-header {
+    border-bottom: 3px solid #1a365d;
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+  }
+  .doc-header h1 {
+    color: #1a365d;
+    font-size: 18pt;
+    margin: 0 0 4px;
+    letter-spacing: -0.5px;
+  }
+  .doc-header .subtitle {
+    color: #4a5568;
+    font-size: 10.5pt;
+    margin: 0;
+  }
+
+  /* ===== Status Badge ===== */
+  .status-badge {
+    display: inline-block;
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+    padding: 4px 14px;
+    font-size: 9.5pt;
+    font-weight: bold;
+    margin: 12px 0 0;
+  }
+
+  /* ===== Metadata Table ===== */
+  .meta-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 28px;
+    font-size: 9.5pt;
+  }
+  .meta-table td {
+    padding: 5px 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .meta-table .label {
+    width: 90px;
+    background: #edf2f7;
+    font-weight: bold;
+    color: #2d3748;
+  }
+
+  /* ===== Section Headers ===== */
+  h2 {
+    color: #1a365d;
+    font-size: 13pt;
+    border-left: 5px solid #1a365d;
+    padding-left: 12px;
+    margin: 36px 0 14px;
+  }
+  h3 {
+    color: #2c5282;
+    font-size: 11pt;
+    margin: 24px 0 10px;
+  }
+
+  /* ===== Generic Table ===== */
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px;
+    font-size: 9pt;
+  }
+  table.data th {
+    background: #1a365d;
+    color: #fff;
+    padding: 7px 10px;
+    text-align: left;
+    font-weight: 600;
+  }
+  table.data td {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e0;
+    vertical-align: top;
+  }
+  table.data tr:nth-child(even) td {
+    background: #f7fafc;
+  }
+  table.data tr.highlight td {
+    background: #ebf8ff;
+    border-color: #90cdf4;
+  }
+
+  /* ===== Comparison Table ===== */
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px;
+    font-size: 9pt;
+  }
+  table.compare th {
+    background: #1a365d;
+    color: #fff;
+    padding: 7px 10px;
+    text-align: center;
+    font-weight: 600;
+  }
+  table.compare th:first-child {
+    text-align: left;
+    width: 80px;
+  }
+  table.compare th.recommended {
+    background: #2b6cb0;
+    position: relative;
+  }
+  table.compare th.recommended::after {
+    content: ' \u2605';
+    color: #fbd38d;
+  }
+  table.compare td {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e0;
+    vertical-align: top;
+    text-align: left;
+  }
+  table.compare td:first-child {
+    background: #edf2f7;
+    font-weight: bold;
+    color: #2d3748;
+    white-space: nowrap;
+  }
+  table.compare tr:nth-child(even) td {
+    background: #f7fafc;
+  }
+  table.compare tr:nth-child(even) td:first-child {
+    background: #e2e8f0;
+  }
+  table.compare col.col-a { background: rgba(43, 108, 176, 0.03); }
+
+  /* ===== Callout Boxes ===== */
+  .callout {
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 9.5pt;
+  }
+  .callout-recommend {
+    background: #ebf8ff;
+    border-left: 5px solid #3182ce;
+  }
+  .callout-warn {
+    background: #fffbeb;
+    border-left: 5px solid #d69e2e;
+  }
+  .callout-success {
+    background: #f0fff4;
+    border-left: 5px solid #38a169;
+  }
+  .callout-title {
+    font-weight: bold;
+    color: #1a365d;
+    margin-bottom: 6px;
+  }
+
+  /* ===== Timeline ===== */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin: 16px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    bottom: 4px;
+    width: 3px;
+    background: #cbd5e0;
+    border-radius: 2px;
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 14px;
+    font-size: 9.5pt;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 5px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #3182ce;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #3182ce;
+  }
+  .tl-day {
+    font-weight: bold;
+    color: #2b6cb0;
+  }
+  .tl-desc {
+    color: #4a5568;
+  }
+
+  /* ===== Risk List ===== */
+  .risk-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+  }
+  .risk-list li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+    font-size: 9.5pt;
+  }
+  .risk-list li::before {
+    content: '\25B6';
+    position: absolute;
+    left: 6px;
+    top: 7px;
+    color: #d69e2e;
+    font-size: 8pt;
+  }
+
+  /* ===== Success Criteria ===== */
+  .criteria-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+  }
+  .criteria-list li {
+    padding: 5px 0 5px 28px;
+    position: relative;
+    font-size: 9.5pt;
+  }
+  .criteria-list li::before {
+    content: '\2714';
+    position: absolute;
+    left: 6px;
+    top: 5px;
+    color: #38a169;
+    font-weight: bold;
+  }
+
+  /* ===== Tag Badges ===== */
+  .tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 3px;
+    font-size: 8.5pt;
+    font-weight: bold;
+  }
+  .tag-yes { background: #c6f6d5; color: #22543d; }
+  .tag-no  { background: #fed7d7; color: #822727; }
+  .tag-mid { background: #fefcbf; color: #744210; }
+  .tag-high{ background: #fed7d7; color: #822727; }
+  .tag-low { background: #c6f6d5; color: #22543d; }
+
+  /* ===== Footer ===== */
+  .doc-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 2px solid #e2e8f0;
+    font-size: 8.5pt;
+    color: #a0aec0;
+    text-align: center;
+  }
+
+  /* ===== Utility ===== */
+  code {
+    background: #edf2f7;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'D2Coding', monospace;
+    font-size: 9pt;
+    color: #c53030;
+  }
+  .text-center { text-align: center; }
+  .text-right  { text-align: right; }
+  .bold { font-weight: bold; }
+  .muted { color: #718096; }
+  .small { font-size: 8.5pt; }
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     DOCUMENT HEADER
+     ================================================================ -->
+<div class="doc-header">
+  <h1>S25-7 Robot2 ArcL 기술 의사결정안</h1>
+  <p class="subtitle">Robot2 Arc Welding Linear Interpolation 지원 방안 검토</p>
+  <div class="status-badge">상태: 의사결정 요청 (C팀 검토용)</div>
+</div>
+
+<!-- Metadata -->
+<table class="meta-table">
+  <tr><td class="label">문서번호</td><td>S25-7-DEC-001</td><td class="label" style="width:80px;">버전</td><td style="width:100px;">v1.0</td></tr>
+  <tr><td class="label">작성일</td><td>2026년 2월 26일</td><td class="label">작성자</td><td>심태양 / 에스피시스템스</td></tr>
+  <tr><td class="label">프로젝트</td><td>S25016 소조립 자동용접 B라인 (PlanB)</td><td class="label">분류</td><td>기술 의사결정</td></tr>
+</table>
+
+
+<!-- ================================================================
+     1. 현황 요약
+     ================================================================ -->
+<h2>1. 현황 요약</h2>
+
+<h3>1.1 문제 정의</h3>
+
+<p>S25016 갠트리 시스템은 Robot1(Master)과 Robot2(Slave) 2대가 동일 갠트리 프레임에 물리적으로 장착되어 있다. 그러나 <b>ABB 컨트롤러의 MOC(Motion Coordination) 설정에서 Robot2는 갠트리 외부축으로 매핑되지 않은 상태</b>이다.</p>
+
+<table class="data">
+  <tr>
+    <th style="width:140px;">항목</th>
+    <th>Robot1 (T_ROB1)</th>
+    <th>Robot2 (T_ROB2)</th>
+  </tr>
+  <tr>
+    <td style="font-weight:bold;">물리적 장착</td>
+    <td>갠트리 프레임에 장착</td>
+    <td>갠트리 프레임에 장착</td>
+  </tr>
+  <tr>
+    <td style="font-weight:bold;">MOC 갠트리 매핑</td>
+    <td><span class="tag tag-yes">매핑됨</span> (R축 = 갠트리 이동)</td>
+    <td><span class="tag tag-no">매핑 안됨</span> (Base = 고정 좌표)</td>
+  </tr>
+  <tr>
+    <td style="font-weight:bold;">Cartesian 명령</td>
+    <td><span class="tag tag-yes">정상</span> MoveL, ArcL 사용 가능</td>
+    <td><span class="tag tag-no">불가</span> 갠트리 R&ne;0에서 위치 오류</td>
+  </tr>
+  <tr>
+    <td style="font-weight:bold;">Joint 명령</td>
+    <td><span class="tag tag-yes">정상</span></td>
+    <td><span class="tag tag-yes">정상</span> MoveAbsJ만 안전</td>
+  </tr>
+  <tr>
+    <td style="font-weight:bold;">ArcL 용접</td>
+    <td><span class="tag tag-yes">지원</span></td>
+    <td><span class="tag tag-no">불가</span></td>
+  </tr>
+</table>
+
+<h3>1.2 핵심 제약사항</h3>
+
+<div class="callout callout-warn">
+  <div class="callout-title">Robot2 Cartesian 명령 실패 원인</div>
+  <p style="margin:4px 0;">
+    Robot2의 <code>WobjGantry_Rob2</code> 워크오브젝트는 갠트리 위치(R축)를 기반으로 좌표를 계산한다.
+    그러나 컨트롤러가 Robot2의 Base를 고정 좌표로 인식하므로,
+    <b>갠트리가 Home(R=0)이 아닌 위치로 이동하면 Robot2의 Cartesian 좌표 해석에 불일치</b>가 발생한다.
+  </p>
+  <p style="margin:4px 0;">
+    &rarr; <code>MoveL</code>, <code>ArcL</code>, <code>ArcLStart</code>, <code>ArcLEnd</code> 등 모든 Cartesian 기반 명령이 Robot2에서 위치 오류를 유발한다.
+  </p>
+</div>
+
+<h3>1.3 비즈니스 요구사항</h3>
+
+<p><b>PlanB에서 Robot2도 용접을 수행해야 한다.</b>
+Arc Welding은 ABB 표준에서 <code>ArcLStart</code> &rarr; <code>ArcL</code> &rarr; <code>ArcLEnd</code> 시퀀스를 요구하며,
+이 명령들은 모두 <b>Cartesian 좌표 기반</b>이다. 따라서 Robot2에서 ArcL을 지원하지 못하면 PlanB 용접 기능을 구현할 수 없다.</p>
+
+
+<!-- ================================================================
+     2. 대안 비교
+     ================================================================ -->
+<h2>2. 대안 비교</h2>
+
+<table class="compare">
+  <colgroup>
+    <col style="width:80px;">
+    <col class="col-a" style="width:auto;">
+    <col style="width:auto;">
+    <col style="width:auto;">
+  </colgroup>
+  <tr>
+    <th>항목</th>
+    <th class="recommended">대안 A: MultiMove 매핑</th>
+    <th>대안 B: Custom IK</th>
+    <th>대안 C: 신규 외부축 추가</th>
+  </tr>
+  <tr>
+    <td>방식</td>
+    <td>MOC에서 Robot2를 갠트리 외부축으로 매핑 (ABB MultiMove)</td>
+    <td>RAPID에서 역기구학 직접 계산하여 MoveAbsJ로 ArcL 시뮬레이션</td>
+    <td>별도 외부축 하드웨어 추가</td>
+  </tr>
+  <tr>
+    <td>비용</td>
+    <td><b>1~2백만원</b><br><span class="muted small">(소프트웨어 라이선스)</span></td>
+    <td><b>0.5백만원</b><br><span class="muted small">(개발공수)</span></td>
+    <td><b>10~15백만원</b><br><span class="muted small">(하드웨어+설치)</span></td>
+  </tr>
+  <tr>
+    <td>기간</td>
+    <td><b>1~1.5주</b></td>
+    <td><b>2~2.5주</b></td>
+    <td><b>2~3주</b></td>
+  </tr>
+  <tr>
+    <td>위험도</td>
+    <td><span class="tag tag-mid">중</span><br><span class="muted small">MOC 재설정 필요</span></td>
+    <td><span class="tag tag-high">고</span><br><span class="muted small">정밀도/안정성 미검증</span></td>
+    <td><span class="tag tag-mid">중고</span><br><span class="muted small">하드웨어 변경</span></td>
+  </tr>
+  <tr>
+    <td>ArcL 지원</td>
+    <td><span class="tag tag-yes">네이티브</span><br><span class="muted small">ABB 표준</span></td>
+    <td><span class="tag tag-no">불가</span><br><span class="muted small">MoveAbsJ만 가능<br>ArcL 사용 불가</span></td>
+    <td><span class="tag tag-yes">네이티브</span><br><span class="muted small">ABB 표준</span></td>
+  </tr>
+  <tr>
+    <td>장점</td>
+    <td>
+      &bull; ABB 표준 방식<br>
+      &bull; SyncMoveOn/Off 인프라 이미 구축<br>
+      &bull; 기존 <code>Rob2_MainModule.mod</code>에 taskGroup123 사용 중<br>
+      &bull; 기술지원 가능 (ABB 공식)
+    </td>
+    <td>
+      &bull; 추가 라이선스 불필요<br>
+      &bull; 현재 코드 구조 유지<br>
+      &bull; 외부 의존성 없음
+    </td>
+    <td>
+      &bull; 완전한 독립 축 제어<br>
+      &bull; Robot1과 완전 분리<br>
+      &bull; 향후 확장성
+    </td>
+  </tr>
+  <tr>
+    <td>단점</td>
+    <td>
+      &bull; MultiMove 라이선스 필요<br>
+      &bull; MOC 설정 변경 시 다운타임
+    </td>
+    <td>
+      &bull; <b style="color:#c53030;">ArcL 불가능</b> (arc start/end 시퀀스는 Cartesian 필수)<br>
+      &bull; 정밀도 보장 어려움<br>
+      &bull; 유지보수 부담 증가
+    </td>
+    <td>
+      &bull; 비용 과다<br>
+      &bull; 설치 기간 소요<br>
+      &bull; 기계적 개조 필요
+    </td>
+  </tr>
+</table>
+
+<p class="small muted" style="text-align:right;">
+  &#9733; = 권장안
+</p>
+
+
+<!-- ================================================================
+     3. 권장안
+     ================================================================ -->
+<h2>3. 권장안: 대안 A (MultiMove 매핑) &#9733;</h2>
+
+<div class="callout callout-recommend">
+  <div class="callout-title">권장 사유</div>
+  <ol style="margin:6px 0; padding-left:20px; font-size:9.5pt;">
+    <li><b>ABB 네이티브 솔루션</b>으로 안정성과 정밀도가 보장된다.</li>
+    <li><b>SyncMoveOn/Off 인프라가 이미 구축되어 있다.</b>
+        현재 <code>Rob2_MainModule.mod</code>에서 <code>taskGroup123</code>이 정의되어 있어
+        MultiMove 기반 동기 모션의 기본 프레임워크가 갖추어져 있다.</li>
+    <li><b>ArcLStart / ArcL / ArcLEnd 네이티브 지원</b>으로
+        ABB Arc Welding 표준 프로세스를 그대로 적용할 수 있다.</li>
+    <li><b>비용 및 기간이 최소</b>이다 (1~2백만원, 1~1.5주).</li>
+  </ol>
+</div>
+
+<h3>3.1 대안 B 배제 사유</h3>
+
+<div class="callout callout-warn">
+  <div class="callout-title">대안 B (Custom IK)가 부적합한 이유</div>
+  <p style="margin:4px 0;">
+    대안 B는 비용이 가장 낮으나, <b>ArcL 자체가 불가능</b>하다는 근본적 한계가 있다.
+  </p>
+  <ul style="margin:6px 0; padding-left:20px; font-size:9.5pt;">
+    <li>ABB Arc Welding 프로세스는 <code>ArcLStart</code>/<code>ArcLEnd</code>로 용접 시작/종료를 제어한다.
+        이 명령들은 Cartesian 경로 보간이 필수이므로, <code>MoveAbsJ</code>로 대체가 불가능하다.</li>
+    <li>Joint 공간에서의 경로 보간은 직선 용접 경로를 보장하지 못한다 &rarr; <b>용접 품질 저하 불가피</b>.</li>
+    <li>역기구학 직접 구현에 따른 정밀도 리스크와 유지보수 부담이 크다.</li>
+  </ul>
+</div>
+
+<h3>3.2 대안 C 배제 사유</h3>
+<p>대안 C는 기술적으로는 가장 완전한 해결책이나, <b>비용(10~15백만원)이 대안 A 대비 5~10배</b>이며
+   하드웨어 개조에 따른 추가 리스크(기계적 간섭, 케이블링, 안전 인증)가 발생한다.
+   대안 A로 동일한 기능을 달성할 수 있으므로 비용 대비 효과가 낮다.</p>
+
+
+<!-- ================================================================
+     4. 구현 로드맵
+     ================================================================ -->
+<h2>4. 구현 로드맵 (1.5주)</h2>
+
+<div class="timeline">
+  <div class="tl-item">
+    <span class="tl-day">Day 1~2</span> &mdash;
+    <span class="tl-desc">MultiMove 라이선스 확인 및 MOC 설정 분석</span>
+    <br><span class="muted small">
+      &bull; 현재 컨트롤러의 MultiMove 라이선스 보유 여부 확인<br>
+      &bull; MOC.cfg 현재 설정 덤프 및 Robot2 축 매핑 구조 분석<br>
+      &bull; 필요 시 ABB 라이선스 발주
+    </span>
+  </div>
+  <div class="tl-item">
+    <span class="tl-day">Day 3~4</span> &mdash;
+    <span class="tl-desc">Robot2 갠트리 축 매핑 (MOC.cfg 수정)</span>
+    <br><span class="muted small">
+      &bull; MOC 설정에서 Robot2 Base를 갠트리 외부축(R축)에 매핑<br>
+      &bull; WobjGantry_Rob2 워크오브젝트 좌표계 재정의<br>
+      &bull; Robot1 MOC 설정 영향 없음 확인
+    </span>
+  </div>
+  <div class="tl-item">
+    <span class="tl-day">Day 5~6</span> &mdash;
+    <span class="tl-desc">RobotStudio 시뮬레이션 검증 (ArcL 테스트)</span>
+    <br><span class="muted small">
+      &bull; RobotStudio 가상 컨트롤러에 MOC 변경 적용<br>
+      &bull; Robot2 ArcLStart &rarr; ArcL &rarr; ArcLEnd 시퀀스 시뮬레이션<br>
+      &bull; 갠트리 R&ne;0 다양한 위치에서 Cartesian 명령 정상 동작 확인
+    </span>
+  </div>
+  <div class="tl-item">
+    <span class="tl-day">Day 7~8</span> &mdash;
+    <span class="tl-desc">현장 적용 및 Robot1/Robot2 동기 모션 검증</span>
+    <br><span class="muted small">
+      &bull; 현장 컨트롤러에 MOC 설정 적용 (백업 완료 후)<br>
+      &bull; Robot1/Robot2 SyncMoveOn/Off 동기 모션 검증<br>
+      &bull; 갠트리 이동 중 Robot2 Cartesian 추종 확인
+    </span>
+  </div>
+  <div class="tl-item">
+    <span class="tl-day">Day 9~10</span> &mdash;
+    <span class="tl-desc">통합 테스트 및 문서화</span>
+    <br><span class="muted small">
+      &bull; Robot2 단독 용접 경로 테스트 (ArcL 시퀀스)<br>
+      &bull; Robot1+Robot2 동시 용접 시나리오 테스트<br>
+      &bull; MOC 설정 변경 이력 및 검증 결과 문서화
+    </span>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     5. 리스크 완화
+     ================================================================ -->
+<h2>5. 리스크 완화</h2>
+
+<table class="data">
+  <tr>
+    <th style="width:50px;">#</th>
+    <th style="width:200px;">리스크</th>
+    <th style="width:70px;">영향도</th>
+    <th>완화 조치</th>
+  </tr>
+  <tr>
+    <td class="text-center">R1</td>
+    <td>MOC 설정 변경 후 시스템 불안정</td>
+    <td class="text-center"><span class="tag tag-high">고</span></td>
+    <td>MOC 설정 변경 전 <b>전체 시스템 백업 필수</b> (cfg 파일, 모듈, PERS 변수 포함). 롤백 절차를 사전에 수립하고 문서화한다.</td>
+  </tr>
+  <tr>
+    <td class="text-center">R2</td>
+    <td>Robot1 모션에 의도치 않은 영향</td>
+    <td class="text-center"><span class="tag tag-mid">중</span></td>
+    <td>Robot2 MOC 매핑은 Robot1의 독립 태스크(T_ROB1)에 영향을 주지 않는 것을 <b>RobotStudio에서 선 검증</b> 후 현장 적용한다.</td>
+  </tr>
+  <tr>
+    <td class="text-center">R3</td>
+    <td>MultiMove 라이선스 미보유</td>
+    <td class="text-center"><span class="tag tag-mid">중</span></td>
+    <td>Day 1에서 라이선스 확인을 최우선으로 수행. 미보유 시 ABB 긴급 발주 또는 Trial 라이선스 요청.</td>
+  </tr>
+  <tr>
+    <td class="text-center">R4</td>
+    <td>현장 적용 시 예상치 못한 간섭</td>
+    <td class="text-center"><span class="tag tag-mid">중</span></td>
+    <td>현장 적용 전 RobotStudio 시뮬레이션에서 충분한 시나리오(갠트리 양 끝단, 중간 위치) 검증 완료 후 적용한다.</td>
+  </tr>
+  <tr>
+    <td class="text-center">R5</td>
+    <td>다운타임 발생</td>
+    <td class="text-center"><span class="tag tag-mid">중</span></td>
+    <td>MOC 설정 변경 작업은 <b>비생산 시간(야간/주말)</b>에 수행하여 생산 영향을 최소화한다.</td>
+  </tr>
+</table>
+
+<ul class="risk-list">
+  <li>MOC 설정 변경 전 <b>전체 백업 필수</b> (시스템 cfg, RAPID 모듈, PERS 변수)</li>
+  <li>RobotStudio에서 <b>선(先) 검증</b> 후 현장 적용 원칙 준수</li>
+  <li><b>롤백 절차</b> 사전 수립 및 문서화</li>
+  <li>Robot1 모션에 <b>영향 없음을 반드시 확인</b> (독립 태스크 T_ROB1)</li>
+  <li>현장 적용 시 <b>단계적 검증</b> (조인트 &rarr; Cartesian &rarr; ArcL &rarr; 동기모션)</li>
+</ul>
+
+
+<!-- ================================================================
+     6. 성공 기준
+     ================================================================ -->
+<h2>6. 성공 기준</h2>
+
+<div class="callout callout-success">
+  <div class="callout-title">검증 완료 판정 기준</div>
+  <ul class="criteria-list">
+    <li>Robot2에서 <code>ArcLStart</code> &rarr; <code>ArcL</code> &rarr; <code>ArcLEnd</code> 시퀀스가 정상 실행된다.</li>
+    <li>갠트리 R&ne;0 위치 (다수의 비-홈 포지션)에서 Robot2 Cartesian 명령이 정상 동작한다.</li>
+    <li>Robot1/Robot2 <code>SyncMoveOn</code>/<code>SyncMoveOff</code> 기존 기능이 유지된다.</li>
+    <li>용접 경로 정밀도 <b>&plusmn;1mm 이내</b>를 달성한다.</li>
+    <li>Robot1 단독 모션 및 용접에 영향이 없다.</li>
+    <li>시스템 리부팅 후에도 설정이 유지된다.</li>
+  </ul>
+</div>
+
+<table class="data">
+  <tr>
+    <th style="width:50px;">#</th>
+    <th style="width:250px;">검증 항목</th>
+    <th style="width:120px;">검증 방법</th>
+    <th>합격 기준</th>
+  </tr>
+  <tr>
+    <td class="text-center">V1</td>
+    <td>Robot2 ArcL 시퀀스 실행</td>
+    <td>RobotStudio + 현장</td>
+    <td>ArcLStart/ArcL/ArcLEnd 오류 없이 완료</td>
+  </tr>
+  <tr>
+    <td class="text-center">V2</td>
+    <td>비-홈 갠트리 위치 Cartesian</td>
+    <td>R=0, 500, 1000, -500 테스트</td>
+    <td>모든 위치에서 위치 오류 없음</td>
+  </tr>
+  <tr>
+    <td class="text-center">V3</td>
+    <td>SyncMoveOn/Off 동기 모션</td>
+    <td>Robot1+Robot2 동시 동작</td>
+    <td>기존 동기 시퀀스 정상 유지</td>
+  </tr>
+  <tr>
+    <td class="text-center">V4</td>
+    <td>용접 경로 정밀도</td>
+    <td>직선 용접 경로 측정</td>
+    <td>&plusmn;1mm 이내</td>
+  </tr>
+  <tr>
+    <td class="text-center">V5</td>
+    <td>Robot1 영향도</td>
+    <td>Robot1 단독 운전</td>
+    <td>모션/용접 기존 동작 동일</td>
+  </tr>
+  <tr>
+    <td class="text-center">V6</td>
+    <td>설정 영속성</td>
+    <td>컨트롤러 리부팅</td>
+    <td>리부팅 후 설정 유지 확인</td>
+  </tr>
+</table>
+
+
+<!-- ================================================================
+     FOOTER
+     ================================================================ -->
+<div class="doc-footer">
+  <p>
+    S25-7-DEC-001 &nbsp;|&nbsp; S25016 소조립 자동용접 B라인 &nbsp;|&nbsp; 에스피시스템스
+    <br>
+    이 문서는 기술 의사결정을 위한 내부 검토용이며, 외부 배포 시 사전 승인이 필요합니다.
+  </p>
+</div>
+
+</body>
+</html>

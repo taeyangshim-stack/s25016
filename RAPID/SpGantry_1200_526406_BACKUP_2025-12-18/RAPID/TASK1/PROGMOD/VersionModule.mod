@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.62";
+CONST string TASK1_VERSION := "v1.9.63";
 CONST string TASK2_VERSION := "v1.9.46";
 CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
@@ -24,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-25";
+CONST string BUILD_DATE := "2026-02-25";  ! v1.9.63 code date
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -46,6 +46,20 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
+! v1.9.63 (2026-02-25) - FIX: Scenario E (200°) R-axis angle normalization
+!   - ROOT CAUSE: R-axis limit ±90° simple clamping failed for angles >90°
+!     E(200°): target_r = 0 - (-160.1) = +160.1° -> clamped to +90° -> 70° error
+!     Clamped angle diverges from intended weld direction -> motion failure
+!   - FIX: ±180° normalize + 180° fold for angles outside ±90° limits
+!     Step 1: WHILE loop normalizes to ±180° range
+!     Step 2: If outside ±90°, flip 180° (equivalent weld direction for fillet welds)
+!     E(200°): +160.1° -> fold: 160.1-180 = -19.9° -> within ±90° -> PASS
+!   - VERIFY: Scenarios A~C unchanged, D improved
+!     A(0°)=0°, B(45°)=-45°, C(90°)=-90° (all within ±90°, no fold)
+!     D(135°)=+45° (was -90° clamped, now correct 180° fold)
+!   - SCOPE: MoveGantryToWeldPosition + LogPositionDetails (2 locations)
+!   - REF: S25-11 C-team closure condition - Scenario E re-verification
+!
 ! v1.9.62 (2026-02-25) - FIX: Init 50050 when gantry at non-home + robot at jgHomeJoint
 !   - ROOT CAUSE: Robot2 Step2 Cartesian motion (MoveL/MoveJ) with WobjGantry_Rob2
 !     Robot2 is NOT gantry-configured - controller thinks base is fixed

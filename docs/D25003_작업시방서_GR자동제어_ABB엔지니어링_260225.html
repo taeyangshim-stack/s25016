@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>작업시방서 — D25003 갠트리 로봇 ABB 엔지니어링</title>
+<style>
+  /* ===== Reset & Base ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: '맑은 고딕', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    font-size: 11pt;
+    line-height: 1.7;
+    color: #1a202c;
+    background: #f7f8fa;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ===== A4 Page Container ===== */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 16px auto;
+    padding: 25mm 22mm 20mm 22mm;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    position: relative;
+  }
+
+  /* ===== DRAFT Banner ===== */
+  .draft-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 9999;
+    background: linear-gradient(135deg, #f6ad55, #ed8936);
+    color: #fff;
+    text-align: center;
+    padding: 8px 0;
+    font-size: 13pt;
+    font-weight: 700;
+    letter-spacing: 6px;
+    box-shadow: 0 2px 8px rgba(237,137,54,0.4);
+  }
+  .draft-banner span {
+    background: rgba(255,255,255,0.2);
+    padding: 2px 18px;
+    border-radius: 4px;
+  }
+  body { padding-top: 44px; }
+
+  /* ===== Draft Watermark ===== */
+  .page::after {
+    content: 'DRAFT';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-size: 120pt;
+    font-weight: 900;
+    color: rgba(237, 137, 54, 0.06);
+    pointer-events: none;
+    z-index: 0;
+    letter-spacing: 20px;
+  }
+  .page > * { position: relative; z-index: 1; }
+
+  /* ===== Cover Page ===== */
+  .cover { display: flex; flex-direction: column; justify-content: center; min-height: 257mm; text-align: center; }
+  .cover-title {
+    font-size: 32pt;
+    font-weight: 800;
+    color: #1a365d;
+    letter-spacing: 8px;
+    margin-bottom: 12px;
+  }
+  .cover-subtitle {
+    font-size: 14pt;
+    color: #4a5568;
+    margin-bottom: 6px;
+    line-height: 1.8;
+  }
+  .cover-project {
+    font-size: 11pt;
+    color: #718096;
+    margin-top: 4px;
+  }
+  .cover-divider {
+    width: 80px;
+    height: 3px;
+    background: #1a365d;
+    margin: 28px auto;
+  }
+  .cover-meta-table {
+    margin: 30px auto 0;
+    border-collapse: collapse;
+    font-size: 10.5pt;
+    text-align: left;
+  }
+  .cover-meta-table th {
+    background: #1a365d;
+    color: #fff;
+    padding: 8px 20px;
+    font-weight: 600;
+    border: 1px solid #2d4a7a;
+    width: 130px;
+  }
+  .cover-meta-table td {
+    padding: 8px 20px;
+    border: 1px solid #cbd5e0;
+    min-width: 240px;
+  }
+  .cover-draft-stamp {
+    display: inline-block;
+    margin-top: 36px;
+    padding: 8px 36px;
+    background: #fffbeb;
+    border: 2px solid #ed8936;
+    border-radius: 6px;
+    color: #c05621;
+    font-size: 13pt;
+    font-weight: 700;
+    letter-spacing: 4px;
+  }
+
+  /* ===== Section Headers ===== */
+  h1 {
+    font-size: 18pt;
+    color: #fff;
+    background: #1a365d;
+    padding: 10px 18px;
+    margin: 0 -22mm 16px -22mm;
+    padding-left: 22mm;
+    padding-right: 22mm;
+    letter-spacing: 2px;
+  }
+  h2 {
+    font-size: 13pt;
+    color: #1a365d;
+    border-bottom: 2px solid #1a365d;
+    padding-bottom: 4px;
+    margin: 22px 0 10px;
+  }
+  h3 {
+    font-size: 11.5pt;
+    color: #2d3748;
+    margin: 16px 0 6px;
+    padding-left: 10px;
+    border-left: 3px solid #4299e1;
+  }
+
+  /* ===== Paragraphs ===== */
+  p { margin: 6px 0; text-align: justify; }
+  .indent { padding-left: 18px; }
+
+  /* ===== Tables ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 16px;
+    font-size: 10pt;
+  }
+  th, td {
+    border: 1px solid #a0aec0;
+    padding: 7px 10px;
+    vertical-align: top;
+  }
+  th {
+    background: #edf2f7;
+    color: #1a365d;
+    font-weight: 700;
+    text-align: center;
+  }
+  td { text-align: left; }
+  tr:nth-child(even) td { background: #f7fafc; }
+
+  /* ===== TBD Highlight ===== */
+  .tbd {
+    background: #fefcbf;
+    color: #975a16;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 9.5pt;
+    white-space: nowrap;
+  }
+
+  /* ===== Lists ===== */
+  ul, ol { margin: 6px 0 10px 22px; }
+  li { margin: 3px 0; }
+
+  /* ===== Info Box ===== */
+  .info-box {
+    background: #ebf8ff;
+    border-left: 4px solid #3182ce;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 10pt;
+    border-radius: 0 4px 4px 0;
+  }
+  .warn-box {
+    background: #fffbeb;
+    border-left: 4px solid #ed8936;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 10pt;
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* ===== Subtotal Row ===== */
+  .subtotal td, .subtotal th {
+    background: #e2e8f0 !important;
+    font-weight: 700;
+  }
+  .total td, .total th {
+    background: #1a365d !important;
+    color: #fff !important;
+    font-weight: 800;
+  }
+
+  /* ===== Footer ===== */
+  .doc-footer {
+    margin-top: 30px;
+    padding-top: 12px;
+    border-top: 1px solid #cbd5e0;
+    font-size: 9pt;
+    color: #a0aec0;
+    text-align: center;
+  }
+
+  /* ===== Page Break ===== */
+  .page-break { page-break-before: always; }
+
+  /* ===== Print Styles ===== */
+  @media print {
+    body { background: #fff; padding-top: 0; }
+    .draft-banner { position: absolute; }
+    .page {
+      width: auto;
+      margin: 0;
+      padding: 15mm 18mm;
+      box-shadow: none;
+      min-height: auto;
+    }
+    .page::after { font-size: 100pt; color: rgba(237,137,54,0.04); }
+    h1 {
+      margin-left: -18mm;
+      margin-right: -18mm;
+      padding-left: 18mm;
+      padding-right: 18mm;
+    }
+    .page-break { page-break-before: always; }
+    .no-print { display: none; }
+  }
+
+  /* ===== Signature Area ===== */
+  .sig-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-top: 36px;
+  }
+  .sig-box {
+    border: 1px solid #a0aec0;
+    padding: 12px 16px;
+    text-align: center;
+    min-height: 80px;
+  }
+  .sig-box .label {
+    font-size: 9.5pt;
+    color: #718096;
+    margin-bottom: 40px;
+  }
+  .sig-box .name {
+    font-size: 10pt;
+    color: #2d3748;
+    border-top: 1px solid #cbd5e0;
+    padding-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<!-- DRAFT Banner -->
+<div class="draft-banner"><span>DRAFT &mdash; 초안 (강연지 사원 구체화 필요)</span></div>
+
+<!-- ============================================================ -->
+<!-- 표지 (Cover Page)                                             -->
+<!-- ============================================================ -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-title">작 업 시 방 서</div>
+    <div class="cover-divider"></div>
+    <div class="cover-subtitle">
+      D25003 선박 소부재 생산지능화 과제<br>
+      갠트리 로봇 ABB 엔지니어링
+    </div>
+    <div class="cover-project">
+      과제번호: RS-2023-00253140&ensp;|&ensp;수행기간: 2023.04 ~ 2026.12
+    </div>
+
+    <table class="cover-meta-table">
+      <tr><th>문서번호</th><td>D25003-WS-2026-001</td></tr>
+      <tr><th>작성일</th><td>2026년 02월 25일</td></tr>
+      <tr><th>버전</th><td>v0.1 (초안)</td></tr>
+      <tr><th>발주자</th><td>㈜에스피시스템스</td></tr>
+      <tr><th>수급자</th><td>GR자동제어 (사업자번호: 620-11-52026)</td></tr>
+      <tr><th>작성자</th><td>심태양 부장 / 에스피시스템스 (초안)</td></tr>
+    </table>
+
+    <div class="cover-draft-stamp">DRAFT &mdash; 초 안</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 1. 개요                                                        -->
+<!-- ============================================================ -->
+<div class="page page-break">
+  <h1>1. 개요</h1>
+
+  <h2>1.1 목적</h2>
+  <p>
+    본 작업시방서는 <strong>D25003 선박 소부재 생산지능화 과제</strong>(RS-2023-00253140) 내
+    <strong>삼성중공업 거제조선소 34bay 소부재 자동용접 갠트리 로봇 시스템(Plan B)</strong>의
+    ABB 로봇 엔지니어링 업무에 대하여, 작업 범위(Scope of Work), 산출물(Deliverables),
+    일정(Schedule), 검수 기준(Acceptance Criteria)을 명확히 정의함으로써
+    발주자(㈜에스피시스템스)와 수급자(GR자동제어) 간 계약의 기술적 근거를 수립하는 것을 목적으로 한다.
+  </p>
+
+  <h2>1.2 적용 범위</h2>
+  <p>본 시방서의 적용 범위는 다음과 같다.</p>
+  <ul>
+    <li>ABB IRB 1200-5/0.9 듀얼 로봇 + 5축 갠트리 시스템의 <strong>RAPID 프로그래밍</strong></li>
+    <li>ABB IRC5 컨트롤러의 <strong>MOC(Motion Coordination) 설정</strong> 및 외부축 매핑</li>
+    <li>RobotStudio 기반 시뮬레이션 검증 및 <strong>현장 시운전</strong></li>
+    <li>Lincoln Electric Power Wave 용접기 인터페이스 연동</li>
+    <li><strong>양산 최적화</strong> 및 기술 이전</li>
+  </ul>
+
+  <h2>1.3 관련 문서</h2>
+  <table>
+    <thead>
+      <tr><th style="width:50px">No.</th><th>문서명</th><th style="width:120px">비고</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align:center">1</td><td>D25003 집행계획서 (260223)</td><td>내부 기안</td></tr>
+      <tr><td style="text-align:center">2</td><td>GR자동제어 견적서 (2026-02-19)</td><td>수급자 제출</td></tr>
+      <tr><td style="text-align:center">3</td><td>[D25003] 용접갠트리 설치시방</td><td>기계 시방</td></tr>
+      <tr><td style="text-align:center">4</td><td>ABB IRB 1200 Product Specification (3HAC044079)</td><td>ABB 공식</td></tr>
+      <tr><td style="text-align:center">5</td><td>Lincoln Power Wave S500 Operator's Manual</td><td>Lincoln 공식</td></tr>
+    </tbody>
+  </table>
+
+  <h2>1.4 용어 정의</h2>
+  <table>
+    <thead>
+      <tr><th style="width:140px">용어</th><th>정의</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>RAPID</td><td>ABB 로봇 전용 프로그래밍 언어</td></tr>
+      <tr><td>MOC</td><td>Motion Coordination — ABB 다축 모션 조정 설정</td></tr>
+      <tr><td>IRC5</td><td>ABB 로봇 컨트롤러 (RobotWare 6.x 탑재)</td></tr>
+      <tr><td>ArcL</td><td>ABB 아크 용접 리니어 모션 명령 (Arc welding MoveL)</td></tr>
+      <tr><td>DeviceNet</td><td>CIP 기반 산업용 필드버스 통신 프로토콜</td></tr>
+      <tr><td>ArcLink-XT</td><td>Lincoln Electric 용접기 디지털 통신 프로토콜</td></tr>
+      <tr><td>Plan B</td><td>본 과제의 B라인 갠트리 로봇 시스템 명칭</td></tr>
+      <tr><td>PERS 변수</td><td>RAPID 영속(Persistent) 변수 — 태스크 간 공유 데이터</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- 2. 시스템 구성                                                  -->
+<!-- ============================================================ -->
+<div class="page page-break">
+  <h1>2. 시스템 구성</h1>
+
+  <h2>2.1 하드웨어 구성</h2>
+
+  <table>
+    <thead>
+      <tr><th style="width:50px">No.</th><th style="width:180px">장비</th><th>사양</th><th style="width:110px">수량</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align:center">1</td><td>ABB IRB 1200-5/0.9</td><td>가반하중 5kg, 작업반경 0.9m (Robot1: 갠트리 연동, Robot2: 독립 제어)</td><td style="text-align:center">2대</td></tr>
+      <tr><td style="text-align:center">2</td><td>갠트리 시스템</td><td>5축 구성 — X1/X2 링크드 모터, Y축, Z축, R축(회전)</td><td style="text-align:center">1식</td></tr>
+      <tr><td style="text-align:center">3</td><td>ABB IRC5 컨트롤러</td><td>RobotWare 6.x, MultiMove 옵션</td><td style="text-align:center">1식</td></tr>
+      <tr><td style="text-align:center">4</td><td>Lincoln Power Wave S500</td><td>ArcLink-XT / DeviceNet 인터페이스</td><td style="text-align:center">2대</td></tr>
+      <tr><td style="text-align:center">5</td><td>ABB FlexPendant</td><td>조작 판넬 (티칭 인터페이스)</td><td style="text-align:center">1대</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2.2 소프트웨어 구성</h2>
+
+  <h3>2.2.1 RAPID 태스크 구조</h3>
+  <table>
+    <thead>
+      <tr><th style="width:140px">태스크</th><th>역할</th><th style="width:100px">타입</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>T_ROB1</td><td>Robot1 메인 모션 제어 (갠트리 연동)</td><td>NORMAL</td></tr>
+      <tr><td>T_ROB2</td><td>Robot2 독립 모션 제어</td><td>NORMAL</td></tr>
+      <tr><td>T_BG</td><td>백그라운드 감시 (에러 핸들링, 상태 모니터링)</td><td>SEMISTATIC</td></tr>
+      <tr><td>T_Head</td><td>상위 시스템(UI) 통신 핸들러</td><td>SEMISTATIC</td></tr>
+      <tr><td>T_Teaching</td><td>티칭 포인트 관리 및 캘리브레이션</td><td>SEMISTATIC</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2.2 좌표계 아키텍처</h3>
+  <p>3계층 동적 좌표 변환 구조를 적용한다.</p>
+  <table>
+    <thead>
+      <tr><th style="width:50px">계층</th><th style="width:140px">좌표계</th><th>설명</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align:center">1</td><td>World Frame</td><td>절대 기준 좌표계 (갠트리 레일 원점)</td></tr>
+      <tr><td style="text-align:center">2</td><td>Floor Frame</td><td>갠트리 바닥면 기준 — Z축 오프셋 보정</td></tr>
+      <tr><td style="text-align:center">3</td><td>Gantry Frame</td><td>갠트리 이동에 따른 동적 좌표계 — X/Y/Z/R 실시간 반영</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2.3 용접 파라미터 구조</h3>
+  <p>
+    ArcL 멀티패스 용접을 지원하며, 최대 <strong>10패스</strong>까지 개별 파라미터를 설정할 수 있다.
+    각 패스는 <strong>22개 필드</strong>(torchmotion 구조)로 구성된다.
+  </p>
+
+  <div class="info-box">
+    <strong>현재 개발 현황:</strong> RAPID 코드 v1.9.63 기준 &mdash;
+    약 15,500 라인, PERS 변수 200여개, 프로시저 160여개 구현 완료.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 3. 업체 선정 사유                                               -->
+<!-- ============================================================ -->
+<div class="page page-break">
+  <h1>3. 업체 선정 사유</h1>
+
+  <h2>3.1 기존 수행 실적</h2>
+  <p>
+    GR자동제어는 <strong>2025년부터 본 과제의 갠트리 로봇 제어 프로그램을 설계 및 구현</strong>해 온
+    기존 수행업체로서, 현재까지 아래와 같은 개발 실적을 보유하고 있다.
+  </p>
+  <table>
+    <thead>
+      <tr><th style="width:200px">항목</th><th>내용</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>현재 버전</td><td><strong>v1.9.63</strong> (63회 버전 이력 — 지속적 개선·디버깅 수행)</td></tr>
+      <tr><td>RAPID 코드 규모</td><td>약 <strong>15,500 라인</strong></td></tr>
+      <tr><td>PERS 공유 변수</td><td><strong>200여 개</strong> (5개 태스크 간 크로스 동기화)</td></tr>
+      <tr><td>프로시저 수</td><td><strong>160여 개</strong></td></tr>
+      <tr><td>수행 기간</td><td>2025년 ~ 현재 (약 12개월 이상 투입)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3.2 ABB RAPID 전문성 요구</h2>
+  <p>
+    ABB RAPID은 C, Python 등 범용 언어와 달리 <strong>ABB 로봇 전용 프로그래밍 언어</strong>로서,
+    다음과 같은 ABB 시스템 수준의 전문 지식이 필수적으로 요구된다.
+  </p>
+  <ul>
+    <li><strong>MOC(Motion Coordination) 설정</strong> &mdash; 외부 5축 갠트리와 로봇 관절의 동기 제어 구성</li>
+    <li><strong>외부축 매핑</strong> &mdash; IRC5 컨트롤러의 드라이브 유닛, 모터, 조인트 매핑 체계</li>
+    <li><strong>크로스 태스크 동기화</strong> &mdash; PERS 변수를 통한 5개 병렬 태스크 간 데이터 교환</li>
+    <li><strong>ArcL/ArcC 용접 명령</strong> &mdash; 용접기 파라미터 바인딩 및 실시간 제어</li>
+    <li><strong>에러 코드 대응</strong> &mdash; ABB 고유 런타임 에러(50050, 50246, 50426, 50436 등)의 원인 분석 및 복구 로직</li>
+  </ul>
+  <div class="warn-box">
+    <strong>참고:</strong> 신규 업체 투입 시, 기존 15,500라인 코드 분석에만 <strong>최소 4~6주</strong>가 소요될 것으로 예상되며,
+    ABB MOC/외부축 설정 경험이 없는 경우 추가 학습 기간이 필요하다.
+  </div>
+
+  <h2>3.3 업무 연속성</h2>
+  <p>
+    63회에 걸친 버전 이력에는 단순 기능 추가뿐 아니라, ABB 시스템 고유의 제약 조건을 해결한
+    <strong>오류 대응 경험</strong>이 축적되어 있다. 주요 사례는 다음과 같다.
+  </p>
+  <table>
+    <thead>
+      <tr><th style="width:120px">에러 코드</th><th style="width:200px">내용</th><th>대응 내역</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align:center">50050</td>
+        <td>Cartesian Supervision 한계 초과</td>
+        <td>중간 경유점 삽입, MoveAbsJ 전환으로 특이점(Singularity) 회피 로직 구현</td>
+      </tr>
+      <tr>
+        <td style="text-align:center">50246</td>
+        <td>외부축 범위 초과</td>
+        <td>갠트리 R축 정규화 로직 (-180~+180 범핑), 각도 시나리오별 검증 완료</td>
+      </tr>
+      <tr>
+        <td style="text-align:center">50426</td>
+        <td>모션 큐 오버플로우</td>
+        <td>SyncMoveOn/Off 타이밍 조정, WaitSyncTask 삽입</td>
+      </tr>
+      <tr>
+        <td style="text-align:center">50436</td>
+        <td>TCP 속도 제한 초과</td>
+        <td>속도 프로파일 재설계, 가감속 파라미터 튜닝</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin-top:12px;">
+    또한, <strong>좌표계 변환 로직</strong>(World &rarr; Floor &rarr; Gantry)과
+    <strong>쿼터니언 기반 TCP 보정</strong> 등은 수학적 구현과 ABB 시스템 동작 방식
+    양쪽에 대한 이해가 동시에 요구되는 영역으로, 기존 업체의 연속 투입이
+    <strong>비용, 기간, 품질</strong> 면에서 최적의 선택이다.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- 4. 작업 범위 (차수별)                                            -->
+<!-- ============================================================ -->
+<div class="page page-break">
+  <h1>4. 작업 범위</h1>
+
+  <h2>4.1 1차: 시스템 설계 + 기본 모션 제어</h2>
+
+  <table>
+    <thead>
+      <tr><th style="width:50px">No.</th><th>작업 항목</th><th style="width:160px">산출물</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align:center">1</td><td>갠트리 5축 MOC 설정 (X1/X2 링크드 모터, Y, Z, R축)</td><td>MOC.cfg</td></tr>
+      <tr><td style="text-align:center">2</td><td>듀얼 로봇 좌표계 아키텍처 설계 (World/Floor/Gantry 3계층)</td><td>SYS.cfg</td></tr>
+      <tr><td style="text-align:center">3</td><td>Robot1/Robot2 초기화 및 홈 복귀 시퀀스 구현</td><td>MainModule.mod (기본)</td></tr>
+      <tr><td style="text-align:center">4</td><td>5태스크 크로스 동기화 구조 설계 (PERS 변수 200여개 정의)</td><td>ConfigModule.mod</td></tr>
+      <tr><td style="text-align:center">5</td><td>갠트리-로봇 연동 모션 제어 (MoveAbsJ, MoveJ, MoveL)</td><td>모션 테스트 로그</td></tr>
+      <tr><td style="text-align:center">6</td><td>EIO(Ethernet I/O) 기본 설정</td><td>EIO.cfg</td></tr>
+    </tbody>
+  </table>
+  <p><strong>금액:</strong> <span class="tbd">[TBD &mdash; 강연지 구체화]</span></p>
+
+  <h2>4.2 2차: 용접 시퀀스 구현 + 시뮬레이션 검증</h2>
+
+  <table>
+    <thead>
+      <tr><th style="width:50px">No.</th><th>작업 항목</th><th style="width:160px">산출물</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align:center">1</td><td>ArcL 용접 경로 생성 (멀티패스 최대 10단 지원)</td><td>MainModule.mod (완성)</td></tr>
+      <tr><td style="text-align:center">2</td><td>Lincoln ArcLink-XT 용접기 파라미터 매핑 (torchmotion 22필드/패스)</td><td>Rob2_MainModule.mod</td></tr>
+      <tr><td style="text-align:center">3</td><td>R축 각도 정규화 + 5시나리오 검증 (0&deg;, 45&deg;, 90&deg;, 135&deg;, 200&deg;)</td><td>시나리오 테스트 로그</td></tr>
+      <tr><td style="text-align:center">4</td><td>로봇 스왑 로직 구현 (bRobSwap: Buffer1/Buffer2 전환)</td><td>SwapModule.mod</td></tr>
+      <tr><td style="text-align:center">5</td><td>에러 처리 구현 (50050, 50246, 50426, 50436 대응)</td><td>ErrorHandler.mod</td></tr>
+      <tr><td style="text-align:center">6</td><td>RobotStudio 가상 컨트롤러 통합 테스트</td><td>VersionModule.mod</td></tr>
+    </tbody>
+  </table>
+  <p><strong>금액:</strong> <span class="tbd">[TBD &mdash; 강연지 구체화]</span></p>
+
+  <div class="info-box">
+    <strong>1차 + 2차 소계: 68,400,000원 (VAT 별도)</strong> &mdash; 금번 품의 대상
+  </div>
+</div>
+
+<div class="page page-break">
+  <h2>4.3 3차: 현장 설치 + 시운전</h2>
+
+  <table>
+    <thead>
+      <tr><th style="width:50px">No.</th><th>작업 항목</th><th style="width:160px">산출물</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align:center">1</td><td>거제조선소 34bay 현장 갠트리 설치 후 캘리브레이션</td><td>캘리브레이션 보고서</td></tr>
+      <tr><td style="text-align:center">2</td><td>Lincoln 용접기 실제 아크 연동 (DeviceNet 158신호 매핑)</td><td>EIO.cfg (업데이트)</td></tr>
+      <tr><td style="text-align:center">3</td><td>Robot2 MultiMove 매핑 (ArcL 네이티브 지원 전환)</td><td>MOC.cfg (업데이트)</td></tr>
+      <tr><td style="text-align:center">4</td><td>상위 시스템(UI) 통합 테스트</td><td>통합 테스트 보고서</td></tr>
+      <tr><td style="text-align:center">5</td><td>현장 용접 시운전 및 품질 확인</td><td>시운전 보고서</td></tr>
+    </tbody>
+  </table>
+  <p><strong>금액:</strong> <span class="tbd">[TBD &mdash; 26년 예산 확정 후]</span></p>
+
+  <h2>4.4 4차: 양산 최적화 + 기술 이전</h2>
+
+  <table>
+    <thead>
+      <tr><th style="width:50px">No.</th><th>작업 항목</th><th style="width:160px">산출물</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="text-align:center">1</td><td>A/B라인 양산 용접 파라미터 튜닝</td><td>용접 품질 데이터</td></tr>
+      <tr><td style="text-align:center">2</td><td>에러 복구 로직 고도화 (Phase 2~3 에러 핸들링)</td><td>에러 복구 매뉴얼</td></tr>
+      <tr><td style="text-align:center">3</td><td>기술 문서화 및 에스피시스템스 기술 이전</td><td>기술 이전 문서</td></tr>
+      <tr><td style="text-align:center">4</td><td>운영/유지보수 매뉴얼 작성</td><td>운영 매뉴얼</td></tr>
+    </tbody>
+  </table>
+  <p><strong>금액:</strong> <span class="tbd">[TBD &mdash; 26년 예산 확정 후]</span></p>
+
+  <div class="info-box">
+    <strong>3차 + 4차 소계: 36,000,000원 (VAT 별도)</strong> &mdash; 2026년 예산 확정 후 집행
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 5. 산출물 목록                                                  -->
+<!-- ============================================================ -->
+<div class="page page-break">
+  <h1>5. 산출물 목록</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:40px">No.</th>
+        <th style="width:60px">차수</th>
+        <th style="width:200px">산출물</th>
+        <th>설명</th>
+        <th style="width:80px">형식</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 1차 -->
+      <tr><td style="text-align:center">1</td><td style="text-align:center">1차</td><td>MOC.cfg</td><td>갠트리 5축 Motion Coordination 설정 파일</td><td style="text-align:center">.cfg</td></tr>
+      <tr><td style="text-align:center">2</td><td style="text-align:center">1차</td><td>SYS.cfg</td><td>시스템 파라미터 설정 (좌표계 정의 포함)</td><td style="text-align:center">.cfg</td></tr>
+      <tr><td style="text-align:center">3</td><td style="text-align:center">1차</td><td>EIO.cfg</td><td>Ethernet I/O 기본 설정</td><td style="text-align:center">.cfg</td></tr>
+      <tr><td style="text-align:center">4</td><td style="text-align:center">1차</td><td>ConfigModule.mod</td><td>PERS 변수 및 시스템 설정 모듈</td><td style="text-align:center">.mod</td></tr>
+      <tr><td style="text-align:center">5</td><td style="text-align:center">1차</td><td>MainModule.mod (기본)</td><td>Robot1 메인 제어 로직 기본 구조</td><td style="text-align:center">.mod</td></tr>
+      <tr><td style="text-align:center">6</td><td style="text-align:center">1차</td><td>모션 테스트 로그</td><td>갠트리-로봇 연동 모션 테스트 결과</td><td style="text-align:center">.txt/.log</td></tr>
+      <!-- 2차 -->
+      <tr><td style="text-align:center">7</td><td style="text-align:center">2차</td><td>MainModule.mod (완성)</td><td>Robot1 메인 제어 로직 전체 (용접 포함)</td><td style="text-align:center">.mod</td></tr>
+      <tr><td style="text-align:center">8</td><td style="text-align:center">2차</td><td>Rob2_MainModule.mod</td><td>Robot2 메인 제어 로직</td><td style="text-align:center">.mod</td></tr>
+      <tr><td style="text-align:center">9</td><td style="text-align:center">2차</td><td>VersionModule.mod</td><td>버전 관리 모듈</td><td style="text-align:center">.mod</td></tr>
+      <tr><td style="text-align:center">10</td><td style="text-align:center">2차</td><td>시나리오 테스트 로그</td><td>R축 5시나리오 테스트 결과</td><td style="text-align:center">.txt/.log</td></tr>
+      <tr><td style="text-align:center">11</td><td style="text-align:center">2차</td><td>RobotStudio 프로젝트</td><td>가상 컨트롤러 포함 시뮬레이션 환경</td><td style="text-align:center">.rspag</td></tr>
+      <!-- 3차 -->
+      <tr><td style="text-align:center">12</td><td style="text-align:center">3차</td><td>캘리브레이션 보고서</td><td>현장 로봇/갠트리 캘리브레이션 결과</td><td style="text-align:center">.pdf</td></tr>
+      <tr><td style="text-align:center">13</td><td style="text-align:center">3차</td><td>EIO.cfg (업데이트)</td><td>DeviceNet 158신호 현장 매핑 반영</td><td style="text-align:center">.cfg</td></tr>
+      <tr><td style="text-align:center">14</td><td style="text-align:center">3차</td><td>MOC.cfg (업데이트)</td><td>Robot2 MultiMove 설정 반영</td><td style="text-align:center">.cfg</td></tr>
+      <tr><td style="text-align:center">15</td><td style="text-align:center">3차</td><td>시운전 보고서</td><td>현장 시운전 결과 보고서</td><td style="text-align:center">.pdf</td></tr>
+      <!-- 4차 -->
+      <tr><td style="text-align:center">16</td><td style="text-align:center">4차</td><td>용접 품질 데이터</td><td>양산 용접 파라미터 및 품질 검사 결과</td><td style="text-align:center">.xlsx/.pdf</td></tr>
+      <tr><td style="text-align:center">17</td><td style="text-align:center">4차</td><td>에러 복구 매뉴얼</td><td>ABB 에러 코드별 대응 절차서</td><td style="text-align:center">.pdf</td></tr>
+      <tr><td style="text-align:center">18</td><td style="text-align:center">4차</td><td>운영 매뉴얼</td><td>시스템 운영 및 유지보수 가이드</td><td style="text-align:center">.pdf</td></tr>
+      <tr><td style="text-align:center">19</td><td style="text-align:center">4차</td><td>기술 이전 문서</td><td>에스피시스템스 내부 기술 이전 자료</td><td style="text-align:center">.pdf/.pptx</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- 6. 검수 기준                                                    -->
+<!-- ============================================================ -->
+<div class="page page-break">
+  <h1>6. 검수 기준</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:60px">차수</th>
+        <th style="width:50px">No.</th>
+        <th>검수 항목</th>
+        <th style="width:90px">판정 기준</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 1차 -->
+      <tr><td rowspan="4" style="text-align:center; vertical-align:middle; font-weight:700;">1차</td>
+        <td style="text-align:center">1</td><td>MOC 설정 완료 &mdash; 갠트리 5축 정상 동작 확인</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">2</td><td>듀얼 로봇(Robot1, Robot2) 초기화 및 홈 복귀 성공</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">3</td><td>5개 태스크 정상 기동 및 크로스 동기화 확인</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">4</td><td>갠트리-로봇 연동 모션(MoveAbsJ/MoveJ/MoveL) 정상 실행</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <!-- 2차 -->
+      <tr><td rowspan="4" style="text-align:center; vertical-align:middle; font-weight:700;">2차</td>
+        <td style="text-align:center">5</td><td>R축 5시나리오(0&deg;/45&deg;/90&deg;/135&deg;/200&deg;) 전체 PASS</td><td style="text-align:center">5/5 PASS</td></tr>
+      <tr><td style="text-align:center">6</td><td>ArcL 멀티패스 용접 경로 생성 및 시뮬레이션 정상</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">7</td><td>로봇 스왑(Buffer1/Buffer2) 전환 정상 동작</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">8</td><td>RobotStudio 가상 컨트롤러 전체 시나리오 통합 테스트 완료</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <!-- 3차 -->
+      <tr><td rowspan="4" style="text-align:center; vertical-align:middle; font-weight:700;">3차</td>
+        <td style="text-align:center">9</td><td>현장 갠트리 캘리브레이션 완료 (정밀도 기준 충족)</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">10</td><td>Lincoln 용접기 실제 아크 용접 성공</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">11</td><td>DeviceNet 158신호 통신 정상 확인</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">12</td><td>상위 시스템(UI) 연동 통합 테스트 완료</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <!-- 4차 -->
+      <tr><td rowspan="3" style="text-align:center; vertical-align:middle; font-weight:700;">4차</td>
+        <td style="text-align:center">13</td><td>A/B라인 양산 라인 정상 운영 확인 (연속 용접 테스트)</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">14</td><td>에러 복구 매뉴얼 및 운영 매뉴얼 납품</td><td style="text-align:center">PASS/FAIL</td></tr>
+      <tr><td style="text-align:center">15</td><td>에스피시스템스 기술 이전 완료 (교육 포함)</td><td style="text-align:center">PASS/FAIL</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn-box">
+    <strong>검수 절차:</strong> 각 차수별 산출물 납품 후, 발주자(에스피시스템스) 검수 담당자가
+    상기 기준에 따라 검수를 실시하며, 전 항목 PASS 시 해당 차수의 대금을 지급한다.
+    FAIL 항목 발생 시 수급자는 <span class="tbd">[TBD &mdash; 강연지 구체화: 보완 기한]</span> 이내에 보완하여 재검수를 받아야 한다.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 7. 일정 계획                                                    -->
+<!-- ============================================================ -->
+<div class="page page-break">
+  <h1>7. 일정 계획</h1>
+
+  <p>상세 일정은 별첨 일정표를 참조한다. 아래는 차수별 개략 일정이다.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:60px">차수</th>
+        <th>주요 내용</th>
+        <th style="width:120px">시작</th>
+        <th style="width:120px">종료</th>
+        <th style="width:80px">비고</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align:center; font-weight:700;">1차</td>
+        <td>시스템 설계 + 기본 모션 제어</td>
+        <td style="text-align:center"><span class="tbd">[TBD]</span></td>
+        <td style="text-align:center"><span class="tbd">[TBD]</span></td>
+        <td style="text-align:center"><span class="tbd">[강연지]</span></td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:700;">2차</td>
+        <td>용접 시퀀스 구현 + 시뮬레이션 검증</td>
+        <td style="text-align:center"><span class="tbd">[TBD]</span></td>
+        <td style="text-align:center"><span class="tbd">[TBD]</span></td>
+        <td style="text-align:center"><span class="tbd">[강연지]</span></td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:700;">3차</td>
+        <td>현장 설치 + 시운전</td>
+        <td style="text-align:center"><span class="tbd">[TBD]</span></td>
+        <td style="text-align:center"><span class="tbd">[TBD]</span></td>
+        <td>현장 일정 연동</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:700;">4차</td>
+        <td>양산 최적화 + 기술 이전</td>
+        <td style="text-align:center"><span class="tbd">[TBD]</span></td>
+        <td style="text-align:center">2026.12</td>
+        <td>과제 종료 전</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="info-box">
+    <strong>별첨:</strong> 상세 일정표 (Excel) — <span class="tbd">[TBD &mdash; 강연지 구체화: 일정표 작성 필요]</span>
+  </div>
+
+  <h1 style="margin-top:40px;">8. 비용</h1>
+
+  <h2>8.1 차수별 비용 총괄</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:80px">차수</th>
+        <th style="width:180px; text-align:right;">금액 (원)</th>
+        <th>비고</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align:center; font-weight:700;">1차</td>
+        <td style="text-align:right;"><span class="tbd">[TBD &mdash; 강연지 구체화]</span></td>
+        <td>시스템 설계 + 기본 모션</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:700;">2차</td>
+        <td style="text-align:right;"><span class="tbd">[TBD &mdash; 강연지 구체화]</span></td>
+        <td>용접 시퀀스 + 시뮬레이션</td>
+      </tr>
+      <tr class="subtotal">
+        <td style="text-align:center;">1+2차 소계</td>
+        <td style="text-align:right;">68,400,000</td>
+        <td>금번 품의 대상</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:700;">3차</td>
+        <td style="text-align:right;"><span class="tbd">[TBD &mdash; 26년 예산]</span></td>
+        <td>현장 설치 + 시운전</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:700;">4차</td>
+        <td style="text-align:right;"><span class="tbd">[TBD &mdash; 26년 예산]</span></td>
+        <td>양산 최적화 + 기술 이전</td>
+      </tr>
+      <tr class="subtotal">
+        <td style="text-align:center;">3+4차 소계</td>
+        <td style="text-align:right;">36,000,000</td>
+        <td>2026년 예산 확정 후 집행</td>
+      </tr>
+      <tr class="total">
+        <td style="text-align:center;">총계</td>
+        <td style="text-align:right;">104,400,000</td>
+        <td>VAT 별도</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>8.2 대금 지급 조건</h2>
+  <ul>
+    <li>각 차수별 산출물 납품 및 검수 완료 후 지급</li>
+    <li>세금계산서 발행일 기준 <span class="tbd">[TBD &mdash; 강연지 구체화: 지급 기한]</span>일 이내 지급</li>
+    <li>부가가치세(VAT 10%) 별도</li>
+  </ul>
+
+  <h2>8.3 수급자 정보</h2>
+  <table>
+    <tbody>
+      <tr><th style="width:140px; text-align:center;">상호</th><td>GR자동제어</td></tr>
+      <tr><th style="text-align:center;">사업자번호</th><td>620-11-52026</td></tr>
+      <tr><th style="text-align:center;">소재지</th><td>울산광역시 중구 성안1길 25</td></tr>
+      <tr><th style="text-align:center;">대표자</th><td><span class="tbd">[TBD &mdash; 강연지 확인]</span></td></tr>
+      <tr><th style="text-align:center;">연락처</th><td><span class="tbd">[TBD &mdash; 강연지 확인]</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- 9. 특기 사항                                                    -->
+<!-- ============================================================ -->
+<div class="page page-break">
+  <h1>9. 특기 사항</h1>
+
+  <h2>9.1 예산 집행 관련</h2>
+  <ol>
+    <li>
+      당 과제(D25003)의 <strong>2026년 예산이 미결정 상태</strong>이므로,
+      1차 및 2차 비용(68,400,000원)은 <strong>2025년 예산으로 집행</strong>한다.
+    </li>
+    <li>
+      3차 및 4차 비용(36,000,000원)은 <strong>2026년 예산 확정 후</strong>,
+      내정가 세부 항목 조정을 통해 해결할 예정이다.
+    </li>
+    <li>
+      ABB 로봇 구매 축소로 비용 여유 발생 시, <strong>내정가 총액 변동 없이</strong>
+      항목 간 조정으로 처리 가능할 것으로 예상된다.
+    </li>
+  </ol>
+
+  <h2>9.2 업무 수행 관련</h2>
+  <ol>
+    <li>수급자는 작업 진행 중 주요 변경 사항 발생 시 발주자에게 사전 협의하여야 한다.</li>
+    <li>
+      현장 시운전(3차) 일정은 거제조선소 현장 상황에 따라 변경될 수 있으며,
+      이 경우 양 사 협의하여 일정을 조정한다.
+    </li>
+    <li>
+      기술 이전(4차) 범위에는 에스피시스템스 엔지니어 대상
+      <strong>ABB RAPID 교육</strong>(최소 <span class="tbd">[TBD &mdash; 강연지 구체화: 교육 시간]</span>시간)이 포함된다.
+    </li>
+    <li>
+      RobotStudio 라이선스 및 ABB 서비스 계약은 발주자(에스피시스템스)가 별도 관리하며,
+      수급자에게 접근 환경을 제공한다.
+    </li>
+  </ol>
+
+  <h2>9.3 지식재산권</h2>
+  <ol>
+    <li>
+      본 계약에 의해 생성되는 산출물의 지식재산권은
+      <span class="tbd">[TBD &mdash; 강연지 구체화: 지재권 귀속 조건]</span>에 귀속된다.
+    </li>
+    <li>
+      수급자는 본 과제 수행 과정에서 취득한 발주자의 기술 정보를 제3자에게 누설하여서는 안 된다.
+    </li>
+  </ol>
+
+  <h2>9.4 하자 보증</h2>
+  <p>
+    최종 검수 완료일로부터 <span class="tbd">[TBD &mdash; 강연지 구체화: 하자 보증 기간]</span>개월간
+    하자 보증 기간으로 하며, 해당 기간 내 수급자 귀책 사유로 인한 하자 발생 시
+    수급자는 무상으로 보수하여야 한다.
+  </p>
+
+  <!-- ===== 서명란 ===== -->
+  <div style="margin-top:50px;">
+    <h2>서명란</h2>
+    <p style="margin-bottom:20px;">
+      상기 작업시방서의 내용을 확인하고 이에 동의합니다.
+    </p>
+    <div class="sig-grid">
+      <div class="sig-box">
+        <div class="label">작성</div>
+        <div class="name">심태양 부장<br><small style="color:#a0aec0;">에스피시스템스</small></div>
+      </div>
+      <div class="sig-box">
+        <div class="label">검토</div>
+        <div class="name"><span class="tbd">[TBD]</span><br><small style="color:#a0aec0;">에스피시스템스</small></div>
+      </div>
+      <div class="sig-box">
+        <div class="label">승인</div>
+        <div class="name"><span class="tbd">[TBD]</span><br><small style="color:#a0aec0;">에스피시스템스</small></div>
+      </div>
+    </div>
+
+    <div class="sig-grid" style="margin-top:16px;">
+      <div class="sig-box">
+        <div class="label">수급자 확인</div>
+        <div class="name"><span class="tbd">[TBD]</span><br><small style="color:#a0aec0;">GR자동제어</small></div>
+      </div>
+      <div class="sig-box" style="border:none;"></div>
+      <div class="sig-box" style="border:none;"></div>
+    </div>
+  </div>
+
+  <!-- ===== 문서 Footer ===== -->
+  <div class="doc-footer">
+    D25003-WS-2026-001 v0.1 (DRAFT) &ensp;|&ensp; ㈜에스피시스템스 &ensp;|&ensp; 2026-02-25
+  </div>
+</div>
+
+</body>
+</html>

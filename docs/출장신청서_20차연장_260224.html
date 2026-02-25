@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>출장신청서 - 20차 연장 (2026-02-24 ~ 02-28)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Malgun Gothic', '맑은 고딕', dotum, sans-serif;
+    font-size: 10pt;
+    color: #222;
+    line-height: 1.6;
+    margin: 0; padding: 0;
+    background: #f0f0f0;
+  }
+  .page {
+    max-width: 860px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 50px 40px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+  }
+
+  /* 제목 */
+  h1.doc-title {
+    text-align: center;
+    font-size: 22pt;
+    letter-spacing: 18px;
+    margin: 0 0 30px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #333;
+  }
+
+  /* 품의번호 + 결재 영역 */
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+  }
+  .approval-no { font-size: 9.5pt; color: #555; }
+  .approval-no b { color: #222; }
+
+  /* 결재 박스 */
+  .sign-box {
+    border: 1px solid #666;
+    border-collapse: collapse;
+    font-size: 9pt;
+    text-align: center;
+  }
+  .sign-box th {
+    background: #eee;
+    padding: 4px 8px;
+    border: 1px solid #666;
+    font-weight: normal;
+    writing-mode: vertical-rl;
+    letter-spacing: 4px;
+  }
+  .sign-box td {
+    border: 1px solid #666;
+    padding: 0;
+    width: 80px;
+  }
+  .sign-box .role { background: #f9f9f9; padding: 3px 4px; border-bottom: 1px solid #666; font-size: 8.5pt; }
+  .sign-box .name { padding: 4px; font-weight: bold; height: 32px; border-bottom: 1px solid #666; }
+  .sign-box .date { padding: 3px 4px; font-size: 8pt; color: #666; }
+
+  /* 기본 정보 테이블 */
+  table.info {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 9.5pt;
+  }
+  table.info th {
+    background: #f5f5f5;
+    border: 1px solid #999;
+    padding: 6px 10px;
+    text-align: center;
+    font-weight: bold;
+    width: 120px;
+    white-space: nowrap;
+  }
+  table.info td {
+    border: 1px solid #999;
+    padding: 6px 10px;
+  }
+
+  /* 일정 테이블 */
+  table.schedule {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 9pt;
+  }
+  table.schedule th {
+    background: #333;
+    color: #fff;
+    border: 1px solid #333;
+    padding: 6px 8px;
+    text-align: center;
+    font-weight: bold;
+  }
+  table.schedule td {
+    border: 1px solid #bbb;
+    padding: 6px 8px;
+    vertical-align: top;
+  }
+  table.schedule tr:nth-child(even) { background: #fafafa; }
+  table.schedule .date-col { width: 100px; text-align: center; font-weight: bold; white-space: nowrap; }
+  table.schedule .place-col { width: 160px; text-align: center; }
+
+  /* 상세 일정 */
+  .detail-section {
+    margin-top: 30px;
+    border-top: 2px solid #1a5276;
+    padding-top: 15px;
+  }
+  .detail-section h2 {
+    color: #1a5276;
+    font-size: 13pt;
+    margin: 0 0 15px;
+    padding-left: 12px;
+    border-left: 4px solid #1a5276;
+  }
+
+  table.detail {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    font-size: 9pt;
+  }
+  table.detail th {
+    background: #1a5276;
+    color: #fff;
+    border: 1px solid #1a5276;
+    padding: 7px 10px;
+    text-align: left;
+  }
+  table.detail td {
+    border: 1px solid #ccc;
+    padding: 7px 10px;
+    vertical-align: top;
+  }
+  table.detail tr:nth-child(even) { background: #f8fafe; }
+  .label-a { color: #1a5276; font-weight: bold; }
+  .label-b { color: #8e44ad; font-weight: bold; }
+  .label-planb { color: #c0392b; font-weight: bold; }
+
+  ul.work-list {
+    margin: 3px 0 3px 14px;
+    padding: 0;
+    list-style: none;
+  }
+  ul.work-list li {
+    position: relative;
+    padding-left: 10px;
+    margin-bottom: 2px;
+  }
+  ul.work-list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 7px;
+    width: 4px; height: 4px;
+    background: #888;
+    border-radius: 50%;
+  }
+
+  /* 비고 */
+  .remark {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 9pt;
+    margin-top: 10px;
+  }
+  .remark ul { margin: 5px 0 0 16px; padding: 0; }
+  .remark li { margin-bottom: 3px; }
+
+  /* 펀치리스트 */
+  .pl-tag {
+    display: inline-block;
+    background: #eaf2f8;
+    color: #1a5276;
+    font-size: 8pt;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+  .pl-tag.urgent {
+    background: #fdedec;
+    color: #c0392b;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; padding: 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 제목 -->
+  <h1 class="doc-title">출 장 신 청 서</h1>
+
+  <!-- 품의번호 + 결재 -->
+  <div class="header-row">
+    <div class="approval-no">
+      <b>품 의 번 호</b><br>
+      에스피시스템스-개발팀-20260224-002
+    </div>
+    <table class="sign-box">
+      <tr>
+        <th rowspan="1">결<br>재</th>
+        <td>
+          <div class="role">팀장</div>
+          <div class="name">심태양</div>
+          <div class="date">2026/02/24</div>
+        </td>
+        <td>
+          <div class="role">사장</div>
+          <div class="name">정시득</div>
+          <div class="date"></div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 기본 정보 -->
+  <table class="info">
+    <tr>
+      <th>기 안 일 자</th><td>2026-02-24(화)</td>
+      <th>기 안 부 서</th><td>개발팀</td>
+    </tr>
+    <tr>
+      <th>기안자 직책</th><td>팀장</td>
+      <th>기 안 자</th><td>심태양</td>
+    </tr>
+    <tr>
+      <th>구 분</th><td>국내출장</td>
+      <th>기 간</th><td>2026-02-24(화) ~ 2026-02-28(토)</td>
+    </tr>
+    <tr>
+      <th>제 목</th>
+      <td colspan="3">삼성중공업 거제조선소 자동용접시스템 성능 문제 대응 및 양산 정상화 지원 (20차 연장)</td>
+    </tr>
+  </table>
+
+  <!-- 출장자 -->
+  <table class="info">
+    <tr>
+      <th>출 장 자</th>
+      <th>소 속</th><td>개발팀</td>
+      <th>직 급</th><td>부장</td>
+      <th>성 명</th><td>심태양</td>
+    </tr>
+    <tr>
+      <th>출 장 지</th>
+      <td colspan="6">경상남도 거제시 장목면 거제대로 3370 삼성중공업 거제조선소</td>
+    </tr>
+  </table>
+
+  <!-- 일정별 업무계획 -->
+  <table class="schedule">
+    <tr>
+      <th>일 자</th>
+      <th>방 문 처</th>
+      <th>업 무 내 용</th>
+    </tr>
+    <tr>
+      <td class="date-col">2026-02-24(화)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>A/B라인 기능 실물 테스트 (터치/갠트리 오프셋, 십자레이저 원점, 수동 티칭)</td>
+    </tr>
+    <tr>
+      <td class="date-col">2026-02-25(수)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>A라인 기능 컨펌 적용, B라인 한팔용접 구현, 권한 설정</td>
+    </tr>
+    <tr>
+      <td class="date-col">2026-02-26(목)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>UI 로깅/이력 컨펌, Plan B v1.9.62 현장 검증, 실시간 용접조건</td>
+    </tr>
+    <tr>
+      <td class="date-col">2026-02-27(금)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>체크 포인트 용접 검증, B라인 한팔용접/권한 설정 계속</td>
+    </tr>
+    <tr>
+      <td class="date-col">2026-02-28(토)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>A/B라인 전체 기능 최종 컨펌 및 적용, 한팔용접 실물 테스트</td>
+    </tr>
+  </table>
+
+  <!-- 출장비 -->
+  <table class="info">
+    <tr>
+      <th rowspan="4" style="width:80px;">출 장 비</th>
+      <th>항 목</th><th>금 액</th><th colspan="2">산 출 내 역</th>
+    </tr>
+    <tr>
+      <td style="text-align:center;">숙 박 비</td><td></td><td colspan="2"></td>
+    </tr>
+    <tr>
+      <td style="text-align:center;">교 통 비</td><td></td><td colspan="2"></td>
+    </tr>
+    <tr>
+      <td style="text-align:center;">식 대</td><td></td><td colspan="2"></td>
+    </tr>
+  </table>
+
+  <!-- ============================================ -->
+  <!-- 상세 일정 섹션 -->
+  <!-- ============================================ -->
+  <div class="detail-section">
+    <h2>출장 목적</h2>
+    <p style="margin-bottom:15px;">
+      Plan B RAPID v1.9.62 현장 적용 및 A/B라인 양산 정상화 지원
+    </p>
+    <table class="detail" style="margin-bottom:25px;">
+      <tr>
+        <th style="width:40px;">#</th>
+        <th>주요 목표</th>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:bold;">1</td>
+        <td><b>A라인 기능 컨펌 및 배포</b> &mdash; 터치/갠트리 오프셋 실물 테스트, 십자레이저 원점 확인, 수직용접 컨펌</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:bold;">2</td>
+        <td><b>B라인 기능 구현 및 테스트</b> &mdash; 한팔용접(1xx 매크로) 구현, 실시간 용접조건, 수동 티칭(와이어 커팅/노즐 클리닝/스프레이)</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:bold;">3</td>
+        <td><b>공통 기능 적용</b> &mdash; 작업자/관리자 권한 설정, UI 조작 로깅, 사용 이력 로그</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:bold;">4</td>
+        <td><b>Plan B RAPID 검증</b> &mdash; v1.9.62/v1.9.46 현장 배포, 시나리오 E(200&deg;) 갠트리 포지셔닝 재검증, Robot2 ArcL 기술 의사결정안 확정</td>
+      </tr>
+    </table>
+
+    <h2>상세 일정</h2>
+    <table class="detail">
+      <tr>
+        <th style="width:100px;">날짜</th>
+        <th style="width:80px;">구분</th>
+        <th>세부 업무</th>
+      </tr>
+
+      <!-- 2/24 -->
+      <tr>
+        <td rowspan="2" style="text-align:center; font-weight:bold;">2/24(화)</td>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>터치 오프셋 / 갠트리 오프셋 / 파라미터 엑셀 관리: 실물 테스트</li>
+            <li>십자레이저 기반 갠트리 원점 오차 확인: 실물 테스트</li>
+            <li>홀센서 UI 수정: 실물 테스트</li>
+            <li>캘리브레이션 / 제어모드 이원화: 컨펌 및 적용</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-b">B라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>기능 원복(취소) &mdash; 한 프로와 협의 후 작업 예정</li>
+            <li>터치/갠트리 오프셋, 파라미터 엑셀 관리</li>
+            <li>십자레이저 기반 갠트리 원점 오차 확인</li>
+            <li>홀센서 UI 수정</li>
+            <li>와이어 커팅 / 노즐 클리닝 / 스프레이 수동 티칭</li>
+            <li>로봇 자동 운전 조건 진단 (용접 활성화 여부 확인)</li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- 2/25 -->
+      <tr>
+        <td rowspan="2" style="text-align:center; font-weight:bold;">2/25(수)</td>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>터치/갠트리 오프셋: 컨펌 및 적용</li>
+            <li>십자레이저 원점 오차 확인: 컨펌 및 적용</li>
+            <li>홀센서 UI 수정: 컨펌 및 적용</li>
+            <li>수직용접</li>
+            <li>로봇 자동 운전 조건 진단 (용접 활성화 여부 확인)</li>
+            <li>수직용접 관제 명령 및 노티 연결: 테스트</li>
+            <li>작업자/관리자 권한 설정</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-b">B라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>터치/갠트리 오프셋, 파라미터 엑셀 관리</li>
+            <li>UI 조작 로깅</li>
+            <li>작업자 사용 이력 로그 기능 추가</li>
+            <li>작업자/관리자 권한 설정</li>
+            <li>한팔용접 (1xx 매크로) 구현</li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- 2/26 -->
+      <tr>
+        <td rowspan="3" style="text-align:center; font-weight:bold;">2/26(목)</td>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>UI 조작 로깅: 컨펌 및 적용</li>
+            <li>작업자 사용 이력 로그: 컨펌 및 적용</li>
+            <li>수직용접: 컨펌 및 적용</li>
+            <li>수직용접 관제 명령 및 노티 연결: 컨펌</li>
+            <li>작업자/관리자 권한 설정</li>
+            <li>장비 상태 전송 GRPC 수신 서버 개설: 구현 및 컨펌</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-b">B라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>실시간 용접조건 변경: 테스트</li>
+            <li>작업자/관리자 권한 설정</li>
+            <li>한팔용접 (1xx 매크로) 구현 계속</li>
+            <li>장비 상태 전송 GRPC 수신 서버 개설: 구현 및 컨펌</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-planb">Plan B</span></td>
+        <td>
+          <ul class="work-list">
+            <li>v1.9.62/v1.9.46 시나리오 E(200&deg;) 갠트리 포지셔닝 재검증</li>
+            <li>백업 패키지 정리 (zip + SHA-256)</li>
+            <li>Robot2 ArcL 적용 범위 기술검토 및 의사결정안 정리</li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- 2/27 -->
+      <tr>
+        <td rowspan="2" style="text-align:center; font-weight:bold;">2/27(금)</td>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>체크한 포인트만 용접 기능 검증 (순서/개수 확인)</li>
+            <li>계측 홈 / 기본 Z홈 구분 기능</li>
+            <li>작업자/관리자 권한 설정</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-b">B라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>실시간 용접조건</li>
+            <li>한팔용접 (1xx 매크로) 구현</li>
+            <li>작업자/관리자 권한 설정</li>
+            <li>주간 정리</li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- 2/28 -->
+      <tr>
+        <td rowspan="2" style="text-align:center; font-weight:bold;">2/28(토)</td>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>터치/갠트리 오프셋, 파라미터 엑셀 관리: 컨펌 및 적용</li>
+            <li>십자레이저 기반 갠트리 원점 오차 확인: 컨펌 및 적용</li>
+            <li>홀센서 UI 수정: 컨펌 및 적용</li>
+            <li>수직용접</li>
+            <li>로봇 자동 운전 조건 진단 (용접 활성화 여부 확인): 컨펌 및 적용</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-b">B라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>터치/갠트리 오프셋, 파라미터 엑셀 관리: 컨펌 및 적용</li>
+            <li>십자레이저 기반 갠트리 원점 오차 확인: 컨펌 및 적용</li>
+            <li>홀센서 UI 수정: 컨펌 및 적용</li>
+            <li>와이어 커팅 수동 티칭: 컨펌 및 적용</li>
+            <li>노즐 클리닝/스프레이 수동 티칭: 컨펌 및 적용</li>
+            <li>로봇 자동 운전 조건 진단 (용접 활성화 여부 확인): 컨펌 및 적용</li>
+            <li>한팔용접 (1xx 매크로): 동작 구현 / 실물 테스트</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+
+    <!-- 긴급 모니터링 -->
+    <h2>긴급 모니터링 항목</h2>
+    <table class="detail" style="margin-bottom:25px;">
+      <tr>
+        <th style="width:120px;">펀치리스트</th>
+        <th>내용</th>
+        <th style="width:80px;">긴급도</th>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="pl-tag urgent">PL-2025-111</span></td>
+        <td>형상 보간 실패 에러</td>
+        <td style="text-align:center; color:#c0392b; font-weight:bold;">긴급</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="pl-tag urgent">PL-2025-113</span></td>
+        <td>Z축 과부하 에러</td>
+        <td style="text-align:center; color:#c0392b; font-weight:bold;">긴급</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="pl-tag urgent">PL-2026-184</span></td>
+        <td>Plan C 아크에러 동기화</td>
+        <td style="text-align:center; color:#c0392b; font-weight:bold;">긴급</td>
+      </tr>
+    </table>
+
+    <!-- 비고 -->
+    <h2>비고</h2>
+    <div class="remark">
+      <ul>
+        <li><b>2/27(금) PM 업무 개선 토론회</b>: 현장 출장으로 불참 (발표자료 사전 제출 완료)</li>
+        <li>Plan B RAPID v1.9.62(TASK1) / v1.9.46(TASK2) 현장 적용 및 양산 검증</li>
+        <li>라이트커튼 미러타입 변경 추가비용 품의 별건 진행 중</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 서명 -->
+  <div style="margin-top:40px; text-align:right; font-size:9pt; color:#666;">
+    <p>에스피시스템스 개발팀</p>
+    <p style="font-weight:bold; color:#222; font-size:10pt;">심태양 부장</p>
+  </div>
+
+</div>
+</body>
+</html>
