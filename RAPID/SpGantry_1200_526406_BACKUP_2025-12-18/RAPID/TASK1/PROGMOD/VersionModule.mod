@@ -9,7 +9,7 @@ MODULE VersionModule
 ! ========================================
 ! Task Versions
 ! ========================================
-CONST string TASK1_VERSION := "v1.9.63";
+CONST string TASK1_VERSION := "v1.9.64";
 CONST string TASK2_VERSION := "v1.9.46";
 CONST string TASK_BG_VERSION := "v2.0.1";
 CONST string TASK_HEAD_VERSION := "v1.9.41";
@@ -24,7 +24,7 @@ CONST string VERSION_MODULE_VERSION := "v1.0.0";
 ! ========================================
 ! Build Information
 ! ========================================
-CONST string BUILD_DATE := "2026-02-25";  ! v1.9.63 code date
+CONST string BUILD_DATE := "2026-02-26";  ! v1.9.64 code date
 CONST string BUILD_TIME := "00:00:00";
 CONST string PROJECT_NAME := "S25016 SpGantry Dual Robot System";
 
@@ -46,18 +46,36 @@ CONST string WELD_SEQUENCE_VERSION := "v1.9.40";  ! PlanA-PlanB variable integra
 ! ========================================
 ! Version History (Latest 10)
 ! ========================================
-! v1.9.63 (2026-02-25) - FIX: Scenario E (200°) R-axis angle normalization
-!   - ROOT CAUSE: R-axis limit ±90° simple clamping failed for angles >90°
-!     E(200°): target_r = 0 - (-160.1) = +160.1° -> clamped to +90° -> 70° error
-!     Clamped angle diverges from intended weld direction -> motion failure
-!   - FIX: ±180° normalize + 180° fold for angles outside ±90° limits
-!     Step 1: WHILE loop normalizes to ±180° range
-!     Step 2: If outside ±90°, flip 180° (equivalent weld direction for fillet welds)
-!     E(200°): +160.1° -> fold: 160.1-180 = -19.9° -> within ±90° -> PASS
-!   - VERIFY: Scenarios A~C unchanged, D improved
-!     A(0°)=0°, B(45°)=-45°, C(90°)=-90° (all within ±90°, no fold)
-!     D(135°)=+45° (was -90° clamped, now correct 180° fold)
-!   - SCOPE: MoveGantryToWeldPosition + LogPositionDetails (2 locations)
+! v1.9.64 (2026-02-26) - FIX: Gantry positioning TCP offset - Y-axis inversion bug
+!   - ROOT CAUSE: WobjGantry = Physical coords with identity rotation (UpdateGantryWobj)
+!     Physical Y is INVERTED from Floor Y (FloorToPhysical: phys.y = HOME_Y-(floor.y-5300))
+!     MoveGantryToWeldPosition used R-rotation model assuming WobjGantry rotates with R
+!     But WobjGantry has NO rotation -> offset is fixed [X_wg, -Y_wg] in Floor
+!   - EFFECT: ALL scenarios had ~200mm Y error between expected and actual TCP Floor pos
+!     S1-S3: error within robot reach -> happened to PASS
+!     S4 (D,135deg): error 254mm -> 50050 at TraceWeldLine Approach
+!   - FIX: offset_floor = [MODE2_TCP_OFFSET_R1_X, -MODE2_TCP_OFFSET_R1_Y] (no R rotation)
+!     Removes incorrect Cos/Sin rotation, negates Y for Physical-to-Floor inversion
+!   - RESULT: TCP at calcPosStart (error reduced to ~50mm BreadthOffset, within reach)
+!   - SCOPE: MoveGantryToWeldPosition offset calculation (2 lines)
+!   - Approach distance restored 25mm -> 50mm (no longer needed with correct positioning)
+!
+! v1.9.63 (2026-02-25) - FIX: Scenario E (200deg) R-axis - PlanC benchmarking
+!   - ROOT CAUSE: R-axis limit +/-90deg, angles >90deg caused clamping error or reach failure
+!   - FIX (v1.9.63c): DefineWeldLine swap start/end (PlanC NormalizeAngle method)
+!     When |angle| >= 90deg: swap calcPosStart <-> calcPosEnd, recalculate ATan2
+!     Swapped angle is always within +/-90deg -> no fold/clamp needed
+!     MoveGantryToWeldPosition uses swapped start + correct angle -> robot reachable
+!   - PlanC REF: Head_MoveControl.mod rDefineWeldPosG()
+!     NormalizeAngle(nAngleRzStore, 180) -> NormalizeAngle(result, 90)
+!     PlanB equivalent: swap start/end -> ATan2 recalc (same math, simpler code)
+!   - v1.9.63/63b HISTORY:
+!     v1.9.63: fold-all broke D(135deg) R=+45deg 50050 (gantry at original start)
+!     v1.9.63b: 2-tier (>135deg fold, else clamp) - workaround, not root fix
+!     v1.9.63c: swap start/end - gantry at swapped start, angle within +/-90deg
+!   - FIX: boundary >=90 -> >90 (match PlanC strict inequality, 90deg no swap)
+!   - VERIFY: A(0)=0 B(45)=-45 C(90)=-90(no swap) D(135)->-45 E(200)->20
+!   - SCOPE: DefineWeldLine (swap) + MoveGantryToWeldPosition + LogPositionDetails
 !   - REF: S25-11 C-team closure condition - Scenario E re-verification
 !
 ! v1.9.62 (2026-02-25) - FIX: Init 50050 when gantry at non-home + robot at jgHomeJoint

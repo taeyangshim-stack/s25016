@@ -3655,6 +3655,7 @@ PROC DefineWeldLine()
 	VAR num dx;
 	VAR num dy;
 	VAR num dz;
+	VAR pos tempPos;
 
 	TPWrite "[WELD] Defining weld line...";
 
@@ -3670,12 +3671,23 @@ PROC DefineWeldLine()
 	! Floor coordinate: X+ = gantry forward, Y+ = left
 	nAngleRzStore := ATan2(dy, dx);
 
-	! Determine robot swap (PlanA logic)
-	! If R-axis angle is outside -90 to +90 range, swap robots
-	IF (nAngleRzStore < -90 OR nAngleRzStore >= 90) THEN
+	! Determine bRobSwap: TRUE when angle at or beyond +/-90deg (buffer/orient select)
+	IF (nAngleRzStore <= -90 OR nAngleRzStore >= 90) THEN
 		bRobSwap := TRUE;
 		shared_bRobSwap := TRUE;
-		TPWrite "[WELD] bRobSwap = TRUE (R=" + NumToStr(nAngleRzStore,1) + " deg)";
+		TPWrite "[WELD] bRobSwap = TRUE (raw R=" + NumToStr(nAngleRzStore,1) + " deg)";
+
+		! Swap start/end only when strictly outside +/-90deg (PlanC NormalizeAngle strict >)
+		! At exactly +/-90deg: bRobSwap=TRUE for buffer, but no swap needed (within R limit)
+		IF (nAngleRzStore < -90 OR nAngleRzStore > 90) THEN
+			tempPos := calcPosStart;
+			calcPosStart := calcPosEnd;
+			calcPosEnd := tempPos;
+			dx := calcPosEnd.x - calcPosStart.x;
+			dy := calcPosEnd.y - calcPosStart.y;
+			nAngleRzStore := ATan2(dy, dx);
+			TPWrite "[WELD] Swapped start/end -> R=" + NumToStr(nAngleRzStore,1) + " deg";
+		ENDIF
 	ELSE
 		bRobSwap := FALSE;
 		shared_bRobSwap := FALSE;
@@ -3783,28 +3795,25 @@ PROC MoveGantryToWeldPosition()
 		Stop;
 	ENDIF
 
-	! Calculate R-axis first (needed for X/Y offset rotation)
+	! Calculate R-axis (nAngleRzStore already +/-90deg after DefineWeldLine swap)
 	target_r := HOME_GANTRY_R - nAngleRzStore;
 
-	! v1.9.63: Normalize angle to ±180° then fold into ±90° R-axis limits
-	! Scenario E (200°): target_r=+160.1 -> still ±180 -> fold: 160.1-180=-19.9 -> OK
-	WHILE target_r > 180 DO target_r := target_r - 360; ENDWHILE
-	WHILE target_r < -180 DO target_r := target_r + 360; ENDWHILE
-	! If outside R-axis limits, flip 180° (equivalent weld direction for fillet welds)
+	! v1.9.63c: Safety clamp only (swap in DefineWeldLine guarantees +/-90deg)
 	IF target_r > nLimitR_Positive THEN
-		target_r := target_r - 180;
+		target_r := nLimitR_Positive;
 	ELSEIF target_r < nLimitR_Negative THEN
-		target_r := target_r + 180;
+		target_r := nLimitR_Negative;
 	ENDIF
-	TPWrite "[WELD] R-axis normalized: " + NumToStr(target_r,1) + " deg (raw=" + NumToStr(HOME_GANTRY_R - nAngleRzStore,1) + ")";
+	TPWrite "[WELD] R-axis: " + NumToStr(target_r,1) + " deg";
 
-	! Calculate TCP X/Y offsets rotated by gantry R-axis angle
-	! TCP offset is relative to robot base which rotates with gantry R-axis
-	! offset_floor = rotation_matrix(target_r) * tcp_offset
-	! NOTE: Use target_r (actual gantry rotation), NOT nAngleRzStore (weld line angle)
-	! NOTE: RAPID Cos/Sin functions use DEGREES directly (not radians!)
-	offset_floor_x := MODE2_TCP_OFFSET_R1_X * Cos(target_r) - MODE2_TCP_OFFSET_R1_Y * Sin(target_r);
-	offset_floor_y := MODE2_TCP_OFFSET_R1_X * Sin(target_r) + MODE2_TCP_OFFSET_R1_Y * Cos(target_r);
+	! v1.9.64: Fixed TCP offset Floor calculation
+	! WobjGantry = Physical coords with identity rotation (UpdateGantryWobj L1460-1466)
+	! R-axis rotates robot base, NOT WobjGantry frame
+	! Robot TCP in WobjGantry [X_wg, Y_wg] maps to Physical as [X_wg, Y_wg] (identity)
+	! Physical-to-Floor: X same direction, Y INVERTED (FloorToPhysical L3720)
+	! Therefore: offset_floor = [X_wg, -Y_wg] (no R rotation, Y negated)
+	offset_floor_x := MODE2_TCP_OFFSET_R1_X;
+	offset_floor_y := -MODE2_TCP_OFFSET_R1_Y;
 
 	! Calculate gantry Floor position (gantry = weld_center - tcp_offset)
 	! Gantry must be offset so that TCP reaches the weld center
@@ -3994,13 +4003,11 @@ PROC TestEdgeToWeldCalcOnly()
 	Write logfile, "calcLengthWeldLine: " + NumToStr(calcLengthWeldLine,1) + " mm";
 	Write logfile, "";
 
-	! Calculate R-axis first (needed for X/Y offset rotation)
+	! Calculate R-axis (nAngleRzStore already +/-90deg after DefineWeldLine swap)
 	target_r := HOME_GANTRY_R - nAngleRzStore;
-	! v1.9.63: Normalize angle to ±180° then fold into ±90° R-axis limits
-	WHILE target_r > 180 DO target_r := target_r - 360; ENDWHILE
-	WHILE target_r < -180 DO target_r := target_r + 360; ENDWHILE
-	IF target_r > nLimitR_Positive THEN target_r := target_r - 180; ENDIF
-	IF target_r < nLimitR_Negative THEN target_r := target_r + 180; ENDIF
+	! v1.9.63c: Safety clamp only
+	IF target_r > nLimitR_Positive THEN target_r := nLimitR_Positive; ENDIF
+	IF target_r < nLimitR_Negative THEN target_r := nLimitR_Negative; ENDIF
 
 	! Calculate X/Y TCP offsets rotated by gantry R-axis angle
 	Write logfile, "--- X/Y TCP Offset Calculation ---";
@@ -4597,49 +4604,143 @@ ENDPROC
 PROC MoveRobotToWeldPosition()
 	VAR robtarget weld_target;
 	VAR robtarget current_tcp;
+	VAR robtarget tcp_floor;
+	VAR jointtarget cur_jt;
+	VAR jointtarget safe_jt;
+	VAR iodev rob_log;
 
 	TPWrite "========================================";
-	TPWrite "[ROB] Move Robot to Weld Position v2.4.2";
+	TPWrite "[ROB] Move Robot to Weld Position v2.5.0";
 	TPWrite "========================================";
+
+	! Open log file (overwrite per call - latest move always available)
+	Open "HOME:/robot_weld_move.txt", rob_log \Write;
+	Write rob_log, "MoveRobotToWeldPosition v2.5.0 - " + CDate() + " " + CTime();
+	Write rob_log, "R-axis=" + NumToStr(nAngleRzStore,1) + " bRobSwap=" + ValToStr(bRobSwap);
+	Write rob_log, "";
+
+	! Debug: log current joints before any motion
+	cur_jt := CJointT();
+	Write rob_log, "=== Pre-move (carry-over from previous) ===";
+	Write rob_log, "Joints: J1=" + NumToStr(cur_jt.robax.rax_1,1)
+		+ " J2=" + NumToStr(cur_jt.robax.rax_2,1)
+		+ " J3=" + NumToStr(cur_jt.robax.rax_3,1)
+		+ " J4=" + NumToStr(cur_jt.robax.rax_4,1)
+		+ " J5=" + NumToStr(cur_jt.robax.rax_5,1)
+		+ " J6=" + NumToStr(cur_jt.robax.rax_6,1);
+	Write rob_log, "Gantry: X1=" + NumToStr(cur_jt.extax.eax_a,1)
+		+ " Y=" + NumToStr(cur_jt.extax.eax_b,1)
+		+ " Z=" + NumToStr(cur_jt.extax.eax_c,1)
+		+ " R=" + NumToStr(cur_jt.extax.eax_d,1);
+	tcp_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
+	Write rob_log, "TCP(Floor): [" + NumToStr(tcp_floor.trans.x,1)
+		+ "," + NumToStr(tcp_floor.trans.y,1)
+		+ "," + NumToStr(tcp_floor.trans.z,1) + "]";
+	TPWrite "[ROB] Pre-move J1=" + NumToStr(cur_jt.robax.rax_1,1)
+		+ " J4=" + NumToStr(cur_jt.robax.rax_4,1)
+		+ " J5=" + NumToStr(cur_jt.robax.rax_5,1);
+
+	! Step 0: Move robot to safe init joints first (PlanA/PlanC approach)
+	! Gantry stays at current position, robot resets to known-good config
+	Write rob_log, "";
+	Write rob_log, "=== Step 0: Safe init joints ===";
+	safe_jt := cur_jt;
+	safe_jt.robax.rax_1 := 0;
+	safe_jt.robax.rax_2 := -49;
+	safe_jt.robax.rax_3 := 6;
+	safe_jt.robax.rax_4 := 0;
+	safe_jt.robax.rax_5 := 8;
+	safe_jt.robax.rax_6 := 0;
+	MoveAbsJ safe_jt, v200, fine, tWeld1;
+
+	cur_jt := CJointT();
+	Write rob_log, "After safe: J1=" + NumToStr(cur_jt.robax.rax_1,1)
+		+ " J2=" + NumToStr(cur_jt.robax.rax_2,1)
+		+ " J3=" + NumToStr(cur_jt.robax.rax_3,1)
+		+ " J4=" + NumToStr(cur_jt.robax.rax_4,1)
+		+ " J5=" + NumToStr(cur_jt.robax.rax_5,1)
+		+ " J6=" + NumToStr(cur_jt.robax.rax_6,1);
+	tcp_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
+	Write rob_log, "TCP(Floor): [" + NumToStr(tcp_floor.trans.x,1)
+		+ "," + NumToStr(tcp_floor.trans.y,1)
+		+ "," + NumToStr(tcp_floor.trans.z,1) + "]";
+	TPWrite "[ROB] Safe init joints reached";
 
 	! Ensure WobjGantry is updated
 	UpdateGantryWobj;
 
-	! Get current TCP position - use this as base for weld_target
+	! Get current TCP position from safe config
+	Write rob_log, "";
+	Write rob_log, "=== Step 1: Move to weld offset ===";
 	current_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
-	TPWrite "[ROB] Current TCP tWeld1 (WobjGantry): ["
+	Write rob_log, "Current TCP(WobjGantry): ["
+		+ NumToStr(current_tcp.trans.x,1) + ", "
+		+ NumToStr(current_tcp.trans.y,1) + ", "
+		+ NumToStr(current_tcp.trans.z,1) + "]";
+	Write rob_log, "Current orient: ["
+		+ NumToStr(current_tcp.rot.q1,5) + ","
+		+ NumToStr(current_tcp.rot.q2,5) + ","
+		+ NumToStr(current_tcp.rot.q3,5) + ","
+		+ NumToStr(current_tcp.rot.q4,5) + "]";
+	TPWrite "[ROB] Current TCP (WobjGantry): ["
 		+ NumToStr(current_tcp.trans.x,1) + ", "
 		+ NumToStr(current_tcp.trans.y,1) + ", "
 		+ NumToStr(current_tcp.trans.z,1) + "]";
 
-	! Start with current position (preserves robconf, extax, AND orientation)
+	! Start with current position (from safe config - predictable robconf/extax/orient)
 	weld_target := current_tcp;
 
 	! Define weld target in WobjGantry coordinates
-	! X=0 (along weld line)
-	! Y=TCP_OFFSET (offset from gantry center)
-	! Z=keep current (safer, avoids joint limit issues)
 	weld_target.trans.x := 0;
 	weld_target.trans.y := MODE2_TCP_OFFSET_R1_Y;
-	! weld_target.trans.z := WELD_R1_TCP_Z_OFFSET;  ! Commented: may cause joint limit error
-	! Keep current Z for safety (orientation already preserved from current_tcp)
 
+	Write rob_log, "Target TCP(WobjGantry): ["
+		+ NumToStr(weld_target.trans.x,1) + ", "
+		+ NumToStr(weld_target.trans.y,1) + ", "
+		+ NumToStr(weld_target.trans.z,1) + "]";
+	Write rob_log, "MODE2_TCP_OFFSET_R1_Y=" + NumToStr(MODE2_TCP_OFFSET_R1_Y,1);
 	TPWrite "[ROB] Target TCP (WobjGantry): ["
 		+ NumToStr(weld_target.trans.x,1) + ", "
 		+ NumToStr(weld_target.trans.y,1) + ", "
 		+ NumToStr(weld_target.trans.z,1) + "]";
-	TPWrite "[ROB] Note: Keeping current Z and orientation for safety";
 
-	! Move robot to weld position (MoveJ for more forgiving joint interpolation)
+	! Move robot to weld position (MoveJ from safe config - small, predictable motion)
 	TPWrite "[ROB] Moving robot...";
 	MoveJ weld_target, v100, fine, tWeld1 \WObj:=WobjGantry;
 
-	! Verify position
+	! Debug: log final state
+	Write rob_log, "";
+	Write rob_log, "=== Post-move (final weld position) ===";
+	cur_jt := CJointT();
+	Write rob_log, "Joints: J1=" + NumToStr(cur_jt.robax.rax_1,1)
+		+ " J2=" + NumToStr(cur_jt.robax.rax_2,1)
+		+ " J3=" + NumToStr(cur_jt.robax.rax_3,1)
+		+ " J4=" + NumToStr(cur_jt.robax.rax_4,1)
+		+ " J5=" + NumToStr(cur_jt.robax.rax_5,1)
+		+ " J6=" + NumToStr(cur_jt.robax.rax_6,1);
 	current_tcp := CRobT(\Tool:=tWeld1\WObj:=WobjGantry);
+	Write rob_log, "TCP(WobjGantry): ["
+		+ NumToStr(current_tcp.trans.x,1) + ", "
+		+ NumToStr(current_tcp.trans.y,1) + ", "
+		+ NumToStr(current_tcp.trans.z,1) + "]";
+	Write rob_log, "Orient(WobjGantry): ["
+		+ NumToStr(current_tcp.rot.q1,5) + ","
+		+ NumToStr(current_tcp.rot.q2,5) + ","
+		+ NumToStr(current_tcp.rot.q3,5) + ","
+		+ NumToStr(current_tcp.rot.q4,5) + "]";
+	tcp_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
+	Write rob_log, "TCP(Floor): [" + NumToStr(tcp_floor.trans.x,1)
+		+ "," + NumToStr(tcp_floor.trans.y,1)
+		+ "," + NumToStr(tcp_floor.trans.z,1) + "]";
+	TPWrite "[ROB] Post-move J1=" + NumToStr(cur_jt.robax.rax_1,1)
+		+ " J4=" + NumToStr(cur_jt.robax.rax_4,1)
+		+ " J5=" + NumToStr(cur_jt.robax.rax_5,1);
 	TPWrite "[ROB] Final TCP (WobjGantry): ["
 		+ NumToStr(current_tcp.trans.x,1) + ", "
 		+ NumToStr(current_tcp.trans.y,1) + ", "
 		+ NumToStr(current_tcp.trans.z,1) + "]";
+
+	Close rob_log;
 
 	TPWrite "========================================";
 	TPWrite "[ROB] Robot move complete";
@@ -4696,14 +4797,17 @@ PROC GenerateWeldPath(pos adjStart, pos adjEnd, robtarget refTarget, num nPass)
 		pWeldPosR1{i}.trans.y := adjStart.y + ratio * (adjEnd.y - adjStart.y);
 		pWeldPosR1{i}.trans.z := adjStart.z + ratio * (adjEnd.z - adjStart.z);
 
-		! Set torch orientation based on bRobSwap (PlanA convention)
+		! v1.9.64: Use refTarget orientation (robot's current WobjFloor orient)
+		! Fixed Floor orientations [0.5,0.5,-0.5,0.5] / [0.5,-0.5,-0.5,-0.5]
+		! caused 50050 at non-zero gantry R angles (robot base rotated by R,
+		! fixed Floor orient required impossible joint configs to achieve)
+		! refTarget.rot is already compatible with current R angle
+		! Apply torch angle adjustments (TA/WA) via RelTool on current orient
 		IF bRobSwap = FALSE THEN
-			pWeldPosR1{i}.rot := [0.5, 0.5, -0.5, 0.5];
 			pWeldPosR1{i} := RelTool(pWeldPosR1{i}, 0, 0, 0
 				\Rx:=-1*curMacro.TravelAngle
 				\Ry:=-1*curMacro.WorkingAngle);
 		ELSE
-			pWeldPosR1{i}.rot := [0.5, -0.5, -0.5, -0.5];
 			pWeldPosR1{i} := RelTool(pWeldPosR1{i}, 0, 0, 0
 				\Rx:=curMacro.TravelAngle
 				\Ry:=-1*curMacro.WorkingAngle);
@@ -5325,6 +5429,17 @@ PROC TestSwapScenarios()
 		! Return gantry to HOME between scenarios
 		TPWrite "[SWAP] Returning gantry to HOME...";
 		ReturnGantryToHome;
+
+		! Return robot to init safe joints (prevent carry-over from extreme configs)
+		dbg_jt := CJointT();
+		dbg_jt.robax.rax_1 := 0;
+		dbg_jt.robax.rax_2 := -49;
+		dbg_jt.robax.rax_3 := 6;
+		dbg_jt.robax.rax_4 := 0;
+		dbg_jt.robax.rax_5 := 8;
+		dbg_jt.robax.rax_6 := 0;
+		MoveAbsJ dbg_jt, v200, fine, tWeld1;
+		TPWrite "[SWAP] Robot returned to init position";
 
 		IF i < nScenarios THEN
 			WaitTime 2.0;
