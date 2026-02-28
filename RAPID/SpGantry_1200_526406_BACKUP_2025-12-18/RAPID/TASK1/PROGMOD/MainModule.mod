@@ -6291,12 +6291,13 @@ PROC TestPlanAB_Stage1()
 		! Step 2: BridgeToGantry -> store WeldsG_* PERS (monitoring/debug)
 		BridgeToGantry WELD_SPEED;
 
-		! Step 3: WeldsG_* -> jointtarget -> MoveExtJ
+		! Step 3: Build jointtarget using CJointT() (keeps robot joints at current pos)
+		! Same pattern as MoveGantryToWeldPosition (proven working)
 		! R-axis: HOME_GANTRY_R(0) - nAngleRzStore
 		target_r := HOME_GANTRY_R - nAngleRzStore;
 
-		! Start jointtarget (robax=9E+09: robot joints ignored by MoveExtJ)
-		jt_start := [[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09],[0,0,0,0,9E+09,0]];
+		! Start jointtarget: base = current joint pos, overwrite extax only
+		jt_start := CJointT();
 		phys := FloorToPhysical(calcPosStart);
 		jt_start.extax.eax_a := phys.x;
 		jt_start.extax.eax_b := phys.y;
@@ -6304,7 +6305,7 @@ PROC TestPlanAB_Stage1()
 		jt_start.extax.eax_d := target_r;
 		jt_start.extax.eax_f := phys.x;
 
-		! End jointtarget (same R, only X/Y/Z changed)
+		! End jointtarget (same robot joints, only X/Y/Z changed)
 		jt_end := jt_start;
 		phys := FloorToPhysical(calcPosEnd);
 		jt_end.extax.eax_a := phys.x;
@@ -6318,14 +6319,13 @@ PROC TestPlanAB_Stage1()
 		Write res_file, "Gantry End(Phys):   X=" + NumToStr(jt_end.extax.eax_a,1)
 		        + " Y=" + NumToStr(jt_end.extax.eax_b,1);
 
-		! Step 4: Move gantry to start
+		! Step 4: Move gantry to start (MoveAbsJ: same as MoveGantryToWeldPosition)
 		TPWrite "[HYBRID] Moving gantry to start...";
-		WaitRob \ZeroSpeed;
-		MoveExtJ jt_start, v500, fine;
+		MoveAbsJ jt_start, v500, fine, tool0;
 
 		! Step 5: Move gantry to end (weld speed)
 		TPWrite "[HYBRID] Weld driving...";
-		MoveExtJ jt_end, [WELD_SPEED,200,WELD_SPEED,200], fine;
+		MoveAbsJ jt_end, [WELD_SPEED,200,WELD_SPEED,200], fine, tool0;
 		WaitRob \InPos;
 
 		Write res_file, "Result=COMPLETE";
