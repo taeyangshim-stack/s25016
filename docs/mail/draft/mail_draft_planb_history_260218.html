@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:'맑은 고딕','Malgun Gothic',sans-serif; font-size:10pt; color:#333; line-height:1.7; max-width:800px; margin:0 auto;">
+
+<div style="border-bottom:3px solid #1a5276; padding-bottom:10px; margin-bottom:20px;">
+  <h2 style="color:#1a5276; margin:0;">[S25016] PlanB RAPID 개발 히스토리 및 PlanC Phase 1 진행보고 (2026.02.18)</h2>
+</div>
+
+<table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:9.5pt;">
+  <tr><td style="width:60px; padding:4px 8px; background:#f0f4f8; font-weight:bold;">수신</td><td style="padding:4px 8px;">삼성중공업 담당자님</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">참조</td><td style="padding:4px 8px;">GR자동화, 디파인시스템</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">발신</td><td style="padding:4px 8px;">심태양 / 에스피시스템스</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">일자</td><td style="padding:4px 8px;">2026년 2월 18일</td></tr>
+</table>
+
+<p>안녕하십니까, 에스피시스템스 심태양입니다.</p>
+<p>S25016 B라인 자동용접 로봇 시스템의 <b>PlanB RAPID 개발 전체 히스토리</b>와 금일 진행한 <b>PlanC Phase 1 (용접 드라이런 40-Segment 경로)</b> 작업 내용을 종합 정리하여 보고드립니다.</p>
+
+<!-- ========== 1. 프로젝트 구성 개요 ========== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">1. 프로젝트 Plan 구성 개요</h3>
+
+<table style="width:100%; border-collapse:collapse; margin:10px 0; font-size:9.5pt;">
+  <tr style="background:#1a5276; color:#fff;">
+    <th style="padding:6px 10px; text-align:left; width:80px;">구분</th>
+    <th style="padding:6px 10px; text-align:left; width:220px;">구성</th>
+    <th style="padding:6px 10px; text-align:left;">현황</th>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold;">PlanA</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">10태스크 (로봇1 + 로봇2 + 갠트리 분리)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">돌림부 품질이슈로 현업 적용 보류</td>
+  </tr>
+  <tr>
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold; color:#c0392b;">PlanC</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">현업 적용 구성 (현장 운영 중)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">돌림부 이슈 대응으로 현업 적용, 문제점 도출 및 개선 진행 중</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold; color:#2471a3;">PlanB</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">8태스크 (로봇1 + 갠트리 통합)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">로봇+갠트리 하나의 MUG로 통합, 장기적 최적 대안</td>
+  </tr>
+</table>
+
+<!-- ========== 2. 전체 개발 히스토리 ========== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">2. PlanB RAPID 개발 전체 히스토리 (Git 기준 260+ 커밋)</h3>
+
+<table style="width:100%; border-collapse:collapse; margin:10px 0; font-size:9pt;">
+  <tr style="background:#1a5276; color:#fff;">
+    <th style="padding:6px 10px; text-align:left; width:130px;">시기</th>
+    <th style="padding:6px 10px; text-align:left; width:260px;">작업 내용</th>
+    <th style="padding:6px 10px; text-align:left;">버전 / 비고</th>
+  </tr>
+
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">12월 중순 (25년)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>좌표계 기초 분석 및 검증</b><br>wobj0 정의, Floor 좌표계, Robot Base 좌표 변환</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">v1.0 ~ v1.4</td>
+  </tr>
+  <tr>
+    <td style="padding:6px 10px; border:1px solid #ddd;">12월 말 ~ 1월 초</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>갠트리 4축 제어 및 Linked Motor 동기화</b><br>X1/X2 Master-Follower 동기, HOME 이동, eax_f 동기화</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">v1.5 ~ v1.7</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">1월 중순</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>R축 회전 검증 및 동적 WObj 구현</b><br>WobjGantry 동적 생성, Robot2 Floor TCP 산출공식</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">v1.7.49 ~ v1.8.5</td>
+  </tr>
+  <tr>
+    <td style="padding:6px 10px; border:1px solid #ddd;">1월 말</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>Mode2 오프셋 검증 및 Config 모듈 분리</b><br>config.txt 파싱, PERS 변수 전환, VersionModule 신설</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">v1.8.6 ~ v1.8.77</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">2월 초</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>용접 시퀀스 개발</b><br>EdgeWeld, WeldCorr, Multi-pass, 토치각도, 아크 파라미터, Robot2 동기 용접</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">v1.9.3 ~ v1.9.38</td>
+  </tr>
+  <tr>
+    <td style="padding:6px 10px; border:1px solid #ddd;">2/8 (토)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>PlanA-PlanB 변수 통합</b><br>T_Head 통합, stReact{3} 확장, 50+ PERS 변수, RECORD 정의, 40-step welddata/weavedata 배열</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">v1.9.40</td>
+  </tr>
+  <tr style="background:#fff3cd;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">2/11 (화)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>UI 연동 오류 수정</b><br>RAPID 심볼 9개 누락 해결, VersionModule 유니코드 제거, Static.mod MU명 수정</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">메일 발송: UI 연동 오류 조치 보고서 (v3)</td>
+  </tr>
+  <tr style="background:#fff3cd;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">2/12 (수)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>B라인 PlanB UI 연동 완료</b><br>TCP 좌표 수정 (R2 Z좌표 1360mm 오차 해결), CalcCurrentTcp 갠트리 좌표 변환 복원</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">메일 발송: UI 연동 완료 보고서</td>
+  </tr>
+  <tr style="background:#fff3cd;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">2/12 (수)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>PlanA→PlanB T_Gantry 미이행 분석</b><br>T_Head에 PlanA 참조 15곳 잔존 → 전수 수정 계획</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">메일 발송: T_Gantry 수정 계획</td>
+  </tr>
+  <tr style="background:#fff3cd;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">2/13 (목)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>T_Gantry 참조 전수 수정 + MoveJgJ 핸들러 + TASK2 모션 핸들러</b><br>checkpos 안전체크, MoveToZHome 데드락 해결, Robot1+Robot2 동시 홈이동 성공</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">v1.9.41 ~ v1.9.42<br>메일 발송: PlanB 진행경과 종합보고</td>
+  </tr>
+  <tr style="background:#fff3cd;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">2/13 (목)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>RAPID 백업 비교분석 (12/23 vs 02/11)</b><br>약 7주간 변경사항 전수 분석</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">메일 발송: 백업 비교분석 자료</td>
+  </tr>
+  <tr style="background:#d4efdf;">
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold;">2/18 (화) 금일</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;"><b>PlanC Phase 1 - 40-Segment 드라이런 모션 경로</b><br>TestWeldSequence→TestFullWeldSequence 연결, GenerateWeldPath() 신규, TraceWeldLine v2.0.0 다중 세그먼트</td>
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold; color:#1a7a2e;">MainModule v2.2.0<br>ConfigModule v1.9.41</td>
+  </tr>
+</table>
+
+<!-- ========== 3. 메일 발송 이력 ========== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">3. 관련 메일 발송 이력</h3>
+
+<table style="width:100%; border-collapse:collapse; margin:10px 0; font-size:9pt;">
+  <tr style="background:#1a5276; color:#fff;">
+    <th style="padding:6px 10px; text-align:left; width:80px;">일자</th>
+    <th style="padding:6px 10px; text-align:left;">제목</th>
+    <th style="padding:6px 10px; text-align:left; width:100px;">수신</th>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:5px 10px; border:1px solid #ddd;">02/11</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">PlanB 상위제어 UI 연동 오류 조치 보고서 (v3)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">초안 확인용</td>
+  </tr>
+  <tr>
+    <td style="padding:5px 10px; border:1px solid #ddd;">02/12</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">B라인 PlanB UI 연동 완료 보고서</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">초안 확인용</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:5px 10px; border:1px solid #ddd;">02/12</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">PlanA→PlanB T_Gantry 미이행 분석 및 수정 계획</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">초안 확인용</td>
+  </tr>
+  <tr>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">02/13</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">PlanB RAPID 수정 진행경과 보고 (종합)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">삼성중공업 외</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:5px 10px; border:1px solid #ddd;">02/13</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">RAPID 백업 비교분석 (12/23 vs 02/11)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">초안 확인용</td>
+  </tr>
+</table>
+
+<!-- ========== 4. 해결한 주요 문제점 ========== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">4. 해결한 주요 문제점 (2/11 ~ 2/13)</h3>
+
+<table style="width:100%; border-collapse:collapse; margin:10px 0; font-size:9pt;">
+  <tr style="background:#1a5276; color:#fff;">
+    <th style="padding:6px 8px; width:30px;">#</th>
+    <th style="padding:6px 10px; text-align:left;">문제</th>
+    <th style="padding:6px 10px; text-align:left;">원인</th>
+    <th style="padding:6px 10px; text-align:left; width:60px;">상태</th>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">1</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">T_Gantry 미존재 에러 (Error 41634)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">PlanB에서 T_Gantry 제거되었으나 T_Head에 PlanA 참조 15곳 잔존</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; color:#1a7a2e; font-weight:bold; text-align:center;">해결</td>
+  </tr>
+  <tr>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">2</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">갠트리 이동 미동작 (0.7초 즉시 완료)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">TASK1에 MoveJgJ 핸들러 없음</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; color:#1a7a2e; font-weight:bold; text-align:center;">해결</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">3</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">MoveToZHome 데드락 (무한 대기)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">"checkpos" 비표준 응답 핸들러 미구현</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; color:#1a7a2e; font-weight:bold; text-align:center;">해결</td>
+  </tr>
+  <tr>
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">4</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">Robot2 홈이동 미동작</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">TASK2에 MoveJgJ/MovePgJ/MovePgL 핸들러 없음</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; color:#1a7a2e; font-weight:bold; text-align:center;">해결</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:5px 8px; border:1px solid #ddd; text-align:center;">5</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">R2 TCP Z좌표 1360mm 오차</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">CalcCurrentTcp 갠트리 좌표 변환 누락</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; color:#1a7a2e; font-weight:bold; text-align:center;">해결</td>
+  </tr>
+</table>
+
+<!-- ========== 5. 금일 진행: PlanC Phase 1 ========== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">5. 금일 진행: PlanC Phase 1 — 40-Segment 드라이런 모션 경로 (2/18)</h3>
+
+<p>PlanB의 TraceWeldLine을 참조 시스템(PlanC/PlanA)의 실용접 시퀀스로 점진적 고도화하는 첫 단계를 진행하였습니다.</p>
+
+<table style="width:100%; border-collapse:collapse; margin:10px 0; font-size:9pt;">
+  <tr style="background:#1a5276; color:#fff;">
+    <th style="padding:6px 10px; text-align:left; width:200px;">변경 항목</th>
+    <th style="padding:6px 10px; text-align:left;">내용</th>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold;">TestWeldSequence() 교체</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">기존 stub("Not implemented") → <code>TestFullWeldSequence</code> 호출로 교체<br>"Weld"/"WeldMotion" 커맨드가 실제 Edge 기반 용접 시퀀스 실행</td>
+  </tr>
+  <tr>
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold;">GenerateWeldPath() 신규</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">calcPosStart→calcPosEnd를 <code>nMotionStepCount{1}</code>개 세그먼트로 선형 보간<br>pWeldPosR1{1..N} 경로 배열 동적 생성, 토치 오리엔테이션 자동 적용</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold;">TraceWeldLine() v2.0.0</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">단일 MoveL(start→end) → <b>다중 세그먼트 MoveL 루프</b><br>Approach → MoveL(seg1) → MoveL(seg2) → ... → MoveL(seg6) → Retract<br>각 세그먼트별 로그 기록 (trace_weld_line.txt)</td>
+  </tr>
+  <tr>
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold;">경로 배열 추가</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">pWeldPosR1{40}, pWeldPosR2{40}: Robot1/2 용접 경로점 (최대 40개)<br>vWeldSpeed{40}: 세그먼트별 용접 속도</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold;">ConfigModule 업데이트</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">nMotionStepCount{2}: [4,4] → [6,6] (기본 6세그먼트)<br>nMotionTotalStep{2}: [2,2] → [6,6]</td>
+  </tr>
+</table>
+
+<div style="background:#eaf2f8; border:1px solid #aed6f1; border-radius:4px; padding:12px; margin:15px 0; font-size:9.5pt;">
+  <b>동작 흐름 (변경 후):</b><br>
+  <code style="font-size:9pt;">
+  CMD_WELD (200) → TestWeldSequence → TestFullWeldSequence<br>
+  &nbsp;&nbsp;→ CalcCenterFromEdges + DefineWeldLine<br>
+  &nbsp;&nbsp;→ MoveGantryToWeldPosition<br>
+  &nbsp;&nbsp;→ MoveRobotToWeldPosition + Robot2 Sync<br>
+  &nbsp;&nbsp;→ TraceWeldLine v2.0.0<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;→ GenerateWeldPath (6-segment 선형보간)<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;→ Approach(-100mm) → MoveL×6 → Retract(-50mm)<br>
+  &nbsp;&nbsp;→ ReturnGantryToHome
+  </code>
+</div>
+
+<!-- ========== 6. 향후 Phase 계획 ========== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">6. 향후 Phase 계획</h3>
+
+<table style="width:100%; border-collapse:collapse; margin:10px 0; font-size:9pt;">
+  <tr style="background:#1a5276; color:#fff;">
+    <th style="padding:6px 10px; text-align:left; width:130px;">Phase</th>
+    <th style="padding:6px 10px; text-align:left;">내용</th>
+    <th style="padding:6px 10px; text-align:left; width:80px;">상태</th>
+  </tr>
+  <tr style="background:#d4efdf;">
+    <td style="padding:6px 10px; border:1px solid #ddd; font-weight:bold;">Phase 1 (금일)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">40-Segment 드라이런 모션 경로 구축 (MoveL)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd; color:#1a7a2e; font-weight:bold; text-align:center;">완료</td>
+  </tr>
+  <tr>
+    <td style="padding:6px 10px; border:1px solid #ddd;">Phase 2</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">ArcLStart/ArcL/ArcLEnd 실용접 시퀀스 구현 (WELD_ARC_ENABLED=TRUE)</td>
+    <td style="padding:6px 10px; border:1px solid #ddd; text-align:center;">예정</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">Phase 3</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">welddata/weavedata/trackdata 세그먼트별 적용</td>
+    <td style="padding:6px 10px; border:1px solid #ddd; text-align:center;">예정</td>
+  </tr>
+  <tr>
+    <td style="padding:6px 10px; border:1px solid #ddd;">Phase 4</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">터치센싱 보정 (CorrSearchStartEnd) 연동</td>
+    <td style="padding:6px 10px; border:1px solid #ddd; text-align:center;">예정</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:6px 10px; border:1px solid #ddd;">Phase 5</td>
+    <td style="padding:6px 10px; border:1px solid #ddd;">어곡 갠트리 실기 검증 및 용접 파라미터 튜닝</td>
+    <td style="padding:6px 10px; border:1px solid #ddd; text-align:center;">예정</td>
+  </tr>
+</table>
+
+<!-- ========== 7. 협의 필요 사항 ========== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">7. 협의 필요 사항</h3>
+<ol style="font-size:9.5pt;">
+  <li>이마룬 사원 공유 일정표(260213) 기준 <b>W3(2/23~27) 복구일 이후 순차 진행</b> — 복구 상황에 따라 일정 변동 가능</li>
+  <li>RAPID 관련 개발건(자동운전진단, 수직용접 등)의 <b>완료 일정 및 테스트 일정 협의</b> 필요</li>
+  <li>어곡 갠트리 활용 <b>실기 검증 일정 협의</b> 필요 (아크 발생 테스트 완료 상태)</li>
+</ol>
+
+<hr style="border:none; border-top:1px solid #ddd; margin:25px 0;">
+
+<p style="font-size:9.5pt;">
+3개월간 260건 이상의 커밋을 통해 좌표계 기초부터 UI 연동, 용접 시퀀스까지 체계적으로 구축해 왔으며,
+금일 PlanC Phase 1을 통해 참조 시스템의 40-segment 용접 경로 구조를 PlanB에 이식하였습니다.<br>
+연휴 이후 RobotStudio 시뮬레이션과 어곡 갠트리를 병행하여 Phase 2~5를 단계적으로 진행하겠습니다.
+</p>
+
+<p style="font-size:9.5pt;">문의사항이 있으시면 말씀 부탁드립니다.<br>감사합니다.</p>
+
+<div style="margin-top:20px; padding-top:10px; border-top:1px solid #ccc; font-size:8.5pt; color:#888;">
+  심태양 / 에스피시스템스 개발팀<br>
+  taeyang@spsystems.kr
+</div>
+
+</body>
+</html>

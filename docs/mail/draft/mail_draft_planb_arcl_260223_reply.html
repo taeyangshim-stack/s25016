@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:'맑은 고딕','Malgun Gothic',sans-serif; font-size:10pt; color:#333; line-height:1.7; max-width:800px; margin:0 auto;">
+
+<div style="border-bottom:3px solid #1a5276; padding-bottom:10px; margin-bottom:20px;">
+  <h2 style="color:#1a5276; margin:0;">[S25016] PlanB v1.9.53 — 기술 검토 종합 정리 (8건 + 스왑 검토)</h2>
+  <p style="margin:5px 0 0 0; font-size:9pt; color:#666;">v1.9.52 → v1.9.53: BuildArcParams 필드 매핑 버그 2건 수정 포함</p>
+</div>
+
+<table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:9.5pt;">
+  <tr><td style="width:60px; padding:4px 8px; background:#f0f4f8; font-weight:bold;">수신</td><td style="padding:4px 8px;">C팀</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">발신</td><td style="padding:4px 8px;">심태양 / 에스피시스템스</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">일자</td><td style="padding:4px 8px;">2026년 2월 23일</td></tr>
+</table>
+
+<p>안녕하십니까, 에스피시스템스 심태양입니다.</p>
+<p>C팀 회신 확인하였습니다. 「항목번호 / OK·NG / 근거」 회신 형식에 동의합니다.</p>
+<p>기존 5건에 대해 PlanA 코드와 직접 대조하여 자체 검토를 완료하였으며,
+<b style="color:#c0392b;">매핑 버그 2건(#1, #4)을 발견하여 v1.9.53에서 즉시 수정</b>하였습니다.<br>
+추가로 코드 전수 검토에서 발견한 <b>3건(#6~#8)</b>을 포함하여 <b>총 8건</b>을 아래에 종합 정리합니다.</p>
+<p>아울러, <b style="color:#2471a3;">Robot1↔Robot2 스왑(Swap) 검증</b> 계획도 함께 공유드립니다.</p>
+
+<!-- ========== 자체 검토 결과 ========== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">A. 자체 검토 완료 5건 (PlanA 대비 코드 대조)</h3>
+
+<p style="font-size:9pt; color:#666;">기존 5건에 대해 PlanA(가동 시스템) 코드와 PlanB 코드를 직접 대조하여 검토하였습니다.</p>
+
+<!-- 버그 #1: welddata/seamdata -->
+<div style="background:#fdedec; border:2px solid #e74c3c; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#c0392b; margin:0 0 10px 0;">
+    #1. welddata / seamdata 필드 매핑 — <span style="background:#c0392b; color:#fff; padding:2px 8px; border-radius:3px; font-size:8pt;">BUG → 수정 완료</span>
+  </h4>
+  <p style="font-size:9pt; margin:0 0 8px 0;">PlanA 대비 <b>par4(WFS)와 par6(Current)이 뒤바뀌어 있었습니다.</b> v1.9.53에서 수정하였습니다.</p>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt; margin-bottom:10px;">
+    <tr style="background:#fbeee6;">
+      <th style="padding:5px 8px; text-align:left; width:100px;">구분</th>
+      <th style="padding:5px 8px; text-align:center;">par3</th>
+      <th style="padding:5px 8px; text-align:center;">par4</th>
+      <th style="padding:5px 8px; text-align:center;">par5</th>
+      <th style="padding:5px 8px; text-align:center;">par6</th>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold; color:#1a7a2e;">PlanA (기준)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">Voltage</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#d5f5e3; font-weight:bold;">WFS</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">0</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#d5f5e3; font-weight:bold;">Current</td>
+    </tr>
+    <tr style="background:#f9f9f9;">
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold; color:#c0392b;">v1.9.52 (버그)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">Voltage</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#fadbd8; font-weight:bold; color:#c0392b;">Current ✗</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">—</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#fadbd8; font-weight:bold; color:#c0392b;">WFS ✗</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold; color:#1a7a2e;">v1.9.53 (수정)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center;">Voltage</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#d5f5e3; font-weight:bold;">WFS ✓</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">—</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#d5f5e3; font-weight:bold;">Current ✓</td>
+    </tr>
+  </table>
+  <p style="font-size:8.5pt; color:#666; margin:5px 0 0 0;">
+    <b>영향 범위:</b> weld1.weld_heat, seam1.s_heat, seam1.e_heat 모두 동일 수정 적용<br>
+    <b>근거:</b> PlanA Rob1_MainModule.mod L708 — <code>[5, 0, voltage, wfs, 0, Current, 0,0,0]</code>
+  </p>
+</div>
+
+<!-- #2 ArcL WObj -->
+<div style="background:#d4efdf; border:1px solid #a9dfbf; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#1a7a2e; margin:0 0 8px 0;">
+    #2. ArcL \WObj 지원 여부 — <span style="background:#1a7a2e; color:#fff; padding:2px 8px; border-radius:3px; font-size:8pt;">확인 완료</span>
+  </h4>
+  <p style="font-size:9pt; margin:0;">
+    PlanA에서 <code>ArcLStart ... \WObj:=wobjWeldLine1\Track:=track0</code> 형태로 사용 중 확인 → <b>\WObj 지원됨.</b><br>
+    PlanB는 <code>\WObj:=WobjFloor</code> (바닥 좌표계) 사용. PlanA는 wobjWeldLine(용접선 정렬 좌표계) 사용.<br>
+    좌표계 차이이며, ArcL 기능 자체는 정상 동작합니다.
+  </p>
+</div>
+
+<!-- #3 PowerPac -->
+<div style="background:#d4efdf; border:1px solid #a9dfbf; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#1a7a2e; margin:0 0 8px 0;">
+    #3. ArcWelding PowerPac 설치 — <span style="background:#1a7a2e; color:#fff; padding:2px 8px; border-radius:3px; font-size:8pt;">확인 완료</span>
+  </h4>
+  <p style="font-size:9pt; margin:0;">
+    PlanB 가상 컨트롤러 system.xml 확인 결과: <b>LincolnArcLink-XT 1.06.5.0</b> 설치됨 (Robot1 + Robot2 모두).<br>
+    PlanA와 동일 버전 사용 중.
+  </p>
+</div>
+
+<!-- 버그 #4: weavedata -->
+<div style="background:#fdedec; border:2px solid #e74c3c; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#c0392b; margin:0 0 10px 0;">
+    #4. weavedata 필드 순서 — <span style="background:#c0392b; color:#fff; padding:2px 8px; border-radius:3px; font-size:8pt;">BUG → 수정 완료</span>
+  </h4>
+  <p style="font-size:9pt; margin:0 0 8px 0;">PlanA 대비 <b>DwellLeft/DwellRight가 2칸 앞으로 밀려 있었습니다.</b> v1.9.53에서 수정하였습니다.</p>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt; margin-bottom:10px;">
+    <tr style="background:#fbeee6;">
+      <th style="padding:5px 8px; text-align:left; width:100px;">구분</th>
+      <th style="padding:5px 8px; text-align:center;">pos5</th>
+      <th style="padding:5px 8px; text-align:center;">pos6</th>
+      <th style="padding:5px 8px; text-align:center;">pos7</th>
+      <th style="padding:5px 8px; text-align:center;">pos8</th>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold; color:#1a7a2e;">PlanA (기준)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">height(0)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#d5f5e3; font-weight:bold;">DwellL</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">dir(0)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#d5f5e3; font-weight:bold;">DwellR</td>
+    </tr>
+    <tr style="background:#f9f9f9;">
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold; color:#c0392b;">v1.9.52 (버그)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#fadbd8; font-weight:bold; color:#c0392b;">DwellL ✗</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#fadbd8; font-weight:bold; color:#c0392b;">DwellR ✗</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">0</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">0</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold; color:#1a7a2e;">v1.9.53 (수정)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">0 (height)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#d5f5e3; font-weight:bold;">DwellL ✓</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">0 (dir)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; background:#d5f5e3; font-weight:bold;">DwellR ✓</td>
+    </tr>
+  </table>
+  <p style="font-size:8.5pt; color:#666; margin:5px 0 0 0;">
+    <b>근거:</b> PlanA Rob1_MainModule.mod L720 — <code>[Shape, Type, Len, Width, 0, DwellL, 0, DwellR, 0...]</code>
+  </p>
+</div>
+
+<!-- #5 fine zone -->
+<div style="background:#d4efdf; border:1px solid #a9dfbf; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#1a7a2e; margin:0 0 8px 0;">
+    #5. ArcLStart fine zone 적정성 — <span style="background:#1a7a2e; color:#fff; padding:2px 8px; border-radius:3px; font-size:8pt;">확인 완료</span>
+  </h4>
+  <p style="font-size:9pt; margin:0;">
+    PlanA와 동일: <code>ArcLStart ... fine</code>, <code>ArcL ... z0</code>, <code>ArcLEnd ... fine</code> 패턴 사용.<br>
+    이상 없음.
+  </p>
+</div>
+
+<!-- ========== C팀 의견 요청 3건 ========== -->
+<h3 style="color:#c0392b; border-left:4px solid #c0392b; padding-left:10px; margin-top:30px;">B. C팀 의견 요청 3건 (신규)</h3>
+
+<p style="font-size:9pt; color:#666;">코드 전수 검토 후 발견한 사항입니다. 구현 방향 결정을 위해 C팀 의견 요청드립니다.</p>
+
+<!-- #6 에러 핸들링 -->
+<div style="background:#fff3cd; border:1px solid #ffc107; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#856404; margin:0 0 8px 0;">#6. ArcL 에러 핸들링 전략 <span style="background:#c0392b; color:#fff; padding:2px 8px; border-radius:3px; font-size:8pt; margin-left:8px;">HIGH</span></h4>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr>
+      <td style="width:70px; padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">현황</td>
+      <td style="padding:4px 8px;">PlanB ArcL 호출부에 <b>에러 핸들링이 최소한</b> (TPWrite + 로그만 기록)<br>
+        PlanA에는 <code>rArcError()</code> — StopMove, ClearPath, 에러 신호, 크로스태스크 동기화, ExitCycle 구현됨</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">코드 참조</td>
+      <td style="padding:4px 8px;">
+        PlanA: <code>Rob1_MainModule.mod</code> L1791 rArcError()<br>
+        PlanB: <code>MainModule.mod</code> L4905 ERROR 핸들러
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">C팀 의견 요청</td>
+      <td style="padding:4px 8px;">
+        &bull; PlanA <code>rArcError()</code> 동작을 PlanB에 이식할지, 새로 설계할지<br>
+        &bull; 현재 시뮬레이션 단계이므로 <b>실 용접 전까지 구현</b> 예정 — 우선순위 조율 필요
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- #7 Robot2 -->
+<div style="background:#fff3cd; border:1px solid #ffc107; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#856404; margin:0 0 8px 0;">#7. Robot2 ArcL 구현 범위 <span style="background:#c0392b; color:#fff; padding:2px 8px; border-radius:3px; font-size:8pt; margin-left:8px;">HIGH — 방향 결정</span></h4>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr>
+      <td style="width:70px; padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">현황</td>
+      <td style="padding:4px 8px;">
+        <b>PlanA:</b> TASK1(Rob1) + TASK2(Rob2) 모두 완전한 ArcL 시퀀스 구현<br>
+        <b>PlanB:</b> Robot1만 ArcL 구현. Robot2(TASK2)는 위치 대기(WeldHold)만 처리, ArcL 없음
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">C팀 결정 요청</td>
+      <td style="padding:4px 8px;">
+        &bull; PlanB에서 <b>Robot2도 동시에 용접</b>해야 하는지<br>
+        &bull; 동시 용접 시 <b>동기화 메커니즘</b> — PlanA는 SyncMove + WaitSyncTask 사용<br>
+        &bull; Robot2용 <b>별도 welddata/seamdata 인스턴스</b> 필요 여부
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- #8 배열 범위 -->
+<div style="background:#fff3cd; border:1px solid #ffc107; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#856404; margin:0 0 8px 0;">#8. BuildArcParams 배열 범위 체크 <span style="background:#e67e22; color:#fff; padding:2px 8px; border-radius:3px; font-size:8pt; margin-left:8px;">확인 필요</span></h4>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr>
+      <td style="width:70px; padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">현황</td>
+      <td style="padding:4px 8px;"><code>macroStartBuffer1{10}</code> — 배열 크기 10개<br>
+        <code>nWeldPassCount</code> 10 초과 시 <b>배열 범위 초과 → 런타임 에러</b><br>
+        PlanA Head_Data.mod에서도 wd1~wd10 (10개) 사용</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">C팀 확인 요청</td>
+      <td style="padding:4px 8px;">
+        &bull; 실제 시스템에서 <b>최대 weld pass 수</b>는 몇 개인지<br>
+        &bull; 상위시스템에서 10 초과 전송이 발생 가능한지<br>
+        &bull; 범위 가드 코드 추가 필요 여부
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- ========== 종합 ========== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">C. 종합 현황</h3>
+
+<table style="width:100%; border-collapse:collapse; margin:10px 0; font-size:9pt;">
+  <tr style="background:#1a5276; color:#fff;">
+    <th style="padding:6px 10px; text-align:center; width:30px;">#</th>
+    <th style="padding:6px 10px; text-align:left;">항목</th>
+    <th style="padding:6px 10px; text-align:center; width:60px;">중요도</th>
+    <th style="padding:6px 10px; text-align:center; width:100px;">검토 결과</th>
+    <th style="padding:6px 10px; text-align:center; width:120px;">C팀 요청</th>
+  </tr>
+  <tr style="background:#d5f5e3;">
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; font-weight:bold;">1</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">welddata/seamdata par4↔par6</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">HIGH</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#1a7a2e; font-weight:bold;">BUG → 수정 완료</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center;">참고 (보고)</td>
+  </tr>
+  <tr>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center;">2</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">ArcL \WObj 지원 여부</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">HIGH</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#1a7a2e; font-weight:bold;">확인 완료 (OK)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center;">참고 (보고)</td>
+  </tr>
+  <tr style="background:#f9f9f9;">
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center;">3</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">ArcWelding PowerPac 설치</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">HIGH</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#1a7a2e; font-weight:bold;">확인 완료 (OK)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center;">참고 (보고)</td>
+  </tr>
+  <tr style="background:#d5f5e3;">
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; font-weight:bold;">4</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">weavedata DwellL/R 필드 위치</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">HIGH</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#1a7a2e; font-weight:bold;">BUG → 수정 완료</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center;">참고 (보고)</td>
+  </tr>
+  <tr>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center;">5</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">ArcLStart fine zone 적정성</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#e67e22; font-weight:bold;">MED</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#1a7a2e; font-weight:bold;">확인 완료 (OK)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center;">참고 (보고)</td>
+  </tr>
+  <tr style="background:#fff3cd;">
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; font-weight:bold;">6</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">ArcL 에러 핸들링 전략</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">HIGH</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#e67e22;">향후 구현 예정</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; font-weight:bold;">의견 요청</td>
+  </tr>
+  <tr style="background:#fff3cd;">
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; font-weight:bold;">7</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">Robot2 ArcL 구현 범위</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">HIGH</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#e67e22;">미구현</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; font-weight:bold;">방향 결정 요청</td>
+  </tr>
+  <tr style="background:#fff3cd;">
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; font-weight:bold;">8</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">BuildArcParams 배열 범위</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">HIGH</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#e67e22;">조건부 OK</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; font-weight:bold;">최대 pass 수 확인</td>
+  </tr>
+</table>
+
+<div style="background:#d4efdf; border:1px solid #a9dfbf; border-radius:4px; padding:10px; margin:15px 0; font-size:9.5pt;">
+  <b>참고:</b> v1.9.52 백업은 이전 메일의 Cloudinary 링크 참조.<br>
+  <a href="https://res.cloudinary.com/dmmjpofcc/raw/upload/v1771750868/s25016/backups/SpGantry_1200_526406_BACKUP_v1-9-52.zip" style="color:#2471a3;">SpGantry_1200_526406_BACKUP_v1-9-52.zip 다운로드</a><br>
+  v1.9.53 수정 백업은 별도 공유 예정입니다.
+</div>
+
+<!-- ========== D. 스왑 검토 ========== -->
+<h3 style="color:#2471a3; border-left:4px solid #2471a3; padding-left:10px; margin-top:30px;">D. Robot1↔Robot2 스왑(Swap) 검증 현황</h3>
+
+<p style="font-size:9.5pt;">PlanB에서 스왑 로직의 구현 상태를 PlanA와 대비하여 코드 검토하였습니다.</p>
+
+<!-- 스왑 개념 -->
+<div style="background:#eaf2f8; border:1px solid #aed6f1; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#2471a3; margin:0 0 8px 0;">스왑(Swap) 개념</h4>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr>
+      <td style="width:70px; padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">배경</td>
+      <td style="padding:4px 8px;">
+        부재 양면에 용접선 2개 배치 (A면/B면, 약 12mm 간격)<br>
+        Robot1=A면, Robot2=B면 기본 할당하여 동시 용접
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">제약</td>
+      <td style="padding:4px 8px;">
+        용접선 방향: <b>0~360도</b> 랜덤 배치 가능<br>
+        갠트리 R축: <b>약 ±90도</b>만 회전 가능
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; font-weight:bold; vertical-align:top; color:#666;">스왑</td>
+      <td style="padding:4px 8px;">
+        용접선 방향이 R축 범위를 벗어나면 → <b>Robot1↔Robot2 담당면 교환</b><br>
+        Robot1이 B면, Robot2가 A면을 용접하도록 소프트웨어적 할당 변경
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- 데이터 흐름 -->
+<div style="background:#f8f9fa; border:1px solid #dee2e6; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#2471a3; margin:0 0 8px 0;">데이터 흐름</h4>
+  <div style="background:#2c3e50; color:#ecf0f1; padding:12px; border-radius:4px; font-family:Consolas,'Courier New',monospace; font-size:8.5pt; line-height:1.8;">
+    <span style="color:#f39c12;">관제시스템</span>(비전계측) → s1, e1, s2, e2 (4개 포인트)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;↓ gRPC<br>
+    <span style="color:#f39c12;">UI</span>(상위시스템) → ABB SDK → RAPID 변수에 기록<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+    <span style="color:#7fb3d3;">DefineWeldLine()</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;calcPosStart = (s1+s2)/2, calcPosEnd = (e1+e2)/2<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;nAngleRzStore = <span style="color:#e74c3c;">ATan2(dy, dx)</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;-90° ≤ angle &lt; 90° → <span style="color:#2ecc71;">bRobSwap = FALSE</span> (정상)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;angle &lt; -90° or ≥ 90° → <span style="color:#e74c3c;">bRobSwap = TRUE</span> (스왑)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+    <span style="color:#7fb3d3;">GenerateWeldPath()</span> — 스왑에 따라 rot/TravelAngle 반전<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+    <span style="color:#7fb3d3;">TraceWeldLine()</span> → ArcL 호출 (pWeldPosR1에 스왑 이미 반영)
+  </div>
+</div>
+
+<!-- 스왑 시 변환 -->
+<div style="background:#f8f9fa; border:1px solid #dee2e6; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#2471a3; margin:0 0 8px 0;">스왑 시 변환 내용 (GenerateWeldPath)</h4>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr style="background:#eaf2f8;">
+      <th style="padding:5px 8px; text-align:left; width:140px;">항목</th>
+      <th style="padding:5px 8px; text-align:left;">정상 (bRobSwap=FALSE)</th>
+      <th style="padding:5px 8px; text-align:left;">스왑 (bRobSwap=TRUE)</th>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">토치 방향 (rot)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;"><code>[0.5, 0.5, -0.5, 0.5]</code></td>
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#c0392b;"><code>[0.5, -0.5, -0.5, -0.5]</code></td>
+    </tr>
+    <tr style="background:#f9f9f9;">
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">TravelAngle 부호</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;"><code>-1 * TA</code></td>
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#c0392b;"><code>+TA</code> (반전)</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">매크로 버퍼</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">Robot1 ← Macro1</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#c0392b;">Robot1 ← <b>Macro2</b></td>
+    </tr>
+    <tr style="background:#f9f9f9;">
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">Y오프셋 (BreadthOffset)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;"><code>-1 * offset</code></td>
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#c0392b;"><code>+offset</code> (반전)</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 코드 검토 결과 -->
+<div style="background:#fef9e7; border:2px solid #f9e79f; border-radius:6px; padding:15px; margin:15px 0; font-size:9.5pt;">
+  <p style="margin:0 0 10px 0; font-weight:bold; color:#7d6608;">스왑 관련 코드 검토 결과:</p>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr style="background:#eaf2f8;">
+      <th style="padding:5px 8px; text-align:left; width:180px;">항목</th>
+      <th style="padding:5px 8px; text-align:center; width:60px;">상태</th>
+      <th style="padding:5px 8px; text-align:left;">비고</th>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd;">스왑 판단 (DefineWeldLine)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#1a7a2e; font-weight:bold;">구현됨</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">PlanA와 동일 조건 (±90° 기준)</td>
+    </tr>
+    <tr style="background:#f9f9f9;">
+      <td style="padding:4px 8px; border:1px solid #ddd;">rot/TravelAngle 반전</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#1a7a2e; font-weight:bold;">구현됨</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">GenerateWeldPath L4647-4657</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd;">shared_bRobSwap (TASK2 공유)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#1a7a2e; font-weight:bold;">구현됨</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">PERS로 TASK2에 전달</td>
+    </tr>
+    <tr style="background:#f9f9f9;">
+      <td style="padding:4px 8px; border:1px solid #ddd;">ArcL과 스왑 연동</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#1a7a2e; font-weight:bold;">이상 없음</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">GenerateWeldPath가 스왑 반영 후 → ArcL은 좌표만 사용</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#c0392b; font-weight:bold;">macroAutoStartB 버퍼 교환</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#e67e22; font-weight:bold;">C팀 확인</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">PlanA 방식의 매크로 교환 로직이 PlanB에도 동일하게 적용되는지 확인 필요</td>
+    </tr>
+    <tr style="background:#f9f9f9;">
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#c0392b; font-weight:bold;">BreadthOffset 부호 반전</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#e67e22; font-weight:bold;">C팀 확인</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">스왑 시 Y오프셋 부호가 PlanA와 동일하게 반전되는지 검증 필요</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 시뮬레이션 계획 -->
+<div style="background:#f8f9fa; border:1px solid #dee2e6; border-radius:6px; padding:15px; margin:15px 0;">
+  <h4 style="color:#2471a3; margin:0 0 8px 0;">RobotStudio 시뮬레이션 검증 계획</h4>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr style="background:#eaf2f8;">
+      <th style="padding:5px 8px; text-align:center; width:60px;">시나리오</th>
+      <th style="padding:5px 8px; text-align:left;">용접선 방향</th>
+      <th style="padding:5px 8px; text-align:center; width:80px;">bRobSwap</th>
+      <th style="padding:5px 8px; text-align:left;">검증 항목</th>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; font-weight:bold;">A</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">0° (X+ 방향)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#1a7a2e;">FALSE</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">기준 동작 확인</td>
+    </tr>
+    <tr style="background:#f9f9f9;">
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; font-weight:bold;">B</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">45° (대각선)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#1a7a2e;">FALSE</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">R축 회전 + 정상 할당</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; font-weight:bold;">C</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">90° (경계값)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#c0392b;">TRUE</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">경계 동작 — 스왑 전환점</td>
+    </tr>
+    <tr style="background:#f9f9f9;">
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; font-weight:bold;">D</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">135° (스왑 영역)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#c0392b;">TRUE</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">rot/TA 반전, 매크로 교환 검증</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; font-weight:bold;">E</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">200° (반대편)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#c0392b;">TRUE</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">큰 각도 스왑 + ArcL 연동</td>
+    </tr>
+  </table>
+  <p style="font-size:8.5pt; color:#666; margin:8px 0 0 0;">
+    각 시나리오에서 Robot1/Robot2 TCP 위치, 토치 방향, 용접 궤적을 비교 검증 예정
+  </p>
+</div>
+
+<hr style="border:none; border-top:1px solid #ddd; margin:25px 0;">
+
+<p style="font-size:9.5pt;">
+<b>요약:</b> 기존 5건(#1~#5)은 자체 검토를 완료하여 결과를 보고드리며, #1·#4는 버그 수정 완료하였습니다.<br>
+추가 3건(#6~#8) 중 <b>#7(Robot2 범위)</b>은 아키텍처 결정이 필요한 항목이므로 조기 의견 부탁드립니다.<br><br>
+스왑 검증은 RobotStudio 시뮬레이션으로 5개 시나리오를 진행 예정이며,<br>
+<b>macroAutoStartB 버퍼 교환</b>과 <b>BreadthOffset 부호 반전</b>에 대해 C팀 확인 부탁드립니다.
+</p>
+
+<p style="font-size:9.5pt;">문의사항이 있으시면 말씀 부탁드립니다.<br>감사합니다.</p>
+
+<div style="margin-top:20px; padding-top:10px; border-top:1px solid #ccc; font-size:8.5pt; color:#888;">
+  심태양 / 에스피시스템스 개발팀<br>
+  taeyang@spsystems.kr
+</div>
+
+</body>
+</html>

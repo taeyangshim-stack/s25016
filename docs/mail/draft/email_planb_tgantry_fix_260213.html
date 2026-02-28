@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>S25016 PlanA→PlanB T_Gantry 미이행 분석 및 수정 계획</title></head>
+<body style="margin:0;padding:0;background:#f5f6fa;font-family:'Malgun Gothic','맑은 고딕',sans-serif;">
+<div style="max-width:780px;margin:20px auto;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);overflow:hidden;">
+
+<!-- Header -->
+<div style="background:linear-gradient(135deg,#1e3a5f 0%,#2d5a8e 100%);padding:28px 32px;">
+  <div style="color:#fff;font-size:20px;font-weight:700;letter-spacing:-0.5px;">S25016 B라인 자동용접 로봇 시스템</div>
+  <div style="color:#8bb8e8;font-size:14px;margin-top:6px;">PlanA→PlanB T_Gantry 미이행 분석 및 수정 계획 (260213)</div>
+</div>
+
+<!-- Summary -->
+<div style="padding:24px 32px;border-bottom:1px solid #eef0f5;">
+  <div style="font-size:15px;font-weight:700;color:#1a2030;margin-bottom:12px;">1. 요약</div>
+  <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 18px;border-radius:6px;font-size:13px;line-height:1.8;color:#92400e;">
+    <b>현상:</b> UI에서 갠트리 이동 명령(CMD_MOVE_INC_GANTRY) 실행 시 <b>에러 41634 (Unknown Task Name: T_Gantry)</b> 발생 후 15분 타임아웃<br>
+    <b>원인:</b> PlanB에서 T_Gantry 태스크가 제거되었으나, T_Head RAPID 코드에 PlanA 참조가 15곳 잔존<br>
+    <b>영향:</b> 갠트리 이동, 로봇 홈이동, 용접 시퀀스 등 <b>모든 MoveJgJ 기반 동작 불가</b>
+  </div>
+</div>
+
+<!-- TCP Fix Completed -->
+<div style="padding:24px 32px;border-bottom:1px solid #eef0f5;">
+  <div style="font-size:15px;font-weight:700;color:#1a2030;margin-bottom:12px;">2. 선행 작업 완료: TCP 좌표 수정</div>
+  <div style="font-size:13px;line-height:1.7;color:#1a2030;">
+    CalcCurrentTcp 함수를 수정하여 R1/R2 TCP 좌표가 정상 표시됩니다.
+  </div>
+  <table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px;">
+    <tr style="background:#f1f5f9;">
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:left;">항목</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">수정 전</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">수정 후</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">판정</th>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">R1 TCP (X, Y, Z)</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">9506, 4970, 1420</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">9506, 4970, 1420</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;color:#16a34a;font-weight:700;">OK</td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">R2 TCP (X, Y, Z)</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;">9494, 4482, <b>2780</b></td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;color:#16a34a;">9494, 4482, <b>1420</b></td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;color:#16a34a;font-weight:700;">OK</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">R1-R2 Z 차이</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;"><b>1360mm</b></td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;color:#16a34a;"><b>0.43mm</b></td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;color:#16a34a;font-weight:700;">OK</td>
+    </tr>
+  </table>
+  <div style="font-size:12px;color:#64748b;margin-top:8px;">커밋: b7d18b77 fix(rapid): R2 CalcCurrentTcp 갠트리 좌표 변환 복원</div>
+</div>
+
+<!-- Error Analysis -->
+<div style="padding:24px 32px;border-bottom:1px solid #eef0f5;">
+  <div style="font-size:15px;font-weight:700;color:#1a2030;margin-bottom:12px;">3. T_Gantry 미이행 에러 분석</div>
+
+  <div style="font-size:13px;font-weight:600;color:#1e3a5f;margin-bottom:8px;">3-1. PlanA vs PlanB 태스크 구조</div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px;">
+    <tr style="background:#f1f5f9;">
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;">TASK#</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;">PlanA (10개 태스크)</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;">PlanB (8개 태스크)</th>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">TASK1</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">T_ROB1 (로봇1)</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">T_ROB1 (로봇1 <b>+ 갠트리 통합</b>)</td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">TASK2</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">T_ROB2 (로봇2)</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">T_ROB2 (로봇2)</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;color:#dc2626;font-weight:700;">TASK7</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;color:#dc2626;"><b>T_Gantry (갠트리 전용)</b></td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;color:#dc2626;"><b>T_BG (백그라운드 모니터링) ← 제거됨</b></td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">TASK8</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">T_Head (헤드 제어)</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">T_Head (헤드 제어)</td>
+    </tr>
+  </table>
+
+  <div style="font-size:13px;font-weight:600;color:#1e3a5f;margin-bottom:8px;">3-2. 에러 발생 흐름</div>
+  <div style="background:#1a2030;border-radius:8px;padding:16px 20px;font-family:'Consolas','Courier New',monospace;font-size:12px;color:#e2e8f0;line-height:1.8;overflow-x:auto;">
+    <span style="color:#8bb8e8;">03:37:48.188</span> UI → SetGantryPos(500, 0, 0, 0)<br>
+    <span style="color:#8bb8e8;">03:37:48.217</span> UI → SetRobotInputCommand(<span style="color:#fbbf24;">CMD_MOVE_INC_GANTRY = 109</span>)<br>
+    <span style="color:#8bb8e8;">03:37:48.708</span> T_Head: nCmdInput=109 → rCheckCmdMatch → <span style="color:#4ade80;">OK</span><br>
+    <span style="color:#8bb8e8;">03:37:48.xxx</span> T_Head: rMoveToGantryInInc() 호출<br>
+    <span style="color:#8bb8e8;">03:37:48.xxx</span> &nbsp;&nbsp;→ CJointT(\TaskName:="<span style="color:#f87171;font-weight:700;">T_Gantry</span>") <span style="color:#f87171;">← ERROR 41634</span><br>
+    <span style="color:#8bb8e8;">03:37:50</span> &nbsp;&nbsp;→ <span style="color:#f87171;">ERROR 40228 - Execution error</span><br>
+    <span style="color:#8bb8e8;">03:52:48.924</span> UI: WaitForCompletion <span style="color:#f87171;">TIMEOUT (15분)</span>
+  </div>
+
+  <div style="font-size:13px;font-weight:600;color:#1e3a5f;margin:16px 0 8px;">3-3. 영향 범위: T_Gantry 잔존 참조</div>
+  <table style="width:100%;border-collapse:collapse;font-size:13px;">
+    <tr style="background:#fef2f2;">
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:left;">문제 유형</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;">파일</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;">건수</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;">영향</th>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">CJointT("T_Gantry")</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">Head_Function.mod</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">3</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;color:#dc2626;">즉시 에러</td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">CJointT("T_Gantry")</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">Head_MoveControl.mod</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">9</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;color:#dc2626;">즉시 에러</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">stReact{3} 미응답</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">Head_Command.mod (MoveJgJ)</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">전체</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;color:#dc2626;">데드락 (영구대기)</td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">taskGroup "T_Gantry"</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">Head_Command.mod</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">3</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;color:#dc2626;">SyncMove 에러</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Fix Plan -->
+<div style="padding:24px 32px;border-bottom:1px solid #eef0f5;">
+  <div style="font-size:15px;font-weight:700;color:#1a2030;margin-bottom:12px;">4. RAPID 수정 계획</div>
+  <div style="font-size:13px;color:#64748b;margin-bottom:12px;">UI는 빌드된 시스템(DF.SubAssembly)으로 수정 불가 → RAPID 쪽에서 전수 수정</div>
+
+  <table style="width:100%;border-collapse:collapse;font-size:13px;">
+    <tr style="background:#ecfdf5;">
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;">#</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;text-align:left;">수정 내용</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;">대상 파일</th>
+      <th style="padding:8px 12px;border:1px solid #e2e8f0;">변경량</th>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;font-weight:700;">1</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">CJointT("T_Gantry") → CJointT("T_Rob1")</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">TASK8: Head_Function.mod<br>TASK8: Head_MoveControl.mod</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">12곳</td>
+    </tr>
+    <tr style="background:#f9fafb;">
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;font-weight:700;">2</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">TASK1에서 stReact{1} 설정 시 stReact{3}도 동일값 설정<br><span style="color:#64748b;">(T_ROB1이 갠트리 역할 겸임)</span></td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">TASK1: MainModule.mod</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">~30곳</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;font-weight:700;">3</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">taskGroup "T_Gantry" → "T_Rob1"</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">TASK8: Head_Command.mod</td>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;text-align:center;">3곳</td>
+    </tr>
+  </table>
+
+  <div style="background:#f0f9ff;border-left:4px solid #0ea5e9;padding:12px 16px;border-radius:6px;font-size:12px;line-height:1.7;color:#0c4a6e;margin-top:12px;">
+    <b>수정 원칙:</b> PlanB에서 갠트리 외부축이 T_ROB1의 Mechanical Unit Group에 통합되었으므로,<br>
+    CJointT(\TaskName:="T_Rob1")로 갠트리 관절값 읽기 가능. T_ROB1이 기존 T_Gantry의 stReact{3} 응답도 겸함.
+  </div>
+</div>
+
+<!-- Footer -->
+<div style="padding:20px 32px;background:#f8fafc;border-top:1px solid #eef0f5;">
+  <div style="font-size:13px;color:#1a2030;font-weight:600;">심태양 / 에스피시스템스</div>
+  <div style="font-size:12px;color:#94a3b8;margin-top:4px;">S25016 삼성중공업 거제조선소 34bay 자동용접 로봇 시스템</div>
+  <div style="font-size:11px;color:#cbd5e1;margin-top:8px;">Generated: 2026-02-13</div>
+</div>
+
+</div>
+</body>
+</html>

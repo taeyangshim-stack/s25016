@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:'맑은 고딕','Malgun Gothic',sans-serif; font-size:10pt; color:#333; line-height:1.7; max-width:860px; margin:0 auto;">
+
+<div style="border-bottom:3px solid #1a5276; padding-bottom:10px; margin-bottom:20px;">
+  <h2 style="color:#1a5276; margin:0;">[S25016] PlanB v1.9.61 — 홈 복귀 로봇 모션 복원 및 진행상황</h2>
+  <p style="margin:5px 0 0 0; font-size:9pt; color:#666;">MoveJgJ 로봇 관절 무시 버그 수정 + init 50050 이슈 분석</p>
+</div>
+
+<table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:9.5pt;">
+  <tr><td style="width:60px; padding:4px 8px; background:#f0f4f8; font-weight:bold;">수신</td><td style="padding:4px 8px;">C팀</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">참조</td><td style="padding:4px 8px;">이마룬</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">발신</td><td style="padding:4px 8px;">심태양 / 에스피시스템스</td></tr>
+  <tr><td style="padding:4px 8px; background:#f0f4f8; font-weight:bold;">일자</td><td style="padding:4px 8px;">2026년 2월 24일</td></tr>
+</table>
+
+<p>안녕하십니까, 에스피시스템스 심태양입니다.</p>
+<p>PlanB 홈 복귀(원점복귀) 시 로봇이 움직이지 않는 이슈를 분석하여 수정하였습니다.<br>
+현재까지의 진행상황과 잔여 이슈를 공유드립니다.</p>
+
+<!-- ============================== -->
+<!-- 1. 수정 내역 (v1.9.61) -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  1. v1.9.61 수정 내역 — MoveJgJ 로봇 관절 복원
+</h3>
+
+<p><b>증상:</b> UI에서 홈 복귀(원점복귀) 명령 시, 갠트리는 이동하나 <span style="color:#c0392b; font-weight:bold;">로봇 2대가 초기 자세에서 전혀 움직이지 않음</span></p>
+
+<p><b>원인 분석:</b></p>
+<div style="background:#fdf2e9; border:1px solid #f0b27a; border-radius:6px; padding:15px; margin:10px 0;">
+  <p style="margin:0 0 8px 0;"><b>T_Head</b>의 <code>MoveJgJ</code> 프로시저는 로봇 관절 목표(jRob1, jRob2)와 갠트리 목표(jGantry)를 PERS 변수에 기록 후 <code>stCommand:="MoveJgJ"</code>로 TASK1/TASK2에 실행 명령</p>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr style="background:#e8daef;">
+      <th style="padding:5px 8px; text-align:left;">Task</th>
+      <th style="padding:5px 8px; text-align:left;">문제점 (v1.9.42~v1.9.47)</th>
+      <th style="padding:5px 8px; text-align:left;">수정 (v1.9.61)</th>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">TASK1 (Robot1)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#c0392b;">ExecMoveJgJ가 jRob1.robax를 <b>무시</b><br>갠트리 extax만 이동, 로봇 관절은 현재값 유지</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#27ae60;">jMoveTarget.robax := jRob1.robax 적용<br>세그먼트 이동 시 로봇 관절도 보간</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold;">TASK2 (Robot2)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#c0392b;">MoveJgJ 수신 시 <b>아무 동작 없이 즉시 Ack</b><br>(v1.9.42에서 의도적으로 제거됨)</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; color:#27ae60;">MoveAbsJ jRob2, vSync, fine, tool0 복원</td>
+    </tr>
+  </table>
+  <p style="margin:8px 0 0 0; font-size:9pt; color:#666;">
+    <b>참고:</b> v1.9.42/v1.9.47에서 "tool0 vs tWeld1 호환성 문제"를 이유로 로봇 모션을 제거했으나,
+    MoveAbsJ는 관절 공간(joint-space) 이동이므로 tool 파라미터가 최종 관절 위치에 영향을 주지 않음.<br>
+    MergeJgWith()에서 \Rob1/\Rob2 인수 미지정 시 CJointT() (현재 위치)가 기본값이므로 <b>갠트리만 이동하는 기존 호출에는 영향 없음</b> (하위호환)
+  </p>
+</div>
+
+<!-- ============================== -->
+<!-- 2. 시뮬레이션 결과 -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  2. RobotStudio 시뮬레이션 결과 (2026-02-24)
+</h3>
+
+<table style="width:100%; border-collapse:collapse; font-size:9.5pt; margin:15px 0;">
+  <tr style="background:#d5f5e3;">
+    <th style="padding:6px 10px; text-align:left; width:200px;">항목</th>
+    <th style="padding:6px 10px; text-align:center; width:80px;">결과</th>
+    <th style="padding:6px 10px; text-align:left;">상세</th>
+  </tr>
+  <tr>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">홈 복귀 (원점복귀)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold; font-size:12pt;">PASS</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">
+      Robot1/Robot2 모두 jgHomeJoint [90,90,-50,0,0,0]으로 정상 이동<br>
+      <span style="font-size:8.5pt; color:#666;">debug_movejgj.txt 확인: Current [90,-90,55] -> Target [90,90,-50] delta 존재, MoveAbsJ completed OK</span>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">T_Head 다단계 시퀀스</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold; font-size:12pt;">PASS</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">
+      checkpos 4회 + MoveJgJ 다수 실행<br>
+      rMoveToRobotHome의 4단계 (팔 올림 -> 손목 -> 베이스 -> 전체) 정상 동작
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">init (원점에서 시작)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#27ae60; font-weight:bold; font-size:12pt;">PASS</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">
+      갠트리 HOME [0,0,0,0]에서 init 정상 완료<br>
+      <span style="font-size:8.5pt; color:#666;">TCP_Floor: [9500, 5300, 1100] 정상 수렴</span>
+    </td>
+  </tr>
+  <tr style="background:#fdedec;">
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">init (홈 복귀 후 재실행)</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold; font-size:12pt;">FAIL</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">
+      <b>50050 - Position outside reach</b><br>
+      홈 복귀로 로봇이 jgHomeJoint 자세로 변경된 후 init 재실행 시 발생
+    </td>
+  </tr>
+</table>
+
+<!-- ============================== -->
+<!-- 3. 50050 분석 -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  3. 잔여 이슈 — 50050 Position outside reach 분석
+</h3>
+
+<div style="background:#fdf2e9; border:1px solid #f0b27a; border-radius:6px; padding:15px; margin:10px 0;">
+  <p style="margin:0 0 10px 0;"><b>발생 조건:</b> 홈 복귀 후 로봇이 jgHomeJoint [90, 90, -50, 0, 0, 0] 상태에서 init 재실행</p>
+
+  <p style="margin:0 0 5px 0;"><b>init (SetRobot1InitialPosition) 동작 순서:</b></p>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr style="background:#fbeee6;">
+      <th style="padding:4px 8px; text-align:left; width:70px;">Step</th>
+      <th style="padding:4px 8px; text-align:left;">동작</th>
+      <th style="padding:4px 8px; text-align:center; width:80px;">결과</th>
+      <th style="padding:4px 8px; text-align:left;">비고</th>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd;">Step 0</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">X1/X2 동기화 확인</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#27ae60;">OK</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-size:8.5pt;">diff=0 로그 확인</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd;">Step 1</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">MoveAbsJ [90,90,-50] -> [0,-48.88,6.22]</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">50050</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-size:8.5pt;">J2: 90->-48.88 (139도 변화)<br>중간 경로 TCP가 도달 범위 초과 추정</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd;">Step 2</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">MoveL TCP->[0,0,1000] WobjGantry</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#999;">미도달</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; font-size:8.5pt;">Step 1에서 중단</td>
+    </tr>
+  </table>
+
+  <p style="margin:10px 0 5px 0;"><b>Robot2 (참고):</b></p>
+  <table style="width:100%; border-collapse:collapse; font-size:9pt;">
+    <tr style="background:#fbeee6;">
+      <th style="padding:4px 8px; text-align:left; width:70px;">Step</th>
+      <th style="padding:4px 8px; text-align:left;">동작</th>
+      <th style="padding:4px 8px; text-align:center; width:80px;">결과</th>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd;">Step 1</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">MoveAbsJ [90,90,-50] -> [0,-48.88,6.22]</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#27ae60;">OK</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px; border:1px solid #ddd;">Step 2</td>
+      <td style="padding:4px 8px; border:1px solid #ddd;">MoveJ TCP->[0,488,-1000] WobjGantry_Rob2</td>
+      <td style="padding:4px 8px; border:1px solid #ddd; text-align:center; color:#c0392b; font-weight:bold;">50050</td>
+    </tr>
+  </table>
+
+  <p style="margin:10px 0 0 0; font-size:9pt; color:#666;">
+    <b>원인 분석:</b> init 프로시저는 로봇이 초기 전원 투입 자세(약 [0,-49,6,0,8,0])에서 시작하는 것을 전제로 설계됨.
+    홈 복귀 후 jgHomeJoint [90,90,-50,0,0,0]에서 시작할 경우, 특히 J2축 139도 변화가 포함된 MoveAbsJ에서
+    중간 경로의 TCP가 외부축(갠트리) 결합 시 도달 범위를 초과.<br>
+    <b>이전에는 홈 복귀가 로봇을 움직이지 않았으므로 이 시나리오가 발생하지 않았음.</b>
+  </p>
+</div>
+
+<!-- ============================== -->
+<!-- 4. 대응 방향 -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  4. 대응 방향
+</h3>
+
+<table style="width:100%; border-collapse:collapse; font-size:9.5pt; margin:10px 0;">
+  <tr style="background:#d6eaf8;">
+    <th style="padding:6px 10px; text-align:left; width:60px;">순번</th>
+    <th style="padding:6px 10px; text-align:left;">방안</th>
+    <th style="padding:6px 10px; text-align:left;">설명</th>
+  </tr>
+  <tr>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">A</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">init에 중간 경유점 추가</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">
+      jgHomeJoint에서 init 목표까지 직접 이동하지 않고, 안전한 중간 관절 자세를 경유<br>
+      <span style="font-size:8.5pt; color:#666;">예: J2=90 -> J2=0 (수직) -> J2=-48.88 (최종) 2단계 분할</span>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">B</td>
+    <td style="padding:5px 10px; border:1px solid #ddd; font-weight:bold;">init 시작 전 홈 복귀 역순 실행</td>
+    <td style="padding:5px 10px; border:1px solid #ddd;">
+      init 프로시저 시작 시 현재 관절이 jgHomeJoint 근처인지 확인하여,
+      먼저 안전 자세로 복귀 후 init 진행
+    </td>
+  </tr>
+</table>
+
+<p>방안 <b>A</b>를 우선 적용하여 v1.9.62로 RobotStudio 검증 예정입니다.</p>
+
+<!-- ============================== -->
+<!-- 5. 버전 이력 -->
+<!-- ============================== -->
+<h3 style="color:#1a5276; border-left:4px solid #1a5276; padding-left:10px; margin-top:30px;">
+  5. 최근 버전 이력
+</h3>
+
+<table style="width:100%; border-collapse:collapse; font-size:9pt; margin:10px 0;">
+  <tr style="background:#eaecee;">
+    <th style="padding:5px 8px; text-align:left; width:90px;">버전</th>
+    <th style="padding:5px 8px; text-align:left; width:100px;">일자</th>
+    <th style="padding:5px 8px; text-align:left;">내용</th>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd; font-weight:bold; color:#1a5276;">v1.9.61</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">2026-02-24</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">MoveJgJ 로봇 관절 복원 (TASK1 + TASK2 v1.9.44)</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd;">v1.9.60</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">2026-02-23</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">ClearPath per scenario (50426 workaround)</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd;">v1.9.59</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">2026-02-23</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">ConfL Off + approach/retract 거리 축소</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd;">v1.9.58</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">2026-02-23</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">TCP_Z_OFFSET 복원 + motion-enabled swap test</td>
+  </tr>
+  <tr>
+    <td style="padding:4px 8px; border:1px solid #ddd;">v1.9.57</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">2026-02-23</td>
+    <td style="padding:4px 8px; border:1px solid #ddd;">자동 테스트 (Guard TC + Swap Scenario)</td>
+  </tr>
+</table>
+
+<br>
+<p>확인 부탁드립니다. 감사합니다.</p>
+
+<div style="margin-top:30px; padding-top:15px; border-top:1px solid #ddd; font-size:9pt; color:#666;">
+  심태양 부장 / 에스피시스템스<br>
+  taeyang@spsystems.kr
+</div>
+
+</body>
+</html>

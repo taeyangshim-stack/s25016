@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PL-2025-125 용접기 용접 모드 상실 이슈 점검 계획 공유 (SP시스템스 심태양)</title>
+    <style>
+        body { font-family: 'Malgun Gothic', '맑은 고딕', Dotum, '돋움', sans-serif; font-size: 10pt; line-height: 1.6; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px; background-color: #fff; }
+        h3 { color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px; }
+        h4 { color: #34495e; margin-top: 15px; }
+        p { margin-bottom: 10px; }
+        ul { list-style-type: disc; margin-left: 20px; margin-bottom: 10px; }
+        ol { list-style-type: decimal; margin-left: 20px; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; }
+        th { background-color: #f8f8f8; font-weight: bold; }
+        .scenario-highlight { font-weight: bold; color: #2980b9; }
+        .note { background-color: #f9f9e0; border-left: 3px solid #f39c12; padding: 10px; margin-top: 20px; }
+        .emphasis { color: #e74c3c; font-weight: bold; }
+        .strong { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>이동혁 프로님께,</p>
+
+        <p>안녕하십니까, 에스피시스템스 심태양입니다.</p>
+
+        <p>PL-2025-125로 등록된 <strong class="emphasis">'용접기 용접 모드 상실' 이슈</strong>와 관련하여, 문제의 원인을 파악하고 재현하기 위한 구체적인 점검 계획을 수립하여 공유드립니다.</p>
+
+        <h3>1. 점검 목적</h3>
+        <p>용접 모드 5번 소실 및 User Weld Set 변경 현상(`PL-2025-125`)이 발생하는 원인을 체계적으로 분석하고, 재현 조건을 명확히 파악하는 것이 목표입니다. 특히, <strong class="strong">12월 16일에 발생했던 용접 설정 변경 문제 상황을 재현</strong>하는 데 중점을 둡니다.</p>
+
+        <h3>2. 점검 방법 (상세 테스트 시나리오)</h3>
+        <p>랜선 연결 상태 변경과 장비(로봇/용접기) 재부팅을 조합하여 문제 발생의 원인(통신 문제, 장비 자체 문제 등)을 분리하여 확인합니다. 각 시나리오 전에는 반드시 용접기 설정이 <strong class="strong">정상 상태(용접 모드 5번 존재, User Weld Set 활성)</strong>인지 확인합니다.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">순서</th>
+                    <th style="width: 25%;">테스트 시나리오</th>
+                    <th style="width: 20%;">세부 조치 내용</th>
+                    <th style="width: 30%;">점검 목적 및 예상 결과</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong class="strong">1</strong></td>
+                    <td><span class="scenario-highlight">랜선을 뽑았다가 재연결</span></td>
+                    <td>
+                        <ol>
+                            <li>로봇과 용접기 연결 랜선을 뽑습니다.</li>
+                            <li>각각 1초, 5초, 10초 대기 후 랜선을 다시 연결합니다.</li>
+                            <li><strong class="strong">각 재연결 후 즉시, 그리고 1분 경과 후</strong> 용접기 설정값(모드 5, User Weld Set)을 확인합니다.</li>
+                        </ol>
+                    </td>
+                    <td>통신 단절 및 재연결 과정에서 설정 변경이 발생하는지 확인합니다. 짧은/긴 통신 단절이 미치는 영향을 파악하여 통신 복구 로직 오류 여부를 추정합니다.</td>
+                </tr>
+                <tr>
+                    <td><strong class="strong">2</strong></td>
+                    <td><span class="scenario-highlight">랜선 분리 후 로봇 재부팅</span></td>
+                    <td>
+                        <ol>
+                            <li>로봇과 용접기 연결 랜선을 뽑습니다.</li>
+                            <li><strong class="strong">로봇만</strong> 전원을 껐다가 다시 고 완전히 부팅될 때까지 기다립니다.</li>
+                            <li>용접기 설정값(모드 5, User Weld Set)을 확인합니다. (정상이어야 함)</li>
+                            <li>랜선을 다시 연결하고, <strong class="strong">즉시 그리고 1분 경과 후</strong> 용접기 설정값을 확인합니다.</li>
+                        </ol>
+                    </td>
+                    <td>로봇 재부팅 시 설정값이 변동되는지, 또는 재부팅 후 랜선 재연결 시 로봇이 잘못된 값을 용접기에 전송하는지 확인합니다.</td>
+                </tr>
+                <tr>
+                    <td><strong class="strong">3</strong></td>
+                    <td><span class="scenario-highlight">랜선 분리 후 용접기 재부팅</span></td>
+                    <td>
+                        <ol>
+                            <li>로봇과 용접기 연결 랜선을 뽑습니다.</li>
+                            <li><strong class="strong">용접기만</strong> 전원을 껐다가 다시 고 완전히 부팅될 때까지 기다립니다.</li>
+                            <li>로봇 측에서 용접기 설정값을 확인합니다. (정상이어야 함)</li>
+                            <li>랜선을 다시 연결하고, <strong class="strong">즉시 그리고 1분 경과 후</strong> 용접기 설정값을 확인합니다.</li>
+                        </ol>
+                    </td>
+                    <td>용접기 자체 재부팅 시 설정값이 변동되는지, 또는 로봇과의 통신 없이 용접기 자체의 안정성(설정값 유지)을 점검합니다.</td>
+                </tr>
+                <tr>
+                    <td><strong class="strong">4</strong></td>
+                    <td><span class="scenario-highlight">랜선 분리 후 용접기 & 로봇 재부팅</span></td>
+                    <td>
+                        <ol>
+                            <li>로봇과 용접기 연결 랜선을 뽑습니다.</li>
+                            <li><strong class="strong">로봇과 용접기 모두</strong> 전원을 껐다가 다시 고 완전히 부팅될 때까지 기다립니다.</li>
+                            <li>랜선을 다시 연결하고, <strong class="strong">즉시 그리고 1분 경과 후</strong> 용접기 설정값을 확인합니다.</li>
+                        </ol>
+                    </td>
+                    <td>모든 장비가 초기 상태에서 시작하여, 통신 연결이 확립되는 과정에서 동기화 문제나 설정 교환 오류가 발생하는지 확인합니다.</td>
+                </tr>
+                <tr>
+                    <td><strong class="strong">5</strong></td>
+                    <td><span class="scenario-highlight">랜선 10초 분리 후 재연결, 전체 시스템 재부팅</span></td>
+                    <td>
+                        <ol>
+                            <li>로봇과 용접기 연결 랜선을 뽑습니다.</li>
+                            <li>10초간 대기 후 랜선을 다시 연결합니다.</li>
+                            <li><strong class="strong">로봇과 용접기 모두</strong> 전원을 껐다가 다시 고 완전히 부팅될 때까지 기다립니다.</li>
+                            <li><strong class="strong">완전히 부팅된 후 즉시, 그리고 1분 경과 후</strong> 용접기 설정값을 확인합니다.</li>
+                        </ol>
+                    </td>
+                    <td>통신 단절 및 전체 시스템 재시작이 결합된 복합 시나리오에서 설정값이 변동되는지 확인하여 특정 조건에서만 발생하는 심각한 동기화 문제를 파악합니다.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>3. 예상되는 다음 단계</h3>
+        <p>성공적으로 문제 상황이 재현될 경우, 해당 시나리오를 통해 <strong class="strong">유저 설정값 변경 여부와 모드 소실 여부를 명확히 확인</strong>하여 문제의 재현 조건을 확립하고, 이를 바탕으로 원인 분석 방향을 설정할 계획입니다.</p>
+
+        <div class="note">
+            <h4><strong class="emphasis">📌 중요 참고 사항</strong></h4>
+            <ul>
+                <li>각 테스트 시나리오 시작 전에는 반드시 용접기의 <strong class="strong">현재 설정값(특히 '용접 모드 5번'과 'User Weld Set')을 백업</strong>해 두시고, <strong class="strong">정상 상태</strong>임을 확인해 주십시오.</li>
+                <li>각 조치 후 용접기 설정값의 변동 여부를 <strong class="strong">정확하게 기록</strong>해야 합니다.</li>
+            </ul>
+        </div>
+
+        <p>프로님께서 이 점검 계획에 대해 의견이나 제안해 주실 사항이 있으시면 편하게 말씀해 주시면 감사하겠습니다.</p>
+
+        <p>항상 협력해 주셔서 감사합니다.</p>
+
+        <p>심태양 드림<br>㈜에스피시스템스 연구소 / 부장</p>
+    </div>
+</body>
+</html>
