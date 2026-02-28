@@ -2910,7 +2910,7 @@ PROC TestMenu()
 		TPWrite " 12. Init Non-HOME Test (4 scenarios)";
 		TPWrite " 13. Guard Test (#8 TC T1~T5)";
 		TPWrite " 14. Swap Scenarios (A~E auto)";
-		TPWrite " 15. [Hybrid] DefineWeldLine→Gantry Stage1";
+		TPWrite " 15. [Hybrid] DefineWeldLine->Gantry Stage1";
 		TPWrite "  0. Exit";
 		TPWrite "";
 		TPWrite "----------------------------------------";
@@ -3032,7 +3032,7 @@ PROC TestMenu()
 
 		CASE 15:
 			TPErase;
-			TPWrite "[Menu] Hybrid: DefineWeldLine→Gantry Stage1...";
+			TPWrite "[Menu] Hybrid: DefineWeldLine->Gantry Stage1...";
 			TestPlanAB_Stage1;
 			TPWrite "";
 			TPWrite "Press any key to continue...";
@@ -6196,7 +6196,7 @@ ERROR
 ENDPROC
 
 ! ============================================================
-! BridgeToGantry — PlanAB-Hybrid Bridge (v0.1.0)
+! BridgeToGantry - PlanAB-Hybrid Bridge (v0.1.0)
 ! ============================================================
 ! DefineWeldLine() 계산 결과(calcPosStart/End, nAngleRzStore)를
 ! TASK7 공유 PERS 변수(WeldsG_*)로 전달
@@ -6220,9 +6220,9 @@ PROC BridgeToGantry(num weld_speed)
 ENDPROC
 
 ! ============================================================
-! TestPlanAB_Stage1 — Hybrid 1단계 개념 검증 (v0.2.0)
+! TestPlanAB_Stage1 - Hybrid 1단계 개념 검증 (v0.2.0)
 ! ============================================================
-! swap_test.txt 5개 시나리오: DefineWeldLine → BridgeToGantry → MoveExtJ
+! swap_test.txt 5개 시나리오: DefineWeldLine -> BridgeToGantry -> MoveExtJ
 ! Direction-C: TASK1에서 직접 갠트리 외부축 제어 (TASK7 불사용)
 !
 ! 결과 파일: HOME:/planab_stage1.txt
@@ -6281,16 +6281,16 @@ PROC TestPlanAB_Stage1()
 		Write res_file, "Input End=[" + NumToStr(ex,0) + "," + NumToStr(ey,0) + "," + NumToStr(ez,0) + "]";
 		TPWrite "[HYBRID] === Scenario " + NumToStr(i,0) + "/" + NumToStr(nScenarios,0) + " ===";
 
-		! Step 1: DefineWeldLine → 각도 + 스왑 처리 (nAngleRzStore는 [-90,90] 범위)
+		! Step 1: DefineWeldLine -> 각도 + 스왑 처리 (nAngleRzStore는 [-90,90] 범위)
 		DefineWeldLine;
 		Write res_file, "R_angle=" + NumToStr(nAngleRzStore,2) + "deg bRobSwap=" + BoolToStr(bRobSwap);
 		Write res_file, "Calc Start=[" + NumToStr(calcPosStart.x,0) + "," + NumToStr(calcPosStart.y,0) + "]";
 		Write res_file, "Calc End=[" + NumToStr(calcPosEnd.x,0) + "," + NumToStr(calcPosEnd.y,0) + "]";
 
-		! Step 2: BridgeToGantry → WeldsG_* PERS 저장 (모니터링/디버깅용)
+		! Step 2: BridgeToGantry -> WeldsG_* PERS 저장 (모니터링/디버깅용)
 		BridgeToGantry WELD_SPEED;
 
-		! Step 3: WeldsG_* → jointtarget 변환 → MoveExtJ
+		! Step 3: WeldsG_* -> jointtarget 변환 -> MoveExtJ
 		! R축: HOME_GANTRY_R(0) - nAngleRzStore
 		target_r := HOME_GANTRY_R - nAngleRzStore;
 
