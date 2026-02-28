@@ -92,3 +92,6 @@ __pycache__/
 
 # Local secret files
 *.pass
+
+# Git worktrees
+.worktrees/
