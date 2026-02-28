@@ -6220,10 +6220,10 @@ PROC BridgeToGantry(num weld_speed)
 ENDPROC
 
 ! ============================================================
-! TestPlanAB_Stage1 — Hybrid 1단계 개념 검증 (v0.1.0)
+! TestPlanAB_Stage1 — Hybrid 1단계 개념 검증 (v0.2.0)
 ! ============================================================
-! swap_test.txt 시나리오를 읽어 TASK7 갠트리 모션 확인
-! DefineWeldLine → BridgeToGantry → stCommand "Weld"/"WeldGo" 프로토콜
+! swap_test.txt 5개 시나리오: DefineWeldLine → BridgeToGantry → MoveExtJ
+! Direction-C: TASK1에서 직접 갠트리 외부축 제어 (TASK7 불사용)
 !
 ! 결과 파일: HOME:/planab_stage1.txt
 ! ============================================================
@@ -6240,25 +6240,22 @@ PROC TestPlanAB_Stage1()
 	VAR num ez;
 	VAR bool ok;
 	VAR num i;
+	VAR jointtarget jt_start;
+	VAR jointtarget jt_end;
+	VAR pos phys;
+	VAR num target_r;
+	CONST num WELD_SPEED := 20;  ! mm/s
 
 	TPWrite "========================================";
-	TPWrite "[HYBRID] PlanAB Stage1 Gantry Bridge Test";
+	TPWrite "[HYBRID] PlanAB Stage1 Direct MoveExtJ";
+	TPWrite "Direction-C: TASK1 drives gantry directly";
 	TPWrite "========================================";
-
-	! TASK7 준비 확인
-	IF stReact{3} <> "Ready" THEN
-		TPWrite "[HYBRID] Waiting for TASK7 Ready...";
-		WaitUntil stReact{3} = "Ready" \MaxTime:=10 \TimeFlag:=ok;
-		IF NOT ok THEN
-			TPWrite "[HYBRID] ERROR: TASK7 not ready (stReact{3}=" + stReact{3} + ")";
-			RETURN ;
-		ENDIF
-	ENDIF
 
 	Open "HOME:/swap_test.txt", cfg_file \Read;
 	Open "HOME:/planab_stage1.txt", res_file \Write;
-	Write res_file, "PlanAB Hybrid Stage1 Test - " + CDate() + " " + CTime();
+	Write res_file, "PlanAB Hybrid Stage1 Test (Direction-C) - " + CDate() + " " + CTime();
 	Write res_file, "Version=" + TASK1_VERSION;
+	Write res_file, "Concept: DefineWeldLine -> BridgeToGantry -> MoveExtJ";
 
 	! 시나리오 수 읽기
 	line := ReadStr(cfg_file);
@@ -6275,12 +6272,8 @@ PROC TestPlanAB_Stage1()
 		line := ReadStr(cfg_file); ok := StrToVal(line, ez);
 
 		! calcPosStart/End 설정
-		calcPosStart.x := sx;
-		calcPosStart.y := sy;
-		calcPosStart.z := sz;
-		calcPosEnd.x := ex;
-		calcPosEnd.y := ey;
-		calcPosEnd.z := ez;
+		calcPosStart.x := sx;  calcPosStart.y := sy;  calcPosStart.z := sz;
+		calcPosEnd.x   := ex;  calcPosEnd.y   := ey;  calcPosEnd.z   := ez;
 
 		Write res_file, "";
 		Write res_file, "=== Scenario " + NumToStr(i,0) + "/" + NumToStr(nScenarios,0) + " ===";
@@ -6288,39 +6281,54 @@ PROC TestPlanAB_Stage1()
 		Write res_file, "Input End=[" + NumToStr(ex,0) + "," + NumToStr(ey,0) + "," + NumToStr(ez,0) + "]";
 		TPWrite "[HYBRID] === Scenario " + NumToStr(i,0) + "/" + NumToStr(nScenarios,0) + " ===";
 
-		! Step 1: DefineWeldLine → 각도 계산 + 스왑 처리
+		! Step 1: DefineWeldLine → 각도 + 스왑 처리 (nAngleRzStore는 [-90,90] 범위)
 		DefineWeldLine;
 		Write res_file, "R_angle=" + NumToStr(nAngleRzStore,2) + "deg bRobSwap=" + BoolToStr(bRobSwap);
 		Write res_file, "Calc Start=[" + NumToStr(calcPosStart.x,0) + "," + NumToStr(calcPosStart.y,0) + "]";
 		Write res_file, "Calc End=[" + NumToStr(calcPosEnd.x,0) + "," + NumToStr(calcPosEnd.y,0) + "]";
 
-		! Step 2: BridgeToGantry → WeldsG_* 전달
-		BridgeToGantry 20;
+		! Step 2: BridgeToGantry → WeldsG_* PERS 저장 (모니터링/디버깅용)
+		BridgeToGantry WELD_SPEED;
 
-		! Step 3: TASK7에 Weld 명령 (갠트리 시작점 이동)
-		stCommand := "Weld";
-		TPWrite "[HYBRID] stCommand=Weld sent, waiting gantry at start...";
+		! Step 3: WeldsG_* → jointtarget 변환 → MoveExtJ
+		! R축: HOME_GANTRY_R(0) - nAngleRzStore
+		target_r := HOME_GANTRY_R - nAngleRzStore;
 
-		! Step 4: 갠트리 시작점 도달 대기 (v500, 최대거리~10000mm → 약 20초)
-		WaitTime 8;
+		! 시작점 jointtarget (robax=9E+09: MoveExtJ에서 로봇 관절 무시)
+		jt_start := [[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09],[0,0,0,0,9E+09,0]];
+		phys := FloorToPhysical(calcPosStart);
+		jt_start.extax.eax_a := phys.x;
+		jt_start.extax.eax_b := phys.y;
+		jt_start.extax.eax_c := phys.z;
+		jt_start.extax.eax_d := target_r;
+		jt_start.extax.eax_f := phys.x;
 
-		! Step 5: WeldGo 명령 (갠트리 끝점으로 용접 이동)
-		stCommand := "WeldGo";
-		TPWrite "[HYBRID] stCommand=WeldGo sent, waiting WeldOk...";
+		! 끝점 jointtarget (R축 동일, X/Y/Z만 변경)
+		jt_end := jt_start;
+		phys := FloorToPhysical(calcPosEnd);
+		jt_end.extax.eax_a := phys.x;
+		jt_end.extax.eax_b := phys.y;
+		jt_end.extax.eax_c := phys.z;
+		jt_end.extax.eax_f := phys.x;
 
-		! Step 6: 용접 완료 대기
-		WaitUntil stReact{3} = "WeldOk" \MaxTime:=60 \TimeFlag:=ok;
-		IF ok THEN
-			Write res_file, "Result=COMPLETE";
-			TPWrite "[HYBRID] Scenario " + NumToStr(i,0) + " COMPLETE";
-		ELSE
-			Write res_file, "Result=TIMEOUT (stReact{3}=" + stReact{3} + ")";
-			TPWrite "[HYBRID] Scenario " + NumToStr(i,0) + " TIMEOUT";
-		ENDIF
+		Write res_file, "Gantry Start(Phys): X=" + NumToStr(jt_start.extax.eax_a,1)
+		        + " Y=" + NumToStr(jt_start.extax.eax_b,1)
+		        + " R=" + NumToStr(target_r,2);
+		Write res_file, "Gantry End(Phys):   X=" + NumToStr(jt_end.extax.eax_a,1)
+		        + " Y=" + NumToStr(jt_end.extax.eax_b,1);
 
-		! Step 7: 명령 클리어 → TASK7 Ready 복귀
-		stCommand := "";
-		WaitUntil stReact{3} = "Ready" \MaxTime:=10;
+		! Step 4: 갠트리 시작점 이동
+		TPWrite "[HYBRID] Moving gantry to start...";
+		WaitRob \ZeroSpeed;
+		MoveExtJ jt_start, v500, fine;
+
+		! Step 5: 갠트리 끝점 이동 (용접 속도)
+		TPWrite "[HYBRID] Weld driving...";
+		MoveExtJ jt_end, [WELD_SPEED,200,WELD_SPEED,200], fine;
+		WaitRob \InPos;
+
+		Write res_file, "Result=COMPLETE";
+		TPWrite "[HYBRID] Scenario " + NumToStr(i,0) + " COMPLETE";
 		WaitTime 1;
 	ENDFOR
 
@@ -6329,7 +6337,7 @@ PROC TestPlanAB_Stage1()
 	Write res_file, "=== Test Complete ===";
 	Close res_file;
 
-	TPWrite "[HYBRID] Stage1 test done. See HOME:/planab_stage1.txt";
+	TPWrite "[HYBRID] Stage1 done. See HOME:/planab_stage1.txt";
 ENDPROC
 
 ENDMODULE
