@@ -840,8 +840,8 @@ PERS num idSync;
 ! ========================================
 ! [PlanAB-Hybrid] Gantry Bridge Variables (Stage1)
 ! ========================================
-! TASK1의 BridgeToGantry()가 DefineWeldLine 결과를 여기에 저장
-! TASK7(Gantry_MainModule)이 읽어서 MoveExtJ 실행
+! BridgeToGantry() stores DefineWeldLine results here
+! Used by MoveExtJ in TASK1 (monitoring/debug)
 PERS num WeldsG_StartX := 0;
 PERS num WeldsG_StartY := 0;
 PERS num WeldsG_StartZ := 0;
