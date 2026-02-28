@@ -2910,12 +2910,13 @@ PROC TestMenu()
 		TPWrite " 12. Init Non-HOME Test (4 scenarios)";
 		TPWrite " 13. Guard Test (#8 TC T1~T5)";
 		TPWrite " 14. Swap Scenarios (A~E auto)";
+		TPWrite " 15. [Hybrid] DefineWeldLine→Gantry Stage1";
 		TPWrite "  0. Exit";
 		TPWrite "";
 		TPWrite "----------------------------------------";
 
 		! Numeric selection
-		TPReadNum menu_sel, "Select (0-14): ";
+		TPReadNum menu_sel, "Select (0-15): ";
 
 		TEST menu_sel
 		CASE 1:
@@ -3025,6 +3026,14 @@ PROC TestMenu()
 			TPErase;
 			TPWrite "[Menu] Swap Scenarios (A~E auto)...";
 			TestSwapScenarios;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
+		CASE 15:
+			TPErase;
+			TPWrite "[Menu] Hybrid: DefineWeldLine→Gantry Stage1...";
+			TestPlanAB_Stage1;
 			TPWrite "";
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
@@ -6184,6 +6193,143 @@ PROC Rob1_CommandListener()
 ERROR
 	Write head_log, "ERROR " + NumToStr(ERRNO, 0);
 	Close head_log;
+ENDPROC
+
+! ============================================================
+! BridgeToGantry — PlanAB-Hybrid Bridge (v0.1.0)
+! ============================================================
+! DefineWeldLine() 계산 결과(calcPosStart/End, nAngleRzStore)를
+! TASK7 공유 PERS 변수(WeldsG_*)로 전달
+!
+! 호출 전제: DefineWeldLine() 완료
+! ============================================================
+PROC BridgeToGantry(num weld_speed)
+	WeldsG_StartX := calcPosStart.x;
+	WeldsG_StartY := calcPosStart.y;
+	WeldsG_StartZ := calcPosStart.z;
+	WeldsG_StartR := nAngleRzStore;  ! DefineWeldLine() 계산값
+	WeldsG_EndX   := calcPosEnd.x;
+	WeldsG_EndY   := calcPosEnd.y;
+	WeldsG_EndZ   := calcPosEnd.z;
+	WeldsG_EndR   := nAngleRzStore;  ! 용접선 방향 유지 (시작=끝 각도)
+	WeldsG_Speed  := weld_speed;
+	TPWrite "[BRIDGE] WeldsG set: Start=[" + NumToStr(WeldsG_StartX,0)
+	        + "," + NumToStr(WeldsG_StartY,0) + "] End=["
+	        + NumToStr(WeldsG_EndX,0) + "," + NumToStr(WeldsG_EndY,0)
+	        + "] R=" + NumToStr(WeldsG_StartR,1) + "deg v=" + NumToStr(weld_speed,0);
+ENDPROC
+
+! ============================================================
+! TestPlanAB_Stage1 — Hybrid 1단계 개념 검증 (v0.1.0)
+! ============================================================
+! swap_test.txt 시나리오를 읽어 TASK7 갠트리 모션 확인
+! DefineWeldLine → BridgeToGantry → stCommand "Weld"/"WeldGo" 프로토콜
+!
+! 결과 파일: HOME:/planab_stage1.txt
+! ============================================================
+PROC TestPlanAB_Stage1()
+	VAR iodev cfg_file;
+	VAR iodev res_file;
+	VAR string line;
+	VAR num nScenarios;
+	VAR num sx;
+	VAR num sy;
+	VAR num sz;
+	VAR num ex;
+	VAR num ey;
+	VAR num ez;
+	VAR bool ok;
+	VAR num i;
+
+	TPWrite "========================================";
+	TPWrite "[HYBRID] PlanAB Stage1 Gantry Bridge Test";
+	TPWrite "========================================";
+
+	! TASK7 준비 확인
+	IF stReact{3} <> "Ready" THEN
+		TPWrite "[HYBRID] Waiting for TASK7 Ready...";
+		WaitUntil stReact{3} = "Ready" \MaxTime:=10 \TimeFlag:=ok;
+		IF NOT ok THEN
+			TPWrite "[HYBRID] ERROR: TASK7 not ready (stReact{3}=" + stReact{3} + ")";
+			RETURN ;
+		ENDIF
+	ENDIF
+
+	Open "HOME:/swap_test.txt", cfg_file \Read;
+	Open "HOME:/planab_stage1.txt", res_file \Write;
+	Write res_file, "PlanAB Hybrid Stage1 Test - " + CDate() + " " + CTime();
+	Write res_file, "Version=" + TASK1_VERSION;
+
+	! 시나리오 수 읽기
+	line := ReadStr(cfg_file);
+	ok := StrToVal(line, nScenarios);
+	Write res_file, "Scenarios=" + NumToStr(nScenarios,0);
+
+	FOR i FROM 1 TO nScenarios DO
+		! 6줄 읽기: sx, sy, sz, ex, ey, ez
+		line := ReadStr(cfg_file); ok := StrToVal(line, sx);
+		line := ReadStr(cfg_file); ok := StrToVal(line, sy);
+		line := ReadStr(cfg_file); ok := StrToVal(line, sz);
+		line := ReadStr(cfg_file); ok := StrToVal(line, ex);
+		line := ReadStr(cfg_file); ok := StrToVal(line, ey);
+		line := ReadStr(cfg_file); ok := StrToVal(line, ez);
+
+		! calcPosStart/End 설정
+		calcPosStart.x := sx;
+		calcPosStart.y := sy;
+		calcPosStart.z := sz;
+		calcPosEnd.x := ex;
+		calcPosEnd.y := ey;
+		calcPosEnd.z := ez;
+
+		Write res_file, "";
+		Write res_file, "=== Scenario " + NumToStr(i,0) + "/" + NumToStr(nScenarios,0) + " ===";
+		Write res_file, "Input Start=[" + NumToStr(sx,0) + "," + NumToStr(sy,0) + "," + NumToStr(sz,0) + "]";
+		Write res_file, "Input End=[" + NumToStr(ex,0) + "," + NumToStr(ey,0) + "," + NumToStr(ez,0) + "]";
+		TPWrite "[HYBRID] === Scenario " + NumToStr(i,0) + "/" + NumToStr(nScenarios,0) + " ===";
+
+		! Step 1: DefineWeldLine → 각도 계산 + 스왑 처리
+		DefineWeldLine;
+		Write res_file, "R_angle=" + NumToStr(nAngleRzStore,2) + "deg bRobSwap=" + BoolToStr(bRobSwap);
+		Write res_file, "Calc Start=[" + NumToStr(calcPosStart.x,0) + "," + NumToStr(calcPosStart.y,0) + "]";
+		Write res_file, "Calc End=[" + NumToStr(calcPosEnd.x,0) + "," + NumToStr(calcPosEnd.y,0) + "]";
+
+		! Step 2: BridgeToGantry → WeldsG_* 전달
+		BridgeToGantry 20;
+
+		! Step 3: TASK7에 Weld 명령 (갠트리 시작점 이동)
+		stCommand := "Weld";
+		TPWrite "[HYBRID] stCommand=Weld sent, waiting gantry at start...";
+
+		! Step 4: 갠트리 시작점 도달 대기 (v500, 최대거리~10000mm → 약 20초)
+		WaitTime 8;
+
+		! Step 5: WeldGo 명령 (갠트리 끝점으로 용접 이동)
+		stCommand := "WeldGo";
+		TPWrite "[HYBRID] stCommand=WeldGo sent, waiting WeldOk...";
+
+		! Step 6: 용접 완료 대기
+		WaitUntil stReact{3} = "WeldOk" \MaxTime:=60 \TimeFlag:=ok;
+		IF ok THEN
+			Write res_file, "Result=COMPLETE";
+			TPWrite "[HYBRID] Scenario " + NumToStr(i,0) + " COMPLETE";
+		ELSE
+			Write res_file, "Result=TIMEOUT (stReact{3}=" + stReact{3} + ")";
+			TPWrite "[HYBRID] Scenario " + NumToStr(i,0) + " TIMEOUT";
+		ENDIF
+
+		! Step 7: 명령 클리어 → TASK7 Ready 복귀
+		stCommand := "";
+		WaitUntil stReact{3} = "Ready" \MaxTime:=10;
+		WaitTime 1;
+	ENDFOR
+
+	Close cfg_file;
+	Write res_file, "";
+	Write res_file, "=== Test Complete ===";
+	Close res_file;
+
+	TPWrite "[HYBRID] Stage1 test done. See HOME:/planab_stage1.txt";
 ENDPROC
 
 ENDMODULE

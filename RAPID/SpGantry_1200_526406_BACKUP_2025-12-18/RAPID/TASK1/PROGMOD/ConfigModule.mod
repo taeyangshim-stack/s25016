@@ -837,4 +837,19 @@ PERS speeddata vSync;
 PERS zonedata zSync;
 PERS num idSync;
 
+! ========================================
+! [PlanAB-Hybrid] Gantry Bridge Variables (Stage1)
+! ========================================
+! TASK1의 BridgeToGantry()가 DefineWeldLine 결과를 여기에 저장
+! TASK7(Gantry_MainModule)이 읽어서 MoveExtJ 실행
+PERS num WeldsG_StartX := 0;
+PERS num WeldsG_StartY := 0;
+PERS num WeldsG_StartZ := 0;
+PERS num WeldsG_StartR := 0;  ! R축 각도 (nAngleRzStore에서 설정)
+PERS num WeldsG_EndX   := 0;
+PERS num WeldsG_EndY   := 0;
+PERS num WeldsG_EndZ   := 0;
+PERS num WeldsG_EndR   := 0;
+PERS num WeldsG_Speed  := 10;
+
 ENDMODULE
