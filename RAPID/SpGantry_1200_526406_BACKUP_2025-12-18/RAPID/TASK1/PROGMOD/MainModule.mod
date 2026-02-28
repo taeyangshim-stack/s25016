@@ -6284,7 +6284,7 @@ PROC TestPlanAB_Stage1()
 
 		! Step 1: DefineWeldLine -> angle + swap (nAngleRzStore normalized to [-90,90])
 		DefineWeldLine;
-		Write res_file, "R_angle=" + NumToStr(nAngleRzStore,2) + "deg bRobSwap=" + BoolToStr(bRobSwap);
+		Write res_file, "R_angle=" + NumToStr(nAngleRzStore,2) + "deg bRobSwap=" + ValToStr(bRobSwap);
 		Write res_file, "Calc Start=[" + NumToStr(calcPosStart.x,0) + "," + NumToStr(calcPosStart.y,0) + "]";
 		Write res_file, "Calc End=[" + NumToStr(calcPosEnd.x,0) + "," + NumToStr(calcPosEnd.y,0) + "]";
 
