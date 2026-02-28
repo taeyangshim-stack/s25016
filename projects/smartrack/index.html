@@ -389,18 +389,19 @@
   <a class="toc-item" href="#sec04">04 물류 흐름도</a>
   <a class="toc-item" href="#sec05">05 다중 랙 배치</a>
   <a class="toc-item" href="#sec06">06 랙장 컨셉</a>
-  <a class="toc-item" href="#sec07">07 핵심 아이디어</a>
-  <a class="toc-item" href="#sec08">08 유연성 시연</a>
-  <a class="toc-item" href="#sec09">09 벤치마킹</a>
-  <a class="toc-item" href="#sec10">10 벤치마킹 브릿지</a>
-  <a class="toc-item" href="#sec11">11 컨셉 A — 핀-그리드</a>
-  <a class="toc-item" href="#sec12">12 컨셉 B — 전동 서포트</a>
-  <a class="toc-item" href="#sec13">13 컨셉 C — 셀 어레이</a>
-  <a class="toc-item" href="#sec14">14 랙 모듈 + 안전</a>
-  <a class="toc-item" href="#sec15">15 AMR 도킹</a>
-  <a class="toc-item" href="#sec16">16 시스템 아키텍처</a>
-  <a class="toc-item" href="#sec17">17 입출고 시퀀스</a>
-  <a class="toc-item" href="#sec18">18 로드맵 + 결론</a>
+  <a class="toc-item" href="#sec07">07 이송 방식 비교</a>
+  <a class="toc-item" href="#sec08">08 핵심 아이디어</a>
+  <a class="toc-item" href="#sec09">09 유연성 시연</a>
+  <a class="toc-item" href="#sec10">10 벤치마킹</a>
+  <a class="toc-item" href="#sec11">11 벤치마킹 브릿지</a>
+  <a class="toc-item" href="#sec12">12 컨셉 A — 핀-그리드</a>
+  <a class="toc-item" href="#sec13">13 컨셉 B — 전동 서포트</a>
+  <a class="toc-item" href="#sec14">14 컨셉 C — 셀 어레이</a>
+  <a class="toc-item" href="#sec15">15 랙 모듈 + 안전</a>
+  <a class="toc-item" href="#sec16">16 AMR 도킹</a>
+  <a class="toc-item" href="#sec17">17 시스템 아키텍처</a>
+  <a class="toc-item" href="#sec18">18 입출고 시퀀스</a>
+  <a class="toc-item" href="#sec19">19 로드맵 + 결론</a>
 </nav>
 
 <!-- NAV DOTS (PPT mode) -->
@@ -1058,9 +1059,154 @@
   </div>
 </section>
 
-<!-- ===== SECTION 07: 핵심 아이디어 — "핀 아트" ===== -->
-<section class="slide" id="sec07" data-title="핵심 아이디어">
+<!-- ===== SECTION 07: Stacker Crane vs AMR 이송 방식 ���교 ===== -->
+<section class="slide" id="sec07" data-title="이송 방식 비교">
   <span class="slide-num">07</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag tag-amber">이송 전략</span>
+      <h2 style="margin-top:8px">이송 방식 선택 — Stacker Crane vs AMR</h2>
+      <p class="subtitle">랙장 내 소부재 이동을 위한 두 가지 방식 비교 및 스마트랙 권고안</p>
+    </div>
+
+    <!-- PPT: 3-컬럼 비교 카드 -->
+    <div class="row" style="gap:16px;margin-top:8px">
+
+      <!-- A: Overhead Stacker Crane -->
+      <div class="card" style="padding:18px;border-top:3px solid #D97706">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:20px">🏗️</span>
+          <span style="font-size:12px;font-weight:700;color:#92400E">Overhead Stacker Crane</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-sub);line-height:1.7">
+          <div style="margin-bottom:4px">📌 천장 레일 고정 → 바닥 무장애</div>
+          <div style="margin-bottom:4px">📌 최대 하중 <b>30t+</b> 대응</div>
+          <div style="margin-bottom:4px">📌 수직 스태킹 → 공간 효율 우수</div>
+          <div style="margin-bottom:4px;color:#DC2626">⚠ 고정 경로 — 유연성 제한</div>
+          <div style="color:#DC2626">⚠ 설치비 · 유지보수 高</div>
+        </div>
+        <div style="margin-top:10px;padding:6px 10px;background:#FEF3C7;border-radius:6px;font-size:11px;color:#92400E;font-weight:600">
+          적합: 고하중 · 반복 경로 · 대형 부재
+        </div>
+      </div>
+
+      <!-- B: AMR 기반 -->
+      <div class="card" style="padding:18px;border-top:3px solid #1D4ED8">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:20px">🤖</span>
+          <span style="font-size:12px;font-weight:700;color:#1E40AF">AMR 기반 자율 이송</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-sub);line-height:1.7">
+          <div style="margin-bottom:4px">📌 자율 경로 → 레이아웃 유연</div>
+          <div style="margin-bottom:4px">📌 AI 연동 · IoT 통합 용이</div>
+          <div style="margin-bottom:4px">📌 확장 · 재배치 간단</div>
+          <div style="margin-bottom:4px;color:#DC2626">⚠ 최대 하중 <b>~5t</b> (일반)</div>
+          <div style="color:#DC2626">⚠ 도킹 정밀도 요구</div>
+        </div>
+        <div style="margin-top:10px;padding:6px 10px;background:#DBEAFE;border-radius:6px;font-size:11px;color:#1E40AF;font-weight:600">
+          적합: 경·중하중 · 다품종 · AI 운영
+        </div>
+      </div>
+
+      <!-- C: 스마트랙 권고 — Hybrid -->
+      <div class="card" style="padding:18px;border-top:3px solid #0D6E51;background:linear-gradient(135deg,#F0FDF4,#fff)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span style="font-size:20px">⚡</span>
+          <span style="font-size:12px;font-weight:700;color:#0D6E51">스마트랙 권고 — 하이브리드</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-sub);line-height:1.7">
+          <div style="margin-bottom:4px">✅ <b>A존</b>: 크레인 (5t+ 대형 부재)</div>
+          <div style="margin-bottom:4px">✅ <b>B존</b>: 크레인 + AMR 병행</div>
+          <div style="margin-bottom:4px">✅ <b>C존</b>: AMR 전담 (경량 소부재)</div>
+          <div style="margin-bottom:4px">✅ AI가 하중·사이즈 판단 후 자동 배정</div>
+        </div>
+        <div style="margin-top:10px;padding:6px 10px;background:#ECFDF5;border:1.5px solid #34D399;border-radius:6px;font-size:11px;color:#065F46;font-weight:700">
+          → 조선소 소부재 0.2~15t 전 범위 커버
+        </div>
+      </div>
+    </div>
+
+    <!-- 핵심 판단 근거 callout -->
+    <div style="margin-top:12px;padding:10px 16px;background:#FFF1F2;border-left:4px solid #E11D48;border-radius:8px;display:flex;gap:16px;align-items:center">
+      <span style="font-size:13px;font-weight:700;color:#9F1239;white-space:nowrap">핵심 판단</span>
+      <span style="font-size:12px;color:#52525B;line-height:1.6">
+        조선소 소부재는 <b>0.2~15t 중하중</b> 구간 → 단일 AMR 불가.
+        단일 크레인은 경로 고정으로 AI 유연 배치 불가.
+        <b>구역별 하이브리드</b>가 최적 솔루션.
+      </span>
+    </div>
+  </div>
+
+  <!-- Report-only: 상세 분석 -->
+  <div class="report-only" style="margin-top:24px">
+    <h3 style="font-size:16px;margin-bottom:16px">이송 방식 상세 비교 분석</h3>
+
+    <!-- 비교표 -->
+    <div class="card" style="padding:20px;margin-bottom:20px">
+      <h4 style="font-size:14px;margin-bottom:12px;color:var(--accent)">정량 비교표</h4>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#F4F4F5">
+            <th style="padding:10px;text-align:left;border-bottom:2px solid #E4E4E7">항목</th>
+            <th style="padding:10px;text-align:center;border-bottom:2px solid #E4E4E7;color:#92400E">Overhead Stacker Crane</th>
+            <th style="padding:10px;text-align:center;border-bottom:2px solid #E4E4E7;color:#1E40AF">AMR 기반</th>
+            <th style="padding:10px;text-align:center;border-bottom:2px solid #E4E4E7;color:#065F46">스마트랙 하이브리드</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #F4F4F5"><td style="padding:8px;font-weight:600">최대 하중</td><td style="padding:8px;text-align:center">30t+</td><td style="padding:8px;text-align:center">~5t (일반)</td><td style="padding:8px;text-align:center;color:#065F46;font-weight:700">0.2~15t (구역별)</td></tr>
+          <tr style="border-bottom:1px solid #F4F4F5;background:#FAFAFA"><td style="padding:8px;font-weight:600">경로 유연성</td><td style="padding:8px;text-align:center">고정 레일</td><td style="padding:8px;text-align:center">완전 자율</td><td style="padding:8px;text-align:center;color:#065F46;font-weight:700">구역 내 자율</td></tr>
+          <tr style="border-bottom:1px solid #F4F4F5"><td style="padding:8px;font-weight:600">AI 연동</td><td style="padding:8px;text-align:center">제한적</td><td style="padding:8px;text-align:center">우수</td><td style="padding:8px;text-align:center;color:#065F46;font-weight:700">우수</td></tr>
+          <tr style="border-bottom:1px solid #F4F4F5;background:#FAFAFA"><td style="padding:8px;font-weight:600">초기 투자비</td><td style="padding:8px;text-align:center">高 (레일 공사)</td><td style="padding:8px;text-align:center">中</td><td style="padding:8px;text-align:center;color:#065F46;font-weight:700">中~高 (단계 투자)</td></tr>
+          <tr style="border-bottom:1px solid #F4F4F5"><td style="padding:8px;font-weight:600">유지보수</td><td style="padding:8px;text-align:center">高 (레일·모터)</td><td style="padding:8px;text-align:center">低~中</td><td style="padding:8px;text-align:center;color:#065F46;font-weight:700">中</td></tr>
+          <tr style="border-bottom:1px solid #F4F4F5;background:#FAFAFA"><td style="padding:8px;font-weight:600">확장성</td><td style="padding:8px;text-align:center">低 (레일 증설)</td><td style="padding:8px;text-align:center">高</td><td style="padding:8px;text-align:center;color:#065F46;font-weight:700">高</td></tr>
+          <tr><td style="padding:8px;font-weight:600">조선소 적합도</td><td style="padding:8px;text-align:center">★★★★☆</td><td style="padding:8px;text-align:center">★★☆☆☆</td><td style="padding:8px;text-align:center;color:#065F46;font-weight:700">★★★★★</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- YouTube: Overhead Stacker Crane -->
+    <div class="card" style="padding:20px;margin-bottom:20px">
+      <h4 style="font-size:14px;margin-bottom:12px;color:#92400E">참고 영상 1 — Overhead Stacker Crane (Type A)</h4>
+      <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000">
+        <iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" src="https://www.youtube.com/embed/PcJeRFpsWaI" title="Overhead Stacker Crane" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-top:8px">천장 레일 기반 Overhead Stacker Crane. 고하중 수직 스태킹, 고정 경로.</p>
+    </div>
+
+    <!-- YouTube: Stacker Crane Type B -->
+    <div class="card" style="padding:20px;margin-bottom:20px">
+      <h4 style="font-size:14px;margin-bottom:12px;color:#92400E">참고 영상 2 — Stacker Crane (Type B)</h4>
+      <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000">
+        <iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" src="https://www.youtube.com/embed/N7D3FkhTwLU" title="Stacker Crane Type B" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-top:8px">유사 타입 Stacker Crane. 경로 특성 및 하중 대응 비교.</p>
+    </div>
+
+    <!-- YouTube: 중국 조선소 AMR 사례 -->
+    <div class="card" style="padding:20px;margin-bottom:20px">
+      <h4 style="font-size:14px;margin-bottom:12px;color:#1E40AF">참고 영상 3 — 중국 조선소 AMR 자동화 공정</h4>
+      <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:10px;overflow:hidden;background:#000">
+        <iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" src="https://www.youtube.com/embed/VNn5mQX1lQ8" title="중국 조선소 AMR 자동화" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);margin-top:8px">중국 조선소 AMR+Rack 자동화 공정. AMR 방식의 유연성과 한계 동시 확인.</p>
+    </div>
+
+    <!-- 최종 권고 -->
+    <div class="card card-accent" style="padding:20px">
+      <h4 style="font-size:14px;margin-bottom:12px">스마트랙 최종 권고</h4>
+      <div style="font-size:13px;color:var(--text-sub);line-height:1.8">
+        <p style="margin-bottom:8px">단일 방식(크레인 or AMR)으로는 <b>조선소 소부재 중하중(0.2~15t) 다품종 환경</b>을 완전히 커버하기 어렵습니다.</p>
+        <p style="margin-bottom:8px"><b>스마트랙 하이브리드 전략</b>: A존(5t+ 대형)은 크레인, C존(경량 소부재)은 AMR, B존(중간)은 양방향 연동. AI가 실시간 하중·형상 데이터를 바탕으로 이송 수단을 자동 선택합니다.</p>
+        <p>이 방식은 <b>중소조선소부터 대형 조선소</b>까지 단계적 확장이 가능하며, 기존 크레인 인프라를 최대한 재활용하여 초기 투자 부담을 낮춥니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 08: 핵심 아이디어 — "핀 아트" ===== -->
+<section class="slide" id="sec08" data-title="핵심 아이디어">
+  <span class="slide-num">08</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">핵심 아이디어</span>
@@ -1169,9 +1315,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 08: 유연성 시연 — 3패널 ===== -->
-<section class="slide" id="sec08" data-title="유연성 시연">
-  <span class="slide-num">08</span>
+<!-- ===== SECTION 09: 유연성 시연 — 3패널 ===== -->
+<section class="slide" id="sec09" data-title="유연성 시연">
+  <span class="slide-num">09</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">유연성 증명</span>
@@ -1261,9 +1407,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 09: 벤치마킹 / 참고 사례 ===== -->
-<section class="slide" id="sec09" data-title="벤치마킹">
-  <span class="slide-num">09</span>
+<!-- ===== SECTION 10: 벤치마킹 / 참고 사례 ===== -->
+<section class="slide" id="sec10" data-title="벤치마킹">
+  <span class="slide-num">10</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">벤치마킹</span>
@@ -1763,9 +1909,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 10: 벤치마킹 → 스마트랙 브릿지 ===== -->
-<section class="slide" id="sec10" data-title="벤치마킹 브릿지">
-  <span class="slide-num">10</span>
+<!-- ===== SECTION 11: 벤치마킹 → 스마트랙 브릿지 ===== -->
+<section class="slide" id="sec11" data-title="벤치마킹 브릿지">
+  <span class="slide-num">11</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag" style="background:linear-gradient(135deg,#1D4ED8,#0D6E51);color:#fff">전환</span>
@@ -1852,9 +1998,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 11: 컨셉 A ===== -->
-<section class="slide" id="sec11" data-title="컨셉 A">
-  <span class="slide-num">11</span>
+<!-- ===== SECTION 12: 컨셉 A ===== -->
+<section class="slide" id="sec12" data-title="컨셉 A">
+  <span class="slide-num">12</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">컨셉 A · MVP</span>
@@ -1951,9 +2097,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 12: 컨셉 B ===== -->
-<section class="slide" id="sec12" data-title="컨셉 B">
-  <span class="slide-num">12</span>
+<!-- ===== SECTION 13: 컨셉 B ===== -->
+<section class="slide" id="sec13" data-title="컨셉 B">
+  <span class="slide-num">13</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">컨셉 B · 차별화</span>
@@ -2074,9 +2220,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 13: 컨셉 C ===== -->
-<section class="slide" id="sec13" data-title="컨셉 C">
-  <span class="slide-num">13</span>
+<!-- ===== SECTION 14: 컨셉 C ===== -->
+<section class="slide" id="sec14" data-title="컨셉 C">
+  <span class="slide-num">14</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-violet">컨셉 C · 세계 최초급</span>
@@ -2136,9 +2282,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 14: 랙 모듈 + 안전 ===== -->
-<section class="slide" id="sec14" data-title="랙 모듈">
-  <span class="slide-num">14</span>
+<!-- ===== SECTION 15: 랙 모듈 + 안전 ===== -->
+<section class="slide" id="sec15" data-title="랙 모듈">
+  <span class="slide-num">15</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">기구 설계</span>
@@ -2185,9 +2331,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 15: AMR 도킹 개념 ===== -->
-<section class="slide" id="sec15" data-title="AMR 도킹">
-  <span class="slide-num">15</span>
+<!-- ===== SECTION 16: AMR 도킹 개념 ===== -->
+<section class="slide" id="sec16" data-title="AMR 도킹">
+  <span class="slide-num">16</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-violet">AMR 연계</span>
@@ -2280,9 +2426,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 16: 시스템 아키텍처 ===== -->
-<section class="slide" id="sec16" data-title="시스템 아키텍처">
-  <span class="slide-num">16</span>
+<!-- ===== SECTION 17: 시스템 아키텍처 ===== -->
+<section class="slide" id="sec17" data-title="시스템 아키텍처">
+  <span class="slide-num">17</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-blue">S/W 아키텍처</span>
@@ -2342,9 +2488,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 17: 입출고 시퀀스 ===== -->
-<section class="slide" id="sec17" data-title="입출고 시퀀스">
-  <span class="slide-num">17</span>
+<!-- ===== SECTION 18: 입출고 시퀀스 ===== -->
+<section class="slide" id="sec18" data-title="입출고 시퀀스">
+  <span class="slide-num">18</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-green">물류 운영</span>
@@ -2412,9 +2558,9 @@
   </div>
 </section>
 
-<!-- ===== SECTION 18: 로드맵 + 역량 + 결론 ===== -->
-<section class="slide" id="sec18" data-title="로드맵 + 결론">
-  <span class="slide-num">18</span>
+<!-- ===== SECTION 19: 로드맵 + 역량 + 결론 ===== -->
+<section class="slide" id="sec19" data-title="로드맵 + 결론">
+  <span class="slide-num">19</span>
   <div class="slide-inner">
     <div>
       <span class="slide-tag tag-amber">개발 계획 + 결론</span>
