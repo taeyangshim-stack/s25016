@@ -463,7 +463,7 @@ PERS num nLimitX_Positive := 12300;
 PERS num nLimitY_Negative := 0;
 PERS num nLimitY_Positive := 5300;
 PERS num nLimitZ_Negative := 0;
-PERS num nLimitZ_Positive := 2100;  ! PlanA value (was 1000)
+PERS num nLimitZ_Positive := 1050;  ! MOC.cfg hardware limit: 1.05m
 PERS num nLimitR_Negative := -90;
 PERS num nLimitR_Positive := 90;
 
