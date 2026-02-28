@@ -6207,11 +6207,11 @@ PROC BridgeToGantry(num weld_speed)
 	WeldsG_StartX := calcPosStart.x;
 	WeldsG_StartY := calcPosStart.y;
 	WeldsG_StartZ := calcPosStart.z;
-	WeldsG_StartR := nAngleRzStore;  ! DefineWeldLine() 계산값
+	WeldsG_StartR := nAngleRzStore;  ! result of DefineWeldLine()
 	WeldsG_EndX   := calcPosEnd.x;
 	WeldsG_EndY   := calcPosEnd.y;
 	WeldsG_EndZ   := calcPosEnd.z;
-	WeldsG_EndR   := nAngleRzStore;  ! 용접선 방향 유지 (시작=끝 각도)
+	WeldsG_EndR   := nAngleRzStore;  ! same angle start=end
 	WeldsG_Speed  := weld_speed;
 	TPWrite "[BRIDGE] WeldsG set: Start=[" + NumToStr(WeldsG_StartX,0)
 	        + "," + NumToStr(WeldsG_StartY,0) + "] End=["
@@ -6258,13 +6258,13 @@ PROC TestPlanAB_Stage1()
 	Write res_file, "Version=" + TASK1_VERSION;
 	Write res_file, "Concept: DefineWeldLine -> BridgeToGantry -> MoveExtJ";
 
-	! 시나리오 수 읽기
+	! Read scenario count
 	line := ReadStr(cfg_file);
 	ok := StrToVal(line, nScenarios);
 	Write res_file, "Scenarios=" + NumToStr(nScenarios,0);
 
 	FOR i FROM 1 TO nScenarios DO
-		! 6줄 읽기: sx, sy, sz, ex, ey, ez
+		! Read 6 lines: sx, sy, sz, ex, ey, ez
 		line := ReadStr(cfg_file); ok := StrToVal(line, sx);
 		line := ReadStr(cfg_file); ok := StrToVal(line, sy);
 		line := ReadStr(cfg_file); ok := StrToVal(line, sz);
@@ -6272,7 +6272,7 @@ PROC TestPlanAB_Stage1()
 		line := ReadStr(cfg_file); ok := StrToVal(line, ey);
 		line := ReadStr(cfg_file); ok := StrToVal(line, ez);
 
-		! calcPosStart/End 설정
+		! Set calcPosStart/End
 		calcPosStart.x := sx;  calcPosStart.y := sy;  calcPosStart.z := sz;
 		calcPosEnd.x   := ex;  calcPosEnd.y   := ey;  calcPosEnd.z   := ez;
 
@@ -6282,20 +6282,20 @@ PROC TestPlanAB_Stage1()
 		Write res_file, "Input End=[" + NumToStr(ex,0) + "," + NumToStr(ey,0) + "," + NumToStr(ez,0) + "]";
 		TPWrite "[HYBRID] === Scenario " + NumToStr(i,0) + "/" + NumToStr(nScenarios,0) + " ===";
 
-		! Step 1: DefineWeldLine -> 각도 + 스왑 처리 (nAngleRzStore는 [-90,90] 범위)
+		! Step 1: DefineWeldLine -> angle + swap (nAngleRzStore normalized to [-90,90])
 		DefineWeldLine;
 		Write res_file, "R_angle=" + NumToStr(nAngleRzStore,2) + "deg bRobSwap=" + BoolToStr(bRobSwap);
 		Write res_file, "Calc Start=[" + NumToStr(calcPosStart.x,0) + "," + NumToStr(calcPosStart.y,0) + "]";
 		Write res_file, "Calc End=[" + NumToStr(calcPosEnd.x,0) + "," + NumToStr(calcPosEnd.y,0) + "]";
 
-		! Step 2: BridgeToGantry -> WeldsG_* PERS 저장 (모니터링/디버깅용)
+		! Step 2: BridgeToGantry -> store WeldsG_* PERS (monitoring/debug)
 		BridgeToGantry WELD_SPEED;
 
-		! Step 3: WeldsG_* -> jointtarget 변환 -> MoveExtJ
-		! R축: HOME_GANTRY_R(0) - nAngleRzStore
+		! Step 3: WeldsG_* -> jointtarget -> MoveExtJ
+		! R-axis: HOME_GANTRY_R(0) - nAngleRzStore
 		target_r := HOME_GANTRY_R - nAngleRzStore;
 
-		! 시작점 jointtarget (robax=9E+09: MoveExtJ에서 로봇 관절 무시)
+		! Start jointtarget (robax=9E+09: robot joints ignored by MoveExtJ)
 		jt_start := [[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09],[0,0,0,0,9E+09,0]];
 		phys := FloorToPhysical(calcPosStart);
 		jt_start.extax.eax_a := phys.x;
@@ -6304,7 +6304,7 @@ PROC TestPlanAB_Stage1()
 		jt_start.extax.eax_d := target_r;
 		jt_start.extax.eax_f := phys.x;
 
-		! 끝점 jointtarget (R축 동일, X/Y/Z만 변경)
+		! End jointtarget (same R, only X/Y/Z changed)
 		jt_end := jt_start;
 		phys := FloorToPhysical(calcPosEnd);
 		jt_end.extax.eax_a := phys.x;
@@ -6318,12 +6318,12 @@ PROC TestPlanAB_Stage1()
 		Write res_file, "Gantry End(Phys):   X=" + NumToStr(jt_end.extax.eax_a,1)
 		        + " Y=" + NumToStr(jt_end.extax.eax_b,1);
 
-		! Step 4: 갠트리 시작점 이동
+		! Step 4: Move gantry to start
 		TPWrite "[HYBRID] Moving gantry to start...";
 		WaitRob \ZeroSpeed;
 		MoveExtJ jt_start, v500, fine;
 
-		! Step 5: 갠트리 끝점 이동 (용접 속도)
+		! Step 5: Move gantry to end (weld speed)
 		TPWrite "[HYBRID] Weld driving...";
 		MoveExtJ jt_end, [WELD_SPEED,200,WELD_SPEED,200], fine;
 		WaitRob \InPos;
