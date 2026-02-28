@@ -845,7 +845,7 @@ PERS num idSync;
 PERS num WeldsG_StartX := 0;
 PERS num WeldsG_StartY := 0;
 PERS num WeldsG_StartZ := 0;
-PERS num WeldsG_StartR := 0;  ! R축 각도 (nAngleRzStore에서 설정)
+PERS num WeldsG_StartR := 0;  ! R-axis angle (from nAngleRzStore)
 PERS num WeldsG_EndX   := 0;
 PERS num WeldsG_EndY   := 0;
 PERS num WeldsG_EndZ   := 0;
