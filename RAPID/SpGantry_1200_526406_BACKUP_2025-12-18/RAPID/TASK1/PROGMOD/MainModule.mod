@@ -6198,10 +6198,10 @@ ENDPROC
 ! ============================================================
 ! BridgeToGantry - PlanAB-Hybrid Bridge (v0.1.0)
 ! ============================================================
-! DefineWeldLine() 계산 결과(calcPosStart/End, nAngleRzStore)를
-! TASK7 공유 PERS 변수(WeldsG_*)로 전달
+! Copies DefineWeldLine results (calcPosStart/End, nAngleRzStore)
+! into shared PERS vars (WeldsG_*) for monitoring/debug.
 !
-! 호출 전제: DefineWeldLine() 완료
+! Prerequisite: DefineWeldLine() must be called first.
 ! ============================================================
 PROC BridgeToGantry(num weld_speed)
 	WeldsG_StartX := calcPosStart.x;
@@ -6220,12 +6220,13 @@ PROC BridgeToGantry(num weld_speed)
 ENDPROC
 
 ! ============================================================
-! TestPlanAB_Stage1 - Hybrid 1단계 개념 검증 (v0.2.0)
+! TestPlanAB_Stage1 - Hybrid Stage1 Concept Test (v0.2.0)
 ! ============================================================
-! swap_test.txt 5개 시나리오: DefineWeldLine -> BridgeToGantry -> MoveExtJ
-! Direction-C: TASK1에서 직접 갠트리 외부축 제어 (TASK7 불사용)
+! Reads 5 scenarios from swap_test.txt.
+! Flow: DefineWeldLine -> BridgeToGantry -> MoveExtJ
+! Direction-C: TASK1 drives gantry directly (no TASK7).
 !
-! 결과 파일: HOME:/planab_stage1.txt
+! Output: HOME:/planab_stage1.txt
 ! ============================================================
 PROC TestPlanAB_Stage1()
 	VAR iodev cfg_file;
