@@ -1397,6 +1397,10 @@
     <div class="ppt-only" id="sr3d-cont" style="flex:1;min-height:0;border-radius:12px;overflow:hidden;position:relative;background:#F1F5F9;border:1px solid #E2E8F0;flex-shrink:0">
       <canvas id="sr3d-canvas" style="display:block;width:100%;height:100%"></canvas>
       <div style="position:absolute;top:10px;left:14px;color:rgba(30,41,59,0.5);font-size:9px;font-family:monospace;letter-spacing:1.5px;text-transform:uppercase">Smart Rack · 듀얼 야드 물류 흐름 시뮬레이션</div>
+      <div style="position:absolute;top:8px;right:14px;display:flex;gap:4px;z-index:10">
+        <button class="sr3d-tab" data-layout="A" style="padding:4px 12px;border:1px solid #CBD5E1;border-radius:6px;font-size:10px;font-family:monospace;cursor:pointer;background:#1E293B;color:#F8FAFC;font-weight:700">현재 배치</button>
+        <button class="sr3d-tab" data-layout="B" style="padding:4px 12px;border:1px solid #CBD5E1;border-radius:6px;font-size:10px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">신규 배치</button>
+      </div>
       <div style="position:absolute;bottom:10px;left:14px;display:flex;gap:12px;font-size:8px;font-family:monospace;color:rgba(30,41,59,0.5)">
         <span style="color:#D97706">■ 절단</span>
         <span style="color:#16A34A">■ 입고장</span>
@@ -1429,7 +1433,8 @@
     var d=14,asp=W/H;
     var cam=new THREE.OrthographicCamera(-d*asp,d*asp,d,-d,0.1,300);
     cam.position.set(25,22,20); cam.lookAt(0,2,0);
-    /* Lights — bright studio setup */
+
+    /* ===== SHARED: Lights ===== */
     scene.add(new THREE.AmbientLight(0xffffff,0.7));
     var sun=new THREE.DirectionalLight(0xffffff,1.0);
     sun.position.set(18,28,14); sun.castShadow=true;
@@ -1438,158 +1443,166 @@
     scene.add(sun);
     var fl2=new THREE.DirectionalLight(0x93C5FD,0.4); fl2.position.set(-12,10,-8); scene.add(fl2);
     var fl3=new THREE.DirectionalLight(0xFDE68A,0.25); fl3.position.set(0,16,18); scene.add(fl3);
-    /* Helpers */
+
+    /* ===== SHARED: Helpers ===== */
     function bx(w,h,dd,col,opt){
       return new THREE.Mesh(new THREE.BoxGeometry(w,h,dd),
         new THREE.MeshLambertMaterial(Object.assign({color:col},opt||{})));
     }
     function at(o,x,y,z){o.position.set(x,y,z);return o;}
-    function add(o){o.castShadow=true;o.receiveShadow=true;scene.add(o);return o;}
-    /* Floor — light theme */
-    add(at(bx(40,0.08,20,0xE2E8F0),0,0,0));
-    scene.add(new THREE.GridHelper(40,40,0xCBD5E1,0xCBD5E1));
+    var clk=new THREE.Clock(),CY=10;
+    function lerp(a,b,t){return a+(b-a)*Math.min(Math.max(t,0),1);}
+    function ease(t){return t<0.5?2*t*t:-1+(4-2*t)*t;}
+    function clamp01(v){return Math.min(Math.max(v,0),1);}
 
-    /* ===== ZONES ===== */
+    /* ===== Layout switching ===== */
+    var activeLayout='A';
+    var groupA=new THREE.Group(); groupA.name='layoutA';
+    var groupB=new THREE.Group(); groupB.name='layoutB'; groupB.visible=false;
+    scene.add(groupA); scene.add(groupB);
+
+    function addA(o){o.castShadow=true;o.receiveShadow=true;groupA.add(o);return o;}
+    function addB(o){o.castShadow=true;o.receiveShadow=true;groupB.add(o);return o;}
+
+    function switchLayout(lay){
+      if(lay===activeLayout)return;
+      activeLayout=lay;
+      groupA.visible=(lay==='A');
+      groupB.visible=(lay==='B');
+      d=(lay==='A')?14:20;
+      asp=W/H;
+      cam.left=-d*asp;cam.right=d*asp;cam.top=d;cam.bottom=-d;
+      cam.updateProjectionMatrix();
+      /* update tab buttons */
+      var tabs=cont.querySelectorAll('.sr3d-tab');
+      tabs.forEach(function(btn){
+        if(btn.dataset.layout===lay){
+          btn.style.background='#1E293B';btn.style.color='#F8FAFC';btn.style.fontWeight='700';
+        }else{
+          btn.style.background='#F1F5F9';btn.style.color='#64748B';btn.style.fontWeight='400';
+        }
+      });
+    }
+    /* tab click handler */
+    cont.querySelectorAll('.sr3d-tab').forEach(function(btn){
+      btn.addEventListener('click',function(){switchLayout(btn.dataset.layout);});
+    });
+
+    /* ============================================================
+       LAYOUT A — 기존 직선형 배치 (모든 오브젝트 groupA에)
+       ============================================================ */
+    /* Floor */
+    addA(at(bx(40,0.08,20,0xE2E8F0),0,0,0));
+    var gridA=new THREE.GridHelper(40,40,0xCBD5E1,0xCBD5E1);
+    groupA.add(gridA);
+
     /* 절단 (x=-13) */
-    add(at(bx(3.5,0.12,2.5,0xFBBF24,{transparent:true,opacity:0.5}),-13,0.06,0));
+    addA(at(bx(3.5,0.12,2.5,0xFBBF24,{transparent:true,opacity:0.5}),-13,0.06,0));
     for(var i=0;i<3;i++){for(var j=0;j<2;j++){
-      add(at(bx(0.7,0.4,0.5,0xD97706),-14+i*1.0,0.32,-0.5+j*1.0));
+      addA(at(bx(0.7,0.4,0.5,0xD97706),-14+i*1.0,0.32,-0.5+j*1.0));
     }}
-    /* 소조립 (x=0) — 4단계 박스 */
+    /* 소조립 (x=0) */
     var subSteps=[
-      {dx:-1.8,col:0xF97316,label:'취부'},
-      {dx:-0.6,col:0xEAB308,label:'용접'},
-      {dx:0.6,col:0x94A3B8,label:'수정'},
-      {dx:1.8,col:0x22D3EE,label:'열처리'}
+      {dx:-1.8,col:0xF97316},{dx:-0.6,col:0xEAB308},
+      {dx:0.6,col:0x94A3B8},{dx:1.8,col:0x22D3EE}
     ];
-    var subBoxes=[];
-    add(at(bx(5.5,0.08,2.5,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,0));
+    var subBoxesA=[];
+    addA(at(bx(5.5,0.08,2.5,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,0));
     subSteps.forEach(function(s){
       var b=bx(1.0,0.7,1.0,s.col,{transparent:true,opacity:0.85});
-      at(b,s.dx,0.45,0); add(b); subBoxes.push(b);
+      at(b,s.dx,0.45,0); addA(b); subBoxesA.push(b);
     });
     /* 중조립 (x=+13) */
-    add(at(bx(3.5,0.12,2.5,0x60A5FA,{transparent:true,opacity:0.5}),13,0.06,0));
-    add(at(bx(2.8,1.6,2.0,0x93C5FD,{transparent:true,opacity:0.5}),13,0.92,0));
-    add(at(bx(1.2,0.5,1.8,0x3B82F6),13,1.97,0));
+    addA(at(bx(3.5,0.12,2.5,0x60A5FA,{transparent:true,opacity:0.5}),13,0.06,0));
+    addA(at(bx(2.8,1.6,2.0,0x93C5FD,{transparent:true,opacity:0.5}),13,0.92,0));
+    addA(at(bx(1.2,0.5,1.8,0x3B82F6),13,1.97,0));
 
-    /* ===== RACKS (4x2 grid) ===== */
-    function makeRack(cx,cz,fillRatio){
+    /* Racks A */
+    function makeRackA(cx,cz,fillRatio){
       var SW=1.2,SH=0.8,SD=1.2,COLS=4,ROWS=2;
       var startX=cx-(COLS-1)*(SW+0.15)/2;
       for(var r=0;r<ROWS;r++){for(var c=0;c<COLS;c++){
         var rx=startX+c*(SW+0.15),ry=0.5+r*(SH+0.12),rz=cz;
         var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
-        at(fr,rx,ry,rz); scene.add(fr);
+        at(fr,rx,ry,rz); groupA.add(fr);
         var edg=new THREE.LineSegments(
           new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),
           new THREE.LineBasicMaterial({color:0x94A3B8}));
-        edg.position.copy(fr.position); scene.add(edg);
+        edg.position.copy(fr.position); groupA.add(edg);
         var idx=r*COLS+c;
         if(idx<Math.round(COLS*ROWS*fillRatio)){
-          add(at(bx(SW*0.75,SH*0.75,SD*0.75,0x22C55E),rx,ry,rz));
+          addA(at(bx(SW*0.75,SH*0.75,SD*0.75,0x22C55E),rx,ry,rz));
         }
       }}
     }
-    makeRack(-7,-1,0.6);
-    makeRack(7,-1,0.4);
-    /* 입고장/출고장 바닥 표시 */
-    add(at(bx(5.5,0.08,2.8,0x86EFAC,{transparent:true,opacity:0.3}),-7,0.04,-1));
-    add(at(bx(5.5,0.08,2.8,0x86EFAC,{transparent:true,opacity:0.3}),7,0.04,-1));
+    makeRackA(-7,-1,0.6);
+    makeRackA(7,-1,0.4);
+    addA(at(bx(5.5,0.08,2.8,0x86EFAC,{transparent:true,opacity:0.3}),-7,0.04,-1));
+    addA(at(bx(5.5,0.08,2.8,0x86EFAC,{transparent:true,opacity:0.3}),7,0.04,-1));
 
-    /* ===== LANE PATHS (visual hints) ===== */
-    var lanes=[
-      {z:2.0,x1:-13,x2:-7},
-      {z:-2.0,x1:-7,x2:-2.5},
-      {z:2.0,x1:2.5,x2:7},
-      {z:-2.0,x1:7,x2:13}
-    ];
-    lanes.forEach(function(ln){
-      var len=Math.abs(ln.x2-ln.x1);
-      var mx=(ln.x1+ln.x2)/2;
-      var lp=new THREE.Mesh(
-        new THREE.PlaneGeometry(len,0.25),
+    /* Lanes A */
+    [{z:2.0,x1:-13,x2:-7},{z:-2.0,x1:-7,x2:-2.5},
+     {z:2.0,x1:2.5,x2:7},{z:-2.0,x1:7,x2:13}].forEach(function(ln){
+      var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
+      var lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.25),
         new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
-      lp.rotation.x=-Math.PI/2;
-      at(lp,mx,0.05,ln.z); scene.add(lp);
+      lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z); groupA.add(lp);
     });
 
-    /* ===== DOCKING STATIONS (8) ===== */
-    function makeDock(x,z){
+    /* Docks A */
+    function makeDockA(x,z){
       var g=new THREE.Group();
-      /* table top */
       g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
-      /* 4 legs */
       [[-0.5,0,-0.25],[0.5,0,-0.25],[-0.5,0,0.25],[0.5,0,0.25]].forEach(function(l){
         g.add(at(bx(0.06,0.15,0.06,0x94A3B8),l[0],0.075,l[2]));
       });
-      /* guide rails on top */
       g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,-0.3));
       g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,0.3));
-      g.position.set(x,0,z);
-      g.castShadow=true;
-      scene.add(g);
+      g.position.set(x,0,z); g.castShadow=true; groupA.add(g);
       return g;
     }
-    var docks={
-      cutOut:    makeDock(-13, 2),
-      inRecv:   makeDock(-7, 2),
-      inSend:   makeDock(-7,-2),
-      subIn:    makeDock(-2.5,-2),
-      subOut:   makeDock( 2.5, 2),
-      outRecv:  makeDock( 7, 2),
-      outSend:  makeDock( 7,-2),
-      midIn:    makeDock( 13,-2)
+    var docksA={
+      cutOut:makeDockA(-13,2),inRecv:makeDockA(-7,2),inSend:makeDockA(-7,-2),
+      subIn:makeDockA(-2.5,-2),subOut:makeDockA(2.5,2),outRecv:makeDockA(7,2),
+      outSend:makeDockA(7,-2),midIn:makeDockA(13,-2)
     };
 
-    /* ===== STACKER CRANES (2) ===== */
-    function makeCrane(x,z){
+    /* Cranes A */
+    function makeCraneA(x,z){
       var g=new THREE.Group();
-      /* rail base */
       g.add(at(bx(0.3,0.05,3.0,0x71717A),0,0.025,0));
-      /* vertical mast */
       g.add(at(bx(0.15,3.0,0.15,0x52525B),0,1.5,0));
-      /* carriage — separate group for animation */
       var carriage=new THREE.Group();
       carriage.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
-      /* fork — separate child for extension animation */
       var fork=bx(0.6,0.05,0.4,0xA3A3A3);
       at(fork,0.0,-0.1,0.5); carriage.add(fork);
-      carriage.position.set(0,0.8,0);
-      g.add(carriage);
-      g.position.set(x,0,z);
-      scene.add(g);
-      return {group:g, carriage:carriage, fork:fork};
+      carriage.position.set(0,0.8,0); g.add(carriage);
+      g.position.set(x,0,z); groupA.add(g);
+      return {group:g,carriage:carriage,fork:fork};
     }
-    var craneIn =makeCrane(-7, 0);
-    var craneOut=makeCrane( 7, 0);
+    var craneInA=makeCraneA(-7,0), craneOutA=makeCraneA(7,0);
 
-    /* ===== CONVEYORS ===== */
-    function makeConveyor(x,z1,z2){
+    /* Conveyors A */
+    function makeConveyorG(grp,x,z1,z2){
       var g=new THREE.Group();
-      var len=Math.abs(z2-z1), mz=(z1+z2)/2;
-      /* side rails */
+      var len=Math.abs(z2-z1),mz=(z1+z2)/2;
       g.add(at(bx(0.04,0.12,len,0x78716C),-0.3,0.12,0));
-      g.add(at(bx(0.04,0.12,len,0x78716C), 0.3,0.12,0));
-      /* rollers */
+      g.add(at(bx(0.04,0.12,len,0x78716C),0.3,0.12,0));
       var count=Math.max(3,Math.round(len/0.25));
-      for(var i=0;i<count;i++){
-        var rz=-len/2+i*(len/(count-1));
-        var roller=new THREE.Mesh(
-          new THREE.CylinderGeometry(0.06,0.06,0.56,8),
+      for(var ci=0;ci<count;ci++){
+        var rz=-len/2+ci*(len/(count-1));
+        var roller=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.56,8),
           new THREE.MeshLambertMaterial({color:0xA8A29E}));
-        roller.rotation.z=Math.PI/2;
-        at(roller,0,0.12,rz); g.add(roller);
+        roller.rotation.z=Math.PI/2; at(roller,0,0.12,rz); g.add(roller);
       }
-      g.position.set(x,0,mz);
-      scene.add(g);
+      g.position.set(x,0,mz); grp.add(g);
       return g;
     }
-    var convIn =makeConveyor(-2.5,-1.5,0);
-    var convOut=makeConveyor( 2.5, 0, 1.5);
+    var convInA=makeConveyorG(groupA,-2.5,-1.5,0);
+    var convOutA=makeConveyorG(groupA,2.5,0,1.5);
 
-    /* ===== AMR FACTORY ===== */
-    function makeAMR(bodyCol){
+    /* AMR A */
+    function makeAMRg(grp,bodyCol){
       var g=new THREE.Group();
       g.add(at(bx(1.1,0.3,0.85,bodyCol),0,0,0));
       g.add(at(bx(0.78,0.2,0.6,0xEDE9FE),0,0.25,0));
@@ -1598,345 +1611,597 @@
           new THREE.MeshLambertMaterial({color:0x475569}));
         wh.position.set(w[0],-0.1,w[1]); wh.rotation.z=Math.PI/2; g.add(wh);
       });
-      scene.add(g);
-      return g;
+      grp.add(g); return g;
     }
-    function makePart(col){
+    function makePartA(col){
       var p=bx(0.8,0.35,0.55,col);
-      p.castShadow=true; scene.add(p);
-      return p;
+      p.castShadow=true; groupA.add(p); return p;
     }
-    /* 4 AMR definitions */
-    var amrDefs=[
+    var amrDefsA=[
       {amr:null,part:null,bodyCol:0x7C3AED,partCol:0xF97316,x1:-13,x2:-7,z:2.0,offset:0.0},
       {amr:null,part:null,bodyCol:0x8B5CF6,partCol:0x22C55E,x1:-7,x2:-2.5,z:-2.0,offset:2.5},
       {amr:null,part:null,bodyCol:0xA855F7,partCol:0xEAB308,x1:2.5,x2:7,z:2.0,offset:5.0},
       {amr:null,part:null,bodyCol:0xC084FC,partCol:0x22C55E,x1:7,x2:13,z:-2.0,offset:7.5}
     ];
-    amrDefs.forEach(function(def){
-      def.amr=makeAMR(def.bodyCol);
-      def.part=makePart(def.partCol);
+    amrDefsA.forEach(function(def){
+      def.amr=makeAMRg(groupA,def.bodyCol);
+      def.part=makePartA(def.partCol);
       def.amr.position.set(def.x1,0.22,def.z);
       def.part.visible=false;
     });
+    var cranePartsA={inPart:makePartA(0x22C55E),outPart:makePartA(0x22C55E)};
+    cranePartsA.inPart.visible=false; cranePartsA.outPart.visible=false;
+    var subColsA=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
 
-    /* ===== ANIMATION ===== */
-    var clk=new THREE.Clock(),CY=10;
-    function lerp(a,b,t){return a+(b-a)*Math.min(Math.max(t,0),1);}
-    function ease(t){return t<0.5?2*t*t:-1+(4-2*t)*t;}
-    function clamp01(v){return Math.min(Math.max(v,0),1);}
-    /* sub-assembly emissive colors */
-    var subCols=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
+    /* ============================================================
+       LAYOUT B — 90° 랙장 + 5배 소조립 + L자 AMR 경로
+       ============================================================ */
+    /* Floor B */
+    addB(at(bx(50,0.08,24,0xE2E8F0),0,0,0));
+    var gridB=new THREE.GridHelper(50,50,0xCBD5E1,0xCBD5E1);
+    groupB.add(gridB);
 
-    /* crane parts — extra part meshes for crane operations */
-    var craneParts={
-      inPart: makePart(0x22C55E),
-      outPart: makePart(0x22C55E)
-    };
-    craneParts.inPart.visible=false;
-    craneParts.outPart.visible=false;
+    /* 절단 B (x=-18) */
+    addB(at(bx(4.0,0.12,3.0,0xFBBF24,{transparent:true,opacity:0.5}),-18,0.06,0));
+    for(var bi=0;bi<3;bi++){for(var bj=0;bj<2;bj++){
+      addB(at(bx(0.7,0.4,0.5,0xD97706),-19+bi*1.0,0.32,-0.5+bj*1.0));
+    }}
 
-    /* animate crane: carriage up/down + fork extend */
-    function animCrane(crane,t,tStart,tEnd,pickY,placeY,forkDir){
-      var dur=tEnd-tStart;
-      if(t<tStart||t>=tEnd){
-        crane.carriage.position.y=0.8;
-        crane.fork.position.z=0.5*forkDir;
-        return;
-      }
-      var p=clamp01((t-tStart)/dur);
-      if(p<0.2){
-        /* fork extend to pick */
-        crane.fork.position.z=lerp(0.5*forkDir,0.9*forkDir,p/0.2);
-        crane.carriage.position.y=pickY;
-      }else if(p<0.4){
-        /* fork retract with part */
-        crane.fork.position.z=lerp(0.9*forkDir,0.5*forkDir,(p-0.2)/0.2);
-        crane.carriage.position.y=pickY;
-      }else if(p<0.7){
-        /* carriage moves vertically */
-        crane.carriage.position.y=lerp(pickY,placeY,(p-0.4)/0.3);
-        crane.fork.position.z=0.5*forkDir;
-      }else if(p<0.85){
-        /* fork extend to place */
-        crane.fork.position.z=lerp(0.5*forkDir,0.9*forkDir,(p-0.7)/0.15);
-        crane.carriage.position.y=placeY;
+    /* 소조립 B (5배, x=0) */
+    var subStepsB=[
+      {dx:-3.6,col:0xF97316},{dx:-1.2,col:0xEAB308},
+      {dx:1.2,col:0x94A3B8},{dx:3.6,col:0x22D3EE}
+    ];
+    var subBoxesB=[];
+    addB(at(bx(12.0,0.08,6.0,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,0));
+    subStepsB.forEach(function(s){
+      var b=bx(2.2,1.4,2.2,s.col,{transparent:true,opacity:0.85});
+      at(b,s.dx,0.78,0); addB(b); subBoxesB.push(b);
+    });
+
+    /* 중조립 B (x=18) */
+    addB(at(bx(4.0,0.12,3.0,0x60A5FA,{transparent:true,opacity:0.5}),18,0.06,0));
+    addB(at(bx(3.0,1.8,2.2,0x93C5FD,{transparent:true,opacity:0.5}),18,1.02,0));
+    addB(at(bx(1.4,0.6,2.0,0x3B82F6),18,2.2,0));
+
+    /* 입고 랙 B (90° 회전, x=-10, z=2~7) */
+    addB(at(bx(3.0,0.08,7.0,0x86EFAC,{transparent:true,opacity:0.3}),-10,0.04,4.5));
+    function makeRackB(cx,zStart,zDir,fillRatio){
+      var SW=1.2,SH=0.9,SD=1.2,SLOTS=5,ROWS=3;
+      var zPositions=[];
+      for(var si=0;si<SLOTS;si++) zPositions.push(zStart+zDir*(si*1.35+0.5));
+      var yPositions=[0.55,1.57,2.59];
+      for(var r=0;r<ROWS;r++){for(var s=0;s<SLOTS;s++){
+        var rz=zPositions[s],ry=yPositions[r];
+        var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
+        at(fr,cx,ry,rz); groupB.add(fr);
+        var edg=new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),
+          new THREE.LineBasicMaterial({color:0x94A3B8}));
+        edg.position.copy(fr.position); groupB.add(edg);
+        var idx=r*SLOTS+s;
+        if(idx<Math.round(SLOTS*ROWS*fillRatio)){
+          addB(at(bx(SW*0.7,SH*0.7,SD*0.7,0x22C55E),cx,ry,rz));
+        }
+      }}
+      return {cx:cx,zPositions:zPositions,yPositions:yPositions};
+    }
+    var rackInB=makeRackB(-10,2,1,0.5);
+    /* 출고 랙 B (90° 회전, x=10, z=-2~-7) */
+    addB(at(bx(3.0,0.08,7.0,0x86EFAC,{transparent:true,opacity:0.3}),10,0.04,-4.5));
+    var rackOutB=makeRackB(10,-2,-1,0.35);
+
+    /* L자 AMR 레인 바닥 (8 segments) */
+    var lanesB=[
+      /* Route1: 절단→입고 L자 */
+      {x1:-18,x2:-10,z:0},{x:-10,z1:0,z2:1.5},
+      /* Route2: 입고→소조립 L자 */
+      {x:-10,z1:-1.5,z2:0},{x1:-10,x2:-5,z:0},
+      /* Route3: 소조립→출고 L자 */
+      {x1:5,x2:10,z:0},{x:10,z1:-1.5,z2:0},
+      /* Route4: 출고→중조립 L자 */
+      {x:10,z1:0,z2:1.5},{x1:10,x2:18,z:0}
+    ];
+    lanesB.forEach(function(ln){
+      var lp;
+      if(ln.x1!==undefined){
+        var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
+        lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.3),
+          new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
+        lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z);
       }else{
-        /* fork retract */
-        crane.fork.position.z=lerp(0.9*forkDir,0.5*forkDir,(p-0.85)/0.15);
-        crane.carriage.position.y=placeY;
+        var len=Math.abs(ln.z2-ln.z1),mz=(ln.z1+ln.z2)/2;
+        lp=new THREE.Mesh(new THREE.PlaneGeometry(0.3,len),
+          new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
+        lp.rotation.x=-Math.PI/2; at(lp,ln.x,0.05,mz);
+      }
+      groupB.add(lp);
+    });
+
+    /* Docks B */
+    function makeDockB(x,z){
+      var g=new THREE.Group();
+      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
+      [[-0.5,0,-0.25],[0.5,0,-0.25],[-0.5,0,0.25],[0.5,0,0.25]].forEach(function(l){
+        g.add(at(bx(0.06,0.15,0.06,0x94A3B8),l[0],0.075,l[2]));
+      });
+      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,-0.3));
+      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,0.3));
+      g.position.set(x,0,z); g.castShadow=true; groupB.add(g);
+      return g;
+    }
+    var docksB={
+      cutOut:makeDockB(-18,0),inRecv:makeDockB(-10,1.5),inSend:makeDockB(-10,-1.5),
+      subIn:makeDockB(-5,0),subOut:makeDockB(5,0),outRecv:makeDockB(10,-1.5),
+      outSend:makeDockB(10,1.5),midIn:makeDockB(18,0)
+    };
+
+    /* Stacker Cranes B — z방향 주행 + y 승강 + fork 신축 */
+    function makeCraneB(x,zMin,zMax){
+      var g=new THREE.Group();
+      var railLen=zMax-zMin+1.0;
+      var railMid=(zMin+zMax)/2;
+      g.add(at(bx(0.3,0.05,railLen,0x71717A),0,0.025,railMid));
+      var trolley=new THREE.Group();
+      trolley.add(at(bx(0.15,4.0,0.15,0x52525B),0,2.0,0));
+      trolley.add(at(bx(0.12,0.12,0.5,0x52525B),0,4.06,0));
+      var carriage=new THREE.Group();
+      carriage.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
+      var fork=bx(0.6,0.05,0.4,0xA3A3A3);
+      at(fork,0.7,- 0.1,0); carriage.add(fork);
+      fork.position.set(0,-0.1,0);
+      carriage.position.set(0,0.8,0);
+      trolley.add(carriage);
+      trolley.position.set(0,0,(zMin+zMax)/2);
+      g.add(trolley);
+      g.position.set(x,0,0);
+      groupB.add(g);
+      return {group:g,trolley:trolley,carriage:carriage,fork:fork,zMin:zMin,zMax:zMax};
+    }
+    var craneInB=makeCraneB(-10,2,7);
+    var craneOutB=makeCraneB(10,-7,-2);
+
+    /* Conveyors B */
+    var convInB=makeConveyorG(groupB,-5,-2.5,0);
+    var convOutB=makeConveyorG(groupB,5,0,2.5);
+
+    /* AMR B + 원판 부재 */
+    function makePartB(col){
+      var p=new THREE.Mesh(
+        new THREE.CylinderGeometry(0.4,0.4,0.1,16),
+        new THREE.MeshLambertMaterial({color:col}));
+      p.rotation.z=Math.PI/2;
+      p.castShadow=true; groupB.add(p);
+      return p;
+    }
+    var amrDefsB=[
+      {amr:null,part:null,bodyCol:0x7C3AED,partCol:0xF97316,offset:0.0},
+      {amr:null,part:null,bodyCol:0x8B5CF6,partCol:0x22C55E,offset:2.5},
+      {amr:null,part:null,bodyCol:0xA855F7,partCol:0xEAB308,offset:5.0},
+      {amr:null,part:null,bodyCol:0xC084FC,partCol:0x22C55E,offset:7.5}
+    ];
+    amrDefsB.forEach(function(def){
+      def.amr=makeAMRg(groupB,def.bodyCol);
+      def.part=makePartB(def.partCol);
+      def.amr.position.set(-18,0.22,0);
+      def.part.visible=false;
+    });
+    var cranePartsB={inPart:makePartB(0x22C55E),outPart:makePartB(0x22C55E)};
+    cranePartsB.inPart.visible=false; cranePartsB.outPart.visible=false;
+
+    /* ============================================================
+       ANIMATION — Layout A (기존 로직)
+       ============================================================ */
+    function animCraneA(crane,t,tStart,tEnd,pickY,placeY,forkDir){
+      var dur=tEnd-tStart;
+      if(t<tStart||t>=tEnd){crane.carriage.position.y=0.8;crane.fork.position.z=0.5*forkDir;return;}
+      var p=clamp01((t-tStart)/dur);
+      if(p<0.2){crane.fork.position.z=lerp(0.5*forkDir,0.9*forkDir,p/0.2);crane.carriage.position.y=pickY;
+      }else if(p<0.4){crane.fork.position.z=lerp(0.9*forkDir,0.5*forkDir,(p-0.2)/0.2);crane.carriage.position.y=pickY;
+      }else if(p<0.7){crane.carriage.position.y=lerp(pickY,placeY,(p-0.4)/0.3);crane.fork.position.z=0.5*forkDir;
+      }else if(p<0.85){crane.fork.position.z=lerp(0.5*forkDir,0.9*forkDir,(p-0.7)/0.15);crane.carriage.position.y=placeY;
+      }else{crane.fork.position.z=lerp(0.9*forkDir,0.5*forkDir,(p-0.85)/0.15);crane.carriage.position.y=placeY;}
+    }
+
+    function animateLayoutA(elapsed){
+      /* Route 1 */
+      (function(){
+        var def=amrDefsA[0],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var x1=-13,x2=-7,z=2;
+        if(t<1){amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.24+0.5*ease(t),z);
+        }else if(t<1.5){var p=(t-1)/0.5;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.55+0.3*ease(p),z);
+        }else if(t<4){var p=ease((t-1.5)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
+        }else if(t<4.5){var p=(t-4)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.5*ease(p),z);if(p>0.95)part.visible=false;
+        }else if(t<6){amr.position.set(x2,0.22,z);part.visible=false;cranePartsA.inPart.visible=true;var cp=clamp01((t-4.5)/1.5);if(cp<0.5){cranePartsA.inPart.position.set(-7,0.3+1.0*ease(cp*2),0);}else{cranePartsA.inPart.position.set(-7,1.3,-0.3-0.7*ease((cp-0.5)*2));}
+        }else if(t<6.5){cranePartsA.inPart.visible=false;amr.position.set(x2,0.22,z);part.visible=false;
+        }else if(t<9){var p=ease((t-6.5)/2.5);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;cranePartsA.inPart.visible=false;
+        }else{amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.inPart.visible=false;}
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+      /* Route 2 */
+      (function(){
+        var def=amrDefsA[1],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var x1=-7,x2=-2.5,z=-2;
+        if(t<1.5){amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.inPart.visible=true;var cp=clamp01(t/1.5);if(cp<0.5){cranePartsA.inPart.position.set(-7,1.3,-0.3-0.7*(1-ease(cp*2)));}else{cranePartsA.inPart.position.set(-7,1.3-1.0*ease((cp-0.5)*2),-1.0);}
+        }else if(t<2){var p=(t-1.5)/0.5;cranePartsA.inPart.visible=false;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.3+0.55*ease(p),z);
+        }else if(t<4.5){var p=ease((t-2)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
+        }else if(t<5){var p=(t-4.5)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.55*ease(p),z);if(p>0.95)part.visible=false;
+        }else if(t<5.5){amr.position.set(x2,0.22,z);part.visible=false;
+        }else if(t<9){var p=ease((t-5.5)/3.5);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;
+        }else{amr.position.set(x1,0.22,z);part.visible=false;}
+        cranePartsA.inPart.visible=(t<1.5);
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+      /* craneIn A */
+      (function(){
+        var t1=((elapsed-amrDefsA[0].offset)%CY+CY)%CY;
+        var t2=((elapsed-amrDefsA[1].offset)%CY+CY)%CY;
+        if(t1>=4.5&&t1<6)animCraneA(craneInA,t1,4.5,6,0.3,1.3,1);
+        else if(t2<1.5)animCraneA(craneInA,t2,0,1.5,1.3,0.3,-1);
+        else{craneInA.carriage.position.y=0.8;craneInA.fork.position.z=0.5;}
+      })();
+      /* Route 3 */
+      (function(){
+        var def=amrDefsA[2],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var x1=2.5,x2=7,z=2;
+        if(t<1){amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.24+0.5*ease(t),z);
+        }else if(t<1.5){var p=(t-1)/0.5;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.55+0.3*ease(p),z);
+        }else if(t<4){var p=ease((t-1.5)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
+        }else if(t<4.5){var p=(t-4)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.5*ease(p),z);if(p>0.95)part.visible=false;
+        }else if(t<6){amr.position.set(x2,0.22,z);part.visible=false;cranePartsA.outPart.visible=true;var cp=clamp01((t-4.5)/1.5);if(cp<0.5){cranePartsA.outPart.position.set(7,0.3+1.0*ease(cp*2),0);}else{cranePartsA.outPart.position.set(7,1.3,-0.3-0.7*ease((cp-0.5)*2));}
+        }else if(t<6.5){cranePartsA.outPart.visible=false;amr.position.set(x2,0.22,z);part.visible=false;
+        }else if(t<9){var p=ease((t-6.5)/2.5);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;cranePartsA.outPart.visible=false;
+        }else{amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.outPart.visible=false;}
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+      /* Route 4 */
+      (function(){
+        var def=amrDefsA[3],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var x1=7,x2=13,z=-2;
+        if(t<1.5){amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.outPart.visible=true;var cp=clamp01(t/1.5);if(cp<0.5){cranePartsA.outPart.position.set(7,1.3,-0.3-0.7*(1-ease(cp*2)));}else{cranePartsA.outPart.position.set(7,1.3-1.0*ease((cp-0.5)*2),-1.0);}
+        }else if(t<2){var p=(t-1.5)/0.5;cranePartsA.outPart.visible=false;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.3+0.55*ease(p),z);
+        }else if(t<4.5){var p=ease((t-2)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
+        }else if(t<5){var p=(t-4.5)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.55*ease(p),z);if(p>0.95)part.visible=false;
+        }else if(t<9){var p=ease((t-5)/4);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;
+        }else{amr.position.set(x1,0.22,z);part.visible=false;}
+        cranePartsA.outPart.visible=(t<1.5);
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+      /* craneOut A */
+      (function(){
+        var t3=((elapsed-amrDefsA[2].offset)%CY+CY)%CY;
+        var t4=((elapsed-amrDefsA[3].offset)%CY+CY)%CY;
+        if(t3>=4.5&&t3<6)animCraneA(craneOutA,t3,4.5,6,0.3,1.3,1);
+        else if(t4<1.5)animCraneA(craneOutA,t4,0,1.5,1.3,0.3,-1);
+        else{craneOutA.carriage.position.y=0.8;craneOutA.fork.position.z=0.5;}
+      })();
+      /* 소조립 emissive */
+      var sp=(elapsed%2.5)/2.5,aIdx=Math.floor(sp*4);
+      subBoxesA.forEach(function(b,i){
+        if(i===aIdx){var pulse=0.3+0.7*Math.abs(Math.sin(elapsed*4));b.material.emissive=new THREE.Color(subColsA[i]);b.material.emissiveIntensity=pulse*0.6;
+        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
+      });
+      /* conveyor spin */
+      [convInA,convOutA].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
+    }
+
+    /* ============================================================
+       ANIMATION — Layout B
+       ============================================================ */
+    var subColsB=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
+    var craneBCycle=0;
+
+    /* Crane B 10-step animation */
+    function animCraneB(crane,p,dockZ,slotZ,slotY){
+      if(p<0.10){
+        /* 1: trolley → dockZ */
+        crane.trolley.position.z=lerp((crane.zMin+crane.zMax)/2,dockZ,p/0.10);
+        crane.carriage.position.y=0.4; crane.fork.position.x=0;
+      }else if(p<0.20){
+        /* 2: fork extend (pick) */
+        crane.trolley.position.z=dockZ; crane.carriage.position.y=0.4;
+        crane.fork.position.x=lerp(0,0.7,(p-0.10)/0.10);
+      }else if(p<0.25){
+        /* 3: slight raise */
+        crane.trolley.position.z=dockZ; crane.fork.position.x=0.7;
+        crane.carriage.position.y=lerp(0.4,0.6,(p-0.20)/0.05);
+      }else if(p<0.35){
+        /* 4: fork retract */
+        crane.trolley.position.z=dockZ; crane.carriage.position.y=0.6;
+        crane.fork.position.x=lerp(0.7,0,(p-0.25)/0.10);
+      }else if(p<0.55){
+        /* 5: trolley → slotZ */
+        crane.trolley.position.z=lerp(dockZ,slotZ,(p-0.35)/0.20);
+        crane.carriage.position.y=0.6; crane.fork.position.x=0;
+      }else if(p<0.70){
+        /* 6: carriage → slotY */
+        crane.trolley.position.z=slotZ;
+        crane.carriage.position.y=lerp(0.6,slotY,(p-0.55)/0.15);
+        crane.fork.position.x=0;
+      }else if(p<0.80){
+        /* 7: fork extend (place) */
+        crane.trolley.position.z=slotZ; crane.carriage.position.y=slotY;
+        crane.fork.position.x=lerp(0,-0.7,(p-0.70)/0.10);
+      }else if(p<0.85){
+        /* 8: slight lower */
+        crane.trolley.position.z=slotZ; crane.fork.position.x=-0.7;
+        crane.carriage.position.y=lerp(slotY,slotY-0.15,(p-0.80)/0.05);
+      }else if(p<0.95){
+        /* 9: fork retract */
+        crane.trolley.position.z=slotZ; crane.carriage.position.y=slotY-0.15;
+        crane.fork.position.x=lerp(-0.7,0,(p-0.85)/0.10);
+      }else{
+        /* 10: return home */
+        crane.trolley.position.z=lerp(slotZ,(crane.zMin+crane.zMax)/2,(p-0.95)/0.05);
+        crane.carriage.position.y=lerp(slotY-0.15,0.8,(p-0.95)/0.05);
+        crane.fork.position.x=0;
       }
     }
 
+    function animateLayoutB(elapsed){
+      var cycleNum=Math.floor(elapsed/CY);
+
+      /* --- Route 1 B: 절단→입고 (L자 x→z) --- */
+      (function(){
+        var def=amrDefsB[0],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        if(t<1){
+          /* part appears at cut dock */
+          amr.position.set(-18,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(-18,0.24+0.5*ease(t),0);
+        }else if(t<1.5){
+          var p=(t-1)/0.5;
+          amr.position.set(-18,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(-18,0.55+0.3*ease(p),0);
+        }else if(t<3){
+          /* Leg1: x=-18→-10 (z=0) */
+          var p=ease((t-1.5)/1.5);
+          amr.position.set(lerp(-18,-10,p),0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(lerp(-18,-10,p),0.85,0);
+        }else if(t<4){
+          /* Leg2: z=0→1.5 (x=-10), AMR turns */
+          var p=ease((t-3)/1.0);
+          amr.position.set(-10,0.22,lerp(0,1.5,p)); amr.rotation.y=Math.PI/2;
+          part.visible=true; part.position.set(-10,0.85,lerp(0,1.5,p));
+        }else if(t<4.5){
+          /* unload at inRecv dock */
+          var p=(t-4)/0.5;
+          amr.position.set(-10,0.22,1.5); amr.rotation.y=Math.PI/2;
+          part.visible=true; part.position.set(-10,0.85-0.5*ease(p),1.5);
+          if(p>0.95)part.visible=false;
+        }else if(t<6){
+          /* crane stacker picks */
+          amr.position.set(-10,0.22,1.5); part.visible=false;
+          cranePartsB.inPart.visible=true;
+          var cp=clamp01((t-4.5)/1.5);
+          cranePartsB.inPart.position.set(-10,0.3+1.5*ease(cp),lerp(1.5,3.5,ease(cp)));
+        }else if(t<6.5){
+          cranePartsB.inPart.visible=false;
+          amr.position.set(-10,0.22,1.5); part.visible=false;
+        }else if(t<7){
+          /* Return Leg2: z=1.5→0 */
+          var p=ease((t-6.5)/0.5);
+          amr.position.set(-10,0.22,lerp(1.5,0,p)); amr.rotation.y=-Math.PI/2;
+          part.visible=false;
+        }else if(t<9){
+          /* Return Leg1: x=-10→-18 */
+          var p=ease((t-7)/2.0);
+          amr.position.set(lerp(-10,-18,p),0.22,0); amr.rotation.y=Math.PI;
+          part.visible=false;
+        }else{
+          amr.position.set(-18,0.22,0); amr.rotation.y=0;
+          part.visible=false; cranePartsB.inPart.visible=false;
+        }
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+
+      /* --- Route 2 B: 입고→소조립 (L자 z→x) --- */
+      (function(){
+        var def=amrDefsB[1],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        if(t<1.5){
+          /* crane retrieves → inSend dock */
+          amr.position.set(-10,0.22,-1.5); amr.rotation.y=0;
+          part.visible=false;
+          cranePartsB.inPart.visible=true;
+          var cp=clamp01(t/1.5);
+          cranePartsB.inPart.position.set(-10,1.8-1.5*ease(cp),lerp(3.5,-1.5,ease(cp)));
+        }else if(t<2){
+          var p=(t-1.5)/0.5;
+          cranePartsB.inPart.visible=false;
+          amr.position.set(-10,0.22,-1.5); amr.rotation.y=0;
+          part.visible=true; part.position.set(-10,0.3+0.55*ease(p),-1.5);
+        }else if(t<3){
+          /* Leg1: z=-1.5→0 */
+          var p=ease((t-2)/1.0);
+          amr.position.set(-10,0.22,lerp(-1.5,0,p)); amr.rotation.y=-Math.PI/2;
+          part.visible=true; part.position.set(-10,0.85,lerp(-1.5,0,p));
+        }else if(t<4.5){
+          /* Leg2: x=-10→-5 */
+          var p=ease((t-3)/1.5);
+          amr.position.set(lerp(-10,-5,p),0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(lerp(-10,-5,p),0.85,0);
+        }else if(t<5){
+          var p=(t-4.5)/0.5;
+          amr.position.set(-5,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(-5,0.85-0.55*ease(p),0);
+          if(p>0.95)part.visible=false;
+        }else if(t<6){
+          /* Return Leg2: x=-5→-10 */
+          var p=ease((t-5)/1.0);
+          amr.position.set(lerp(-5,-10,p),0.22,0); amr.rotation.y=Math.PI;
+          part.visible=false;
+        }else if(t<7){
+          /* Return Leg1: z=0→-1.5 */
+          var p=ease((t-6)/1.0);
+          amr.position.set(-10,0.22,lerp(0,-1.5,p)); amr.rotation.y=Math.PI/2;
+          part.visible=false;
+        }else{
+          amr.position.set(-10,0.22,-1.5); amr.rotation.y=0;
+          part.visible=false; cranePartsB.inPart.visible=false;
+        }
+        cranePartsB.inPart.visible=(t<1.5);
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+
+      /* --- Route 3 B: 소조립→출고 (L자 x→z) --- */
+      (function(){
+        var def=amrDefsB[2],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        if(t<1){
+          amr.position.set(5,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(5,0.24+0.5*ease(t),0);
+        }else if(t<1.5){
+          var p=(t-1)/0.5;
+          amr.position.set(5,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(5,0.55+0.3*ease(p),0);
+        }else if(t<3){
+          /* Leg1: x=5→10 */
+          var p=ease((t-1.5)/1.5);
+          amr.position.set(lerp(5,10,p),0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(lerp(5,10,p),0.85,0);
+        }else if(t<4){
+          /* Leg2: z=0→-1.5 */
+          var p=ease((t-3)/1.0);
+          amr.position.set(10,0.22,lerp(0,-1.5,p)); amr.rotation.y=-Math.PI/2;
+          part.visible=true; part.position.set(10,0.85,lerp(0,-1.5,p));
+        }else if(t<4.5){
+          var p=(t-4)/0.5;
+          amr.position.set(10,0.22,-1.5); amr.rotation.y=-Math.PI/2;
+          part.visible=true; part.position.set(10,0.85-0.5*ease(p),-1.5);
+          if(p>0.95)part.visible=false;
+        }else if(t<6){
+          amr.position.set(10,0.22,-1.5); part.visible=false;
+          cranePartsB.outPart.visible=true;
+          var cp=clamp01((t-4.5)/1.5);
+          cranePartsB.outPart.position.set(10,0.3+1.5*ease(cp),lerp(-1.5,-3.5,ease(cp)));
+        }else if(t<6.5){
+          cranePartsB.outPart.visible=false;
+          amr.position.set(10,0.22,-1.5); part.visible=false;
+        }else if(t<7){
+          /* Return Leg2: z=-1.5→0 */
+          var p=ease((t-6.5)/0.5);
+          amr.position.set(10,0.22,lerp(-1.5,0,p)); amr.rotation.y=Math.PI/2;
+          part.visible=false;
+        }else if(t<9){
+          /* Return Leg1: x=10→5 */
+          var p=ease((t-7)/2.0);
+          amr.position.set(lerp(10,5,p),0.22,0); amr.rotation.y=Math.PI;
+          part.visible=false;
+        }else{
+          amr.position.set(5,0.22,0); amr.rotation.y=0;
+          part.visible=false; cranePartsB.outPart.visible=false;
+        }
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+
+      /* --- Route 4 B: 출고→중조립 (L자 z→x) --- */
+      (function(){
+        var def=amrDefsB[3],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        if(t<1.5){
+          amr.position.set(10,0.22,1.5); amr.rotation.y=0;
+          part.visible=false;
+          cranePartsB.outPart.visible=true;
+          var cp=clamp01(t/1.5);
+          cranePartsB.outPart.position.set(10,1.8-1.5*ease(cp),lerp(-3.5,1.5,ease(cp)));
+        }else if(t<2){
+          var p=(t-1.5)/0.5;
+          cranePartsB.outPart.visible=false;
+          amr.position.set(10,0.22,1.5); amr.rotation.y=0;
+          part.visible=true; part.position.set(10,0.3+0.55*ease(p),1.5);
+        }else if(t<3){
+          /* Leg1: z=1.5→0 */
+          var p=ease((t-2)/1.0);
+          amr.position.set(10,0.22,lerp(1.5,0,p)); amr.rotation.y=-Math.PI/2;
+          part.visible=true; part.position.set(10,0.85,lerp(1.5,0,p));
+        }else if(t<4.5){
+          /* Leg2: x=10→18 */
+          var p=ease((t-3)/1.5);
+          amr.position.set(lerp(10,18,p),0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(lerp(10,18,p),0.85,0);
+        }else if(t<5){
+          var p=(t-4.5)/0.5;
+          amr.position.set(18,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(18,0.85-0.55*ease(p),0);
+          if(p>0.95)part.visible=false;
+        }else if(t<6.5){
+          /* Return Leg2: x=18→10 */
+          var p=ease((t-5)/1.5);
+          amr.position.set(lerp(18,10,p),0.22,0); amr.rotation.y=Math.PI;
+          part.visible=false;
+        }else if(t<7.5){
+          /* Return Leg1: z=0→1.5 */
+          var p=ease((t-6.5)/1.0);
+          amr.position.set(10,0.22,lerp(0,1.5,p)); amr.rotation.y=Math.PI/2;
+          part.visible=false;
+        }else{
+          amr.position.set(10,0.22,1.5); amr.rotation.y=0;
+          part.visible=false; cranePartsB.outPart.visible=false;
+        }
+        cranePartsB.outPart.visible=(t<1.5);
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+
+      /* Crane B: 입고 스태커 */
+      (function(){
+        var t1=((elapsed-amrDefsB[0].offset)%CY+CY)%CY;
+        var cn=cycleNum%5, rw=Math.floor(cycleNum/5)%3;
+        var slotZ=rackInB.zPositions[cn], slotY=rackInB.yPositions[rw];
+        var dockZ=1.5;
+        if(t1>=4.5&&t1<6){
+          var p=clamp01((t1-4.5)/1.5);
+          animCraneB(craneInB,p,dockZ,slotZ,slotY);
+        }else{
+          craneInB.trolley.position.z=(craneInB.zMin+craneInB.zMax)/2;
+          craneInB.carriage.position.y=0.8; craneInB.fork.position.x=0;
+        }
+      })();
+
+      /* Crane B: 출고 스태커 */
+      (function(){
+        var t3=((elapsed-amrDefsB[2].offset)%CY+CY)%CY;
+        var cn=cycleNum%5, rw=Math.floor(cycleNum/5)%3;
+        var slotZ=rackOutB.zPositions[cn], slotY=rackOutB.yPositions[rw];
+        var dockZ=-1.5;
+        if(t3>=4.5&&t3<6){
+          var p=clamp01((t3-4.5)/1.5);
+          animCraneB(craneOutB,p,dockZ,slotZ,slotY);
+        }else{
+          craneOutB.trolley.position.z=(craneOutB.zMin+craneOutB.zMax)/2;
+          craneOutB.carriage.position.y=0.8; craneOutB.fork.position.x=0;
+        }
+      })();
+
+      /* 소조립 B emissive pulse */
+      var sp=(elapsed%2.5)/2.5,aIdx=Math.floor(sp*4);
+      subBoxesB.forEach(function(b,i){
+        if(i===aIdx){var pulse=0.3+0.7*Math.abs(Math.sin(elapsed*4));b.material.emissive=new THREE.Color(subColsB[i]);b.material.emissiveIntensity=pulse*0.6;
+        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
+      });
+
+      /* conveyor B spin */
+      [convInB,convOutB].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
+    }
+
+    /* ============================================================
+       MAIN ANIMATE LOOP
+       ============================================================ */
     function animate(){
       requestAnimationFrame(animate);
       var elapsed=clk.getElapsedTime();
-      /* Camera orbit */
       var ang=elapsed*0.025;
-      cam.position.set(25*Math.cos(ang),22,20*Math.sin(ang));
+      var camR=(activeLayout==='A')?25:35;
+      var camH=(activeLayout==='A')?22:30;
+      var camD=(activeLayout==='A')?20:28;
+      cam.position.set(camR*Math.cos(ang),camH,camD*Math.sin(ang));
       cam.lookAt(0,2,0);
-
-      /* ---- Route 1: 절단→입고장 (z=2, x:-13→-7) ---- */
-      (function(){
-        var def=amrDefs[0], amr=def.amr, part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var x1=-13,x2=-7,z=2;
-        if(t<1){
-          /* part appears on cutOut dock */
-          amr.position.set(x1,0.22,z);
-          part.visible=true;
-          part.position.set(x1,0.24+0.5*ease(t),z);
-        }else if(t<1.5){
-          /* part slides horizontally onto AMR */
-          var p=(t-1)/0.5;
-          amr.position.set(x1,0.22,z);
-          part.visible=true;
-          part.position.set(x1,0.55+0.3*ease(p),z);
-        }else if(t<4){
-          /* AMR travels with part */
-          var p=ease((t-1.5)/2.5);
-          amr.position.set(lerp(x1,x2,p),0.22,z);
-          part.visible=true;
-          part.position.set(lerp(x1,x2,p),0.85,z);
-        }else if(t<4.5){
-          /* part slides to inRecv dock */
-          var p=(t-4)/0.5;
-          amr.position.set(x2,0.22,z);
-          part.visible=true;
-          part.position.set(x2,0.85-0.5*ease(p),z);
-          if(p>0.95) part.visible=false;
-        }else if(t<6){
-          /* crane picks from dock → rack */
-          amr.position.set(x2,0.22,z);
-          part.visible=false;
-          craneParts.inPart.visible=true;
-          var cp=clamp01((t-4.5)/1.5);
-          if(cp<0.5){
-            craneParts.inPart.position.set(-7,0.3+1.0*ease(cp*2),0);
-          }else{
-            craneParts.inPart.position.set(-7,1.3,-0.3-0.7*ease((cp-0.5)*2));
-          }
-        }else if(t<6.5){
-          craneParts.inPart.visible=false;
-          amr.position.set(x2,0.22,z);
-          part.visible=false;
-        }else if(t<9){
-          /* AMR returns empty */
-          var p=ease((t-6.5)/2.5);
-          amr.position.set(lerp(x2,x1,p),0.22,z);
-          part.visible=false;
-          craneParts.inPart.visible=false;
-        }else{
-          amr.position.set(x1,0.22,z);
-          part.visible=false;
-          craneParts.inPart.visible=false;
-        }
-        for(var i=2;i<6;i++){if(amr.children[i])amr.children[i].rotation.x+=0.08;}
-      })();
-
-      /* ---- Route 2: 입고장→소조립 (z=-2, x:-7→-2.5) ---- */
-      (function(){
-        var def=amrDefs[1], amr=def.amr, part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var x1=-7,x2=-2.5,z=-2;
-        if(t<1.5){
-          /* crane retrieves from rack → inSend dock */
-          amr.position.set(x1,0.22,z);
-          part.visible=false;
-          craneParts.inPart.visible=true;
-          var cp=clamp01(t/1.5);
-          if(cp<0.5){
-            craneParts.inPart.position.set(-7,1.3,-0.3-0.7*(1-ease(cp*2)));
-          }else{
-            craneParts.inPart.position.set(-7,1.3-1.0*ease((cp-0.5)*2),-1.0);
-          }
-        }else if(t<2){
-          /* part slides onto AMR */
-          var p=(t-1.5)/0.5;
-          craneParts.inPart.visible=false;
-          amr.position.set(x1,0.22,z);
-          part.visible=true;
-          part.position.set(x1,0.3+0.55*ease(p),z);
-        }else if(t<4.5){
-          /* AMR travels */
-          var p=ease((t-2)/2.5);
-          amr.position.set(lerp(x1,x2,p),0.22,z);
-          part.visible=true;
-          part.position.set(lerp(x1,x2,p),0.85,z);
-        }else if(t<5){
-          /* part to subIn dock */
-          var p=(t-4.5)/0.5;
-          amr.position.set(x2,0.22,z);
-          part.visible=true;
-          part.position.set(x2,0.85-0.55*ease(p),z);
-          if(p>0.95) part.visible=false;
-        }else if(t<5.5){
-          /* conveyor moves part toward sub-assembly */
-          amr.position.set(x2,0.22,z);
-          part.visible=false;
-        }else if(t<9){
-          /* AMR returns empty */
-          var p=ease((t-5.5)/3.5);
-          amr.position.set(lerp(x2,x1,p),0.22,z);
-          part.visible=false;
-        }else{
-          amr.position.set(x1,0.22,z);
-          part.visible=false;
-        }
-        craneParts.inPart.visible=(t<1.5);
-        for(var i=2;i<6;i++){if(amr.children[i])amr.children[i].rotation.x+=0.08;}
-      })();
-
-      /* ---- craneIn: resolve control from Route 1 & Route 2 ---- */
-      (function(){
-        var t1=((elapsed-amrDefs[0].offset)%CY+CY)%CY;
-        var t2=((elapsed-amrDefs[1].offset)%CY+CY)%CY;
-        var r1active=(t1>=4.5&&t1<6);
-        var r2active=(t2<1.5);
-        if(r1active) animCrane(craneIn,t1,4.5,6,0.3,1.3,1);
-        else if(r2active) animCrane(craneIn,t2,0,1.5,1.3,0.3,-1);
-        else{ craneIn.carriage.position.y=0.8; craneIn.fork.position.z=0.5; }
-      })();
-
-      /* ---- Route 3: 소조립→출고장 (z=2, x:2.5→7) ---- */
-      (function(){
-        var def=amrDefs[2], amr=def.amr, part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var x1=2.5,x2=7,z=2;
-        if(t<1){
-          /* part appears on subOut dock (from conveyor) */
-          amr.position.set(x1,0.22,z);
-          part.visible=true;
-          part.position.set(x1,0.24+0.5*ease(t),z);
-        }else if(t<1.5){
-          /* part slides onto AMR */
-          var p=(t-1)/0.5;
-          amr.position.set(x1,0.22,z);
-          part.visible=true;
-          part.position.set(x1,0.55+0.3*ease(p),z);
-        }else if(t<4){
-          /* AMR travels */
-          var p=ease((t-1.5)/2.5);
-          amr.position.set(lerp(x1,x2,p),0.22,z);
-          part.visible=true;
-          part.position.set(lerp(x1,x2,p),0.85,z);
-        }else if(t<4.5){
-          /* part to outRecv dock */
-          var p=(t-4)/0.5;
-          amr.position.set(x2,0.22,z);
-          part.visible=true;
-          part.position.set(x2,0.85-0.5*ease(p),z);
-          if(p>0.95) part.visible=false;
-        }else if(t<6){
-          /* crane picks from dock → rack */
-          amr.position.set(x2,0.22,z);
-          part.visible=false;
-          craneParts.outPart.visible=true;
-          var cp=clamp01((t-4.5)/1.5);
-          if(cp<0.5){
-            craneParts.outPart.position.set(7,0.3+1.0*ease(cp*2),0);
-          }else{
-            craneParts.outPart.position.set(7,1.3,-0.3-0.7*ease((cp-0.5)*2));
-          }
-        }else if(t<6.5){
-          craneParts.outPart.visible=false;
-          amr.position.set(x2,0.22,z);
-          part.visible=false;
-        }else if(t<9){
-          /* AMR returns empty */
-          var p=ease((t-6.5)/2.5);
-          amr.position.set(lerp(x2,x1,p),0.22,z);
-          part.visible=false;
-          craneParts.outPart.visible=false;
-        }else{
-          amr.position.set(x1,0.22,z);
-          part.visible=false;
-          craneParts.outPart.visible=false;
-        }
-        for(var i=2;i<6;i++){if(amr.children[i])amr.children[i].rotation.x+=0.08;}
-      })();
-
-      /* ---- Route 4: 출고장→중조립 (z=-2, x:7→13) ---- */
-      (function(){
-        var def=amrDefs[3], amr=def.amr, part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var x1=7,x2=13,z=-2;
-        if(t<1.5){
-          /* crane retrieves from rack → outSend dock */
-          amr.position.set(x1,0.22,z);
-          part.visible=false;
-          craneParts.outPart.visible=true;
-          var cp=clamp01(t/1.5);
-          if(cp<0.5){
-            craneParts.outPart.position.set(7,1.3,-0.3-0.7*(1-ease(cp*2)));
-          }else{
-            craneParts.outPart.position.set(7,1.3-1.0*ease((cp-0.5)*2),-1.0);
-          }
-        }else if(t<2){
-          /* part slides onto AMR */
-          var p=(t-1.5)/0.5;
-          craneParts.outPart.visible=false;
-          amr.position.set(x1,0.22,z);
-          part.visible=true;
-          part.position.set(x1,0.3+0.55*ease(p),z);
-        }else if(t<4.5){
-          /* AMR travels */
-          var p=ease((t-2)/2.5);
-          amr.position.set(lerp(x1,x2,p),0.22,z);
-          part.visible=true;
-          part.position.set(lerp(x1,x2,p),0.85,z);
-        }else if(t<5){
-          /* part to midIn dock */
-          var p=(t-4.5)/0.5;
-          amr.position.set(x2,0.22,z);
-          part.visible=true;
-          part.position.set(x2,0.85-0.55*ease(p),z);
-          if(p>0.95) part.visible=false;
-        }else if(t<9){
-          /* AMR returns empty */
-          var p=ease((t-5)/4);
-          amr.position.set(lerp(x2,x1,p),0.22,z);
-          part.visible=false;
-        }else{
-          amr.position.set(x1,0.22,z);
-          part.visible=false;
-        }
-        craneParts.outPart.visible=(t<1.5);
-        for(var i=2;i<6;i++){if(amr.children[i])amr.children[i].rotation.x+=0.08;}
-      })();
-
-      /* ---- craneOut: resolve control from Route 3 & Route 4 ---- */
-      (function(){
-        var t3=((elapsed-amrDefs[2].offset)%CY+CY)%CY;
-        var t4=((elapsed-amrDefs[3].offset)%CY+CY)%CY;
-        var r3active=(t3>=4.5&&t3<6);
-        var r4active=(t4<1.5);
-        if(r3active) animCrane(craneOut,t3,4.5,6,0.3,1.3,1);
-        else if(r4active) animCrane(craneOut,t4,0,1.5,1.3,0.3,-1);
-        else{ craneOut.carriage.position.y=0.8; craneOut.fork.position.z=0.5; }
-      })();
-
-      /* 소조립 emissive pulse (2.5s cycle) */
-      var sp=(elapsed%2.5)/2.5;
-      var activeIdx=Math.floor(sp*4);
-      subBoxes.forEach(function(b,i){
-        if(i===activeIdx){
-          var pulse=0.3+0.7*Math.abs(Math.sin(elapsed*4));
-          b.material.emissive=new THREE.Color(subCols[i]);
-          b.material.emissiveIntensity=pulse*0.6;
-        }else{
-          b.material.emissive=new THREE.Color(0x000000);
-          b.material.emissiveIntensity=0;
-        }
-      });
-
-      /* conveyor roller spin */
-      [convIn,convOut].forEach(function(cv){
-        cv.children.forEach(function(c){
-          if(c.geometry&&c.geometry.type==='CylinderGeometry') c.rotation.x+=0.04;
-        });
-      });
-
+      if(activeLayout==='A') animateLayoutA(elapsed);
+      else animateLayoutB(elapsed);
       renderer.render(scene,cam);
     }
     animate();
