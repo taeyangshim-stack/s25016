@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SmarTrack 프로젝트 개요</title>
+  <!-- Ant Design Reset + Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7/css/materialdesignicons.min.css">
+  <!-- AOS Animate On Scroll -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Ant Design 5.x Tokens */
+      --primary: #1677ff;
+      --primary-bg: #e6f4ff;
+      --primary-border: #91caff;
+      --success: #52c41a;
+      --success-bg: #f6ffed;
+      --success-border: #b7eb8f;
+      --warning: #faad14;
+      --warning-bg: #fffbe6;
+      --warning-border: #ffe58f;
+      --error: #ff4d4f;
+      --error-bg: #fff2f0;
+      --error-border: #ffccc7;
+      --info: #1677ff;
+      --purple: #722ed1;
+      --purple-bg: #f9f0ff;
+      --purple-border: #d3adf7;
+      --cyan: #13c2c2;
+      --cyan-bg: #e6fffb;
+      --cyan-border: #87e8de;
+      --geekblue: #2f54eb;
+      --volcano: #fa541c;
+      --gold: #faad14;
+      /* Neutral */
+      --text: rgba(0,0,0,.88);
+      --text-secondary: rgba(0,0,0,.65);
+      --text-tertiary: rgba(0,0,0,.45);
+      --text-quaternary: rgba(0,0,0,.25);
+      --border: #d9d9d9;
+      --border-secondary: #f0f0f0;
+      --fill: rgba(0,0,0,.04);
+      --fill-secondary: rgba(0,0,0,.06);
+      --bg-layout: #f5f5f5;
+      --bg-container: #ffffff;
+      --bg-elevated: #ffffff;
+      /* Spacing */
+      --radius: 8px;
+      --radius-lg: 12px;
+      --shadow: 0 1px 2px 0 rgba(0,0,0,.03), 0 1px 6px -1px rgba(0,0,0,.02), 0 2px 4px 0 rgba(0,0,0,.02);
+      --shadow-md: 0 6px 16px 0 rgba(0,0,0,.08), 0 3px 6px -4px rgba(0,0,0,.12), 0 9px 28px 8px rgba(0,0,0,.05);
+      --font: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg-layout); line-height: 1.7; font-size: 14px; }
+    ::selection { background: var(--primary-bg); color: var(--primary); }
+
+    /* ===== LAYOUT ===== */
+    .ant-layout { max-width: 1000px; margin: 0 auto; padding: 24px 24px 64px; }
+
+    /* ===== BREADCRUMB ===== */
+    .ant-breadcrumb { font-size: 13px; color: var(--text-tertiary); margin-bottom: 16px; }
+    .ant-breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+    .ant-breadcrumb a:hover { color: var(--primary); }
+    .ant-breadcrumb span { margin: 0 8px; }
+
+    /* ===== PAGE HEADER ===== */
+    .ant-page-header {
+      background: var(--bg-container); border-radius: var(--radius-lg);
+      padding: 32px; margin-bottom: 24px; box-shadow: var(--shadow);
+      border: 1px solid var(--border-secondary);
+    }
+    .ant-page-header-heading { display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+    .ant-page-header-heading-left { flex: 1; }
+    .ant-page-header-heading-title {
+      font-size: 28px; font-weight: 700; line-height: 1.3;
+      margin-bottom: 8px; color: var(--text);
+    }
+    .ant-page-header-heading-sub-title {
+      font-size: 15px; color: var(--text-secondary); line-height: 1.6;
+      max-width: 600px;
+    }
+    .ant-page-header-heading-extra { display: flex; gap: 8px; flex-wrap: wrap; }
+    .header-stat {
+      text-align: center; padding: 8px 20px;
+      background: var(--fill); border-radius: var(--radius); min-width: 90px;
+    }
+    .header-stat-value { font-size: 22px; font-weight: 700; color: var(--primary); }
+    .header-stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+
+    /* ===== TAGS ===== */
+    .ant-tag {
+      display: inline-block; padding: 2px 10px; border-radius: 4px;
+      font-size: 12px; font-weight: 500; line-height: 22px;
+      border: 1px solid transparent; white-space: nowrap;
+    }
+    .ant-tag-blue    { background: var(--primary-bg); color: var(--primary); border-color: var(--primary-border); }
+    .ant-tag-green   { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+    .ant-tag-orange  { background: var(--warning-bg); color: #d48806; border-color: var(--warning-border); }
+    .ant-tag-red     { background: var(--error-bg); color: var(--error); border-color: var(--error-border); }
+    .ant-tag-purple  { background: var(--purple-bg); color: var(--purple); border-color: var(--purple-border); }
+    .ant-tag-cyan    { background: var(--cyan-bg); color: #08979c; border-color: var(--cyan-border); }
+    .ant-tag-default { background: var(--fill); color: var(--text-secondary); border-color: var(--border); }
+
+    /* ===== ANCHOR NAV ===== */
+    .ant-anchor-wrapper {
+      background: var(--bg-container); border-radius: var(--radius-lg);
+      padding: 20px 24px; margin-bottom: 24px; box-shadow: var(--shadow);
+      border: 1px solid var(--border-secondary);
+    }
+    .ant-anchor-title {
+      font-size: 13px; font-weight: 600; color: var(--text-tertiary);
+      text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ant-anchor-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px 16px; }
+    .ant-anchor-link {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 10px; border-radius: 6px;
+      text-decoration: none; color: var(--text-secondary); font-size: 13px;
+      transition: all .2s; border-left: 2px solid transparent;
+    }
+    .ant-anchor-link:hover {
+      background: var(--primary-bg); color: var(--primary);
+      border-left-color: var(--primary);
+    }
+    .ant-anchor-link .mdi { font-size: 14px; opacity: .5; }
+
+    /* ===== CARD ===== */
+    .ant-card {
+      background: var(--bg-container); border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow);
+      margin-bottom: 16px; overflow: hidden;
+      transition: box-shadow .3s, border-color .3s;
+    }
+    .ant-card:hover { box-shadow: var(--shadow-md); border-color: var(--primary-border); }
+    .ant-card-head {
+      padding: 12px 20px; border-bottom: 1px solid var(--border-secondary);
+      display: flex; align-items: center; gap: 10px;
+      min-height: 48px;
+    }
+    .ant-card-head-title { font-size: 15px; font-weight: 600; flex: 1; }
+    .ant-card-head-extra { font-size: 12px; color: var(--text-tertiary); }
+    .ant-card-body { padding: 20px; }
+    .ant-card-bordered-left { border-left: 3px solid var(--primary); }
+    .ant-card-bordered-green { border-left: 3px solid var(--success); }
+    .ant-card-bordered-purple { border-left: 3px solid var(--purple); }
+    .ant-card-bordered-orange { border-left: 3px solid var(--warning); }
+    .ant-card-bordered-red { border-left: 3px solid var(--error); }
+    .ant-card-bordered-cyan { border-left: 3px solid var(--cyan); }
+
+    /* ===== SECTION ===== */
+    .ant-section { margin-bottom: 28px; }
+    .ant-section-title {
+      font-size: 20px; font-weight: 700; margin-bottom: 16px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--border-secondary);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ant-section-title .mdi { font-size: 22px; color: var(--primary); }
+
+    /* ===== TABLE ===== */
+    .ant-table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: var(--fill); font-weight: 600; text-align: left;
+      padding: 10px 12px; border-bottom: 1px solid var(--border);
+      color: var(--text); white-space: nowrap;
+    }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border-secondary); }
+    tbody tr:hover { background: var(--fill); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* ===== GRID ===== */
+    .ant-row { display: grid; gap: 16px; }
+    .ant-col-2 { grid-template-columns: 1fr 1fr; }
+    .ant-col-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .ant-col-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    @media (max-width: 768px) {
+      .ant-col-2, .ant-col-3, .ant-col-4 { grid-template-columns: 1fr; }
+      .ant-anchor-grid { grid-template-columns: 1fr 1fr; }
+      .ant-page-header { padding: 20px; }
+      .ant-page-header-heading-title { font-size: 22px; }
+      .ant-steps { grid-template-columns: 1fr 1fr 1fr !important; }
+    }
+
+    /* ===== STATISTIC ===== */
+    .ant-statistic {
+      text-align: center; padding: 16px;
+      background: var(--bg-container); border: 1px solid var(--border-secondary);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .ant-statistic-value { font-size: 28px; font-weight: 700; color: var(--primary); }
+    .ant-statistic-title { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+
+    /* ===== STEPS ===== */
+    .ant-steps {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
+      margin: 12px 0;
+    }
+    .ant-step {
+      position: relative; padding: 14px 12px; border-radius: var(--radius);
+      text-align: center; font-size: 12px; font-weight: 500;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .ant-step:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .ant-step-icon {
+      width: 28px; height: 28px; border-radius: 50%; display: inline-flex;
+      align-items: center; justify-content: center; font-weight: 700;
+      font-size: 14px; margin-bottom: 6px; color: #fff;
+    }
+    .ant-step-title { font-weight: 600; margin-bottom: 2px; }
+    .ant-step-desc { font-size: 11px; opacity: .7; }
+    .ant-step-arrow {
+      position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+      font-size: 16px; z-index: 1;
+    }
+
+    /* ===== ALERT ===== */
+    .ant-alert {
+      padding: 12px 16px; border-radius: var(--radius); margin-bottom: 12px;
+      font-size: 13px; line-height: 1.6; display: flex; align-items: flex-start; gap: 10px;
+      border: 1px solid;
+    }
+    .ant-alert-success { background: var(--success-bg); border-color: var(--success-border); color: #135200; }
+    .ant-alert-warning { background: var(--warning-bg); border-color: var(--warning-border); color: #614700; }
+    .ant-alert-info    { background: var(--primary-bg); border-color: var(--primary-border); color: #003eb3; }
+    .ant-alert-error   { background: var(--error-bg); border-color: var(--error-border); color: #a8071a; }
+    .ant-alert .mdi { font-size: 18px; margin-top: 1px; flex-shrink: 0; }
+
+    /* ===== TIMELINE ===== */
+    .ant-timeline { padding-left: 20px; border-left: 2px solid var(--border-secondary); }
+    .ant-timeline-item {
+      position: relative; padding: 0 0 20px 20px;
+    }
+    .ant-timeline-item::before {
+      content: ""; position: absolute; left: -7px; top: 4px;
+      width: 12px; height: 12px; border-radius: 50%;
+      border: 2px solid var(--primary); background: #fff;
+    }
+    .ant-timeline-item-red::before { border-color: var(--error); }
+    .ant-timeline-item-green::before { border-color: var(--success); }
+    .ant-timeline-item-orange::before { border-color: var(--warning); }
+    .ant-timeline-item-head { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+    .ant-timeline-item-content { font-size: 13px; color: var(--text-secondary); }
+
+    /* ===== ROADMAP BAR ===== */
+    .ant-progress-bar {
+      display: flex; border-radius: var(--radius); overflow: hidden;
+      height: 52px; margin: 12px 0; box-shadow: var(--shadow);
+    }
+    .ant-progress-seg {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; color: #fff; font-size: 12px; padding: 4px 8px;
+      transition: flex .3s;
+    }
+    .ant-progress-seg b { font-size: 13px; }
+    .ant-progress-seg small { font-size: 10px; opacity: .8; }
+
+    /* ===== FILE TREE ===== */
+    .ant-code-block {
+      background: #1e1e2e; color: #cdd6f4; border-radius: var(--radius-lg);
+      padding: 20px 24px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 13px; line-height: 1.8; overflow-x: auto;
+      box-shadow: var(--shadow);
+    }
+    .ant-code-block .dir { color: #89b4fa; font-weight: 600; }
+    .ant-code-block .file { color: #a6adc8; }
+    .ant-code-block .comment { color: #6c7086; }
+
+    /* ===== DIVIDER ===== */
+    .ant-divider {
+      border: none; border-top: 1px solid var(--border-secondary);
+      margin: 24px 0;
+    }
+
+    /* ===== FOOTER ===== */
+    .ant-footer {
+      text-align: center; padding: 24px; color: var(--text-tertiary);
+      font-size: 12px; border-top: 1px solid var(--border-secondary);
+      margin-top: 40px;
+    }
+
+    /* ===== CHANGELOG ===== */
+    .changelog-toggle {
+      position: fixed; bottom: 20px; right: 20px; z-index: 100;
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--primary); color: #fff; border: none;
+      box-shadow: var(--shadow-md); cursor: pointer; font-size: 22px;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .2s;
+    }
+    .changelog-toggle:hover { transform: scale(1.1); }
+    .changelog-drawer {
+      position: fixed; right: -400px; top: 0; width: 380px; height: 100vh;
+      background: var(--bg-container); box-shadow: -6px 0 16px rgba(0,0,0,.08);
+      z-index: 200; transition: right .3s ease; overflow-y: auto;
+      border-left: 1px solid var(--border-secondary);
+    }
+    .changelog-drawer.open { right: 0; }
+    .changelog-drawer-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border-secondary);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: var(--bg-container); z-index: 1;
+    }
+    .changelog-drawer-header h3 { font-size: 16px; font-weight: 600; }
+    .changelog-drawer-close {
+      border: none; background: none; font-size: 20px; cursor: pointer;
+      color: var(--text-tertiary); padding: 4px;
+    }
+    .changelog-drawer-body { padding: 20px; }
+    .changelog-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.3);
+      z-index: 199; display: none;
+    }
+    .changelog-overlay.open { display: block; }
+
+    /* ===== BACK TO TOP ===== */
+    .back-to-top {
+      position: fixed; bottom: 76px; right: 20px; z-index: 100;
+      width: 40px; height: 40px; border-radius: var(--radius);
+      background: var(--bg-container); color: var(--text-secondary);
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      cursor: pointer; font-size: 18px; display: flex;
+      align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .3s;
+    }
+    .back-to-top.visible { opacity: 1; }
+    .back-to-top:hover { color: var(--primary); border-color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<div class="ant-layout">
+
+  <!-- Breadcrumb -->
+  <div class="ant-breadcrumb" data-aos="fade-down">
+    <a href="/smartrack">SmarTrack</a> <span>/</span> 프로젝트 개요
+  </div>
+
+  <!-- ===== PAGE HEADER ===== -->
+  <div class="ant-page-header" data-aos="fade-up">
+    <div class="ant-page-header-heading">
+      <div class="ant-page-header-heading-left">
+        <div style="margin-bottom:10px">
+          <span class="ant-tag ant-tag-blue">신규과제</span>
+          <span class="ant-tag ant-tag-green">v4.0</span>
+          <span class="ant-tag ant-tag-default">2026</span>
+        </div>
+        <div class="ant-page-header-heading-title">
+          <span class="mdi mdi-cube-outline" style="color:var(--primary)"></span>
+          SmarTrack — 유연 적치 시스템
+        </div>
+        <div class="ant-page-header-heading-sub-title">
+          조선소 소조립 공장의 다양한 형상 부재를 자동으로 인식 · 분류하고,
+          지능형 핀-그리드 랙에 최적 배치하는 차세대 물류 자동화 시스템
+        </div>
+      </div>
+      <div class="ant-page-header-heading-extra">
+        <div class="header-stat">
+          <div class="header-stat-value">5년</div>
+          <div class="header-stat-label">개발기간</div>
+        </div>
+        <div class="header-stat">
+          <div class="header-stat-value" style="color:var(--success)">200억</div>
+          <div class="header-stat-label">총 국비</div>
+        </div>
+        <div class="header-stat">
+          <div class="header-stat-value" style="color:var(--purple)">10</div>
+          <div class="header-stat-label">참여기관</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ANCHOR NAV ===== -->
+  <nav class="ant-anchor-wrapper" data-aos="fade-up" data-aos-delay="100">
+    <div class="ant-anchor-title"><span class="mdi mdi-format-list-bulleted"></span> 목차</div>
+    <div class="ant-anchor-grid">
+      <a class="ant-anchor-link" href="#overview"><span class="mdi mdi-information-outline"></span> 프로젝트 개요</a>
+      <a class="ant-anchor-link" href="#problem"><span class="mdi mdi-alert-circle-outline"></span> 문제 정의</a>
+      <a class="ant-anchor-link" href="#target"><span class="mdi mdi-shape-outline"></span> 대상 부재</a>
+      <a class="ant-anchor-link" href="#benchmark"><span class="mdi mdi-chart-bubble"></span> 벤치마킹</a>
+      <a class="ant-anchor-link" href="#role"><span class="mdi mdi-star-outline"></span> SP 핵심 역할</a>
+      <a class="ant-anchor-link" href="#flow"><span class="mdi mdi-truck-outline"></span> 물류 흐름도</a>
+      <a class="ant-anchor-link" href="#ai"><span class="mdi mdi-brain"></span> 소부재 분류 AI</a>
+      <a class="ant-anchor-link" href="#rack"><span class="mdi mdi-archive-outline"></span> 랙장 컨셉</a>
+      <a class="ant-anchor-link" href="#pin"><span class="mdi mdi-pin"></span> 핀 아트 메커니즘</a>
+      <a class="ant-anchor-link" href="#concepts"><span class="mdi mdi-lightbulb-outline"></span> 3가지 컨셉</a>
+      <a class="ant-anchor-link" href="#module"><span class="mdi mdi-cog-outline"></span> 랙 모듈 + 안전</a>
+      <a class="ant-anchor-link" href="#amr"><span class="mdi mdi-robot-outline"></span> AMR 도킹</a>
+      <a class="ant-anchor-link" href="#arch"><span class="mdi mdi-sitemap-outline"></span> 시스템 아키텍처</a>
+      <a class="ant-anchor-link" href="#sequence"><span class="mdi mdi-swap-horizontal"></span> 입출고 시퀀스</a>
+      <a class="ant-anchor-link" href="#consortium"><span class="mdi mdi-account-group-outline"></span> 컨소시엄</a>
+      <a class="ant-anchor-link" href="#roadmap"><span class="mdi mdi-road-variant"></span> 로드맵</a>
+      <a class="ant-anchor-link" href="#changelog"><span class="mdi mdi-history"></span> 변경 이력</a>
+      <a class="ant-anchor-link" href="#files"><span class="mdi mdi-folder-outline"></span> 파일 구조</a>
+    </div>
+  </nav>
+
+  <!-- ===== 1. 프로젝트 개요 ===== -->
+  <div class="ant-section" id="overview" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-information-outline"></span> 프로젝트 개요</div>
+    <div class="ant-card ant-card-bordered-left">
+      <div class="ant-card-head">
+        <div class="ant-card-head-title">중대형 선박 유연생산시스템 — 스마트랙</div>
+        <span class="ant-tag ant-tag-blue">핵심</span>
+      </div>
+      <div class="ant-card-body">
+        <p style="margin-bottom:12px">조선소 소조립 공장에서 다양한 형상의 부재(T-bar, 보강재, 곡판, 스캘럽 등)를
+          안전하고 효율적으로 적치·관리하기 위한 <b>지능형 유연 적치 시스템</b>입니다.</p>
+        <div class="ant-row ant-col-3" style="margin-top:12px">
+          <div class="ant-alert ant-alert-error"><span class="mdi mdi-close-circle"></span> <div><b>기존 문제</b>: 고정식 받침대 → 공간 낭비, 안전 리스크, 수작업 의존</div></div>
+          <div class="ant-alert ant-alert-success"><span class="mdi mdi-check-circle"></span> <div><b>솔루션</b>: AI 형상 인식 + 가변형 핀-그리드 랙 + AMR/크레인 자동이송</div></div>
+          <div class="ant-alert ant-alert-info"><span class="mdi mdi-target"></span> <div><b>목표</b>: 공간 30% 절감, 시간 30% 단축, 무중단 운영</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 2. 문제 정의 ===== -->
+  <div class="ant-section" id="problem" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-alert-circle-outline" style="color:var(--error)"></span> 왜 스마트랙이 필요한가?</div>
+    <div class="ant-row ant-col-3">
+      <div class="ant-card ant-card-bordered-red" data-aos="fade-up" data-aos-delay="0">
+        <div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-arrow-expand-all" style="color:var(--error)"></span> 공간 낭비</div></div>
+        <div class="ant-card-body"><p style="color:var(--text-secondary)">고정 높이 받침대 → 형상별 최적화 불가, 바닥면적 40% 이상 유휴</p></div>
+      </div>
+      <div class="ant-card ant-card-bordered-red" data-aos="fade-up" data-aos-delay="100">
+        <div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-shield-alert-outline" style="color:var(--error)"></span> 안전 리스크</div></div>
+        <div class="ant-card-body"><p style="color:var(--text-secondary)">부적절한 지지 → 전도/미끄러짐, 중량물 사고 위험 상존</p></div>
+      </div>
+      <div class="ant-card ant-card-bordered-red" data-aos="fade-up" data-aos-delay="200">
+        <div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-hand-back-left-outline" style="color:var(--error)"></span> 수작업 의존</div></div>
+        <div class="ant-card-body"><p style="color:var(--text-secondary)">크레인 기사 경험에 의존, 표준화 불가, 공정 병목 발생</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 3. 대상 부재 ===== -->
+  <div class="ant-section" id="target" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-shape-outline" style="color:var(--geekblue)"></span> 대상 부재 — 유연 적치 필요</div>
+    <div class="ant-card">
+      <div class="ant-card-body ant-table-wrapper">
+        <table>
+          <thead><tr><th>부재 유형</th><th>특징</th><th>중량 범위</th><th>적치 난이도</th></tr></thead>
+          <tbody>
+            <tr><td><b>T-bar</b></td><td>길이 방향 부재, 단면 T자</td><td>1~5t</td><td><span class="ant-tag ant-tag-orange">중</span></td></tr>
+            <tr><td><b>보강재</b></td><td>판재 보강용 스티프너</td><td>0.5~3t</td><td><span class="ant-tag ant-tag-green">저</span></td></tr>
+            <tr><td><b>곡판</b></td><td>3D 곡면, 무게중심 편향</td><td>2~8t</td><td><span class="ant-tag ant-tag-red">고</span></td></tr>
+            <tr><td><b>스캘럽</b></td><td>소형 절단재, 다량 배치</td><td>0.1~0.5t</td><td><span class="ant-tag ant-tag-green">저</span></td></tr>
+            <tr><td><b>소조 블록</b></td><td>조립 완료 중간제품</td><td>5~15t</td><td><span class="ant-tag ant-tag-red">최고</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 4. 벤치마킹 ===== -->
+  <div class="ant-section" id="benchmark" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-chart-bubble" style="color:var(--purple)"></span> 벤치마킹 — 글로벌 참고 사례</div>
+    <div class="ant-row ant-col-2">
+      <div class="ant-card ant-card-bordered-purple" data-aos="fade-right"><div class="ant-card-head"><div class="ant-card-head-title">Cat.1 — 핀-베드 / 재구성형 몰드</div><span class="ant-tag ant-tag-purple">핵심</span></div><div class="ant-card-body"><p style="color:var(--text-secondary)">ADAPA Adaptive Mould 등. 높이 가변 핀 어레이로 곡면 지지. 스마트랙의 핵심 영감원.</p></div></div>
+      <div class="ant-card ant-card-bordered-left" data-aos="fade-left"><div class="ant-card-head"><div class="ant-card-head-title">Cat.2 — 유니버설 홀딩 픽스처 (UHF)</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)">다축 자유도 클램프 시스템. 항공/자동차 분야 적용.</p></div></div>
+      <div class="ant-card ant-card-bordered-orange" data-aos="fade-right"><div class="ant-card-head"><div class="ant-card-head-title">Cat.3 — 조선 패널라인 / 용접 자동화</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)">Pemamek, Comau 등. 대형 구조물 핸들링 + 용접 자동화.</p></div></div>
+      <div class="ant-card ant-card-bordered-cyan" data-aos="fade-left"><div class="ant-card-head"><div class="ant-card-head-title">Cat.4/5 — 스마트야드 / AGV 플랫폼</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)">한국 조선소 스마트야드 동향 + 중량물 AGV / 디지털 플랫폼.</p></div></div>
+    </div>
+    <div class="ant-alert ant-alert-success" data-aos="fade-up"><span class="mdi mdi-lightbulb-on-outline"></span> <div><b>스마트랙 포지셔닝</b>: 기존 솔루션이 다루지 못하는 "다품종 · 중량물 · 형상 가변" 영역의 블루오션.</div></div>
+  </div>
+
+  <!-- ===== 5. SP 역할 ===== -->
+  <div class="ant-section" id="role" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-star-outline" style="color:var(--success)"></span> SP시스템스 — 3대 핵심 개발 영역</div>
+    <div class="ant-row ant-col-3">
+      <div class="ant-card ant-card-bordered-purple" data-aos="zoom-in" data-aos-delay="0">
+        <div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-brain" style="color:var(--purple)"></span> 소부재 분류 AI</div><span class="ant-tag ant-tag-purple">1</span></div>
+        <div class="ant-card-body"><p style="color:var(--text-secondary)">3D 점군 인식 → 형상 분류 → 무게중심(CoG) 추정 → 자동 랙 배정</p></div>
+      </div>
+      <div class="ant-card ant-card-bordered-green" data-aos="zoom-in" data-aos-delay="100">
+        <div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-archive-outline" style="color:var(--success)"></span> 지능형 Rack</div><span class="ant-tag ant-tag-green">2</span></div>
+        <div class="ant-card-body"><p style="color:var(--text-secondary)">핀-그리드 가변 서포트 + 하중 센싱 + 안전 검증 알고리즘</p></div>
+      </div>
+      <div class="ant-card ant-card-bordered-orange" data-aos="zoom-in" data-aos-delay="200">
+        <div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-crane" style="color:#d48806"></span> Stacker Crane</div><span class="ant-tag ant-tag-orange">3</span></div>
+        <div class="ant-card-body"><p style="color:var(--text-secondary)">랙 간 부재 자동 이송 + AMR/크레인 도킹 인터페이스</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 6. 물류 흐름도 ===== -->
+  <div class="ant-section" id="flow" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-truck-outline" style="color:var(--success)"></span> 소조립 공장 물류 흐름도</div>
+    <div class="ant-steps" data-aos="fade-up">
+      <div class="ant-step" style="background:var(--success-bg);color:#135200">
+        <div class="ant-step-icon" style="background:var(--success)">1</div>
+        <div class="ant-step-title">절단 → 입고</div>
+        <span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span>
+      </div>
+      <div class="ant-step" style="background:var(--primary-bg);color:#003eb3">
+        <div class="ant-step-icon" style="background:var(--primary)">2</div>
+        <div class="ant-step-title">3D 스캔 분류</div>
+        <span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span>
+      </div>
+      <div class="ant-step" style="background:var(--purple-bg);color:#391085">
+        <div class="ant-step-icon" style="background:var(--purple)">3</div>
+        <div class="ant-step-title">AI 슬롯 배정</div>
+        <span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span>
+      </div>
+      <div class="ant-step" style="background:var(--success-bg);color:#135200">
+        <div class="ant-step-icon" style="background:var(--success)">4</div>
+        <div class="ant-step-title">스마트랙 적치</div>
+        <span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span>
+      </div>
+      <div class="ant-step" style="background:var(--warning-bg);color:#614700">
+        <div class="ant-step-icon" style="background:var(--warning)">5</div>
+        <div class="ant-step-title">JIT 출고</div>
+        <span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span>
+      </div>
+      <div class="ant-step" style="background:var(--error-bg);color:#a8071a">
+        <div class="ant-step-icon" style="background:var(--error)">6</div>
+        <div class="ant-step-title">소조립 라인</div>
+      </div>
+    </div>
+    <div class="ant-alert ant-alert-success"><span class="mdi mdi-check-circle"></span> <div><b>핵심 가치</b>: 생산계획(MES)과 연동하여 공정 순서에 맞는 JIT 출고 → 대기시간 최소화</div></div>
+  </div>
+
+  <!-- ===== 7. AI ===== -->
+  <div class="ant-section" id="ai" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-brain" style="color:var(--purple)"></span> 소부재 분류 AI</div>
+    <div class="ant-card ant-card-bordered-purple">
+      <div class="ant-card-head"><div class="ant-card-head-title">형상 인식 → 자동 배정 파이프라인</div><span class="ant-tag ant-tag-purple">AI/ML</span></div>
+      <div class="ant-card-body ant-table-wrapper">
+        <table>
+          <thead><tr><th>단계</th><th>기술</th><th>출력</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ant-tag ant-tag-blue">1. 스캔</span></td><td>3D LiDAR / 비전 카메라</td><td>포인트 클라우드</td></tr>
+            <tr><td><span class="ant-tag ant-tag-purple">2. 분류</span></td><td>딥러닝 (PointNet++)</td><td>부재 유형, 치수</td></tr>
+            <tr><td><span class="ant-tag ant-tag-orange">3. CoG</span></td><td>형상 + CAD 매칭</td><td>무게중심 좌표</td></tr>
+            <tr><td><span class="ant-tag ant-tag-green">4. 배정</span></td><td>최적화 알고리즘</td><td>랙/베이/슬롯 ID</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 8. 랙장 ===== -->
+  <div class="ant-section" id="rack" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-archive-outline" style="color:var(--success)"></span> 랙장 컨셉 — 부재별 최적 적재</div>
+    <div class="ant-row ant-col-3">
+      <div class="ant-card ant-card-bordered-green" data-aos="flip-left"><div class="ant-card-head"><div class="ant-card-head-title">A존 — 대형 부재</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)">슬라이딩 빔 타입. 대형 곡판/블록 대응. 크레인 직접 적재.</p></div></div>
+      <div class="ant-card ant-card-bordered-left" data-aos="flip-left" data-aos-delay="100"><div class="ant-card-head"><div class="ant-card-head-title">B존 — 중형 부재</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)">다단 베드 타입. T-bar/보강재 적재. 핀-그리드 적용.</p></div></div>
+      <div class="ant-card ant-card-bordered-orange" data-aos="flip-left" data-aos-delay="200"><div class="ant-card-head"><div class="ant-card-head-title">C존 — 소형 부재</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)">카세트 트레이 타입. 스캘럽/소형 절단재 대량 적재.</p></div></div>
+    </div>
+    <div class="ant-alert ant-alert-info"><span class="mdi mdi-layers-outline"></span> <div><b>슬롯 관리 계층</b>: 랙(Rack) → 베이(Bay) → 슬롯(Slot) 3단계 계층 구조로 WMS 관리</div></div>
+  </div>
+
+  <!-- ===== 9. 핀 아트 ===== -->
+  <div class="ant-section" id="pin" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-pin" style="color:var(--success)"></span> "핀 아트" — 작동 원리</div>
+    <div class="ant-card ant-card-bordered-green">
+      <div class="ant-card-head"><div class="ant-card-head-title">4단계 작동 시퀀스</div><span class="ant-tag ant-tag-green">핵심 메커니즘</span></div>
+      <div class="ant-card-body">
+        <div class="ant-steps" style="grid-template-columns: repeat(4, 1fr)">
+          <div class="ant-step" style="background:var(--primary-bg);color:#003eb3" data-aos="fade-right" data-aos-delay="0"><div class="ant-step-icon" style="background:var(--primary)">1</div><div class="ant-step-title">형상 수신</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+          <div class="ant-step" style="background:var(--purple-bg);color:#391085" data-aos="fade-right" data-aos-delay="100"><div class="ant-step-icon" style="background:var(--purple)">2</div><div class="ant-step-title">핀 높이 계산</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+          <div class="ant-step" style="background:var(--success-bg);color:#135200" data-aos="fade-right" data-aos-delay="200"><div class="ant-step-icon" style="background:var(--success)">3</div><div class="ant-step-title">핀 조정</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+          <div class="ant-step" style="background:var(--warning-bg);color:#614700" data-aos="fade-right" data-aos-delay="300"><div class="ant-step-icon" style="background:var(--warning)">4</div><div class="ant-step-title">적치 + 검증</div></div>
+        </div>
+        <p style="margin-top:16px;color:var(--text-secondary)">부재의 3D 형상과 무게중심을 기반으로 핀 높이를 개별 조정하여, <b>하나의 랙으로 무한한 형상에 대응</b>합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 10. 3가지 컨셉 ===== -->
+  <div class="ant-section" id="concepts" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-lightbulb-outline" style="color:var(--geekblue)"></span> 3가지 컨셉</div>
+    <div class="ant-row ant-col-3">
+      <div class="ant-card ant-card-bordered-green" data-aos="fade-up" data-aos-delay="0"><div class="ant-card-head"><div class="ant-card-head-title">컨셉 A</div><span class="ant-tag ant-tag-green">1차년도</span></div><div class="ant-card-body"><h4 style="margin-bottom:8px">핀-그리드 수동</h4><ul style="padding-left:18px;color:var(--text-secondary)"><li>격자 배열 핀 + 수동 높이 조절</li><li>구조 단순, 저비용</li><li>MVP 대상</li></ul></div></div>
+      <div class="ant-card ant-card-bordered-left" data-aos="fade-up" data-aos-delay="100"><div class="ant-card-head"><div class="ant-card-head-title">컨셉 B</div><span class="ant-tag ant-tag-blue">2~3차년도</span></div><div class="ant-card-body"><h4 style="margin-bottom:8px">전동 서포트 반자동</h4><ul style="padding-left:18px;color:var(--text-secondary)"><li>서보모터 기반 높이/각도 자동 조절</li><li>로드셀 하중 센싱</li><li>실증 대상</li></ul></div></div>
+      <div class="ant-card ant-card-bordered-purple" data-aos="fade-up" data-aos-delay="200"><div class="ant-card-head"><div class="ant-card-head-title">컨셉 C</div><span class="ant-tag ant-tag-purple">PoC</span></div><div class="ant-card-body"><h4 style="margin-bottom:8px">셀 기반 자동</h4><ul style="padding-left:18px;color:var(--text-secondary)"><li>다점 셀 각각 서보 제어</li><li>"형상 무관" 정점, 특허 가치</li><li>PoC/특허 트랙</li></ul></div></div>
+    </div>
+    <div class="ant-alert ant-alert-success"><span class="mdi mdi-strategy"></span> <div><b>추천 전략</b>: A로 빠르게 실증 → B로 차별화 → C는 PoC/특허 트랙 병렬 추진</div></div>
+  </div>
+
+  <!-- ===== 11. 모듈 ===== -->
+  <div class="ant-section" id="module" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-cog-outline" style="color:var(--success)"></span> 랙 모듈 + 안전 체계</div>
+    <div class="ant-card">
+      <div class="ant-card-body ant-table-wrapper">
+        <table>
+          <thead><tr><th>모듈</th><th>기능</th><th>비고</th></tr></thead>
+          <tbody>
+            <tr><td><b>서포트</b></td><td>높이/각도 조절, 패드 교체, 하중 센싱</td><td><span class="ant-tag ant-tag-default">A/B/C 공통</span></td></tr>
+            <tr><td><b>빔/프레임</b></td><td>레일/슬라이딩 빔, 지지점 간격 조절</td><td><span class="ant-tag ant-tag-green">공간 효율</span></td></tr>
+            <tr><td><b>안전</b></td><td>과하중, 편하중, 접촉 이상 감지 + 인터록</td><td><span class="ant-tag ant-tag-red">필수</span></td></tr>
+            <tr><td><b>도킹/정렬</b></td><td>AMR/크레인 위치 유도 (마커, 비전, LiDAR)</td><td><span class="ant-tag ant-tag-default">현장 맞춤</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ant-alert ant-alert-info"><span class="mdi mdi-shield-check-outline"></span> <div><b>설계 원칙</b>: H/W는 단순 · 강건, 지능은 S/W로</div></div>
+  </div>
+
+  <!-- ===== 12. AMR ===== -->
+  <div class="ant-section" id="amr" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-robot-outline" style="color:var(--purple)"></span> AMR 도킹 — 자동 적재/하역</div>
+    <div class="ant-card ant-card-bordered-purple">
+      <div class="ant-card-head"><div class="ant-card-head-title">도킹 5단계</div></div>
+      <div class="ant-card-body">
+        <div class="ant-steps" style="grid-template-columns: repeat(5, 1fr)">
+          <div class="ant-step" style="background:var(--purple-bg);color:#391085"><div class="ant-step-icon" style="background:var(--purple)">1</div><div class="ant-step-title">접근</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+          <div class="ant-step" style="background:var(--primary-bg);color:#003eb3"><div class="ant-step-icon" style="background:var(--primary)">2</div><div class="ant-step-title">정렬</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+          <div class="ant-step" style="background:var(--success-bg);color:#135200"><div class="ant-step-icon" style="background:var(--success)">3</div><div class="ant-step-title">도킹</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+          <div class="ant-step" style="background:var(--warning-bg);color:#614700"><div class="ant-step-icon" style="background:var(--warning)">4</div><div class="ant-step-title">적재</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+          <div class="ant-step" style="background:var(--success-bg);color:#135200"><div class="ant-step-icon" style="background:var(--success)">5</div><div class="ant-step-title">검증</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ant-row ant-col-2" style="margin-top:8px">
+      <div class="ant-card"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-connection"></span> 도킹 인터페이스</div></div><div class="ant-card-body"><ul style="padding-left:18px;color:var(--text-secondary)"><li><b>기계</b>: V자 가이드 레일 + 핀 정렬</li><li><b>센서</b>: LiDAR 거리, 비전 마커, 근접 SW</li><li><b>통신</b>: Wi-Fi/5G → WCS 연계</li><li><b>안전</b>: 광커튼, E-Stop, 인터록</li></ul></div></div>
+      <div class="ant-card"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-handshake-outline"></span> AMR 파트너</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)"><b>고레로보틱스</b>: AMR 자율 이동 플랫폼 개발 담당. 자율 주행 + 군집 제어 알고리즘.</p></div></div>
+    </div>
+  </div>
+
+  <!-- ===== 13. 아키텍처 ===== -->
+  <div class="ant-section" id="arch" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-sitemap-outline" style="color:var(--geekblue)"></span> 시스템 아키텍처</div>
+    <div class="ant-card ant-card-bordered-left">
+      <div class="ant-card-head"><div class="ant-card-head-title">계층 구조</div><span class="ant-tag ant-tag-blue">S/W</span></div>
+      <div class="ant-card-body ant-table-wrapper">
+        <table>
+          <thead><tr><th>계층</th><th>구성요소</th><th>역할</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ant-tag ant-tag-blue">상위</span></td><td>WMS / WCS</td><td>입출고 관리, 생산계획 연동</td></tr>
+            <tr><td><span class="ant-tag ant-tag-green">중간</span></td><td>스마트랙 컨트롤러</td><td>적치 알고리즘, 안전 검증, 최적 배치</td></tr>
+            <tr><td><span class="ant-tag ant-tag-orange">하위</span></td><td>3D 인식 / 서포트 PLC / 안전 / 도킹 I/F</td><td>현장 제어 · 센서 · 액추에이터</td></tr>
+            <tr><td><span class="ant-tag ant-tag-purple">보조</span></td><td>디지털트윈</td><td>실시간 모니터링 · 시뮬레이션</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ant-row ant-col-2">
+      <div class="ant-alert ant-alert-success"><span class="mdi mdi-database-arrow-right"></span> <div><b>데이터 파이프</b>: 입고 스캔 → 형상/CoG 추정 → 적치 후보 → 안전 검증 → 최적 배치 → 학습</div></div>
+      <div class="ant-alert ant-alert-warning"><span class="mdi mdi-wifi"></span> <div><b>통신</b>: 상위 REST/MQTT · 하위 필드버스(PLC) · 안전 하드와이어 인터록</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 14. 시퀀스 ===== -->
+  <div class="ant-section" id="sequence" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-swap-horizontal" style="color:var(--success)"></span> 입고 → 출고 6단계</div>
+    <div class="ant-steps">
+      <div class="ant-step" style="background:var(--success-bg);color:#135200"><div class="ant-step-icon" style="background:var(--success)">1</div><div class="ant-step-title">입고 스캔</div><div class="ant-step-desc">바코드/RFID/3D</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+      <div class="ant-step" style="background:var(--success-bg);color:#135200"><div class="ant-step-icon" style="background:var(--success)">2</div><div class="ant-step-title">형상·CoG</div><div class="ant-step-desc">3D 점군 분류</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+      <div class="ant-step" style="background:var(--primary-bg);color:#003eb3"><div class="ant-step-icon" style="background:var(--primary)">3</div><div class="ant-step-title">슬롯 배정</div><div class="ant-step-desc">AI 최적화</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+      <div class="ant-step" style="background:var(--purple-bg);color:#391085"><div class="ant-step-icon" style="background:var(--purple)">4</div><div class="ant-step-title">핀 + 적치</div><div class="ant-step-desc">크레인/AMR</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+      <div class="ant-step" style="background:var(--warning-bg);color:#614700"><div class="ant-step-icon" style="background:var(--warning)">5</div><div class="ant-step-title">실시간 추적</div><div class="ant-step-desc">재고 대시보드</div><span class="ant-step-arrow" style="color:var(--text-quaternary)">→</span></div>
+      <div class="ant-step" style="background:var(--error-bg);color:#a8071a"><div class="ant-step-icon" style="background:var(--error)">6</div><div class="ant-step-title">JIT 출고</div><div class="ant-step-desc">MES 연동</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 15. 컨소시엄 ===== -->
+  <div class="ant-section" id="consortium" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-account-group-outline" style="color:var(--geekblue)"></span> 컨소시엄 — 10개 기관</div>
+    <div class="ant-row ant-col-2">
+      <div class="ant-card ant-card-bordered-green" data-aos="fade-up" data-aos-delay="0"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-star" style="color:var(--success)"></span> SP시스템스</div><span class="ant-tag ant-tag-green">핵심</span></div><div class="ant-card-body"><p style="color:var(--text-secondary)">소부재 분류 AI, 지능형 Rack, Stacker Crane, 시스템 통합</p></div></div>
+      <div class="ant-card ant-card-bordered-left" data-aos="fade-up" data-aos-delay="50"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-factory"></span> 실증 기관</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)"><b>삼성중공업</b> 거제조선소 실증, <b>한화오션</b> 추가 실증</p></div></div>
+      <div class="ant-card ant-card-bordered-orange" data-aos="fade-up" data-aos-delay="100"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-robot-outline"></span> 로봇 · 자동화</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)"><b>고레로보틱스</b>: AMR 플랫폼 + 도킹 인터페이스</p></div></div>
+      <div class="ant-card ant-card-bordered-purple" data-aos="fade-up" data-aos-delay="150"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-school-outline"></span> AI · 연구</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)"><b>동국대</b> 최적화 알고리즘, <b>RIST</b> 3D 인식 공동연구</p></div></div>
+      <div class="ant-card ant-card-bordered-cyan" data-aos="fade-up" data-aos-delay="200"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-monitor-dashboard"></span> SW · 플랫폼</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)"><b>지오소프트</b> MES/WMS 미들웨어, <b>올포랜드</b> 디지털트윈</p></div></div>
+      <div class="ant-card" style="border-left:3px solid #8c8c8c" data-aos="fade-up" data-aos-delay="250"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-certificate-outline"></span> 인증 · 검증</div></div><div class="ant-card-body"><p style="color:var(--text-secondary)"><b>한국선급(KR)</b> 안전 인증, <b>중소조선연구원</b> 기술 검증</p></div></div>
+    </div>
+  </div>
+
+  <!-- ===== 16. 로드맵 ===== -->
+  <div class="ant-section" id="roadmap" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-road-variant" style="color:#d48806"></span> 5개년 로드맵</div>
+    <div class="ant-row ant-col-4" style="margin-bottom:16px">
+      <div class="ant-statistic" data-aos="zoom-in" data-aos-delay="0"><div class="ant-statistic-value">200억</div><div class="ant-statistic-title">총 국비</div></div>
+      <div class="ant-statistic" data-aos="zoom-in" data-aos-delay="100"><div class="ant-statistic-value" style="color:var(--success)">5년</div><div class="ant-statistic-title">개발기간</div></div>
+      <div class="ant-statistic" data-aos="zoom-in" data-aos-delay="200"><div class="ant-statistic-value" style="color:var(--purple)">TRL 3→8</div><div class="ant-statistic-title">기술성숙도</div></div>
+      <div class="ant-statistic" data-aos="zoom-in" data-aos-delay="300"><div class="ant-statistic-value" style="color:#d48806">10</div><div class="ant-statistic-title">참여 기관</div></div>
+    </div>
+    <div class="ant-progress-bar" data-aos="fade-up">
+      <div class="ant-progress-seg" style="flex:9;background:var(--success)"><b>1차 9M</b><small>6억 · TRL 3→4</small></div>
+      <div class="ant-progress-seg" style="flex:12;background:#389e0d"><b>2차 12M</b><small>10억 · TRL 4→5</small></div>
+      <div class="ant-progress-seg" style="flex:12;background:var(--primary)"><b>3차 12M</b><small>12억 · TRL 5→6</small></div>
+      <div class="ant-progress-seg" style="flex:12;background:var(--purple)"><b>4차 12M</b><small>12억 · TRL 6→7</small></div>
+      <div class="ant-progress-seg" style="flex:12;background:#531dab"><b>5차 12M</b><small>12억 · TRL 7→8</small></div>
+    </div>
+    <div class="ant-card" data-aos="fade-up">
+      <div class="ant-card-body ant-table-wrapper">
+        <table>
+          <thead><tr><th>연차</th><th>컨셉</th><th>핵심 산출물</th><th>KPI</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ant-tag ant-tag-green">1차</span></td><td>A MVP + B PoC</td><td>핀-그리드 시제품, 알고리즘 v0</td><td>안전검증 80%+</td></tr>
+            <tr><td><span class="ant-tag ant-tag-blue">2차</span></td><td>B 실증</td><td>전동서포트 랙, AMR 도킹, S/W v1</td><td>적치시간 30% 단축</td></tr>
+            <tr><td><span class="ant-tag ant-tag-purple">3차</span></td><td>B 양산 + C PoC</td><td>양산형 모듈, 소조블록 확장, 특허</td><td>특허 2건+</td></tr>
+            <tr><td><span class="ant-tag ant-tag-orange">4차</span></td><td>통합 + DT</td><td>멀티 랙, 디지털트윈, AI 최적화</td><td>무중단 1개월+</td></tr>
+            <tr><td><span class="ant-tag ant-tag-red">5차</span></td><td>상용화</td><td>제품화, 매뉴얼, 타 조선소 적용</td><td>판매 1건+</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ant-card ant-card-bordered-red" data-aos="fade-up">
+      <div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-alert-outline" style="color:var(--error)"></span> 기술 리스크 + 대응</div></div>
+      <div class="ant-card-body ant-table-wrapper">
+        <table>
+          <tbody>
+            <tr><td><span class="ant-tag ant-tag-red">핀 내구성</span></td><td>500회 사이클 검증 → 1차년도 가속시험</td></tr>
+            <tr><td><span class="ant-tag ant-tag-red">AMR 정밀도</span></td><td>도킹 ±10mm → V가이드 + 비전 보정</td></tr>
+            <tr><td><span class="ant-tag ant-tag-red">AI 학습데이터</span></td><td>초기 100건 수작업 라벨링 → 이후 자동 축적</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 17. 변경 이력 ===== -->
+  <div class="ant-section" id="changelog" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-history" style="color:var(--primary)"></span> 변경 이력 / 업무 히스토리</div>
+    <div class="ant-card">
+      <div class="ant-card-head">
+        <div class="ant-card-head-title">업무 진행 타임라인</div>
+        <span class="ant-tag ant-tag-blue">관리</span>
+      </div>
+      <div class="ant-card-body">
+        <div class="ant-timeline">
+          <div class="ant-timeline-item">
+            <div class="ant-timeline-item-head"><span class="ant-tag ant-tag-blue">2026-03-02</span> 프로젝트 개요 페이지 생성</div>
+            <div class="ant-timeline-item-content">Ant Design 스타일 적용, AOS 애니메이션 추가, 업무 히스토리 섹션 신설</div>
+          </div>
+          <div class="ant-timeline-item">
+            <div class="ant-timeline-item-head"><span class="ant-tag ant-tag-orange">2026-02-28</span> 김종필 — 스마트랙 신규과제 자료 공유</div>
+            <div class="ant-timeline-item-content">
+              지능형 랙 시스템 개발과제 PPT (52.7MB) 공유<br>
+              SP 담당: ① 소부재 분류 ② Stacker Crane ③ Rack<br>
+              과제명: 중대형 선박의 유연생산시스템 도입을 위한 지능형 물류 관리 기술개발<br>
+              총 국비 200억원 / 26년 예산 23억원
+            </div>
+          </div>
+          <div class="ant-timeline-item ant-timeline-item-red">
+            <div class="ant-timeline-item-head"><span class="ant-tag ant-tag-red">2026-03-08</span> 사업계획서 초안 완료 (예정)</div>
+            <div class="ant-timeline-item-content">컨소시엄 오프라인 미팅을 통한 개발 내용 확인 및 수정 보완</div>
+          </div>
+          <div class="ant-timeline-item ant-timeline-item-red">
+            <div class="ant-timeline-item-head"><span class="ant-tag ant-tag-red">2026-03-09</span> 사업계획서 수정 회의 (예정)</div>
+            <div class="ant-timeline-item-content">컨소시엄 회의</div>
+          </div>
+          <div class="ant-timeline-item ant-timeline-item-orange">
+            <div class="ant-timeline-item-head"><span class="ant-tag ant-tag-orange">2026-03-16</span> 사업계획서 작성 완료 (예정)</div>
+            <div class="ant-timeline-item-content">삼성중공업 및 한화오션 내부 보고/검토용</div>
+          </div>
+          <div class="ant-timeline-item ant-timeline-item-red">
+            <div class="ant-timeline-item-head"><span class="ant-tag ant-tag-red">2026-03-25</span> 사업계획서 제출 기한 (18시)</div>
+            <div class="ant-timeline-item-content">최종 제출 마감</div>
+          </div>
+          <div class="ant-timeline-item ant-timeline-item-green">
+            <div class="ant-timeline-item-head"><span class="ant-tag ant-tag-default">2026-02-24</span> index.html v4.0 업데이트</div>
+            <div class="ant-timeline-item-content">랙장 컨셉 + 스토리 흐름 보완 (벤치마킹·브릿지·리스크), 22슬라이드 완성</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 18. 파일 구조 ===== -->
+  <div class="ant-section" id="files" data-aos="fade-up">
+    <div class="ant-section-title"><span class="mdi mdi-folder-outline" style="color:var(--cyan)"></span> 파일 구조 / 기술 스택</div>
+    <div class="ant-code-block">
+<span class="dir">smartrack/</span>
+├── <span class="file">index.html</span>              <span class="comment">── 메인 프레젠테이션 (22 슬라이드, PPT/Report 듀얼 모드)</span>
+├── <span class="file">project-overview.html</span>    <span class="comment">── 프로젝트 개요 + 업무 히스토리 (이 파일)</span>
+└── <span class="dir">macro_images/</span>           <span class="comment">── 슬라이드 이미지 에셋 (10개 PNG)</span>
+    ├── <span class="file">slide05_img00~02.png</span>
+    ├── <span class="file">slide08_img03~05.png</span>
+    ├── <span class="file">slide09_img06.png</span>
+    ├── <span class="file">slide10_img07.png</span>
+    └── <span class="file">slide13_img08~09.png</span>
+    </div>
+    <div class="ant-row ant-col-2" style="margin-top:16px">
+      <div class="ant-card"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-code-tags"></span> 기술 스택</div></div><div class="ant-card-body"><ul style="padding-left:18px;color:var(--text-secondary)"><li><b>프레젠테이션</b>: Vanilla HTML/CSS/JS + Three.js</li><li><b>이 페이지</b>: Ant Design CSS + AOS + MDI Icons</li><li><b>모드</b>: PPT (스냅) / Report (연속) 듀얼</li><li><b>배포</b>: Vercel 정적 배포</li></ul></div></div>
+      <div class="ant-card"><div class="ant-card-head"><div class="ant-card-head-title"><span class="mdi mdi-link-variant"></span> 배포 URL</div></div><div class="ant-card-body"><ul style="padding-left:18px;color:var(--text-secondary)"><li><b>메인</b>: <code>s2501602.vercel.app/smartrack</code></li><li><b>이 페이지</b>: <code>/projects/smartrack/project-overview.html</code></li><li><b>버전</b>: v4.0 (2026-02-24)</li></ul></div></div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <div class="ant-footer">
+    <p>SmarTrack Project Overview — SP시스템스 — 2026</p>
+    <p style="margin-top:4px">Powered by Ant Design + AOS | Generated from index.html v4.0</p>
+  </div>
+
+</div>
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0})">
+  <span class="mdi mdi-chevron-up"></span>
+</button>
+
+<!-- Changelog Toggle -->
+<button class="changelog-toggle" onclick="document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('open')">
+  <span class="mdi mdi-history"></span>
+</button>
+<div class="changelog-overlay" id="overlay" onclick="document.getElementById('drawer').classList.remove('open');this.classList.remove('open')"></div>
+<div class="changelog-drawer" id="drawer">
+  <div class="changelog-drawer-header">
+    <h3><span class="mdi mdi-history"></span> 변경 이력</h3>
+    <button class="changelog-drawer-close" onclick="document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('open')">&times;</button>
+  </div>
+  <div class="changelog-drawer-body">
+    <div class="ant-timeline">
+      <div class="ant-timeline-item">
+        <div class="ant-timeline-item-head">2026-03-02</div>
+        <div class="ant-timeline-item-content">Ant Design 스타일 적용, 업무 히스토리 섹션 추가</div>
+      </div>
+      <div class="ant-timeline-item">
+        <div class="ant-timeline-item-head">2026-02-28</div>
+        <div class="ant-timeline-item-content">신규과제 자료 공유 (김종필)</div>
+      </div>
+      <div class="ant-timeline-item ant-timeline-item-green">
+        <div class="ant-timeline-item-head">2026-02-24</div>
+        <div class="ant-timeline-item-content">index.html v4.0 — 22슬라이드 완성</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AOS Init -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 600, once: true, offset: 60 });
+
+  // Back to top visibility
+  window.addEventListener('scroll', () => {
+    document.getElementById('backToTop').classList.toggle('visible', window.scrollY > 300);
+  });
+</script>
+
+</body>
+</html>
