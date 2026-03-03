@@ -1396,6 +1396,36 @@
     <!-- PPT: Three.js 3D 물류 흐름 시뮬레이션 (PPT only) -->
     <div class="ppt-only" id="sr3d-cont" style="flex:1;min-height:0;border-radius:12px;overflow:hidden;position:relative;background:#F1F5F9;border:1px solid #E2E8F0;flex-shrink:0">
       <canvas id="sr3d-canvas" style="display:block;width:100%;height:100%"></canvas>
+      <!-- Fallback: Three.js 로드 실패 시 정적 SVG 다이어그램 -->
+      <div id="sr3d-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#F1F5F9">
+        <svg viewBox="0 0 720 180" width="90%" style="max-width:700px">
+          <defs><marker id="fb-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#0D6E51"/></marker></defs>
+          <rect x="10" y="60" width="100" height="60" rx="10" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="60" y="88" text-anchor="middle" fill="#92400E" font-size="13" font-weight="700">절단공장</text>
+          <text x="60" y="106" text-anchor="middle" fill="#A1A1AA" font-size="10">소재 출하</text>
+          <line x1="110" y1="90" x2="148" y2="90" stroke="#0D6E51" stroke-width="2" marker-end="url(#fb-arr)"/>
+          <rect x="152" y="50" width="110" height="80" rx="10" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2"/>
+          <text x="207" y="82" text-anchor="middle" fill="#0D6E51" font-size="13" font-weight="700">입고 스캔</text>
+          <text x="207" y="100" text-anchor="middle" fill="#52525B" font-size="10">3D·CoG 추정</text>
+          <text x="207" y="116" text-anchor="middle" fill="#52525B" font-size="10">바코드·RFID</text>
+          <line x1="262" y1="90" x2="300" y2="90" stroke="#0D6E51" stroke-width="2" marker-end="url(#fb-arr)"/>
+          <rect x="304" y="40" width="120" height="100" rx="14" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2.5"/>
+          <text x="364" y="76" text-anchor="middle" fill="#0D6E51" font-size="16" font-weight="800">스마트랙</text>
+          <text x="364" y="96" text-anchor="middle" fill="#065F46" font-size="11" font-weight="600">소조립 입고장</text>
+          <text x="364" y="114" text-anchor="middle" fill="#52525B" font-size="10">유연 지지점 배치</text>
+          <text x="364" y="128" text-anchor="middle" fill="#52525B" font-size="10">JIT 피킹</text>
+          <line x1="424" y1="90" x2="462" y2="90" stroke="#7C3AED" stroke-width="2" marker-end="url(#fb-arr)"/>
+          <rect x="466" y="60" width="100" height="60" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+          <text x="516" y="88" text-anchor="middle" fill="#5B21B6" font-size="13" font-weight="700">AMR 이송</text>
+          <text x="516" y="106" text-anchor="middle" fill="#A1A1AA" font-size="10">자율주행·도킹</text>
+          <line x1="566" y1="90" x2="604" y2="90" stroke="#0D6E51" stroke-width="2" marker-end="url(#fb-arr)"/>
+          <rect x="608" y="50" width="100" height="80" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+          <text x="658" y="82" text-anchor="middle" fill="#1E40AF" font-size="13" font-weight="700">중조립</text>
+          <text x="658" y="100" text-anchor="middle" fill="#52525B" font-size="10">출고장 경유</text>
+          <text x="658" y="116" text-anchor="middle" fill="#52525B" font-size="10">대조립 연계</text>
+          <text x="360" y="170" text-anchor="middle" fill="#94A3B8" font-size="10" font-style="italic">3D 뷰어를 로드할 수 없습니다 — 정적 다이어그램 표시</text>
+        </svg>
+      </div>
       <div style="position:absolute;top:10px;left:14px;color:rgba(30,41,59,0.5);font-size:9px;font-family:monospace;letter-spacing:1.5px;text-transform:uppercase">Smart Rack · 듀얼 야드 물류 흐름 시뮬레이션</div>
       <div style="position:absolute;top:8px;right:14px;display:flex;gap:4px;z-index:10">
         <button class="sr3d-tab" data-layout="A" style="padding:4px 12px;border:1px solid #CBD5E1;border-radius:6px;font-size:10px;font-family:monospace;cursor:pointer;background:#1E293B;color:#F8FAFC;font-weight:700">현재 배치</button>
@@ -1417,8 +1447,9 @@
     <script>
 (function(){
   var INIT=false;
+  function hideFallback(){var fb=document.getElementById('sr3d-fallback');if(fb)fb.style.display='none';}
   function startSR3D(){
-    if(INIT||typeof THREE==='undefined')return; INIT=true;
+    if(INIT||typeof THREE==='undefined')return; INIT=true; hideFallback();
     var cont=document.getElementById('sr3d-cont');
     var cv=document.getElementById('sr3d-canvas');
     if(!cont||!cv)return;
@@ -2212,10 +2243,12 @@
       cam.updateProjectionMatrix();
     });
   }
-  if(window.THREE)startSR3D();
+  if(window.THREE){startSR3D();}
   else{var s=document.createElement('script');
     s.src='https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js';
-    s.onload=startSR3D;document.head.appendChild(s);}
+    s.onload=startSR3D;
+    s.onerror=function(){console.warn('Three.js CDN load failed — showing fallback SVG');};
+    document.head.appendChild(s);}
 })();
     </script>
 
