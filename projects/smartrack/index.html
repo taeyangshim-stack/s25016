@@ -390,6 +390,8 @@
   <a class="toc-item" href="#sec05">05 블루오션 포지셔닝</a>
   <a class="toc-item" href="#sec06">06 SP 3대 개발 역할</a>
   <a class="toc-item" href="#sec07">07 물류 흐름도</a>
+  <a class="toc-item" href="#sec07b">07b 입고~출고 세부 단계</a>
+  <a class="toc-item" href="#sec07c">07c 시스템 연동 아키텍처</a>
   <a class="toc-item" href="#sec08">08 소부재 분류 AI</a>
   <a class="toc-item" href="#sec09">09 랙장 컨셉</a>
   <a class="toc-item" href="#sec10">10 다중 랙 배치</a>
@@ -1323,7 +1325,275 @@
   </div>
 </section>
 
-<!-- ===== SECTION 08: 소부재 분류 AI 기술 ===== -->
+<!-- ===== SECTION 07b: 7단계 이송 구체화 ===== -->
+<section class="slide" id="sec07b" data-title="이송 구체화">
+  <span class="slide-num">07b</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag tag-green">이송 세부 방법</span>
+      <h2 style="margin-top:8px">7단계 — 도킹·이송·이재(移載) 구체화</h2>
+    </div>
+
+    <!-- 입고 사이클 (Step 1~4) -->
+    <div>
+      <p style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:1.2px;text-transform:uppercase;">◆ 입고 사이클 — 절단공정 → 랙장 적치</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+
+        <div class="card" style="padding:14px;border-top:3px solid var(--accent)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</span>
+            <div style="font-size:13px;font-weight:800;color:var(--text)">절단공정 → AMR</div>
+          </div>
+          <ul style="font-size:11px;line-height:1.9;padding-left:14px;margin:0">
+            <li>컨베이어 end-of-line에 <b>AMR 도킹 스테이션</b> 설치</li>
+            <li>AMR 자율주행 후 가이드 핀으로 <b>정밀 정렬</b></li>
+            <li>롤러 구동으로 AMR 상판에 <b>슬라이딩 이재</b></li>
+            <li>중량 센서 + 바코드 스캔으로 <b>반입 확인</b></li>
+          </ul>
+          <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 롤러 컨베이어 + AMR</div>
+        </div>
+
+        <div class="card" style="padding:14px;border-top:3px solid var(--accent)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</span>
+            <div style="font-size:13px;font-weight:800;color:var(--text)">AMR → 투입랙장</div>
+          </div>
+          <ul style="font-size:11px;line-height:1.9;padding-left:14px;margin:0">
+            <li>WMS 배정 슬롯 기반 <b>자율주행 경로 생성</b></li>
+            <li>랙장 투입구(I/O 스테이션)에 AMR 도킹</li>
+            <li>AMR 상판 → I/O 스테이션 <b>롤러/리프터 인계</b></li>
+            <li>WCS가 스테커 크레인 <b>이동 지령 발행</b></li>
+          </ul>
+          <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: AMR + I/O 스테이션</div>
+        </div>
+
+        <div class="card" style="padding:14px;border-top:3px solid var(--accent)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</span>
+            <div style="font-size:13px;font-weight:800;color:var(--text)">랙장 스테커 크레인</div>
+          </div>
+          <ul style="font-size:11px;line-height:1.9;padding-left:14px;margin:0">
+            <li>WCS → PLC 지령: <b>슬롯 주소(행·열) 이동</b></li>
+            <li>X축(수평) + Z축(수직) <b>동시 이동</b>으로 위치</li>
+            <li>PLC 제어로 <b>핀 높이 사전 세팅</b> (형상 데이터)</li>
+            <li>하중 센서 확인 후 WMS에 <b>입고 완료 통보</b></li>
+          </ul>
+          <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 스테커 크레인 + PLC</div>
+        </div>
+
+        <div class="card" style="padding:14px;border-top:3px solid var(--accent)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</span>
+            <div style="font-size:13px;font-weight:800;color:var(--text)">랙장 → AMR → 취부</div>
+          </div>
+          <ul style="font-size:11px;line-height:1.9;padding-left:14px;margin:0">
+            <li>MES 생산계획 → WMS <b>JIT 피킹 신호</b> 발생</li>
+            <li>스테커 크레인 슬롯 인출 → <b>출고 I/O 스테이션</b></li>
+            <li>AMR 도킹·부재 인수 → <b>취부 스테이션 자율주행</b></li>
+            <li>취부 도킹 후 <b>작업자/로봇에 부재 전달</b></li>
+          </ul>
+          <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 크레인 + AMR + 취부대</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 출고 사이클 (Step 5~7) -->
+    <div>
+      <p style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:8px;letter-spacing:1.2px;text-transform:uppercase;">◆ 출고 사이클 — 소조립 완성 → 중조립 출하</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+
+        <div class="card" style="padding:14px;border-top:3px solid var(--amber)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">5</span>
+            <div style="font-size:13px;font-weight:800;color:var(--text)">소조립 아웃 → AMR</div>
+          </div>
+          <ul style="font-size:11px;line-height:1.9;padding-left:14px;margin:0">
+            <li>소조립 완료 후 <b>아웃 컨베이어/리프팅 테이블</b> 대기</li>
+            <li>AMR 자율주행으로 <b>아웃 픽업 포인트</b> 이동·도킹</li>
+            <li>완성 소조블록 AMR 상판에 <b>탑재 및 중량 재확인</b></li>
+            <li>완성품 식별 <b>바코드 스캔</b> → 출하 추적 등록</li>
+          </ul>
+          <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 리프팅 테이블 + AMR</div>
+        </div>
+
+        <div class="card" style="padding:14px;border-top:3px solid var(--amber)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">6</span>
+            <div style="font-size:13px;font-weight:800;color:var(--text)">AMR → 랙장 (완성부재)</div>
+          </div>
+          <ul style="font-size:11px;line-height:1.9;padding-left:14px;margin:0">
+            <li>WMS가 <b>출하 대기 슬롯</b> 지정 → AMR 이동 지시</li>
+            <li>랙장 <b>투입 I/O 스테이션</b>에 완성부재 인계</li>
+            <li>스테커 크레인이 <b>출하 대기존 슬롯</b>에 보관</li>
+            <li>WMS 재고 반영 — <b>출하 대기 상태</b>로 표시</li>
+          </ul>
+          <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: AMR + 스테커 크레인</div>
+        </div>
+
+        <div class="card" style="padding:14px;border-top:3px solid var(--amber)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">7</span>
+            <div style="font-size:13px;font-weight:800;color:var(--text)">랙장 → 중조립 출하</div>
+          </div>
+          <ul style="font-size:11px;line-height:1.9;padding-left:14px;margin:0">
+            <li>중조립 공정 스케줄 연동 → <b>출하 지령</b> 발행</li>
+            <li>스테커 크레인이 <b>출하 전용 I/O 스테이션</b>으로 이송</li>
+            <li>오버헤드 크레인 or <b>트레일러 핸드오프</b></li>
+            <li>출하 스캔 → 재고 <b>확정 차감</b> + 중조립 인계 완료</li>
+          </ul>
+          <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 크레인 / 트레일러</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== SECTION 07c: 3-레이어 시스템 연동 + 데이터 흐름 ===== -->
+<section class="slide" id="sec07c" data-title="시스템 연동">
+  <span class="slide-num">07c</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag tag-blue">데이터 아키텍처</span>
+      <h2 style="margin-top:8px">3-레이어 시스템 연동 + 데이터 흐름</h2>
+    </div>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 980 360" width="100%" style="display:block">
+        <defs>
+          <marker id="arr-p" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#0D6E51"/>
+          </marker>
+          <marker id="arr-c" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#1D4ED8"/>
+          </marker>
+          <marker id="arr-d" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#7C3AED"/>
+          </marker>
+        </defs>
+
+        <!-- Layer Bands -->
+        <rect x="28" y="18" width="820" height="96" rx="10" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.2"/>
+        <rect x="28" y="126" width="820" height="88" rx="10" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.2"/>
+        <rect x="28" y="226" width="820" height="88" rx="10" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="1.2"/>
+
+        <!-- Layer Labels -->
+        <text x="16" y="72" text-anchor="middle" fill="#0D6E51" font-size="10" font-weight="800" transform="rotate(-90,16,72)">물리층</text>
+        <text x="16" y="172" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="800" transform="rotate(-90,16,172)">제어층</text>
+        <text x="16" y="272" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="800" transform="rotate(-90,16,272)">지능층</text>
+
+        <!-- 물리층 노드 -->
+        <rect x="44" y="36" width="80" height="46" rx="7" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="84" y="55" text-anchor="middle" fill="#92400E" font-size="10" font-weight="700">절단공장</text>
+        <text x="84" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">소재 출하</text>
+        <line x1="124" y1="59" x2="154" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
+
+        <rect x="157" y="28" width="96" height="62" rx="7" fill="#fff" stroke="#E4E4E7" stroke-width="1.5"/>
+        <text x="205" y="47" text-anchor="middle" fill="#18181B" font-size="10" font-weight="700">입고 스캔</text>
+        <text x="205" y="63" text-anchor="middle" fill="#A1A1AA" font-size="9">3D·바코드·RFID</text>
+        <text x="205" y="78" text-anchor="middle" fill="#A1A1AA" font-size="9">무게 측정</text>
+        <line x1="253" y1="59" x2="283" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
+
+        <rect x="286" y="24" width="110" height="70" rx="9" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2"/>
+        <text x="341" y="46" text-anchor="middle" fill="#0D6E51" font-size="12" font-weight="800">스마트랙</text>
+        <text x="341" y="62" text-anchor="middle" fill="#065F46" font-size="9">유연 적치·재고 관리</text>
+        <text x="341" y="77" text-anchor="middle" fill="#065F46" font-size="9">JIT 출고·안전 검증</text>
+        <text x="341" y="89" text-anchor="middle" fill="#065F46" font-size="9">핀 구성 자동 계산</text>
+        <line x1="396" y1="59" x2="424" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
+
+        <rect x="427" y="36" width="82" height="46" rx="7" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+        <text x="468" y="55" text-anchor="middle" fill="#5B21B6" font-size="10" font-weight="700">AMR 이송</text>
+        <text x="468" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">자율주행</text>
+        <line x1="509" y1="59" x2="539" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
+
+        <rect x="542" y="36" width="82" height="46" rx="7" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="583" y="55" text-anchor="middle" fill="#92400E" font-size="10" font-weight="700">소조립</text>
+        <text x="583" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">용접·조립</text>
+        <line x1="624" y1="59" x2="654" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
+
+        <rect x="657" y="36" width="82" height="46" rx="7" fill="#FFF1F2" stroke="#FB7185" stroke-width="1.5"/>
+        <text x="698" y="55" text-anchor="middle" fill="#9F1239" font-size="10" font-weight="700">완성품 출하</text>
+        <text x="698" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">중조립 이송</text>
+
+        <!-- 제어층 노드 -->
+        <rect x="157" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/>
+        <text x="205" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">WCS</text>
+        <text x="205" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">창고 제어 시스템</text>
+
+        <rect x="298" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/>
+        <text x="346" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">PLC / 핀 구동</text>
+        <text x="346" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">서보·액추에이터</text>
+
+        <rect x="427" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/>
+        <text x="475" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">AMR 플릿 MCS</text>
+        <text x="475" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">경로·충돌 관리</text>
+
+        <rect x="557" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/>
+        <text x="605" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">안전 모니터링</text>
+        <text x="605" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">하중·진동·이탈</text>
+
+        <!-- 지능층 노드 -->
+        <rect x="44" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
+        <text x="94" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">AI 형상 분류</text>
+        <text x="94" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">비전·포인트클라우드</text>
+        <text x="94" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">슬롯 자동 배정</text>
+
+        <rect x="190" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
+        <text x="240" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">WMS</text>
+        <text x="240" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">재고 현황·입출고</text>
+        <text x="240" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">JIT 스케줄 관리</text>
+
+        <rect x="340" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
+        <text x="390" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">ERP / MES</text>
+        <text x="390" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">생산계획·BOM</text>
+        <text x="390" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">공정 진척 연계</text>
+
+        <rect x="490" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
+        <text x="540" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">디지털 트윈</text>
+        <text x="540" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">실시간 3D 시각화</text>
+        <text x="540" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">예측 유지보수</text>
+
+        <rect x="640" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
+        <text x="690" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">운영 대시보드</text>
+        <text x="690" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">KPI·알람·리포트</text>
+        <text x="690" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">관리자 인터페이스</text>
+
+        <!-- 물리↔제어 수직 연결 -->
+        <line x1="205" y1="90" x2="205" y2="142" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-c)"/>
+        <line x1="346" y1="94" x2="346" y2="142" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-c)"/>
+        <line x1="475" y1="82" x2="475" y2="142" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-c)"/>
+
+        <!-- 제어↔지능 수직 연결 -->
+        <line x1="205" y1="192" x2="240" y2="244" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
+        <line x1="346" y1="192" x2="346" y2="244" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
+        <line x1="475" y1="192" x2="475" y2="244" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
+        <line x1="605" y1="192" x2="540" y2="244" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
+
+        <!-- AI → 입고스캔 피드백 -->
+        <line x1="94" y1="244" x2="175" y2="90" stroke="#7C3AED" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arr-d)"/>
+
+        <!-- 범례 -->
+        <line x1="870" y1="36" x2="905" y2="36" stroke="#0D6E51" stroke-width="2" marker-end="url(#arr-p)"/>
+        <text x="910" y="40" fill="#52525B" font-size="10">물리 이동</text>
+        <line x1="870" y1="58" x2="905" y2="58" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-c)"/>
+        <text x="910" y="62" fill="#52525B" font-size="10">제어 신호</text>
+        <line x1="870" y1="80" x2="905" y2="80" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
+        <text x="910" y="84" fill="#52525B" font-size="10">데이터 흐름</text>
+      </svg>
+    </div>
+
+    <div class="row">
+      <div class="callout callout-green" style="flex:1"><b>물리층</b>: 부재의 실물 이동 경로 — 절단공장 → 스마트랙 → 소조립 → 출하</div>
+      <div class="callout" style="flex:1;background:var(--blue-soft);color:#1e40af"><b>제어층</b>: WCS·PLC·AMR MCS가 실시간으로 물리 시스템 구동·감시</div>
+      <div class="callout" style="flex:1;background:var(--violet-soft);color:#5b21b6"><b>지능층</b>: AI·WMS·ERP·디지털트윈이 의사결정 및 최적화 수행</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== SECTION 08: 소부재 분류 AI 기술 =====
 <section class="slide" id="sec08" data-title="소부재 분류 AI">
   <span class="slide-num">08</span>
   <div class="slide-inner">
