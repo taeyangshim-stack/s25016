@@ -1430,24 +1430,9 @@
       </div>
       <div style="position:absolute;top:10px;left:14px;color:rgba(30,41,59,0.5);font-size:9px;font-family:monospace;letter-spacing:1.5px;text-transform:uppercase">Smart Rack · 듀얼 야드 물류 흐름 시뮬레이션</div>
       <div style="position:absolute;top:8px;right:14px;display:flex;gap:3px;z-index:10;flex-wrap:wrap;max-width:420px;justify-content:flex-end">
-        <button class="sr3d-tab" data-layout="1" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#1E293B;color:#F8FAFC;font-weight:700">배치안1</button>
-        <button class="sr3d-tab" data-layout="2" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안2</button>
-        <button class="sr3d-tab" data-layout="3" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안3</button>
-        <button class="sr3d-tab" data-layout="4" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안4</button>
-        <button class="sr3d-tab" data-layout="5" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안5</button>
-        <button class="sr3d-tab" data-layout="6" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안6</button>
+        <button class="sr3d-tab" data-layout="6" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#1E293B;color:#F8FAFC;font-weight:700">배치안6</button>
       </div>
-      <div id="sr3d-legend" style="position:absolute;bottom:10px;left:14px;display:flex;gap:10px;font-size:8px;font-family:monospace;color:rgba(30,41,59,0.5);flex-wrap:wrap;max-width:80%">
-        <span style="color:#D97706">■ 절단</span>
-        <span style="color:#16A34A">■ 입고장</span>
-        <span style="color:#CA8A04">■ 소조립</span>
-        <span style="color:#16A34A">■ 출고장</span>
-        <span style="color:#2563EB">■ 중조립</span>
-        <span style="color:#7C3AED">■ AMR</span>
-        <span style="color:#D4D4D8">■ 도킹</span>
-        <span style="color:#FBBF24">■ 크레인</span>
-        <span style="color:#A8A29E">■ 컨베이어</span>
-      </div>
+      <div id="sr3d-legend" style="position:absolute;bottom:10px;left:14px;display:flex;gap:10px;font-size:8px;font-family:monospace;color:rgba(30,41,59,0.5);flex-wrap:wrap;max-width:80%"></div>
       <div style="position:absolute;bottom:10px;right:14px;color:rgba(30,41,59,0.3);font-size:8px;font-family:monospace">Three.js WebGL</div>
     </div>
     <script>
@@ -1493,37 +1478,23 @@
     function clamp01(v){return Math.min(Math.max(v,0),1);}
 
     /* ===== Layout switching ===== */
-    var activeLayout='1';
+    var activeLayout='6';
     var layouts={};
-    var camConfigs={
-      '1':{d:14,R:25,H:22,D:20},
-      '2':{d:20,R:35,H:30,D:28},
-      '3':{d:18,R:32,H:26,D:24},
-      '4':{d:22,R:40,H:34,D:32},
-      '5':{d:18,R:30,H:25,D:22},
-      '6':{d:28,R:52,H:44,D:40}
-    };
-    ['1','2','3','4','5','6'].forEach(function(k){
-      var g=new THREE.Group(); g.name='layout'+k; g.visible=(k==='1');
+    var camConfigs={'6':{d:28,R:52,H:44,D:40}};
+    ['6'].forEach(function(k){
+      var g=new THREE.Group(); g.name='layout'+k; g.visible=(k==='6');
       layouts[k]=g; scene.add(g);
     });
-    var group1=layouts['1'], group2=layouts['2'],
-        group3=layouts['3'], group4=layouts['4'], group5=layouts['5'],
-        group6=layouts['6'];
+    var group6=layouts['6'];
 
     function addTo(key,o){o.castShadow=true;o.receiveShadow=true;layouts[key].add(o);return o;}
-    function add1(o){return addTo('1',o);}
-    function add2(o){return addTo('2',o);}
-    function add3(o){return addTo('3',o);}
-    function add4(o){return addTo('4',o);}
-    function add5(o){return addTo('5',o);}
     function add6(o){return addTo('6',o);}
 
     function switchLayout(lay){
       if(lay===activeLayout)return;
       activeLayout=lay;
       Object.keys(layouts).forEach(function(k){layouts[k].visible=(k===lay);});
-      var cc=camConfigs[lay]||camConfigs['1'];
+      var cc=camConfigs[lay]||camConfigs['6'];
       d=cc.d; asp=W/H;
       cam.left=-d*asp;cam.right=d*asp;cam.top=d;cam.bottom=-d;
       cam.updateProjectionMatrix();
@@ -1545,1268 +1516,17 @@
 
     /* ===== Dynamic legend per layout ===== */
     var legendConfigs={
-      '1':[
-        {c:'#D97706',l:'절단'},{c:'#16A34A',l:'입고장'},{c:'#CA8A04',l:'소조립'},
-        {c:'#16A34A',l:'출고장'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR'},
-        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'크레인'},{c:'#A8A29E',l:'컨베이어'}
-      ],
-      '2':[
-        {c:'#D97706',l:'절단'},{c:'#16A34A',l:'입고랙'},{c:'#CA8A04',l:'소조립(5배)'},
-        {c:'#16A34A',l:'출고랙'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR(L자)'},
-        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'스태커'},{c:'#A8A29E',l:'컨베이어'}
-      ],
-      '3':[
-        {c:'#D97706',l:'절단'},{c:'#16A34A',l:'입고랙'},{c:'#CA8A04',l:'소조립'},
-        {c:'#16A34A',l:'출고랙'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR(U루프)'},
-        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'크레인×4'},{c:'#A8A29E',l:'컨베이어'}
-      ],
-      '4':[
-        {c:'#D97706',l:'입고존'},{c:'#16A34A',l:'보관랙×3'},{c:'#CA8A04',l:'소조립'},
-        {c:'#0EA5E9',l:'출고존'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR(그리드)'},
-        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'갠트리'},{c:'#A8A29E',l:'컨베이어'}
-      ],
-      '5':[
-        {c:'#D97706',l:'입고'},{c:'#16A34A',l:'셀 어레이'},{c:'#CA8A04',l:'소조립'},
-        {c:'#0EA5E9',l:'출고'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR(자율)'},
-        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'갠트리+스태커'},{c:'#A8A29E',l:'컨베이어'}
-      ],
       '6':[
-        {c:'#D97706',l:'절단×6'},{c:'#16A34A',l:'선행랙장(3단)'},{c:'#CA8A04',l:'소조립×6'},
-        {c:'#4ADE80',l:'후행랙장×6'},{c:'#2563EB',l:'중조/대조'},{c:'#7C3AED',l:'AMR'},
-        {c:'#FBBF24',l:'스태커크레인'}
+        {c:'#D97706',l:'절단(갠트리×6)'},{c:'#16A34A',l:'선행랙장(3단)'},{c:'#CA8A04',l:'소조립×6'},
+        {c:'#4ADE80',l:'후행랙장×6'},{c:'#2563EB',l:'중조/대조'},{c:'#7C3AED',l:'AMR-A(절단↔소조립)'},
+        {c:'#059669',l:'AMR-B(후행→중조)'},{c:'#FBBF24',l:'갠트리/스태커'},{c:'#FEF3C7',l:'버퍼존'}
       ]
     };
     function updateLegend(lay){
       var el=document.getElementById('sr3d-legend');
       if(!el)return;
-      var items=legendConfigs[lay]||legendConfigs['1'];
+      var items=legendConfigs[lay]||legendConfigs['6'];
       el.innerHTML=items.map(function(it){return '<span style="color:'+it.c+'">■ '+it.l+'</span>';}).join('');
-    }
-
-    /* ============================================================
-       LAYOUT 1 — 직렬형 기본 배치 (배치안1)
-       ============================================================ */
-    /* Floor */
-    add1(at(bx(40,0.08,20,0xE2E8F0),0,0,0));
-    var gridA=new THREE.GridHelper(40,40,0xCBD5E1,0xCBD5E1);
-    group1.add(gridA);
-
-    /* 절단 (x=-13) */
-    add1(at(bx(3.5,0.12,2.5,0xFBBF24,{transparent:true,opacity:0.5}),-13,0.06,0));
-    for(var i=0;i<3;i++){for(var j=0;j<2;j++){
-      add1(at(bx(0.7,0.4,0.5,0xD97706),-14+i*1.0,0.32,-0.5+j*1.0));
-    }}
-    /* 소조립 (x=0) */
-    var subSteps=[
-      {dx:-1.8,col:0xF97316},{dx:-0.6,col:0xEAB308},
-      {dx:0.6,col:0x94A3B8},{dx:1.8,col:0x22D3EE}
-    ];
-    var subBoxesA=[];
-    add1(at(bx(5.5,0.08,2.5,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,0));
-    subSteps.forEach(function(s){
-      var b=bx(1.0,0.7,1.0,s.col,{transparent:true,opacity:0.85});
-      at(b,s.dx,0.45,0); add1(b); subBoxesA.push(b);
-    });
-    /* 중조립 (x=+13) */
-    add1(at(bx(3.5,0.12,2.5,0x60A5FA,{transparent:true,opacity:0.5}),13,0.06,0));
-    add1(at(bx(2.8,1.6,2.0,0x93C5FD,{transparent:true,opacity:0.5}),13,0.92,0));
-    add1(at(bx(1.2,0.5,1.8,0x3B82F6),13,1.97,0));
-
-    /* Racks A */
-    function makeRackA(cx,cz,fillRatio){
-      var SW=1.2,SH=0.8,SD=1.2,COLS=4,ROWS=2;
-      var startX=cx-(COLS-1)*(SW+0.15)/2;
-      for(var r=0;r<ROWS;r++){for(var c=0;c<COLS;c++){
-        var rx=startX+c*(SW+0.15),ry=0.5+r*(SH+0.12),rz=cz;
-        var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
-        at(fr,rx,ry,rz); group1.add(fr);
-        var edg=new THREE.LineSegments(
-          new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),
-          new THREE.LineBasicMaterial({color:0x94A3B8}));
-        edg.position.copy(fr.position); group1.add(edg);
-        var idx=r*COLS+c;
-        if(idx<Math.round(COLS*ROWS*fillRatio)){
-          add1(at(bx(SW*0.75,SH*0.75,SD*0.75,0x22C55E),rx,ry,rz));
-        }
-      }}
-    }
-    makeRackA(-7,-1,0.6);
-    makeRackA(7,-1,0.4);
-    add1(at(bx(5.5,0.08,2.8,0x86EFAC,{transparent:true,opacity:0.3}),-7,0.04,-1));
-    add1(at(bx(5.5,0.08,2.8,0x86EFAC,{transparent:true,opacity:0.3}),7,0.04,-1));
-
-    /* Lanes A */
-    [{z:2.0,x1:-13,x2:-7},{z:-2.0,x1:-7,x2:-2.5},
-     {z:2.0,x1:2.5,x2:7},{z:-2.0,x1:7,x2:13}].forEach(function(ln){
-      var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
-      var lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.25),
-        new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
-      lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z); group1.add(lp);
-    });
-
-    /* Docks A */
-    function makeDockA(x,z){
-      var g=new THREE.Group();
-      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
-      [[-0.5,0,-0.25],[0.5,0,-0.25],[-0.5,0,0.25],[0.5,0,0.25]].forEach(function(l){
-        g.add(at(bx(0.06,0.15,0.06,0x94A3B8),l[0],0.075,l[2]));
-      });
-      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,-0.3));
-      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,0.3));
-      g.position.set(x,0,z); g.castShadow=true; group1.add(g);
-      return g;
-    }
-    var docksA={
-      cutOut:makeDockA(-13,2),inRecv:makeDockA(-7,2),inSend:makeDockA(-7,-2),
-      subIn:makeDockA(-2.5,-2),subOut:makeDockA(2.5,2),outRecv:makeDockA(7,2),
-      outSend:makeDockA(7,-2),midIn:makeDockA(13,-2)
-    };
-
-    /* Cranes A */
-    function makeCraneA(x,z){
-      var g=new THREE.Group();
-      g.add(at(bx(0.3,0.05,3.0,0x71717A),0,0.025,0));
-      g.add(at(bx(0.15,3.0,0.15,0x52525B),0,1.5,0));
-      var carriage=new THREE.Group();
-      carriage.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
-      var fork=bx(0.6,0.05,0.4,0xA3A3A3);
-      at(fork,0.0,-0.1,0.5); carriage.add(fork);
-      carriage.position.set(0,0.8,0); g.add(carriage);
-      g.position.set(x,0,z); group1.add(g);
-      return {group:g,carriage:carriage,fork:fork};
-    }
-    var craneInA=makeCraneA(-7,0), craneOutA=makeCraneA(7,0);
-
-    /* Conveyors A */
-    function makeConveyorG(grp,x,z1,z2){
-      var g=new THREE.Group();
-      var len=Math.abs(z2-z1),mz=(z1+z2)/2;
-      g.add(at(bx(0.04,0.12,len,0x78716C),-0.3,0.12,0));
-      g.add(at(bx(0.04,0.12,len,0x78716C),0.3,0.12,0));
-      var count=Math.max(3,Math.round(len/0.25));
-      for(var ci=0;ci<count;ci++){
-        var rz=-len/2+ci*(len/(count-1));
-        var roller=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.56,8),
-          new THREE.MeshLambertMaterial({color:0xA8A29E}));
-        roller.rotation.z=Math.PI/2; at(roller,0,0.12,rz); g.add(roller);
-      }
-      g.position.set(x,0,mz); grp.add(g);
-      return g;
-    }
-    var convInA=makeConveyorG(group1,-2.5,-1.5,0);
-    var convOutA=makeConveyorG(group1,2.5,0,1.5);
-
-    /* AMR A */
-    function makeAMRg(grp,bodyCol){
-      var g=new THREE.Group();
-      g.add(at(bx(1.1,0.3,0.85,bodyCol),0,0,0));
-      g.add(at(bx(0.78,0.2,0.6,0xEDE9FE),0,0.25,0));
-      [[0.44,0.36],[0.44,-0.36],[-0.44,0.36],[-0.44,-0.36]].forEach(function(w){
-        var wh=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.09,8),
-          new THREE.MeshLambertMaterial({color:0x475569}));
-        wh.position.set(w[0],-0.1,w[1]); wh.rotation.z=Math.PI/2; g.add(wh);
-      });
-      grp.add(g); return g;
-    }
-    function makePartA(col){
-      var p=bx(0.8,0.35,0.55,col);
-      p.castShadow=true; group1.add(p); return p;
-    }
-    var amrDefsA=[
-      {amr:null,part:null,bodyCol:0x7C3AED,partCol:0xF97316,x1:-13,x2:-7,z:2.0,offset:0.0},
-      {amr:null,part:null,bodyCol:0x8B5CF6,partCol:0x22C55E,x1:-7,x2:-2.5,z:-2.0,offset:2.5},
-      {amr:null,part:null,bodyCol:0xA855F7,partCol:0xEAB308,x1:2.5,x2:7,z:2.0,offset:5.0},
-      {amr:null,part:null,bodyCol:0xC084FC,partCol:0x22C55E,x1:7,x2:13,z:-2.0,offset:7.5}
-    ];
-    amrDefsA.forEach(function(def){
-      def.amr=makeAMRg(group1,def.bodyCol);
-      def.part=makePartA(def.partCol);
-      def.amr.position.set(def.x1,0.22,def.z);
-      def.part.visible=false;
-    });
-    var cranePartsA={inPart:makePartA(0x22C55E),outPart:makePartA(0x22C55E)};
-    cranePartsA.inPart.visible=false; cranePartsA.outPart.visible=false;
-    var subColsA=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
-
-    /* ============================================================
-       LAYOUT 2 — 직교 확장형 (배치안2)
-       ============================================================ */
-    /* Floor B */
-    add2(at(bx(50,0.08,24,0xE2E8F0),0,0,0));
-    var gridB=new THREE.GridHelper(50,50,0xCBD5E1,0xCBD5E1);
-    group2.add(gridB);
-
-    /* 절단 B (x=-18) */
-    add2(at(bx(4.0,0.12,3.0,0xFBBF24,{transparent:true,opacity:0.5}),-18,0.06,0));
-    for(var bi=0;bi<3;bi++){for(var bj=0;bj<2;bj++){
-      add2(at(bx(0.7,0.4,0.5,0xD97706),-19+bi*1.0,0.32,-0.5+bj*1.0));
-    }}
-
-    /* 소조립 B (5배, x=0) */
-    var subStepsB=[
-      {dx:-3.6,col:0xF97316},{dx:-1.2,col:0xEAB308},
-      {dx:1.2,col:0x94A3B8},{dx:3.6,col:0x22D3EE}
-    ];
-    var subBoxesB=[];
-    add2(at(bx(12.0,0.08,6.0,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,0));
-    subStepsB.forEach(function(s){
-      var b=bx(2.2,1.4,2.2,s.col,{transparent:true,opacity:0.85});
-      at(b,s.dx,0.78,0); add2(b); subBoxesB.push(b);
-    });
-
-    /* 중조립 B (x=18) */
-    add2(at(bx(4.0,0.12,3.0,0x60A5FA,{transparent:true,opacity:0.5}),18,0.06,0));
-    add2(at(bx(3.0,1.8,2.2,0x93C5FD,{transparent:true,opacity:0.5}),18,1.02,0));
-    add2(at(bx(1.4,0.6,2.0,0x3B82F6),18,2.2,0));
-
-    /* 입고 랙 B (90° 회전, x=-10, z=2~7) */
-    add2(at(bx(3.0,0.08,7.0,0x86EFAC,{transparent:true,opacity:0.3}),-10,0.04,4.5));
-    function makeRackB(cx,zStart,zDir,fillRatio){
-      var SW=1.2,SH=0.9,SD=1.2,SLOTS=5,ROWS=3;
-      var zPositions=[];
-      for(var si=0;si<SLOTS;si++) zPositions.push(zStart+zDir*(si*1.35+0.5));
-      var yPositions=[0.55,1.57,2.59];
-      for(var r=0;r<ROWS;r++){for(var s=0;s<SLOTS;s++){
-        var rz=zPositions[s],ry=yPositions[r];
-        var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
-        at(fr,cx,ry,rz); group2.add(fr);
-        var edg=new THREE.LineSegments(
-          new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),
-          new THREE.LineBasicMaterial({color:0x94A3B8}));
-        edg.position.copy(fr.position); group2.add(edg);
-        var idx=r*SLOTS+s;
-        if(idx<Math.round(SLOTS*ROWS*fillRatio)){
-          add2(at(bx(SW*0.7,SH*0.7,SD*0.7,0x22C55E),cx,ry,rz));
-        }
-      }}
-      return {cx:cx,zPositions:zPositions,yPositions:yPositions};
-    }
-    var rackInB=makeRackB(-10,2,1,0.5);
-    /* 출고 랙 B (90° 회전, x=10, z=-2~-7) */
-    add2(at(bx(3.0,0.08,7.0,0x86EFAC,{transparent:true,opacity:0.3}),10,0.04,-4.5));
-    var rackOutB=makeRackB(10,-2,-1,0.35);
-
-    /* L자 AMR 레인 바닥 (8 segments) */
-    var lanesB=[
-      /* Route1: 절단→입고 L자 */
-      {x1:-18,x2:-10,z:0},{x:-10,z1:0,z2:1.5},
-      /* Route2: 입고→소조립 L자 */
-      {x:-10,z1:-1.5,z2:0},{x1:-10,x2:-5,z:0},
-      /* Route3: 소조립→출고 L자 */
-      {x1:5,x2:10,z:0},{x:10,z1:-1.5,z2:0},
-      /* Route4: 출고→중조립 L자 */
-      {x:10,z1:0,z2:1.5},{x1:10,x2:18,z:0}
-    ];
-    lanesB.forEach(function(ln){
-      var lp;
-      if(ln.x1!==undefined){
-        var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
-        lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.3),
-          new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
-        lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z);
-      }else{
-        var len=Math.abs(ln.z2-ln.z1),mz=(ln.z1+ln.z2)/2;
-        lp=new THREE.Mesh(new THREE.PlaneGeometry(0.3,len),
-          new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
-        lp.rotation.x=-Math.PI/2; at(lp,ln.x,0.05,mz);
-      }
-      group2.add(lp);
-    });
-
-    /* Docks B */
-    function makeDockB(x,z){
-      var g=new THREE.Group();
-      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
-      [[-0.5,0,-0.25],[0.5,0,-0.25],[-0.5,0,0.25],[0.5,0,0.25]].forEach(function(l){
-        g.add(at(bx(0.06,0.15,0.06,0x94A3B8),l[0],0.075,l[2]));
-      });
-      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,-0.3));
-      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,0.3));
-      g.position.set(x,0,z); g.castShadow=true; group2.add(g);
-      return g;
-    }
-    var docksB={
-      cutOut:makeDockB(-18,0),inRecv:makeDockB(-10,1.5),inSend:makeDockB(-10,-1.5),
-      subIn:makeDockB(-5,0),subOut:makeDockB(5,0),outRecv:makeDockB(10,-1.5),
-      outSend:makeDockB(10,1.5),midIn:makeDockB(18,0)
-    };
-
-    /* Stacker Cranes B — z방향 주행 + y 승강 + fork 신축 */
-    function makeCraneB(x,zMin,zMax){
-      var g=new THREE.Group();
-      var railLen=zMax-zMin+1.0;
-      var railMid=(zMin+zMax)/2;
-      g.add(at(bx(0.3,0.05,railLen,0x71717A),0,0.025,railMid));
-      var trolley=new THREE.Group();
-      trolley.add(at(bx(0.15,4.0,0.15,0x52525B),0,2.0,0));
-      trolley.add(at(bx(0.12,0.12,0.5,0x52525B),0,4.06,0));
-      var carriage=new THREE.Group();
-      carriage.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
-      var fork=bx(0.6,0.05,0.4,0xA3A3A3);
-      at(fork,0.7,- 0.1,0); carriage.add(fork);
-      fork.position.set(0,-0.1,0);
-      carriage.position.set(0,0.8,0);
-      trolley.add(carriage);
-      trolley.position.set(0,0,(zMin+zMax)/2);
-      g.add(trolley);
-      g.position.set(x,0,0);
-      group2.add(g);
-      return {group:g,trolley:trolley,carriage:carriage,fork:fork,zMin:zMin,zMax:zMax};
-    }
-    var craneInB=makeCraneB(-10,2,7);
-    var craneOutB=makeCraneB(10,-7,-2);
-
-    /* Conveyors B */
-    var convInB=makeConveyorG(group2,-5,-2.5,0);
-    var convOutB=makeConveyorG(group2,5,0,2.5);
-
-    /* AMR B + 원판 부재 */
-    function makePartB(col){
-      var p=new THREE.Mesh(
-        new THREE.CylinderGeometry(0.4,0.4,0.1,16),
-        new THREE.MeshLambertMaterial({color:col}));
-      p.rotation.z=Math.PI/2;
-      p.castShadow=true; group2.add(p);
-      return p;
-    }
-    var amrDefsB=[
-      {amr:null,part:null,bodyCol:0x7C3AED,partCol:0xF97316,offset:0.0},
-      {amr:null,part:null,bodyCol:0x8B5CF6,partCol:0x22C55E,offset:2.5},
-      {amr:null,part:null,bodyCol:0xA855F7,partCol:0xEAB308,offset:5.0},
-      {amr:null,part:null,bodyCol:0xC084FC,partCol:0x22C55E,offset:7.5}
-    ];
-    amrDefsB.forEach(function(def){
-      def.amr=makeAMRg(group2,def.bodyCol);
-      def.part=makePartB(def.partCol);
-      def.amr.position.set(-18,0.22,0);
-      def.part.visible=false;
-    });
-    var cranePartsB={inPart:makePartB(0x22C55E),outPart:makePartB(0x22C55E)};
-    cranePartsB.inPart.visible=false; cranePartsB.outPart.visible=false;
-
-    /* ============================================================
-       ANIMATION — Layout 1 (배치안1)
-       ============================================================ */
-    function animCraneA(crane,t,tStart,tEnd,pickY,placeY,forkDir){
-      var dur=tEnd-tStart;
-      if(t<tStart||t>=tEnd){crane.carriage.position.y=0.8;crane.fork.position.z=0.5*forkDir;return;}
-      var p=clamp01((t-tStart)/dur);
-      if(p<0.2){crane.fork.position.z=lerp(0.5*forkDir,0.9*forkDir,p/0.2);crane.carriage.position.y=pickY;
-      }else if(p<0.4){crane.fork.position.z=lerp(0.9*forkDir,0.5*forkDir,(p-0.2)/0.2);crane.carriage.position.y=pickY;
-      }else if(p<0.7){crane.carriage.position.y=lerp(pickY,placeY,(p-0.4)/0.3);crane.fork.position.z=0.5*forkDir;
-      }else if(p<0.85){crane.fork.position.z=lerp(0.5*forkDir,0.9*forkDir,(p-0.7)/0.15);crane.carriage.position.y=placeY;
-      }else{crane.fork.position.z=lerp(0.9*forkDir,0.5*forkDir,(p-0.85)/0.15);crane.carriage.position.y=placeY;}
-    }
-
-    function animateLayout1(elapsed){
-      /* Route 1 */
-      (function(){
-        var def=amrDefsA[0],amr=def.amr,part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var x1=-13,x2=-7,z=2;
-        if(t<1){amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.24+0.5*ease(t),z);
-        }else if(t<1.5){var p=(t-1)/0.5;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.55+0.3*ease(p),z);
-        }else if(t<4){var p=ease((t-1.5)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
-        }else if(t<4.5){var p=(t-4)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.5*ease(p),z);if(p>0.95)part.visible=false;
-        }else if(t<6){amr.position.set(x2,0.22,z);part.visible=false;cranePartsA.inPart.visible=true;var cp=clamp01((t-4.5)/1.5);if(cp<0.5){cranePartsA.inPart.position.set(-7,0.3+1.0*ease(cp*2),0);}else{cranePartsA.inPart.position.set(-7,1.3,-0.3-0.7*ease((cp-0.5)*2));}
-        }else if(t<6.5){cranePartsA.inPart.visible=false;amr.position.set(x2,0.22,z);part.visible=false;
-        }else if(t<9){var p=ease((t-6.5)/2.5);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;cranePartsA.inPart.visible=false;
-        }else{amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.inPart.visible=false;}
-        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
-      })();
-      /* Route 2 */
-      (function(){
-        var def=amrDefsA[1],amr=def.amr,part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var x1=-7,x2=-2.5,z=-2;
-        if(t<1.5){amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.inPart.visible=true;var cp=clamp01(t/1.5);if(cp<0.5){cranePartsA.inPart.position.set(-7,1.3,-0.3-0.7*(1-ease(cp*2)));}else{cranePartsA.inPart.position.set(-7,1.3-1.0*ease((cp-0.5)*2),-1.0);}
-        }else if(t<2){var p=(t-1.5)/0.5;cranePartsA.inPart.visible=false;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.3+0.55*ease(p),z);
-        }else if(t<4.5){var p=ease((t-2)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
-        }else if(t<5){var p=(t-4.5)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.55*ease(p),z);if(p>0.95)part.visible=false;
-        }else if(t<5.5){amr.position.set(x2,0.22,z);part.visible=false;
-        }else if(t<9){var p=ease((t-5.5)/3.5);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;
-        }else{amr.position.set(x1,0.22,z);part.visible=false;}
-        cranePartsA.inPart.visible=(t<1.5);
-        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
-      })();
-      /* craneIn A */
-      (function(){
-        var t1=((elapsed-amrDefsA[0].offset)%CY+CY)%CY;
-        var t2=((elapsed-amrDefsA[1].offset)%CY+CY)%CY;
-        if(t1>=4.5&&t1<6)animCraneA(craneInA,t1,4.5,6,0.3,1.3,1);
-        else if(t2<1.5)animCraneA(craneInA,t2,0,1.5,1.3,0.3,-1);
-        else{craneInA.carriage.position.y=0.8;craneInA.fork.position.z=0.5;}
-      })();
-      /* Route 3 */
-      (function(){
-        var def=amrDefsA[2],amr=def.amr,part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var x1=2.5,x2=7,z=2;
-        if(t<1){amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.24+0.5*ease(t),z);
-        }else if(t<1.5){var p=(t-1)/0.5;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.55+0.3*ease(p),z);
-        }else if(t<4){var p=ease((t-1.5)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
-        }else if(t<4.5){var p=(t-4)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.5*ease(p),z);if(p>0.95)part.visible=false;
-        }else if(t<6){amr.position.set(x2,0.22,z);part.visible=false;cranePartsA.outPart.visible=true;var cp=clamp01((t-4.5)/1.5);if(cp<0.5){cranePartsA.outPart.position.set(7,0.3+1.0*ease(cp*2),0);}else{cranePartsA.outPart.position.set(7,1.3,-0.3-0.7*ease((cp-0.5)*2));}
-        }else if(t<6.5){cranePartsA.outPart.visible=false;amr.position.set(x2,0.22,z);part.visible=false;
-        }else if(t<9){var p=ease((t-6.5)/2.5);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;cranePartsA.outPart.visible=false;
-        }else{amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.outPart.visible=false;}
-        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
-      })();
-      /* Route 4 */
-      (function(){
-        var def=amrDefsA[3],amr=def.amr,part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var x1=7,x2=13,z=-2;
-        if(t<1.5){amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.outPart.visible=true;var cp=clamp01(t/1.5);if(cp<0.5){cranePartsA.outPart.position.set(7,1.3,-0.3-0.7*(1-ease(cp*2)));}else{cranePartsA.outPart.position.set(7,1.3-1.0*ease((cp-0.5)*2),-1.0);}
-        }else if(t<2){var p=(t-1.5)/0.5;cranePartsA.outPart.visible=false;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.3+0.55*ease(p),z);
-        }else if(t<4.5){var p=ease((t-2)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
-        }else if(t<5){var p=(t-4.5)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.55*ease(p),z);if(p>0.95)part.visible=false;
-        }else if(t<9){var p=ease((t-5)/4);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;
-        }else{amr.position.set(x1,0.22,z);part.visible=false;}
-        cranePartsA.outPart.visible=(t<1.5);
-        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
-      })();
-      /* craneOut A */
-      (function(){
-        var t3=((elapsed-amrDefsA[2].offset)%CY+CY)%CY;
-        var t4=((elapsed-amrDefsA[3].offset)%CY+CY)%CY;
-        if(t3>=4.5&&t3<6)animCraneA(craneOutA,t3,4.5,6,0.3,1.3,1);
-        else if(t4<1.5)animCraneA(craneOutA,t4,0,1.5,1.3,0.3,-1);
-        else{craneOutA.carriage.position.y=0.8;craneOutA.fork.position.z=0.5;}
-      })();
-      /* 소조립 emissive */
-      var sp=(elapsed%2.5)/2.5,aIdx=Math.floor(sp*4);
-      subBoxesA.forEach(function(b,i){
-        if(i===aIdx){var pulse=0.3+0.7*Math.abs(Math.sin(elapsed*4));b.material.emissive=new THREE.Color(subColsA[i]);b.material.emissiveIntensity=pulse*0.6;
-        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
-      });
-      /* conveyor spin */
-      [convInA,convOutA].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
-    }
-
-    /* ============================================================
-       ANIMATION — Layout 2 (배치안2)
-       ============================================================ */
-    var subColsB=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
-    var craneBCycle=0;
-
-    /* Crane B 10-step animation */
-    function animCraneB(crane,p,dockZ,slotZ,slotY){
-      if(p<0.10){
-        /* 1: trolley → dockZ */
-        crane.trolley.position.z=lerp((crane.zMin+crane.zMax)/2,dockZ,p/0.10);
-        crane.carriage.position.y=0.4; crane.fork.position.x=0;
-      }else if(p<0.20){
-        /* 2: fork extend (pick) */
-        crane.trolley.position.z=dockZ; crane.carriage.position.y=0.4;
-        crane.fork.position.x=lerp(0,0.7,(p-0.10)/0.10);
-      }else if(p<0.25){
-        /* 3: slight raise */
-        crane.trolley.position.z=dockZ; crane.fork.position.x=0.7;
-        crane.carriage.position.y=lerp(0.4,0.6,(p-0.20)/0.05);
-      }else if(p<0.35){
-        /* 4: fork retract */
-        crane.trolley.position.z=dockZ; crane.carriage.position.y=0.6;
-        crane.fork.position.x=lerp(0.7,0,(p-0.25)/0.10);
-      }else if(p<0.55){
-        /* 5: trolley → slotZ */
-        crane.trolley.position.z=lerp(dockZ,slotZ,(p-0.35)/0.20);
-        crane.carriage.position.y=0.6; crane.fork.position.x=0;
-      }else if(p<0.70){
-        /* 6: carriage → slotY */
-        crane.trolley.position.z=slotZ;
-        crane.carriage.position.y=lerp(0.6,slotY,(p-0.55)/0.15);
-        crane.fork.position.x=0;
-      }else if(p<0.80){
-        /* 7: fork extend (place) */
-        crane.trolley.position.z=slotZ; crane.carriage.position.y=slotY;
-        crane.fork.position.x=lerp(0,-0.7,(p-0.70)/0.10);
-      }else if(p<0.85){
-        /* 8: slight lower */
-        crane.trolley.position.z=slotZ; crane.fork.position.x=-0.7;
-        crane.carriage.position.y=lerp(slotY,slotY-0.15,(p-0.80)/0.05);
-      }else if(p<0.95){
-        /* 9: fork retract */
-        crane.trolley.position.z=slotZ; crane.carriage.position.y=slotY-0.15;
-        crane.fork.position.x=lerp(-0.7,0,(p-0.85)/0.10);
-      }else{
-        /* 10: return home */
-        crane.trolley.position.z=lerp(slotZ,(crane.zMin+crane.zMax)/2,(p-0.95)/0.05);
-        crane.carriage.position.y=lerp(slotY-0.15,0.8,(p-0.95)/0.05);
-        crane.fork.position.x=0;
-      }
-    }
-
-    function animateLayout2(elapsed){
-      var cycleNum=Math.floor(elapsed/CY);
-
-      /* --- Route 1 B: 절단→입고 (L자 x→z) --- */
-      (function(){
-        var def=amrDefsB[0],amr=def.amr,part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        if(t<1){
-          /* part appears at cut dock */
-          amr.position.set(-18,0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(-18,0.24+0.5*ease(t),0);
-        }else if(t<1.5){
-          var p=(t-1)/0.5;
-          amr.position.set(-18,0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(-18,0.55+0.3*ease(p),0);
-        }else if(t<3){
-          /* Leg1: x=-18→-10 (z=0) */
-          var p=ease((t-1.5)/1.5);
-          amr.position.set(lerp(-18,-10,p),0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(lerp(-18,-10,p),0.85,0);
-        }else if(t<4){
-          /* Leg2: z=0→1.5 (x=-10), AMR turns */
-          var p=ease((t-3)/1.0);
-          amr.position.set(-10,0.22,lerp(0,1.5,p)); amr.rotation.y=Math.PI/2;
-          part.visible=true; part.position.set(-10,0.85,lerp(0,1.5,p));
-        }else if(t<4.5){
-          /* unload at inRecv dock */
-          var p=(t-4)/0.5;
-          amr.position.set(-10,0.22,1.5); amr.rotation.y=Math.PI/2;
-          part.visible=true; part.position.set(-10,0.85-0.5*ease(p),1.5);
-          if(p>0.95)part.visible=false;
-        }else if(t<6){
-          /* crane stacker picks */
-          amr.position.set(-10,0.22,1.5); part.visible=false;
-          cranePartsB.inPart.visible=true;
-          var cp=clamp01((t-4.5)/1.5);
-          cranePartsB.inPart.position.set(-10,0.3+1.5*ease(cp),lerp(1.5,3.5,ease(cp)));
-        }else if(t<6.5){
-          cranePartsB.inPart.visible=false;
-          amr.position.set(-10,0.22,1.5); part.visible=false;
-        }else if(t<7){
-          /* Return Leg2: z=1.5→0 */
-          var p=ease((t-6.5)/0.5);
-          amr.position.set(-10,0.22,lerp(1.5,0,p)); amr.rotation.y=-Math.PI/2;
-          part.visible=false;
-        }else if(t<9){
-          /* Return Leg1: x=-10→-18 */
-          var p=ease((t-7)/2.0);
-          amr.position.set(lerp(-10,-18,p),0.22,0); amr.rotation.y=Math.PI;
-          part.visible=false;
-        }else{
-          amr.position.set(-18,0.22,0); amr.rotation.y=0;
-          part.visible=false; cranePartsB.inPart.visible=false;
-        }
-        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
-      })();
-
-      /* --- Route 2 B: 입고→소조립 (L자 z→x) --- */
-      (function(){
-        var def=amrDefsB[1],amr=def.amr,part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        if(t<1.5){
-          /* crane retrieves → inSend dock */
-          amr.position.set(-10,0.22,-1.5); amr.rotation.y=0;
-          part.visible=false;
-          cranePartsB.inPart.visible=true;
-          var cp=clamp01(t/1.5);
-          cranePartsB.inPart.position.set(-10,1.8-1.5*ease(cp),lerp(3.5,-1.5,ease(cp)));
-        }else if(t<2){
-          var p=(t-1.5)/0.5;
-          cranePartsB.inPart.visible=false;
-          amr.position.set(-10,0.22,-1.5); amr.rotation.y=0;
-          part.visible=true; part.position.set(-10,0.3+0.55*ease(p),-1.5);
-        }else if(t<3){
-          /* Leg1: z=-1.5→0 */
-          var p=ease((t-2)/1.0);
-          amr.position.set(-10,0.22,lerp(-1.5,0,p)); amr.rotation.y=-Math.PI/2;
-          part.visible=true; part.position.set(-10,0.85,lerp(-1.5,0,p));
-        }else if(t<4.5){
-          /* Leg2: x=-10→-5 */
-          var p=ease((t-3)/1.5);
-          amr.position.set(lerp(-10,-5,p),0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(lerp(-10,-5,p),0.85,0);
-        }else if(t<5){
-          var p=(t-4.5)/0.5;
-          amr.position.set(-5,0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(-5,0.85-0.55*ease(p),0);
-          if(p>0.95)part.visible=false;
-        }else if(t<6){
-          /* Return Leg2: x=-5→-10 */
-          var p=ease((t-5)/1.0);
-          amr.position.set(lerp(-5,-10,p),0.22,0); amr.rotation.y=Math.PI;
-          part.visible=false;
-        }else if(t<7){
-          /* Return Leg1: z=0→-1.5 */
-          var p=ease((t-6)/1.0);
-          amr.position.set(-10,0.22,lerp(0,-1.5,p)); amr.rotation.y=Math.PI/2;
-          part.visible=false;
-        }else{
-          amr.position.set(-10,0.22,-1.5); amr.rotation.y=0;
-          part.visible=false; cranePartsB.inPart.visible=false;
-        }
-        cranePartsB.inPart.visible=(t<1.5);
-        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
-      })();
-
-      /* --- Route 3 B: 소조립→출고 (L자 x→z) --- */
-      (function(){
-        var def=amrDefsB[2],amr=def.amr,part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        if(t<1){
-          amr.position.set(5,0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(5,0.24+0.5*ease(t),0);
-        }else if(t<1.5){
-          var p=(t-1)/0.5;
-          amr.position.set(5,0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(5,0.55+0.3*ease(p),0);
-        }else if(t<3){
-          /* Leg1: x=5→10 */
-          var p=ease((t-1.5)/1.5);
-          amr.position.set(lerp(5,10,p),0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(lerp(5,10,p),0.85,0);
-        }else if(t<4){
-          /* Leg2: z=0→-1.5 */
-          var p=ease((t-3)/1.0);
-          amr.position.set(10,0.22,lerp(0,-1.5,p)); amr.rotation.y=-Math.PI/2;
-          part.visible=true; part.position.set(10,0.85,lerp(0,-1.5,p));
-        }else if(t<4.5){
-          var p=(t-4)/0.5;
-          amr.position.set(10,0.22,-1.5); amr.rotation.y=-Math.PI/2;
-          part.visible=true; part.position.set(10,0.85-0.5*ease(p),-1.5);
-          if(p>0.95)part.visible=false;
-        }else if(t<6){
-          amr.position.set(10,0.22,-1.5); part.visible=false;
-          cranePartsB.outPart.visible=true;
-          var cp=clamp01((t-4.5)/1.5);
-          cranePartsB.outPart.position.set(10,0.3+1.5*ease(cp),lerp(-1.5,-3.5,ease(cp)));
-        }else if(t<6.5){
-          cranePartsB.outPart.visible=false;
-          amr.position.set(10,0.22,-1.5); part.visible=false;
-        }else if(t<7){
-          /* Return Leg2: z=-1.5→0 */
-          var p=ease((t-6.5)/0.5);
-          amr.position.set(10,0.22,lerp(-1.5,0,p)); amr.rotation.y=Math.PI/2;
-          part.visible=false;
-        }else if(t<9){
-          /* Return Leg1: x=10→5 */
-          var p=ease((t-7)/2.0);
-          amr.position.set(lerp(10,5,p),0.22,0); amr.rotation.y=Math.PI;
-          part.visible=false;
-        }else{
-          amr.position.set(5,0.22,0); amr.rotation.y=0;
-          part.visible=false; cranePartsB.outPart.visible=false;
-        }
-        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
-      })();
-
-      /* --- Route 4 B: 출고→중조립 (L자 z→x) --- */
-      (function(){
-        var def=amrDefsB[3],amr=def.amr,part=def.part;
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        if(t<1.5){
-          amr.position.set(10,0.22,1.5); amr.rotation.y=0;
-          part.visible=false;
-          cranePartsB.outPart.visible=true;
-          var cp=clamp01(t/1.5);
-          cranePartsB.outPart.position.set(10,1.8-1.5*ease(cp),lerp(-3.5,1.5,ease(cp)));
-        }else if(t<2){
-          var p=(t-1.5)/0.5;
-          cranePartsB.outPart.visible=false;
-          amr.position.set(10,0.22,1.5); amr.rotation.y=0;
-          part.visible=true; part.position.set(10,0.3+0.55*ease(p),1.5);
-        }else if(t<3){
-          /* Leg1: z=1.5→0 */
-          var p=ease((t-2)/1.0);
-          amr.position.set(10,0.22,lerp(1.5,0,p)); amr.rotation.y=-Math.PI/2;
-          part.visible=true; part.position.set(10,0.85,lerp(1.5,0,p));
-        }else if(t<4.5){
-          /* Leg2: x=10→18 */
-          var p=ease((t-3)/1.5);
-          amr.position.set(lerp(10,18,p),0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(lerp(10,18,p),0.85,0);
-        }else if(t<5){
-          var p=(t-4.5)/0.5;
-          amr.position.set(18,0.22,0); amr.rotation.y=0;
-          part.visible=true; part.position.set(18,0.85-0.55*ease(p),0);
-          if(p>0.95)part.visible=false;
-        }else if(t<6.5){
-          /* Return Leg2: x=18→10 */
-          var p=ease((t-5)/1.5);
-          amr.position.set(lerp(18,10,p),0.22,0); amr.rotation.y=Math.PI;
-          part.visible=false;
-        }else if(t<7.5){
-          /* Return Leg1: z=0→1.5 */
-          var p=ease((t-6.5)/1.0);
-          amr.position.set(10,0.22,lerp(0,1.5,p)); amr.rotation.y=Math.PI/2;
-          part.visible=false;
-        }else{
-          amr.position.set(10,0.22,1.5); amr.rotation.y=0;
-          part.visible=false; cranePartsB.outPart.visible=false;
-        }
-        cranePartsB.outPart.visible=(t<1.5);
-        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
-      })();
-
-      /* Crane B: 입고 스태커 */
-      (function(){
-        var t1=((elapsed-amrDefsB[0].offset)%CY+CY)%CY;
-        var cn=cycleNum%5, rw=Math.floor(cycleNum/5)%3;
-        var slotZ=rackInB.zPositions[cn], slotY=rackInB.yPositions[rw];
-        var dockZ=1.5;
-        if(t1>=4.5&&t1<6){
-          var p=clamp01((t1-4.5)/1.5);
-          animCraneB(craneInB,p,dockZ,slotZ,slotY);
-        }else{
-          craneInB.trolley.position.z=(craneInB.zMin+craneInB.zMax)/2;
-          craneInB.carriage.position.y=0.8; craneInB.fork.position.x=0;
-        }
-      })();
-
-      /* Crane B: 출고 스태커 */
-      (function(){
-        var t3=((elapsed-amrDefsB[2].offset)%CY+CY)%CY;
-        var cn=cycleNum%5, rw=Math.floor(cycleNum/5)%3;
-        var slotZ=rackOutB.zPositions[cn], slotY=rackOutB.yPositions[rw];
-        var dockZ=-1.5;
-        if(t3>=4.5&&t3<6){
-          var p=clamp01((t3-4.5)/1.5);
-          animCraneB(craneOutB,p,dockZ,slotZ,slotY);
-        }else{
-          craneOutB.trolley.position.z=(craneOutB.zMin+craneOutB.zMax)/2;
-          craneOutB.carriage.position.y=0.8; craneOutB.fork.position.x=0;
-        }
-      })();
-
-      /* 소조립 B emissive pulse */
-      var sp=(elapsed%2.5)/2.5,aIdx=Math.floor(sp*4);
-      subBoxesB.forEach(function(b,i){
-        if(i===aIdx){var pulse=0.3+0.7*Math.abs(Math.sin(elapsed*4));b.material.emissive=new THREE.Color(subColsB[i]);b.material.emissiveIntensity=pulse*0.6;
-        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
-      });
-
-      /* conveyor B spin */
-      [convInB,convOutB].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
-    }
-
-    /* ============================================================
-       LAYOUT 3 — U자형 순환 배치 (배치안3)
-       ============================================================ */
-    /* Floor 3: 45×30 */
-    add3(at(bx(45,0.08,30,0xE2E8F0),0,0,0));
-    group3.add(new THREE.GridHelper(45,45,0xCBD5E1,0xCBD5E1));
-
-    /* 절단 3 */
-    add3(at(bx(4,0.12,3,0xFBBF24,{transparent:true,opacity:0.5}),-18,0.06,0));
-    for(var c3i=0;c3i<3;c3i++){for(var c3j=0;c3j<2;c3j++){
-      add3(at(bx(0.7,0.4,0.5,0xD97706),-19+c3i,0.32,-0.5+c3j));
-    }}
-    /* 소조립 3 */
-    add3(at(bx(8,0.08,5,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,0));
-    var subBoxes3=[];
-    [{dx:-2.4,col:0xF97316},{dx:-0.8,col:0xEAB308},{dx:0.8,col:0x94A3B8},{dx:2.4,col:0x22D3EE}].forEach(function(s){
-      var b=bx(1.5,1.0,1.5,s.col,{transparent:true,opacity:0.85});
-      at(b,s.dx,0.58,0); add3(b); subBoxes3.push(b);
-    });
-    /* 중조립 3 */
-    add3(at(bx(4,0.12,3,0x60A5FA,{transparent:true,opacity:0.5}),18,0.06,0));
-    add3(at(bx(3,1.8,2.2,0x93C5FD,{transparent:true,opacity:0.5}),18,1.02,0));
-    add3(at(bx(1.4,0.6,2.0,0x3B82F6),18,2.2,0));
-
-    /* 입고 랙 3 — top (z=+8..+12), 2 sets */
-    add3(at(bx(4,0.08,6,0x86EFAC,{transparent:true,opacity:0.3}),-6,0.04,10));
-    add3(at(bx(4,0.08,6,0x86EFAC,{transparent:true,opacity:0.3}),6,0.04,10));
-    function makeRack3(cx,zStart,zDir,fill){
-      var SW=1.0,SH=0.8,SD=1.0,SLOTS=5,ROWS=2;
-      for(var r=0;r<ROWS;r++){for(var s=0;s<SLOTS;s++){
-        var rz=zStart+zDir*(s*1.2+0.5),ry=0.5+r*(SH+0.12);
-        var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
-        at(fr,cx,ry,rz); group3.add(fr);
-        var eg=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),new THREE.LineBasicMaterial({color:0x94A3B8}));
-        eg.position.copy(fr.position); group3.add(eg);
-        if(r*SLOTS+s<Math.round(SLOTS*ROWS*fill)) add3(at(bx(SW*0.7,SH*0.7,SD*0.7,0x22C55E),cx,ry,rz));
-      }}
-    }
-    makeRack3(-6,8,1,0.6); makeRack3(6,8,1,0.5);
-    /* 출고 랙 3 — bottom (z=-8..-12) */
-    add3(at(bx(4,0.08,6,0x86EFAC,{transparent:true,opacity:0.3}),-6,0.04,-10));
-    add3(at(bx(4,0.08,6,0x86EFAC,{transparent:true,opacity:0.3}),6,0.04,-10));
-    makeRack3(-6,-8,-1,0.4); makeRack3(6,-8,-1,0.35);
-
-    /* U-loop lanes 3 */
-    [{x1:-18,x2:-6,z:5},{x1:-6,x2:6,z:5},{x1:6,x2:18,z:5},
-     {x:14,z1:5,z2:-5},
-     {x1:18,x2:6,z:-5},{x1:6,x2:-6,z:-5},{x1:-6,x2:-18,z:-5},
-     {x:-14,z1:-5,z2:5}
-    ].forEach(function(ln){
-      var lp;
-      if(ln.x1!==undefined){
-        var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
-        lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.3),new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
-        lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z);
-      }else{
-        var len=Math.abs(ln.z2-ln.z1),mz=(ln.z1+ln.z2)/2;
-        lp=new THREE.Mesh(new THREE.PlaneGeometry(0.3,len),new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
-        lp.rotation.x=-Math.PI/2; at(lp,ln.x,0.05,mz);
-      }
-      group3.add(lp);
-    });
-
-    /* Docks 3 */
-    function makeDock3(x,z){
-      var g=new THREE.Group();
-      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
-      [[-0.5,0,-0.25],[0.5,0,-0.25],[-0.5,0,0.25],[0.5,0,0.25]].forEach(function(l){
-        g.add(at(bx(0.06,0.15,0.06,0x94A3B8),l[0],0.075,l[2]));
-      });
-      g.position.set(x,0,z); g.castShadow=true; group3.add(g);
-      return g;
-    }
-    makeDock3(-18,5);makeDock3(-6,5);makeDock3(6,5);makeDock3(18,5);
-    makeDock3(-18,-5);makeDock3(-6,-5);makeDock3(6,-5);makeDock3(18,-5);
-
-    /* Cranes 3 — 4 stacker cranes */
-    function makeSCrane3(x,zMin,zMax){
-      var g=new THREE.Group();
-      var rl=zMax-zMin+1,rm=(zMin+zMax)/2;
-      g.add(at(bx(0.3,0.05,rl,0x71717A),0,0.025,rm));
-      var trolley=new THREE.Group();
-      trolley.add(at(bx(0.15,3.5,0.15,0x52525B),0,1.75,0));
-      var car=new THREE.Group();
-      car.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
-      var fk=bx(0.6,0.05,0.4,0xA3A3A3); at(fk,0,-0.1,0); car.add(fk);
-      car.position.set(0,0.8,0); trolley.add(car);
-      trolley.position.set(0,0,rm); g.add(trolley);
-      g.position.set(x,0,0); group3.add(g);
-      return {group:g,trolley:trolley,carriage:car,fork:fk,zMin:zMin,zMax:zMax};
-    }
-    var crane3=[makeSCrane3(-6,8,13),makeSCrane3(6,8,13),makeSCrane3(-6,-13,-8),makeSCrane3(6,-13,-8)];
-
-    /* Conveyors 3 */
-    var conv3In=makeConveyorG(group3,-4,-2,2);
-    var conv3Out=makeConveyorG(group3,4,-2,2);
-
-    /* AMR 3 — 6 units on U-loop */
-    var amrDefs3=[];
-    [0x7C3AED,0x8B5CF6,0xA855F7,0xC084FC,0x6D28D9,0x9333EA].forEach(function(col,i){
-      var a=makeAMRg(group3,col);
-      var p=bx(0.8,0.35,0.55,[0xF97316,0x22C55E,0xEAB308,0x22C55E,0xF97316,0xEAB308][i]);
-      p.castShadow=true; group3.add(p); p.visible=false;
-      a.position.set(-18,0.22,5);
-      amrDefs3.push({amr:a,part:p,offset:i*1.67});
-    });
-    /* U waypoints (counterclockwise) */
-    var uWP=[{x:-18,z:5},{x:-6,z:5},{x:6,z:5},{x:14,z:5},{x:14,z:0},{x:14,z:-5},{x:6,z:-5},{x:-6,z:-5},{x:-14,z:-5},{x:-14,z:0},{x:-14,z:5},{x:-18,z:5}];
-    var uSegLen=[];var uTotalLen=0;
-    for(var ui=0;ui<uWP.length-1;ui++){
-      var dx=uWP[ui+1].x-uWP[ui].x,dz=uWP[ui+1].z-uWP[ui].z;
-      var sl=Math.sqrt(dx*dx+dz*dz); uSegLen.push(sl); uTotalLen+=sl;
-    }
-
-    /* ============================================================
-       ANIMATION — Layout 3 (배치안3)
-       ============================================================ */
-    var subCols3=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
-    function animateLayout3(elapsed){
-      /* AMR U-loop */
-      amrDefs3.forEach(function(def){
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var frac=t/CY;
-        /* first 70% travel with part, last 30% return empty */
-        var hasPart=(frac<0.6);
-        var pathFrac=hasPart?frac/0.6:(frac-0.6)/0.4;
-        var dist=pathFrac*uTotalLen,acc=0,seg=0;
-        for(seg=0;seg<uSegLen.length-1;seg++){
-          if(acc+uSegLen[seg]>=dist)break;acc+=uSegLen[seg];
-        }
-        var segP=clamp01((dist-acc)/uSegLen[seg]);
-        var wx=lerp(uWP[seg].x,uWP[seg+1].x,segP);
-        var wz=lerp(uWP[seg].z,uWP[seg+1].z,segP);
-        def.amr.position.set(wx,0.22,wz);
-        /* face direction */
-        var ddx=uWP[seg+1].x-uWP[seg].x,ddz=uWP[seg+1].z-uWP[seg].z;
-        def.amr.rotation.y=Math.atan2(ddx,ddz);
-        def.part.visible=hasPart;
-        if(hasPart)def.part.position.set(wx,0.85,wz);
-        for(var wi=2;wi<6;wi++){if(def.amr.children[wi])def.amr.children[wi].rotation.x+=0.08;}
-      });
-      /* Crane 3 oscillation */
-      crane3.forEach(function(cr,ci){
-        var ph=elapsed*0.4+ci*1.5;
-        var zr=lerp(cr.zMin,cr.zMax,(Math.sin(ph)*0.5+0.5));
-        cr.trolley.position.z=zr;
-        cr.carriage.position.y=0.6+0.5*Math.abs(Math.sin(ph*0.7));
-      });
-      /* 소조립 emissive */
-      var sp3=(elapsed%2.5)/2.5,aIdx3=Math.floor(sp3*4);
-      subBoxes3.forEach(function(b,i){
-        if(i===aIdx3){b.material.emissive=new THREE.Color(subCols3[i]);b.material.emissiveIntensity=(0.3+0.7*Math.abs(Math.sin(elapsed*4)))*0.6;
-        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
-      });
-      [conv3In,conv3Out].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
-    }
-
-    /* ============================================================
-       LAYOUT 4 — 병렬 다중 랙 (배치안4)
-       ============================================================ */
-    /* Floor 4: 60×35 */
-    add4(at(bx(60,0.08,35,0xE2E8F0),0,0,0));
-    group4.add(new THREE.GridHelper(60,60,0xCBD5E1,0xCBD5E1));
-
-    /* 입고존 (left, x=-24) */
-    add4(at(bx(6,0.12,8,0xFBBF24,{transparent:true,opacity:0.4}),-24,0.06,0));
-    for(var d4i=0;d4i<4;d4i++){for(var d4j=0;d4j<3;d4j++){
-      add4(at(bx(0.7,0.4,0.5,0xD97706),-25.5+d4i*1,-1+d4j*1,0.32));
-    }}
-    /* 소조립 4 (x=-12) */
-    add4(at(bx(8,0.08,8,0xFDE68A,{transparent:true,opacity:0.4}),-12,0.04,0));
-    var subBoxes4=[];
-    [{dx:-2.4,col:0xF97316},{dx:-0.8,col:0xEAB308},{dx:0.8,col:0x94A3B8},{dx:2.4,col:0x22D3EE}].forEach(function(s){
-      var b=bx(1.5,1.0,1.5,s.col,{transparent:true,opacity:0.85});
-      at(b,-12+s.dx,0.58,0); add4(b); subBoxes4.push(b);
-    });
-
-    /* 보관존 — 3 parallel racks (center, x=-2, x=0, x=2 → spaced out) */
-    var rack4Data=[];
-    [-4,0,4].forEach(function(cx){
-      add4(at(bx(3,0.08,14,0x86EFAC,{transparent:true,opacity:0.3}),cx,0.04,0));
-      var SW=1.0,SH=0.7,SD=1.0,SLOTS=8,ROWS=3;
-      for(var r=0;r<ROWS;r++){for(var s=0;s<SLOTS;s++){
-        var rz=-4.5+s*1.15,ry=0.45+r*(SH+0.1);
-        var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
-        at(fr,cx,ry,rz); group4.add(fr);
-        var eg=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),new THREE.LineBasicMaterial({color:0x94A3B8}));
-        eg.position.copy(fr.position); group4.add(eg);
-        if(r*SLOTS+s<Math.round(SLOTS*ROWS*0.45)) add4(at(bx(SW*0.7,SH*0.7,SD*0.7,0x22C55E),cx,ry,rz));
-      }}
-      rack4Data.push({cx:cx,zMin:-4.5,zMax:3.5});
-    });
-
-    /* 출고존 (right, x=+14) */
-    add4(at(bx(6,0.12,8,0x60A5FA,{transparent:true,opacity:0.4}),14,0.06,0));
-    add4(at(bx(4,1.8,3,0x93C5FD,{transparent:true,opacity:0.5}),14,1.02,0));
-    /* 중조립 4 (far right, x=+24) */
-    add4(at(bx(6,0.12,8,0x60A5FA,{transparent:true,opacity:0.5}),24,0.06,0));
-    add4(at(bx(4,2.0,3,0x3B82F6,{transparent:true,opacity:0.6}),24,1.12,0));
-
-    /* Overhead gantry crane 4 — spans x=-6..6, long rail */
-    function makeGantry4(z){
-      var g=new THREE.Group();
-      /* 2 rails (x-direction) */
-      g.add(at(bx(16,0.15,0.2,0x52525B),0,4.0,z-1));
-      g.add(at(bx(16,0.15,0.2,0x52525B),0,4.0,z+1));
-      /* 4 legs */
-      [[-8,z-1],[-8,z+1],[8,z-1],[8,z+1]].forEach(function(l){
-        g.add(at(bx(0.2,4.0,0.2,0x71717A),l[0],2.0,l[1]));
-      });
-      /* trolley beam */
-      var beam=new THREE.Group();
-      beam.add(at(bx(0.25,0.25,2.4,0xFBBF24),0,0,0));
-      /* hoist */
-      var hoist=new THREE.Group();
-      hoist.add(at(bx(0.4,0.15,0.4,0xF97316),0,0,0));
-      hoist.add(at(bx(0.04,1.5,0.04,0xA3A3A3),0,-0.75,0));
-      var hook=bx(0.3,0.08,0.3,0xEF4444); at(hook,0,-1.5,0); hoist.add(hook);
-      hoist.position.set(0,-0.2,0); beam.add(hoist);
-      beam.position.set(0,3.85,z); g.add(beam);
-      group4.add(g);
-      return {group:g,beam:beam,hoist:hoist,hook:hook};
-    }
-    var gantry4=[makeGantry4(-5),makeGantry4(5)];
-
-    /* Stacker cranes 4 (one per rack row) */
-    function makeSCrane4(x,zMin,zMax){
-      var g=new THREE.Group();
-      var rl=zMax-zMin+1,rm=(zMin+zMax)/2;
-      g.add(at(bx(0.3,0.05,rl,0x71717A),0,0.025,rm));
-      var trolley=new THREE.Group();
-      trolley.add(at(bx(0.15,3.0,0.15,0x52525B),0,1.5,0));
-      var car=new THREE.Group();
-      car.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
-      var fk=bx(0.6,0.05,0.4,0xA3A3A3); at(fk,0,-0.1,0); car.add(fk);
-      car.position.set(0,0.8,0); trolley.add(car);
-      trolley.position.set(0,0,rm); g.add(trolley);
-      g.position.set(x,0,0); group4.add(g);
-      return {group:g,trolley:trolley,carriage:car,fork:fk,zMin:zMin,zMax:zMax};
-    }
-    var crane4=rack4Data.map(function(rd){return makeSCrane4(rd.cx,rd.zMin,rd.zMax);});
-
-    /* Grid lanes 4 */
-    [{x1:-24,x2:-16,z:3},{x1:-24,x2:-16,z:-3},
-     {x1:-16,x2:-8,z:3},{x1:-16,x2:-8,z:-3},
-     {x1:-8,x2:8,z:6},{x1:-8,x2:8,z:-6},
-     {x1:8,x2:14,z:3},{x1:8,x2:14,z:-3},
-     {x1:14,x2:24,z:3},{x1:14,x2:24,z:-3},
-     {x:-8,z1:-6,z2:6},{x:8,z1:-6,z2:6},{x:-16,z1:-3,z2:3},{x:14,z1:-3,z2:3}
-    ].forEach(function(ln){
-      var lp;
-      if(ln.x1!==undefined){
-        var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
-        lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.3),new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.15}));
-        lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z);
-      }else{
-        var len=Math.abs(ln.z2-ln.z1),mz=(ln.z1+ln.z2)/2;
-        lp=new THREE.Mesh(new THREE.PlaneGeometry(0.3,len),new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.15}));
-        lp.rotation.x=-Math.PI/2; at(lp,ln.x,0.05,mz);
-      }
-      group4.add(lp);
-    });
-
-    /* Docks 4 */
-    function makeDock4(x,z){
-      var g=new THREE.Group();
-      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
-      g.position.set(x,0,z); g.castShadow=true; group4.add(g);
-      return g;
-    }
-    makeDock4(-24,3);makeDock4(-24,-3);makeDock4(-16,3);makeDock4(-16,-3);
-    makeDock4(-8,6);makeDock4(-8,-6);makeDock4(8,6);makeDock4(8,-6);
-    makeDock4(14,3);makeDock4(14,-3);makeDock4(24,3);makeDock4(24,-3);
-
-    /* Conveyors 4 */
-    var conv4In=makeConveyorG(group4,-16,-3,3);
-    var conv4Out=makeConveyorG(group4,14,-3,3);
-
-    /* AMR 4 — 8 units grid path */
-    var amrDefs4=[];
-    var amr4Cols=[0x7C3AED,0x8B5CF6,0xA855F7,0xC084FC,0x6D28D9,0x9333EA,0x7E22CE,0xA78BFA];
-    var amr4Routes=[
-      [{x:-24,z:3},{x:-16,z:3},{x:-8,z:3},{x:-8,z:6},{x:8,z:6},{x:14,z:3},{x:24,z:3}],
-      [{x:-24,z:-3},{x:-16,z:-3},{x:-8,z:-3},{x:-8,z:-6},{x:8,z:-6},{x:14,z:-3},{x:24,z:-3}],
-      [{x:-24,z:3},{x:-16,z:3},{x:-16,z:-3},{x:-8,z:-3},{x:-8,z:-6},{x:8,z:-6},{x:14,z:-3}],
-      [{x:-24,z:-3},{x:-16,z:-3},{x:-16,z:3},{x:-8,z:3},{x:-8,z:6},{x:8,z:6},{x:14,z:3}],
-      [{x:14,z:3},{x:24,z:3},{x:24,z:-3},{x:14,z:-3},{x:8,z:-3},{x:8,z:-6},{x:-8,z:-6}],
-      [{x:14,z:-3},{x:24,z:-3},{x:24,z:3},{x:14,z:3},{x:8,z:3},{x:8,z:6},{x:-8,z:6}],
-      [{x:-8,z:6},{x:8,z:6},{x:8,z:-6},{x:-8,z:-6},{x:-16,z:-3},{x:-24,z:-3}],
-      [{x:-8,z:-6},{x:8,z:-6},{x:8,z:6},{x:-8,z:6},{x:-16,z:3},{x:-24,z:3}]
-    ];
-    amr4Cols.forEach(function(col,i){
-      var a=makeAMRg(group4,col);
-      var pc=[0xF97316,0x22C55E,0xEAB308,0x22C55E,0xF97316,0xEAB308,0x94A3B8,0x22D3EE][i];
-      var p=bx(0.8,0.35,0.55,pc); p.castShadow=true; group4.add(p); p.visible=false;
-      a.position.set(-24,0.22,0);
-      amrDefs4.push({amr:a,part:p,offset:i*1.25,route:amr4Routes[i]});
-    });
-
-    /* ============================================================
-       ANIMATION — Layout 4 (배치안4)
-       ============================================================ */
-    var subCols4=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
-    function animateLayout4(elapsed){
-      /* AMR grid paths */
-      amrDefs4.forEach(function(def){
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var route=def.route,n=route.length;
-        var frac=t/CY;
-        var hasPart=(frac<0.65);
-        var pathFrac=hasPart?frac/0.65:(frac-0.65)/0.35;
-        var totalD=0; var segs=[];
-        for(var ri=0;ri<n-1;ri++){
-          var dx=route[ri+1].x-route[ri].x,dz=route[ri+1].z-route[ri].z;
-          var sl=Math.sqrt(dx*dx+dz*dz); segs.push(sl); totalD+=sl;
-        }
-        var dist=pathFrac*totalD,acc=0,seg=0;
-        for(seg=0;seg<segs.length-1;seg++){if(acc+segs[seg]>=dist)break;acc+=segs[seg];}
-        var segP=clamp01((dist-acc)/segs[seg]);
-        var wx=lerp(route[seg].x,route[seg+1].x,segP);
-        var wz=lerp(route[seg].z,route[seg+1].z,segP);
-        def.amr.position.set(wx,0.22,wz);
-        var ddx=route[seg+1].x-route[seg].x,ddz=route[seg+1].z-route[seg].z;
-        def.amr.rotation.y=Math.atan2(ddx,ddz);
-        def.part.visible=hasPart;
-        if(hasPart)def.part.position.set(wx,0.85,wz);
-        for(var wi=2;wi<6;wi++){if(def.amr.children[wi])def.amr.children[wi].rotation.x+=0.08;}
-      });
-      /* Gantry crane 4 oscillation */
-      gantry4.forEach(function(gc,gi){
-        var ph=elapsed*0.3+gi*2;
-        gc.beam.position.x=lerp(-6,6,Math.sin(ph)*0.5+0.5);
-        gc.hoist.position.y=-0.2-0.8*Math.abs(Math.sin(ph*0.6));
-      });
-      /* Stacker cranes 4 */
-      crane4.forEach(function(cr,ci){
-        var ph=elapsed*0.4+ci*1.2;
-        cr.trolley.position.z=lerp(cr.zMin,cr.zMax,Math.sin(ph)*0.5+0.5);
-        cr.carriage.position.y=0.6+0.5*Math.abs(Math.sin(ph*0.7));
-      });
-      /* 소조립 emissive */
-      var sp4=(elapsed%2.5)/2.5,aIdx4=Math.floor(sp4*4);
-      subBoxes4.forEach(function(b,i){
-        if(i===aIdx4){b.material.emissive=new THREE.Color(subCols4[i]);b.material.emissiveIntensity=(0.3+0.7*Math.abs(Math.sin(elapsed*4)))*0.6;
-        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
-      });
-      [conv4In,conv4Out].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
-    }
-
-    /* ============================================================
-       LAYOUT 5 — 셀 기반 Full-Auto (배치안5)
-       ============================================================ */
-    /* Floor 5: 55×30 */
-    add5(at(bx(55,0.08,30,0xE2E8F0),0,0,0));
-    group5.add(new THREE.GridHelper(55,55,0xCBD5E1,0xCBD5E1));
-
-    /* 입고 (left, x=-22) */
-    add5(at(bx(4,0.12,4,0xFBBF24,{transparent:true,opacity:0.5}),-22,0.06,0));
-    for(var s5i=0;s5i<3;s5i++){for(var s5j=0;s5j<2;s5j++){
-      add5(at(bx(0.7,0.4,0.5,0xD97706),-23+s5i,0.32,-0.5+s5j));
-    }}
-
-    /* 셀 어레이 6×10 (center) */
-    var cells5=[];
-    var cellCols=[0xBBF7D0,0xA7F3D0,0x6EE7B7,0x34D399,0x86EFAC,0xD1FAE5];
-    for(var cr=0;cr<6;cr++){for(var cc=0;cc<10;cc++){
-      var cx=-9+cc*2, cz=-5+cr*2;
-      var cell=bx(1.6,0.3,1.6,cellCols[cr],{transparent:true,opacity:0.7});
-      at(cell,cx,0.2,cz); add5(cell);
-      cells5.push({mesh:cell,baseY:0.2,cx:cx,cz:cz,cr:cr,cc:cc});
-      /* slot frame */
-      var ef=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.6,0.3,1.6)),new THREE.LineBasicMaterial({color:0x16A34A,transparent:true,opacity:0.4}));
-      ef.position.copy(cell.position); group5.add(ef);
-    }}
-
-    /* 소조립 5 (top, z=+10) */
-    add5(at(bx(10,0.08,4,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,10));
-    var subBoxes5=[];
-    [{dx:-3,col:0xF97316},{dx:-1,col:0xEAB308},{dx:1,col:0x94A3B8},{dx:3,col:0x22D3EE}].forEach(function(s){
-      var b=bx(1.8,1.2,1.8,s.col,{transparent:true,opacity:0.85});
-      at(b,s.dx,0.68,10); add5(b); subBoxes5.push(b);
-    });
-
-    /* 출고 (right, x=+22) */
-    add5(at(bx(4,0.12,4,0x60A5FA,{transparent:true,opacity:0.5}),22,0.06,0));
-    /* 중조립 5 (far right, x=+22, z=-8) */
-    add5(at(bx(4,0.12,4,0x60A5FA,{transparent:true,opacity:0.5}),22,0.06,-8));
-    add5(at(bx(3,1.8,2.5,0x93C5FD,{transparent:true,opacity:0.5}),22,1.02,-8));
-    add5(at(bx(1.4,0.6,2.0,0x3B82F6),22,2.2,-8));
-
-    /* Overhead gantry 5 — 2 units spanning the cell array */
-    function makeGantry5(z){
-      var g=new THREE.Group();
-      g.add(at(bx(22,0.15,0.2,0x52525B),0,5.0,z-1.5));
-      g.add(at(bx(22,0.15,0.2,0x52525B),0,5.0,z+1.5));
-      [[-11,z-1.5],[-11,z+1.5],[11,z-1.5],[11,z+1.5]].forEach(function(l){
-        g.add(at(bx(0.2,5.0,0.2,0x71717A),l[0],2.5,l[1]));
-      });
-      var beam=new THREE.Group();
-      beam.add(at(bx(0.25,0.25,3.4,0xFBBF24),0,0,0));
-      var hoist=new THREE.Group();
-      hoist.add(at(bx(0.5,0.15,0.5,0xF97316),0,0,0));
-      hoist.add(at(bx(0.04,2.0,0.04,0xA3A3A3),0,-1.0,0));
-      var hook=bx(0.4,0.08,0.4,0xEF4444); at(hook,0,-2.0,0); hoist.add(hook);
-      hoist.position.set(0,-0.2,0); beam.add(hoist);
-      beam.position.set(0,4.85,z); g.add(beam);
-      group5.add(g);
-      return {group:g,beam:beam,hoist:hoist,hook:hook};
-    }
-    var gantry5=[makeGantry5(-2),makeGantry5(2)];
-
-    /* Stacker cranes 5 — 2 at edges */
-    function makeSCrane5(x,zMin,zMax){
-      var g=new THREE.Group();
-      var rl=zMax-zMin+1,rm=(zMin+zMax)/2;
-      g.add(at(bx(0.3,0.05,rl,0x71717A),0,0.025,rm));
-      var trolley=new THREE.Group();
-      trolley.add(at(bx(0.15,3.5,0.15,0x52525B),0,1.75,0));
-      var car=new THREE.Group();
-      car.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
-      var fk=bx(0.6,0.05,0.4,0xA3A3A3); at(fk,0,-0.1,0); car.add(fk);
-      car.position.set(0,0.8,0); trolley.add(car);
-      trolley.position.set(0,0,rm); g.add(trolley);
-      g.position.set(x,0,0); group5.add(g);
-      return {group:g,trolley:trolley,carriage:car,fork:fk,zMin:zMin,zMax:zMax};
-    }
-    var crane5=[makeSCrane5(-11,-6,6),makeSCrane5(11,-6,6)];
-
-    /* Conveyors 5 */
-    var conv5In=makeConveyorG(group5,-14,-3,3);
-    var conv5Out=makeConveyorG(group5,14,-3,3);
-
-    /* AMR 5 — 6 units, dynamic paths between cells */
-    var amrDefs5=[];
-    [0x7C3AED,0x8B5CF6,0xA855F7,0xC084FC,0x6D28D9,0x9333EA].forEach(function(col,i){
-      var a=makeAMRg(group5,col);
-      var p=bx(0.8,0.35,0.55,[0xF97316,0x22C55E,0xEAB308,0x22C55E,0xF97316,0xEAB308][i]);
-      p.castShadow=true; group5.add(p); p.visible=false;
-      a.position.set(-22,0.22,0);
-      amrDefs5.push({amr:a,part:p,offset:i*1.67,seed:i*137});
-    });
-
-    /* Docks 5 */
-    function makeDock5(x,z){
-      var g=new THREE.Group();
-      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
-      g.position.set(x,0,z); g.castShadow=true; group5.add(g);
-      return g;
-    }
-    makeDock5(-22,3);makeDock5(-22,-3);makeDock5(-14,3);makeDock5(-14,-3);
-    makeDock5(14,3);makeDock5(14,-3);makeDock5(22,3);makeDock5(22,-3);
-
-    /* ============================================================
-       ANIMATION — Layout 5 (배치안5)
-       ============================================================ */
-    var subCols5=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
-    function animateLayout5(elapsed){
-      /* Cell wave animation — servo height changes */
-      cells5.forEach(function(c){
-        var wave=Math.sin(elapsed*1.5+c.cx*0.3+c.cz*0.4)*0.3+
-                 Math.sin(elapsed*0.8-c.cr*0.5)*0.15;
-        c.mesh.position.y=c.baseY+Math.max(0,wave);
-        c.mesh.scale.y=1.0+Math.max(0,wave)*0.5;
-      });
-      /* AMR 5 — pseudo-random cell-to-cell movement */
-      amrDefs5.forEach(function(def){
-        var t=((elapsed-def.offset)%CY+CY)%CY;
-        var frac=t/CY;
-        /* pick source and target cell based on seed+cycle */
-        var cycle=Math.floor((elapsed-def.offset)/CY);
-        var srcIdx=((def.seed+cycle*7)%60);
-        var tgtIdx=((def.seed+cycle*13+30)%60);
-        var src=cells5[srcIdx],tgt=cells5[tgtIdx];
-        /* path: source → center row → target column → target */
-        var hasPart=(frac<0.6);
-        if(frac<0.15){
-          /* at source cell */
-          def.amr.position.set(src.cx,0.22,src.cz);
-          def.part.visible=true; def.part.position.set(src.cx,0.85,src.cz);
-        }else if(frac<0.35){
-          /* move x toward target */
-          var p=ease((frac-0.15)/0.2);
-          def.amr.position.set(lerp(src.cx,tgt.cx,p),0.22,src.cz);
-          def.part.visible=true; def.part.position.set(lerp(src.cx,tgt.cx,p),0.85,src.cz);
-          def.amr.rotation.y=(tgt.cx>src.cx)?0:Math.PI;
-        }else if(frac<0.55){
-          /* move z toward target */
-          var p=ease((frac-0.35)/0.2);
-          def.amr.position.set(tgt.cx,0.22,lerp(src.cz,tgt.cz,p));
-          def.part.visible=true; def.part.position.set(tgt.cx,0.85,lerp(src.cz,tgt.cz,p));
-          def.amr.rotation.y=(tgt.cz>src.cz)?Math.PI/2:-Math.PI/2;
-        }else if(frac<0.65){
-          /* unload at target */
-          var p=(frac-0.55)/0.1;
-          def.amr.position.set(tgt.cx,0.22,tgt.cz);
-          def.part.visible=(p<0.8); def.part.position.set(tgt.cx,0.85-0.5*ease(p),tgt.cz);
-        }else{
-          /* return empty */
-          var p=ease((frac-0.65)/0.35);
-          def.amr.position.set(lerp(tgt.cx,src.cx,p),0.22,lerp(tgt.cz,src.cz,p));
-          def.part.visible=false;
-          def.amr.rotation.y=Math.atan2(src.cx-tgt.cx,src.cz-tgt.cz);
-        }
-        for(var wi=2;wi<6;wi++){if(def.amr.children[wi])def.amr.children[wi].rotation.x+=0.08;}
-      });
-      /* Gantry 5 oscillation */
-      gantry5.forEach(function(gc,gi){
-        var ph=elapsed*0.25+gi*3;
-        gc.beam.position.x=lerp(-8,8,Math.sin(ph)*0.5+0.5);
-        gc.hoist.position.y=-0.2-1.2*Math.abs(Math.sin(ph*0.5));
-      });
-      /* Stacker cranes 5 */
-      crane5.forEach(function(cr,ci){
-        var ph=elapsed*0.35+ci*2;
-        cr.trolley.position.z=lerp(cr.zMin,cr.zMax,Math.sin(ph)*0.5+0.5);
-        cr.carriage.position.y=0.6+0.6*Math.abs(Math.sin(ph*0.6));
-      });
-      /* 소조립 emissive */
-      var sp5=(elapsed%2.5)/2.5,aIdx5=Math.floor(sp5*4);
-      subBoxes5.forEach(function(b,i){
-        if(i===aIdx5){b.material.emissive=new THREE.Color(subCols5[i]);b.material.emissiveIntensity=(0.3+0.7*Math.abs(Math.sin(elapsed*4)))*0.6;
-        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
-      });
-      [conv5In,conv5Out].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
     }
 
     /* ============================================================
@@ -2853,6 +1573,30 @@
         var tbl=bx(2.8,0.12,2.6,0x92400E); at(tbl,X_CUT,1.12,lz); add6(tbl);
         var hd=bx(0.24,0.4,0.24,0xFFFBEB); at(hd,X_CUT,1.44,lz); add6(hd);
         cutHeads6.push(hd);
+      });
+
+      /* ── 절단 선별갠트리 ×6 (라인마다 1대, X방향 빔) ── */
+      /* 갠트리: 절단공정(X=-9.5~-6.5) + 아웃포지션(X=-5.5 AMR통로) 커버 */
+      var cutGantries6=[];
+      LZ.forEach(function(lz){
+        var g=new THREE.Group();
+        /* 좌측 업라이트 */
+        var uL=bx(0.12,2.8,0.12,0x6B7280); uL.position.set(-10.5,1.4,0); g.add(uL);
+        /* 우측 업라이트 */
+        var uR=bx(0.12,2.8,0.12,0x6B7280); uR.position.set(-4.8,1.4,0); g.add(uR);
+        /* 상단 빔 */
+        var beam=bx(5.7,0.14,0.14,0x9CA3AF); beam.position.set(-7.65,2.8,0); g.add(beam);
+        /* 이동 트롤리 */
+        var trolley=bx(0.5,0.22,0.5,0xFBBF24); trolley.position.set(-10.5,2.72,0); g.add(trolley);
+        /* 호이스트(수직 와이어+훅) */
+        var wire=bx(0.06,0.9,0.06,0x374151); wire.position.set(0,-0.55,0); trolley.add(wire);
+        var hook=bx(0.22,0.18,0.22,0xE5E7EB); hook.position.set(0,-1.08,0); trolley.add(hook);
+        /* 아웃포지션 마커 */
+        var outPos=bx(0.9,0.07,0.9,0xFDE68A,{transparent:true,opacity:0.7});
+        outPos.position.set(-4.8,0.04,0); g.add(outPos);
+        g.position.set(0,0,lz);
+        group6.add(g);
+        cutGantries6.push({grp:g,trolley:trolley,xMin:-10.2,xMax:-5.0});
       });
 
       /* ── 소조립공정 ×6 (6u, 4단계 X방향 배열) ── */
@@ -2912,6 +1656,48 @@
       var stkYMin=0.45, stkYMax=NTIERS*TIER_H-0.2;
       var stkXMin=PRE_XC-PRE_XD/2+0.3, stkXMax=PRE_XC+PRE_XD/2-0.3;
 
+      /* ── 선행랙장 버퍼존 (정렬갠트리 아래, Z- 방향 랙 옆) ── */
+      var BUF_Z=PRE_Z-PRE_ZW/2-1.8;
+      var BUF_ZW=3.0;
+      add6(at(bx(PRE_XD,0.08,BUF_ZW,0xFEF3C7,{transparent:true,opacity:0.55}),PRE_XC,0.04,BUF_Z));
+      add6(at(bx(PRE_XD,0.1,0.06,0xFBBF24),PRE_XC,0.05,BUF_Z-BUF_ZW/2));
+      add6(at(bx(PRE_XD,0.1,0.06,0xFBBF24),PRE_XC,0.05,BUF_Z+BUF_ZW/2));
+      [{dx:-2,dz:0.3},{dx:-0.5,dz:-0.4},{dx:1.0,dz:0.2},{dx:2.2,dz:-0.2}].forEach(function(p){
+        add6(at(bx(1.1,0.35,0.7,0xFDE68A),PRE_XC+p.dx,0.22,BUF_Z+p.dz));
+      });
+
+      /* ── 외부 입고구 (지게차, 절단 반대편 Z-) ── */
+      var EXT_Z=BUF_Z-4.2;
+      add6(at(bx(PRE_XD+1,0.1,2.0,0xE5E7EB,{transparent:true,opacity:0.5}),PRE_XC,0.05,EXT_Z));
+      add6(at(bx(0.2,0.08,3.5,0xFBBF24,{transparent:true,opacity:0.6}),PRE_XC,0.09,EXT_Z+2.5));
+      var fk=new THREE.Group();
+      fk.add(bx(1.4,0.55,0.8,0xFACC15));
+      var fkMast=bx(0.1,1.2,0.1,0x78716C); fkMast.position.set(0.65,0.88,0); fk.add(fkMast);
+      var fkF1=bx(1.1,0.08,0.12,0x78716C); fkF1.position.set(0.05,0.18,0.22); fk.add(fkF1);
+      var fkF2=bx(1.1,0.08,0.12,0x78716C); fkF2.position.set(0.05,0.18,-0.22); fk.add(fkF2);
+      fk.position.set(PRE_XC+1.0,0.3,EXT_Z-0.5); fk.rotation.y=Math.PI/2; group6.add(fk);
+      add6(at(bx(2.5,0.5,0.06,0xFEF9C3),PRE_XC,1.0,EXT_Z-1.0));
+
+      /* ── 선행랙장 정렬갠트리 (버퍼존+랙 커버, X방향 브리지, Z이동) ── */
+      var GANT_Z_MIN=BUF_Z-BUF_ZW/2-0.3;
+      var GANT_Z_MAX=PRE_Z+PRE_ZW/2+0.3;
+      var GANT_SPAN=GANT_Z_MAX-GANT_Z_MIN;
+      var GANT_ZC=(GANT_Z_MIN+GANT_Z_MAX)/2;
+      var GANT_H=3.8;
+      add6(at(bx(0.12,0.12,GANT_SPAN,0x9CA3AF),PRE_XC-PRE_XD/2-0.3,GANT_H,GANT_ZC));
+      add6(at(bx(0.12,0.12,GANT_SPAN,0x9CA3AF),PRE_XC+PRE_XD/2+0.3,GANT_H,GANT_ZC));
+      [GANT_Z_MIN+0.3,GANT_ZC,GANT_Z_MAX-0.3].forEach(function(pz){
+        add6(at(bx(0.12,GANT_H,0.12,0x6B7280),PRE_XC-PRE_XD/2-0.3,GANT_H/2,pz));
+        add6(at(bx(0.12,GANT_H,0.12,0x6B7280),PRE_XC+PRE_XD/2+0.3,GANT_H/2,pz));
+      });
+      var preGBridge=bx(PRE_XD+1.0,0.16,0.16,0x374151);
+      at(preGBridge,PRE_XC,GANT_H,GANT_Z_MIN+0.5); add6(preGBridge);
+      var preGTrolley=bx(0.5,0.24,0.5,0xFBBF24);
+      at(preGTrolley,PRE_XC-2,GANT_H+0.2,GANT_Z_MIN+0.5); add6(preGTrolley);
+      var preGWire=bx(0.06,1.0,0.06,0x374151); preGWire.position.set(0,-0.6,0); preGTrolley.add(preGWire);
+      var preGHook=bx(0.24,0.2,0.24,0xE5E7EB); preGHook.position.set(0,-1.15,0); preGTrolley.add(preGHook);
+      /* preG, cutG → window._6에 통합 (아래) */
+
       /* ── 중조/대조 (별도 섹션, L6 외측 더 멀리, 절반 크기) ── */
       add6(at(bx(MID_XW,0.1,MID_ZD,0xBFDBFE,{transparent:true,opacity:0.3}),MID_XC,0.05,MID_Z));
       add6(at(bx(MID_XW,1.5,MID_ZD,0x2563EB,{transparent:true,opacity:0.35}),MID_XC,0.8,MID_Z));
@@ -2953,6 +1739,10 @@
         stk:{c:stk6Car,yMin:stkYMin,yMax:stkYMax,xMin:stkXMin,xMax:stkXMax},
         amrsA:amrsA6,amrsB:amrsB6,
         subBoxes6:subBoxes6,subCols6:subCols6,cutHeads6:cutHeads6,
+        cutG:cutGantries6,
+        preG:{bridge:preGBridge,trolley:preGTrolley,
+          bzMin:GANT_Z_MIN+0.5,bzMax:GANT_Z_MAX-0.5,
+          txMin:PRE_XC-PRE_XD/2+0.4,txMax:PRE_XC+PRE_XD/2-0.4},
         X:{CUT:X_CUT,AMR:X_AMR,SUB:X_SUB,POST:X_POST},
         PRE:{Z:PRE_Z,XC:PRE_XC},MID:{Z:MID_Z}
       };
@@ -3050,21 +1840,49 @@
       d.cutHeads6.forEach(function(h,hi){
         h.position.y=1.44+0.08*Math.sin(elapsed*2.5+hi*1.4);
       });
+
+      /* ── 절단 선별갠트리 트롤리 애니메이션 (라인별, 각 독립 위상) ── */
+      if(d.cutG) d.cutG.forEach(function(cg,gi){
+        /* 절단→아웃포지션 왕복: 1.8초 사이클 */
+        var ct=(elapsed*0.5+gi*0.52)%3.6;
+        var tx;
+        if(ct<1.2)      tx=lerp(cg.xMin,cg.xMax,ease(ct/1.2));
+        else if(ct<1.8) tx=cg.xMax; /* 아웃포지션 대기 */
+        else            tx=lerp(cg.xMax,cg.xMin,ease((ct-1.8)/1.8));
+        cg.trolley.position.x=tx;
+        /* 호이스트 Y (픽업/배치 때 낮아짐) */
+        var atOut=ct>1.0&&ct<2.5;
+        var wireChild=cg.trolley.children[0];
+        if(wireChild) wireChild.position.y=atOut?-0.9:-0.55;
+      });
+
+      /* ── 선행랙장 정렬갠트리 애니메이션 ── */
+      if(d.preG){
+        var pg=d.preG;
+        /* 브리지: 버퍼존↔랙 Z방향 왕복 */
+        var bph=elapsed*0.28;
+        var bz=lerp(pg.bzMin,pg.bzMax,Math.sin(bph)*0.5+0.5);
+        pg.bridge.position.z=bz;
+        pg.trolley.position.z=bz;
+        /* 트롤리: X방향 왕복 */
+        var tph=elapsed*0.42+1.2;
+        pg.trolley.position.x=lerp(pg.txMin,pg.txMax,Math.sin(tph)*0.5+0.5);
+        /* 호이스트 */
+        var pgWire=pg.trolley.children[0];
+        var atRack=(pg.trolley.position.z>PRE_Z-0.5);
+        if(pgWire) pgWire.position.y=atRack?-0.9:-0.55;
+      }
     }
 
     /* ============================================================
        MAIN ANIMATE LOOP
        ============================================================ */
-    var animateFns={
-      '1':animateLayout1,'2':animateLayout2,
-      '3':animateLayout3,'4':animateLayout4,'5':animateLayout5,
-      '6':animateLayout6
-    };
+    var animateFns={'6':animateLayout6};
     function animate(){
       requestAnimationFrame(animate);
       var elapsed=clk.getElapsedTime();
       var ang=elapsed*0.025;
-      var cc=camConfigs[activeLayout]||camConfigs['1'];
+      var cc=camConfigs[activeLayout]||camConfigs['6'];
       cam.position.set(cc.R*Math.cos(ang),cc.H,cc.D*Math.sin(ang));
       cam.lookAt(0,2,0);
       var fn=animateFns[activeLayout];
