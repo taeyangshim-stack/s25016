@@ -12,15 +12,17 @@ import csv
 import re
 from collections import OrderedDict
 from datetime import datetime
+from pathlib import Path
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
 # === Configuration ===
-PRIMARY_CSV = "/home/qwe/works/s25016/punchlist/3week-plan/punchlist_2026-02-05 (1).csv"
-GANTT_CSV = "/home/qwe/works/s25016/punchlist/3week-plan/S25016_3주완료계획_260130.csv"
-OUTPUT_PATH = "/home/qwe/works/s25016/punchlist/3week-plan/S25016_펀치리스트_현황_260205.xlsx"
+_HERE = Path(__file__).parent
+PRIMARY_CSV = str(_HERE / "punchlist_2026-02-05 (1).csv")
+GANTT_CSV = str(_HERE / "S25016_3주완료계획_260130.csv")
+OUTPUT_PATH = str(_HERE / "S25016_펀치리스트_현황_260205.xlsx")
 BASE_URL = "https://s2501602.vercel.app/punchlist/pages/detail.html?id="
 PUNCHLIST_URL = "https://s2501602.vercel.app/punchlist/"
 GANTT_URL = "https://s2501602.vercel.app/punchlist/3week-plan/"

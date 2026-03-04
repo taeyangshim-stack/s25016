@@ -6261,16 +6261,30 @@ PROC TestPlanAB_Stage1()
 	! Read scenario count
 	line := ReadStr(cfg_file);
 	ok := StrToVal(line, nScenarios);
+	IF NOT ok THEN
+		TPWrite "[HYBRID] ERROR: Failed to parse scenario count";
+		Write res_file, "ERROR: Failed to parse nScenarios from: " + line;
+		Close cfg_file;
+		Close res_file;
+		RETURN;
+	ENDIF
 	Write res_file, "Scenarios=" + NumToStr(nScenarios,0);
 
 	FOR i FROM 1 TO nScenarios DO
 		! Read 6 lines: sx, sy, sz, ex, ey, ez
 		line := ReadStr(cfg_file); ok := StrToVal(line, sx);
-		line := ReadStr(cfg_file); ok := StrToVal(line, sy);
-		line := ReadStr(cfg_file); ok := StrToVal(line, sz);
-		line := ReadStr(cfg_file); ok := StrToVal(line, ex);
-		line := ReadStr(cfg_file); ok := StrToVal(line, ey);
-		line := ReadStr(cfg_file); ok := StrToVal(line, ez);
+		line := ReadStr(cfg_file); ok := ok AND StrToVal(line, sy);
+		line := ReadStr(cfg_file); ok := ok AND StrToVal(line, sz);
+		line := ReadStr(cfg_file); ok := ok AND StrToVal(line, ex);
+		line := ReadStr(cfg_file); ok := ok AND StrToVal(line, ey);
+		line := ReadStr(cfg_file); ok := ok AND StrToVal(line, ez);
+		IF NOT ok THEN
+			TPWrite "[HYBRID] ERROR: Failed to parse coords in scenario " + NumToStr(i,0);
+			Write res_file, "ERROR: Parse failed at Scenario " + NumToStr(i,0);
+			Close cfg_file;
+			Close res_file;
+			RETURN;
+		ENDIF
 
 		! Set calcPosStart/End
 		calcPosStart.x := sx;  calcPosStart.y := sy;  calcPosStart.z := sz;
@@ -6339,6 +6353,13 @@ PROC TestPlanAB_Stage1()
 	Close res_file;
 
 	TPWrite "[HYBRID] Stage1 done. See HOME:/planab_stage1.txt";
+
+ERROR
+	TPWrite "[HYBRID] ERROR: " + NumToStr(ERRNO,0);
+	Write res_file, "ERROR: " + NumToStr(ERRNO,0);
+	Close cfg_file;
+	Close res_file;
+	TRYNEXT;
 ENDPROC
 
 ENDMODULE
