@@ -1451,7 +1451,7 @@
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure=1.2;
     var scene=new THREE.Scene(); scene.background=new THREE.Color(0xF1F5F9);
-    scene.fog=new THREE.FogExp2(0xF1F5F9,0.012);
+    scene.fog=new THREE.FogExp2(0xF1F5F9,0.004);
     var d=14,asp=W/H;
     var cam=new THREE.OrthographicCamera(-d*asp,d*asp,d,-d,0.1,300);
     cam.position.set(25,22,20); cam.lookAt(0,2,0);
@@ -1595,33 +1595,37 @@
         add6(at(bx(0.06,0.85,2.8,0x6B7280,{transparent:true,opacity:0.5}),-7.5,0.45,lz));
       });
 
-      /* ── 절단 선별갠트리 ×6 (3축 포털: X이동 트롤리 + Z이동 브리지 + Y호이스트) ── */
-      var CG_X_L=-10.5, CG_X_R=-4.8, CG_H=3.0, CG_Z_HALF=1.35;
+      /* ── 절단 선별갠트리 ×6 (포털크레인: X바닥레일 + X이동포털 + Z언더슬렁트롤리 + Y호이스트) ── */
+      var CG_X_L=-10.5, CG_X_R=-4.8, CG_H=2.8, CG_Z_HALF=1.35;
       var cutGantries6=[];
       LZ.forEach(function(lz){
         var g=new THREE.Group();
-        /* ── 4개 코너 기둥 ── */
-        [[CG_X_L,-CG_Z_HALF],[CG_X_L,CG_Z_HALF],[CG_X_R,-CG_Z_HALF],[CG_X_R,CG_Z_HALF]].forEach(function(p){
-          var col=bx(0.12,CG_H,0.12,0x6B7280); col.position.set(p[0],CG_H/2,p[1]); g.add(col);
-        });
-        /* ── Z방향 레일 (X_L측, X_R측 각 1개) ── */
-        var rL=bx(0.1,0.1,CG_Z_HALF*2,0x9CA3AF); rL.position.set(CG_X_L,CG_H,0); g.add(rL);
-        var rR=bx(0.1,0.1,CG_Z_HALF*2,0x9CA3AF); rR.position.set(CG_X_R,CG_H,0); g.add(rR);
-        /* ── X방향 브리지빔 (Z방향으로 이동) ── */
-        var bridge=bx(CG_X_R-CG_X_L,0.14,0.14,0x374151);
-        bridge.position.set((CG_X_L+CG_X_R)/2,CG_H+0.07,0); g.add(bridge);
-        /* ── 트롤리 (브리지 위에서 X방향 이동) ── */
-        var trolley=bx(0.48,0.22,0.48,0xFBBF24);
-        trolley.position.set(CG_X_L+0.4,CG_H+0.19,0); g.add(trolley);
+        /* ── 바닥 주행 레일 2개 (X방향, Z=±CG_Z_HALF) ── */
+        var rl1=bx(CG_X_R-CG_X_L+0.6,0.1,0.12,0x475569);
+        rl1.position.set((CG_X_L+CG_X_R)/2,0.05,-CG_Z_HALF); g.add(rl1);
+        var rl2=bx(CG_X_R-CG_X_L+0.6,0.1,0.12,0x475569);
+        rl2.position.set((CG_X_L+CG_X_R)/2,0.05,CG_Z_HALF); g.add(rl2);
+        /* ── 포털 프레임 (X방향으로 이동) ── */
+        var portal=new THREE.Group();
+        portal.position.set(CG_X_L+0.4,0,0);
+        /* 양측 다리 */
+        var legN=bx(0.12,CG_H,0.12,0x6B7280); legN.position.set(0,CG_H/2,-CG_Z_HALF); portal.add(legN);
+        var legF=bx(0.12,CG_H,0.12,0x6B7280); legF.position.set(0,CG_H/2, CG_Z_HALF); portal.add(legF);
+        /* Z방향 크로스빔 (상단) */
+        var beam=bx(0.14,0.16,CG_Z_HALF*2+0.22,0x374151); beam.position.set(0,CG_H,0); portal.add(beam);
+        /* ── 트롤리 (빔 하부 언더슬렁, Z방향 이동) ── */
+        var trolley=bx(0.5,0.22,0.5,0xFBBF24);
+        trolley.position.set(0,CG_H-0.13,0); portal.add(trolley);
         /* ── 호이스트(Y축: 와이어+훅) ── */
         var wire=bx(0.06,0.85,0.06,0x374151); wire.position.set(0,-0.52,0); trolley.add(wire);
         var hook=bx(0.2,0.16,0.2,0xE5E7EB); hook.position.set(0,-0.98,0); trolley.add(hook);
         /* ── 아웃포지션 바닥 마커 ── */
         var outPos=bx(0.85,0.06,0.85,0xFDE68A,{transparent:true,opacity:0.65});
         outPos.position.set(CG_X_R,0.04,0); g.add(outPos);
+        g.add(portal);
         g.position.set(0,0,lz);
         group6.add(g);
-        cutGantries6.push({grp:g,bridge:bridge,trolley:trolley,
+        cutGantries6.push({grp:g,portal:portal,trolley:trolley,
           zMin:-CG_Z_HALF+0.25,zMax:CG_Z_HALF-0.25,
           xMin:CG_X_L+0.35,xMax:CG_X_R-0.05});
       });
@@ -1643,12 +1647,14 @@
       var subCols6=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
       var subBoxes6=[];
       LZ.forEach(function(lz,li){
+        var lineBoxes=[];
         add6(at(bx(6,0.1,2.8,0xFEF9C3,{transparent:true,opacity:0.45}),X_SUB,0.05,lz));
         [-2.25,-0.75,0.75,2.25].forEach(function(dx,si){
           var b=bx(1.2,0.7,2.2,subCols6[si],{transparent:true,opacity:0.85});
           at(b,X_SUB+dx,0.45,lz); add6(b);
-          if(li===0) subBoxes6.push(b);
+          lineBoxes.push(b);
         });
+        subBoxes6.push(lineBoxes);
       });
 
       /* ── 소조립 투입 도킹 마커 ×6 (SUB_DOCK_X, 소조립 입력측) ── */
@@ -1851,6 +1857,36 @@
         amrsB6.push({g:g,li:li,lz:lz,phase:li*0.68+1.3,xLane:X_POST+0.2+li*0.1});
       });
 
+      /* ── 공정 레이블 (3D 스프라이트, 카메라 방향 자동 추적) ── */
+      function makeLabel6(text,x,y,z,opts){
+        var W2=opts&&opts.w||200,H2=opts&&opts.h||44,fs=opts&&opts.fs||16;
+        var bg=opts&&opts.bg||'rgba(30,41,59,0.85)',fg=opts&&opts.fg||'#ffffff';
+        var c=document.createElement('canvas'); c.width=W2; c.height=H2;
+        var ctx=c.getContext('2d');
+        ctx.fillStyle=bg;
+        if(ctx.roundRect) ctx.roundRect(3,3,W2-6,H2-6,7); else ctx.rect(3,3,W2-6,H2-6);
+        ctx.fill();
+        ctx.fillStyle=fg; ctx.font='bold '+fs+'px Arial,sans-serif';
+        ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(text,W2/2,H2/2);
+        var tex=new THREE.CanvasTexture(c);
+        var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,depthWrite:false});
+        var spr=new THREE.Sprite(mat);
+        var sc=opts&&opts.s||1.8; spr.scale.set((W2/H2)*sc,sc,1);
+        spr.position.set(x,y,z); group6.add(spr);
+      }
+      var CG_X_L=-10.5;
+      /* 공정 구역 레이블 */
+      makeLabel6('① 절단공정',-8.5,4.5,0,{bg:'rgba(180,83,9,0.88)',fg:'#FEF3C7',w:200,h:44,fs:17});
+      makeLabel6('② 소조립공정',X_SUB,4.5,0,{bg:'rgba(21,128,61,0.88)',fg:'#D1FAE5',w:210,h:44,fs:17});
+      makeLabel6('③ 후행랙장',X_POST,4.5,0,{bg:'rgba(5,150,105,0.88)',fg:'#D1FAE5',w:190,h:44,fs:17});
+      makeLabel6('④ 선행랙장',PRE_XC,5.8,PRE_Z,{bg:'rgba(5,150,105,0.88)',fg:'#D1FAE5',w:200,h:44,fs:17});
+      makeLabel6('⑤ 버퍼존',PRE_XC,3.5,BUF_Z,{bg:'rgba(245,158,11,0.88)',fg:'#FEF9C3',w:160,h:40,fs:15,s:1.5});
+      makeLabel6('⑥ 중조/대조',MID_XC,3.5,MID_Z,{bg:'rgba(37,99,235,0.88)',fg:'#BFDBFE',w:190,h:44,fs:17});
+      /* 라인 번호 레이블 */
+      LZ.forEach(function(lz,li){
+        makeLabel6('L'+(li+1),CG_X_L-1.4,2.0,lz,{bg:'rgba(51,65,85,0.82)',fg:'#F1F5F9',w:64,h:38,fs:15,s:1.2});
+      });
+
       window._6={
         stk:{mast:stkMastGrp,car:stkCarriage,yMin:stkYMin,yMax:stkYMax,xMin:stkXMin,xMax:stkXMax},
         amrsA:amrsA6,amrsB:amrsB6,
@@ -1965,11 +2001,13 @@
       st.mast.position.x=lerp(st.xMin,st.xMax,Math.sin(ph)*0.5+0.5);
       st.car.position.y=lerp(st.yMin,st.yMax,Math.sin(ph*0.63)*0.5+0.5);
 
-      /* ── 소조립 순서 발광 ── */
-      var sp=(elapsed%2.2)/2.2,ai=Math.floor(sp*4);
-      d.subBoxes6.forEach(function(b,i){
-        if(i===ai){b.material.emissive=new THREE.Color(d.subCols6[i]);b.material.emissiveIntensity=0.4;}
-        else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
+      /* ── 소조립 순서 발광 (6라인 각자 위상 분산) ── */
+      d.subBoxes6.forEach(function(lineBoxes,li){
+        var sp=((elapsed+li*0.55)%2.2)/2.2,ai=Math.floor(sp*4);
+        lineBoxes.forEach(function(b,i){
+          if(i===ai){b.material.emissive=new THREE.Color(d.subCols6[i]);b.material.emissiveIntensity=0.4;}
+          else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
+        });
       });
 
       /* ── 절단기 헤드 진동 ── */
@@ -1979,17 +2017,16 @@
 
       /* ── 절단 선별갠트리 3축 애니메이션 (Z=브리지, X=트롤리, Y=호이스트) ── */
       if(d.cutG) d.cutG.forEach(function(cg,gi){
-        /* 축1: 브리지 Z이동 (절단구역 내 Z스캔) */
-        var bz=lerp(cg.zMin,cg.zMax,Math.sin(elapsed*0.55+gi*1.1)*0.5+0.5);
-        cg.bridge.position.z=bz;
-        cg.trolley.position.z=bz; /* 트롤리는 브리지에 탑재 */
-        /* 축2: 트롤리 X이동 (절단구역→아웃포지션 왕복) */
+        /* 축1: 포털 X이동 (절단구역→아웃포지션 왕복) */
         var ct=(elapsed*0.5+gi*0.52)%3.6;
-        var tx;
-        if(ct<1.2)      tx=lerp(cg.xMin,cg.xMax,ease(ct/1.2));
-        else if(ct<1.8) tx=cg.xMax; /* 아웃포지션 정지 */
-        else            tx=lerp(cg.xMax,cg.xMin,ease((ct-1.8)/1.8));
-        cg.trolley.position.x=tx;
+        var px;
+        if(ct<1.2)      px=lerp(cg.xMin,cg.xMax,ease(ct/1.2));
+        else if(ct<1.8) px=cg.xMax; /* 아웃포지션 정지 */
+        else            px=lerp(cg.xMax,cg.xMin,ease((ct-1.8)/1.8));
+        cg.portal.position.x=px;
+        /* 축2: 트롤리 Z이동 (언더슬렁, 크로스빔 따라 Z스캔) */
+        var tz=lerp(cg.zMin,cg.zMax,Math.sin(elapsed*0.55+gi*1.1)*0.5+0.5);
+        cg.trolley.position.z=tz;
         /* 축3: 호이스트 Y (아웃포지션 도착 시 낮아짐) */
         var atOut=ct>1.0&&ct<2.5;
         var wireChild=cg.trolley.children[0];
@@ -2018,13 +2055,49 @@
        MAIN ANIMATE LOOP
        ============================================================ */
     var animateFns={'6':animateLayout6};
+
+    /* ── 마우스/터치 컨트롤 ── */
+    var ctrl={az:0,zoom:1.0,drag:false,lx:0,lastT:-1e9};
+    cv.style.cursor='grab';
+    cv.addEventListener('mousedown',function(e){
+      ctrl.drag=true;ctrl.lx=e.clientX;ctrl.lastT=performance.now();cv.style.cursor='grabbing';
+    });
+    window.addEventListener('mouseup',function(){ctrl.drag=false;cv.style.cursor='grab';});
+    cv.addEventListener('mousemove',function(e){
+      if(!ctrl.drag)return;
+      ctrl.az+=(e.clientX-ctrl.lx)*0.008;ctrl.lx=e.clientX;ctrl.lastT=performance.now();
+    });
+    cv.addEventListener('wheel',function(e){
+      e.preventDefault();
+      ctrl.zoom=Math.max(0.3,Math.min(4.0,ctrl.zoom*(1+e.deltaY*0.001)));
+      ctrl.lastT=performance.now();
+    },{passive:false});
+    var tpch=0;
+    cv.addEventListener('touchstart',function(e){
+      if(e.touches.length===1){ctrl.drag=true;ctrl.lx=e.touches[0].clientX;ctrl.lastT=performance.now();}
+      if(e.touches.length===2){tpch=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
+      e.preventDefault();
+    },{passive:false});
+    cv.addEventListener('touchmove',function(e){
+      if(e.touches.length===1&&ctrl.drag){ctrl.az+=(e.touches[0].clientX-ctrl.lx)*0.008;ctrl.lx=e.touches[0].clientX;ctrl.lastT=performance.now();}
+      if(e.touches.length===2){var n=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);ctrl.zoom=Math.max(0.3,Math.min(4.0,ctrl.zoom*(tpch/n)));tpch=n;ctrl.lastT=performance.now();}
+      e.preventDefault();
+    },{passive:false});
+    cv.addEventListener('touchend',function(){ctrl.drag=false;});
+
     function animate(){
       requestAnimationFrame(animate);
       var elapsed=clk.getElapsedTime();
-      var ang=elapsed*0.025;
       var cc=camConfigs[activeLayout]||camConfigs['6'];
+      /* 8초 이상 조작 없으면 자동회전 재개 */
+      var idle=(performance.now()-ctrl.lastT)>8000;
+      var ang=idle?elapsed*0.025:ctrl.az;
+      if(idle) ctrl.az=elapsed*0.025; /* 복귀 시 튐 방지 */
+      var dz=d/ctrl.zoom;
       cam.position.set(cc.R*Math.cos(ang),cc.H,cc.D*Math.sin(ang));
       cam.lookAt(0,2,0);
+      cam.left=-dz*asp;cam.right=dz*asp;cam.top=dz;cam.bottom=-dz;
+      cam.updateProjectionMatrix();
       var fn=animateFns[activeLayout];
       if(fn) fn(elapsed);
       renderer.render(scene,cam);
@@ -2033,7 +2106,8 @@
     window.addEventListener('resize',function(){
       W=cont.clientWidth;H=cont.clientHeight;if(!W||!H)return;
       renderer.setSize(W,H);asp=W/H;
-      cam.left=-d*asp;cam.right=d*asp;cam.top=d;cam.bottom=-d;
+      var dz=d/ctrl.zoom;
+      cam.left=-dz*asp;cam.right=dz*asp;cam.top=dz;cam.bottom=-dz;
       cam.updateProjectionMatrix();
     });
   }
