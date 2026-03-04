@@ -1517,9 +1517,10 @@
     /* ===== Dynamic legend per layout ===== */
     var legendConfigs={
       '6':[
-        {c:'#D97706',l:'절단(갠트리×6)'},{c:'#16A34A',l:'선행랙장(3단)'},{c:'#CA8A04',l:'소조립×6'},
-        {c:'#4ADE80',l:'후행랙장×6'},{c:'#2563EB',l:'중조/대조'},{c:'#7C3AED',l:'AMR-A(절단↔소조립)'},
-        {c:'#059669',l:'AMR-B(후행→중조)'},{c:'#FBBF24',l:'갠트리/스태커'},{c:'#FEF3C7',l:'버퍼존'}
+        {c:'#D97706',l:'절단A(절단기)'},{c:'#B45309',l:'절단B(선별)'},{c:'#16A34A',l:'선행랙장(3단)'},
+        {c:'#CA8A04',l:'소조립×6'},{c:'#4ADE80',l:'후행랙장×6'},{c:'#2563EB',l:'중조/대조'},
+        {c:'#7C3AED',l:'AMR-A경로'},{c:'#059669',l:'AMR-B경로'},
+        {c:'#FBBF24',l:'3축갠트리/스태커'},{c:'#DC2626',l:'AMR도킹장치'},{c:'#FEF3C7',l:'버퍼존'}
       ]
     };
     function updateLegend(lay){
@@ -1531,7 +1532,7 @@
 
     /* ============================================================
        LAYOUT 6 — 6라인 병렬형 (X=흐름방향, Z=라인배열)
-       절단(2u)→AMR통로→소조립(4u)→후행랙장 / 선행랙장(3단):L1 Z외측
+       절단A(절단기1.5u)+절단B(선별1.5u)→AMR통로→소조립(6u)→후행랙장 / 선행랙장:L1 Z외측
        중조/대조: L6 Z외측(측면), 6라인 전체 X 스팬에 준하는 크기
        ============================================================ */
     (function(){
@@ -1565,38 +1566,67 @@
       /* 후행랙장→중조 연결 통로 (Z방향, 더 길게) */
       add6(at(bx(1.4,0.06,8,0xDDD6FE,{transparent:true,opacity:0.4}),X_POST,0.04,(LZ[5]+MID_Z)/2));
 
-      /* ── 절단공정 ×6 (3u) ── */
+      /* ── 절단공정 ×6 (3u = 절단A 원자재절단 1.5u + 절단B 선별스테이션 1.5u) ── */
+      var X_CUT_A=-8.75; /* 절단A center (X=-10~-7.5) */
+      var X_CUT_B=-7.25; /* 절단B center (X=-7.5~-6.0) */
       var cutHeads6=[];
       LZ.forEach(function(lz){
-        add6(at(bx(3,0.1,2.8,0xFED7AA,{transparent:true,opacity:0.45}),X_CUT,0.05,lz));
-        var body=bx(2.6,0.9,2.4,0xD97706); at(body,X_CUT,0.55,lz); add6(body);
-        var tbl=bx(2.8,0.12,2.6,0x92400E); at(tbl,X_CUT,1.12,lz); add6(tbl);
-        var hd=bx(0.24,0.4,0.24,0xFFFBEB); at(hd,X_CUT,1.44,lz); add6(hd);
+        /* 구역A: 원자재절단 (주황) */
+        add6(at(bx(1.5,0.1,2.8,0xFED7AA,{transparent:true,opacity:0.5}),X_CUT_A,0.05,lz));
+        var bodyA=bx(1.1,0.95,2.4,0xD97706); at(bodyA,X_CUT_A,0.55,lz); add6(bodyA);
+        var tblA=bx(1.3,0.12,2.6,0x92400E); at(tblA,X_CUT_A,1.1,lz); add6(tblA);
+        var hd=bx(0.22,0.42,0.22,0xFFFBEB); at(hd,X_CUT_A,1.38,lz); add6(hd);
         cutHeads6.push(hd);
+        /* 구역B: 선별스테이션 (황갈) */
+        add6(at(bx(1.5,0.1,2.8,0xFEF3C7,{transparent:true,opacity:0.5}),X_CUT_B,0.05,lz));
+        var bodyB=bx(1.1,0.65,2.4,0xB45309,{transparent:true,opacity:0.75}); at(bodyB,X_CUT_B,0.38,lz); add6(bodyB);
+        var tblB=bx(1.3,0.1,2.6,0x78350F); at(tblB,X_CUT_B,0.78,lz); add6(tblB);
+        /* 구역 경계선 */
+        add6(at(bx(0.06,0.85,2.8,0x6B7280,{transparent:true,opacity:0.5}),-7.5,0.45,lz));
       });
 
-      /* ── 절단 선별갠트리 ×6 (라인마다 1대, X방향 빔) ── */
-      /* 갠트리: 절단공정(X=-9.5~-6.5) + 아웃포지션(X=-5.5 AMR통로) 커버 */
+      /* ── 절단 선별갠트리 ×6 (3축 포털: X이동 트롤리 + Z이동 브리지 + Y호이스트) ── */
+      var CG_X_L=-10.5, CG_X_R=-4.8, CG_H=3.0, CG_Z_HALF=1.35;
       var cutGantries6=[];
       LZ.forEach(function(lz){
         var g=new THREE.Group();
-        /* 좌측 업라이트 */
-        var uL=bx(0.12,2.8,0.12,0x6B7280); uL.position.set(-10.5,1.4,0); g.add(uL);
-        /* 우측 업라이트 */
-        var uR=bx(0.12,2.8,0.12,0x6B7280); uR.position.set(-4.8,1.4,0); g.add(uR);
-        /* 상단 빔 */
-        var beam=bx(5.7,0.14,0.14,0x9CA3AF); beam.position.set(-7.65,2.8,0); g.add(beam);
-        /* 이동 트롤리 */
-        var trolley=bx(0.5,0.22,0.5,0xFBBF24); trolley.position.set(-10.5,2.72,0); g.add(trolley);
-        /* 호이스트(수직 와이어+훅) */
-        var wire=bx(0.06,0.9,0.06,0x374151); wire.position.set(0,-0.55,0); trolley.add(wire);
-        var hook=bx(0.22,0.18,0.22,0xE5E7EB); hook.position.set(0,-1.08,0); trolley.add(hook);
-        /* 아웃포지션 마커 */
-        var outPos=bx(0.9,0.07,0.9,0xFDE68A,{transparent:true,opacity:0.7});
-        outPos.position.set(-4.8,0.04,0); g.add(outPos);
+        /* ── 4개 코너 기둥 ── */
+        [[CG_X_L,-CG_Z_HALF],[CG_X_L,CG_Z_HALF],[CG_X_R,-CG_Z_HALF],[CG_X_R,CG_Z_HALF]].forEach(function(p){
+          var col=bx(0.12,CG_H,0.12,0x6B7280); col.position.set(p[0],CG_H/2,p[1]); g.add(col);
+        });
+        /* ── Z방향 레일 (X_L측, X_R측 각 1개) ── */
+        var rL=bx(0.1,0.1,CG_Z_HALF*2,0x9CA3AF); rL.position.set(CG_X_L,CG_H,0); g.add(rL);
+        var rR=bx(0.1,0.1,CG_Z_HALF*2,0x9CA3AF); rR.position.set(CG_X_R,CG_H,0); g.add(rR);
+        /* ── X방향 브리지빔 (Z방향으로 이동) ── */
+        var bridge=bx(CG_X_R-CG_X_L,0.14,0.14,0x374151);
+        bridge.position.set((CG_X_L+CG_X_R)/2,CG_H+0.07,0); g.add(bridge);
+        /* ── 트롤리 (브리지 위에서 X방향 이동) ── */
+        var trolley=bx(0.48,0.22,0.48,0xFBBF24);
+        trolley.position.set(CG_X_L+0.4,CG_H+0.19,0); g.add(trolley);
+        /* ── 호이스트(Y축: 와이어+훅) ── */
+        var wire=bx(0.06,0.85,0.06,0x374151); wire.position.set(0,-0.52,0); trolley.add(wire);
+        var hook=bx(0.2,0.16,0.2,0xE5E7EB); hook.position.set(0,-0.98,0); trolley.add(hook);
+        /* ── 아웃포지션 바닥 마커 ── */
+        var outPos=bx(0.85,0.06,0.85,0xFDE68A,{transparent:true,opacity:0.65});
+        outPos.position.set(CG_X_R,0.04,0); g.add(outPos);
         g.position.set(0,0,lz);
         group6.add(g);
-        cutGantries6.push({grp:g,trolley:trolley,xMin:-10.2,xMax:-5.0});
+        cutGantries6.push({grp:g,bridge:bridge,trolley:trolley,
+          zMin:-CG_Z_HALF+0.25,zMax:CG_Z_HALF-0.25,
+          xMin:CG_X_L+0.35,xMax:CG_X_R-0.05});
+      });
+
+      /* ── AMR 도킹장치 ×6 (절단 아웃포지션, CG_X_R측) ── */
+      LZ.forEach(function(lz){
+        /* 진입 가이드 레일 (X방향 바, AMR이 X축으로 접근할 때 Z정렬) */
+        add6(at(bx(0.8,0.12,0.06,0x64748B),CG_X_R-0.4,0.08,lz-0.34));
+        add6(at(bx(0.8,0.12,0.06,0x64748B),CG_X_R-0.4,0.08,lz+0.34));
+        /* 스톱퍼 (X방향 정지 바) */
+        add6(at(bx(0.08,0.2,0.72,0xDC2626),CG_X_R-0.02,0.1,lz));
+        /* 도킹 센서 (발광 구) */
+        var sens=new THREE.Mesh(new THREE.SphereGeometry(0.07,6,6),
+          new THREE.MeshLambertMaterial({color:0x22C55E,emissive:0x22C55E,emissiveIntensity:0.7}));
+        sens.position.set(CG_X_R-0.1,0.3,lz); group6.add(sens);
       });
 
       /* ── 소조립공정 ×6 (6u, 4단계 X방향 배열) ── */
@@ -1705,6 +1735,37 @@
         add6(at(bx(0.15,2.0,0.15,0x1D4ED8),MID_XC-MID_XW/2+1.5+mi*(MID_XW-3)/2,1.1,MID_Z));
       }
 
+      /* ── AMR 경로 표시 (정적 바닥 라인) ── */
+      function addPath(xzPairs,col,opa){
+        var pts=xzPairs.map(function(p){return new THREE.Vector3(p[0],0.13,p[1]);});
+        var geo=new THREE.BufferGeometry().setFromPoints(pts);
+        var mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:opa||0.32,depthWrite:false});
+        group6.add(new THREE.Line(geo,mat));
+      }
+      /* AMR-A 직행 경로 (홀수라인 li=1,3,5: 절단→소조립 X방향 직선) */
+      [LZ[1],LZ[3],LZ[5]].forEach(function(lz){
+        addPath([[X_CUT-1,lz],[X_SUB+3.0,lz]],0x7C3AED,0.30);
+      });
+      /* AMR-A 선행랙장 경유 경로 (짝수라인 li=0,2,4: L자형, 전용 X레인) */
+      var VIA_LANES=[X_AMR-0.15,X_AMR,X_AMR+0.15];
+      [LZ[0],LZ[2],LZ[4]].forEach(function(lz,vi){
+        var vx=VIA_LANES[vi];
+        /* 절단→레인 X이동 */
+        addPath([[X_CUT-1,lz],[vx,lz]],0xA78BFA,0.25);
+        /* 레인→선행랙장 Z이동 */
+        addPath([[vx,lz],[vx,PRE_Z]],0xA78BFA,0.22);
+        /* 선행랙장 내 X이동 */
+        addPath([[vx,PRE_Z],[PRE_XC+PRE_XD/2,PRE_Z]],0xA78BFA,0.18);
+      });
+      /* AMR-B 경로 (6라인→중조, 직각 L자형, 라인별 전용 X레인) */
+      LZ.forEach(function(lz,li){
+        var xb=X_POST+0.2+li*0.1;
+        /* 소조립→전용레인 X이동 */
+        addPath([[X_SUB+3.0,lz],[xb,lz]],0x059669,0.28);
+        /* 전용레인→중조 Z이동 */
+        addPath([[xb,lz],[xb,MID_Z-1.2]],0x059669,0.22);
+      });
+
       /* ── AMR 공통 생성 함수 ── */
       function makeAMR6(col,ldCol){
         var g=new THREE.Group();
@@ -1719,20 +1780,22 @@
         return g;
       }
 
-      /* ── AMR-A: 절단↔소조립 (짝수 라인=선행랙장 경유, 홀수=직행) ×6 ── */
+      /* ── AMR-A: 절단↔소조립 (짝수라인=선행랙장 경유, 홀수=직행) ×6 ── */
       var amrsA6=[];
+      var VIA_LANES_AMR=[X_AMR-0.15,X_AMR,X_AMR+0.15]; /* 짝수라인 전용 Z이동 레인 */
       LZ.forEach(function(lz,li){
         var g=makeAMR6(0x7C3AED,0xC4B5FD);
         g.position.set(X_CUT-1.0,0.22,lz); group6.add(g);
-        amrsA6.push({g:g,li:li,lz:lz,via:(li%2===0),phase:li*0.78});
+        amrsA6.push({g:g,li:li,lz:lz,via:(li%2===0),phase:li*0.78,
+          vx:li%2===0?VIA_LANES_AMR[Math.floor(li/2)]:X_AMR});
       });
 
-      /* ── AMR-B: 소조립→후행랙장→중조/대조→복귀 ×6 ── */
+      /* ── AMR-B: 소조립→후행랙장→중조/대조→복귀 ×6 (전용 X레인) ── */
       var amrsB6=[];
       LZ.forEach(function(lz,li){
         var g=makeAMR6(0x059669,0x6EE7B7);
         g.position.set(X_SUB+3.0,0.22,lz); group6.add(g);
-        amrsB6.push({g:g,li:li,lz:lz,phase:li*0.68+1.3});
+        amrsB6.push({g:g,li:li,lz:lz,phase:li*0.68+1.3,xLane:X_POST+0.2+li*0.1});
       });
 
       window._6={
@@ -1753,73 +1816,71 @@
       var X_CUT=d.X.CUT,X_AMR=d.X.AMR,X_SUB=d.X.SUB,X_POST=d.X.POST;
       var PRE_Z=d.PRE.Z,PRE_XC=d.PRE.XC,MID_Z=d.MID.Z;
 
-      /* ── AMR-A: 절단↔(선행랙장 경유 or 직행)↔소조립 ── */
+      /* ── AMR-A: 절단↔(선행랙장 경유 or 직행)↔소조립 (직각이동, 전용레인) ── */
       d.amrsA.forEach(function(a){
         var cyc=a.via?5.0:3.2, spd=0.26;
         var t=(elapsed*spd+a.phase)%cyc;
+        var vx=a.vx; /* 전용 Z이동 레인 X좌표 */
         var x,z=a.lz;
         if(!a.via){
-          /* 직행 패턴 */
-          if(t<1.0){        x=lerp(X_CUT-1.0,X_AMR,ease(t/1.0));}
-          else if(t<2.0){   x=lerp(X_AMR,X_SUB+3.0,ease((t-1.0)/1.0));}
-          else{             x=lerp(X_SUB+3.0,X_CUT-1.0,ease((t-2.0)/1.2));}
-          a.g.position.set(x,0.22,z); a.g.rotation.y=0;
+          /* 직행 패턴 (X방향만, 직각) */
+          if(t<1.0){   x=lerp(X_CUT-1.0,X_SUB+3.0,ease(t/1.0)); a.g.rotation.y=0;}
+          else if(t<2.2){ x=X_SUB+3.0; a.g.rotation.y=0;}
+          else{        x=lerp(X_SUB+3.0,X_CUT-1.0,ease((t-2.2)/1.0)); a.g.rotation.y=Math.PI;}
+          a.g.position.set(x,0.22,z);
         } else {
-          /* 선행랙장 경유 패턴 */
+          /* 선행랙장 경유 패턴 (모두 직각이동) */
           if(t<0.8){
-            /* 절단→AMR통로 X이동 */
-            x=lerp(X_CUT-1.0,X_AMR,ease(t/0.8)); z=a.lz;
-            a.g.rotation.y=0;
+            /* 절단→전용레인 X이동 */
+            x=lerp(X_CUT-1.0,vx,ease(t/0.8)); z=a.lz; a.g.rotation.y=0;
           } else if(t<1.6){
-            /* AMR통로→선행랙장 Z이동 */
-            x=X_AMR; z=lerp(a.lz,PRE_Z,ease((t-0.8)/0.8));
+            /* 전용레인→선행랙장 Z이동 */
+            x=vx; z=lerp(a.lz,PRE_Z,ease((t-0.8)/0.8));
             a.g.rotation.y=(a.lz>PRE_Z)?Math.PI/2:-Math.PI/2;
           } else if(t<2.2){
             /* 선행랙장 내 X이동 */
-            x=lerp(X_AMR,PRE_XC,ease((t-1.6)/0.6)); z=PRE_Z;
-            a.g.rotation.y=0;
+            x=lerp(vx,PRE_XC,ease((t-1.6)/0.6)); z=PRE_Z; a.g.rotation.y=0;
           } else if(t<2.8){
-            /* 선행랙장→AMR통로 X복귀 */
-            x=lerp(PRE_XC,X_AMR,ease((t-2.2)/0.6)); z=PRE_Z;
-            a.g.rotation.y=Math.PI;
+            /* 선행랙장→전용레인 X복귀 */
+            x=lerp(PRE_XC,vx,ease((t-2.2)/0.6)); z=PRE_Z; a.g.rotation.y=Math.PI;
           } else if(t<3.5){
-            /* AMR통로→해당라인 Z복귀 */
-            x=X_AMR; z=lerp(PRE_Z,a.lz,ease((t-2.8)/0.7));
+            /* 전용레인→해당라인 Z복귀 */
+            x=vx; z=lerp(PRE_Z,a.lz,ease((t-2.8)/0.7));
             a.g.rotation.y=(a.lz>PRE_Z)?-Math.PI/2:Math.PI/2;
           } else {
-            /* AMR통로→소조립 X이동 */
-            x=lerp(X_AMR,X_SUB+3.0,ease((t-3.5)/1.5)); z=a.lz;
-            a.g.rotation.y=0;
+            /* 전용레인→소조립 X이동 */
+            x=lerp(vx,X_SUB+3.0,ease((t-3.5)/1.5)); z=a.lz; a.g.rotation.y=0;
           }
           a.g.position.set(x,0.22,z);
         }
       });
 
-      /* ── AMR-B: 소조립→(해당라인)후행랙장→중조/대조→복귀 ── */
+      /* ── AMR-B: 소조립→후행랙장→중조/대조→복귀 (직각이동, 전용 X레인) ── */
       d.amrsB.forEach(function(a){
-        var cyc=5.5, spd=0.22;
+        var xb=a.xLane; /* 전용 X레인 (라인별 분리) */
+        var cyc=6.5, spd=0.22;
         var t=(elapsed*spd+a.phase)%cyc;
         var x,z;
-        if(t<0.9){
-          /* 소조립→후행랙장 X이동 (해당 라인) */
-          x=lerp(X_SUB+3.0,X_POST+0.6,ease(t/0.9)); z=a.lz;
-          a.g.rotation.y=0;
-        } else if(t<1.6){
+        if(t<0.8){
+          /* 소조립→전용레인 X이동 */
+          x=lerp(X_SUB+3.0,xb,ease(t/0.8)); z=a.lz; a.g.rotation.y=0;
+        } else if(t<1.8){
           /* 후행랙장 대기 */
-          x=X_POST+0.6; z=a.lz;
-        } else if(t<2.8){
-          /* 후행랙장→중조/대조 Z이동 (더 멀리) */
-          x=X_POST+0.6; z=lerp(a.lz,MID_Z-1.2,ease((t-1.6)/1.2));
+          x=xb; z=a.lz; a.g.rotation.y=0;
+        } else if(t<3.0){
+          /* 전용레인→중조 Z이동 (직각) */
+          x=xb; z=lerp(a.lz,MID_Z-1.2,ease((t-1.8)/1.2));
           a.g.rotation.y=(a.lz<MID_Z)?-Math.PI/2:Math.PI/2;
-        } else if(t<3.4){
+        } else if(t<3.8){
           /* 중조 대기 */
-          x=X_POST+0.6; z=MID_Z-1.2;
+          x=xb; z=MID_Z-1.2; a.g.rotation.y=Math.PI;
+        } else if(t<4.9){
+          /* 중조→해당라인 Z복귀 (직각) */
+          x=xb; z=lerp(MID_Z-1.2,a.lz,ease((t-3.8)/1.1));
+          a.g.rotation.y=(a.lz<MID_Z)?Math.PI/2:-Math.PI/2;
         } else {
-          /* 중조→소조립 복귀 (대각) */
-          var t4=(t-3.4)/2.1;
-          x=lerp(X_POST+0.6,X_SUB+3.0,ease(t4));
-          z=lerp(MID_Z-1.2,a.lz,ease(t4));
-          a.g.rotation.y=Math.PI*0.8;
+          /* 전용레인→소조립 X복귀 (직각) */
+          x=lerp(xb,X_SUB+3.0,ease((t-4.9)/1.6)); z=a.lz; a.g.rotation.y=Math.PI;
         }
         a.g.position.set(x,0.22,z);
       });
@@ -1838,22 +1899,26 @@
 
       /* ── 절단기 헤드 진동 ── */
       d.cutHeads6.forEach(function(h,hi){
-        h.position.y=1.44+0.08*Math.sin(elapsed*2.5+hi*1.4);
+        h.position.y=1.38+0.08*Math.sin(elapsed*2.5+hi*1.4);
       });
 
-      /* ── 절단 선별갠트리 트롤리 애니메이션 (라인별, 각 독립 위상) ── */
+      /* ── 절단 선별갠트리 3축 애니메이션 (Z=브리지, X=트롤리, Y=호이스트) ── */
       if(d.cutG) d.cutG.forEach(function(cg,gi){
-        /* 절단→아웃포지션 왕복: 1.8초 사이클 */
+        /* 축1: 브리지 Z이동 (절단구역 내 Z스캔) */
+        var bz=lerp(cg.zMin,cg.zMax,Math.sin(elapsed*0.55+gi*1.1)*0.5+0.5);
+        cg.bridge.position.z=bz;
+        cg.trolley.position.z=bz; /* 트롤리는 브리지에 탑재 */
+        /* 축2: 트롤리 X이동 (절단구역→아웃포지션 왕복) */
         var ct=(elapsed*0.5+gi*0.52)%3.6;
         var tx;
         if(ct<1.2)      tx=lerp(cg.xMin,cg.xMax,ease(ct/1.2));
-        else if(ct<1.8) tx=cg.xMax; /* 아웃포지션 대기 */
+        else if(ct<1.8) tx=cg.xMax; /* 아웃포지션 정지 */
         else            tx=lerp(cg.xMax,cg.xMin,ease((ct-1.8)/1.8));
         cg.trolley.position.x=tx;
-        /* 호이스트 Y (픽업/배치 때 낮아짐) */
+        /* 축3: 호이스트 Y (아웃포지션 도착 시 낮아짐) */
         var atOut=ct>1.0&&ct<2.5;
         var wireChild=cg.trolley.children[0];
-        if(wireChild) wireChild.position.y=atOut?-0.9:-0.55;
+        if(wireChild) wireChild.position.y=atOut?-0.88:-0.52;
       });
 
       /* ── 선행랙장 정렬갠트리 애니메이션 ── */
