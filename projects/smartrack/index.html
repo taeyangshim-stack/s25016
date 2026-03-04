@@ -1435,6 +1435,7 @@
         <button class="sr3d-tab" data-layout="3" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안3</button>
         <button class="sr3d-tab" data-layout="4" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안4</button>
         <button class="sr3d-tab" data-layout="5" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안5</button>
+        <button class="sr3d-tab" data-layout="6" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안6</button>
       </div>
       <div id="sr3d-legend" style="position:absolute;bottom:10px;left:14px;display:flex;gap:10px;font-size:8px;font-family:monospace;color:rgba(30,41,59,0.5);flex-wrap:wrap;max-width:80%">
         <span style="color:#D97706">■ 절단</span>
@@ -1499,14 +1500,16 @@
       '2':{d:20,R:35,H:30,D:28},
       '3':{d:18,R:32,H:26,D:24},
       '4':{d:22,R:40,H:34,D:32},
-      '5':{d:18,R:30,H:25,D:22}
+      '5':{d:18,R:30,H:25,D:22},
+      '6':{d:22,R:38,H:32,D:30}
     };
-    ['1','2','3','4','5'].forEach(function(k){
+    ['1','2','3','4','5','6'].forEach(function(k){
       var g=new THREE.Group(); g.name='layout'+k; g.visible=(k==='1');
       layouts[k]=g; scene.add(g);
     });
     var group1=layouts['1'], group2=layouts['2'],
-        group3=layouts['3'], group4=layouts['4'], group5=layouts['5'];
+        group3=layouts['3'], group4=layouts['4'], group5=layouts['5'],
+        group6=layouts['6'];
 
     function addTo(key,o){o.castShadow=true;o.receiveShadow=true;layouts[key].add(o);return o;}
     function add1(o){return addTo('1',o);}
@@ -1514,6 +1517,7 @@
     function add3(o){return addTo('3',o);}
     function add4(o){return addTo('4',o);}
     function add5(o){return addTo('5',o);}
+    function add6(o){return addTo('6',o);}
 
     function switchLayout(lay){
       if(lay===activeLayout)return;
@@ -1565,6 +1569,11 @@
         {c:'#D97706',l:'입고'},{c:'#16A34A',l:'셀 어레이'},{c:'#CA8A04',l:'소조립'},
         {c:'#0EA5E9',l:'출고'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR(자율)'},
         {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'갠트리+스태커'},{c:'#A8A29E',l:'컨베이어'}
+      ],
+      '6':[
+        {c:'#D97706',l:'절단×6'},{c:'#16A34A',l:'선행랙장(3단)'},{c:'#CA8A04',l:'소조립×6'},
+        {c:'#4ADE80',l:'후행랙장×6'},{c:'#2563EB',l:'중조/대조'},{c:'#7C3AED',l:'AMR'},
+        {c:'#FBBF24',l:'스태커크레인'}
       ]
     };
     function updateLegend(lay){
@@ -2801,11 +2810,236 @@
     }
 
     /* ============================================================
+       LAYOUT 6 — 6라인 병렬형 선행랙장(3단)/후행랙장 배치 (배치안6)
+       절단(2u) — AMR통로 — 선행랙장(3단,L1외측) — 소조립(4u) — 후행랙장(단층×6)
+       ============================================================ */
+    (function(){
+      /* Floor */
+      add6(at(bx(52,0.08,28,0xE2E8F0),0,0,0));
+      var grid6=new THREE.GridHelper(52,52,0xCBD5E1,0xCBD5E1);
+      group6.add(grid6);
+
+      /* 6 라인 X 좌표 (4 unit spacing, centered) */
+      var LX=[-10,-6,-2,2,6,10];
+      /* Z 좌표 (흐름 방향) */
+      var CZ_CUT=-8;    /* 절단공정 center Z */
+      var CZ_AMR=-5;    /* AMR 통로 center Z */
+      var CZ_SUB=-1;    /* 소조립공정 center Z (4u: Z=-3 to Z=1) */
+      var CZ_POST=3;    /* 후행랙장 center Z */
+      var CZ_MID=6.5;   /* 중조/대조 center Z */
+
+      /* ===== 절단공정 ×6 ===== */
+      var cutHeads6=[];
+      LX.forEach(function(lx,li){
+        /* floor pad (3w × 2d) */
+        add6(at(bx(3,0.1,2,0xFED7AA,{transparent:true,opacity:0.45}),lx,0.05,CZ_CUT));
+        /* machine body */
+        var body=bx(2.2,1.0,1.6,0xD97706);
+        at(body,lx,0.6,CZ_CUT); add6(body);
+        /* cutting table top */
+        var tbl=bx(2.4,0.16,1.8,0x92400E);
+        at(tbl,lx,1.18,CZ_CUT); add6(tbl);
+        /* blade/head (oscillates) */
+        var head=bx(0.28,0.45,0.28,0xFFFBEB);
+        at(head,lx,1.52,CZ_CUT); add6(head);
+        cutHeads6.push(head);
+      });
+
+      /* ===== AMR 통로 (Z=CZ_AMR) ===== */
+      /* 통로 바닥 — 6라인 전체 폭 */
+      add6(at(bx(24,0.06,1.6,0xF1F5F9,{transparent:true,opacity:0.55}),0,0.03,CZ_AMR));
+      /* 통로 경계선 */
+      add6(at(bx(24,0.1,0.05,0xCBD5E1),0,0.05,CZ_AMR-0.8));
+      add6(at(bx(24,0.1,0.05,0xCBD5E1),0,0.05,CZ_AMR+0.8));
+      /* 선행랙장으로 연결하는 횡단 통로 (X방향, L1 외측까지) */
+      add6(at(bx(6,0.06,1.6,0xE0F2FE,{transparent:true,opacity:0.5}),-13,0.04,CZ_AMR));
+
+      /* ===== 소조립공정 ×6 ===== */
+      var subCols6=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
+      var subBoxes6=[];
+      LX.forEach(function(lx,li){
+        /* floor pad (3w × 4d) */
+        add6(at(bx(3,0.1,4,0xFEF9C3,{transparent:true,opacity:0.45}),lx,0.05,CZ_SUB));
+        /* 4 sub-process steps along Z (-3, -2, -1, 0 relative to CZ_SUB center) */
+        var zOffsets=[-1.5,-0.5,0.5,1.5];
+        zOffsets.forEach(function(dz,si){
+          var b=bx(2.4,0.75,0.8,subCols6[si],{transparent:true,opacity:0.85});
+          at(b,lx,0.47,CZ_SUB+dz); add6(b);
+          if(li===0) subBoxes6.push(b); /* animate first line */
+        });
+      });
+
+      /* ===== 선행랙장 (L1 외측 — 3단 스태커크레인 랙) ===== */
+      var PRE_X=-15.5;   /* 선행랙장 X 중심 (L1 은 X=-10) */
+      var PRE_Z=CZ_SUB;  /* Z 중심 = 소조립 Z 중심 */
+      var PRE_W=3.0;     /* X 폭 */
+      var PRE_D=4.0;     /* Z 깊이 = 소조립 Z 깊이 */
+      var TIER_H=1.2;    /* 단당 높이 */
+      var NTIERS=3;
+      /* 외곽 프레임 바닥 */
+      add6(at(bx(PRE_W+0.4,0.1,PRE_D+0.2,0x4ADE80,{transparent:true,opacity:0.25}),PRE_X,0.05,PRE_Z));
+      /* 기둥 4개 */
+      var pillarPos=[[-0.6,-0.6],[-0.6,0.6],[0.6,-0.6],[0.6,0.6]]; /* 상대 X,Z 오프셋 쌍 */
+      /* (pillarPos 는 quarter of PRE_W/PRE_D) */
+      var pw=PRE_W/2-0.1, pd=PRE_D/2-0.1;
+      [[-pw,-pd],[-pw,pd],[pw,-pd],[pw,pd]].forEach(function(p){
+        add6(at(bx(0.15,NTIERS*TIER_H+0.5,0.15,0x6B7280),PRE_X+p[0],NTIERS*TIER_H/2+0.05,PRE_Z+p[1]));
+      });
+      /* 선반 빔 (각 단 하부) */
+      for(var ti=0;ti<NTIERS;ti++){
+        var ty=ti*TIER_H+0.05;
+        add6(at(bx(PRE_W-0.1,0.08,PRE_D-0.1,0x9CA3AF,{transparent:true,opacity:0.2}),PRE_X,ty,PRE_Z));
+      }
+      /* 랙 셀 채우기 (3단 × 4열) */
+      var cellsPerTier=4;
+      var cellD=(PRE_D-0.2)/cellsPerTier;
+      for(var ti=0;ti<NTIERS;ti++){
+        for(var ci=0;ci<cellsPerTier;ci++){
+          var cellX=PRE_X;
+          var cellY=ti*TIER_H+TIER_H/2+0.1;
+          var cellZ=(PRE_Z-PRE_D/2+cellD/2)+ci*cellD;
+          /* 셀 슬롯 */
+          var slot6=bx(PRE_W-0.25,TIER_H-0.2,cellD-0.08,0xD1FAE5,{transparent:true,opacity:0.4});
+          at(slot6,cellX,cellY,cellZ); add6(slot6);
+          var edgSlot=new THREE.LineSegments(
+            new THREE.EdgesGeometry(new THREE.BoxGeometry(PRE_W-0.25,TIER_H-0.2,cellD-0.08)),
+            new THREE.LineBasicMaterial({color:0x16A34A}));
+          edgSlot.position.copy(slot6.position); group6.add(edgSlot);
+          /* 부재 (일부만 차있음) */
+          if((ti*cellsPerTier+ci)%2===0){
+            add6(at(bx((PRE_W-0.25)*0.75,(TIER_H-0.2)*0.65,(cellD-0.08)*0.75,0x22C55E),cellX,cellY,cellZ));
+          }
+        }
+      }
+      /* 스태커 크레인 마스트 */
+      var stk6Mast=bx(0.16,NTIERS*TIER_H+0.2,0.16,0x374151);
+      at(stk6Mast,PRE_X+0.8,(NTIERS*TIER_H)/2+0.1,PRE_Z); add6(stk6Mast);
+      /* 캐리지 */
+      var stk6Carriage=bx(0.45,0.28,0.55,0xFBBF24);
+      at(stk6Carriage,PRE_X+0.8,0.7,PRE_Z); add6(stk6Carriage);
+      var stk6YMin=0.5, stk6YMax=NTIERS*TIER_H-0.2;
+      var stk6ZMin=PRE_Z-PRE_D/2+0.4, stk6ZMax=PRE_Z+PRE_D/2-0.4;
+
+      /* ===== AMR 차량 ×6 (절단↔선행랙장↔소조립) ===== */
+      var amrs6=[];
+      LX.forEach(function(lx,li){
+        var grp=new THREE.Group();
+        var body6=bx(1.0,0.32,0.65,0x7C3AED);
+        grp.add(body6);
+        /* wheels */
+        [[0.38,0,0.28],[0.38,0,-0.28],[-0.38,0,0.28],[-0.38,0,-0.28]].forEach(function(wh){
+          var w=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.07,8),
+            new THREE.MeshLambertMaterial({color:0x1E293B}));
+          w.rotation.z=Math.PI/2; w.position.set(wh[0],-0.11,wh[2]); grp.add(w);
+        });
+        /* 적재 표시 */
+        var load6=bx(0.55,0.14,0.38,0xC4B5FD,{transparent:true,opacity:0.8});
+        load6.position.set(0,0.23,0); grp.add(load6);
+        grp.position.set(lx,0.26,CZ_CUT-0.8);
+        group6.add(grp);
+        amrs6.push({g:grp,li:li,lx:lx,phase:li*0.9});
+      });
+
+      /* ===== 후행랙장 ×6 (단층, 각 라인 끝) ===== */
+      LX.forEach(function(lx){
+        add6(at(bx(3,0.1,1.8,0x86EFAC,{transparent:true,opacity:0.3}),lx,0.05,CZ_POST));
+        for(var ri=0;ri<2;ri++){
+          var rz6=CZ_POST-0.42+ri*0.84;
+          var rk=bx(2.4,0.9,0.72,0x4ADE80,{transparent:true,opacity:0.5});
+          at(rk,lx,0.5,rz6); add6(rk);
+          var edgR=new THREE.LineSegments(
+            new THREE.EdgesGeometry(new THREE.BoxGeometry(2.4,0.9,0.72)),
+            new THREE.LineBasicMaterial({color:0x16A34A}));
+          edgR.position.copy(rk.position); group6.add(edgR);
+        }
+        /* 적재 부재 */
+        add6(at(bx(1.5,0.55,0.45,0xA7F3D0),lx,0.82,CZ_POST));
+      });
+
+      /* ===== 중조/대조 영역 ===== */
+      add6(at(bx(26,0.1,3.2,0xBFDBFE,{transparent:true,opacity:0.3}),0,0.05,CZ_MID));
+      add6(at(bx(22,2.2,2.6,0x2563EB,{transparent:true,opacity:0.35}),0,1.2,CZ_MID));
+      add6(at(bx(0.25,3.0,0.25,0x1D4ED8),0,1.6,CZ_MID)); /* center marker */
+
+      /* ===== animateLayout6 ===== */
+      window._stk6={carriage:stk6Carriage,yMin:stk6YMin,yMax:stk6YMax,zMin:stk6ZMin,zMax:stk6ZMax};
+      window._amrs6=amrs6;
+      window._subBoxes6=subBoxes6;
+      window._subCols6=subCols6;
+      window._cutHeads6=cutHeads6;
+      window._CZ6={CUT:CZ_CUT,AMR:CZ_AMR,SUB:CZ_SUB,PRE_X:PRE_X};
+    })();
+
+    function animateLayout6(elapsed){
+      var st=window._stk6, amrs6=window._amrs6;
+      var subBoxes6=window._subBoxes6, subCols6=window._subCols6;
+      var cutHeads6=window._cutHeads6;
+      var CZ6=window._CZ6;
+      var CZ_CUT=CZ6.CUT, CZ_AMR=CZ6.AMR, CZ_SUB=CZ6.SUB, PRE_X=CZ6.PRE_X;
+
+      /* AMR 이동: 절단→AMR통로→(L1경우 선행랙장)→소조립→복귀 */
+      amrs6.forEach(function(a){
+        var cyc=3.6;
+        var t=(elapsed*0.28+a.phase)%cyc;
+        var x=a.lx, z;
+        if(t<0.9){
+          /* 절단 → AMR통로 */
+          z=lerp(CZ_CUT-0.5,CZ_AMR,ease(t/0.9));
+          a.g.position.set(x,0.26,z);
+          a.g.rotation.y=0;
+        } else if(t<1.4){
+          /* L1(li==0)만 선행랙장 방향으로 X 이동 */
+          var t2=(t-0.9)/0.5;
+          z=CZ_AMR;
+          var tx=a.li===0?lerp(a.lx,PRE_X,ease(t2)):a.lx;
+          a.g.position.set(tx,0.26,z);
+          a.g.rotation.y=a.li===0?-Math.PI/2:0;
+        } else if(t<1.9){
+          /* 선행랙장→소조립 (또는 통로→소조립) */
+          var t3=(t-1.4)/0.5;
+          var sx=a.li===0?lerp(PRE_X,a.lx,ease(t3)):a.lx;
+          z=lerp(CZ_AMR,CZ_SUB+1.5,ease(t3));
+          a.g.position.set(sx,0.26,z);
+          a.g.rotation.y=0;
+        } else {
+          /* 소조립→절단 복귀 */
+          var t4=(t-1.9)/(cyc-1.9);
+          z=lerp(CZ_SUB+1.5,CZ_CUT-0.5,ease(t4));
+          a.g.position.set(x,0.26,z);
+          a.g.rotation.y=Math.PI;
+        }
+      });
+
+      /* 스태커 크레인 진동 */
+      var ph6=elapsed*0.38;
+      st.carriage.position.y=lerp(st.yMin,st.yMax,Math.sin(ph6)*0.5+0.5);
+      st.carriage.position.z=lerp(st.zMin,st.zMax,Math.sin(ph6*0.65)*0.5+0.5);
+
+      /* 소조립 순서 발광 */
+      var sp6=(elapsed%2.2)/2.2, aIdx6=Math.floor(sp6*4);
+      subBoxes6.forEach(function(b,i){
+        if(i===aIdx6){
+          b.material.emissive=new THREE.Color(subCols6[i]);
+          b.material.emissiveIntensity=(0.3+0.7*Math.abs(Math.sin(elapsed*4)))*0.6;
+        } else {
+          b.material.emissive=new THREE.Color(0);
+          b.material.emissiveIntensity=0;
+        }
+      });
+
+      /* 절단기 헤드 진동 */
+      cutHeads6.forEach(function(h,hi){
+        h.position.y=1.52+0.09*Math.sin(elapsed*2.5+hi*1.4);
+      });
+    }
+
+    /* ============================================================
        MAIN ANIMATE LOOP
        ============================================================ */
     var animateFns={
       '1':animateLayout1,'2':animateLayout2,
-      '3':animateLayout3,'4':animateLayout4,'5':animateLayout5
+      '3':animateLayout3,'4':animateLayout4,'5':animateLayout5,
+      '6':animateLayout6
     };
     function animate(){
       requestAnimationFrame(animate);
