@@ -1501,7 +1501,7 @@
       '3':{d:18,R:32,H:26,D:24},
       '4':{d:22,R:40,H:34,D:32},
       '5':{d:18,R:30,H:25,D:22},
-      '6':{d:22,R:38,H:32,D:30}
+      '6':{d:26,R:46,H:38,D:36}
     };
     ['1','2','3','4','5','6'].forEach(function(k){
       var g=new THREE.Group(); g.name='layout'+k; g.visible=(k==='1');
@@ -2810,226 +2810,245 @@
     }
 
     /* ============================================================
-       LAYOUT 6 — 6라인 병렬형 선행랙장(3단)/후행랙장 배치 (배치안6)
-       절단(2u) — AMR통로 — 선행랙장(3단,L1외측) — 소조립(4u) — 후행랙장(단층×6)
+       LAYOUT 6 — 6라인 병렬형 (X=흐름방향, Z=라인배열)
+       절단(2u)→AMR통로→소조립(4u)→후행랙장 / 선행랙장(3단):L1 Z외측
+       중조/대조: L6 Z외측(측면), 6라인 전체 X 스팬에 준하는 크기
        ============================================================ */
     (function(){
-      /* Floor */
-      add6(at(bx(52,0.08,28,0xE2E8F0),0,0,0));
-      var grid6=new THREE.GridHelper(52,52,0xCBD5E1,0xCBD5E1);
-      group6.add(grid6);
+      /* ── 좌표 상수 ── */
+      var LZ=[-10,-6,-2,2,6,10]; /* 6라인 Z위치 (4u 간격) */
+      var X_CUT=-6;  /* 절단공정 center X (2u: X=-7~-5) */
+      var X_AMR=-4;  /* AMR통로 center X */
+      var X_SUB=0;   /* 소조립공정 center X (4u: X=-2~2) */
+      var X_POST=4;  /* 후행랙장 center X (1.5u: X=3.25~4.75) */
+      var PRE_Z=-14; /* 선행랙장 center Z (L1=-10의 외측) */
+      var PRE_XC=X_SUB; /* 선행랙장 X 중심 = 소조립 X 중심 */
+      var PRE_XD=4;  /* 선행랙장 X 깊이 = 소조립 X 깊이 */
+      var PRE_ZW=3;  /* 선행랙장 Z 폭 */
+      var MID_Z=14;  /* 중조/대조 center Z (L6=10 외측) */
+      var MID_XC=-1; /* 중조/대조 X 중심 */
+      var MID_XW=15; /* 중조/대조 X 폭 (절단~후행 전체 스팬) */
+      var MID_ZD=3.5;/* 중조/대조 Z 깊이 */
+      var TIER_H=1.2,NTIERS=3;
 
-      /* 6 라인 X 좌표 (4 unit spacing, centered) */
-      var LX=[-10,-6,-2,2,6,10];
-      /* Z 좌표 (흐름 방향) */
-      var CZ_CUT=-8;    /* 절단공정 center Z */
-      var CZ_AMR=-5;    /* AMR 통로 center Z */
-      var CZ_SUB=-1;    /* 소조립공정 center Z (4u: Z=-3 to Z=1) */
-      var CZ_POST=3;    /* 후행랙장 center Z */
-      var CZ_MID=6.5;   /* 중조/대조 center Z */
+      /* ── 바닥 & 그리드 ── */
+      add6(at(bx(20,0.08,40,0xE2E8F0),-1,0,0));
+      var grid6=new THREE.GridHelper(40,40,0xCBD5E1,0xCBD5E1);
+      grid6.position.set(-1,0,0); group6.add(grid6);
 
-      /* ===== 절단공정 ×6 ===== */
+      /* ── AMR통로 바닥 (X=X_AMR, Z 전체 스팬) ── */
+      add6(at(bx(1.4,0.06,24,0xF1F5F9,{transparent:true,opacity:0.6}),X_AMR,0.03,0));
+      add6(at(bx(1.4,0.08,0.05,0xCBD5E1),X_AMR,0.04,-12));
+      add6(at(bx(1.4,0.08,0.05,0xCBD5E1),X_AMR,0.04,12));
+      /* 선행랙장 연결 통로 (Z방향) */
+      add6(at(bx(1.4,0.06,3.5,0xE0F2FE,{transparent:true,opacity:0.5}),X_AMR,0.04,(LZ[0]+PRE_Z)/2));
+      /* 후행랙장→중조 연결 통로 (Z방향) */
+      add6(at(bx(1.4,0.06,3.5,0xDDD6FE,{transparent:true,opacity:0.5}),X_POST,0.04,(LZ[5]+MID_Z)/2));
+
+      /* ── 절단공정 ×6 ── */
       var cutHeads6=[];
-      LX.forEach(function(lx,li){
-        /* floor pad (3w × 2d) */
-        add6(at(bx(3,0.1,2,0xFED7AA,{transparent:true,opacity:0.45}),lx,0.05,CZ_CUT));
-        /* machine body */
-        var body=bx(2.2,1.0,1.6,0xD97706);
-        at(body,lx,0.6,CZ_CUT); add6(body);
-        /* cutting table top */
-        var tbl=bx(2.4,0.16,1.8,0x92400E);
-        at(tbl,lx,1.18,CZ_CUT); add6(tbl);
-        /* blade/head (oscillates) */
-        var head=bx(0.28,0.45,0.28,0xFFFBEB);
-        at(head,lx,1.52,CZ_CUT); add6(head);
-        cutHeads6.push(head);
+      LZ.forEach(function(lz){
+        add6(at(bx(2,0.1,2.8,0xFED7AA,{transparent:true,opacity:0.45}),X_CUT,0.05,lz));
+        var body=bx(1.6,0.9,2.4,0xD97706); at(body,X_CUT,0.55,lz); add6(body);
+        var tbl=bx(1.8,0.12,2.6,0x92400E); at(tbl,X_CUT,1.12,lz); add6(tbl);
+        var hd=bx(0.24,0.4,0.24,0xFFFBEB); at(hd,X_CUT,1.44,lz); add6(hd);
+        cutHeads6.push(hd);
       });
 
-      /* ===== AMR 통로 (Z=CZ_AMR) ===== */
-      /* 통로 바닥 — 6라인 전체 폭 */
-      add6(at(bx(24,0.06,1.6,0xF1F5F9,{transparent:true,opacity:0.55}),0,0.03,CZ_AMR));
-      /* 통로 경계선 */
-      add6(at(bx(24,0.1,0.05,0xCBD5E1),0,0.05,CZ_AMR-0.8));
-      add6(at(bx(24,0.1,0.05,0xCBD5E1),0,0.05,CZ_AMR+0.8));
-      /* 선행랙장으로 연결하는 횡단 통로 (X방향, L1 외측까지) */
-      add6(at(bx(6,0.06,1.6,0xE0F2FE,{transparent:true,opacity:0.5}),-13,0.04,CZ_AMR));
-
-      /* ===== 소조립공정 ×6 ===== */
+      /* ── 소조립공정 ×6 (4단계, X방향 배열) ── */
       var subCols6=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
       var subBoxes6=[];
-      LX.forEach(function(lx,li){
-        /* floor pad (3w × 4d) */
-        add6(at(bx(3,0.1,4,0xFEF9C3,{transparent:true,opacity:0.45}),lx,0.05,CZ_SUB));
-        /* 4 sub-process steps along Z (-3, -2, -1, 0 relative to CZ_SUB center) */
-        var zOffsets=[-1.5,-0.5,0.5,1.5];
-        zOffsets.forEach(function(dz,si){
-          var b=bx(2.4,0.75,0.8,subCols6[si],{transparent:true,opacity:0.85});
-          at(b,lx,0.47,CZ_SUB+dz); add6(b);
-          if(li===0) subBoxes6.push(b); /* animate first line */
+      LZ.forEach(function(lz,li){
+        add6(at(bx(4,0.1,2.8,0xFEF9C3,{transparent:true,opacity:0.45}),X_SUB,0.05,lz));
+        [-1.5,-0.5,0.5,1.5].forEach(function(dx,si){
+          var b=bx(0.8,0.7,2.2,subCols6[si],{transparent:true,opacity:0.85});
+          at(b,X_SUB+dx,0.45,lz); add6(b);
+          if(li===0) subBoxes6.push(b);
         });
       });
 
-      /* ===== 선행랙장 (L1 외측 — 3단 스태커크레인 랙) ===== */
-      var PRE_X=-15.5;   /* 선행랙장 X 중심 (L1 은 X=-10) */
-      var PRE_Z=CZ_SUB;  /* Z 중심 = 소조립 Z 중심 */
-      var PRE_W=3.0;     /* X 폭 */
-      var PRE_D=4.0;     /* Z 깊이 = 소조립 Z 깊이 */
-      var TIER_H=1.2;    /* 단당 높이 */
-      var NTIERS=3;
-      /* 외곽 프레임 바닥 */
-      add6(at(bx(PRE_W+0.4,0.1,PRE_D+0.2,0x4ADE80,{transparent:true,opacity:0.25}),PRE_X,0.05,PRE_Z));
-      /* 기둥 4개 */
-      var pillarPos=[[-0.6,-0.6],[-0.6,0.6],[0.6,-0.6],[0.6,0.6]]; /* 상대 X,Z 오프셋 쌍 */
-      /* (pillarPos 는 quarter of PRE_W/PRE_D) */
-      var pw=PRE_W/2-0.1, pd=PRE_D/2-0.1;
-      [[-pw,-pd],[-pw,pd],[pw,-pd],[pw,pd]].forEach(function(p){
-        add6(at(bx(0.15,NTIERS*TIER_H+0.5,0.15,0x6B7280),PRE_X+p[0],NTIERS*TIER_H/2+0.05,PRE_Z+p[1]));
-      });
-      /* 선반 빔 (각 단 하부) */
-      for(var ti=0;ti<NTIERS;ti++){
-        var ty=ti*TIER_H+0.05;
-        add6(at(bx(PRE_W-0.1,0.08,PRE_D-0.1,0x9CA3AF,{transparent:true,opacity:0.2}),PRE_X,ty,PRE_Z));
-      }
-      /* 랙 셀 채우기 (3단 × 4열) */
-      var cellsPerTier=4;
-      var cellD=(PRE_D-0.2)/cellsPerTier;
-      for(var ti=0;ti<NTIERS;ti++){
-        for(var ci=0;ci<cellsPerTier;ci++){
-          var cellX=PRE_X;
-          var cellY=ti*TIER_H+TIER_H/2+0.1;
-          var cellZ=(PRE_Z-PRE_D/2+cellD/2)+ci*cellD;
-          /* 셀 슬롯 */
-          var slot6=bx(PRE_W-0.25,TIER_H-0.2,cellD-0.08,0xD1FAE5,{transparent:true,opacity:0.4});
-          at(slot6,cellX,cellY,cellZ); add6(slot6);
-          var edgSlot=new THREE.LineSegments(
-            new THREE.EdgesGeometry(new THREE.BoxGeometry(PRE_W-0.25,TIER_H-0.2,cellD-0.08)),
-            new THREE.LineBasicMaterial({color:0x16A34A}));
-          edgSlot.position.copy(slot6.position); group6.add(edgSlot);
-          /* 부재 (일부만 차있음) */
-          if((ti*cellsPerTier+ci)%2===0){
-            add6(at(bx((PRE_W-0.25)*0.75,(TIER_H-0.2)*0.65,(cellD-0.08)*0.75,0x22C55E),cellX,cellY,cellZ));
-          }
-        }
-      }
-      /* 스태커 크레인 마스트 */
-      var stk6Mast=bx(0.16,NTIERS*TIER_H+0.2,0.16,0x374151);
-      at(stk6Mast,PRE_X+0.8,(NTIERS*TIER_H)/2+0.1,PRE_Z); add6(stk6Mast);
-      /* 캐리지 */
-      var stk6Carriage=bx(0.45,0.28,0.55,0xFBBF24);
-      at(stk6Carriage,PRE_X+0.8,0.7,PRE_Z); add6(stk6Carriage);
-      var stk6YMin=0.5, stk6YMax=NTIERS*TIER_H-0.2;
-      var stk6ZMin=PRE_Z-PRE_D/2+0.4, stk6ZMax=PRE_Z+PRE_D/2-0.4;
-
-      /* ===== AMR 차량 ×6 (절단↔선행랙장↔소조립) ===== */
-      var amrs6=[];
-      LX.forEach(function(lx,li){
-        var grp=new THREE.Group();
-        var body6=bx(1.0,0.32,0.65,0x7C3AED);
-        grp.add(body6);
-        /* wheels */
-        [[0.38,0,0.28],[0.38,0,-0.28],[-0.38,0,0.28],[-0.38,0,-0.28]].forEach(function(wh){
-          var w=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.07,8),
-            new THREE.MeshLambertMaterial({color:0x1E293B}));
-          w.rotation.z=Math.PI/2; w.position.set(wh[0],-0.11,wh[2]); grp.add(w);
-        });
-        /* 적재 표시 */
-        var load6=bx(0.55,0.14,0.38,0xC4B5FD,{transparent:true,opacity:0.8});
-        load6.position.set(0,0.23,0); grp.add(load6);
-        grp.position.set(lx,0.26,CZ_CUT-0.8);
-        group6.add(grp);
-        amrs6.push({g:grp,li:li,lx:lx,phase:li*0.9});
-      });
-
-      /* ===== 후행랙장 ×6 (단층, 각 라인 끝) ===== */
-      LX.forEach(function(lx){
-        add6(at(bx(3,0.1,1.8,0x86EFAC,{transparent:true,opacity:0.3}),lx,0.05,CZ_POST));
+      /* ── 후행랙장 ×6 (단층, 소조립 출구쪽) ── */
+      LZ.forEach(function(lz){
+        add6(at(bx(1.5,0.1,2.8,0x86EFAC,{transparent:true,opacity:0.3}),X_POST,0.05,lz));
         for(var ri=0;ri<2;ri++){
-          var rz6=CZ_POST-0.42+ri*0.84;
-          var rk=bx(2.4,0.9,0.72,0x4ADE80,{transparent:true,opacity:0.5});
-          at(rk,lx,0.5,rz6); add6(rk);
-          var edgR=new THREE.LineSegments(
-            new THREE.EdgesGeometry(new THREE.BoxGeometry(2.4,0.9,0.72)),
+          var rz=lz-0.65+ri*1.3;
+          var rk=bx(1.3,0.85,1.1,0x4ADE80,{transparent:true,opacity:0.5});
+          at(rk,X_POST,0.5,rz); add6(rk);
+          var edR=new THREE.LineSegments(
+            new THREE.EdgesGeometry(new THREE.BoxGeometry(1.3,0.85,1.1)),
             new THREE.LineBasicMaterial({color:0x16A34A}));
-          edgR.position.copy(rk.position); group6.add(edgR);
+          edR.position.copy(rk.position); group6.add(edR);
         }
-        /* 적재 부재 */
-        add6(at(bx(1.5,0.55,0.45,0xA7F3D0),lx,0.82,CZ_POST));
+        add6(at(bx(0.85,0.5,0.65,0xA7F3D0),X_POST,0.77,lz));
       });
 
-      /* ===== 중조/대조 영역 ===== */
-      add6(at(bx(26,0.1,3.2,0xBFDBFE,{transparent:true,opacity:0.3}),0,0.05,CZ_MID));
-      add6(at(bx(22,2.2,2.6,0x2563EB,{transparent:true,opacity:0.35}),0,1.2,CZ_MID));
-      add6(at(bx(0.25,3.0,0.25,0x1D4ED8),0,1.6,CZ_MID)); /* center marker */
+      /* ── 선행랙장 3단 (L1 외측 Z=PRE_Z) ── */
+      var ppx=PRE_XD/2-0.1, ppz=PRE_ZW/2-0.1;
+      add6(at(bx(PRE_XD+0.3,0.1,PRE_ZW+0.2,0x4ADE80,{transparent:true,opacity:0.2}),PRE_XC,0.05,PRE_Z));
+      [[-ppx,-ppz],[-ppx,ppz],[ppx,-ppz],[ppx,ppz]].forEach(function(p){
+        add6(at(bx(0.13,NTIERS*TIER_H+0.35,0.13,0x6B7280),PRE_XC+p[0],NTIERS*TIER_H/2,PRE_Z+p[1]));
+      });
+      for(var ti=0;ti<NTIERS;ti++){
+        add6(at(bx(PRE_XD-0.1,0.06,PRE_ZW-0.1,0x9CA3AF,{transparent:true,opacity:0.15}),PRE_XC,ti*TIER_H+0.05,PRE_Z));
+      }
+      var cellsX=4, cellXW=(PRE_XD-0.2)/cellsX;
+      for(var ti=0;ti<NTIERS;ti++){
+        for(var ci=0;ci<cellsX;ci++){
+          var cx=(PRE_XC-PRE_XD/2+cellXW/2)+ci*cellXW;
+          var cy=ti*TIER_H+TIER_H/2+0.1;
+          var sl=bx(cellXW-0.07,TIER_H-0.17,PRE_ZW-0.22,0xD1FAE5,{transparent:true,opacity:0.4});
+          at(sl,cx,cy,PRE_Z); add6(sl);
+          var eS=new THREE.LineSegments(
+            new THREE.EdgesGeometry(new THREE.BoxGeometry(cellXW-0.07,TIER_H-0.17,PRE_ZW-0.22)),
+            new THREE.LineBasicMaterial({color:0x16A34A}));
+          eS.position.copy(sl.position); group6.add(eS);
+          if((ti+ci)%2===0) add6(at(bx((cellXW-0.07)*0.7,(TIER_H-0.17)*0.6,(PRE_ZW-0.22)*0.7,0x22C55E),cx,cy,PRE_Z));
+        }
+      }
+      var stk6Mast=bx(0.14,NTIERS*TIER_H+0.15,0.14,0x374151);
+      at(stk6Mast,PRE_XC+ppx-0.1,NTIERS*TIER_H/2,PRE_Z); add6(stk6Mast);
+      var stk6Car=bx(0.38,0.25,0.45,0xFBBF24);
+      at(stk6Car,PRE_XC+ppx-0.1,0.65,PRE_Z); add6(stk6Car);
+      var stkYMin=0.45, stkYMax=NTIERS*TIER_H-0.2;
+      var stkXMin=PRE_XC-PRE_XD/2+0.3, stkXMax=PRE_XC+PRE_XD/2-0.3;
 
-      /* ===== animateLayout6 ===== */
-      window._stk6={carriage:stk6Carriage,yMin:stk6YMin,yMax:stk6YMax,zMin:stk6ZMin,zMax:stk6ZMax};
-      window._amrs6=amrs6;
-      window._subBoxes6=subBoxes6;
-      window._subCols6=subCols6;
-      window._cutHeads6=cutHeads6;
-      window._CZ6={CUT:CZ_CUT,AMR:CZ_AMR,SUB:CZ_SUB,PRE_X:PRE_X};
+      /* ── 중조/대조 (L6 외측 Z=MID_Z, 6라인 전체 X 스팬) ── */
+      add6(at(bx(MID_XW,0.1,MID_ZD,0xBFDBFE,{transparent:true,opacity:0.3}),MID_XC,0.05,MID_Z));
+      add6(at(bx(MID_XW,3.0,MID_ZD,0x2563EB,{transparent:true,opacity:0.35}),MID_XC,1.6,MID_Z));
+      for(var mi=0;mi<5;mi++){
+        add6(at(bx(0.18,3.8,0.18,0x1D4ED8),MID_XC-MID_XW/2+1.5+mi*(MID_XW-3)/4,2.0,MID_Z));
+      }
+
+      /* ── AMR 공통 생성 함수 ── */
+      function makeAMR6(col,ldCol){
+        var g=new THREE.Group();
+        g.add(bx(0.85,0.28,0.58,col));
+        [[0.33,0,0.24],[0.33,0,-0.24],[-0.33,0,0.24],[-0.33,0,-0.24]].forEach(function(wh){
+          var w=new THREE.Mesh(new THREE.CylinderGeometry(0.085,0.085,0.055,8),
+            new THREE.MeshLambertMaterial({color:0x1E293B}));
+          w.rotation.x=Math.PI/2; w.position.set(wh[0],-0.1,wh[2]); g.add(w);
+        });
+        var ld=bx(0.48,0.11,0.33,ldCol,{transparent:true,opacity:0.8});
+        ld.position.set(0,0.2,0); g.add(ld);
+        return g;
+      }
+
+      /* ── AMR-A: 절단↔소조립 (짝수 라인=선행랙장 경유, 홀수=직행) ×6 ── */
+      var amrsA6=[];
+      LZ.forEach(function(lz,li){
+        var g=makeAMR6(0x7C3AED,0xC4B5FD);
+        g.position.set(X_CUT-0.7,0.22,lz); group6.add(g);
+        amrsA6.push({g:g,li:li,lz:lz,via:(li%2===0),phase:li*0.78});
+      });
+
+      /* ── AMR-B: 소조립→후행랙장→중조/대조→복귀 ×6 ── */
+      var amrsB6=[];
+      LZ.forEach(function(lz,li){
+        var g=makeAMR6(0x059669,0x6EE7B7);
+        g.position.set(X_SUB+1.8,0.22,lz); group6.add(g);
+        amrsB6.push({g:g,li:li,lz:lz,phase:li*0.68+1.3});
+      });
+
+      window._6={
+        stk:{c:stk6Car,yMin:stkYMin,yMax:stkYMax,xMin:stkXMin,xMax:stkXMax},
+        amrsA:amrsA6,amrsB:amrsB6,
+        subBoxes6:subBoxes6,subCols6:subCols6,cutHeads6:cutHeads6,
+        X:{CUT:X_CUT,AMR:X_AMR,SUB:X_SUB,POST:X_POST},
+        PRE:{Z:PRE_Z,XC:PRE_XC},MID:{Z:MID_Z}
+      };
     })();
 
     function animateLayout6(elapsed){
-      var st=window._stk6, amrs6=window._amrs6;
-      var subBoxes6=window._subBoxes6, subCols6=window._subCols6;
-      var cutHeads6=window._cutHeads6;
-      var CZ6=window._CZ6;
-      var CZ_CUT=CZ6.CUT, CZ_AMR=CZ6.AMR, CZ_SUB=CZ6.SUB, PRE_X=CZ6.PRE_X;
+      var d=window._6;
+      var X_CUT=d.X.CUT,X_AMR=d.X.AMR,X_SUB=d.X.SUB,X_POST=d.X.POST;
+      var PRE_Z=d.PRE.Z,PRE_XC=d.PRE.XC,MID_Z=d.MID.Z;
 
-      /* AMR 이동: 절단→AMR통로→(L1경우 선행랙장)→소조립→복귀 */
-      amrs6.forEach(function(a){
-        var cyc=3.6;
-        var t=(elapsed*0.28+a.phase)%cyc;
-        var x=a.lx, z;
+      /* ── AMR-A: 절단↔(선행랙장 경유 or 직행)↔소조립 ── */
+      d.amrsA.forEach(function(a){
+        var cyc=a.via?5.0:3.2, spd=0.26;
+        var t=(elapsed*spd+a.phase)%cyc;
+        var x,z=a.lz;
+        if(!a.via){
+          /* 직행 패턴 */
+          if(t<1.0){        x=lerp(X_CUT-0.7,X_AMR,ease(t/1.0));}
+          else if(t<2.0){   x=lerp(X_AMR,X_SUB+1.8,ease((t-1.0)/1.0));}
+          else{             x=lerp(X_SUB+1.8,X_CUT-0.7,ease((t-2.0)/1.2));}
+          a.g.position.set(x,0.22,z); a.g.rotation.y=0;
+        } else {
+          /* 선행랙장 경유 패턴 */
+          if(t<0.8){
+            /* 절단→AMR통로 X이동 */
+            x=lerp(X_CUT-0.7,X_AMR,ease(t/0.8)); z=a.lz;
+            a.g.rotation.y=0;
+          } else if(t<1.6){
+            /* AMR통로→선행랙장 Z이동 */
+            x=X_AMR; z=lerp(a.lz,PRE_Z,ease((t-0.8)/0.8));
+            a.g.rotation.y=(a.lz>PRE_Z)?Math.PI/2:-Math.PI/2;
+          } else if(t<2.2){
+            /* 선행랙장 내 X이동 */
+            x=lerp(X_AMR,PRE_XC,ease((t-1.6)/0.6)); z=PRE_Z;
+            a.g.rotation.y=0;
+          } else if(t<2.8){
+            /* 선행랙장→AMR통로 X복귀 */
+            x=lerp(PRE_XC,X_AMR,ease((t-2.2)/0.6)); z=PRE_Z;
+            a.g.rotation.y=Math.PI;
+          } else if(t<3.5){
+            /* AMR통로→해당라인 Z복귀 */
+            x=X_AMR; z=lerp(PRE_Z,a.lz,ease((t-2.8)/0.7));
+            a.g.rotation.y=(a.lz>PRE_Z)?-Math.PI/2:Math.PI/2;
+          } else {
+            /* AMR통로→소조립 X이동 */
+            x=lerp(X_AMR,X_SUB+1.8,ease((t-3.5)/1.5)); z=a.lz;
+            a.g.rotation.y=0;
+          }
+          a.g.position.set(x,0.22,z);
+        }
+      });
+
+      /* ── AMR-B: 소조립→(해당라인)후행랙장→중조/대조→복귀 ── */
+      d.amrsB.forEach(function(a){
+        var cyc=4.5, spd=0.24;
+        var t=(elapsed*spd+a.phase)%cyc;
+        var x,z;
         if(t<0.9){
-          /* 절단 → AMR통로 */
-          z=lerp(CZ_CUT-0.5,CZ_AMR,ease(t/0.9));
-          a.g.position.set(x,0.26,z);
+          /* 소조립→후행랙장 X이동 (해당 라인) */
+          x=lerp(X_SUB+1.8,X_POST+0.6,ease(t/0.9)); z=a.lz;
           a.g.rotation.y=0;
-        } else if(t<1.4){
-          /* L1(li==0)만 선행랙장 방향으로 X 이동 */
-          var t2=(t-0.9)/0.5;
-          z=CZ_AMR;
-          var tx=a.li===0?lerp(a.lx,PRE_X,ease(t2)):a.lx;
-          a.g.position.set(tx,0.26,z);
-          a.g.rotation.y=a.li===0?-Math.PI/2:0;
-        } else if(t<1.9){
-          /* 선행랙장→소조립 (또는 통로→소조립) */
-          var t3=(t-1.4)/0.5;
-          var sx=a.li===0?lerp(PRE_X,a.lx,ease(t3)):a.lx;
-          z=lerp(CZ_AMR,CZ_SUB+1.5,ease(t3));
-          a.g.position.set(sx,0.26,z);
-          a.g.rotation.y=0;
+        } else if(t<1.6){
+          /* 후행랙장 대기 */
+          x=X_POST+0.6; z=a.lz;
+        } else if(t<2.5){
+          /* 후행랙장→중조/대조 Z이동 */
+          x=X_POST+0.6; z=lerp(a.lz,MID_Z-1.8,ease((t-1.6)/0.9));
+          a.g.rotation.y=(a.lz<MID_Z)?-Math.PI/2:Math.PI/2;
+        } else if(t<3.0){
+          /* 중조 대기 */
+          x=X_POST+0.6; z=MID_Z-1.8;
         } else {
-          /* 소조립→절단 복귀 */
-          var t4=(t-1.9)/(cyc-1.9);
-          z=lerp(CZ_SUB+1.5,CZ_CUT-0.5,ease(t4));
-          a.g.position.set(x,0.26,z);
-          a.g.rotation.y=Math.PI;
+          /* 중조→소조립 복귀 (대각) */
+          var t4=(t-3.0)/1.5;
+          x=lerp(X_POST+0.6,X_SUB+1.8,ease(t4));
+          z=lerp(MID_Z-1.8,a.lz,ease(t4));
+          a.g.rotation.y=Math.PI*0.8;
         }
+        a.g.position.set(x,0.22,z);
       });
 
-      /* 스태커 크레인 진동 */
-      var ph6=elapsed*0.38;
-      st.carriage.position.y=lerp(st.yMin,st.yMax,Math.sin(ph6)*0.5+0.5);
-      st.carriage.position.z=lerp(st.zMin,st.zMax,Math.sin(ph6*0.65)*0.5+0.5);
+      /* ── 스태커크레인 ── */
+      var st=d.stk, ph=elapsed*0.38;
+      st.c.position.y=lerp(st.yMin,st.yMax,Math.sin(ph)*0.5+0.5);
+      st.c.position.x=lerp(st.xMin,st.xMax,Math.sin(ph*0.63)*0.5+0.5);
 
-      /* 소조립 순서 발광 */
-      var sp6=(elapsed%2.2)/2.2, aIdx6=Math.floor(sp6*4);
-      subBoxes6.forEach(function(b,i){
-        if(i===aIdx6){
-          b.material.emissive=new THREE.Color(subCols6[i]);
-          b.material.emissiveIntensity=(0.3+0.7*Math.abs(Math.sin(elapsed*4)))*0.6;
-        } else {
-          b.material.emissive=new THREE.Color(0);
-          b.material.emissiveIntensity=0;
-        }
+      /* ── 소조립 순서 발광 ── */
+      var sp=(elapsed%2.2)/2.2,ai=Math.floor(sp*4);
+      d.subBoxes6.forEach(function(b,i){
+        if(i===ai){b.material.emissive=new THREE.Color(d.subCols6[i]);b.material.emissiveIntensity=0.4;}
+        else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
       });
 
-      /* 절단기 헤드 진동 */
-      cutHeads6.forEach(function(h,hi){
-        h.position.y=1.52+0.09*Math.sin(elapsed*2.5+hi*1.4);
+      /* ── 절단기 헤드 진동 ── */
+      d.cutHeads6.forEach(function(h,hi){
+        h.position.y=1.44+0.08*Math.sin(elapsed*2.5+hi*1.4);
       });
     }
 
