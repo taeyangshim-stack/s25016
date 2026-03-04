@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>ABB·삼성중공업·SP시스템스 기술 미팅 아젠다 (2026-03-04)</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.7; color: #333; max-width: 960px; margin: 20px auto; padding: 20px; background-color: #f4f7f9; }
+        .container { background-color: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #1a5276; padding-bottom: 10px; text-align: center; margin-bottom: 6px; }
+        .subtitle { text-align: center; color: #7f8c8d; font-size: 0.95em; margin-bottom: 30px; }
+        h2 { color: #1a5276; border-left: 5px solid #1a5276; padding-left: 10px; margin-top: 40px; }
+        h3 { color: #2c3e50; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        th, td { border: 1px solid #ddd; padding: 11px 14px; }
+        th { background-color: #d6eaf8; color: #1a5276; font-weight: bold; text-align: center; }
+        td.left { text-align: left; }
+        td { text-align: center; }
+        ul { margin: 8px 0; padding-left: 22px; }
+        li { margin-bottom: 8px; }
+        .agenda-item { background: #fff; border: 1px solid #d5d8dc; border-radius: 6px; margin: 16px 0; overflow: hidden; }
+        .agenda-header { background: #1a5276; color: #fff; padding: 10px 18px; font-weight: bold; font-size: 1.05em; display: flex; justify-content: space-between; align-items: center; }
+        .agenda-body { padding: 16px 20px; }
+        .agenda-num { background: rgba(255,255,255,0.25); border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.9em; margin-right: 8px; }
+        .question-box { background: #eaf4fd; border-left: 4px solid #2980b9; padding: 10px 14px; margin: 10px 0; border-radius: 3px; }
+        .question-box strong { color: #1a5276; }
+        .warn-box { background-color: #fdf2f2; border-left: 5px solid #e74c3c; padding: 12px 16px; margin: 14px 0; border-radius: 4px; }
+        .info-box { background-color: #fdf9e7; border-left: 5px solid #f1c40f; padding: 12px 16px; margin: 14px 0; border-radius: 4px; }
+        .badge { display: inline-block; padding: 2px 9px; border-radius: 4px; font-size: 0.78em; font-weight: bold; margin-left: 6px; vertical-align: middle; }
+        .badge-sp   { background: #2980b9; color: #fff; }
+        .badge-abb  { background: #c0392b; color: #fff; }
+        .badge-shi  { background: #27ae60; color: #fff; }
+        .badge-confirm { background: #e74c3c; color: #fff; }
+        .badge-info { background: #8e44ad; color: #fff; }
+        .footer { margin-top: 40px; font-size: 0.88em; color: #7f8c8d; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
+        .highlight { color: #c0392b; font-weight: bold; }
+        .time-label { font-size: 0.82em; color: #aaa; font-weight: normal; }
+        .schedule-note { background: #eafaf1; border: 1px solid #a9dfbf; border-radius: 6px; padding: 14px 18px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>ABB · 삼성중공업 · SP시스템스 기술 협의 미팅</h1>
+    <p class="subtitle">삼성중공업 거제조선소 34bay B라인 자동용접 로봇 유지보수 현안 및 향후 대응 방안</p>
+
+    <!-- ============================  1. 회의 개요  ============================= -->
+    <h2>1. 미팅 개요</h2>
+    <table>
+        <tbody>
+            <tr><th style="width:130px">일시</th><td class="left">2026년 3월 4일 (수) 14:00</td></tr>
+            <tr><th>장소</th><td class="left">삼성중공업 거제조선소 자동화 실험동</td></tr>
+            <tr><th>목적</th><td class="left">ADU 긴급 교체 후 원인 분석, 유지보수 체계 수립, 교육 계획 수립, 잔존 이슈 논의</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ============================  2. 참석자  ============================= -->
+    <h2>2. 참석자</h2>
+    <table>
+        <thead><tr><th>소속</th><th>성명</th><th>직책</th></tr></thead>
+        <tbody>
+            <tr><td>SP시스템스 <span class="badge badge-sp">SP</span></td><td><strong>심태양</strong></td><td>부장 (팀장/개발팀)</td></tr>
+            <tr><td>SP시스템스 <span class="badge badge-sp">SP</span></td><td>이상주</td><td>대리 / 제어팀</td></tr>
+            <tr><td>SP시스템스 <span class="badge badge-sp">SP</span></td><td>이마룬</td><td>사원 / 개발팀</td></tr>
+            <tr><td>삼성중공업 <span class="badge badge-shi">SHI</span></td><td>이무림</td><td>담당</td></tr>
+            <tr><td>삼성중공업 <span class="badge badge-shi">SHI</span></td><td>이동혁</td><td>담당</td></tr>
+            <tr><td>ABB Korea <span class="badge badge-abb">ABB</span></td><td><strong>김태경</strong></td><td>차장 / Technical Sales</td></tr>
+            <tr><td>ABB Korea <span class="badge badge-abb">ABB</span></td><td>이영재</td><td>부장 / 서비스팀</td></tr>
+            <tr><td>ABB Korea <span class="badge badge-abb">ABB</span></td><td>윤건태</td><td>과장 / 서비스팀</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ============================  3. 아젠다  ============================= -->
+    <h2>3. 아젠다</h2>
+
+    <!-- 아젠다 1 -->
+    <div class="agenda-item">
+        <div class="agenda-header">
+            <span><span class="agenda-num">1</span>기존 로봇 유지보수 현황 공유</span>
+            <span class="time-label">~10분</span>
+        </div>
+        <div class="agenda-body">
+            <ul>
+                <li>삼성중공업 34bay B라인 운영 현황 및 최근 이슈 이력 공유</li>
+                <li>현재 유지보수 체계 및 역할 분담 현황 확인</li>
+                <li>ABB 측 현재 기술 지원 범위 및 대응 체계 재확인</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 아젠다 2 -->
+    <div class="agenda-item">
+        <div class="agenda-header">
+            <span><span class="agenda-num">2</span>유지보수 교육 전 긴급 대응 체계 수립</span>
+            <span class="time-label">~15분</span>
+        </div>
+        <div class="agenda-body">
+            <ul>
+                <li>유지보수 교육이 완료되기 전까지 발생하는 이슈에 대한 <strong>ABB 긴급 대응 절차 및 범위</strong> 명확화</li>
+                <li>긴급 연락 체계 (유선/방문) 및 응답 시간 기준 협의</li>
+                <li>ABB Service Agreement 진행 협의 여부 (ABB 제안 검토)</li>
+            </ul>
+            <div class="question-box">
+                <strong>SP 확인 요청 사항</strong><br>
+                교육 완료 전 동일 이슈 재발 시 ABB의 구체적 출동 기준과 SLA(응답 시간)는?
+            </div>
+        </div>
+    </div>
+
+    <!-- 아젠다 3 -->
+    <div class="agenda-item">
+        <div class="agenda-header">
+            <span><span class="agenda-num">3</span>ADU 긴급 교체 건 — 원인 분석 및 스페어 확보 <span class="badge badge-confirm">핵심 안건</span></span>
+            <span class="time-label">~20분</span>
+        </div>
+        <div class="agenda-body">
+            <div class="warn-box">
+                <strong>사건 요약</strong><br>
+                2026-02-25(화) ADU 고장 → 삼성중공업 자체 스페어 ADU로 교체하여 라인 복구.<br>
+                ABB 측 원인 분석 진행 중 (그룹 보고 후 회신 예정).
+            </div>
+            <ul>
+                <li><strong>원인 분석 결과 공유</strong> — ABB 그룹 진단 결과 (현시점 확인 가능한 내용)</li>
+                <li class="highlight">만약 삼성중공업 스페어가 없었다면, ABB는 어떻게 대응할 예정이었는가?</li>
+                <li><strong>신규 ADU 보충 일정 확인</strong> — ABB → 삼성중공업 스페어 ADU 재제출 (기존 약속: 3/6 수령 예정)</li>
+                <li>향후 스페어 파트 관리 방안 협의 (ABB 권고 스페어 목록 공유 요청)</li>
+            </ul>
+            <div class="question-box">
+                <strong>SP 확인 요청 사항</strong><br>
+                ① ADU 보충 ADU 수령 일정 재확인 (3/6 가능 여부)<br>
+                ② ABB 권고 현장 필수 스페어 파트 목록 제출 요청<br>
+                ③ 스페어 없을 경우 ABB 긴급 조달 가능 시간(Lead Time) 확인
+            </div>
+        </div>
+    </div>
+
+    <!-- 아젠다 4 -->
+    <div class="agenda-item">
+        <div class="agenda-header">
+            <span><span class="agenda-num">4</span>유지보수 교육 계획 수립 <span class="badge badge-info">일정 연계</span></span>
+            <span class="time-label">~20분</span>
+        </div>
+        <div class="agenda-body">
+            <ul>
+                <li>삼성중공업 유지보수 교육에 <strong>SP시스템스 부산 녹산 RIMS 장비 활용</strong> 가능 — 기확인</li>
+                <li class="highlight">추가 요청: 교육 시 <strong>SP시스템스 인원도 함께 교육</strong> 받을 수 있도록 포함 요청<br>
+                    <small>→ 삼성중공업 Key Maintenance Person 2명 + SP 인원 포함 구성</small></li>
+                <li>교육 장소 우선순위: SP 녹산 RIMS → 불가 시 ABB 천안 공장</li>
+                <li>교육 내용 협의 (3사 공동 정리 후 진행)</li>
+            </ul>
+
+            <div class="schedule-note">
+                <strong>교육 가능 시점 — 녹산 이설 일정 이후</strong><br>
+                <table style="margin:10px 0; font-size:0.93em;">
+                    <thead><tr><th>구분</th><th>일정</th><th>내용</th></tr></thead>
+                    <tbody>
+                        <tr><td>1차 측정</td><td>3/18(수) ~ 3/25(수)</td><td>X축 레일 정도 측정 및 조정 (부산 녹산)</td></tr>
+                        <tr><td>2차 측정</td><td>4/6(월) ~ 4/8(수)</td><td>갠트리 로봇 운전 정도 측정 · SKEW · 공간계측</td></tr>
+                    </tbody>
+                </table>
+                → <strong class="highlight">교육 가능 시점: 2차 측정 완료 이후 (4월 8일 이후)</strong><br>
+                <small style="color:#666">※ 현장 상황에 따라 세부 일정 변동 가능</small>
+            </div>
+
+            <div class="question-box">
+                <strong>SP 확인 요청 사항</strong><br>
+                ① ABB에서 교육 커리큘럼(안) 사전 제출 가능 여부<br>
+                ② 4월 중순 이후 교육 일정 가협의 가능 여부 확인
+            </div>
+        </div>
+    </div>
+
+    <!-- 아젠다 5 -->
+    <div class="agenda-item">
+        <div class="agenda-header">
+            <span><span class="agenda-num">5</span>ABB 잔존 이슈 — 로봇 기본 기능 관련 (Plan B 별도)</span>
+            <span class="time-label">~15분</span>
+        </div>
+        <div class="agenda-body">
+            <div class="info-box">
+                본 안건은 <strong>Plan B 프로그램 개발과 별개</strong>로,<br>
+                ABB 로봇의 <strong>기본 기능 수준</strong>에서의 이슈 및 기술 문의 사항입니다.
+            </div>
+            <ul>
+                <li><strong>BullsEye (불스아이)</strong> — 툴 교정 기능 관련 이슈 및 운용 방법 문의</li>
+                <li><strong>ArcWare (아크웨어)</strong> — 용접 소프트웨어 기능 및 파라미터 관련 이슈</li>
+                <li><strong>RAPID 문법 관련</strong> — 기본 언어 사용 시 발생하는 문법 오류 및 제약 사항</li>
+            </ul>
+            <div class="question-box">
+                <strong>SP 요청 사항</strong><br>
+                위 3개 항목에 대해 ABB 측 기술 문서(레퍼런스) 또는 담당 전문가 연결 요청
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================  4. 팔로업 예상  ============================= -->
+    <h2>4. 예상 팔로업 항목</h2>
+    <table>
+        <thead><tr><th style="width:100px">기한</th><th style="width:160px">담당</th><th>내용</th></tr></thead>
+        <tbody>
+            <tr><td>3/6 (금)</td><td>ABB 김태경</td><td>신규 ADU 삼성중공업 전달 (기약속)</td></tr>
+            <tr><td>미팅 후 1주</td><td>ABB</td><td>ADU 고장 원인 그룹 분석 결과 공유</td></tr>
+            <tr><td>미팅 후 1주</td><td>ABB</td><td>권고 스페어 파트 목록 제출</td></tr>
+            <tr><td>미팅 후 1주</td><td>ABB</td><td>교육 커리큘럼(안) 제출</td></tr>
+            <tr><td>4월 8일 이후</td><td>3사 협의</td><td>유지보수 교육 일정 확정 (SP+삼성 인원 포함)</td></tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        작성: 심태양 부장 (SP시스템스) &nbsp;|&nbsp; 작성일: 2026-03-03 &nbsp;|&nbsp; 문서번호: S25016-AGD-260304
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>출장신청서 - 22차 연장 (2026-03-03 ~ 03-07)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Malgun Gothic', '맑은 고딕', dotum, sans-serif;
+    font-size: 10pt;
+    color: #222;
+    line-height: 1.6;
+    margin: 0; padding: 0;
+    background: #f0f0f0;
+  }
+  .page {
+    max-width: 860px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 50px 40px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+  }
+
+  h1.doc-title {
+    text-align: center;
+    font-size: 22pt;
+    letter-spacing: 18px;
+    margin: 0 0 30px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #333;
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+  }
+  .approval-no { font-size: 9.5pt; color: #555; }
+  .approval-no b { color: #222; }
+
+  .sign-box {
+    border: 1px solid #666;
+    border-collapse: collapse;
+    font-size: 9pt;
+    text-align: center;
+  }
+  .sign-box th {
+    background: #eee;
+    padding: 4px 8px;
+    border: 1px solid #666;
+    font-weight: normal;
+    writing-mode: vertical-rl;
+    letter-spacing: 4px;
+  }
+  .sign-box td {
+    border: 1px solid #666;
+    padding: 0;
+    width: 80px;
+  }
+  .sign-box .role { background: #f9f9f9; padding: 3px 4px; border-bottom: 1px solid #666; font-size: 8.5pt; }
+  .sign-box .name { padding: 4px; font-weight: bold; height: 32px; border-bottom: 1px solid #666; }
+  .sign-box .date { padding: 3px 4px; font-size: 8pt; color: #666; }
+
+  table.info {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 9.5pt;
+  }
+  table.info th {
+    background: #f5f5f5;
+    border: 1px solid #999;
+    padding: 6px 10px;
+    text-align: center;
+    font-weight: bold;
+    width: 120px;
+    white-space: nowrap;
+  }
+  table.info td {
+    border: 1px solid #999;
+    padding: 6px 10px;
+  }
+
+  table.schedule {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 9pt;
+  }
+  table.schedule th {
+    background: #333;
+    color: #fff;
+    border: 1px solid #333;
+    padding: 6px 8px;
+    text-align: center;
+    font-weight: bold;
+  }
+  table.schedule td {
+    border: 1px solid #bbb;
+    padding: 6px 8px;
+    vertical-align: top;
+  }
+  table.schedule tr:nth-child(even) { background: #fafafa; }
+  table.schedule .date-col { width: 110px; text-align: center; font-weight: bold; white-space: nowrap; }
+  table.schedule .place-col { width: 160px; text-align: center; }
+
+  .detail-section {
+    margin-top: 30px;
+    border-top: 2px solid #1a5276;
+    padding-top: 15px;
+  }
+  .detail-section h2 {
+    color: #1a5276;
+    font-size: 13pt;
+    margin: 0 0 15px;
+    padding-left: 12px;
+    border-left: 4px solid #1a5276;
+  }
+
+  table.detail {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    font-size: 9pt;
+  }
+  table.detail th {
+    background: #1a5276;
+    color: #fff;
+    border: 1px solid #1a5276;
+    padding: 7px 10px;
+    text-align: left;
+  }
+  table.detail td {
+    border: 1px solid #ccc;
+    padding: 7px 10px;
+    vertical-align: top;
+  }
+  table.detail tr:nth-child(even) { background: #f8fafe; }
+
+  .label-a { color: #1a5276; font-weight: bold; }
+  .label-b { color: #8e44ad; font-weight: bold; }
+  .label-planb { color: #c0392b; font-weight: bold; }
+  .label-mech { color: #27ae60; font-weight: bold; }
+
+  ul.work-list {
+    margin: 3px 0 3px 14px;
+    padding: 0;
+    list-style: none;
+  }
+  ul.work-list li {
+    position: relative;
+    padding-left: 10px;
+    margin-bottom: 2px;
+  }
+  ul.work-list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 7px;
+    width: 4px; height: 4px;
+    background: #888;
+    border-radius: 50%;
+  }
+
+  /* 전주 진행현황 박스 */
+  .prev-week {
+    background: #f4f6f7;
+    border: 1px solid #d5d8dc;
+    border-left: 4px solid #5d6d7e;
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin-bottom: 25px;
+    font-size: 9pt;
+  }
+  .prev-week h3 {
+    color: #5d6d7e;
+    margin: 0 0 10px;
+    font-size: 10.5pt;
+  }
+  .prev-week table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .prev-week th {
+    background: #eaecee;
+    border: 1px solid #ccc;
+    padding: 5px 8px;
+    text-align: left;
+    font-size: 8.5pt;
+  }
+  .prev-week td {
+    border: 1px solid #ddd;
+    padding: 5px 8px;
+    vertical-align: top;
+    font-size: 8.5pt;
+  }
+  .status-done  { color: #1e8449; font-weight: bold; }
+  .status-cont  { color: #d35400; font-weight: bold; }
+  .status-carry { color: #2471a3; font-weight: bold; }
+
+  .remark {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 9pt;
+    margin-top: 10px;
+  }
+  .remark ul { margin: 5px 0 0 16px; padding: 0; }
+  .remark li { margin-bottom: 3px; }
+
+  .pl-tag { display: inline-block; background: #eaf2f8; color: #1a5276; font-size: 8pt; padding: 1px 5px; border-radius: 3px; font-weight: bold; }
+  .pl-tag.urgent { background: #fdedec; color: #c0392b; }
+
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; padding: 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1 class="doc-title">출 장 신 청 서</h1>
+
+  <div class="header-row">
+    <div class="approval-no">
+      <b>품 의 번 호</b><br>
+      에스피시스템스-개발팀-20260303-00X
+    </div>
+    <table class="sign-box">
+      <tr>
+        <th rowspan="1">결<br>재</th>
+        <td>
+          <div class="role">팀장</div>
+          <div class="name">심태양</div>
+          <div class="date">2026/03/03</div>
+        </td>
+        <td>
+          <div class="role">사장</div>
+          <div class="name">정시득</div>
+          <div class="date"></div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 기본 정보 -->
+  <table class="info">
+    <tr>
+      <th>기 안 일 자</th><td>2026-03-03(화)</td>
+      <th>기 안 부 서</th><td>개발팀</td>
+    </tr>
+    <tr>
+      <th>기안자 직책</th><td>팀장</td>
+      <th>기 안 자</th><td>심태양</td>
+    </tr>
+    <tr>
+      <th>구 분</th><td>국내출장</td>
+      <th>기 간</th><td>2026-03-03(화) ~ 2026-03-07(토)</td>
+    </tr>
+    <tr>
+      <th>제 목</th>
+      <td colspan="3">삼성중공업 거제조선소 자동용접시스템 성능 문제 대응 및 양산 정상화 지원 (22차 연장_주말작업포함)</td>
+    </tr>
+  </table>
+
+  <!-- 출장자 -->
+  <table class="info">
+    <tr>
+      <th>출 장 자</th>
+      <th>소 속</th><td>개발팀</td>
+      <th>직 급</th><td>부장</td>
+      <th>성 명</th><td>심태양</td>
+    </tr>
+    <tr>
+      <th>출 장 지</th>
+      <td colspan="6">경상남도 거제시 장목면 거제대로 3370 삼성중공업 거제조선소</td>
+    </tr>
+  </table>
+
+  <!-- 일정별 업무계획 -->
+  <table class="schedule">
+    <tr>
+      <th>일 자</th>
+      <th>방 문 처</th>
+      <th>업 무 내 용</th>
+    </tr>
+    <tr>
+      <td class="date-col">2026-03-03(화)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>이동 및 현장 점검 / A·B라인 배포 (2/28 컨펌 적용), 수직용접 노티 개발, 권한 설정 개발</td>
+    </tr>
+    <tr>
+      <td class="date-col">2026-03-04(수)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>A라인 체크포인트 용접·권한 설정 개발, B라인 실시간 용접조건·체크포인트 용접·권한 설정 개발/실테스트</td>
+    </tr>
+    <tr>
+      <td class="date-col">2026-03-05(목)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>A라인 계측홈/기본 Z홈 구분 개발, B라인 매크로 미선택 데이터 표시 이슈, 권한 설정 컨펌</td>
+    </tr>
+    <tr>
+      <td class="date-col">2026-03-06(금)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>A라인 운영 S/W 매뉴얼 제출, TCP 커맨드 완료/오류 판단 개발, 계측홈/Z홈 구분 실테스트</td>
+    </tr>
+    <tr>
+      <td class="date-col">2026-03-07(토)</td>
+      <td class="place-col">삼성중공업 거제 조선소</td>
+      <td>A·B라인 컨펌테스트 및 배포 / 기구전기: 라이트커튼 설치·셋업, 차광막 설치, A라인 간이오일팬(루브처리) 설치</td>
+    </tr>
+  </table>
+
+  <!-- 출장비 -->
+  <table class="info">
+    <tr>
+      <th rowspan="4" style="width:80px;">출 장 비</th>
+      <th>항 목</th><th>금 액</th><th colspan="2">산 출 내 역</th>
+    </tr>
+    <tr><td style="text-align:center;">숙 박 비</td><td></td><td colspan="2"></td></tr>
+    <tr><td style="text-align:center;">교 통 비</td><td></td><td colspan="2"></td></tr>
+    <tr><td style="text-align:center;">식 대</td><td></td><td colspan="2"></td></tr>
+  </table>
+
+  <!-- ============================== -->
+  <!-- 상세 섹션 -->
+  <!-- ============================== -->
+  <div class="detail-section">
+
+    <!-- 전주 진행현황 -->
+    <h2>전주 진행현황 (2/24 ~ 2/28, 21차 연장)</h2>
+    <div class="prev-week">
+      <table>
+        <tr>
+          <th style="width:70px;">구분</th>
+          <th>항목</th>
+          <th style="width:80px; text-align:center;">상태</th>
+        </tr>
+        <tr>
+          <td rowspan="7"><span class="label-a">A라인</span></td>
+          <td>터치/갠트리 오프셋, 파라미터 엑셀 관리 — 실물 테스트 → 컨펌 및 적용</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>십자레이저 기반 갠트리 원점 오차 확인 — 컨펌 및 적용</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>홀센서 UI 수정 — 컨펌 및 적용</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>수직용접, 로봇 자동 운전 조건 진단 — 컨펌 및 적용</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>UI 조작 로깅 / 작업자 사용 이력 로그 — 컨펌 및 적용</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>장비 상태 전송 GRPC 수신 서버 — 구현 및 컨펌</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>체크한 포인트만 용접 (순서/개수 확인), 계측홈/기본 Z홈 구분, 작업자/관리자 권한 설정</td>
+          <td style="text-align:center;"><span class="status-carry">이월</span></td>
+        </tr>
+        <tr>
+          <td rowspan="6"><span class="label-b">B라인</span></td>
+          <td>터치/갠트리 오프셋, 원점 확인, 홀센서 UI 수정 — 컨펌 및 적용</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>와이어 커팅 / 노즐 클리닝 / 스프레이 수동 티칭 — 컨펌 및 적용</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>로봇 자동 운전 조건 진단 (용접 활성화 여부 확인) — 컨펌 및 적용</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>UI 조작 로깅 / 작업자 사용 이력 로그 — 컨펌 및 적용</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>장비 상태 전송 GRPC 수신 서버 — 구현 및 컨펌</td>
+          <td style="text-align:center;"><span class="status-done">완료</span></td>
+        </tr>
+        <tr>
+          <td>한팔용접 (1xx 매크로) 동작 구현, 실시간 용접조건 변경, 작업자/관리자 권한 설정</td>
+          <td style="text-align:center;"><span class="status-carry">이월</span></td>
+        </tr>
+        <tr>
+          <td><span class="label-planb">Plan B</span></td>
+          <td>v1.9.62/v1.9.46 시나리오 E(200°) 재검증, 백업 zip + SHA-256 제출, Robot2 ArcL 기술 의사결정안</td>
+          <td style="text-align:center;"><span class="status-cont">진행중</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 출장 목적 -->
+    <h2>출장 목적</h2>
+    <table class="detail" style="margin-bottom:25px;">
+      <tr>
+        <th style="width:40px;">#</th>
+        <th>주요 목표</th>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:bold;">1</td>
+        <td><b>A라인 잔여 기능 완료</b> &mdash; 체크 포인트 용접(순서/개수), 계측홈/기본 Z홈 구분, 수직용접 최종 검증</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:bold;">2</td>
+        <td><b>B라인 한팔용접 완성</b> &mdash; 1xx 매크로 실물 테스트 완료, 실시간 용접조건 변경 적용</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:bold;">3</td>
+        <td><b>양산 안정화</b> &mdash; A/B라인 실부재 용접 테스트, 긴급 이슈 모니터링 및 현장 대응</td>
+      </tr>
+      <tr>
+        <td style="text-align:center; font-weight:bold;">4</td>
+        <td><b>Plan B RAPID 잔여 대응</b> &mdash; Robot2 ArcL 기술 의사결정안 확정, 현장 배포 후 안정화</td>
+      </tr>
+    </table>
+
+    <!-- 상세 일정 -->
+    <h2>상세 일정</h2>
+    <table class="detail">
+      <tr>
+        <th style="width:100px;">날짜</th>
+        <th style="width:80px;">구분</th>
+        <th>세부 업무</th>
+      </tr>
+
+      <!-- 3/3 -->
+      <tr>
+        <td rowspan="3" style="text-align:center; font-weight:bold;">3/3(화)</td>
+        <td colspan="2">이동 및 현장 점검 &mdash; 21차 연장 결과 인수인계, 이월 항목 우선순위 확인, 금주 계획 확정</td>
+      </tr>
+      <tr>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>배포 — 2월 28일자 컨펌 내용 적용</li>
+            <li>개발 — 수직용접 노티 연결</li>
+            <li>개발 — 로봇 자동 운전 조건 진단 (용접 활성화 여부 확인)</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-b">B라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>배포 — 2월 28일자 컨펌 내용 적용</li>
+            <li>개발 — 작업자/관리자 권한 설정 <span class="pl-tag">PL-2025-088</span></li>
+            <li>개발 — 로봇 자동 운전 조건 진단 (용접 활성화 여부 확인)</li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- 3/4 -->
+      <tr>
+        <td rowspan="2" style="text-align:center; font-weight:bold;">3/4(수)</td>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>개발 — 체크한 포인트만 용접 (순서/개수 확인) <span class="pl-tag">PL-2026-175</span></li>
+            <li>개발 — 작업자/관리자 권한 설정 <span class="pl-tag">PL-2025-088</span></li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-b">B라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>개발/실테스트 — 실시간 용접조건 변경 <span class="pl-tag">PL-2025-065</span></li>
+            <li>개발 — 체크한 포인트만 용접 (순서/개수 확인) <span class="pl-tag">PL-2026-175</span></li>
+            <li>개발 — 작업자/관리자 권한 설정 <span class="pl-tag">PL-2025-088</span></li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- 3/5 -->
+      <tr>
+        <td rowspan="2" style="text-align:center; font-weight:bold;">3/5(목)</td>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>개발 — 계측홈 / 기본 Z홈 구분 <span class="pl-tag">PL-2025-132</span></li>
+            <li>실테스트 — 체크한 포인트만 용접 <span class="pl-tag">PL-2026-175</span></li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-b">B라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>개발 — 매크로 미선택 시 전체 용접 데이터 표시 안됨 <span class="pl-tag">PL-2026-180</span></li>
+            <li>컨펌테스트 — 작업자/관리자 권한 설정 <span class="pl-tag">PL-2025-088</span></li>
+            <li>실테스트 — 체크한 포인트만 용접 <span class="pl-tag">PL-2026-175</span></li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- 3/6 -->
+      <tr>
+        <td style="text-align:center; font-weight:bold;">3/6(금)</td>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>개발 — 운영 S/W 최종 매뉴얼 제출 <span class="pl-tag">PL-2025-093</span></li>
+            <li>개발 — TCP 위치 기반 커맨드 완료/오류 여부 판단 <span class="pl-tag">PL-2025-146</span></li>
+            <li>실테스트 — 계측홈 / 기본 Z홈 구분 <span class="pl-tag">PL-2025-132</span></li>
+          </ul>
+        </td>
+      </tr>
+
+      <!-- 3/7 -->
+      <tr>
+        <td rowspan="3" style="text-align:center; font-weight:bold;">3/7(토)</td>
+        <td><span class="label-a">A라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>컨펌/배포 — 작업자/관리자 권한 설정 <span class="pl-tag">PL-2025-088</span></li>
+            <li>컨펌/배포 — 작업자 사용 이력 로그 기능 추가 <span class="pl-tag">PL-2025-104</span></li>
+            <li>컨펌/배포 — 계측홈 / 기본 Z홈 구분 <span class="pl-tag">PL-2025-132</span></li>
+            <li>컨펌/배포 — 체크한 포인트만 용접 <span class="pl-tag">PL-2026-175</span></li>
+            <li>루브처리 — 간이 오일팬 설치</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-b">B라인</span></td>
+        <td>
+          <ul class="work-list">
+            <li>컨펌/배포 — 실시간 용접조건 변경 <span class="pl-tag">PL-2025-065</span></li>
+            <li>컨펌/배포 — UI 조작 로깅 / 작업자 사용 이력 로그 <span class="pl-tag">PL-2025-099</span> <span class="pl-tag">PL-2025-104</span></li>
+            <li>컨펌/배포 — 작업자/관리자 권한 설정 <span class="pl-tag">PL-2025-088</span></li>
+            <li>컨펌/배포 — 체크한 포인트만 용접 <span class="pl-tag">PL-2026-175</span></li>
+            <li>차주 이관 사항 정리 및 인수인계 준비</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td><span class="label-mech">기구/전기</span></td>
+        <td>
+          <ul class="work-list">
+            <li>라이트커튼 설치 및 셋업 (A라인 / B라인)</li>
+            <li>차광막 설치 (A라인 / B라인)</li>
+            <li>A라인 루브처리 — 간이 오일팬 설치</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+
+    <!-- 긴급 모니터링 -->
+    <h2>긴급 모니터링 항목</h2>
+    <table class="detail" style="margin-bottom:25px;">
+      <tr>
+        <th style="width:120px;">펀치리스트</th>
+        <th>내용</th>
+        <th style="width:80px;">긴급도</th>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="pl-tag urgent">PL-2025-111</span></td>
+        <td>형상 보간 실패 에러</td>
+        <td style="text-align:center; color:#c0392b; font-weight:bold;">긴급</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="pl-tag urgent">PL-2025-113</span></td>
+        <td>Z축 과부하 에러</td>
+        <td style="text-align:center; color:#c0392b; font-weight:bold;">긴급</td>
+      </tr>
+      <tr>
+        <td style="text-align:center;"><span class="pl-tag urgent">PL-2026-184</span></td>
+        <td>Plan C 아크에러 동기화</td>
+        <td style="text-align:center; color:#c0392b; font-weight:bold;">긴급</td>
+      </tr>
+    </table>
+
+    <!-- 비고 -->
+    <h2>비고</h2>
+    <div class="remark">
+      <ul>
+        <li>21차 연장(주말작업 포함) 완료 — A/B라인 공통 기능(GRPC, UI 로깅/이력) 컨펌, B라인 한팔용접·실시간 용접조건·권한 설정 이월</li>
+        <li>Plan B RAPID v1.9.62(TASK1) / v1.9.46(TASK2) 현장 배포 후 안정화 지속</li>
+        <li>라이트커튼 미러타입 변경 추가비용 품의 별건 진행 중</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div style="margin-top:40px; text-align:right; font-size:9pt; color:#666;">
+    <p>에스피시스템스 개발팀</p>
+    <p style="font-weight:bold; color:#222; font-size:10pt;">심태양 부장</p>
+  </div>
+
+</div>
+</body>
+</html>

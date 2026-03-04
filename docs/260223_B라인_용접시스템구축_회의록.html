@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>B라인 용접 시스템 구축 및 운영 방안 회의록 (2026-02-23)</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; color: #333; max-width: 960px; margin: 20px auto; padding: 20px; background-color: #f4f7f9; }
+        .container { background-color: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; text-align: center; }
+        h2 { color: #2980b9; border-left: 5px solid #2980b9; padding-left: 10px; margin-top: 35px; }
+        h3 { color: #16a085; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background-color: #fff; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #f0f4f8; color: #2c3e50; font-weight: bold; }
+        td.left { text-align: left; }
+        .highlight { background-color: #e8f4fd; font-weight: bold; color: #2980b9; }
+        .plan-a { background-color: #fef9e7; }
+        .plan-b { background-color: #fdf2f8; }
+        .plan-c { background-color: #e9f7ef; }
+        ul { list-style-type: square; }
+        li { margin-bottom: 8px; }
+        .info-box { background-color: #fdf9e7; border-left: 5px solid #f1c40f; padding: 15px; margin: 20px 0; }
+        .plan-box { padding: 14px 18px; margin: 10px 0; border-radius: 6px; }
+        .plan-box.a { background-color: #fef9e7; border-left: 5px solid #f39c12; }
+        .plan-box.b { background-color: #fdf2f8; border-left: 5px solid #9b59b6; }
+        .plan-box.c { background-color: #e9f7ef; border-left: 5px solid #27ae60; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.82em; font-weight: bold; margin-left: 6px; }
+        .badge-current { background: #3498db; color: #fff; }
+        .badge-dev { background: #9b59b6; color: #fff; }
+        .badge-advanced { background: #27ae60; color: #fff; }
+        .action-table th { background-color: #2c3e50; color: #fff; }
+        .action-table td { text-align: left; }
+        .footer { margin-top: 40px; font-size: 0.9em; color: #7f8c8d; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>B라인 용접 시스템 구축 및 운영 방안 회의록</h1>
+
+    <!-- ============================
+         1. 회의 개요
+    ============================= -->
+    <h2>1. 회의 개요</h2>
+    <table>
+        <tbody>
+            <tr><th style="width:120px">일시</th><td class="left">2026년 2월 23일 (월) 15:00</td></tr>
+            <tr><th>장소</th><td class="left">본사 회의실</td></tr>
+            <tr><th>주요 안건</th><td class="left">B라인 용접 시스템 설정 점검 및 호기별 운영 플랜 확정</td></tr>
+            <tr><th>작성자</th><td class="left">이아란 사원 (에스피시스템)</td></tr>
+        </tbody>
+    </table>
+
+    <h3>참석자</h3>
+    <table>
+        <thead>
+            <tr><th>성명</th><th>직위</th><th>소속</th><th>역할</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>김충헌</td><td>부사장</td><td>에스피시스템</td><td>총괄</td></tr>
+            <tr><td>심태양</td><td>부장</td><td>에스피시스템</td><td>실무 총괄</td></tr>
+            <tr><td>이아란</td><td>사원</td><td>에스피시스템</td><td>회의록 작성</td></tr>
+            <tr><td>김병철</td><td>소장</td><td>디파인시스템</td><td>UI/소프트웨어 협력업체</td></tr>
+            <tr><td>김격림</td><td>사장</td><td>GR자동화</td><td>로봇 협력업체</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ============================
+         2. 현황 및 주요 기술적 문제점
+    ============================= -->
+    <h2>2. 현황 및 주요 기술적 문제점</h2>
+    <div class="info-box">
+        <ul>
+            <li>
+                <strong>[1호기] 용접기 교체에 따른 코드 재사용 불가:</strong>
+                기존 링컨(Lincoln) 용접기에서 EWM 용접기로 변경됨에 따라 아크웨어<sup>*</sup> 및 ArcLink XT<sup>**</sup> 기반의 기존 코드를 그대로 사용할 수 없는 상황 — 코드 재작성 또는 대체 모듈 적용 필요
+            </li>
+            <li>
+                <strong>[2호기] 용접기 미확보:</strong>
+                현재 2호기에 투입할 용접기가 준비되어 있지 않음
+                <ul style="margin-top:6px">
+                    <li>R450 용접기: 중소조선연구소(RIMS)로부터 대여 필요</li>
+                    <li>S700 용접기: 대불산단에서 대여 필요</li>
+                </ul>
+            </li>
+            <li>
+                <strong>[2호기] 조달 계획 미확정:</strong>
+                상기 용접기 대여를 위한 구체적인 일정 및 방법이 아직 확정되지 않은 상태
+            </li>
+            <li><strong>통신 불안정:</strong> 중소조선연구소(RIMS)<sup>***</sup>와의 소켓 통신 반응 속도 저하 및 프로그램 다운 현상 확인</li>
+        </ul>
+        <p style="font-size:0.88em; color:#555; margin-top:10px">
+            <sup>*</sup> <strong>아크웨어(ArcWare)</strong>: ABB 로봇에서 용접 실행 시 사용하는 용접 제어 모듈<br>
+            <sup>**</sup> <strong>ArcLink XT</strong>: ABB 로봇과 Lincoln 용접기 간 접속 통신 모듈<br>
+            <sup>***</sup> <strong>RIMS (중소조선연구소)</strong>: 2호기 적용 회전 토치 개발 기관 — 소켓 통신으로 시스템과 연동
+        </p>
+    </div>
+
+    <!-- ============================
+         3. 호기별 상세 사양 및 결정 사항
+    ============================= -->
+    <h2>3. 호기별 상세 사양 및 결정 사항</h2>
+    <div class="info-box" style="border-left-color:#27ae60; background:#eafaf1">
+        <strong>【최종 결정】</strong>
+        본 회의에서 B라인 호기별 적용 플랜을 다음과 같이 확정하였음
+        <ul style="margin-top:8px">
+            <li><strong>1번 거더 (1호기):</strong> 플랜 B 적용</li>
+            <li><strong>2번 거더 (2호기):</strong> 플랜 C 적용</li>
+        </ul>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>구분</th>
+                <th>용접기 사양</th>
+                <th>토치 및 센싱 방식</th>
+                <th>적용 플랜</th>
+                <th>비고</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="plan-b">
+                <td class="highlight">1호기</td>
+                <td>EWM 용접기</td>
+                <td>프로니우스(Fronius) 상용 토치<br><span style="font-size:0.88em;color:#555">직접터치식 용접모션 구현 예정</span></td>
+                <td><strong>플랜 B</strong></td>
+                <td class="left">개발 중 — 검증 필요</td>
+            </tr>
+            <tr class="plan-c">
+                <td class="highlight">2호기</td>
+                <td>링컨(Lincoln) R450 + S700 <span style="font-size:0.85em;color:#c0392b">(대여 예정)</span></td>
+                <td>회전 토치 + 더블 와이어 토치<br><span style="font-size:0.88em;color:#555">비접촉 비전 센싱 (직접터치식 적용 불가)</span></td>
+                <td><strong>플랜 C</strong></td>
+                <td class="left">고도화 — 돌림용접 포함</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>세부 추진 전략</h3>
+    <ul>
+        <li>
+            <strong>[1호기] 직접터치식 용접모션 구현:</strong>
+            프로니우스 상용 토치의 강성이 충분하므로 직접터치식 센싱 방식으로 용접 위치를 검출하여 자동 용접모션 구현
+        </li>
+        <li>
+            <strong>[2호기] 비접촉 비전 센싱 도입:</strong>
+            회전 토치는 구조적 강성이 부족하여 직접터치식 적용 시 내구성 문제로 시운전 자체가 불가능할 것으로 판단 — 비접촉 비전 카메라(1호기에서 이전 배치)를 통해 용접선 검출 방식 적용
+        </li>
+        <li><strong>[2호기] 공법 고도화:</strong> S700 기반 더블 와이어 동시 공급 및 Weld Guide 트래킹 적용으로 돌림용접 구현</li>
+        <li><strong>공정 최적화:</strong> 설비 특성에 맞춰 '한 판씩 순차 용접' 방식 채택</li>
+    </ul>
+
+    <!-- ============================
+         4. 모니터링 및 UI 구성
+    ============================= -->
+    <h2>4. 모니터링 및 UI 구성</h2>
+    <ul>
+        <li><strong>데이터 가시화:</strong> 시작점/끝점(Start/End Point) 표시로 공정률 확인 간소화 — 실시간성 확보 (김병철 소장 담당)</li>
+        <li><strong>통합 관리:</strong> 별도 PC 없이 운영 소프트웨어 UI 내 3D 관제 뷰 통합 운영</li>
+    </ul>
+
+    <!-- ============================
+         5. 향후 일정 및 운영 계획
+    ============================= -->
+    <h2>5. 향후 일정 및 운영 계획</h2>
+    <ul>
+        <li><strong>현장 테스트:</strong> 4월 중순 전기 투입 및 I-Check 일정에 맞춰 기술 인력 투입</li>
+        <li><strong>데이터 정밀화:</strong> 2호기 적용을 위한 기존 RPM·매크로 데이터 업데이트 진행</li>
+    </ul>
+
+    <!-- ============================
+         6. 액션 아이템
+    ============================= -->
+    <h2>6. 액션 아이템</h2>
+    <table class="action-table">
+        <thead>
+            <tr><th style="width:120px">담당자</th><th>항목</th><th style="width:130px">기한</th><th style="width:80px">상태</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>심태양 부장</td>
+                <td class="left">1호기 플랜 B 고도화 적용 — EWM 용접기 전환에 따른 아크웨어/ArcLink XT 대체 모듈 검토 및 코드 재작성 방안 수립</td>
+                <td>2026-03-15</td>
+                <td>진행 중</td>
+            </tr>
+            <tr>
+                <td>김충헌 부사장</td>
+                <td class="left">2호기 R450 용접기 대여 일정·방법 중소조선연구소(RIMS)와 협의 확정</td>
+                <td>미확정 (4월 초 목표)</td>
+                <td>미확정</td>
+            </tr>
+            <tr>
+                <td>김충헌 부사장</td>
+                <td class="left">2호기 S700 용접기 대여 — 대불산단 출신 RIMS 이직자 통해 조달 경로 확인 (김충헌 부사장이 직접 연락)</td>
+                <td>미확정 (4월 초 목표)</td>
+                <td>미확정</td>
+            </tr>
+            <tr>
+                <td>김격림 사장</td>
+                <td class="left">2호기 회전 토치 셋업 완료 (R450·S700 확보 후 착수)</td>
+                <td>2026-04-초</td>
+                <td>예정</td>
+            </tr>
+            <tr>
+                <td>김병철 소장</td>
+                <td class="left">Start/End Point 공정률 표시 UI 구현 및 3D 관제 뷰 통합</td>
+                <td>2026-03-31</td>
+                <td>예정</td>
+            </tr>
+            <tr>
+                <td>심태양 부장</td>
+                <td class="left">중소조선연구소(RIMS) 소켓 통신 안정화 방안 검토 (반응속도 개선)</td>
+                <td>2026-03-15</td>
+                <td>예정</td>
+            </tr>
+            <tr>
+                <td>김격림 사장</td>
+                <td class="left">1호기 비전 카메라 2호기 이전 배치 및 캘리브레이션</td>
+                <td>2026-04-초</td>
+                <td>예정</td>
+            </tr>
+            <tr>
+                <td>심태양 부장</td>
+                <td class="left">2호기 적용용 RPM·매크로 데이터 업데이트</td>
+                <td>2026-04-초</td>
+                <td>예정</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ============================
+         7. 차기 회의
+    ============================= -->
+    <h2>7. 차기 회의</h2>
+    <table>
+        <tbody>
+            <tr><th style="width:120px">예정 일시</th><td class="left">2026년 3월 중 (일정 별도 공지)</td></tr>
+            <tr><th>안건</th><td class="left">플랜 B 검증 결과 보고 / 2호기 셋업 진도 점검</td></tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        본 회의록은 2026년 2월 23일 회의 내용을 바탕으로 작성되었습니다.<br>
+        <strong>작성:</strong> 이아란 (에스피시스템) &nbsp;|&nbsp; <strong>검토:</strong> 심태양 부장 &nbsp;|&nbsp; <strong>배포:</strong> 참석자 전원
+    </div>
+</div>
+
+</body>
+</html>
