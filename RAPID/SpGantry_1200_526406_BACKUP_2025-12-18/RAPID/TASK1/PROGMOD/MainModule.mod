@@ -2911,12 +2911,13 @@ PROC TestMenu()
 		TPWrite " 13. Guard Test (#8 TC T1~T5)";
 		TPWrite " 14. Swap Scenarios (A~E auto)";
 		TPWrite " 15. [Hybrid] DefineWeldLine->Gantry Stage1";
+		TPWrite " 16. [Hybrid] Gantry+Arc Stage2 (weld traverse)";
 		TPWrite "  0. Exit";
 		TPWrite "";
 		TPWrite "----------------------------------------";
 
 		! Numeric selection
-		TPReadNum menu_sel, "Select (0-15): ";
+		TPReadNum menu_sel, "Select (0-16): ";
 
 		TEST menu_sel
 		CASE 1:
@@ -3038,13 +3039,21 @@ PROC TestMenu()
 			TPWrite "Press any key to continue...";
 			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
 
+		CASE 16:
+			TPErase;
+			TPWrite "[Menu] Hybrid: Gantry+Arc Stage2...";
+			TestPlanAB_Stage2;
+			TPWrite "";
+			TPWrite "Press any key to continue...";
+			TPReadFK menu_sel, "Continue?", "OK", "", "", "", "";
+
 		CASE 0:
 			TPErase;
 			TPWrite "[Menu] Exiting Test Menu...";
 			menu_loop := FALSE;
 
 		DEFAULT:
-			TPWrite "[Menu] Invalid selection (0-14)";
+			TPWrite "[Menu] Invalid selection (0-16)";
 			WaitTime 1;
 		ENDTEST
 	ENDWHILE
@@ -6360,6 +6369,130 @@ ERROR
 	Close cfg_file;
 	Close res_file;
 	TRYNEXT;
+ENDPROC
+
+! ============================================================
+! TestPlanAB_Stage2 - Hybrid Stage2 Gantry+Arc Traverse (v0.1.0)
+! ============================================================
+! Stage2 extends Stage1 by adding full weld positioning and
+! arc-on gantry traversal (gantry drives the weld motion).
+!
+! Architecture: robot arm mounted on gantry carriage.
+!   - Gantry positions to weld start (MoveGantryToWeldPosition)
+!   - Robot arm positions relative to carriage (MoveRobotToWeldPosition)
+!   - WELD_ARC_ENABLED=TRUE during gantry traverse start->end
+!   - Output: HOME:/planab_stage2.txt
+!
+! Menu: 16
+! Input file: swap_test.txt (same format as Stage1)
+! ============================================================
+PROC TestPlanAB_Stage2()
+	VAR iodev cfg_file;
+	VAR iodev res_file;
+	VAR string line;
+	VAR num nScenarios;
+	VAR num sx;
+	VAR num sy;
+	VAR num sz;
+	VAR num ex;
+	VAR num ey;
+	VAR num ez;
+	VAR bool ok;
+	VAR num i;
+	VAR jointtarget jt_end;
+	VAR pos phys;
+	VAR num target_r;
+	CONST num WELD_SPEED := 20;  ! mm/s
+
+	TPWrite "========================================";
+	TPWrite "[STAGE2] PlanAB Stage2 Gantry+Arc";
+	TPWrite "Gantry traverse with arc signal";
+	TPWrite "========================================";
+
+	Open "HOME:/swap_test.txt", cfg_file \Read;
+	Open "HOME:/planab_stage2.txt", res_file \Write;
+	Write res_file, "PlanAB Hybrid Stage2 Test - " + CDate() + " " + CTime();
+	Write res_file, "Version=" + TASK1_VERSION;
+	Write res_file, "Concept: MoveGantryToWeldPos + MoveRobotToWeldPos + ArcTraverse";
+	Write res_file, "WELD_ARC_ENABLED_before=" + ValToStr(WELD_ARC_ENABLED);
+
+	! Read scenario count
+	line := ReadStr(cfg_file);
+	ok := StrToVal(line, nScenarios);
+	Write res_file, "Scenarios=" + NumToStr(nScenarios,0);
+
+	FOR i FROM 1 TO nScenarios DO
+		! Read 6 lines: sx, sy, sz, ex, ey, ez
+		line := ReadStr(cfg_file); ok := StrToVal(line, sx);
+		line := ReadStr(cfg_file); ok := StrToVal(line, sy);
+		line := ReadStr(cfg_file); ok := StrToVal(line, sz);
+		line := ReadStr(cfg_file); ok := StrToVal(line, ex);
+		line := ReadStr(cfg_file); ok := StrToVal(line, ey);
+		line := ReadStr(cfg_file); ok := StrToVal(line, ez);
+
+		calcPosStart.x := sx;  calcPosStart.y := sy;  calcPosStart.z := sz;
+		calcPosEnd.x   := ex;  calcPosEnd.y   := ey;  calcPosEnd.z   := ez;
+
+		Write res_file, "";
+		Write res_file, "=== Scenario " + NumToStr(i,0) + "/" + NumToStr(nScenarios,0) + " ===";
+		Write res_file, "Start=[" + NumToStr(sx,0) + "," + NumToStr(sy,0) + "," + NumToStr(sz,0) + "]";
+		Write res_file, "End=[" + NumToStr(ex,0) + "," + NumToStr(ey,0) + "," + NumToStr(ez,0) + "]";
+		TPWrite "[STAGE2] === Scenario " + NumToStr(i,0) + "/" + NumToStr(nScenarios,0) + " ===";
+
+		! Step 1: DefineWeldLine -> angle + bRobSwap
+		DefineWeldLine;
+		Write res_file, "R_angle=" + NumToStr(nAngleRzStore,2) + "deg bRobSwap=" + ValToStr(bRobSwap);
+
+		! Step 2: BridgeToGantry -> store WeldsG_* PERS
+		BridgeToGantry WELD_SPEED;
+
+		! Step 3: Gantry to weld START (full positioning proc)
+		TPWrite "[STAGE2] Gantry -> weld start...";
+		MoveGantryToWeldPosition;
+		Write res_file, "Gantry at start OK";
+
+		! Step 4: Robot arm to weld pose (relative to carriage)
+		TPWrite "[STAGE2] Robot arm -> weld pose...";
+		MoveRobotToWeldPosition;
+		Write res_file, "Robot at weld pose OK";
+
+		! Step 5: Build end jointtarget (gantry at END, same robot joints)
+		target_r := HOME_GANTRY_R - nAngleRzStore;
+		jt_end := CJointT();
+		phys := FloorToPhysical(calcPosEnd);
+		jt_end.extax.eax_a := phys.x;
+		jt_end.extax.eax_b := phys.y;
+		jt_end.extax.eax_c := phys.z;
+		jt_end.extax.eax_d := target_r;
+		jt_end.extax.eax_f := phys.x;
+		Write res_file, "Traverse end(Phys): X=" + NumToStr(phys.x,1)
+		        + " Y=" + NumToStr(phys.y,1)
+		        + " Z=" + NumToStr(phys.z,1);
+
+		! Step 6: Arc ON -> gantry traverses weld line at weld speed
+		TPWrite "[STAGE2] ARC ON -> gantry traverse...";
+		WELD_ARC_ENABLED := TRUE;
+		Write res_file, "ARC_ON: gantry traversing at " + NumToStr(WELD_SPEED,0) + "mm/s";
+		MoveAbsJ jt_end, [WELD_SPEED,200,WELD_SPEED,200], fine, tool0;
+		WaitRob \InPos;
+
+		! Step 7: Arc OFF
+		WELD_ARC_ENABLED := FALSE;
+		TPWrite "[STAGE2] ARC OFF";
+		Write res_file, "ARC_OFF: traverse complete";
+
+		Write res_file, "Result=COMPLETE";
+		TPWrite "[STAGE2] Scenario " + NumToStr(i,0) + " COMPLETE";
+		WaitTime 1;
+	ENDFOR
+
+	Close cfg_file;
+	Write res_file, "";
+	Write res_file, "=== Stage2 Test Complete ===";
+	Close res_file;
+
+	WELD_ARC_ENABLED := FALSE;  ! Ensure arc off on exit
+	TPWrite "[STAGE2] Done. See HOME:/planab_stage2.txt";
 ENDPROC
 
 ENDMODULE
