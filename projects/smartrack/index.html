@@ -7,6 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
   <style>
     :root {
       --bg: #FAFAF9;
@@ -27,6 +30,13 @@
       --violet: #7C3AED;
       --violet-soft: #F5F3FF;
       --sans: "Outfit", "Noto Sans KR", system-ui, sans-serif;
+      /* Ant Design supplementary tokens */
+      --ant-primary: #1677ff;
+      --ant-success: #52c41a; --ant-success-bg: #f6ffed;
+      --ant-warning: #faad14; --ant-warning-bg: #fffbe6;
+      --ant-error: #ff4d4f;   --ant-error-bg: #fff2f0;
+      --ant-purple: #722ed1;
+      --ant-shadow-md: 0 6px 16px rgba(0,0,0,.08), 0 3px 6px -4px rgba(0,0,0,.12), 0 9px 28px 8px rgba(0,0,0,.05);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; overflow-y: scroll; }
@@ -51,6 +61,114 @@
     body.mode-report .slide-counter { display: none; }
     body.mode-report .toc-sidebar { display: flex; }
     body.mode-report .ppt-only { display: none !important; }
+
+    /* ===== PPT 16:9 SLIDE CARD ===== */
+    body.mode-ppt .slide {
+      background: #1a1a2e; padding: 0;
+      display: flex; justify-content: center; align-items: center;
+    }
+    body.mode-ppt .slide-card {
+      width: calc(100vh * 16 / 9); max-width: 96vw; max-height: 96vh;
+      aspect-ratio: 16 / 9;
+      background: var(--surface); border-radius: 12px;
+      box-shadow: 0 8px 60px rgba(0,0,0,.35);
+      overflow: hidden auto; padding: 36px 48px;
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+    /* thin scrollbar if content overflows */
+    body.mode-ppt .slide-card::-webkit-scrollbar { width: 4px; }
+    body.mode-ppt .slide-card::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 4px; }
+    body.mode-ppt .slide-card::-webkit-scrollbar-track { background: transparent; }
+
+    body.mode-ppt .slide-card .slide-inner { max-width: 100%; width: 100%; }
+    body.mode-ppt .slide-card .slide-num { font-size: 80px; top: 16px; left: 32px; }
+
+    /* PPT density: tighter spacing to fit 16:9 */
+    body.mode-ppt .slide-inner { gap: 14px; }
+    body.mode-ppt h2 { font-size: clamp(22px, 2.8vw, 34px); }
+    body.mode-ppt .subtitle { font-size: 14px; }
+    body.mode-ppt .row { gap: 14px; }
+    body.mode-ppt .card { padding: 16px; border-radius: 12px; }
+    body.mode-ppt .callout { padding: 10px 14px; font-size: 12px; }
+    body.mode-ppt .stat-row { gap: 10px; }
+    body.mode-ppt .stat-box { padding: 10px; }
+    body.mode-ppt .stat-num { font-size: 26px; }
+    body.mode-ppt .stat-label { font-size: 11px; }
+    body.mode-ppt table { font-size: 11px; }
+    body.mode-ppt th { padding: 6px 10px; }
+    body.mode-ppt td { padding: 5px 10px; }
+    body.mode-ppt .diagram-wrap { padding: 12px; border-radius: 12px; }
+    body.mode-ppt .seq-strip { gap: 8px; }
+    body.mode-ppt .panel-row { gap: 10px; }
+    body.mode-ppt .roadmap { height: 44px; }
+    body.mode-ppt .rm-seg { font-size: 11px; padding: 8px 6px; }
+    body.mode-ppt .rm-seg small { font-size: 10px; }
+
+    /* PPT per-section fixes for tight slides */
+    /* sec02: SVG + 3 cards */
+    body.mode-ppt #sec02 .diagram-wrap { padding: 8px; }
+    body.mode-ppt #sec02 .diagram-wrap svg { max-height: 200px; }
+    body.mode-ppt #sec02 .row .card p { font-size: 11px; line-height: 1.5; }
+
+    /* sec04: 3 benchmark cards + positioning map */
+    body.mode-ppt #sec04 .row .card { padding: 12px; }
+    body.mode-ppt #sec04 .row .card p { font-size: 11px; line-height: 1.5; }
+    body.mode-ppt #sec04 .ppt-only .card { padding: 10px 16px; }
+    body.mode-ppt #sec04 .ppt-only svg { max-height: 160px; }
+
+    /* sec05: SVG + 3-col grid + callout */
+    body.mode-ppt #sec05 [style*="display:grid"] { gap: 10px; }
+    body.mode-ppt #sec05 [style*="display:grid"] > div { padding: 14px; font-size: 11px; }
+    body.mode-ppt #sec05 ul { font-size: 11px; line-height: 1.6; }
+
+    /* sec06: 3 role cards */
+    body.mode-ppt #sec06 .row .card { padding: 14px; }
+    body.mode-ppt #sec06 .row .card p { font-size: 10px; line-height: 1.5; }
+
+    /* sec08: 전체 물류 프로세스 SVG */
+    body.mode-ppt #sec08 .diagram-wrap svg { max-height: 220px; }
+
+    /* sec09: 단위공정별 물량 관리 2-col */
+    body.mode-ppt #sec09 .row > .card svg { max-height: 120px; }
+
+    /* sec11 (랙장 컨셉): 3-zone grid with SVGs */
+    body.mode-ppt #sec11 [style*="display:grid"] > div { padding: 12px; }
+    body.mode-ppt #sec11 svg { max-height: 80px; }
+
+    /* sec15 (이송 방식 비교): 3 cards + callout + video links */
+    body.mode-ppt #sec15 .row .card { padding: 12px; }
+    body.mode-ppt #sec15 .row .card > div { font-size: 10px; line-height: 1.5; }
+
+    /* sec20 (AMR 도킹): SVG + side cards */
+    body.mode-ppt #sec20 .diagram-wrap svg { max-height: 200px; }
+    body.mode-ppt #sec20 .card ol, body.mode-ppt #sec20 .card ul { font-size: 11px; line-height: 1.6; }
+
+    /* sec22 (입출고 시퀀스): 6-col grid */
+    body.mode-ppt #sec22 [style*="grid-template-columns"] { gap: 8px; }
+
+    /* sec23 (컨소시엄): 2×3 consortium grid */
+    body.mode-ppt #sec23 [style*="display:grid"] { gap: 8px; }
+    body.mode-ppt #sec23 [style*="display:grid"] .card { padding: 12px; }
+
+    /* sec24 (로드맵): roadmap + table + stats + cards — densest slide */
+    body.mode-ppt #sec24 .row { gap: 10px; }
+    body.mode-ppt #sec24 .row .card { padding: 12px; }
+    body.mode-ppt #sec24 .row .card h3 { font-size: 13px; margin-bottom: 4px; }
+
+    /* Force inline-style padding overrides via !important where needed */
+    body.mode-ppt #sec11 [style*="display:grid"] > div { padding: 12px !important; }
+    body.mode-ppt #sec11 [style*="display:grid"] > div > div[style*="font-size:15px"] { font-size: 13px !important; margin-bottom: 4px !important; }
+    body.mode-ppt #sec05 [style*="display:grid"] > div { padding: 14px !important; }
+    body.mode-ppt #sec23 [style*="display:grid"] > .card { padding: 12px !important; }
+
+    /* Report mode: slide-card passthrough */
+    body.mode-report .slide-card {
+      width: 100%; background: transparent;
+      border-radius: 0; box-shadow: none;
+      padding: 0; aspect-ratio: auto; max-height: none;
+      overflow: visible;
+    }
 
     /* ===== MODE TOGGLE ===== */
     .mode-toggle {
@@ -253,7 +371,6 @@
     .rm-seg small { font-weight: 400; opacity: .85; font-size: 11px; }
 
     /* ===== TITLE SLIDE ===== */
-    .slide-title { background: linear-gradient(135deg, #ECFDF5 0%, #FAFAF9 40%, #FFFBEB 100%); }
     .title-main {
       font-size: clamp(42px, 5.5vw, 72px); font-weight: 900;
       line-height: 1.1; letter-spacing: -2px;
@@ -276,6 +393,10 @@
       body.mode-report .main-content { margin-left: 0; }
       .mode-toggle { top: 10px; right: 10px; }
       .seq-arrow { display: none; }
+      body.mode-ppt .slide-card {
+        width: 96vw; aspect-ratio: auto; max-height: none;
+        padding: 24px 16px; border-radius: 8px;
+      }
     }
 
     /* ===== ANIMATION ===== */
@@ -376,37 +497,39 @@
 
 <!-- MODE TOGGLE -->
 <div class="mode-toggle">
-  <button class="mode-btn active" data-mode="ppt" onclick="setMode('ppt')">프레젠테이션</button>
-  <button class="mode-btn" data-mode="report" onclick="setMode('report')">보고서</button>
+  <button class="mode-btn active" data-mode="ppt" onclick="setMode('ppt')"><i class="mdi mdi-presentation" style="margin-right:4px"></i>프레젠테이션</button>
+  <button class="mode-btn" data-mode="report" onclick="setMode('report')"><i class="mdi mdi-file-document-outline" style="margin-right:4px"></i>보고서</button>
 </div>
 
 <!-- TOC SIDEBAR (Report mode) -->
 <nav class="toc-sidebar" id="tocSidebar">
   <div class="toc-title">목차</div>
-  <a class="toc-item" href="#sec01">01 타이틀</a>
-  <a class="toc-item" href="#sec02">02 문제 정의</a>
-  <a class="toc-item" href="#sec03">03 대상 부재 형상</a>
-  <a class="toc-item" href="#sec04">04 글로벌 벤치마킹</a>
-  <a class="toc-item" href="#sec05">05 블루오션 포지셔닝</a>
-  <a class="toc-item" href="#sec06">06 SP 3대 개발 역할</a>
-  <a class="toc-item" href="#sec07">07 물류 흐름도</a>
+  <a class="toc-item" href="#sec01"><i class="mdi mdi-home" style="margin-right:6px;opacity:.6"></i>01 타이틀</a>
+  <a class="toc-item" href="#sec02"><i class="mdi mdi-alert-circle-outline" style="margin-right:6px;opacity:.6"></i>02 문제 정의</a>
+  <a class="toc-item" href="#sec03"><i class="mdi mdi-shape-outline" style="margin-right:6px;opacity:.6"></i>03 대상 부재 형상</a>
+  <a class="toc-item" href="#sec04"><i class="mdi mdi-earth" style="margin-right:6px;opacity:.6"></i>04 글로벌 벤치마킹</a>
+  <a class="toc-item" href="#sec05"><i class="mdi mdi-diamond-stone" style="margin-right:6px;opacity:.6"></i>05 블루오션 포지셔닝</a>
+  <a class="toc-item" href="#sec06"><i class="mdi mdi-account-hard-hat" style="margin-right:6px;opacity:.6"></i>06 SP 3대 개발 역할</a>
+  <a class="toc-item" href="#sec07"><i class="mdi mdi-truck-fast-outline" style="margin-right:6px;opacity:.6"></i>07 물류 흐름도</a>
   <a class="toc-item" href="#sec07b">07b 입고~출고 세부 단계</a>
   <a class="toc-item" href="#sec07c">07c 시스템 연동 아키텍처</a>
-  <a class="toc-item" href="#sec08">08 소부재 분류 AI</a>
-  <a class="toc-item" href="#sec09">09 랙장 컨셉</a>
-  <a class="toc-item" href="#sec10">10 다중 랙 배치</a>
-  <a class="toc-item" href="#sec11">11 핵심 아이디어</a>
-  <a class="toc-item" href="#sec12">12 유연성 시연</a>
-  <a class="toc-item" href="#sec13">13 이송 방식 비교</a>
-  <a class="toc-item" href="#sec14">14 컨셉 A — 핀-그리드</a>
-  <a class="toc-item" href="#sec15">15 컨셉 B — 전동 서포트</a>
-  <a class="toc-item" href="#sec16">16 컨셉 C — 셀 어레이</a>
-  <a class="toc-item" href="#sec17">17 랙 모듈 + 안전</a>
-  <a class="toc-item" href="#sec18">18 AMR 도킹</a>
-  <a class="toc-item" href="#sec19">19 시스템 아키텍처</a>
-  <a class="toc-item" href="#sec20">20 입출고 시퀀스</a>
-  <a class="toc-item" href="#sec21">21 컨소시엄 역할 분담</a>
-  <a class="toc-item" href="#sec22">22 로드맵 + 결론</a>
+  <a class="toc-item" href="#sec08"><i class="mdi mdi-swap-horizontal" style="margin-right:6px;opacity:.6"></i>08 전체 물류 프로세스</a>
+  <a class="toc-item" href="#sec09"><i class="mdi mdi-package-variant-closed" style="margin-right:6px;opacity:.6"></i>09 단위공정별 물량 관리</a>
+  <a class="toc-item" href="#sec10"><i class="mdi mdi-brain" style="margin-right:6px;opacity:.6"></i>10 소부재 분류 AI</a>
+  <a class="toc-item" href="#sec11"><i class="mdi mdi-warehouse" style="margin-right:6px;opacity:.6"></i>11 랙장 컨셉</a>
+  <a class="toc-item" href="#sec12"><i class="mdi mdi-grid-large" style="margin-right:6px;opacity:.6"></i>12 다중 랙 배치</a>
+  <a class="toc-item" href="#sec13"><i class="mdi mdi-lightbulb-on-outline" style="margin-right:6px;opacity:.6"></i>13 핵심 아이디어</a>
+  <a class="toc-item" href="#sec14"><i class="mdi mdi-swap-horizontal" style="margin-right:6px;opacity:.6"></i>14 유연성 시연</a>
+  <a class="toc-item" href="#sec15"><i class="mdi mdi-compare-horizontal" style="margin-right:6px;opacity:.6"></i>15 이송 방식 비교</a>
+  <a class="toc-item" href="#sec16"><i class="mdi mdi-alpha-a-circle-outline" style="margin-right:6px;opacity:.6"></i>16 컨셉 A — 핀-그리드</a>
+  <a class="toc-item" href="#sec17"><i class="mdi mdi-alpha-b-circle-outline" style="margin-right:6px;opacity:.6"></i>17 컨셉 B — 전동 서포트</a>
+  <a class="toc-item" href="#sec18"><i class="mdi mdi-alpha-c-circle-outline" style="margin-right:6px;opacity:.6"></i>18 컨셉 C — 셀 어레이</a>
+  <a class="toc-item" href="#sec19"><i class="mdi mdi-shield-check-outline" style="margin-right:6px;opacity:.6"></i>19 랙 모듈 + 안전</a>
+  <a class="toc-item" href="#sec20"><i class="mdi mdi-robot-industrial" style="margin-right:6px;opacity:.6"></i>20 AMR 도킹</a>
+  <a class="toc-item" href="#sec21"><i class="mdi mdi-sitemap-outline" style="margin-right:6px;opacity:.6"></i>21 시스템 아키텍처</a>
+  <a class="toc-item" href="#sec22"><i class="mdi mdi-arrow-right-bold-box-outline" style="margin-right:6px;opacity:.6"></i>22 입출고 시퀀스</a>
+  <a class="toc-item" href="#sec23"><i class="mdi mdi-account-group-outline" style="margin-right:6px;opacity:.6"></i>23 컨소시엄 역할 분담</a>
+  <a class="toc-item" href="#sec24"><i class="mdi mdi-calendar-clock" style="margin-right:6px;opacity:.6"></i>24 로드맵 + 결론</a>
 </nav>
 
 <!-- NAV DOTS (PPT mode) -->
@@ -416,10 +539,11 @@
 <div class="main-content">
 
 <!-- ===== SECTION 01: TITLE ===== -->
-<section class="slide slide-title" id="sec01" data-title="타이틀">
+<section class="slide" id="sec01" data-title="타이틀">
+  <div class="slide-card" style="background:linear-gradient(135deg, #ECFDF5 0%, #FAFAF9 40%, #FFFBEB 100%)">
   <div class="slide-inner" style="justify-content:center;">
     <div>
-      <span class="slide-tag tag-green">유연생산시스템 R&D</span>
+      <span class="slide-tag tag-green" data-aos="fade-up">유연생산시스템 R&D</span>
     </div>
     <h1 class="title-main">
       <em>스마트랙</em><br/>
@@ -432,18 +556,21 @@
     <div class="title-meta">
       <span><b>에스피시스템스</b> 연구소</span>
       <span>삼성중공업 거제조선소</span>
-      <span>2026.02</span>
+      <span>2026.03</span>
+      <span style="color:var(--amber);font-weight:600"><i class="mdi mdi-calendar-clock" style="margin-right:2px"></i>사업계획서 제출 3/25</span>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
 <!-- ===== SECTION 02: 문제 정의 — Before/After ===== -->
 <section class="slide" id="sec02" data-title="문제 정의">
+  <div class="slide-card">
   <span class="slide-num">02</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-rose">문제 정의</span>
-      <h2 style="margin-top:8px">왜 스마트랙이 필요한가?</h2>
+      <span class="slide-tag tag-rose" data-aos="fade-up">문제 정의</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">왜 스마트랙이 필요한가?</h2>
     </div>
 
     <!-- Before / After SVG -->
@@ -540,16 +667,18 @@
       </p>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
 <!-- ===== SECTION 03: 대상 부재 형상 (참고 이미지) ===== -->
 <section class="slide" id="sec03" data-title="대상 부재">
+  <div class="slide-card">
   <span class="slide-num">03</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-green">대상 부재</span>
-      <h2 style="margin-top:8px">다양한 형상 → 유연 적치 필요</h2>
-      <p class="subtitle">조선 소조립 부재는 형상·크기·무게가 매우 다양합니다. 고정 적치대로는 대응 불가.</p>
+      <span class="slide-tag tag-green" data-aos="fade-up">대상 부재</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">다양한 형상 → 유연 적치 필요</h2>
+      <p class="subtitle" data-aos="fade-up">조선 소조립 부재는 형상·크기·무게가 매우 다양합니다. 고정 적치대로는 대응 불가.</p>
     </div>
 
     <!-- PPT: 4장 한 줄 / Report: 2×2 그리드 -->
@@ -620,16 +749,18 @@
       </table>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
 <!-- ===== SECTION 04: 벤치마킹 / 참고 사례 ===== -->
 <section class="slide" id="sec04" data-title="벤치마킹">
+  <div class="slide-card">
   <span class="slide-num">04</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-blue">벤치마킹</span>
-      <h2 style="margin-top:8px">유사 기술 — 글로벌 참고 사례</h2>
-      <p class="subtitle">5개 카테고리 20+개사 조사 — 핵심 3사를 영상/사진으로 소개합니다.</p>
+      <span class="slide-tag tag-blue" data-aos="fade-up">벤치마킹</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">유사 기술 — 글로벌 참고 사례</h2>
+      <p class="subtitle" data-aos="fade-up">5개 카테고리 20+개사 조사 — 핵심 3사를 영상/사진으로 소개합니다.</p>
     </div>
 
     <!-- PPT: 5개 카테고리 스코프 태그 라인 -->
@@ -645,7 +776,7 @@
       <!-- ADAPA -->
       <div class="card" style="padding:16px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span class="slide-tag tag-green" style="font-size:10px">핵심 참고</span>
+          <span class="slide-tag tag-green" data-aos="fade-up" style="font-size:10px">핵심 참고</span>
           <span style="font-size:11px;color:var(--muted)">덴마크</span>
         </div>
         <h3 style="font-size:15px">ADAPA — Adaptive Mould</h3>
@@ -663,7 +794,7 @@
       <!-- Pemamek -->
       <div class="card" style="padding:16px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span class="slide-tag tag-amber" style="font-size:10px">조선 자동화</span>
+          <span class="slide-tag tag-amber" data-aos="fade-up" style="font-size:10px">조선 자동화</span>
           <span style="font-size:11px;color:var(--muted)">핀란드</span>
         </div>
         <h3 style="font-size:15px">Pemamek — PEMA Panel Line</h3>
@@ -681,7 +812,7 @@
       <!-- Comau MR4WELD -->
       <div class="card" style="padding:16px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span class="slide-tag tag-blue" style="font-size:10px">최신 트렌드</span>
+          <span class="slide-tag tag-blue" data-aos="fade-up" style="font-size:10px">최신 트렌드</span>
           <span style="font-size:11px;color:var(--muted)">이탈리아</span>
         </div>
         <h3 style="font-size:15px">Comau — MR4WELD</h3>
@@ -762,7 +893,7 @@
 
       <!-- ===== 카테고리 1: 핀-베드 / 재구성형 몰드 ===== -->
       <div class="card" style="padding:16px;border-left:4px solid var(--accent)">
-        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-green" style="font-size:10px">Cat.1</span> 핀-베드 / 재구성형 몰드</h3>
+        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-green" data-aos="fade-up" style="font-size:10px">Cat.1</span> 핀-베드 / 재구성형 몰드</h3>
         <div class="row">
           <!-- ADAPA -->
           <div style="flex:1;min-width:0">
@@ -802,7 +933,7 @@
 
       <!-- ===== 카테고리 2: 유니버설 홀딩 픽스처 (UHF) ===== -->
       <div class="card" style="padding:16px;border-left:4px solid var(--violet)">
-        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-violet" style="font-size:10px">Cat.2</span> 유니버설 홀딩 픽스처 (UHF)</h3>
+        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-violet" data-aos="fade-up" style="font-size:10px">Cat.2</span> 유니버설 홀딩 픽스처 (UHF)</h3>
         <div class="row" style="margin-bottom:12px">
           <!-- ONExia -->
           <div style="flex:1;min-width:0">
@@ -867,7 +998,7 @@
 
       <!-- ===== 카테고리 3: 조선 패널라인 / 용접 자동화 ===== -->
       <div class="card" style="padding:16px;border-left:4px solid var(--amber)">
-        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-amber" style="font-size:10px">Cat.3</span> 조선 패널라인 / 용접 자동화</h3>
+        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-amber" data-aos="fade-up" style="font-size:10px">Cat.3</span> 조선 패널라인 / 용접 자동화</h3>
         <div class="row" style="margin-bottom:12px">
           <!-- Pemamek -->
           <div style="flex:1;min-width:0">
@@ -932,7 +1063,7 @@
 
       <!-- ===== 카테고리 4: 한국 조선소 스마트야드 ===== -->
       <div class="card" style="padding:16px;border-left:4px solid var(--rose)">
-        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-rose" style="font-size:10px">Cat.4</span> 한국 조선소 — 스마트야드 동향</h3>
+        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-rose" data-aos="fade-up" style="font-size:10px">Cat.4</span> 한국 조선소 — 스마트야드 동향</h3>
         <div class="row">
           <!-- HD현대 -->
           <div style="flex:1;min-width:0">
@@ -972,7 +1103,7 @@
 
       <!-- ===== 카테고리 5: 중량물 AGV / 디지털 플랫폼 ===== -->
       <div class="card" style="padding:16px;border-left:4px solid var(--blue)">
-        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-blue" style="font-size:10px">Cat.5</span> 중량물 AGV / 디지털 플랫폼</h3>
+        <h3 style="font-size:14px;margin-bottom:12px"><span class="slide-tag tag-blue" data-aos="fade-up" style="font-size:10px">Cat.5</span> 중량물 AGV / 디지털 플랫폼</h3>
         <div class="row">
           <!-- KUKA omniMove -->
           <div style="flex:1;min-width:0">
@@ -1122,16 +1253,18 @@
     </div>
 
   </div>
+  </div><!-- /slide-card -->
 </section>
 
 <!-- ===== SECTION 05: 벤치마킹 → 스마트랙 브릿지 ===== -->
 <section class="slide" id="sec05" data-title="벤치마킹 브릿지">
+  <div class="slide-card">
   <span class="slide-num">05</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag" style="background:linear-gradient(135deg,#1D4ED8,#0D6E51);color:#fff">전환</span>
-      <h2 style="margin-top:8px">그래서 스마트랙은?</h2>
-      <p class="subtitle">벤치마킹 결론 → 스마트랙이 채워야 할 빈자리</p>
+      <span class="slide-tag" data-aos="fade-up" style="background:linear-gradient(135deg,#1D4ED8,#0D6E51);color:#fff">전환</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">그래서 스마트랙은?</h2>
+      <p class="subtitle" data-aos="fade-up">벤치마킹 결론 → 스마트랙이 채워야 할 빈자리</p>
     </div>
 
     <!-- 시각적 전환 다이어그램 -->
@@ -1211,16 +1344,18 @@
       <span style="font-size:14px;font-weight:700;color:#1D4ED8">▼ 다음: <b>컨셉 A → B → C</b> 단계별 구현 전략</span>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
 <!-- ===== SECTION 06: SP시스템스 3대 개발 역할 ===== -->
 <section class="slide" id="sec06" data-title="SP 3대 역할">
+  <div class="slide-card">
   <span class="slide-num">06</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-green">SP시스템스 과제 역할</span>
-      <h2 style="margin-top:8px">SP시스템스 — 3대 핵심 개발 영역</h2>
-      <p class="subtitle">중대형 선박 유연생산시스템 국가 R&D 과제 내 SP시스템스 담당 영역 (과제명: 지능형 물류 관리 기술개발)</p>
+      <span class="slide-tag tag-green" data-aos="fade-up">SP시스템스 과제 역할</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">SP시스템스 — 3대 핵심 개발 영역</h2>
+      <p class="subtitle" data-aos="fade-up">중대형 선박 유연생산시스템 국가 R&D 과제 내 SP시스템스 담당 영역 (과제명: 지능형 물류 관리 기술개발)</p>
     </div>
     <div class="row" style="gap:20px;margin-top:12px">
       <div class="card" style="padding:20px;border-top:4px solid #7C3AED;text-align:center">
@@ -1247,17 +1382,1460 @@
       <span style="font-size:12px;color:#64748B;line-height:1.5">삼성중공업·한화오션(실증) + 고레로보틱스(AMR) + 동국대·POSTECH(AI 연구) + SP시스템스(<b>H/W · 시스템 통합</b>)</span>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 <!-- ===== SECTION 07: 물류 흐름도 ===== -->
 <section class="slide" id="sec07" data-title="물류 흐름도">
+  <div class="slide-card">
   <span class="slide-num">07</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-green">전체 물류</span>
-      <h2 style="margin-top:8px">소조립 공장 물류 흐름도</h2>
+      <span class="slide-tag tag-green" data-aos="fade-up">전체 물류</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">소조립 공장 물류 흐름도</h2>
     </div>
 
-    <div class="diagram-wrap">
+
+    <!-- PPT: Three.js 3D 물류 흐름 시뮬레이션 (PPT only) -->
+    <div class="ppt-only" id="sr3d-cont" style="flex:1;min-height:0;border-radius:12px;overflow:hidden;position:relative;background:#F1F5F9;border:1px solid #E2E8F0;flex-shrink:0">
+      <canvas id="sr3d-canvas" style="display:block;width:100%;height:100%"></canvas>
+      <!-- Fallback: Three.js 로드 실패 시 정적 SVG 다이어그램 -->
+      <div id="sr3d-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#F1F5F9">
+        <svg viewBox="0 0 720 180" width="90%" style="max-width:700px">
+          <defs><marker id="fb-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#0D6E51"/></marker></defs>
+          <rect x="10" y="60" width="100" height="60" rx="10" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="60" y="88" text-anchor="middle" fill="#92400E" font-size="13" font-weight="700">절단공장</text>
+          <text x="60" y="106" text-anchor="middle" fill="#A1A1AA" font-size="10">소재 출하</text>
+          <line x1="110" y1="90" x2="148" y2="90" stroke="#0D6E51" stroke-width="2" marker-end="url(#fb-arr)"/>
+          <rect x="152" y="50" width="110" height="80" rx="10" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2"/>
+          <text x="207" y="82" text-anchor="middle" fill="#0D6E51" font-size="13" font-weight="700">입고 스캔</text>
+          <text x="207" y="100" text-anchor="middle" fill="#52525B" font-size="10">3D·CoG 추정</text>
+          <text x="207" y="116" text-anchor="middle" fill="#52525B" font-size="10">바코드·RFID</text>
+          <line x1="262" y1="90" x2="300" y2="90" stroke="#0D6E51" stroke-width="2" marker-end="url(#fb-arr)"/>
+          <rect x="304" y="40" width="120" height="100" rx="14" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2.5"/>
+          <text x="364" y="76" text-anchor="middle" fill="#0D6E51" font-size="16" font-weight="800">스마트랙</text>
+          <text x="364" y="96" text-anchor="middle" fill="#065F46" font-size="11" font-weight="600">소조립 입고장</text>
+          <text x="364" y="114" text-anchor="middle" fill="#52525B" font-size="10">유연 지지점 배치</text>
+          <text x="364" y="128" text-anchor="middle" fill="#52525B" font-size="10">JIT 피킹</text>
+          <line x1="424" y1="90" x2="462" y2="90" stroke="#7C3AED" stroke-width="2" marker-end="url(#fb-arr)"/>
+          <rect x="466" y="60" width="100" height="60" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+          <text x="516" y="88" text-anchor="middle" fill="#5B21B6" font-size="13" font-weight="700">AMR 이송</text>
+          <text x="516" y="106" text-anchor="middle" fill="#A1A1AA" font-size="10">자율주행·도킹</text>
+          <line x1="566" y1="90" x2="604" y2="90" stroke="#0D6E51" stroke-width="2" marker-end="url(#fb-arr)"/>
+          <rect x="608" y="50" width="100" height="80" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+          <text x="658" y="82" text-anchor="middle" fill="#1E40AF" font-size="13" font-weight="700">중조립</text>
+          <text x="658" y="100" text-anchor="middle" fill="#52525B" font-size="10">출고장 경유</text>
+          <text x="658" y="116" text-anchor="middle" fill="#52525B" font-size="10">대조립 연계</text>
+          <text x="360" y="170" text-anchor="middle" fill="#94A3B8" font-size="10" font-style="italic">3D 뷰어를 로드할 수 없습니다 — 정적 다이어그램 표시</text>
+        </svg>
+      </div>
+      <div style="position:absolute;top:10px;left:14px;color:rgba(30,41,59,0.5);font-size:9px;font-family:monospace;letter-spacing:1.5px;text-transform:uppercase">Smart Rack · 듀얼 야드 물류 흐름 시뮬레이션</div>
+      <div style="position:absolute;top:8px;right:14px;display:flex;gap:3px;z-index:10;flex-wrap:wrap;max-width:420px;justify-content:flex-end">
+        <button class="sr3d-tab" data-layout="1" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#1E293B;color:#F8FAFC;font-weight:700">배치안1</button>
+        <button class="sr3d-tab" data-layout="2" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안2</button>
+        <button class="sr3d-tab" data-layout="3" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안3</button>
+        <button class="sr3d-tab" data-layout="4" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안4</button>
+        <button class="sr3d-tab" data-layout="5" style="padding:3px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:9px;font-family:monospace;cursor:pointer;background:#F1F5F9;color:#64748B;font-weight:400">배치안5</button>
+      </div>
+      <div id="sr3d-legend" style="position:absolute;bottom:10px;left:14px;display:flex;gap:10px;font-size:8px;font-family:monospace;color:rgba(30,41,59,0.5);flex-wrap:wrap;max-width:80%">
+        <span style="color:#D97706">■ 절단</span>
+        <span style="color:#16A34A">■ 입고장</span>
+        <span style="color:#CA8A04">■ 소조립</span>
+        <span style="color:#16A34A">■ 출고장</span>
+        <span style="color:#2563EB">■ 중조립</span>
+        <span style="color:#7C3AED">■ AMR</span>
+        <span style="color:#D4D4D8">■ 도킹</span>
+        <span style="color:#FBBF24">■ 크레인</span>
+        <span style="color:#A8A29E">■ 컨베이어</span>
+      </div>
+      <div style="position:absolute;bottom:10px;right:14px;color:rgba(30,41,59,0.3);font-size:8px;font-family:monospace">Three.js WebGL</div>
+    </div>
+    <script>
+(function(){
+  var INIT=false;
+  function hideFallback(){var fb=document.getElementById('sr3d-fallback');if(fb)fb.style.display='none';}
+  function startSR3D(){
+    if(INIT||typeof THREE==='undefined')return; INIT=true; hideFallback();
+    var cont=document.getElementById('sr3d-cont');
+    var cv=document.getElementById('sr3d-canvas');
+    if(!cont||!cv)return;
+    var W=cont.clientWidth,H=cont.clientHeight;
+    var renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+    renderer.setSize(W,H); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.shadowMap.enabled=true;
+    renderer.toneMapping=THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure=1.2;
+    var scene=new THREE.Scene(); scene.background=new THREE.Color(0xF1F5F9);
+    scene.fog=new THREE.FogExp2(0xF1F5F9,0.012);
+    var d=14,asp=W/H;
+    var cam=new THREE.OrthographicCamera(-d*asp,d*asp,d,-d,0.1,300);
+    cam.position.set(25,22,20); cam.lookAt(0,2,0);
+
+    /* ===== SHARED: Lights ===== */
+    scene.add(new THREE.AmbientLight(0xffffff,0.7));
+    var sun=new THREE.DirectionalLight(0xffffff,1.0);
+    sun.position.set(18,28,14); sun.castShadow=true;
+    sun.shadow.camera.left=-28; sun.shadow.camera.right=28;
+    sun.shadow.camera.top=20; sun.shadow.camera.bottom=-20;
+    scene.add(sun);
+    var fl2=new THREE.DirectionalLight(0x93C5FD,0.4); fl2.position.set(-12,10,-8); scene.add(fl2);
+    var fl3=new THREE.DirectionalLight(0xFDE68A,0.25); fl3.position.set(0,16,18); scene.add(fl3);
+
+    /* ===== SHARED: Helpers ===== */
+    function bx(w,h,dd,col,opt){
+      return new THREE.Mesh(new THREE.BoxGeometry(w,h,dd),
+        new THREE.MeshLambertMaterial(Object.assign({color:col},opt||{})));
+    }
+    function at(o,x,y,z){o.position.set(x,y,z);return o;}
+    var clk=new THREE.Clock(),CY=10;
+    function lerp(a,b,t){return a+(b-a)*Math.min(Math.max(t,0),1);}
+    function ease(t){return t<0.5?2*t*t:-1+(4-2*t)*t;}
+    function clamp01(v){return Math.min(Math.max(v,0),1);}
+
+    /* ===== Layout switching ===== */
+    var activeLayout='1';
+    var layouts={};
+    var camConfigs={
+      '1':{d:14,R:25,H:22,D:20},
+      '2':{d:20,R:35,H:30,D:28},
+      '3':{d:18,R:32,H:26,D:24},
+      '4':{d:22,R:40,H:34,D:32},
+      '5':{d:18,R:30,H:25,D:22}
+    };
+    ['1','2','3','4','5'].forEach(function(k){
+      var g=new THREE.Group(); g.name='layout'+k; g.visible=(k==='1');
+      layouts[k]=g; scene.add(g);
+    });
+    var group1=layouts['1'], group2=layouts['2'],
+        group3=layouts['3'], group4=layouts['4'], group5=layouts['5'];
+
+    function addTo(key,o){o.castShadow=true;o.receiveShadow=true;layouts[key].add(o);return o;}
+    function add1(o){return addTo('1',o);}
+    function add2(o){return addTo('2',o);}
+    function add3(o){return addTo('3',o);}
+    function add4(o){return addTo('4',o);}
+    function add5(o){return addTo('5',o);}
+
+    function switchLayout(lay){
+      if(lay===activeLayout)return;
+      activeLayout=lay;
+      Object.keys(layouts).forEach(function(k){layouts[k].visible=(k===lay);});
+      var cc=camConfigs[lay]||camConfigs['1'];
+      d=cc.d; asp=W/H;
+      cam.left=-d*asp;cam.right=d*asp;cam.top=d;cam.bottom=-d;
+      cam.updateProjectionMatrix();
+      /* update tab buttons */
+      var tabs=cont.querySelectorAll('.sr3d-tab');
+      tabs.forEach(function(btn){
+        if(btn.dataset.layout===lay){
+          btn.style.background='#1E293B';btn.style.color='#F8FAFC';btn.style.fontWeight='700';
+        }else{
+          btn.style.background='#F1F5F9';btn.style.color='#64748B';btn.style.fontWeight='400';
+        }
+      });
+      updateLegend(lay);
+    }
+    /* tab click handler */
+    cont.querySelectorAll('.sr3d-tab').forEach(function(btn){
+      btn.addEventListener('click',function(){switchLayout(btn.dataset.layout);});
+    });
+
+    /* ===== Dynamic legend per layout ===== */
+    var legendConfigs={
+      '1':[
+        {c:'#D97706',l:'절단'},{c:'#16A34A',l:'입고장'},{c:'#CA8A04',l:'소조립'},
+        {c:'#16A34A',l:'출고장'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR'},
+        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'크레인'},{c:'#A8A29E',l:'컨베이어'}
+      ],
+      '2':[
+        {c:'#D97706',l:'절단'},{c:'#16A34A',l:'입고랙'},{c:'#CA8A04',l:'소조립(5배)'},
+        {c:'#16A34A',l:'출고랙'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR(L자)'},
+        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'스태커'},{c:'#A8A29E',l:'컨베이어'}
+      ],
+      '3':[
+        {c:'#D97706',l:'절단'},{c:'#16A34A',l:'입고랙'},{c:'#CA8A04',l:'소조립'},
+        {c:'#16A34A',l:'출고랙'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR(U루프)'},
+        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'크레인×4'},{c:'#A8A29E',l:'컨베이어'}
+      ],
+      '4':[
+        {c:'#D97706',l:'입고존'},{c:'#16A34A',l:'보관랙×3'},{c:'#CA8A04',l:'소조립'},
+        {c:'#0EA5E9',l:'출고존'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR(그리드)'},
+        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'갠트리'},{c:'#A8A29E',l:'컨베이어'}
+      ],
+      '5':[
+        {c:'#D97706',l:'입고'},{c:'#16A34A',l:'셀 어레이'},{c:'#CA8A04',l:'소조립'},
+        {c:'#0EA5E9',l:'출고'},{c:'#2563EB',l:'중조립'},{c:'#7C3AED',l:'AMR(자율)'},
+        {c:'#D4D4D8',l:'도킹'},{c:'#FBBF24',l:'갠트리+스태커'},{c:'#A8A29E',l:'컨베이어'}
+      ]
+    };
+    function updateLegend(lay){
+      var el=document.getElementById('sr3d-legend');
+      if(!el)return;
+      var items=legendConfigs[lay]||legendConfigs['1'];
+      el.innerHTML=items.map(function(it){return '<span style="color:'+it.c+'">■ '+it.l+'</span>';}).join('');
+    }
+
+    /* ============================================================
+       LAYOUT 1 — 직렬형 기본 배치 (배치안1)
+       ============================================================ */
+    /* Floor */
+    add1(at(bx(40,0.08,20,0xE2E8F0),0,0,0));
+    var gridA=new THREE.GridHelper(40,40,0xCBD5E1,0xCBD5E1);
+    group1.add(gridA);
+
+    /* 절단 (x=-13) */
+    add1(at(bx(3.5,0.12,2.5,0xFBBF24,{transparent:true,opacity:0.5}),-13,0.06,0));
+    for(var i=0;i<3;i++){for(var j=0;j<2;j++){
+      add1(at(bx(0.7,0.4,0.5,0xD97706),-14+i*1.0,0.32,-0.5+j*1.0));
+    }}
+    /* 소조립 (x=0) */
+    var subSteps=[
+      {dx:-1.8,col:0xF97316},{dx:-0.6,col:0xEAB308},
+      {dx:0.6,col:0x94A3B8},{dx:1.8,col:0x22D3EE}
+    ];
+    var subBoxesA=[];
+    add1(at(bx(5.5,0.08,2.5,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,0));
+    subSteps.forEach(function(s){
+      var b=bx(1.0,0.7,1.0,s.col,{transparent:true,opacity:0.85});
+      at(b,s.dx,0.45,0); add1(b); subBoxesA.push(b);
+    });
+    /* 중조립 (x=+13) */
+    add1(at(bx(3.5,0.12,2.5,0x60A5FA,{transparent:true,opacity:0.5}),13,0.06,0));
+    add1(at(bx(2.8,1.6,2.0,0x93C5FD,{transparent:true,opacity:0.5}),13,0.92,0));
+    add1(at(bx(1.2,0.5,1.8,0x3B82F6),13,1.97,0));
+
+    /* Racks A */
+    function makeRackA(cx,cz,fillRatio){
+      var SW=1.2,SH=0.8,SD=1.2,COLS=4,ROWS=2;
+      var startX=cx-(COLS-1)*(SW+0.15)/2;
+      for(var r=0;r<ROWS;r++){for(var c=0;c<COLS;c++){
+        var rx=startX+c*(SW+0.15),ry=0.5+r*(SH+0.12),rz=cz;
+        var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
+        at(fr,rx,ry,rz); group1.add(fr);
+        var edg=new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),
+          new THREE.LineBasicMaterial({color:0x94A3B8}));
+        edg.position.copy(fr.position); group1.add(edg);
+        var idx=r*COLS+c;
+        if(idx<Math.round(COLS*ROWS*fillRatio)){
+          add1(at(bx(SW*0.75,SH*0.75,SD*0.75,0x22C55E),rx,ry,rz));
+        }
+      }}
+    }
+    makeRackA(-7,-1,0.6);
+    makeRackA(7,-1,0.4);
+    add1(at(bx(5.5,0.08,2.8,0x86EFAC,{transparent:true,opacity:0.3}),-7,0.04,-1));
+    add1(at(bx(5.5,0.08,2.8,0x86EFAC,{transparent:true,opacity:0.3}),7,0.04,-1));
+
+    /* Lanes A */
+    [{z:2.0,x1:-13,x2:-7},{z:-2.0,x1:-7,x2:-2.5},
+     {z:2.0,x1:2.5,x2:7},{z:-2.0,x1:7,x2:13}].forEach(function(ln){
+      var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
+      var lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.25),
+        new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
+      lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z); group1.add(lp);
+    });
+
+    /* Docks A */
+    function makeDockA(x,z){
+      var g=new THREE.Group();
+      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
+      [[-0.5,0,-0.25],[0.5,0,-0.25],[-0.5,0,0.25],[0.5,0,0.25]].forEach(function(l){
+        g.add(at(bx(0.06,0.15,0.06,0x94A3B8),l[0],0.075,l[2]));
+      });
+      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,-0.3));
+      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,0.3));
+      g.position.set(x,0,z); g.castShadow=true; group1.add(g);
+      return g;
+    }
+    var docksA={
+      cutOut:makeDockA(-13,2),inRecv:makeDockA(-7,2),inSend:makeDockA(-7,-2),
+      subIn:makeDockA(-2.5,-2),subOut:makeDockA(2.5,2),outRecv:makeDockA(7,2),
+      outSend:makeDockA(7,-2),midIn:makeDockA(13,-2)
+    };
+
+    /* Cranes A */
+    function makeCraneA(x,z){
+      var g=new THREE.Group();
+      g.add(at(bx(0.3,0.05,3.0,0x71717A),0,0.025,0));
+      g.add(at(bx(0.15,3.0,0.15,0x52525B),0,1.5,0));
+      var carriage=new THREE.Group();
+      carriage.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
+      var fork=bx(0.6,0.05,0.4,0xA3A3A3);
+      at(fork,0.0,-0.1,0.5); carriage.add(fork);
+      carriage.position.set(0,0.8,0); g.add(carriage);
+      g.position.set(x,0,z); group1.add(g);
+      return {group:g,carriage:carriage,fork:fork};
+    }
+    var craneInA=makeCraneA(-7,0), craneOutA=makeCraneA(7,0);
+
+    /* Conveyors A */
+    function makeConveyorG(grp,x,z1,z2){
+      var g=new THREE.Group();
+      var len=Math.abs(z2-z1),mz=(z1+z2)/2;
+      g.add(at(bx(0.04,0.12,len,0x78716C),-0.3,0.12,0));
+      g.add(at(bx(0.04,0.12,len,0x78716C),0.3,0.12,0));
+      var count=Math.max(3,Math.round(len/0.25));
+      for(var ci=0;ci<count;ci++){
+        var rz=-len/2+ci*(len/(count-1));
+        var roller=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.56,8),
+          new THREE.MeshLambertMaterial({color:0xA8A29E}));
+        roller.rotation.z=Math.PI/2; at(roller,0,0.12,rz); g.add(roller);
+      }
+      g.position.set(x,0,mz); grp.add(g);
+      return g;
+    }
+    var convInA=makeConveyorG(group1,-2.5,-1.5,0);
+    var convOutA=makeConveyorG(group1,2.5,0,1.5);
+
+    /* AMR A */
+    function makeAMRg(grp,bodyCol){
+      var g=new THREE.Group();
+      g.add(at(bx(1.1,0.3,0.85,bodyCol),0,0,0));
+      g.add(at(bx(0.78,0.2,0.6,0xEDE9FE),0,0.25,0));
+      [[0.44,0.36],[0.44,-0.36],[-0.44,0.36],[-0.44,-0.36]].forEach(function(w){
+        var wh=new THREE.Mesh(new THREE.CylinderGeometry(0.11,0.11,0.09,8),
+          new THREE.MeshLambertMaterial({color:0x475569}));
+        wh.position.set(w[0],-0.1,w[1]); wh.rotation.z=Math.PI/2; g.add(wh);
+      });
+      grp.add(g); return g;
+    }
+    function makePartA(col){
+      var p=bx(0.8,0.35,0.55,col);
+      p.castShadow=true; group1.add(p); return p;
+    }
+    var amrDefsA=[
+      {amr:null,part:null,bodyCol:0x7C3AED,partCol:0xF97316,x1:-13,x2:-7,z:2.0,offset:0.0},
+      {amr:null,part:null,bodyCol:0x8B5CF6,partCol:0x22C55E,x1:-7,x2:-2.5,z:-2.0,offset:2.5},
+      {amr:null,part:null,bodyCol:0xA855F7,partCol:0xEAB308,x1:2.5,x2:7,z:2.0,offset:5.0},
+      {amr:null,part:null,bodyCol:0xC084FC,partCol:0x22C55E,x1:7,x2:13,z:-2.0,offset:7.5}
+    ];
+    amrDefsA.forEach(function(def){
+      def.amr=makeAMRg(group1,def.bodyCol);
+      def.part=makePartA(def.partCol);
+      def.amr.position.set(def.x1,0.22,def.z);
+      def.part.visible=false;
+    });
+    var cranePartsA={inPart:makePartA(0x22C55E),outPart:makePartA(0x22C55E)};
+    cranePartsA.inPart.visible=false; cranePartsA.outPart.visible=false;
+    var subColsA=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
+
+    /* ============================================================
+       LAYOUT 2 — 직교 확장형 (배치안2)
+       ============================================================ */
+    /* Floor B */
+    add2(at(bx(50,0.08,24,0xE2E8F0),0,0,0));
+    var gridB=new THREE.GridHelper(50,50,0xCBD5E1,0xCBD5E1);
+    group2.add(gridB);
+
+    /* 절단 B (x=-18) */
+    add2(at(bx(4.0,0.12,3.0,0xFBBF24,{transparent:true,opacity:0.5}),-18,0.06,0));
+    for(var bi=0;bi<3;bi++){for(var bj=0;bj<2;bj++){
+      add2(at(bx(0.7,0.4,0.5,0xD97706),-19+bi*1.0,0.32,-0.5+bj*1.0));
+    }}
+
+    /* 소조립 B (5배, x=0) */
+    var subStepsB=[
+      {dx:-3.6,col:0xF97316},{dx:-1.2,col:0xEAB308},
+      {dx:1.2,col:0x94A3B8},{dx:3.6,col:0x22D3EE}
+    ];
+    var subBoxesB=[];
+    add2(at(bx(12.0,0.08,6.0,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,0));
+    subStepsB.forEach(function(s){
+      var b=bx(2.2,1.4,2.2,s.col,{transparent:true,opacity:0.85});
+      at(b,s.dx,0.78,0); add2(b); subBoxesB.push(b);
+    });
+
+    /* 중조립 B (x=18) */
+    add2(at(bx(4.0,0.12,3.0,0x60A5FA,{transparent:true,opacity:0.5}),18,0.06,0));
+    add2(at(bx(3.0,1.8,2.2,0x93C5FD,{transparent:true,opacity:0.5}),18,1.02,0));
+    add2(at(bx(1.4,0.6,2.0,0x3B82F6),18,2.2,0));
+
+    /* 입고 랙 B (90° 회전, x=-10, z=2~7) */
+    add2(at(bx(3.0,0.08,7.0,0x86EFAC,{transparent:true,opacity:0.3}),-10,0.04,4.5));
+    function makeRackB(cx,zStart,zDir,fillRatio){
+      var SW=1.2,SH=0.9,SD=1.2,SLOTS=5,ROWS=3;
+      var zPositions=[];
+      for(var si=0;si<SLOTS;si++) zPositions.push(zStart+zDir*(si*1.35+0.5));
+      var yPositions=[0.55,1.57,2.59];
+      for(var r=0;r<ROWS;r++){for(var s=0;s<SLOTS;s++){
+        var rz=zPositions[s],ry=yPositions[r];
+        var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
+        at(fr,cx,ry,rz); group2.add(fr);
+        var edg=new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),
+          new THREE.LineBasicMaterial({color:0x94A3B8}));
+        edg.position.copy(fr.position); group2.add(edg);
+        var idx=r*SLOTS+s;
+        if(idx<Math.round(SLOTS*ROWS*fillRatio)){
+          add2(at(bx(SW*0.7,SH*0.7,SD*0.7,0x22C55E),cx,ry,rz));
+        }
+      }}
+      return {cx:cx,zPositions:zPositions,yPositions:yPositions};
+    }
+    var rackInB=makeRackB(-10,2,1,0.5);
+    /* 출고 랙 B (90° 회전, x=10, z=-2~-7) */
+    add2(at(bx(3.0,0.08,7.0,0x86EFAC,{transparent:true,opacity:0.3}),10,0.04,-4.5));
+    var rackOutB=makeRackB(10,-2,-1,0.35);
+
+    /* L자 AMR 레인 바닥 (8 segments) */
+    var lanesB=[
+      /* Route1: 절단→입고 L자 */
+      {x1:-18,x2:-10,z:0},{x:-10,z1:0,z2:1.5},
+      /* Route2: 입고→소조립 L자 */
+      {x:-10,z1:-1.5,z2:0},{x1:-10,x2:-5,z:0},
+      /* Route3: 소조립→출고 L자 */
+      {x1:5,x2:10,z:0},{x:10,z1:-1.5,z2:0},
+      /* Route4: 출고→중조립 L자 */
+      {x:10,z1:0,z2:1.5},{x1:10,x2:18,z:0}
+    ];
+    lanesB.forEach(function(ln){
+      var lp;
+      if(ln.x1!==undefined){
+        var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
+        lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.3),
+          new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
+        lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z);
+      }else{
+        var len=Math.abs(ln.z2-ln.z1),mz=(ln.z1+ln.z2)/2;
+        lp=new THREE.Mesh(new THREE.PlaneGeometry(0.3,len),
+          new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
+        lp.rotation.x=-Math.PI/2; at(lp,ln.x,0.05,mz);
+      }
+      group2.add(lp);
+    });
+
+    /* Docks B */
+    function makeDockB(x,z){
+      var g=new THREE.Group();
+      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
+      [[-0.5,0,-0.25],[0.5,0,-0.25],[-0.5,0,0.25],[0.5,0,0.25]].forEach(function(l){
+        g.add(at(bx(0.06,0.15,0.06,0x94A3B8),l[0],0.075,l[2]));
+      });
+      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,-0.3));
+      g.add(at(bx(1.2,0.04,0.04,0x78716C),0,0.24,0.3));
+      g.position.set(x,0,z); g.castShadow=true; group2.add(g);
+      return g;
+    }
+    var docksB={
+      cutOut:makeDockB(-18,0),inRecv:makeDockB(-10,1.5),inSend:makeDockB(-10,-1.5),
+      subIn:makeDockB(-5,0),subOut:makeDockB(5,0),outRecv:makeDockB(10,-1.5),
+      outSend:makeDockB(10,1.5),midIn:makeDockB(18,0)
+    };
+
+    /* Stacker Cranes B — z방향 주행 + y 승강 + fork 신축 */
+    function makeCraneB(x,zMin,zMax){
+      var g=new THREE.Group();
+      var railLen=zMax-zMin+1.0;
+      var railMid=(zMin+zMax)/2;
+      g.add(at(bx(0.3,0.05,railLen,0x71717A),0,0.025,railMid));
+      var trolley=new THREE.Group();
+      trolley.add(at(bx(0.15,4.0,0.15,0x52525B),0,2.0,0));
+      trolley.add(at(bx(0.12,0.12,0.5,0x52525B),0,4.06,0));
+      var carriage=new THREE.Group();
+      carriage.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
+      var fork=bx(0.6,0.05,0.4,0xA3A3A3);
+      at(fork,0.7,- 0.1,0); carriage.add(fork);
+      fork.position.set(0,-0.1,0);
+      carriage.position.set(0,0.8,0);
+      trolley.add(carriage);
+      trolley.position.set(0,0,(zMin+zMax)/2);
+      g.add(trolley);
+      g.position.set(x,0,0);
+      group2.add(g);
+      return {group:g,trolley:trolley,carriage:carriage,fork:fork,zMin:zMin,zMax:zMax};
+    }
+    var craneInB=makeCraneB(-10,2,7);
+    var craneOutB=makeCraneB(10,-7,-2);
+
+    /* Conveyors B */
+    var convInB=makeConveyorG(group2,-5,-2.5,0);
+    var convOutB=makeConveyorG(group2,5,0,2.5);
+
+    /* AMR B + 원판 부재 */
+    function makePartB(col){
+      var p=new THREE.Mesh(
+        new THREE.CylinderGeometry(0.4,0.4,0.1,16),
+        new THREE.MeshLambertMaterial({color:col}));
+      p.rotation.z=Math.PI/2;
+      p.castShadow=true; group2.add(p);
+      return p;
+    }
+    var amrDefsB=[
+      {amr:null,part:null,bodyCol:0x7C3AED,partCol:0xF97316,offset:0.0},
+      {amr:null,part:null,bodyCol:0x8B5CF6,partCol:0x22C55E,offset:2.5},
+      {amr:null,part:null,bodyCol:0xA855F7,partCol:0xEAB308,offset:5.0},
+      {amr:null,part:null,bodyCol:0xC084FC,partCol:0x22C55E,offset:7.5}
+    ];
+    amrDefsB.forEach(function(def){
+      def.amr=makeAMRg(group2,def.bodyCol);
+      def.part=makePartB(def.partCol);
+      def.amr.position.set(-18,0.22,0);
+      def.part.visible=false;
+    });
+    var cranePartsB={inPart:makePartB(0x22C55E),outPart:makePartB(0x22C55E)};
+    cranePartsB.inPart.visible=false; cranePartsB.outPart.visible=false;
+
+    /* ============================================================
+       ANIMATION — Layout 1 (배치안1)
+       ============================================================ */
+    function animCraneA(crane,t,tStart,tEnd,pickY,placeY,forkDir){
+      var dur=tEnd-tStart;
+      if(t<tStart||t>=tEnd){crane.carriage.position.y=0.8;crane.fork.position.z=0.5*forkDir;return;}
+      var p=clamp01((t-tStart)/dur);
+      if(p<0.2){crane.fork.position.z=lerp(0.5*forkDir,0.9*forkDir,p/0.2);crane.carriage.position.y=pickY;
+      }else if(p<0.4){crane.fork.position.z=lerp(0.9*forkDir,0.5*forkDir,(p-0.2)/0.2);crane.carriage.position.y=pickY;
+      }else if(p<0.7){crane.carriage.position.y=lerp(pickY,placeY,(p-0.4)/0.3);crane.fork.position.z=0.5*forkDir;
+      }else if(p<0.85){crane.fork.position.z=lerp(0.5*forkDir,0.9*forkDir,(p-0.7)/0.15);crane.carriage.position.y=placeY;
+      }else{crane.fork.position.z=lerp(0.9*forkDir,0.5*forkDir,(p-0.85)/0.15);crane.carriage.position.y=placeY;}
+    }
+
+    function animateLayout1(elapsed){
+      /* Route 1 */
+      (function(){
+        var def=amrDefsA[0],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var x1=-13,x2=-7,z=2;
+        if(t<1){amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.24+0.5*ease(t),z);
+        }else if(t<1.5){var p=(t-1)/0.5;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.55+0.3*ease(p),z);
+        }else if(t<4){var p=ease((t-1.5)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
+        }else if(t<4.5){var p=(t-4)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.5*ease(p),z);if(p>0.95)part.visible=false;
+        }else if(t<6){amr.position.set(x2,0.22,z);part.visible=false;cranePartsA.inPart.visible=true;var cp=clamp01((t-4.5)/1.5);if(cp<0.5){cranePartsA.inPart.position.set(-7,0.3+1.0*ease(cp*2),0);}else{cranePartsA.inPart.position.set(-7,1.3,-0.3-0.7*ease((cp-0.5)*2));}
+        }else if(t<6.5){cranePartsA.inPart.visible=false;amr.position.set(x2,0.22,z);part.visible=false;
+        }else if(t<9){var p=ease((t-6.5)/2.5);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;cranePartsA.inPart.visible=false;
+        }else{amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.inPart.visible=false;}
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+      /* Route 2 */
+      (function(){
+        var def=amrDefsA[1],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var x1=-7,x2=-2.5,z=-2;
+        if(t<1.5){amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.inPart.visible=true;var cp=clamp01(t/1.5);if(cp<0.5){cranePartsA.inPart.position.set(-7,1.3,-0.3-0.7*(1-ease(cp*2)));}else{cranePartsA.inPart.position.set(-7,1.3-1.0*ease((cp-0.5)*2),-1.0);}
+        }else if(t<2){var p=(t-1.5)/0.5;cranePartsA.inPart.visible=false;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.3+0.55*ease(p),z);
+        }else if(t<4.5){var p=ease((t-2)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
+        }else if(t<5){var p=(t-4.5)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.55*ease(p),z);if(p>0.95)part.visible=false;
+        }else if(t<5.5){amr.position.set(x2,0.22,z);part.visible=false;
+        }else if(t<9){var p=ease((t-5.5)/3.5);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;
+        }else{amr.position.set(x1,0.22,z);part.visible=false;}
+        cranePartsA.inPart.visible=(t<1.5);
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+      /* craneIn A */
+      (function(){
+        var t1=((elapsed-amrDefsA[0].offset)%CY+CY)%CY;
+        var t2=((elapsed-amrDefsA[1].offset)%CY+CY)%CY;
+        if(t1>=4.5&&t1<6)animCraneA(craneInA,t1,4.5,6,0.3,1.3,1);
+        else if(t2<1.5)animCraneA(craneInA,t2,0,1.5,1.3,0.3,-1);
+        else{craneInA.carriage.position.y=0.8;craneInA.fork.position.z=0.5;}
+      })();
+      /* Route 3 */
+      (function(){
+        var def=amrDefsA[2],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var x1=2.5,x2=7,z=2;
+        if(t<1){amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.24+0.5*ease(t),z);
+        }else if(t<1.5){var p=(t-1)/0.5;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.55+0.3*ease(p),z);
+        }else if(t<4){var p=ease((t-1.5)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
+        }else if(t<4.5){var p=(t-4)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.5*ease(p),z);if(p>0.95)part.visible=false;
+        }else if(t<6){amr.position.set(x2,0.22,z);part.visible=false;cranePartsA.outPart.visible=true;var cp=clamp01((t-4.5)/1.5);if(cp<0.5){cranePartsA.outPart.position.set(7,0.3+1.0*ease(cp*2),0);}else{cranePartsA.outPart.position.set(7,1.3,-0.3-0.7*ease((cp-0.5)*2));}
+        }else if(t<6.5){cranePartsA.outPart.visible=false;amr.position.set(x2,0.22,z);part.visible=false;
+        }else if(t<9){var p=ease((t-6.5)/2.5);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;cranePartsA.outPart.visible=false;
+        }else{amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.outPart.visible=false;}
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+      /* Route 4 */
+      (function(){
+        var def=amrDefsA[3],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var x1=7,x2=13,z=-2;
+        if(t<1.5){amr.position.set(x1,0.22,z);part.visible=false;cranePartsA.outPart.visible=true;var cp=clamp01(t/1.5);if(cp<0.5){cranePartsA.outPart.position.set(7,1.3,-0.3-0.7*(1-ease(cp*2)));}else{cranePartsA.outPart.position.set(7,1.3-1.0*ease((cp-0.5)*2),-1.0);}
+        }else if(t<2){var p=(t-1.5)/0.5;cranePartsA.outPart.visible=false;amr.position.set(x1,0.22,z);part.visible=true;part.position.set(x1,0.3+0.55*ease(p),z);
+        }else if(t<4.5){var p=ease((t-2)/2.5);amr.position.set(lerp(x1,x2,p),0.22,z);part.visible=true;part.position.set(lerp(x1,x2,p),0.85,z);
+        }else if(t<5){var p=(t-4.5)/0.5;amr.position.set(x2,0.22,z);part.visible=true;part.position.set(x2,0.85-0.55*ease(p),z);if(p>0.95)part.visible=false;
+        }else if(t<9){var p=ease((t-5)/4);amr.position.set(lerp(x2,x1,p),0.22,z);part.visible=false;
+        }else{amr.position.set(x1,0.22,z);part.visible=false;}
+        cranePartsA.outPart.visible=(t<1.5);
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+      /* craneOut A */
+      (function(){
+        var t3=((elapsed-amrDefsA[2].offset)%CY+CY)%CY;
+        var t4=((elapsed-amrDefsA[3].offset)%CY+CY)%CY;
+        if(t3>=4.5&&t3<6)animCraneA(craneOutA,t3,4.5,6,0.3,1.3,1);
+        else if(t4<1.5)animCraneA(craneOutA,t4,0,1.5,1.3,0.3,-1);
+        else{craneOutA.carriage.position.y=0.8;craneOutA.fork.position.z=0.5;}
+      })();
+      /* 소조립 emissive */
+      var sp=(elapsed%2.5)/2.5,aIdx=Math.floor(sp*4);
+      subBoxesA.forEach(function(b,i){
+        if(i===aIdx){var pulse=0.3+0.7*Math.abs(Math.sin(elapsed*4));b.material.emissive=new THREE.Color(subColsA[i]);b.material.emissiveIntensity=pulse*0.6;
+        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
+      });
+      /* conveyor spin */
+      [convInA,convOutA].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
+    }
+
+    /* ============================================================
+       ANIMATION — Layout 2 (배치안2)
+       ============================================================ */
+    var subColsB=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
+    var craneBCycle=0;
+
+    /* Crane B 10-step animation */
+    function animCraneB(crane,p,dockZ,slotZ,slotY){
+      if(p<0.10){
+        /* 1: trolley → dockZ */
+        crane.trolley.position.z=lerp((crane.zMin+crane.zMax)/2,dockZ,p/0.10);
+        crane.carriage.position.y=0.4; crane.fork.position.x=0;
+      }else if(p<0.20){
+        /* 2: fork extend (pick) */
+        crane.trolley.position.z=dockZ; crane.carriage.position.y=0.4;
+        crane.fork.position.x=lerp(0,0.7,(p-0.10)/0.10);
+      }else if(p<0.25){
+        /* 3: slight raise */
+        crane.trolley.position.z=dockZ; crane.fork.position.x=0.7;
+        crane.carriage.position.y=lerp(0.4,0.6,(p-0.20)/0.05);
+      }else if(p<0.35){
+        /* 4: fork retract */
+        crane.trolley.position.z=dockZ; crane.carriage.position.y=0.6;
+        crane.fork.position.x=lerp(0.7,0,(p-0.25)/0.10);
+      }else if(p<0.55){
+        /* 5: trolley → slotZ */
+        crane.trolley.position.z=lerp(dockZ,slotZ,(p-0.35)/0.20);
+        crane.carriage.position.y=0.6; crane.fork.position.x=0;
+      }else if(p<0.70){
+        /* 6: carriage → slotY */
+        crane.trolley.position.z=slotZ;
+        crane.carriage.position.y=lerp(0.6,slotY,(p-0.55)/0.15);
+        crane.fork.position.x=0;
+      }else if(p<0.80){
+        /* 7: fork extend (place) */
+        crane.trolley.position.z=slotZ; crane.carriage.position.y=slotY;
+        crane.fork.position.x=lerp(0,-0.7,(p-0.70)/0.10);
+      }else if(p<0.85){
+        /* 8: slight lower */
+        crane.trolley.position.z=slotZ; crane.fork.position.x=-0.7;
+        crane.carriage.position.y=lerp(slotY,slotY-0.15,(p-0.80)/0.05);
+      }else if(p<0.95){
+        /* 9: fork retract */
+        crane.trolley.position.z=slotZ; crane.carriage.position.y=slotY-0.15;
+        crane.fork.position.x=lerp(-0.7,0,(p-0.85)/0.10);
+      }else{
+        /* 10: return home */
+        crane.trolley.position.z=lerp(slotZ,(crane.zMin+crane.zMax)/2,(p-0.95)/0.05);
+        crane.carriage.position.y=lerp(slotY-0.15,0.8,(p-0.95)/0.05);
+        crane.fork.position.x=0;
+      }
+    }
+
+    function animateLayout2(elapsed){
+      var cycleNum=Math.floor(elapsed/CY);
+
+      /* --- Route 1 B: 절단→입고 (L자 x→z) --- */
+      (function(){
+        var def=amrDefsB[0],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        if(t<1){
+          /* part appears at cut dock */
+          amr.position.set(-18,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(-18,0.24+0.5*ease(t),0);
+        }else if(t<1.5){
+          var p=(t-1)/0.5;
+          amr.position.set(-18,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(-18,0.55+0.3*ease(p),0);
+        }else if(t<3){
+          /* Leg1: x=-18→-10 (z=0) */
+          var p=ease((t-1.5)/1.5);
+          amr.position.set(lerp(-18,-10,p),0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(lerp(-18,-10,p),0.85,0);
+        }else if(t<4){
+          /* Leg2: z=0→1.5 (x=-10), AMR turns */
+          var p=ease((t-3)/1.0);
+          amr.position.set(-10,0.22,lerp(0,1.5,p)); amr.rotation.y=Math.PI/2;
+          part.visible=true; part.position.set(-10,0.85,lerp(0,1.5,p));
+        }else if(t<4.5){
+          /* unload at inRecv dock */
+          var p=(t-4)/0.5;
+          amr.position.set(-10,0.22,1.5); amr.rotation.y=Math.PI/2;
+          part.visible=true; part.position.set(-10,0.85-0.5*ease(p),1.5);
+          if(p>0.95)part.visible=false;
+        }else if(t<6){
+          /* crane stacker picks */
+          amr.position.set(-10,0.22,1.5); part.visible=false;
+          cranePartsB.inPart.visible=true;
+          var cp=clamp01((t-4.5)/1.5);
+          cranePartsB.inPart.position.set(-10,0.3+1.5*ease(cp),lerp(1.5,3.5,ease(cp)));
+        }else if(t<6.5){
+          cranePartsB.inPart.visible=false;
+          amr.position.set(-10,0.22,1.5); part.visible=false;
+        }else if(t<7){
+          /* Return Leg2: z=1.5→0 */
+          var p=ease((t-6.5)/0.5);
+          amr.position.set(-10,0.22,lerp(1.5,0,p)); amr.rotation.y=-Math.PI/2;
+          part.visible=false;
+        }else if(t<9){
+          /* Return Leg1: x=-10→-18 */
+          var p=ease((t-7)/2.0);
+          amr.position.set(lerp(-10,-18,p),0.22,0); amr.rotation.y=Math.PI;
+          part.visible=false;
+        }else{
+          amr.position.set(-18,0.22,0); amr.rotation.y=0;
+          part.visible=false; cranePartsB.inPart.visible=false;
+        }
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+
+      /* --- Route 2 B: 입고→소조립 (L자 z→x) --- */
+      (function(){
+        var def=amrDefsB[1],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        if(t<1.5){
+          /* crane retrieves → inSend dock */
+          amr.position.set(-10,0.22,-1.5); amr.rotation.y=0;
+          part.visible=false;
+          cranePartsB.inPart.visible=true;
+          var cp=clamp01(t/1.5);
+          cranePartsB.inPart.position.set(-10,1.8-1.5*ease(cp),lerp(3.5,-1.5,ease(cp)));
+        }else if(t<2){
+          var p=(t-1.5)/0.5;
+          cranePartsB.inPart.visible=false;
+          amr.position.set(-10,0.22,-1.5); amr.rotation.y=0;
+          part.visible=true; part.position.set(-10,0.3+0.55*ease(p),-1.5);
+        }else if(t<3){
+          /* Leg1: z=-1.5→0 */
+          var p=ease((t-2)/1.0);
+          amr.position.set(-10,0.22,lerp(-1.5,0,p)); amr.rotation.y=-Math.PI/2;
+          part.visible=true; part.position.set(-10,0.85,lerp(-1.5,0,p));
+        }else if(t<4.5){
+          /* Leg2: x=-10→-5 */
+          var p=ease((t-3)/1.5);
+          amr.position.set(lerp(-10,-5,p),0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(lerp(-10,-5,p),0.85,0);
+        }else if(t<5){
+          var p=(t-4.5)/0.5;
+          amr.position.set(-5,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(-5,0.85-0.55*ease(p),0);
+          if(p>0.95)part.visible=false;
+        }else if(t<6){
+          /* Return Leg2: x=-5→-10 */
+          var p=ease((t-5)/1.0);
+          amr.position.set(lerp(-5,-10,p),0.22,0); amr.rotation.y=Math.PI;
+          part.visible=false;
+        }else if(t<7){
+          /* Return Leg1: z=0→-1.5 */
+          var p=ease((t-6)/1.0);
+          amr.position.set(-10,0.22,lerp(0,-1.5,p)); amr.rotation.y=Math.PI/2;
+          part.visible=false;
+        }else{
+          amr.position.set(-10,0.22,-1.5); amr.rotation.y=0;
+          part.visible=false; cranePartsB.inPart.visible=false;
+        }
+        cranePartsB.inPart.visible=(t<1.5);
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+
+      /* --- Route 3 B: 소조립→출고 (L자 x→z) --- */
+      (function(){
+        var def=amrDefsB[2],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        if(t<1){
+          amr.position.set(5,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(5,0.24+0.5*ease(t),0);
+        }else if(t<1.5){
+          var p=(t-1)/0.5;
+          amr.position.set(5,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(5,0.55+0.3*ease(p),0);
+        }else if(t<3){
+          /* Leg1: x=5→10 */
+          var p=ease((t-1.5)/1.5);
+          amr.position.set(lerp(5,10,p),0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(lerp(5,10,p),0.85,0);
+        }else if(t<4){
+          /* Leg2: z=0→-1.5 */
+          var p=ease((t-3)/1.0);
+          amr.position.set(10,0.22,lerp(0,-1.5,p)); amr.rotation.y=-Math.PI/2;
+          part.visible=true; part.position.set(10,0.85,lerp(0,-1.5,p));
+        }else if(t<4.5){
+          var p=(t-4)/0.5;
+          amr.position.set(10,0.22,-1.5); amr.rotation.y=-Math.PI/2;
+          part.visible=true; part.position.set(10,0.85-0.5*ease(p),-1.5);
+          if(p>0.95)part.visible=false;
+        }else if(t<6){
+          amr.position.set(10,0.22,-1.5); part.visible=false;
+          cranePartsB.outPart.visible=true;
+          var cp=clamp01((t-4.5)/1.5);
+          cranePartsB.outPart.position.set(10,0.3+1.5*ease(cp),lerp(-1.5,-3.5,ease(cp)));
+        }else if(t<6.5){
+          cranePartsB.outPart.visible=false;
+          amr.position.set(10,0.22,-1.5); part.visible=false;
+        }else if(t<7){
+          /* Return Leg2: z=-1.5→0 */
+          var p=ease((t-6.5)/0.5);
+          amr.position.set(10,0.22,lerp(-1.5,0,p)); amr.rotation.y=Math.PI/2;
+          part.visible=false;
+        }else if(t<9){
+          /* Return Leg1: x=10→5 */
+          var p=ease((t-7)/2.0);
+          amr.position.set(lerp(10,5,p),0.22,0); amr.rotation.y=Math.PI;
+          part.visible=false;
+        }else{
+          amr.position.set(5,0.22,0); amr.rotation.y=0;
+          part.visible=false; cranePartsB.outPart.visible=false;
+        }
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+
+      /* --- Route 4 B: 출고→중조립 (L자 z→x) --- */
+      (function(){
+        var def=amrDefsB[3],amr=def.amr,part=def.part;
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        if(t<1.5){
+          amr.position.set(10,0.22,1.5); amr.rotation.y=0;
+          part.visible=false;
+          cranePartsB.outPart.visible=true;
+          var cp=clamp01(t/1.5);
+          cranePartsB.outPart.position.set(10,1.8-1.5*ease(cp),lerp(-3.5,1.5,ease(cp)));
+        }else if(t<2){
+          var p=(t-1.5)/0.5;
+          cranePartsB.outPart.visible=false;
+          amr.position.set(10,0.22,1.5); amr.rotation.y=0;
+          part.visible=true; part.position.set(10,0.3+0.55*ease(p),1.5);
+        }else if(t<3){
+          /* Leg1: z=1.5→0 */
+          var p=ease((t-2)/1.0);
+          amr.position.set(10,0.22,lerp(1.5,0,p)); amr.rotation.y=-Math.PI/2;
+          part.visible=true; part.position.set(10,0.85,lerp(1.5,0,p));
+        }else if(t<4.5){
+          /* Leg2: x=10→18 */
+          var p=ease((t-3)/1.5);
+          amr.position.set(lerp(10,18,p),0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(lerp(10,18,p),0.85,0);
+        }else if(t<5){
+          var p=(t-4.5)/0.5;
+          amr.position.set(18,0.22,0); amr.rotation.y=0;
+          part.visible=true; part.position.set(18,0.85-0.55*ease(p),0);
+          if(p>0.95)part.visible=false;
+        }else if(t<6.5){
+          /* Return Leg2: x=18→10 */
+          var p=ease((t-5)/1.5);
+          amr.position.set(lerp(18,10,p),0.22,0); amr.rotation.y=Math.PI;
+          part.visible=false;
+        }else if(t<7.5){
+          /* Return Leg1: z=0→1.5 */
+          var p=ease((t-6.5)/1.0);
+          amr.position.set(10,0.22,lerp(0,1.5,p)); amr.rotation.y=Math.PI/2;
+          part.visible=false;
+        }else{
+          amr.position.set(10,0.22,1.5); amr.rotation.y=0;
+          part.visible=false; cranePartsB.outPart.visible=false;
+        }
+        cranePartsB.outPart.visible=(t<1.5);
+        for(var wi=2;wi<6;wi++){if(amr.children[wi])amr.children[wi].rotation.x+=0.08;}
+      })();
+
+      /* Crane B: 입고 스태커 */
+      (function(){
+        var t1=((elapsed-amrDefsB[0].offset)%CY+CY)%CY;
+        var cn=cycleNum%5, rw=Math.floor(cycleNum/5)%3;
+        var slotZ=rackInB.zPositions[cn], slotY=rackInB.yPositions[rw];
+        var dockZ=1.5;
+        if(t1>=4.5&&t1<6){
+          var p=clamp01((t1-4.5)/1.5);
+          animCraneB(craneInB,p,dockZ,slotZ,slotY);
+        }else{
+          craneInB.trolley.position.z=(craneInB.zMin+craneInB.zMax)/2;
+          craneInB.carriage.position.y=0.8; craneInB.fork.position.x=0;
+        }
+      })();
+
+      /* Crane B: 출고 스태커 */
+      (function(){
+        var t3=((elapsed-amrDefsB[2].offset)%CY+CY)%CY;
+        var cn=cycleNum%5, rw=Math.floor(cycleNum/5)%3;
+        var slotZ=rackOutB.zPositions[cn], slotY=rackOutB.yPositions[rw];
+        var dockZ=-1.5;
+        if(t3>=4.5&&t3<6){
+          var p=clamp01((t3-4.5)/1.5);
+          animCraneB(craneOutB,p,dockZ,slotZ,slotY);
+        }else{
+          craneOutB.trolley.position.z=(craneOutB.zMin+craneOutB.zMax)/2;
+          craneOutB.carriage.position.y=0.8; craneOutB.fork.position.x=0;
+        }
+      })();
+
+      /* 소조립 B emissive pulse */
+      var sp=(elapsed%2.5)/2.5,aIdx=Math.floor(sp*4);
+      subBoxesB.forEach(function(b,i){
+        if(i===aIdx){var pulse=0.3+0.7*Math.abs(Math.sin(elapsed*4));b.material.emissive=new THREE.Color(subColsB[i]);b.material.emissiveIntensity=pulse*0.6;
+        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
+      });
+
+      /* conveyor B spin */
+      [convInB,convOutB].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
+    }
+
+    /* ============================================================
+       LAYOUT 3 — U자형 순환 배치 (배치안3)
+       ============================================================ */
+    /* Floor 3: 45×30 */
+    add3(at(bx(45,0.08,30,0xE2E8F0),0,0,0));
+    group3.add(new THREE.GridHelper(45,45,0xCBD5E1,0xCBD5E1));
+
+    /* 절단 3 */
+    add3(at(bx(4,0.12,3,0xFBBF24,{transparent:true,opacity:0.5}),-18,0.06,0));
+    for(var c3i=0;c3i<3;c3i++){for(var c3j=0;c3j<2;c3j++){
+      add3(at(bx(0.7,0.4,0.5,0xD97706),-19+c3i,0.32,-0.5+c3j));
+    }}
+    /* 소조립 3 */
+    add3(at(bx(8,0.08,5,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,0));
+    var subBoxes3=[];
+    [{dx:-2.4,col:0xF97316},{dx:-0.8,col:0xEAB308},{dx:0.8,col:0x94A3B8},{dx:2.4,col:0x22D3EE}].forEach(function(s){
+      var b=bx(1.5,1.0,1.5,s.col,{transparent:true,opacity:0.85});
+      at(b,s.dx,0.58,0); add3(b); subBoxes3.push(b);
+    });
+    /* 중조립 3 */
+    add3(at(bx(4,0.12,3,0x60A5FA,{transparent:true,opacity:0.5}),18,0.06,0));
+    add3(at(bx(3,1.8,2.2,0x93C5FD,{transparent:true,opacity:0.5}),18,1.02,0));
+    add3(at(bx(1.4,0.6,2.0,0x3B82F6),18,2.2,0));
+
+    /* 입고 랙 3 — top (z=+8..+12), 2 sets */
+    add3(at(bx(4,0.08,6,0x86EFAC,{transparent:true,opacity:0.3}),-6,0.04,10));
+    add3(at(bx(4,0.08,6,0x86EFAC,{transparent:true,opacity:0.3}),6,0.04,10));
+    function makeRack3(cx,zStart,zDir,fill){
+      var SW=1.0,SH=0.8,SD=1.0,SLOTS=5,ROWS=2;
+      for(var r=0;r<ROWS;r++){for(var s=0;s<SLOTS;s++){
+        var rz=zStart+zDir*(s*1.2+0.5),ry=0.5+r*(SH+0.12);
+        var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
+        at(fr,cx,ry,rz); group3.add(fr);
+        var eg=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),new THREE.LineBasicMaterial({color:0x94A3B8}));
+        eg.position.copy(fr.position); group3.add(eg);
+        if(r*SLOTS+s<Math.round(SLOTS*ROWS*fill)) add3(at(bx(SW*0.7,SH*0.7,SD*0.7,0x22C55E),cx,ry,rz));
+      }}
+    }
+    makeRack3(-6,8,1,0.6); makeRack3(6,8,1,0.5);
+    /* 출고 랙 3 — bottom (z=-8..-12) */
+    add3(at(bx(4,0.08,6,0x86EFAC,{transparent:true,opacity:0.3}),-6,0.04,-10));
+    add3(at(bx(4,0.08,6,0x86EFAC,{transparent:true,opacity:0.3}),6,0.04,-10));
+    makeRack3(-6,-8,-1,0.4); makeRack3(6,-8,-1,0.35);
+
+    /* U-loop lanes 3 */
+    [{x1:-18,x2:-6,z:5},{x1:-6,x2:6,z:5},{x1:6,x2:18,z:5},
+     {x:14,z1:5,z2:-5},
+     {x1:18,x2:6,z:-5},{x1:6,x2:-6,z:-5},{x1:-6,x2:-18,z:-5},
+     {x:-14,z1:-5,z2:5}
+    ].forEach(function(ln){
+      var lp;
+      if(ln.x1!==undefined){
+        var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
+        lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.3),new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
+        lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z);
+      }else{
+        var len=Math.abs(ln.z2-ln.z1),mz=(ln.z1+ln.z2)/2;
+        lp=new THREE.Mesh(new THREE.PlaneGeometry(0.3,len),new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.18}));
+        lp.rotation.x=-Math.PI/2; at(lp,ln.x,0.05,mz);
+      }
+      group3.add(lp);
+    });
+
+    /* Docks 3 */
+    function makeDock3(x,z){
+      var g=new THREE.Group();
+      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
+      [[-0.5,0,-0.25],[0.5,0,-0.25],[-0.5,0,0.25],[0.5,0,0.25]].forEach(function(l){
+        g.add(at(bx(0.06,0.15,0.06,0x94A3B8),l[0],0.075,l[2]));
+      });
+      g.position.set(x,0,z); g.castShadow=true; group3.add(g);
+      return g;
+    }
+    makeDock3(-18,5);makeDock3(-6,5);makeDock3(6,5);makeDock3(18,5);
+    makeDock3(-18,-5);makeDock3(-6,-5);makeDock3(6,-5);makeDock3(18,-5);
+
+    /* Cranes 3 — 4 stacker cranes */
+    function makeSCrane3(x,zMin,zMax){
+      var g=new THREE.Group();
+      var rl=zMax-zMin+1,rm=(zMin+zMax)/2;
+      g.add(at(bx(0.3,0.05,rl,0x71717A),0,0.025,rm));
+      var trolley=new THREE.Group();
+      trolley.add(at(bx(0.15,3.5,0.15,0x52525B),0,1.75,0));
+      var car=new THREE.Group();
+      car.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
+      var fk=bx(0.6,0.05,0.4,0xA3A3A3); at(fk,0,-0.1,0); car.add(fk);
+      car.position.set(0,0.8,0); trolley.add(car);
+      trolley.position.set(0,0,rm); g.add(trolley);
+      g.position.set(x,0,0); group3.add(g);
+      return {group:g,trolley:trolley,carriage:car,fork:fk,zMin:zMin,zMax:zMax};
+    }
+    var crane3=[makeSCrane3(-6,8,13),makeSCrane3(6,8,13),makeSCrane3(-6,-13,-8),makeSCrane3(6,-13,-8)];
+
+    /* Conveyors 3 */
+    var conv3In=makeConveyorG(group3,-4,-2,2);
+    var conv3Out=makeConveyorG(group3,4,-2,2);
+
+    /* AMR 3 — 6 units on U-loop */
+    var amrDefs3=[];
+    [0x7C3AED,0x8B5CF6,0xA855F7,0xC084FC,0x6D28D9,0x9333EA].forEach(function(col,i){
+      var a=makeAMRg(group3,col);
+      var p=bx(0.8,0.35,0.55,[0xF97316,0x22C55E,0xEAB308,0x22C55E,0xF97316,0xEAB308][i]);
+      p.castShadow=true; group3.add(p); p.visible=false;
+      a.position.set(-18,0.22,5);
+      amrDefs3.push({amr:a,part:p,offset:i*1.67});
+    });
+    /* U waypoints (counterclockwise) */
+    var uWP=[{x:-18,z:5},{x:-6,z:5},{x:6,z:5},{x:14,z:5},{x:14,z:0},{x:14,z:-5},{x:6,z:-5},{x:-6,z:-5},{x:-14,z:-5},{x:-14,z:0},{x:-14,z:5},{x:-18,z:5}];
+    var uSegLen=[];var uTotalLen=0;
+    for(var ui=0;ui<uWP.length-1;ui++){
+      var dx=uWP[ui+1].x-uWP[ui].x,dz=uWP[ui+1].z-uWP[ui].z;
+      var sl=Math.sqrt(dx*dx+dz*dz); uSegLen.push(sl); uTotalLen+=sl;
+    }
+
+    /* ============================================================
+       ANIMATION — Layout 3 (배치안3)
+       ============================================================ */
+    var subCols3=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
+    function animateLayout3(elapsed){
+      /* AMR U-loop */
+      amrDefs3.forEach(function(def){
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var frac=t/CY;
+        /* first 70% travel with part, last 30% return empty */
+        var hasPart=(frac<0.6);
+        var pathFrac=hasPart?frac/0.6:(frac-0.6)/0.4;
+        var dist=pathFrac*uTotalLen,acc=0,seg=0;
+        for(seg=0;seg<uSegLen.length-1;seg++){
+          if(acc+uSegLen[seg]>=dist)break;acc+=uSegLen[seg];
+        }
+        var segP=clamp01((dist-acc)/uSegLen[seg]);
+        var wx=lerp(uWP[seg].x,uWP[seg+1].x,segP);
+        var wz=lerp(uWP[seg].z,uWP[seg+1].z,segP);
+        def.amr.position.set(wx,0.22,wz);
+        /* face direction */
+        var ddx=uWP[seg+1].x-uWP[seg].x,ddz=uWP[seg+1].z-uWP[seg].z;
+        def.amr.rotation.y=Math.atan2(ddx,ddz);
+        def.part.visible=hasPart;
+        if(hasPart)def.part.position.set(wx,0.85,wz);
+        for(var wi=2;wi<6;wi++){if(def.amr.children[wi])def.amr.children[wi].rotation.x+=0.08;}
+      });
+      /* Crane 3 oscillation */
+      crane3.forEach(function(cr,ci){
+        var ph=elapsed*0.4+ci*1.5;
+        var zr=lerp(cr.zMin,cr.zMax,(Math.sin(ph)*0.5+0.5));
+        cr.trolley.position.z=zr;
+        cr.carriage.position.y=0.6+0.5*Math.abs(Math.sin(ph*0.7));
+      });
+      /* 소조립 emissive */
+      var sp3=(elapsed%2.5)/2.5,aIdx3=Math.floor(sp3*4);
+      subBoxes3.forEach(function(b,i){
+        if(i===aIdx3){b.material.emissive=new THREE.Color(subCols3[i]);b.material.emissiveIntensity=(0.3+0.7*Math.abs(Math.sin(elapsed*4)))*0.6;
+        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
+      });
+      [conv3In,conv3Out].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
+    }
+
+    /* ============================================================
+       LAYOUT 4 — 병렬 다중 랙 (배치안4)
+       ============================================================ */
+    /* Floor 4: 60×35 */
+    add4(at(bx(60,0.08,35,0xE2E8F0),0,0,0));
+    group4.add(new THREE.GridHelper(60,60,0xCBD5E1,0xCBD5E1));
+
+    /* 입고존 (left, x=-24) */
+    add4(at(bx(6,0.12,8,0xFBBF24,{transparent:true,opacity:0.4}),-24,0.06,0));
+    for(var d4i=0;d4i<4;d4i++){for(var d4j=0;d4j<3;d4j++){
+      add4(at(bx(0.7,0.4,0.5,0xD97706),-25.5+d4i*1,-1+d4j*1,0.32));
+    }}
+    /* 소조립 4 (x=-12) */
+    add4(at(bx(8,0.08,8,0xFDE68A,{transparent:true,opacity:0.4}),-12,0.04,0));
+    var subBoxes4=[];
+    [{dx:-2.4,col:0xF97316},{dx:-0.8,col:0xEAB308},{dx:0.8,col:0x94A3B8},{dx:2.4,col:0x22D3EE}].forEach(function(s){
+      var b=bx(1.5,1.0,1.5,s.col,{transparent:true,opacity:0.85});
+      at(b,-12+s.dx,0.58,0); add4(b); subBoxes4.push(b);
+    });
+
+    /* 보관존 — 3 parallel racks (center, x=-2, x=0, x=2 → spaced out) */
+    var rack4Data=[];
+    [-4,0,4].forEach(function(cx){
+      add4(at(bx(3,0.08,14,0x86EFAC,{transparent:true,opacity:0.3}),cx,0.04,0));
+      var SW=1.0,SH=0.7,SD=1.0,SLOTS=8,ROWS=3;
+      for(var r=0;r<ROWS;r++){for(var s=0;s<SLOTS;s++){
+        var rz=-4.5+s*1.15,ry=0.45+r*(SH+0.1);
+        var fr=bx(SW,SH,SD,0xCBD5E1,{transparent:true,opacity:0.35});
+        at(fr,cx,ry,rz); group4.add(fr);
+        var eg=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(SW,SH,SD)),new THREE.LineBasicMaterial({color:0x94A3B8}));
+        eg.position.copy(fr.position); group4.add(eg);
+        if(r*SLOTS+s<Math.round(SLOTS*ROWS*0.45)) add4(at(bx(SW*0.7,SH*0.7,SD*0.7,0x22C55E),cx,ry,rz));
+      }}
+      rack4Data.push({cx:cx,zMin:-4.5,zMax:3.5});
+    });
+
+    /* 출고존 (right, x=+14) */
+    add4(at(bx(6,0.12,8,0x60A5FA,{transparent:true,opacity:0.4}),14,0.06,0));
+    add4(at(bx(4,1.8,3,0x93C5FD,{transparent:true,opacity:0.5}),14,1.02,0));
+    /* 중조립 4 (far right, x=+24) */
+    add4(at(bx(6,0.12,8,0x60A5FA,{transparent:true,opacity:0.5}),24,0.06,0));
+    add4(at(bx(4,2.0,3,0x3B82F6,{transparent:true,opacity:0.6}),24,1.12,0));
+
+    /* Overhead gantry crane 4 — spans x=-6..6, long rail */
+    function makeGantry4(z){
+      var g=new THREE.Group();
+      /* 2 rails (x-direction) */
+      g.add(at(bx(16,0.15,0.2,0x52525B),0,4.0,z-1));
+      g.add(at(bx(16,0.15,0.2,0x52525B),0,4.0,z+1));
+      /* 4 legs */
+      [[-8,z-1],[-8,z+1],[8,z-1],[8,z+1]].forEach(function(l){
+        g.add(at(bx(0.2,4.0,0.2,0x71717A),l[0],2.0,l[1]));
+      });
+      /* trolley beam */
+      var beam=new THREE.Group();
+      beam.add(at(bx(0.25,0.25,2.4,0xFBBF24),0,0,0));
+      /* hoist */
+      var hoist=new THREE.Group();
+      hoist.add(at(bx(0.4,0.15,0.4,0xF97316),0,0,0));
+      hoist.add(at(bx(0.04,1.5,0.04,0xA3A3A3),0,-0.75,0));
+      var hook=bx(0.3,0.08,0.3,0xEF4444); at(hook,0,-1.5,0); hoist.add(hook);
+      hoist.position.set(0,-0.2,0); beam.add(hoist);
+      beam.position.set(0,3.85,z); g.add(beam);
+      group4.add(g);
+      return {group:g,beam:beam,hoist:hoist,hook:hook};
+    }
+    var gantry4=[makeGantry4(-5),makeGantry4(5)];
+
+    /* Stacker cranes 4 (one per rack row) */
+    function makeSCrane4(x,zMin,zMax){
+      var g=new THREE.Group();
+      var rl=zMax-zMin+1,rm=(zMin+zMax)/2;
+      g.add(at(bx(0.3,0.05,rl,0x71717A),0,0.025,rm));
+      var trolley=new THREE.Group();
+      trolley.add(at(bx(0.15,3.0,0.15,0x52525B),0,1.5,0));
+      var car=new THREE.Group();
+      car.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
+      var fk=bx(0.6,0.05,0.4,0xA3A3A3); at(fk,0,-0.1,0); car.add(fk);
+      car.position.set(0,0.8,0); trolley.add(car);
+      trolley.position.set(0,0,rm); g.add(trolley);
+      g.position.set(x,0,0); group4.add(g);
+      return {group:g,trolley:trolley,carriage:car,fork:fk,zMin:zMin,zMax:zMax};
+    }
+    var crane4=rack4Data.map(function(rd){return makeSCrane4(rd.cx,rd.zMin,rd.zMax);});
+
+    /* Grid lanes 4 */
+    [{x1:-24,x2:-16,z:3},{x1:-24,x2:-16,z:-3},
+     {x1:-16,x2:-8,z:3},{x1:-16,x2:-8,z:-3},
+     {x1:-8,x2:8,z:6},{x1:-8,x2:8,z:-6},
+     {x1:8,x2:14,z:3},{x1:8,x2:14,z:-3},
+     {x1:14,x2:24,z:3},{x1:14,x2:24,z:-3},
+     {x:-8,z1:-6,z2:6},{x:8,z1:-6,z2:6},{x:-16,z1:-3,z2:3},{x:14,z1:-3,z2:3}
+    ].forEach(function(ln){
+      var lp;
+      if(ln.x1!==undefined){
+        var len=Math.abs(ln.x2-ln.x1),mx=(ln.x1+ln.x2)/2;
+        lp=new THREE.Mesh(new THREE.PlaneGeometry(len,0.3),new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.15}));
+        lp.rotation.x=-Math.PI/2; at(lp,mx,0.05,ln.z);
+      }else{
+        var len=Math.abs(ln.z2-ln.z1),mz=(ln.z1+ln.z2)/2;
+        lp=new THREE.Mesh(new THREE.PlaneGeometry(0.3,len),new THREE.MeshBasicMaterial({color:0x8B5CF6,transparent:true,opacity:0.15}));
+        lp.rotation.x=-Math.PI/2; at(lp,ln.x,0.05,mz);
+      }
+      group4.add(lp);
+    });
+
+    /* Docks 4 */
+    function makeDock4(x,z){
+      var g=new THREE.Group();
+      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
+      g.position.set(x,0,z); g.castShadow=true; group4.add(g);
+      return g;
+    }
+    makeDock4(-24,3);makeDock4(-24,-3);makeDock4(-16,3);makeDock4(-16,-3);
+    makeDock4(-8,6);makeDock4(-8,-6);makeDock4(8,6);makeDock4(8,-6);
+    makeDock4(14,3);makeDock4(14,-3);makeDock4(24,3);makeDock4(24,-3);
+
+    /* Conveyors 4 */
+    var conv4In=makeConveyorG(group4,-16,-3,3);
+    var conv4Out=makeConveyorG(group4,14,-3,3);
+
+    /* AMR 4 — 8 units grid path */
+    var amrDefs4=[];
+    var amr4Cols=[0x7C3AED,0x8B5CF6,0xA855F7,0xC084FC,0x6D28D9,0x9333EA,0x7E22CE,0xA78BFA];
+    var amr4Routes=[
+      [{x:-24,z:3},{x:-16,z:3},{x:-8,z:3},{x:-8,z:6},{x:8,z:6},{x:14,z:3},{x:24,z:3}],
+      [{x:-24,z:-3},{x:-16,z:-3},{x:-8,z:-3},{x:-8,z:-6},{x:8,z:-6},{x:14,z:-3},{x:24,z:-3}],
+      [{x:-24,z:3},{x:-16,z:3},{x:-16,z:-3},{x:-8,z:-3},{x:-8,z:-6},{x:8,z:-6},{x:14,z:-3}],
+      [{x:-24,z:-3},{x:-16,z:-3},{x:-16,z:3},{x:-8,z:3},{x:-8,z:6},{x:8,z:6},{x:14,z:3}],
+      [{x:14,z:3},{x:24,z:3},{x:24,z:-3},{x:14,z:-3},{x:8,z:-3},{x:8,z:-6},{x:-8,z:-6}],
+      [{x:14,z:-3},{x:24,z:-3},{x:24,z:3},{x:14,z:3},{x:8,z:3},{x:8,z:6},{x:-8,z:6}],
+      [{x:-8,z:6},{x:8,z:6},{x:8,z:-6},{x:-8,z:-6},{x:-16,z:-3},{x:-24,z:-3}],
+      [{x:-8,z:-6},{x:8,z:-6},{x:8,z:6},{x:-8,z:6},{x:-16,z:3},{x:-24,z:3}]
+    ];
+    amr4Cols.forEach(function(col,i){
+      var a=makeAMRg(group4,col);
+      var pc=[0xF97316,0x22C55E,0xEAB308,0x22C55E,0xF97316,0xEAB308,0x94A3B8,0x22D3EE][i];
+      var p=bx(0.8,0.35,0.55,pc); p.castShadow=true; group4.add(p); p.visible=false;
+      a.position.set(-24,0.22,0);
+      amrDefs4.push({amr:a,part:p,offset:i*1.25,route:amr4Routes[i]});
+    });
+
+    /* ============================================================
+       ANIMATION — Layout 4 (배치안4)
+       ============================================================ */
+    var subCols4=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
+    function animateLayout4(elapsed){
+      /* AMR grid paths */
+      amrDefs4.forEach(function(def){
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var route=def.route,n=route.length;
+        var frac=t/CY;
+        var hasPart=(frac<0.65);
+        var pathFrac=hasPart?frac/0.65:(frac-0.65)/0.35;
+        var totalD=0; var segs=[];
+        for(var ri=0;ri<n-1;ri++){
+          var dx=route[ri+1].x-route[ri].x,dz=route[ri+1].z-route[ri].z;
+          var sl=Math.sqrt(dx*dx+dz*dz); segs.push(sl); totalD+=sl;
+        }
+        var dist=pathFrac*totalD,acc=0,seg=0;
+        for(seg=0;seg<segs.length-1;seg++){if(acc+segs[seg]>=dist)break;acc+=segs[seg];}
+        var segP=clamp01((dist-acc)/segs[seg]);
+        var wx=lerp(route[seg].x,route[seg+1].x,segP);
+        var wz=lerp(route[seg].z,route[seg+1].z,segP);
+        def.amr.position.set(wx,0.22,wz);
+        var ddx=route[seg+1].x-route[seg].x,ddz=route[seg+1].z-route[seg].z;
+        def.amr.rotation.y=Math.atan2(ddx,ddz);
+        def.part.visible=hasPart;
+        if(hasPart)def.part.position.set(wx,0.85,wz);
+        for(var wi=2;wi<6;wi++){if(def.amr.children[wi])def.amr.children[wi].rotation.x+=0.08;}
+      });
+      /* Gantry crane 4 oscillation */
+      gantry4.forEach(function(gc,gi){
+        var ph=elapsed*0.3+gi*2;
+        gc.beam.position.x=lerp(-6,6,Math.sin(ph)*0.5+0.5);
+        gc.hoist.position.y=-0.2-0.8*Math.abs(Math.sin(ph*0.6));
+      });
+      /* Stacker cranes 4 */
+      crane4.forEach(function(cr,ci){
+        var ph=elapsed*0.4+ci*1.2;
+        cr.trolley.position.z=lerp(cr.zMin,cr.zMax,Math.sin(ph)*0.5+0.5);
+        cr.carriage.position.y=0.6+0.5*Math.abs(Math.sin(ph*0.7));
+      });
+      /* 소조립 emissive */
+      var sp4=(elapsed%2.5)/2.5,aIdx4=Math.floor(sp4*4);
+      subBoxes4.forEach(function(b,i){
+        if(i===aIdx4){b.material.emissive=new THREE.Color(subCols4[i]);b.material.emissiveIntensity=(0.3+0.7*Math.abs(Math.sin(elapsed*4)))*0.6;
+        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
+      });
+      [conv4In,conv4Out].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
+    }
+
+    /* ============================================================
+       LAYOUT 5 — 셀 기반 Full-Auto (배치안5)
+       ============================================================ */
+    /* Floor 5: 55×30 */
+    add5(at(bx(55,0.08,30,0xE2E8F0),0,0,0));
+    group5.add(new THREE.GridHelper(55,55,0xCBD5E1,0xCBD5E1));
+
+    /* 입고 (left, x=-22) */
+    add5(at(bx(4,0.12,4,0xFBBF24,{transparent:true,opacity:0.5}),-22,0.06,0));
+    for(var s5i=0;s5i<3;s5i++){for(var s5j=0;s5j<2;s5j++){
+      add5(at(bx(0.7,0.4,0.5,0xD97706),-23+s5i,0.32,-0.5+s5j));
+    }}
+
+    /* 셀 어레이 6×10 (center) */
+    var cells5=[];
+    var cellCols=[0xBBF7D0,0xA7F3D0,0x6EE7B7,0x34D399,0x86EFAC,0xD1FAE5];
+    for(var cr=0;cr<6;cr++){for(var cc=0;cc<10;cc++){
+      var cx=-9+cc*2, cz=-5+cr*2;
+      var cell=bx(1.6,0.3,1.6,cellCols[cr],{transparent:true,opacity:0.7});
+      at(cell,cx,0.2,cz); add5(cell);
+      cells5.push({mesh:cell,baseY:0.2,cx:cx,cz:cz,cr:cr,cc:cc});
+      /* slot frame */
+      var ef=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.6,0.3,1.6)),new THREE.LineBasicMaterial({color:0x16A34A,transparent:true,opacity:0.4}));
+      ef.position.copy(cell.position); group5.add(ef);
+    }}
+
+    /* 소조립 5 (top, z=+10) */
+    add5(at(bx(10,0.08,4,0xFDE68A,{transparent:true,opacity:0.4}),0,0.04,10));
+    var subBoxes5=[];
+    [{dx:-3,col:0xF97316},{dx:-1,col:0xEAB308},{dx:1,col:0x94A3B8},{dx:3,col:0x22D3EE}].forEach(function(s){
+      var b=bx(1.8,1.2,1.8,s.col,{transparent:true,opacity:0.85});
+      at(b,s.dx,0.68,10); add5(b); subBoxes5.push(b);
+    });
+
+    /* 출고 (right, x=+22) */
+    add5(at(bx(4,0.12,4,0x60A5FA,{transparent:true,opacity:0.5}),22,0.06,0));
+    /* 중조립 5 (far right, x=+22, z=-8) */
+    add5(at(bx(4,0.12,4,0x60A5FA,{transparent:true,opacity:0.5}),22,0.06,-8));
+    add5(at(bx(3,1.8,2.5,0x93C5FD,{transparent:true,opacity:0.5}),22,1.02,-8));
+    add5(at(bx(1.4,0.6,2.0,0x3B82F6),22,2.2,-8));
+
+    /* Overhead gantry 5 — 2 units spanning the cell array */
+    function makeGantry5(z){
+      var g=new THREE.Group();
+      g.add(at(bx(22,0.15,0.2,0x52525B),0,5.0,z-1.5));
+      g.add(at(bx(22,0.15,0.2,0x52525B),0,5.0,z+1.5));
+      [[-11,z-1.5],[-11,z+1.5],[11,z-1.5],[11,z+1.5]].forEach(function(l){
+        g.add(at(bx(0.2,5.0,0.2,0x71717A),l[0],2.5,l[1]));
+      });
+      var beam=new THREE.Group();
+      beam.add(at(bx(0.25,0.25,3.4,0xFBBF24),0,0,0));
+      var hoist=new THREE.Group();
+      hoist.add(at(bx(0.5,0.15,0.5,0xF97316),0,0,0));
+      hoist.add(at(bx(0.04,2.0,0.04,0xA3A3A3),0,-1.0,0));
+      var hook=bx(0.4,0.08,0.4,0xEF4444); at(hook,0,-2.0,0); hoist.add(hook);
+      hoist.position.set(0,-0.2,0); beam.add(hoist);
+      beam.position.set(0,4.85,z); g.add(beam);
+      group5.add(g);
+      return {group:g,beam:beam,hoist:hoist,hook:hook};
+    }
+    var gantry5=[makeGantry5(-2),makeGantry5(2)];
+
+    /* Stacker cranes 5 — 2 at edges */
+    function makeSCrane5(x,zMin,zMax){
+      var g=new THREE.Group();
+      var rl=zMax-zMin+1,rm=(zMin+zMax)/2;
+      g.add(at(bx(0.3,0.05,rl,0x71717A),0,0.025,rm));
+      var trolley=new THREE.Group();
+      trolley.add(at(bx(0.15,3.5,0.15,0x52525B),0,1.75,0));
+      var car=new THREE.Group();
+      car.add(at(bx(0.8,0.3,0.6,0xFBBF24),0,0,0));
+      var fk=bx(0.6,0.05,0.4,0xA3A3A3); at(fk,0,-0.1,0); car.add(fk);
+      car.position.set(0,0.8,0); trolley.add(car);
+      trolley.position.set(0,0,rm); g.add(trolley);
+      g.position.set(x,0,0); group5.add(g);
+      return {group:g,trolley:trolley,carriage:car,fork:fk,zMin:zMin,zMax:zMax};
+    }
+    var crane5=[makeSCrane5(-11,-6,6),makeSCrane5(11,-6,6)];
+
+    /* Conveyors 5 */
+    var conv5In=makeConveyorG(group5,-14,-3,3);
+    var conv5Out=makeConveyorG(group5,14,-3,3);
+
+    /* AMR 5 — 6 units, dynamic paths between cells */
+    var amrDefs5=[];
+    [0x7C3AED,0x8B5CF6,0xA855F7,0xC084FC,0x6D28D9,0x9333EA].forEach(function(col,i){
+      var a=makeAMRg(group5,col);
+      var p=bx(0.8,0.35,0.55,[0xF97316,0x22C55E,0xEAB308,0x22C55E,0xF97316,0xEAB308][i]);
+      p.castShadow=true; group5.add(p); p.visible=false;
+      a.position.set(-22,0.22,0);
+      amrDefs5.push({amr:a,part:p,offset:i*1.67,seed:i*137});
+    });
+
+    /* Docks 5 */
+    function makeDock5(x,z){
+      var g=new THREE.Group();
+      g.add(at(bx(1.2,0.15,0.7,0xD4D4D8),0,0.15,0));
+      g.position.set(x,0,z); g.castShadow=true; group5.add(g);
+      return g;
+    }
+    makeDock5(-22,3);makeDock5(-22,-3);makeDock5(-14,3);makeDock5(-14,-3);
+    makeDock5(14,3);makeDock5(14,-3);makeDock5(22,3);makeDock5(22,-3);
+
+    /* ============================================================
+       ANIMATION — Layout 5 (배치안5)
+       ============================================================ */
+    var subCols5=[0xF97316,0xEAB308,0x94A3B8,0x22D3EE];
+    function animateLayout5(elapsed){
+      /* Cell wave animation — servo height changes */
+      cells5.forEach(function(c){
+        var wave=Math.sin(elapsed*1.5+c.cx*0.3+c.cz*0.4)*0.3+
+                 Math.sin(elapsed*0.8-c.cr*0.5)*0.15;
+        c.mesh.position.y=c.baseY+Math.max(0,wave);
+        c.mesh.scale.y=1.0+Math.max(0,wave)*0.5;
+      });
+      /* AMR 5 — pseudo-random cell-to-cell movement */
+      amrDefs5.forEach(function(def){
+        var t=((elapsed-def.offset)%CY+CY)%CY;
+        var frac=t/CY;
+        /* pick source and target cell based on seed+cycle */
+        var cycle=Math.floor((elapsed-def.offset)/CY);
+        var srcIdx=((def.seed+cycle*7)%60);
+        var tgtIdx=((def.seed+cycle*13+30)%60);
+        var src=cells5[srcIdx],tgt=cells5[tgtIdx];
+        /* path: source → center row → target column → target */
+        var hasPart=(frac<0.6);
+        if(frac<0.15){
+          /* at source cell */
+          def.amr.position.set(src.cx,0.22,src.cz);
+          def.part.visible=true; def.part.position.set(src.cx,0.85,src.cz);
+        }else if(frac<0.35){
+          /* move x toward target */
+          var p=ease((frac-0.15)/0.2);
+          def.amr.position.set(lerp(src.cx,tgt.cx,p),0.22,src.cz);
+          def.part.visible=true; def.part.position.set(lerp(src.cx,tgt.cx,p),0.85,src.cz);
+          def.amr.rotation.y=(tgt.cx>src.cx)?0:Math.PI;
+        }else if(frac<0.55){
+          /* move z toward target */
+          var p=ease((frac-0.35)/0.2);
+          def.amr.position.set(tgt.cx,0.22,lerp(src.cz,tgt.cz,p));
+          def.part.visible=true; def.part.position.set(tgt.cx,0.85,lerp(src.cz,tgt.cz,p));
+          def.amr.rotation.y=(tgt.cz>src.cz)?Math.PI/2:-Math.PI/2;
+        }else if(frac<0.65){
+          /* unload at target */
+          var p=(frac-0.55)/0.1;
+          def.amr.position.set(tgt.cx,0.22,tgt.cz);
+          def.part.visible=(p<0.8); def.part.position.set(tgt.cx,0.85-0.5*ease(p),tgt.cz);
+        }else{
+          /* return empty */
+          var p=ease((frac-0.65)/0.35);
+          def.amr.position.set(lerp(tgt.cx,src.cx,p),0.22,lerp(tgt.cz,src.cz,p));
+          def.part.visible=false;
+          def.amr.rotation.y=Math.atan2(src.cx-tgt.cx,src.cz-tgt.cz);
+        }
+        for(var wi=2;wi<6;wi++){if(def.amr.children[wi])def.amr.children[wi].rotation.x+=0.08;}
+      });
+      /* Gantry 5 oscillation */
+      gantry5.forEach(function(gc,gi){
+        var ph=elapsed*0.25+gi*3;
+        gc.beam.position.x=lerp(-8,8,Math.sin(ph)*0.5+0.5);
+        gc.hoist.position.y=-0.2-1.2*Math.abs(Math.sin(ph*0.5));
+      });
+      /* Stacker cranes 5 */
+      crane5.forEach(function(cr,ci){
+        var ph=elapsed*0.35+ci*2;
+        cr.trolley.position.z=lerp(cr.zMin,cr.zMax,Math.sin(ph)*0.5+0.5);
+        cr.carriage.position.y=0.6+0.6*Math.abs(Math.sin(ph*0.6));
+      });
+      /* 소조립 emissive */
+      var sp5=(elapsed%2.5)/2.5,aIdx5=Math.floor(sp5*4);
+      subBoxes5.forEach(function(b,i){
+        if(i===aIdx5){b.material.emissive=new THREE.Color(subCols5[i]);b.material.emissiveIntensity=(0.3+0.7*Math.abs(Math.sin(elapsed*4)))*0.6;
+        }else{b.material.emissive=new THREE.Color(0);b.material.emissiveIntensity=0;}
+      });
+      [conv5In,conv5Out].forEach(function(cv){cv.children.forEach(function(c){if(c.geometry&&c.geometry.type==='CylinderGeometry')c.rotation.x+=0.04;});});
+    }
+
+    /* ============================================================
+       MAIN ANIMATE LOOP
+       ============================================================ */
+    var animateFns={
+      '1':animateLayout1,'2':animateLayout2,
+      '3':animateLayout3,'4':animateLayout4,'5':animateLayout5
+    };
+    function animate(){
+      requestAnimationFrame(animate);
+      var elapsed=clk.getElapsedTime();
+      var ang=elapsed*0.025;
+      var cc=camConfigs[activeLayout]||camConfigs['1'];
+      cam.position.set(cc.R*Math.cos(ang),cc.H,cc.D*Math.sin(ang));
+      cam.lookAt(0,2,0);
+      var fn=animateFns[activeLayout];
+      if(fn) fn(elapsed);
+      renderer.render(scene,cam);
+    }
+    animate();
+    window.addEventListener('resize',function(){
+      W=cont.clientWidth;H=cont.clientHeight;if(!W||!H)return;
+      renderer.setSize(W,H);asp=W/H;
+      cam.left=-d*asp;cam.right=d*asp;cam.top=d;cam.bottom=-d;
+      cam.updateProjectionMatrix();
+    });
+  }
+  if(window.THREE){startSR3D();}
+  else{var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js';
+    s.onload=startSR3D;
+    s.onerror=function(){console.warn('Three.js CDN load failed — showing fallback SVG');};
+    document.head.appendChild(s);}
+})();
+    </script>
+
+    <div class="diagram-wrap report-only">
       <svg viewBox="0 0 1000 300" width="100%" style="display:block">
         <!-- SP 범위 -->
         <rect x="140" y="16" width="720" height="265" rx="16" fill="#F0FDF4" stroke="#86EFAC" stroke-width="2" stroke-dasharray="6 3"/>
@@ -1273,31 +2851,32 @@
         <text x="220" y="128" text-anchor="middle" fill="#A1A1AA" font-size="10">3D / 바코드 / RFID</text>
         <text x="220" y="145" text-anchor="middle" fill="#A1A1AA" font-size="10">무게·CoG 추정</text>
         <line x1="276" y1="124" x2="316" y2="124" stroke="#0D6E51" stroke-width="2" marker-end="url(#arr)"/>
-        <!-- 스마트랙 입고 -->
+        <!-- 스마트랙 입고장 -->
         <rect x="320" y="58" width="130" height="120" rx="14" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2"/>
         <text x="385" y="92" text-anchor="middle" fill="#0D6E51" font-size="15" font-weight="800">스마트랙</text>
-        <text x="385" y="110" text-anchor="middle" fill="#065F46" font-size="11">(입고·적치)</text>
+        <text x="385" y="110" text-anchor="middle" fill="#065F46" font-size="11" font-weight="700">입고장</text>
         <text x="385" y="130" text-anchor="middle" fill="#52525B" font-size="10">유연 지지점 배치</text>
         <text x="385" y="146" text-anchor="middle" fill="#52525B" font-size="10">안전검증·JIT 피킹</text>
         <text x="385" y="162" text-anchor="middle" fill="#52525B" font-size="10">재고현황 관리</text>
         <line x1="450" y1="118" x2="488" y2="118" stroke="#0D6E51" stroke-width="2" marker-end="url(#arr)"/>
-        <!-- AMR -->
+        <!-- AMR+도킹 -->
         <rect x="492" y="88" width="104" height="62" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
-        <text x="544" y="115" text-anchor="middle" fill="#5B21B6" font-size="12" font-weight="700">AMR 이송</text>
+        <text x="544" y="115" text-anchor="middle" fill="#5B21B6" font-size="12" font-weight="700">AMR + 도킹</text>
         <text x="544" y="135" text-anchor="middle" fill="#A1A1AA" font-size="10">자율주행·도킹</text>
         <line x1="596" y1="119" x2="634" y2="119" stroke="#0D6E51" stroke-width="2" marker-end="url(#arr)"/>
         <!-- 소조립 -->
-        <rect x="638" y="88" width="104" height="62" rx="10" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
-        <text x="690" y="115" text-anchor="middle" fill="#92400E" font-size="12" font-weight="700">소조립</text>
-        <text x="690" y="135" text-anchor="middle" fill="#A1A1AA" font-size="10">용접·조립 작업</text>
+        <rect x="638" y="82" width="104" height="74" rx="10" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="690" y="108" text-anchor="middle" fill="#92400E" font-size="12" font-weight="700">소조립</text>
+        <text x="690" y="124" text-anchor="middle" fill="#B45309" font-size="8">(취부→용접→수정→열처리)</text>
+        <text x="690" y="142" text-anchor="middle" fill="#A1A1AA" font-size="9">4단계 가공</text>
         <!-- 반송 경로 -->
         <path d="M690 150 L690 240 L450 240" stroke="#D97706" stroke-width="2" fill="none" stroke-dasharray="6 3" marker-end="url(#arr-a)"/>
-        <text x="575" y="228" text-anchor="middle" fill="#92400E" font-size="10" font-weight="600">크레인 / AMR</text>
+        <text x="575" y="228" text-anchor="middle" fill="#92400E" font-size="10" font-weight="600">AMR + 도킹</text>
         <text x="575" y="255" text-anchor="middle" fill="#D97706" font-size="9">완성 소조블록 반송</text>
-        <!-- 스마트랙 출고 -->
+        <!-- 스마트랙 출고장 -->
         <rect x="320" y="205" width="130" height="66" rx="14" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2"/>
         <text x="385" y="232" text-anchor="middle" fill="#0D6E51" font-size="14" font-weight="800">스마트랙</text>
-        <text x="385" y="249" text-anchor="middle" fill="#065F46" font-size="11">(출고·출하)</text>
+        <text x="385" y="249" text-anchor="middle" fill="#065F46" font-size="11" font-weight="700">출고장</text>
         <text x="385" y="264" text-anchor="middle" fill="#52525B" font-size="10">품질검사·출하관리</text>
         <path d="M320 240 L120 240" stroke="#0D6E51" stroke-width="2" fill="none" marker-end="url(#arr)"/>
         <!-- 중조립 -->
@@ -1323,6 +2902,7 @@
     </div>
 
   </div>
+  </div><!-- /slide-card -->
 </section>
 
 <!-- ===== SECTION 07b: 7단계 이송 구체화 ===== -->
@@ -1338,7 +2918,6 @@
     <div>
       <p style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:1.2px;text-transform:uppercase;">◆ 입고 사이클 — 절단공정 → 랙장 적치</p>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-
         <div class="card" style="padding:14px;border-top:3px solid var(--accent)">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</span>
@@ -1352,7 +2931,6 @@
           </ul>
           <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 롤러 컨베이어 + AMR</div>
         </div>
-
         <div class="card" style="padding:14px;border-top:3px solid var(--accent)">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</span>
@@ -1366,7 +2944,6 @@
           </ul>
           <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: AMR + I/O 스테이션</div>
         </div>
-
         <div class="card" style="padding:14px;border-top:3px solid var(--accent)">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</span>
@@ -1380,7 +2957,6 @@
           </ul>
           <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 스테커 크레인 + PLC</div>
         </div>
-
         <div class="card" style="padding:14px;border-top:3px solid var(--accent)">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</span>
@@ -1394,7 +2970,6 @@
           </ul>
           <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 크레인 + AMR + 취부대</div>
         </div>
-
       </div>
     </div>
 
@@ -1402,7 +2977,6 @@
     <div>
       <p style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:8px;letter-spacing:1.2px;text-transform:uppercase;">◆ 출고 사이클 — 소조립 완성 → 중조립 출하</p>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-
         <div class="card" style="padding:14px;border-top:3px solid var(--amber)">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <span style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">5</span>
@@ -1416,7 +2990,6 @@
           </ul>
           <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 리프팅 테이블 + AMR</div>
         </div>
-
         <div class="card" style="padding:14px;border-top:3px solid var(--amber)">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <span style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">6</span>
@@ -1430,7 +3003,6 @@
           </ul>
           <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: AMR + 스테커 크레인</div>
         </div>
-
         <div class="card" style="padding:14px;border-top:3px solid var(--amber)">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <span style="width:22px;height:22px;border-radius:50%;background:var(--amber);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">7</span>
@@ -1444,10 +3016,8 @@
           </ul>
           <div style="margin-top:8px;font-size:10px;font-weight:700;color:var(--amber);background:var(--amber-soft);padding:3px 8px;border-radius:100px;display:inline-block">장비: 크레인 / 트레일러</div>
         </div>
-
       </div>
     </div>
-
   </div>
 </section>
 
@@ -1459,148 +3029,310 @@
       <span class="slide-tag tag-blue">데이터 아키텍처</span>
       <h2 style="margin-top:8px">3-레이어 시스템 연동 + 데이터 흐름</h2>
     </div>
-
     <div class="diagram-wrap">
       <svg viewBox="0 0 980 360" width="100%" style="display:block">
         <defs>
-          <marker id="arr-p" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="#0D6E51"/>
-          </marker>
-          <marker id="arr-c" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="#1D4ED8"/>
-          </marker>
-          <marker id="arr-d" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="#7C3AED"/>
-          </marker>
+          <marker id="arr-p" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#0D6E51"/></marker>
+          <marker id="arr-c" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#1D4ED8"/></marker>
+          <marker id="arr-d" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#7C3AED"/></marker>
         </defs>
-
-        <!-- Layer Bands -->
         <rect x="28" y="18" width="820" height="96" rx="10" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.2"/>
         <rect x="28" y="126" width="820" height="88" rx="10" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1.2"/>
         <rect x="28" y="226" width="820" height="88" rx="10" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="1.2"/>
-
-        <!-- Layer Labels -->
         <text x="16" y="72" text-anchor="middle" fill="#0D6E51" font-size="10" font-weight="800" transform="rotate(-90,16,72)">물리층</text>
         <text x="16" y="172" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="800" transform="rotate(-90,16,172)">제어층</text>
         <text x="16" y="272" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="800" transform="rotate(-90,16,272)">지능층</text>
-
-        <!-- 물리층 노드 -->
-        <rect x="44" y="36" width="80" height="46" rx="7" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
-        <text x="84" y="55" text-anchor="middle" fill="#92400E" font-size="10" font-weight="700">절단공장</text>
-        <text x="84" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">소재 출하</text>
+        <rect x="44" y="36" width="80" height="46" rx="7" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/><text x="84" y="55" text-anchor="middle" fill="#92400E" font-size="10" font-weight="700">절단공장</text><text x="84" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">소재 출하</text>
         <line x1="124" y1="59" x2="154" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
-
-        <rect x="157" y="28" width="96" height="62" rx="7" fill="#fff" stroke="#E4E4E7" stroke-width="1.5"/>
-        <text x="205" y="47" text-anchor="middle" fill="#18181B" font-size="10" font-weight="700">입고 스캔</text>
-        <text x="205" y="63" text-anchor="middle" fill="#A1A1AA" font-size="9">3D·바코드·RFID</text>
-        <text x="205" y="78" text-anchor="middle" fill="#A1A1AA" font-size="9">무게 측정</text>
+        <rect x="157" y="28" width="96" height="62" rx="7" fill="#fff" stroke="#E4E4E7" stroke-width="1.5"/><text x="205" y="47" text-anchor="middle" fill="#18181B" font-size="10" font-weight="700">입고 스캔</text><text x="205" y="63" text-anchor="middle" fill="#A1A1AA" font-size="9">3D·바코드·RFID</text><text x="205" y="78" text-anchor="middle" fill="#A1A1AA" font-size="9">무게 측정</text>
         <line x1="253" y1="59" x2="283" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
-
-        <rect x="286" y="24" width="110" height="70" rx="9" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2"/>
-        <text x="341" y="46" text-anchor="middle" fill="#0D6E51" font-size="12" font-weight="800">스마트랙</text>
-        <text x="341" y="62" text-anchor="middle" fill="#065F46" font-size="9">유연 적치·재고 관리</text>
-        <text x="341" y="77" text-anchor="middle" fill="#065F46" font-size="9">JIT 출고·안전 검증</text>
-        <text x="341" y="89" text-anchor="middle" fill="#065F46" font-size="9">핀 구성 자동 계산</text>
+        <rect x="286" y="24" width="110" height="70" rx="9" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2"/><text x="341" y="46" text-anchor="middle" fill="#0D6E51" font-size="12" font-weight="800">스마트랙</text><text x="341" y="62" text-anchor="middle" fill="#065F46" font-size="9">유연 적치·재고 관리</text><text x="341" y="77" text-anchor="middle" fill="#065F46" font-size="9">JIT 출고·안전 검증</text><text x="341" y="89" text-anchor="middle" fill="#065F46" font-size="9">핀 구성 자동 계산</text>
         <line x1="396" y1="59" x2="424" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
-
-        <rect x="427" y="36" width="82" height="46" rx="7" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
-        <text x="468" y="55" text-anchor="middle" fill="#5B21B6" font-size="10" font-weight="700">AMR 이송</text>
-        <text x="468" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">자율주행</text>
+        <rect x="427" y="36" width="82" height="46" rx="7" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/><text x="468" y="55" text-anchor="middle" fill="#5B21B6" font-size="10" font-weight="700">AMR 이송</text><text x="468" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">자율주행</text>
         <line x1="509" y1="59" x2="539" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
-
-        <rect x="542" y="36" width="82" height="46" rx="7" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
-        <text x="583" y="55" text-anchor="middle" fill="#92400E" font-size="10" font-weight="700">소조립</text>
-        <text x="583" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">용접·조립</text>
+        <rect x="542" y="36" width="82" height="46" rx="7" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/><text x="583" y="55" text-anchor="middle" fill="#92400E" font-size="10" font-weight="700">소조립</text><text x="583" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">용접·조립</text>
         <line x1="624" y1="59" x2="654" y2="59" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr-p)"/>
-
-        <rect x="657" y="36" width="82" height="46" rx="7" fill="#FFF1F2" stroke="#FB7185" stroke-width="1.5"/>
-        <text x="698" y="55" text-anchor="middle" fill="#9F1239" font-size="10" font-weight="700">완성품 출하</text>
-        <text x="698" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">중조립 이송</text>
-
-        <!-- 제어층 노드 -->
-        <rect x="157" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/>
-        <text x="205" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">WCS</text>
-        <text x="205" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">창고 제어 시스템</text>
-
-        <rect x="298" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/>
-        <text x="346" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">PLC / 핀 구동</text>
-        <text x="346" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">서보·액추에이터</text>
-
-        <rect x="427" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/>
-        <text x="475" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">AMR 플릿 MCS</text>
-        <text x="475" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">경로·충돌 관리</text>
-
-        <rect x="557" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/>
-        <text x="605" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">안전 모니터링</text>
-        <text x="605" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">하중·진동·이탈</text>
-
-        <!-- 지능층 노드 -->
-        <rect x="44" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
-        <text x="94" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">AI 형상 분류</text>
-        <text x="94" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">비전·포인트클라우드</text>
-        <text x="94" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">슬롯 자동 배정</text>
-
-        <rect x="190" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
-        <text x="240" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">WMS</text>
-        <text x="240" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">재고 현황·입출고</text>
-        <text x="240" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">JIT 스케줄 관리</text>
-
-        <rect x="340" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
-        <text x="390" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">ERP / MES</text>
-        <text x="390" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">생산계획·BOM</text>
-        <text x="390" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">공정 진척 연계</text>
-
-        <rect x="490" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
-        <text x="540" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">디지털 트윈</text>
-        <text x="540" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">실시간 3D 시각화</text>
-        <text x="540" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">예측 유지보수</text>
-
-        <rect x="640" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/>
-        <text x="690" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">운영 대시보드</text>
-        <text x="690" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">KPI·알람·리포트</text>
-        <text x="690" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">관리자 인터페이스</text>
-
-        <!-- 물리↔제어 수직 연결 -->
+        <rect x="657" y="36" width="82" height="46" rx="7" fill="#FFF1F2" stroke="#FB7185" stroke-width="1.5"/><text x="698" y="55" text-anchor="middle" fill="#9F1239" font-size="10" font-weight="700">완성품 출하</text><text x="698" y="72" text-anchor="middle" fill="#A1A1AA" font-size="9">중조립 이송</text>
+        <rect x="157" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/><text x="205" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">WCS</text><text x="205" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">창고 제어 시스템</text>
+        <rect x="298" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/><text x="346" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">PLC / 핀 구동</text><text x="346" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">서보·액추에이터</text>
+        <rect x="427" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/><text x="475" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">AMR 플릿 MCS</text><text x="475" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">경로·충돌 관리</text>
+        <rect x="557" y="142" width="96" height="50" rx="7" fill="#fff" stroke="#BFDBFE" stroke-width="1.5"/><text x="605" y="161" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">안전 모니터링</text><text x="605" y="178" text-anchor="middle" fill="#A1A1AA" font-size="9">하중·진동·이탈</text>
+        <rect x="44" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/><text x="94" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">AI 형상 분류</text><text x="94" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">비전·포인트클라우드</text><text x="94" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">슬롯 자동 배정</text>
+        <rect x="190" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/><text x="240" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">WMS</text><text x="240" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">재고 현황·입출고</text><text x="240" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">JIT 스케줄 관리</text>
+        <rect x="340" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/><text x="390" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">ERP / MES</text><text x="390" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">생산계획·BOM</text><text x="390" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">공정 진척 연계</text>
+        <rect x="490" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/><text x="540" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">디지털 트윈</text><text x="540" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">실시간 3D 시각화</text><text x="540" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">예측 유지보수</text>
+        <rect x="640" y="244" width="100" height="54" rx="7" fill="#fff" stroke="#DDD6FE" stroke-width="1.5"/><text x="690" y="264" text-anchor="middle" fill="#7C3AED" font-size="10" font-weight="700">운영 대시보드</text><text x="690" y="280" text-anchor="middle" fill="#A1A1AA" font-size="9">KPI·알람·리포트</text><text x="690" y="294" text-anchor="middle" fill="#A1A1AA" font-size="9">관리자 인터페이스</text>
         <line x1="205" y1="90" x2="205" y2="142" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-c)"/>
         <line x1="346" y1="94" x2="346" y2="142" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-c)"/>
         <line x1="475" y1="82" x2="475" y2="142" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-c)"/>
-
-        <!-- 제어↔지능 수직 연결 -->
         <line x1="205" y1="192" x2="240" y2="244" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
         <line x1="346" y1="192" x2="346" y2="244" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
         <line x1="475" y1="192" x2="475" y2="244" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
         <line x1="605" y1="192" x2="540" y2="244" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
-
-        <!-- AI → 입고스캔 피드백 -->
         <line x1="94" y1="244" x2="175" y2="90" stroke="#7C3AED" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arr-d)"/>
-
-        <!-- 범례 -->
-        <line x1="870" y1="36" x2="905" y2="36" stroke="#0D6E51" stroke-width="2" marker-end="url(#arr-p)"/>
-        <text x="910" y="40" fill="#52525B" font-size="10">물리 이동</text>
-        <line x1="870" y1="58" x2="905" y2="58" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-c)"/>
-        <text x="910" y="62" fill="#52525B" font-size="10">제어 신호</text>
-        <line x1="870" y1="80" x2="905" y2="80" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
-        <text x="910" y="84" fill="#52525B" font-size="10">데이터 흐름</text>
+        <line x1="870" y1="36" x2="905" y2="36" stroke="#0D6E51" stroke-width="2" marker-end="url(#arr-p)"/><text x="910" y="40" fill="#52525B" font-size="10">물리 이동</text>
+        <line x1="870" y1="58" x2="905" y2="58" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-c)"/><text x="910" y="62" fill="#52525B" font-size="10">제어 신호</text>
+        <line x1="870" y1="80" x2="905" y2="80" stroke="#7C3AED" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/><text x="910" y="84" fill="#52525B" font-size="10">데이터 흐름</text>
       </svg>
     </div>
-
     <div class="row">
       <div class="callout callout-green" style="flex:1"><b>물리층</b>: 부재의 실물 이동 경로 — 절단공장 → 스마트랙 → 소조립 → 출하</div>
       <div class="callout" style="flex:1;background:var(--blue-soft);color:#1e40af"><b>제어층</b>: WCS·PLC·AMR MCS가 실시간으로 물리 시스템 구동·감시</div>
       <div class="callout" style="flex:1;background:var(--violet-soft);color:#5b21b6"><b>지능층</b>: AI·WMS·ERP·디지털트윈이 의사결정 및 최적화 수행</div>
     </div>
-
   </div>
 </section>
 
-<!-- ===== SECTION 08: 소부재 분류 AI 기술 =====
-<section class="slide" id="sec08" data-title="소부재 분류 AI">
+<!-- ===== SECTION 08: 전체 물류 프로세스 — 듀얼 야드 ===== -->
+<section class="slide" id="sec08" data-title="전체 물류 프로세스">
+  <div class="slide-card">
   <span class="slide-num">08</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag" style="background:#EDE9FE;color:#5B21B6">SP 개발 ①</span>
-      <h2 style="margin-top:8px">소부재 분류 AI — 형상 인식 → 자동 배정</h2>
-      <p class="subtitle">3D 비전 카메라로 소부재를 스캔하고, AI가 형상을 분류하여 최적 랙 슬롯에 자동 배정합니다.</p>
+      <span class="slide-tag tag-green" data-aos="fade-up">듀얼 야드</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">전체 물류 프로세스 — 입고장 &amp; 출고장</h2>
+      <p class="subtitle" data-aos="fade-up">절단 ↔ 입고장 ↔ 소조립 ↔ 출고장 ↔ 중조립 — 모든 구간을 AMR+도킹이 연결하는 듀얼 야드 물류</p>
+    </div>
+
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 1020 230" width="100%" style="display:block">
+        <!-- WMS / 디지털트윈 상단 점선 밴드 -->
+        <rect x="130" y="6" width="760" height="34" rx="8" fill="none" stroke="#94A3B8" stroke-dasharray="5 3"/>
+        <text x="510" y="28" text-anchor="middle" fill="#64748B" font-size="10" font-weight="600">WMS / 디지털트윈 통합 관리 · 생산스케줄 연동</text>
+        <line x1="280" y1="40" x2="280" y2="58" stroke="#94A3B8" stroke-dasharray="3 2"/>
+        <line x1="740" y1="40" x2="740" y2="58" stroke="#94A3B8" stroke-dasharray="3 2"/>
+
+        <!-- Node 1: 절단 -->
+        <rect x="10" y="68" width="110" height="60" rx="10" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+        <text x="65" y="93" text-anchor="middle" fill="#92400E" font-size="13" font-weight="700">절단</text>
+        <text x="65" y="112" text-anchor="middle" fill="#A1A1AA" font-size="8">Cutting Shop</text>
+
+        <!-- AMR ① : 절단 → 입고장 -->
+        <line x1="120" y1="98" x2="168" y2="98" stroke="#7C3AED" stroke-width="2.5" marker-end="url(#arr)"/>
+        <rect x="122" y="68" width="44" height="18" rx="4" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1"/>
+        <text x="144" y="80" text-anchor="middle" fill="#5B21B6" font-size="7" font-weight="700">AMR</text>
+
+        <!-- Node 2: 스마트랙 입고장 -->
+        <rect x="170" y="58" width="170" height="80" rx="14" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2.5"/>
+        <text x="255" y="82" text-anchor="middle" fill="#0D6E51" font-size="14" font-weight="800">스마트랙 입고장</text>
+        <text x="255" y="98" text-anchor="middle" fill="#065F46" font-size="9" font-weight="600">Stacker Crane · 유연 서포트</text>
+        <text x="255" y="114" text-anchor="middle" fill="#52525B" font-size="8">절단 원자재 부재 보관</text>
+        <text x="255" y="130" text-anchor="middle" fill="#52525B" font-size="7">입고스캔 · CoG분석 · 슬롯배정</text>
+
+        <!-- AMR ② : 입고장 → 소조립 투입 -->
+        <line x1="340" y1="98" x2="398" y2="98" stroke="#7C3AED" stroke-width="2.5" marker-end="url(#arr)"/>
+        <rect x="346" y="68" width="44" height="18" rx="4" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1"/>
+        <text x="368" y="80" text-anchor="middle" fill="#5B21B6" font-size="7" font-weight="700">AMR</text>
+
+        <!-- Node 3: 소조립 -->
+        <rect x="400" y="60" width="220" height="76" rx="10" fill="#FFFBEB" stroke="#F59E0B" stroke-width="2"/>
+        <text x="510" y="84" text-anchor="middle" fill="#92400E" font-size="14" font-weight="700">소조립</text>
+        <text x="510" y="102" text-anchor="middle" fill="#B45309" font-size="9" font-weight="600">취부 → 용접 → 수정 → 열처리</text>
+        <text x="510" y="118" text-anchor="middle" fill="#A1A1AA" font-size="8">Sub-Assembly 4단계</text>
+        <!-- 투입/배출 라벨 -->
+        <text x="410" y="55" fill="#065F46" font-size="7" font-weight="600">투입 ▼</text>
+        <text x="596" y="55" fill="#92400E" font-size="7" font-weight="600" text-anchor="end">배출 ▼</text>
+
+        <!-- AMR ③ : 소조립 배출 → 출고장 -->
+        <line x1="620" y1="98" x2="678" y2="98" stroke="#7C3AED" stroke-width="2.5" marker-end="url(#arr)"/>
+        <rect x="626" y="68" width="44" height="18" rx="4" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1"/>
+        <text x="648" y="80" text-anchor="middle" fill="#5B21B6" font-size="7" font-weight="700">AMR</text>
+
+        <!-- Node 4: 스마트랙 출고장 -->
+        <rect x="680" y="58" width="170" height="80" rx="14" fill="#ECFDF5" stroke="#0D6E51" stroke-width="2.5"/>
+        <text x="765" y="82" text-anchor="middle" fill="#0D6E51" font-size="14" font-weight="800">스마트랙 출고장</text>
+        <text x="765" y="98" text-anchor="middle" fill="#065F46" font-size="9" font-weight="600">Stacker Crane · 유연 서포트</text>
+        <text x="765" y="114" text-anchor="middle" fill="#52525B" font-size="8">소조립 완료 용접 부재 보관</text>
+        <text x="765" y="130" text-anchor="middle" fill="#52525B" font-size="7">품질검사 · 출고관리 · JIT출하</text>
+
+        <!-- AMR ④ : 출고장 → 중조립 -->
+        <line x1="850" y1="98" x2="898" y2="98" stroke="#7C3AED" stroke-width="2.5" marker-end="url(#arr)"/>
+        <rect x="854" y="68" width="44" height="18" rx="4" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1"/>
+        <text x="876" y="80" text-anchor="middle" fill="#5B21B6" font-size="7" font-weight="700">AMR</text>
+
+        <!-- Node 5: 중조립 -->
+        <rect x="900" y="68" width="110" height="60" rx="10" fill="#FFF1F2" stroke="#FB7185" stroke-width="1.5"/>
+        <text x="955" y="93" text-anchor="middle" fill="#9F1239" font-size="13" font-weight="700">중조립</text>
+        <text x="955" y="112" text-anchor="middle" fill="#A1A1AA" font-size="8">Block Assy</text>
+
+        <!-- 범례 -->
+        <g transform="translate(30, 160)">
+          <rect x="0" y="0" width="14" height="14" rx="3" fill="#ECFDF5" stroke="#0D6E51" stroke-width="1.5"/>
+          <text x="20" y="11" fill="#52525B" font-size="9" font-weight="600">SmarTrack 야드 (SC)</text>
+          <rect x="180" y="0" width="14" height="14" rx="3" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+          <text x="200" y="11" fill="#52525B" font-size="9" font-weight="600">AMR 자율이송 (4구간)</text>
+          <rect x="370" y="0" width="14" height="14" rx="3" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="390" y="11" fill="#52525B" font-size="9" font-weight="600">가공 / 조립 공정</text>
+          <rect x="530" y="0" width="14" height="14" rx="3" fill="none" stroke="#94A3B8" stroke-dasharray="3 2"/>
+          <text x="550" y="11" fill="#52525B" font-size="9" font-weight="600">WMS / 디지털트윈</text>
+        </g>
+
+        <!-- 핵심 메시지 -->
+        <text x="510" y="195" text-anchor="middle" fill="#7C3AED" font-size="9" font-weight="700">AMR + 도킹 — 절단↔입고장 / 입고장↔소조립 / 소조립↔출고장 / 출고장↔중조립 (4구간 자율이송)</text>
+        <text x="510" y="212" text-anchor="middle" fill="#0D6E51" font-size="9" font-weight="700">두 야드 모두 동일한 SmarTrack 유연 서포트 개념 적용 — Zone → Rack → Bay → Slot 계층 관리</text>
+      </svg>
+    </div>
+
+    <div class="row">
+      <div class="callout callout-green" style="flex:1"><b>입고장</b>: 절단 완료 원자재 부재 — 단위공정(소조립 유닛)별 그룹핑 보관</div>
+      <div class="callout callout-amber" style="flex:1"><b>출고장</b>: 소조립 완료 용접 부재 — 중조립 블록별 그룹핑 출고 대기</div>
+      <div class="callout" style="flex:1;background:#F5F3FF;color:#5B21B6"><b>AMR 4구간</b>: 절단↔입고장, 입고장↔소조립, 소조립↔출고장, 출고장↔중조립</div>
+    </div>
+
+    <!-- Report-only: 노드 상세 설명 테이블 -->
+    <div class="report-only" style="margin-top:16px">
+      <div class="card">
+        <h3>전체 물류 프로세스 — 5개 공정 노드 + 4개 AMR 이송 구간</h3>
+        <table style="font-size:12px;width:100%">
+          <thead>
+            <tr><th>구간</th><th>설명</th><th>주요 기술</th><th>관리 주체</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><b>절단</b></td><td>NC 절단기로 소재 절단 완료</td><td>NC 절단기, 네스팅 최적화</td><td>절단공장</td></tr>
+            <tr class="hl"><td style="color:#7C3AED"><b>→ AMR ①</b></td><td>절단 부재를 입고장으로 자율 이송</td><td>AMR + V-가이드 도킹</td><td>SP시스템스</td></tr>
+            <tr><td><b>스마트랙 입고장</b></td><td>원자재 부재 입고·스캔·보관, 유연 서포트 자동 배치</td><td>SC + 유연 핀 + WMS + 3D스캔</td><td>SP시스템스</td></tr>
+            <tr class="hl"><td style="color:#7C3AED"><b>→ AMR ②</b></td><td>입고장에서 부재를 소조립 라인으로 투입 이송</td><td>AMR + V-가이드 도킹</td><td>SP시스템스</td></tr>
+            <tr><td><b>소조립 (4단계)</b></td><td>취부 → 용접 → 수정 → 열처리</td><td>수작업 + 로봇 용접, 지그</td><td>조선소 소조립 공장</td></tr>
+            <tr class="hl"><td style="color:#7C3AED"><b>→ AMR ③</b></td><td>소조립 완료 부재를 출고장으로 배출 이송</td><td>AMR + V-가이드 도킹</td><td>SP시스템스</td></tr>
+            <tr><td><b>스마트랙 출고장</b></td><td>용접 완료 부재 보관, 중조립 대기</td><td>SC + 유연 핀 + WMS + 품질검사</td><td>SP시스템스</td></tr>
+            <tr class="hl"><td style="color:#7C3AED"><b>→ AMR ④</b></td><td>출고장에서 부재를 중조립 공정으로 출하 이송</td><td>AMR + V-가이드 도킹</td><td>SP시스템스</td></tr>
+            <tr><td><b>중조립</b></td><td>블록 단위 조립</td><td>대형 크레인, 트레일러</td><td>조선소 중조립 공장</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card card-accent" style="padding:20px;margin-top:12px">
+        <h4 style="font-size:14px;margin-bottom:10px">듀얼 야드 + AMR 4구간 아키텍처</h4>
+        <div style="font-size:13px;color:var(--text-sub);line-height:1.8">
+          <p style="margin-bottom:6px"><b>입고장</b>과 <b>출고장</b>은 물리적으로 분리되지만, <b>동일한 SmarTrack 유연 서포트 시스템</b>을 적용합니다.</p>
+          <p style="margin-bottom:6px"><b>AMR+도킹</b>이 4개 구간(절단↔입고장, 입고장↔소조립투입, 소조립배출↔출고장, 출고장↔중조립) 모두에서 부재를 자율 이송합니다.</p>
+          <p style="margin-bottom:6px">두 야드 모두 <b>Zone → Rack → Bay → Slot</b> 계층 구조로 관리하며, WMS가 입·출고를 통합 제어합니다.</p>
+          <p>소조립 4단계(취부→용접→수정→열처리)는 기존 공정 그대로 유지 — SmarTrack은 전·후 물류를 담당합니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /slide-card -->
+</section>
+
+<!-- ===== SECTION 09: 단위공정별 물량 관리 ===== -->
+<section class="slide" id="sec09" data-title="단위공정별 물량 관리">
+  <div class="slide-card">
+  <span class="slide-num">09</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag tag-blue" data-aos="fade-up">물량 관리</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">단위공정별 물량 관리 — 입고장 vs 출고장</h2>
+      <p class="subtitle" data-aos="fade-up">야드별 부재 그룹핑 전략: 입고장은 소조립 유닛별, 출고장은 중조립 블록별로 슬롯 배정</p>
+    </div>
+
+    <div class="row">
+      <!-- 좌측: 입고장 -->
+      <div class="card" style="border-top:3px solid #0D6E51;flex:1">
+        <div style="font-size:12px;font-weight:800;color:#065F46;margin-bottom:10px"><i class="mdi mdi-login-variant" style="margin-right:4px"></i>입고장 — 절단 배치 기준 관리</div>
+        <svg viewBox="0 0 340 170" width="100%" style="display:block;margin-bottom:8px">
+          <!-- 절단 배치 -->
+          <rect x="10" y="10" width="90" height="40" rx="8" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="55" y="28" text-anchor="middle" fill="#92400E" font-size="10" font-weight="700">절단 배치</text>
+          <text x="55" y="42" text-anchor="middle" fill="#A1A1AA" font-size="8">N건 부재</text>
+          <!-- Arrow -->
+          <line x1="100" y1="30" x2="130" y2="30" stroke="#0D6E51" stroke-width="1.5" marker-end="url(#arr)"/>
+          <!-- 분류 -->
+          <rect x="132" y="10" width="72" height="40" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+          <text x="168" y="28" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">AI 분류</text>
+          <text x="168" y="42" text-anchor="middle" fill="#A1A1AA" font-size="8">유닛 배정</text>
+          <!-- Arrows to groups -->
+          <line x1="204" y1="24" x2="234" y2="24" stroke="#0D6E51" stroke-width="1" marker-end="url(#arr)"/>
+          <line x1="204" y1="30" x2="234" y2="70" stroke="#0D6E51" stroke-width="1" marker-end="url(#arr)"/>
+          <line x1="204" y1="36" x2="234" y2="116" stroke="#0D6E51" stroke-width="1" marker-end="url(#arr)"/>
+          <!-- 유닛 그룹 슬롯 -->
+          <rect x="236" y="6" width="94" height="36" rx="6" fill="#ECFDF5" stroke="#34D399" stroke-width="1.5"/>
+          <text x="283" y="20" text-anchor="middle" fill="#065F46" font-size="9" font-weight="700">유닛 A 슬롯</text>
+          <text x="283" y="34" text-anchor="middle" fill="#52525B" font-size="7">소조립 그룹 A</text>
+          <rect x="236" y="52" width="94" height="36" rx="6" fill="#ECFDF5" stroke="#34D399" stroke-width="1.5"/>
+          <text x="283" y="66" text-anchor="middle" fill="#065F46" font-size="9" font-weight="700">유닛 B 슬롯</text>
+          <text x="283" y="80" text-anchor="middle" fill="#52525B" font-size="7">소조립 그룹 B</text>
+          <rect x="236" y="98" width="94" height="36" rx="6" fill="#ECFDF5" stroke="#34D399" stroke-width="1.5"/>
+          <text x="283" y="112" text-anchor="middle" fill="#065F46" font-size="9" font-weight="700">유닛 C 슬롯</text>
+          <text x="283" y="126" text-anchor="middle" fill="#52525B" font-size="7">소조립 그룹 C</text>
+          <!-- 설명 -->
+          <text x="170" y="160" text-anchor="middle" fill="#065F46" font-size="8" font-weight="600">동일 소조립 유닛 부재를 인접 슬롯에 그룹핑</text>
+        </svg>
+        <div style="font-size:10px;color:var(--text-sub);line-height:1.6">
+          <b>목적</b>: 소조립 라인 투입 시 유닛 단위로 일괄 출고<br>
+          <b>배정 기준</b>: 공정 스케줄 + 부재 형상 + 무게중심(CoG)
+        </div>
+      </div>
+
+      <!-- 우측: 출고장 -->
+      <div class="card" style="border-top:3px solid #D97706;flex:1">
+        <div style="font-size:12px;font-weight:800;color:#92400E;margin-bottom:10px"><i class="mdi mdi-logout-variant" style="margin-right:4px"></i>출고장 — 중조립 블록 기준 관리</div>
+        <svg viewBox="0 0 340 170" width="100%" style="display:block;margin-bottom:8px">
+          <!-- 소조립 완료 -->
+          <rect x="10" y="10" width="90" height="40" rx="8" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="55" y="28" text-anchor="middle" fill="#92400E" font-size="10" font-weight="700">소조립 완료</text>
+          <text x="55" y="42" text-anchor="middle" fill="#A1A1AA" font-size="8">용접 부재</text>
+          <!-- Arrow -->
+          <line x1="100" y1="30" x2="130" y2="30" stroke="#D97706" stroke-width="1.5" marker-end="url(#arr-a)"/>
+          <!-- 분류 -->
+          <rect x="132" y="10" width="72" height="40" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+          <text x="168" y="28" text-anchor="middle" fill="#1D4ED8" font-size="10" font-weight="700">블록 분류</text>
+          <text x="168" y="42" text-anchor="middle" fill="#A1A1AA" font-size="8">블록 배정</text>
+          <!-- Arrows to groups -->
+          <line x1="204" y1="24" x2="234" y2="24" stroke="#D97706" stroke-width="1" marker-end="url(#arr-a)"/>
+          <line x1="204" y1="30" x2="234" y2="70" stroke="#D97706" stroke-width="1" marker-end="url(#arr-a)"/>
+          <line x1="204" y1="36" x2="234" y2="116" stroke="#D97706" stroke-width="1" marker-end="url(#arr-a)"/>
+          <!-- 블록 그룹 슬롯 -->
+          <rect x="236" y="6" width="94" height="36" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="283" y="20" text-anchor="middle" fill="#92400E" font-size="9" font-weight="700">블록 X 슬롯</text>
+          <text x="283" y="34" text-anchor="middle" fill="#52525B" font-size="7">중조립 대기</text>
+          <rect x="236" y="52" width="94" height="36" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="283" y="66" text-anchor="middle" fill="#92400E" font-size="9" font-weight="700">블록 Y 슬롯</text>
+          <text x="283" y="80" text-anchor="middle" fill="#52525B" font-size="7">중조립 대기</text>
+          <rect x="236" y="98" width="94" height="36" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+          <text x="283" y="112" text-anchor="middle" fill="#92400E" font-size="9" font-weight="700">블록 Z 슬롯</text>
+          <text x="283" y="126" text-anchor="middle" fill="#52525B" font-size="7">중조립 대기</text>
+          <!-- 설명 -->
+          <text x="170" y="160" text-anchor="middle" fill="#92400E" font-size="8" font-weight="600">동일 중조립 블록 부재를 인접 슬롯에 그룹핑</text>
+        </svg>
+        <div style="font-size:10px;color:var(--text-sub);line-height:1.6">
+          <b>목적</b>: 중조립 투입 시 블록 단위로 일괄 출고 (JIT)<br>
+          <b>배정 기준</b>: 중조립 블록 ID + 투입 일정 + FIFO
+        </div>
+      </div>
+    </div>
+
+    <!-- Report-only: 관리 항목 테이블 -->
+    <div class="report-only" style="margin-top:16px">
+      <div class="card">
+        <h3>입고장 vs 출고장 관리 비교</h3>
+        <table style="font-size:12px;width:100%">
+          <thead>
+            <tr><th>관리 항목</th><th>입고장 (Inbound Yard)</th><th>출고장 (Outbound Yard)</th></tr>
+          </thead>
+          <tbody>
+            <tr class="hl"><td><b>부재 상태</b></td><td>절단 완료 원자재 (미가공)</td><td>소조립 완료 용접 부재</td></tr>
+            <tr><td><b>그룹핑 기준</b></td><td>소조립 유닛(단위공정) 단위</td><td>중조립 블록 단위</td></tr>
+            <tr class="hl"><td><b>입고 트리거</b></td><td>절단공장 배치 완료 시점</td><td>소조립 열처리 완료 시점</td></tr>
+            <tr><td><b>출고 트리거</b></td><td>소조립 라인 투입 스케줄 (MES)</td><td>중조립 블록 투입 스케줄 (MES)</td></tr>
+            <tr class="hl"><td><b>슬롯 배정</b></td><td>유닛별 인접 슬롯 + CoG 안전검증</td><td>블록별 인접 슬롯 + 출고순서 최적화</td></tr>
+            <tr><td><b>핵심 KPI</b></td><td>적치 밀도, 유닛 완결율</td><td>JIT 출고율, 블록 완결율</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div><!-- /slide-card -->
+</section>
+
+<!-- ===== SECTION 10: 소부재 분류 AI 기술 ===== -->
+<section class="slide" id="sec10" data-title="소부재 분류 AI">
+  <div class="slide-card">
+  <span class="slide-num">10</span>
+  <div class="slide-inner">
+    <div>
+      <span class="slide-tag" data-aos="fade-up" style="background:#EDE9FE;color:#5B21B6">SP 개발 ①</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">소부재 분류 AI — 형상 인식 → 자동 배정</h2>
+      <p class="subtitle" data-aos="fade-up">3D 비전 카메라로 소부재를 스캔하고, AI가 형상을 분류하여 최적 랙 슬롯에 자동 배정합니다.</p>
     </div>
     <div style="display:flex;gap:0;align-items:stretch;margin-top:10px">
       <div class="card" style="padding:14px 12px;flex:1;border-top:3px solid #7C3AED;text-align:center">
@@ -1674,15 +3406,17 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
-<!-- ===== SECTION 09: 랙장 컨셉 — 다단 적재 구조 ===== -->
-<section class="slide" id="sec09" data-title="랙장 컨셉">
-  <span class="slide-num">09</span>
+<!-- ===== SECTION 11: 랙장 컨셉 — 다단 적재 구조 ===== -->
+<section class="slide" id="sec11" data-title="랙장 컨셉">
+  <div class="slide-card">
+  <span class="slide-num">11</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-blue">랙장 구조</span>
-      <h2 style="margin-top:8px">랙장 컨셉 — 부재별 최적 적재 구조</h2>
-      <p class="subtitle">대형·중형·소형 부재를 한 야드에서 효율적으로 적재하기 위한 하이브리드 3존 전략</p>
+      <span class="slide-tag tag-blue" data-aos="fade-up">랙장 구조</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">랙장 컨셉 — 부재별 최적 적재 구조</h2>
+      <p class="subtitle" data-aos="fade-up">대형·중형·소형 부재를 한 야드에서 효율적으로 적재하기 위한 하이브리드 3존 전략</p>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
@@ -1952,16 +3686,18 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 10: 다중 랙 배치 + 슬롯 관리 ===== -->
-<section class="slide" id="sec10" data-title="다중 랙 배치">
-  <span class="slide-num">10</span>
+<!-- ===== SECTION 12: 다중 랙 배치 + 슬롯 관리 ===== -->
+<section class="slide" id="sec12" data-title="다중 랙 배치">
+  <div class="slide-card">
+  <span class="slide-num">12</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-blue">야드 배치</span>
-      <h2 style="margin-top:8px">다중 랙 배치 + 슬롯 관리</h2>
-      <p class="subtitle">입고존 → 보관존(N개 랙) → 출고존 — 랙 → 베이 → 슬롯 계층 관리</p>
+      <span class="slide-tag tag-blue" data-aos="fade-up">야드 배치</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">다중 랙 배치 + 슬롯 관리 <span style="font-size:0.5em;font-weight:600;color:var(--accent)">(입고장·출고장 공통 구조)</span></h2>
+      <p class="subtitle" data-aos="fade-up">두 야드 모두 동일한 Zone → Rack → Bay → Slot 계층 구조 적용. 입고존 → 보관존(N개 랙) → 출고존</p>
     </div>
 
     <div class="diagram-wrap">
@@ -2038,16 +3774,18 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 11: 핵심 아이디어 — "핀 아트" ===== -->
-<section class="slide" id="sec11" data-title="핵심 아이디어">
-  <span class="slide-num">11</span>
+<!-- ===== SECTION 13: 핵심 아이디어 — "핀 아트" ===== -->
+<section class="slide" id="sec13" data-title="핵심 아이디어">
+  <div class="slide-card">
+  <span class="slide-num">13</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-green">핵심 아이디어</span>
-      <h2 style="margin-top:8px">"핀 아트" — 작동 원리 4단계</h2>
-      <p class="subtitle">핀 아트 장난감처럼, 부재 형상에 맞춰 지지점 높이를 조절하는 것이 핵심입니다.</p>
+      <span class="slide-tag tag-green" data-aos="fade-up">핵심 아이디어</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">"핀 아트" — 작동 원리 4단계</h2>
+      <p class="subtitle" data-aos="fade-up">핀 아트 장난감처럼, 부재 형상에 맞춰 지지점 높이를 조절하는 것이 핵심입니다.</p>
     </div>
 
     <!-- 4-State Sequence -->
@@ -2149,16 +3887,18 @@
       <b>"핀 아트 장난감" 원리</b> — 손을 대면 핀이 형상을 따르듯, 부재 3D 데이터로 핀 높이를 자동 결정합니다. 컨셉 A는 작업자 가이드, B는 전동, C는 셀 어레이로 구현합니다.
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 12: 유연성 시연 — 3패널 ===== -->
-<section class="slide" id="sec12" data-title="유연성 시연">
-  <span class="slide-num">12</span>
+<!-- ===== SECTION 14: 유연성 시연 — 3패널 ===== -->
+<section class="slide" id="sec14" data-title="유연성 시연">
+  <div class="slide-card">
+  <span class="slide-num">14</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-green">유연성 증명</span>
-      <h2 style="margin-top:8px">하나의 랙 → 무한한 형상 대응</h2>
-      <p class="subtitle">동일한 스마트랙 프레임 위에서 서로 다른 부재 3종을 안정적으로 적치합니다.</p>
+      <span class="slide-tag tag-green" data-aos="fade-up">유연성 증명</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">하나의 랙 → 무한한 형상 대응</h2>
+      <p class="subtitle" data-aos="fade-up">동일한 스마트랙 프레임 위에서 서로 다른 부재 3종을 안정적으로 적치합니다.</p>
     </div>
 
     <!-- 3-Panel Comparison SVG -->
@@ -2241,16 +3981,18 @@
       </table>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 13: Stacker Crane vs AMR 이송 방식 ���교 ===== -->
-<section class="slide" id="sec13" data-title="이송 방식 비교">
-  <span class="slide-num">13</span>
+<!-- ===== SECTION 15: Stacker Crane vs AMR 이송 방식 ���교 ===== -->
+<section class="slide" id="sec15" data-title="이송 방식 비교">
+  <div class="slide-card">
+  <span class="slide-num">15</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-amber">이송 전략</span>
-      <h2 style="margin-top:8px">이송 방식 선택 — Stacker Crane vs AMR</h2>
-      <p class="subtitle">랙장 내 소부재 이동을 위한 두 가지 방식 비교 및 스마트랙 권고안</p>
+      <span class="slide-tag tag-amber" data-aos="fade-up">이송 전략</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">이송 방식 선택 — Stacker Crane vs AMR</h2>
+      <p class="subtitle" data-aos="fade-up">랙장 내 소부재 이동을 위한 두 가지 방식 비교 및 스마트랙 권고안</p>
     </div>
 
     <!-- PPT: 3-컬럼 비교 카드 -->
@@ -2319,6 +4061,14 @@
         <b>구역별 하이브리드</b>가 최적 솔루션.
       </span>
     </div>
+
+    <!-- PPT-only: 참고영상 링크 바 -->
+    <div class="ppt-only" style="margin-top:10px;display:flex;gap:10px;align-items:center">
+      <span style="font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap"><i class="mdi mdi-youtube" style="color:#FF0000;margin-right:4px"></i>참고영상</span>
+      <a href="https://www.youtube.com/watch?v=PcJeRFpsWaI" target="_blank" rel="noopener" style="font-size:11px;color:var(--blue);text-decoration:none;padding:4px 10px;background:var(--blue-soft);border-radius:6px;font-weight:600">Stacker Crane ①</a>
+      <a href="https://www.youtube.com/watch?v=N7D3FkhTwLU" target="_blank" rel="noopener" style="font-size:11px;color:var(--blue);text-decoration:none;padding:4px 10px;background:var(--blue-soft);border-radius:6px;font-weight:600">Stacker Crane ②</a>
+      <a href="https://www.youtube.com/watch?v=VNn5mQX1lQ8" target="_blank" rel="noopener" style="font-size:11px;color:var(--amber);text-decoration:none;padding:4px 10px;background:var(--amber-soft);border-radius:6px;font-weight:600">중국 조선소 자동화</a>
+    </div>
   </div>
 
   <!-- Report-only: 상세 분석 -->
@@ -2386,16 +4136,18 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 14: 컨셉 A ===== -->
-<section class="slide" id="sec14" data-title="컨셉 A">
-  <span class="slide-num">14</span>
+<!-- ===== SECTION 16: 컨셉 A ===== -->
+<section class="slide" id="sec16" data-title="컨셉 A">
+  <div class="slide-card">
+  <span class="slide-num">16</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-green">컨셉 A · MVP</span>
-      <h2 style="margin-top:8px">핀-그리드 + 수동 가변</h2>
-      <p class="subtitle">추천 지지점 자동 계산 → 작업자가 가이드에 따라 서포트 핀을 배치. <b>구조 단순, 성과 빠름.</b></p>
+      <span class="slide-tag tag-green" data-aos="fade-up">컨셉 A · MVP</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">핀-그리드 + 수동 가변</h2>
+      <p class="subtitle" data-aos="fade-up">추천 지지점 자동 계산 → 작업자가 가이드에 따라 서포트 핀을 배치. <b>구조 단순, 성과 빠름.</b></p>
     </div>
 
     <div class="row">
@@ -2485,16 +4237,18 @@
       </svg>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 15: 컨셉 B ===== -->
-<section class="slide" id="sec15" data-title="컨셉 B">
-  <span class="slide-num">15</span>
+<!-- ===== SECTION 17: 컨셉 B ===== -->
+<section class="slide" id="sec17" data-title="컨셉 B">
+  <div class="slide-card">
+  <span class="slide-num">17</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-blue">컨셉 B · 차별화</span>
-      <h2 style="margin-top:8px">전동 서포트 + 반자동</h2>
-      <p class="subtitle">서포트가 높이/각도를 자동 조절. 적치는 크레인/AMR + 센서 보조 도킹.</p>
+      <span class="slide-tag tag-blue" data-aos="fade-up">컨셉 B · 차별화</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">전동 서포트 + 반자동</h2>
+      <p class="subtitle" data-aos="fade-up">서포트가 높이/각도를 자동 조절. 적치는 크레인/AMR + 센서 보조 도킹.</p>
     </div>
 
     <div class="row">
@@ -2608,16 +4362,18 @@
       </svg>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 16: 컨셉 C ===== -->
-<section class="slide" id="sec16" data-title="컨셉 C">
-  <span class="slide-num">16</span>
+<!-- ===== SECTION 18: 컨셉 C ===== -->
+<section class="slide" id="sec18" data-title="컨셉 C">
+  <div class="slide-card">
+  <span class="slide-num">18</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-violet">컨셉 C · 세계 최초급</span>
-      <h2 style="margin-top:8px">셀 기반 Self-Reconfiguring</h2>
-      <p class="subtitle">랙 자체가 셀 배열로 구성. 부재 인식 후 셀이 <b>자동으로 안정 자세를 형성</b>합니다.</p>
+      <span class="slide-tag tag-violet" data-aos="fade-up">컨셉 C · 세계 최초급</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">셀 기반 Self-Reconfiguring</h2>
+      <p class="subtitle" data-aos="fade-up">랙 자체가 셀 배열로 구성. 부재 인식 후 셀이 <b>자동으로 안정 자세를 형성</b>합니다.</p>
     </div>
 
     <div class="row">
@@ -2670,15 +4426,17 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 17: 랙 모듈 + 안전 ===== -->
-<section class="slide" id="sec17" data-title="랙 모듈">
-  <span class="slide-num">17</span>
+<!-- ===== SECTION 19: 랙 모듈 + 안전 ===== -->
+<section class="slide" id="sec19" data-title="랙 모듈">
+  <div class="slide-card">
+  <span class="slide-num">19</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-green">기구 설계</span>
-      <h2 style="margin-top:8px">랙 모듈 + 안전 체계</h2>
+      <span class="slide-tag tag-green" data-aos="fade-up">기구 설계</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">랙 모듈 + 안전 체계</h2>
     </div>
 
     <div class="row">
@@ -2719,16 +4477,18 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 18: AMR 도킹 개념 ===== -->
-<section class="slide" id="sec18" data-title="AMR 도킹">
-  <span class="slide-num">18</span>
+<!-- ===== SECTION 20: AMR 도킹 개념 ===== -->
+<section class="slide" id="sec20" data-title="AMR 도킹">
+  <div class="slide-card">
+  <span class="slide-num">20</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-violet">AMR 연계</span>
-      <h2 style="margin-top:8px">AMR 도킹 — 자동 적재/하역 인터페이스</h2>
-      <p class="subtitle">AMR(자율이동로봇)이 부재를 싣고 스마트랙에 정밀 도킹하는 과정.</p>
+      <span class="slide-tag tag-violet" data-aos="fade-up">AMR 연계</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">AMR 도킹 — 자동 적재/하역 인터페이스</h2>
+      <p class="subtitle" data-aos="fade-up">AMR(자율이동로봇)이 부재를 싣고 스마트랙에 정밀 도킹하는 과정.</p>
     </div>
 
     <div class="row">
@@ -2814,15 +4574,17 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 19: 시스템 아키텍처 ===== -->
-<section class="slide" id="sec19" data-title="시스템 아키텍처">
-  <span class="slide-num">19</span>
+<!-- ===== SECTION 21: 시스템 아키텍처 ===== -->
+<section class="slide" id="sec21" data-title="시스템 아키텍처">
+  <div class="slide-card">
+  <span class="slide-num">21</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-blue">S/W 아키텍처</span>
-      <h2 style="margin-top:8px">알고리즘 + 인터페이스</h2>
+      <span class="slide-tag tag-blue" data-aos="fade-up">S/W 아키텍처</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">알고리즘 + 인터페이스</h2>
     </div>
 
     <div class="diagram-wrap">
@@ -2876,16 +4638,18 @@
     </div>
 
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 20: 입출고 시퀀스 ===== -->
-<section class="slide" id="sec20" data-title="입출고 시퀀스">
-  <span class="slide-num">20</span>
+<!-- ===== SECTION 22: 입출고 시퀀스 ===== -->
+<section class="slide" id="sec22" data-title="입출고 시퀀스">
+  <div class="slide-card">
+  <span class="slide-num">22</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-green">물류 운영</span>
-      <h2 style="margin-top:8px">입고 → 출고 6단계 시퀀스</h2>
-      <p class="subtitle">부재 입고부터 JIT 출고까지 — WMS 기반 전 과정 자동화</p>
+      <span class="slide-tag tag-green" data-aos="fade-up">물류 운영</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">입고 → 출고 6단계 시퀀스</h2>
+      <p class="subtitle" data-aos="fade-up">부재 입고부터 JIT 출고까지 — WMS 기반 전 과정 자동화</p>
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px">
@@ -2893,6 +4657,7 @@
         <div style="background:#0D6E51;color:#fff;font-size:18px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px">1</div>
         <div style="font-size:12px;font-weight:700;color:#065F46">입고 스캔</div>
         <div style="font-size:10px;color:#52525B;margin-top:4px;line-height:1.5">바코드/RFID/3D<br>부재 ID 등록</div>
+        <div style="font-size:8px;color:#0D6E51;margin-top:3px;line-height:1.3;font-weight:600">입고장: 절단 부재<br>출고장: 소조립 부재</div>
       </div>
       <div style="background:#ECFDF5;border-radius:10px;padding:14px 10px;border:1px solid #A7F3D0;text-align:center">
         <div style="background:#0D6E51;color:#fff;font-size:18px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px">2</div>
@@ -2918,6 +4683,7 @@
         <div style="background:#E11D48;color:#fff;font-size:18px;font-weight:800;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px">6</div>
         <div style="font-size:12px;font-weight:700;color:#9F1239">출고 → 출하</div>
         <div style="font-size:10px;color:#52525B;margin-top:4px;line-height:1.5">MES 연동<br>피킹 → 출하</div>
+        <div style="font-size:8px;color:#E11D48;margin-top:3px;line-height:1.3;font-weight:600">입고장→소조립<br>출고장→중조립</div>
       </div>
     </div>
 
@@ -2946,20 +4712,22 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
-<!-- ===== SECTION 21: 컨소시엄 역할 분담 ===== -->
-<section class="slide" id="sec21" data-title="컨소시엄 역할">
-  <span class="slide-num">21</span>
+<!-- ===== SECTION 23: 컨소시엄 역할 분담 ===== -->
+<section class="slide" id="sec23" data-title="컨소시엄 역할">
+  <div class="slide-card">
+  <span class="slide-num">23</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-blue">추진 체계</span>
-      <h2 style="margin-top:8px">컨소시엄 역할 분담</h2>
-      <p class="subtitle">중대형 선박 유연생산시스템 과제 — 10개 기관 역할 구분 (5년 / 총 200억)</p>
+      <span class="slide-tag tag-blue" data-aos="fade-up">추진 체계</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">컨소시엄 역할 분담</h2>
+      <p class="subtitle" data-aos="fade-up">중대형 선박 유연생산시스템 과제 — 10개 기관 역할 구분 (5년 / 총 200억)</p>
     </div>
     <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="card" style="padding:16px;border-left:4px solid #0D6E51;background:linear-gradient(135deg,#F0FDF4,#fff)">
-        <div style="font-size:12px;font-weight:800;color:#065F46;margin-bottom:8px">SP시스템스 ★ 핵심 개발</div>
+        <div style="font-size:12px;font-weight:800;color:#065F46;margin-bottom:8px"><i class="mdi mdi-star" style="margin-right:4px"></i>SP시스템스 ★ 핵심 개발</div>
         <div style="font-size:11px;color:var(--text-sub);line-height:1.7">
           • 소부재 분류 AI 시스템 개발<br>
           • 지능형 Rack 시스템 (핀지그·랙장)<br>
@@ -2968,7 +4736,7 @@
         </div>
       </div>
       <div class="card" style="padding:16px;border-left:4px solid #1D4ED8">
-        <div style="font-size:12px;font-weight:800;color:#1E40AF;margin-bottom:8px">실증 기관</div>
+        <div style="font-size:12px;font-weight:800;color:#1E40AF;margin-bottom:8px"><i class="mdi mdi-factory" style="margin-right:4px"></i>실증 기관</div>
         <div style="font-size:11px;color:var(--text-sub);line-height:1.7">
           • <b>삼성중공업</b>: 거제조선소 소조립 라인 실증<br>
           • <b>한화오션</b>: 추가 실증 Site + 요구사항 정의<br>
@@ -2976,7 +4744,7 @@
         </div>
       </div>
       <div class="card" style="padding:16px;border-left:4px solid #D97706">
-        <div style="font-size:12px;font-weight:800;color:#92400E;margin-bottom:8px">로봇 · 자동화</div>
+        <div style="font-size:12px;font-weight:800;color:#92400E;margin-bottom:8px"><i class="mdi mdi-robot-industrial" style="margin-right:4px"></i>로봇 · 자동화</div>
         <div style="font-size:11px;color:var(--text-sub);line-height:1.7">
           • <b>고레로보틱스</b>: AMR 자율 이동 플랫폼 개발<br>
           • AMR↔Rack 도킹 인터페이스 연동<br>
@@ -2984,7 +4752,7 @@
         </div>
       </div>
       <div class="card" style="padding:16px;border-left:4px solid #7C3AED">
-        <div style="font-size:12px;font-weight:800;color:#5B21B6;margin-bottom:8px">AI · 연구</div>
+        <div style="font-size:12px;font-weight:800;color:#5B21B6;margin-bottom:8px"><i class="mdi mdi-school" style="margin-right:4px"></i>AI · 연구</div>
         <div style="font-size:11px;color:var(--text-sub);line-height:1.7">
           • <b>동국대</b>: 슬롯 배정·스케줄링 최적화 알고리즘<br>
           • <b>포항산업과학연구원(RIST)</b>: 3D 형상 인식 공동연구<br>
@@ -2992,7 +4760,7 @@
         </div>
       </div>
       <div class="card" style="padding:16px;border-left:4px solid #0891B2">
-        <div style="font-size:12px;font-weight:800;color:#0E7490;margin-bottom:8px">SW · 플랫폼</div>
+        <div style="font-size:12px;font-weight:800;color:#0E7490;margin-bottom:8px"><i class="mdi mdi-monitor-dashboard" style="margin-right:4px"></i>SW · 플랫폼</div>
         <div style="font-size:11px;color:var(--text-sub);line-height:1.7">
           • <b>지오소프트</b>: MES/WMS 연동 미들웨어<br>
           • <b>올포랜드</b>: 디지털트윈 + 시각화 플랫폼<br>
@@ -3000,7 +4768,7 @@
         </div>
       </div>
       <div class="card" style="padding:16px;border-left:4px solid #64748B">
-        <div style="font-size:12px;font-weight:800;color:#475569;margin-bottom:8px">인증 · 검증</div>
+        <div style="font-size:12px;font-weight:800;color:#475569;margin-bottom:8px"><i class="mdi mdi-certificate-outline" style="margin-right:4px"></i>인증 · 검증</div>
         <div style="font-size:11px;color:var(--text-sub);line-height:1.7">
           • <b>한국선급(KR)</b>: 안전 인증 기준 수립<br>
           • <b>중소조선연구원</b>: 현장 기술 검증·표준화<br>
@@ -3009,14 +4777,16 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
-<!-- ===== SECTION 22: 로드맵 + 역량 + 결론 ===== -->
-<section class="slide" id="sec22" data-title="로드맵 + 결론">
-  <span class="slide-num">22</span>
+<!-- ===== SECTION 24: 로드맵 + 역량 + 결론 ===== -->
+<section class="slide" id="sec24" data-title="로드맵 + 결론">
+  <div class="slide-card">
+  <span class="slide-num">24</span>
   <div class="slide-inner">
     <div>
-      <span class="slide-tag tag-amber">개발 계획 + 결론</span>
-      <h2 style="margin-top:8px">5개년 로드맵 + 추천 전략</h2>
+      <span class="slide-tag tag-amber" data-aos="fade-up">개발 계획 + 결론</span>
+      <h2 data-aos="fade-up" style="margin-top:8px">5개년 로드맵 + 추천 전략</h2>
     </div>
 
     <!-- 로드맵 바 -->
@@ -3045,7 +4815,13 @@
       <div style="display:flex;flex-direction:column;gap:16px">
         <div class="stat-row">
           <div class="stat-box"><div class="stat-num">52억</div><div class="stat-label">총 예산</div></div>
+          <div class="stat-box"><div class="stat-num" style="color:var(--amber)">23억</div><div class="stat-label">26년 예산</div></div>
           <div class="stat-box"><div class="stat-num">57</div><div class="stat-label">개월</div></div>
+        </div>
+        <!-- 사업계획서 일정 callout -->
+        <div style="padding:10px 14px;background:var(--ant-warning-bg);border:1.5px solid #FFE58F;border-radius:8px;font-size:12px;line-height:1.6">
+          <div style="font-weight:700;color:#92400E;margin-bottom:4px"><i class="mdi mdi-calendar-clock" style="margin-right:4px"></i>사업계획서 일정</div>
+          <div style="color:#52525B">3/8 초안 → 3/9 수정회의 → 3/16 완료 → <b style="color:#D97706">3/25(수) 18시 제출</b></div>
         </div>
         <div class="card" style="background:var(--accent-soft);border:2px solid var(--accent)">
           <h3 style="color:var(--accent)">추천 전략</h3>
@@ -3089,6 +4865,18 @@
           </tbody>
         </table>
       </div>
+      <div class="card" style="border-left:4px solid var(--amber)">
+        <h3><i class="mdi mdi-calendar-clock" style="margin-right:4px;color:var(--amber)"></i>사업계획서 제출 상세 일정</h3>
+        <table style="font-size:12px">
+          <thead><tr><th>날짜</th><th>내용</th><th>상태</th></tr></thead>
+          <tbody>
+            <tr><td><b>3/8</b></td><td>초안 완료 + 컨소시엄 오프라인 미팅</td><td>예정</td></tr>
+            <tr><td><b>3/9 (월)</b></td><td>사업계획서 수정 회의</td><td>예정</td></tr>
+            <tr><td><b>3/16 (월)</b></td><td>사업계획서 작성 완료 (삼성중공업/한화오션 내부검토)</td><td>예정</td></tr>
+            <tr class="hl"><td><b style="color:#D97706">3/25 (수) 18시</b></td><td><b>사업계획서 최종 제출 기한</b></td><td style="color:#E11D48;font-weight:700">D-day</td></tr>
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h3>1차년도 예산 (6억)</h3>
         <table style="font-size:12px">
@@ -3114,13 +4902,14 @@
       </div>
     </div>
   </div>
+  </div><!-- /slide-card -->
 </section>
 
 </div><!-- /main-content -->
 
 <!-- VERSION BADGE -->
 <div class="ver-badge" onclick="document.getElementById('changelogOverlay').classList.add('open')">
-  <span class="ver-badge-dot"></span> v4.0
+  <span class="ver-badge-dot"></span> v5.3
 </div>
 
 <!-- CHANGELOG PANEL -->
@@ -3131,6 +4920,74 @@
       <button class="changelog-close" onclick="document.getElementById('changelogOverlay').classList.remove('open')">&times;</button>
     </div>
     <div class="changelog-body">
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag">v5.3</span>
+          <span class="ver-date">2026-03-04</span>
+        </div>
+        <div class="ver-title">sec07 3D 뷰어 배치안 5종 확장 — 5개년 로드맵 체계</div>
+        <ul class="ver-changes">
+          <li><b>탭 UI 5종 확장</b>: 기존 "현재 배치/신규 배치" 2탭 → "배치안1~5" 5탭으로 확장</li>
+          <li><b>배치안1 (직렬형 기본)</b>: 기존 Layout A 유지, 4×2 랙, AMR 직선 왕복</li>
+          <li><b>배치안2 (직교 확장형)</b>: 기존 Layout B 유지, 90° 랙, 5×3 슬롯, L자 AMR</li>
+          <li><b>배치안3 (U자형 순환)</b>: 신규, 45×30m, 4랙 세트, 반시계 U루프 AMR 6대, 크레인 4대</li>
+          <li><b>배치안4 (병렬 다중 랙)</b>: 신규, 60×35m, 보관존 3랙 병렬(72슬롯), 오버헤드 갠트리, AMR 그리드 8대</li>
+          <li><b>배치안5 (셀 Full-Auto)</b>: 신규, 55×30m, 6×10 셀 어레이 파동 애니메이션, 갠트리+스태커, 동적 AMR 6대</li>
+          <li><b>범례 동적화</b>: 활성 배치안에 따라 범례 항목 자동 변경</li>
+          <li><b>카메라 독립 설정</b>: 배치안별 줌·궤도 반경·높이 개별 camConfigs 적용</li>
+          <li><b>코드 리팩토링</b>: groupA/B → layouts 딕셔너리, switchLayout N개 지원, animateFns 디스패치</li>
+        </ul>
+      </div>
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag">v5.2</span>
+          <span class="ver-date">2026-03-02</span>
+        </div>
+        <div class="ver-title">sec07 Three.js 듀얼 야드 4-AMR 동시 흐름 시뮬레이션</div>
+        <ul class="ver-changes">
+          <li><b>sec07 3D 전면 교체</b>: 단일 야드 입고→듀얼 야드(입고장/출고장) 5개 존 레이아웃으로 전환</li>
+          <li><b>4대 AMR 동시 운행</b>: 절단→입고장, 입고장→소조립, 소조립→출고장, 출고장→중조립 4구간 독립 10초 사이클 (2.5초 stagger)</li>
+          <li><b>소조립 4단계 펄싱</b>: 취부·용접·수정·열처리 순차 emissive 효과</li>
+          <li><b>4×2 랙 그리드</b>: 입고장 60% / 출고장 40% 채움률, 스태커크레인 제거</li>
+          <li><b>하단 범례</b>: 6색 존·AMR 컬러 범례 추가</li>
+        </ul>
+      </div>
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag">v5.1</span>
+          <span class="ver-date">2026-03-02</span>
+        </div>
+        <div class="ver-title">듀얼 야드(입고장/출고장) 아키텍처 — 22→24 슬라이드 확장</div>
+        <ul class="ver-changes">
+          <li><b>sec08 전체 물류 프로세스</b>: 5개 공정 노드 + 4개 AMR 구간 수평 SVG 흐름도, 듀얼 야드 구조 가시화</li>
+          <li><b>sec09 단위공정별 물량 관리</b>: 입고장(유닛별 그룹핑) vs 출고장(블록별 그룹핑) 2컬럼 비교</li>
+          <li><b>sec07 SVG 라벨 보완</b>: 입고→입고장, 출고→출고장, 소조립 4단계(취부→용접→수정→열처리) 서브텍스트, AMR+도킹 라벨</li>
+          <li><b>sec12 다중 랙 배치</b>: "(입고장·출고장 공통 구조)" 부제 추가</li>
+          <li><b>sec22 입출고 시퀀스</b>: 1단계·6단계에 듀얼 야드 컨텍스트(입고장/출고장 구분) 추가</li>
+          <li><b>전체 재번호</b>: sec08~sec22 → sec10~sec24, TOC 24항목 + Nav dots 24개</li>
+        </ul>
+      </div>
+
+      <div class="ver-entry">
+        <div class="ver-entry-head">
+          <span class="ver-tag">v5.0</span>
+          <span class="ver-date">2026-03-02</span>
+        </div>
+        <div class="ver-title">16:9 PPT 슬라이드 카드 + 플러그인 통합 + 콘텐츠 보완</div>
+        <ul class="ver-changes">
+          <li><b>16:9 카드 레이아웃</b>: PPT 모드에서 다크 배경 위 16:9 비율 슬라이드 카드 (실제 PPT 느낌)</li>
+          <li><b>플러그인 통합</b>: Ant Design reset.css, MDI Icons, AOS 애니메이션 CDN 추가</li>
+          <li><b>MDI 아이콘</b>: 모드 토글, TOC 사이드바, 컨소시엄 카드에 아이콘 적용</li>
+          <li><b>AOS 애니메이션</b>: Report 모드에서 fade-up 스크롤 애니메이션 (PPT 모드는 기존 시스템 유지)</li>
+          <li><b>sec22 예산 보완</b>: 26년 예산 23억 stat-box 추가, 사업계획서 일정 callout (3/8~3/25)</li>
+          <li><b>sec13 참고영상</b>: Stacker Crane 2건 + 중국 조선소 자동화 YouTube 링크 바</li>
+          <li><b>sec01 날짜</b>: 2026.02 → 2026.03 + 사업계획서 제출 기한 표시</li>
+          <li><b>sec07 Three.js</b>: 카드 내 유동 크기 대응 (<code>flex:1;min-height:0</code>)</li>
+        </ul>
+      </div>
 
       <div class="ver-entry">
         <div class="ver-entry-head">
@@ -3327,15 +5184,30 @@
 
     if(mode === 'ppt') {
       document.documentElement.style.scrollSnapType = 'y mandatory';
-      slides.forEach(s => { s.style.height = '100vh'; s.style.scrollSnapAlign = 'start'; });
+      slides.forEach(s => { s.style.height = '100vh'; s.style.scrollSnapAlign = 'start'; s.style.padding = '0'; });
     } else {
       document.documentElement.style.scrollSnapType = 'none';
-      slides.forEach(s => { s.style.height = 'auto'; s.style.minHeight = 'auto'; s.style.scrollSnapAlign = 'none'; });
+      slides.forEach(s => { s.style.height = 'auto'; s.style.minHeight = 'auto'; s.style.scrollSnapAlign = 'none'; s.style.padding = ''; });
+      if(typeof AOS !== 'undefined') AOS.refresh();
     }
     window.scrollTo(0,0);
+    window.dispatchEvent(new Event('resize'));
   };
 })();
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    if(typeof AOS !== 'undefined') {
+      AOS.init({ duration: 600, once: true, offset: 60,
+        disable: function(){ return document.body.classList.contains('mode-ppt'); }
+      });
+    }
+  });
+  window.addEventListener('load', function(){
+    if(typeof AOS !== 'undefined' && !document.body.classList.contains('mode-ppt')) AOS.refresh();
+  });
+</script>
 </body>
 </html>

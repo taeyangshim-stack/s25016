@@ -92,3 +92,9 @@ __pycache__/
 
 # Local secret files
 *.pass
+
+# Git worktrees
+.worktrees/
+
+# SmarTrack 신규과제 자료 (대용량)
+projects/smartrack/신규과제*/
