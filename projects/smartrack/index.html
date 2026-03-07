@@ -1517,10 +1517,10 @@
     /* ===== Dynamic legend per layout ===== */
     var legendConfigs={
       '6':[
-        {c:'#D97706',l:'절단A(절단기)'},{c:'#B45309',l:'절단B(선별)'},{c:'#16A34A',l:'선행랙장(3단)'},
+        {c:'#D97706',l:'절단A(원자재절단)'},{c:'#B45309',l:'절단B(선별장)'},{c:'#16A34A',l:'선행랙장(3단)'},
         {c:'#CA8A04',l:'소조립×6'},{c:'#4ADE80',l:'후행랙장×6'},{c:'#2563EB',l:'중조/대조'},
         {c:'#7C3AED',l:'AMR-A경로'},{c:'#059669',l:'AMR-B경로'},
-        {c:'#FBBF24',l:'3축갠트리/스태커'},{c:'#DC2626',l:'AMR도킹장치'},{c:'#FEF3C7',l:'버퍼존'}
+        {c:'#FBBF24',l:'선별갠트리/스태커크레인'},{c:'#DC2626',l:'AMR도킹장치'},{c:'#FEF3C7',l:'버퍼존'}
       ]
     };
     function updateLegend(lay){
@@ -1532,7 +1532,7 @@
 
     /* ============================================================
        LAYOUT 6 — 6라인 병렬형 (X=흐름방향, Z=라인배열)
-       절단A(절단기1.5u)+절단B(선별1.5u)→AMR통로→소조립(6u)→후행랙장 / 선행랙장:L1 Z외측
+       절단A(원자재절단)→절단B(선별장/선별갠트리)→AMR(1.5t파렛트)→스태커&랙장→소조립투입 / 선행랙장:L1 Z외측
        중조/대조: L6 Z외측(측면), 6라인 전체 X 스팬에 준하는 크기
        ============================================================ */
     (function(){
@@ -1833,20 +1833,15 @@
         var mat=new THREE.LineBasicMaterial({color:col,transparent:true,opacity:opa||0.32,depthWrite:false});
         group6.add(new THREE.Line(geo,mat));
       }
-      /* AMR-A 직행 경로 (짝수라인: 절단도킹→소조립투입 X방향) */
-      [LZ[0],LZ[2],LZ[4]].forEach(function(lz){
-        addPath([[X_CUT-1,lz],[CG_X_R_C,lz]],0x7C3AED,0.28); /* 절단→도킹 */
-        addPath([[CG_X_R_C,lz],[SUB_DOCK_X,lz]],0x7C3AED,0.25); /* 도킹→소조립투입 */
-      });
-      /* AMR-A 경유 경로 (홀수라인: 4단계 직각 L자형) */
-      [LZ[1],LZ[3],LZ[5]].forEach(function(lz,vi){
-        var vx=VIA_LANES[vi];
-        addPath([[X_CUT-1,lz],[CG_X_R_C,lz]],0xA78BFA,0.22);   /* 절단→도킹 */
-        addPath([[CG_X_R_C,lz],[vx,lz]],0xA78BFA,0.20);          /* 도킹→레인 */
-        addPath([[vx,lz],[vx,BUF_Z]],0xA78BFA,0.22);             /* 레인→버퍼존 */
-        addPath([[vx,BUF_Z],[vx,STK_DOCK_Z]],0xC4B5FD,0.20);    /* 버퍼→스태커도킹 */
-        addPath([[vx,STK_DOCK_Z],[vx,lz]],0xC4B5FD,0.16);       /* 스태커→라인 */
-        addPath([[vx,lz],[SUB_DOCK_X,lz]],0xA78BFA,0.22);        /* 레인→소조립투입 */
+      /* AMR-A 경로 (전 6라인: 선별장→스태커&랙장 경유 후 소조립투입) */
+      LZ.forEach(function(lz,li){
+        var vx=VIA_LANES[Math.floor(li/2)]+(li%2===0?-0.1:0.1);
+        addPath([[X_CUT-1,lz],[CG_X_R_C,lz]],0x7C3AED,0.25);    /* 절단→도킹 */
+        addPath([[CG_X_R_C,lz],[vx,lz]],0xA78BFA,0.20);           /* 도킹→레인 */
+        addPath([[vx,lz],[vx,BUF_Z]],0xA78BFA,0.22);              /* 레인→버퍼존(선별장 출구) */
+        addPath([[vx,BUF_Z],[vx,STK_DOCK_Z]],0xC4B5FD,0.20);     /* 버퍼→스태커도킹 */
+        addPath([[vx,STK_DOCK_Z],[vx,lz]],0xC4B5FD,0.16);        /* 스태커출고→라인 */
+        addPath([[vx,lz],[SUB_DOCK_X,lz]],0xA78BFA,0.22);         /* 레인→소조립투입 */
       });
       /* AMR-B 경로 (6라인→중조, 라인별 전용 X레인) */
       LZ.forEach(function(lz,li){
@@ -1869,13 +1864,13 @@
         return g;
       }
 
-      /* ── AMR-A: 절단↔소조립 (짝수라인=선행랙장 경유, 홀수=직행) ×6 ── */
+      /* ── AMR-A: 절단→선별장→스태커&랙장→소조립 (전 6라인 경유) ── */
       var amrsA6=[];
       LZ.forEach(function(lz,li){
         var g=makeAMR6(0x7C3AED,0xC4B5FD);
         g.position.set(X_CUT-1.0,0.22,lz); group6.add(g);
-        amrsA6.push({g:g,li:li,lz:lz,via:(li%2!==0),phase:li*0.78,
-          vx:li%2!==0?VIA_LANES[Math.floor(li/2)]:X_AMR});
+        amrsA6.push({g:g,li:li,lz:lz,via:true,phase:li*0.78,
+          vx:VIA_LANES[Math.floor(li/2)]+(li%2===0?-0.1:0.1)});
       });
 
       /* ── AMR-B: 소조립→후행랙장→중조/대조→복귀 ×6 (전용 X레인) ── */
@@ -1904,13 +1899,17 @@
         spr.position.set(x,y,z); group6.add(spr);
       }
       var CG_X_L=-12.5;
+      var CG_X_R=-6.8, CG_H_LBL=2.8; /* 레이블용 상수 (위 cutGantries6 블록과 동일) */
       /* 공정 구역 레이블 */
-      makeLabel6('① 절단공정',-10.5,4.5,0,{bg:'rgba(180,83,9,0.88)',fg:'#FEF3C7',w:200,h:44,fs:17});
-      makeLabel6('② 소조립공정',X_SUB,4.5,0,{bg:'rgba(21,128,61,0.88)',fg:'#D1FAE5',w:210,h:44,fs:17});
-      makeLabel6('③ 후행랙장',X_POST,4.5,0,{bg:'rgba(5,150,105,0.88)',fg:'#D1FAE5',w:190,h:44,fs:17});
-      makeLabel6('④ 선행랙장',PRE_XC,5.8,PRE_Z,{bg:'rgba(5,150,105,0.88)',fg:'#D1FAE5',w:200,h:44,fs:17});
-      makeLabel6('⑤ 버퍼존',PRE_XC,3.5,BUF_Z,{bg:'rgba(245,158,11,0.88)',fg:'#FEF9C3',w:160,h:40,fs:15,s:1.5});
-      makeLabel6('⑥ 중조/대조',MID_XC,3.5,MID_Z,{bg:'rgba(37,99,235,0.88)',fg:'#BFDBFE',w:190,h:44,fs:17});
+      makeLabel6('① 절단공정',-10.75,4.5,0,{bg:'rgba(180,83,9,0.88)',fg:'#FEF3C7',w:200,h:44,fs:17});
+      makeLabel6('② 선별장',-9.25,2.8,0,{bg:'rgba(146,64,14,0.88)',fg:'#FEF3C7',w:170,h:40,fs:15,s:1.5});
+      makeLabel6('선별갠트리',(CG_X_L+CG_X_R)/2,CG_H_LBL+0.7,0,{bg:'rgba(146,64,14,0.82)',fg:'#FEF9C3',w:160,h:36,fs:13,s:1.3});
+      makeLabel6('③ 소조립공정',X_SUB,4.5,0,{bg:'rgba(21,128,61,0.88)',fg:'#D1FAE5',w:210,h:44,fs:17});
+      makeLabel6('④ 후행랙장',X_POST,4.5,0,{bg:'rgba(5,150,105,0.88)',fg:'#D1FAE5',w:190,h:44,fs:17});
+      makeLabel6('⑤ 선행랙장',PRE_XC,5.8,PRE_Z,{bg:'rgba(5,150,105,0.88)',fg:'#D1FAE5',w:200,h:44,fs:17});
+      makeLabel6('스태커크레인',PRE_XC,NTIERS*TIER_H+1.0,STK_FACE_Z,{bg:'rgba(55,65,81,0.88)',fg:'#F1F5F9',w:180,h:38,fs:14,s:1.5});
+      makeLabel6('⑥ 버퍼존',PRE_XC,3.5,BUF_Z,{bg:'rgba(245,158,11,0.88)',fg:'#FEF9C3',w:160,h:40,fs:15,s:1.5});
+      makeLabel6('⑦ 중조/대조',MID_XC,3.5,MID_Z,{bg:'rgba(37,99,235,0.88)',fg:'#BFDBFE',w:190,h:44,fs:17});
       /* 소조립 공정명 레이블 (취부/가접/용접/열처리) */
       [-11.25,-3.75,3.75,11.25].forEach(function(dx,si){
         makeLabel6(subNames6[si],X_SUB+dx,1.8,0,{bg:'rgba(30,41,59,0.75)',fg:'#F1F5F9',w:100,h:36,fs:14,s:1.2});
@@ -1945,61 +1944,46 @@
 
       /* ── AMR-A: 4단계 도킹 경로 (절단도킹→버퍼투입→스태커출고→소조립투입) ── */
       d.amrsA.forEach(function(a){
+        /* 전 6라인: 선별장 → AMR(1.5t파렛트) → 스태커&랙장 → 소조립투입 → 복귀 */
         var vx=a.vx;
         var x,z=a.lz;
-        if(!a.via){
-          /* 직행: 절단도킹 → 소조립투입 → 복귀 */
-          var cyc=3.4, spd=0.26;
-          var t=(elapsed*spd+a.phase)%cyc;
-          if(t<0.5){       x=lerp(X_CUT-1.0,CG_X_R,ease(t/0.5));     a.g.rotation.y=0;}
-          else if(t<1.0){  x=CG_X_R;                                    a.g.rotation.y=0;} /* 절단도킹 */
-          else if(t<1.5){  x=lerp(CG_X_R,SUB_DOCK_X,ease((t-1.0)/0.5)); a.g.rotation.y=0;}
-          else if(t<2.0){  x=SUB_DOCK_X;                                 a.g.rotation.y=0;} /* 소조립투입도킹 */
-          else{            x=lerp(SUB_DOCK_X,X_CUT-1.0,ease((t-2.0)/1.4)); a.g.rotation.y=Math.PI;}
-          a.g.position.set(x,0.22,z);
+        var cyc=10.0, spd=0.18;
+        var t=(elapsed*spd+a.phase)%cyc;
+        if(t<0.5){
+          /* 절단→절단도킹 X이동 */
+          x=lerp(X_CUT-1.0,CG_X_R,ease(t/0.5)); z=a.lz; a.g.rotation.y=0;
+        } else if(t<1.0){
+          /* 절단도킹(선별장) 대기 */
+          x=CG_X_R; z=a.lz; a.g.rotation.y=0;
+        } else if(t<1.4){
+          /* 도킹→Z이동레인 X이동 */
+          x=lerp(CG_X_R,vx,ease((t-1.0)/0.4)); z=a.lz; a.g.rotation.y=Math.PI;
+        } else if(t<3.0){
+          /* 레인→버퍼존 Z이동 (선별장 출구→스태커&랙장 진입) */
+          x=vx; z=lerp(a.lz,BUF_Z,ease((t-1.4)/1.6)); a.g.rotation.y=-Math.PI/2;
+        } else if(t<3.7){
+          /* 버퍼존 투입 대기 */
+          x=vx; z=BUF_Z; a.g.rotation.y=-Math.PI/2;
+        } else if(t<4.5){
+          /* 버퍼존→스태커도킹 Z이동 */
+          x=vx; z=lerp(BUF_Z,STK_DOCK_Z,ease((t-3.7)/0.8)); a.g.rotation.y=-Math.PI/2;
+        } else if(t<5.2){
+          /* 스태커도킹 출고 대기 */
+          x=vx; z=STK_DOCK_Z; a.g.rotation.y=0;
+        } else if(t<6.8){
+          /* 스태커출고→해당라인 Z복귀 */
+          x=vx; z=lerp(STK_DOCK_Z,a.lz,ease((t-5.2)/1.6)); a.g.rotation.y=Math.PI/2;
+        } else if(t<7.4){
+          /* 레인→소조립투입 X이동 */
+          x=lerp(vx,SUB_DOCK_X,ease((t-6.8)/0.6)); z=a.lz; a.g.rotation.y=0;
+        } else if(t<8.0){
+          /* 소조립투입 도킹 대기 */
+          x=SUB_DOCK_X; z=a.lz; a.g.rotation.y=0;
         } else {
-          /* 경유: 절단도킹 → 버퍼존투입 → 스태커출고 → 소조립투입 → 복귀 */
-          var cyc=10.0, spd=0.18;
-          var t=(elapsed*spd+a.phase)%cyc;
-          if(t<0.5){
-            /* 절단→절단도킹 X이동 */
-            x=lerp(X_CUT-1.0,CG_X_R,ease(t/0.5)); z=a.lz; a.g.rotation.y=0;
-          } else if(t<1.0){
-            /* 절단도킹 대기 */
-            x=CG_X_R; z=a.lz; a.g.rotation.y=0;
-          } else if(t<1.4){
-            /* 도킹→Z이동레인 X이동 */
-            x=lerp(CG_X_R,vx,ease((t-1.0)/0.4)); z=a.lz; a.g.rotation.y=Math.PI;
-          } else if(t<3.0){
-            /* 레인→버퍼존 Z이동 */
-            x=vx; z=lerp(a.lz,BUF_Z,ease((t-1.4)/1.6));
-            a.g.rotation.y=(a.lz>BUF_Z)?Math.PI/2:-Math.PI/2;
-          } else if(t<3.7){
-            /* 버퍼존 투입 대기 */
-            x=vx; z=BUF_Z; a.g.rotation.y=(a.lz>BUF_Z)?Math.PI/2:-Math.PI/2;
-          } else if(t<4.5){
-            /* 버퍼존→스태커도킹 Z이동 */
-            x=vx; z=lerp(BUF_Z,STK_DOCK_Z,ease((t-3.7)/0.8));
-            a.g.rotation.y=-Math.PI/2;
-          } else if(t<5.2){
-            /* 스태커도킹 출고 대기 */
-            x=vx; z=STK_DOCK_Z; a.g.rotation.y=0;
-          } else if(t<6.8){
-            /* 스태커도킹→해당라인 Z복귀 */
-            x=vx; z=lerp(STK_DOCK_Z,a.lz,ease((t-5.2)/1.6));
-            a.g.rotation.y=(a.lz>STK_DOCK_Z)?-Math.PI/2:Math.PI/2;
-          } else if(t<7.4){
-            /* 레인→소조립투입 X이동 */
-            x=lerp(vx,SUB_DOCK_X,ease((t-6.8)/0.6)); z=a.lz; a.g.rotation.y=0;
-          } else if(t<8.0){
-            /* 소조립투입 도킹 대기 */
-            x=SUB_DOCK_X; z=a.lz; a.g.rotation.y=0;
-          } else {
-            /* 소조립투입→절단 X복귀 */
-            x=lerp(SUB_DOCK_X,X_CUT-1.0,ease((t-8.0)/2.0)); z=a.lz; a.g.rotation.y=Math.PI;
-          }
-          a.g.position.set(x,0.22,z);
+          /* 소조립투입→절단 X복귀 */
+          x=lerp(SUB_DOCK_X,X_CUT-1.0,ease((t-8.0)/2.0)); z=a.lz; a.g.rotation.y=Math.PI;
         }
+        a.g.position.set(x,0.22,z);
       });
 
       /* ── AMR-B: 소조립→후행랙장→중조/대조→복귀 (직각이동, 전용 X레인) ── */
