@@ -98,3 +98,9 @@ __pycache__/
 
 # SmarTrack 신규과제 자료 (대용량)
 projects/smartrack/신규과제*/
+
+# Local MCP server config (machine-specific paths)
+.mcp.json
+
+# Auto-generated mail audit reports
+**/mail_audit_reports/
