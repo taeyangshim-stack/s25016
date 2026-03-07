@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>박주한 주임 메일 히스토리 | SHI 34베이 갠트리 용접 로봇</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #0b0f1a;
+            --bg: #111827;
+            --bg-elevated: #1a2235;
+            --surface: #1e293b;
+            --surface-hover: #253049;
+            --border: #2a3550;
+            --border-active: #3b5bdb;
+            --text-primary: #e8ecf4;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --blue: #3b82f6;
+            --blue-dim: rgba(59, 130, 246, 0.12);
+            --blue-glow: rgba(59, 130, 246, 0.06);
+            --green: #22c55e;
+            --green-dim: rgba(34, 197, 94, 0.12);
+            --red: #ef4444;
+            --red-dim: rgba(239, 68, 68, 0.1);
+            --amber: #f59e0b;
+            --amber-dim: rgba(245, 158, 11, 0.12);
+            --violet: #8b5cf6;
+            --violet-dim: rgba(139, 92, 246, 0.12);
+            --cyan: #06b6d4;
+            --cyan-dim: rgba(6, 182, 212, 0.12);
+            --pink: #ec4899;
+            --pink-dim: rgba(236, 72, 153, 0.12);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --font-mono: 'IBM Plex Mono', monospace;
+            --font-body: 'Pretendard', -apple-system, sans-serif;
+            --font-display: 'Noto Serif KR', serif;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59,130,246,0.08), transparent),
+                radial-gradient(circle at 20% 80%, rgba(139,92,246,0.04), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(59,130,246,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 1;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ── Hero Header ── */
+        .hero {
+            padding: 48px 0 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+
+        .hero-tag {
+            font-family: var(--font-mono);
+            font-size: 0.7em;
+            color: var(--blue);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-tag::before {
+            content: '';
+            width: 32px;
+            height: 2px;
+            background: var(--blue);
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: 2.4em;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--blue), var(--violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 1em;
+            color: var(--text-secondary);
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta-item {
+            font-family: var(--font-mono);
+            font-size: 0.75em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: var(--surface);
+            border-radius: 999px;
+            border: 1px solid var(--border);
+        }
+
+        .hero-meta-item .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+        }
+
+        /* ── KPI Cards ── */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s var(--ease), transform 0.2s var(--ease);
+        }
+
+        .kpi-card:hover {
+            border-color: var(--border-active);
+            transform: translateY(-2px);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .kpi-card:nth-child(1)::before { background: var(--blue); }
+        .kpi-card:nth-child(2)::before { background: var(--green); }
+        .kpi-card:nth-child(3)::before { background: var(--amber); }
+        .kpi-card:nth-child(4)::before { background: var(--violet); }
+        .kpi-card:nth-child(5)::before { background: var(--cyan); }
+
+        .kpi-label {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .kpi-value {
+            font-family: var(--font-mono);
+            font-size: 2em;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .kpi-card:nth-child(1) .kpi-value { color: var(--blue); }
+        .kpi-card:nth-child(2) .kpi-value { color: var(--green); }
+        .kpi-card:nth-child(3) .kpi-value { color: var(--amber); }
+        .kpi-card:nth-child(4) .kpi-value { color: var(--violet); }
+        .kpi-card:nth-child(5) .kpi-value { color: var(--cyan); }
+
+        .kpi-detail {
+            font-size: 0.78em;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        /* ── Section ── */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-num {
+            font-family: var(--font-mono);
+            font-size: 0.7em;
+            color: var(--blue);
+            background: var(--blue-dim);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        /* ── Charts Row ── */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .chart-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+        }
+
+        .chart-box h3 {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .chart-canvas-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        /* ── Gantt Chart ── */
+        .gantt-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            overflow-x: auto;
+        }
+
+        .gantt-table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+        }
+
+        .gantt-table th {
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+        }
+
+        .gantt-table th:first-child {
+            text-align: left;
+            width: 200px;
+            min-width: 200px;
+        }
+
+        .gantt-row {
+            border-bottom: 1px solid rgba(42,53,80,0.5);
+        }
+
+        .gantt-row:hover {
+            background: var(--surface-hover);
+        }
+
+        .gantt-label {
+            font-size: 0.8em;
+            padding: 10px 12px 10px 0;
+            color: var(--text-secondary);
+            font-weight: 500;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .gantt-cell {
+            padding: 10px 1px;
+            vertical-align: middle;
+            position: relative;
+        }
+
+        .gantt-bar {
+            height: 22px;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            transition: filter 0.2s var(--ease);
+        }
+
+        .gantt-bar:hover {
+            filter: brightness(1.3);
+        }
+
+        .gantt-bar.done { background: var(--blue); opacity: 0.85; }
+        .gantt-bar.active { background: var(--green); animation: gantt-pulse 2s ease infinite; }
+        .gantt-bar.critical { background: var(--red); opacity: 0.9; }
+
+        @keyframes gantt-pulse {
+            0%, 100% { opacity: 0.85; }
+            50% { opacity: 1; }
+        }
+
+        .gantt-tooltip {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-active);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            font-size: 0.75em;
+            color: var(--text-primary);
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .gantt-bar:hover .gantt-tooltip { display: block; }
+
+        .gantt-section-row td {
+            padding: 12px 0 4px;
+            font-family: var(--font-mono);
+            font-size: 0.7em;
+            font-weight: 600;
+            color: var(--blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .gantt-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .gantt-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75em;
+            color: var(--text-muted);
+        }
+
+        .gantt-legend-item .swatch {
+            width: 14px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        /* ── Timeline ── */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--blue), var(--violet), var(--blue));
+        }
+
+        .tl-month {
+            position: relative;
+            margin-bottom: 32px;
+        }
+
+        .tl-month-label {
+            position: relative;
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 12px;
+            padding-left: 24px;
+        }
+
+        .tl-month-label::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--blue);
+            border: 3px solid var(--bg-deep);
+            box-shadow: 0 0 0 2px var(--blue);
+        }
+
+        .tl-events {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-left: 24px;
+        }
+
+        .tl-event {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            transition: border-color 0.2s var(--ease);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .tl-event:hover {
+            border-color: var(--border-active);
+        }
+
+        .tl-event-icon {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+        }
+
+        .tl-event-text strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* ── Category Toggle Tables ── */
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 16px;
+        }
+
+        .cat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .cat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s var(--ease);
+        }
+
+        .cat-header:hover {
+            background: var(--surface-hover);
+        }
+
+        .cat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cat-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+        }
+
+        .cat-name {
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .cat-count {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+
+        .cat-chevron {
+            color: var(--text-muted);
+            transition: transform 0.3s var(--ease);
+            font-size: 0.8em;
+        }
+
+        .cat-card.open .cat-chevron {
+            transform: rotate(180deg);
+        }
+
+        .cat-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s var(--ease);
+        }
+
+        .cat-card.open .cat-body {
+            max-height: 2000px;
+        }
+
+        .cat-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cat-table th {
+            font-size: 0.72em;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 10px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .cat-table td {
+            font-size: 0.82em;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(42,53,80,0.4);
+            color: var(--text-secondary);
+        }
+
+        .cat-table tr:hover td {
+            background: var(--surface-hover);
+        }
+
+        .cat-table td:first-child {
+            font-family: var(--font-mono);
+            font-size: 0.75em;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* ── Summary ── */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .summary-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+        }
+
+        .summary-card h3 {
+            font-size: 0.95em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-list {
+            list-style: none;
+        }
+
+        .summary-list li {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(42,53,80,0.3);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .summary-list li::before {
+            content: '→';
+            color: var(--blue);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .remaining-list li::before {
+            content: '!';
+            color: var(--amber);
+            font-weight: 700;
+            background: var(--amber-dim);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            text-align: center;
+            padding: 32px 0;
+            color: var(--text-muted);
+            font-size: 0.75em;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeUp 0.6s var(--ease) both;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .charts-row { grid-template-columns: 1fr; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .cat-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 1.6em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="shell">
+    <!-- Hero -->
+    <header class="hero animate-in">
+        <div class="hero-tag">SHI 34베이 A/B라인 갠트리 용접 로봇</div>
+        <h1>박주한 주임 <span>메일 히스토리</span></h1>
+        <p class="hero-sub">디파인시스템 운영SW(UI) 개발 담당 — 메일 기반 업무 진행 기록 종합 분석</p>
+        <div class="hero-meta">
+            <span class="hero-meta-item"><span class="dot" style="background:var(--blue)"></span>hans51@dfinesys.com</span>
+            <span class="hero-meta-item"><span class="dot" style="background:var(--green)"></span>2025.02 ~ 2026.03</span>
+            <span class="hero-meta-item"><span class="dot" style="background:var(--amber)"></span>총 103건 분석</span>
+        </div>
+    </header>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid animate-in delay-1">
+        <div class="kpi-card">
+            <div class="kpi-label">총 메일</div>
+            <div class="kpi-value">103</div>
+            <div class="kpi-detail">2025.02 ~ 2026.03</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">주제 카테고리</div>
+            <div class="kpi-value">7</div>
+            <div class="kpi-detail">정기보고 · UI배포 · 이슈 · 문서 · 펀치 · 통신 · 설비</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">펀치리스트 완료율</div>
+            <div class="kpi-value">47%</div>
+            <div class="kpi-detail">2026.01.13 기준</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">최다 월 발송</div>
+            <div class="kpi-value">22</div>
+            <div class="kpi-detail">2026년 1월</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">협업 조직</div>
+            <div class="kpi-value">5</div>
+            <div class="kpi-detail">디파인 · SP · 위드포인츠 · SHI · GR</div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="section animate-in delay-2">
+        <div class="section-header">
+            <span class="section-num">01</span>
+            <h2 class="section-title">월별 통계</h2>
+        </div>
+        <div class="charts-row">
+            <div class="chart-box">
+                <h3>월별 메일 발송 건수</h3>
+                <div class="chart-canvas-wrap">
+                    <canvas id="monthlyChart" height="260"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h3>주제별 분포</h3>
+                <div class="chart-canvas-wrap">
+                    <canvas id="categoryChart" height="260"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gantt -->
+    <div class="section animate-in delay-3">
+        <div class="section-header">
+            <span class="section-num">02</span>
+            <h2 class="section-title">기능별 개발 타임라인</h2>
+        </div>
+        <div class="gantt-container" id="ganttContainer"></div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="section animate-in delay-4">
+        <div class="section-header">
+            <span class="section-num">03</span>
+            <h2 class="section-title">주요 마일스톤 타임라인</h2>
+        </div>
+        <div class="timeline" id="timelineContainer"></div>
+    </div>
+
+    <!-- Category Tables -->
+    <div class="section animate-in delay-5">
+        <div class="section-header">
+            <span class="section-num">04</span>
+            <h2 class="section-title">주제별 상세 내역</h2>
+        </div>
+        <div class="cat-grid" id="categoryGrid"></div>
+    </div>
+
+    <!-- Summary -->
+    <div class="section animate-in delay-5">
+        <div class="section-header">
+            <span class="section-num">05</span>
+            <h2 class="section-title">요약 및 잔존 과제</h2>
+        </div>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>🏆 핵심 역할 및 성과</h3>
+                <ul class="summary-list">
+                    <li>거의 매일 개발 진행상황을 메일로 공유하며 투명한 프로젝트 관리 수행</li>
+                    <li>A/B라인 GUI를 수시로 빌드·배포하며 현장 피드백 즉시 반영</li>
+                    <li>시퀀스 다이어그램, 로그 분석, 와이어샤크 캡처 등 체계적 기술 분석</li>
+                    <li>관제SW(위드포인츠), PLC(에스피시스템스), SHI와 gRPC .proto 인터페이스 설계 주도</li>
+                    <li>펀치리스트 웹 시스템으로 이슈 추적, 43%→47%+ 완료율 달성 중</li>
+                    <li>용접 데이터 매뉴얼, 캘리브레이션 문서, 인터페이스 문서 등 기술 문서 다수 작성</li>
+                </ul>
+            </div>
+            <div class="summary-card">
+                <h3>⚠️ 잔존 주요 과제</h3>
+                <ul class="summary-list remaining-list">
+                    <li>작업자 / 관리자 권한 설정 (PL-2025-088)</li>
+                    <li>운영 S/W 최종 매뉴얼 제출 (PL-2025-093)</li>
+                    <li>경광등 제어 통합 리팩터링</li>
+                    <li>UI 조작 로깅 / 작업자 이력 로그 기능 (진행 중)</li>
+                    <li>홀센서 UI 수정 및 오프셋 엑셀 관리</li>
+                    <li>프로세스 완료 처리 과정 수정 (메시지 박스 → 버튼 활성/비활성)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        박주한 주임 메일 히스토리 대시보드 — 분석 기간 2025.02 ~ 2026.03 · 총 103건 · 생성일 2026.03.08
+    </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════
+
+const MONTHLY_DATA = {
+    labels: ['25.02','25.10','25.11','25.12','26.01','26.02','26.03'],
+    counts: [1, 2, 12, 18, 22, 20, 5]
+};
+
+const CATEGORY_DATA = {
+    labels: ['정기 보고','UI/SW 배포','이슈 리포팅','문서/매뉴얼','펀치리스트','통신/프로토콜','설비 기능'],
+    counts: [25, 15, 20, 12, 8, 10, 13],
+    colors: ['#3b82f6','#22c55e','#ef4444','#f59e0b','#f97316','#8b5cf6','#ec4899']
+};
+
+const GANTT_DATA = [
+    { section: '터치 센싱' },
+    { label: 'B라인 터치센싱 세분화', start: '2025-11-06', end: '2025-11-21', status: 'done' },
+    { label: '터치 에러 플래그 초기화', start: '2026-01-15', end: '2026-01-23', status: 'done' },
+    { label: '용접 조건 세부 셋업 UI', start: '2026-02-24', end: '2026-03-06', status: 'done' },
+    { section: 'PLC 알람 / 경광등' },
+    { label: 'PLC 알람 .proto 제안', start: '2025-11-19', end: '2025-11-25', status: 'done' },
+    { label: 'PLC 알람 수집 구현', start: '2025-12-17', end: '2026-02-04', status: 'done' },
+    { label: '경광등 제어 통합 리팩터링', start: '2026-03-04', end: '2026-03-31', status: 'active' },
+    { section: 'gRPC 인터페이스' },
+    { label: '통합 인터페이스 문서', start: '2025-11-14', end: '2025-11-14', status: 'done' },
+    { label: 'PLCState 메시지 구조 확정', start: '2025-12-17', end: '2025-12-18', status: 'done' },
+    { label: 'WarmUp .proto 설계', start: '2026-01-06', end: '2026-01-06', status: 'done' },
+    { label: '용접환경 메시지 구현', start: '2026-02-09', end: '2026-02-13', status: 'done' },
+    { section: '웜업 (WarmUp)' },
+    { label: '웜업 동작 절차 정의', start: '2025-12-25', end: '2025-12-25', status: 'done' },
+    { label: '.proto 설계 및 구현', start: '2026-01-06', end: '2026-01-20', status: 'done' },
+    { section: '수직 용접' },
+    { label: 'A라인 수직용접 UI', start: '2025-12-17', end: '2026-01-23', status: 'done' },
+    { label: '관제 명령 및 노티 연결', start: '2026-02-23', end: '2026-03-06', status: 'active' },
+    { section: '캘리브레이션 이원화' },
+    { label: '제어모드 이원화 문서', start: '2026-02-13', end: '2026-02-13', status: 'done' },
+    { label: '이원화 개발', start: '2026-02-13', end: '2026-02-27', status: 'done' },
+    { section: 'UI 조작 로깅' },
+    { label: '작업자 이력 로그 기능', start: '2026-03-04', end: '2026-03-31', status: 'active' },
+    { section: '매뉴얼 / 문서' },
+    { label: '용접 데이터 매뉴얼', start: '2026-01-07', end: '2026-01-09', status: 'done' },
+    { label: '명령 데드라인/에러 정의', start: '2026-01-15', end: '2026-01-15', status: 'done' },
+    { label: '최종 매뉴얼 제출', start: '2026-03-06', end: '2026-03-31', status: 'critical' },
+    { section: '이슈 대응' },
+    { label: '실생산 장애 대응', start: '2025-11-20', end: '2025-11-21', status: 'critical' },
+    { label: '컨트롤러 연결 해제 분석', start: '2025-11-21', end: '2025-12-12', status: 'done' },
+    { label: '와이어샤크 네트워크 분석', start: '2025-12-02', end: '2025-12-04', status: 'done' },
+    { label: '통신 주기 최적화', start: '2025-12-29', end: '2026-01-20', status: 'done' },
+    { label: 'B라인 서버 이슈', start: '2026-02-25', end: '2026-02-25', status: 'done' },
+];
+
+const TIMELINE_DATA = [
+    { month: '2025.02', events: [
+        { icon: '📊', bg: 'var(--blue-dim)', text: '<strong>터치 기반 용접선 티칭 데이터 공유</strong> — 초기 데이터 셋업' }
+    ]},
+    { month: '2025.10', events: [
+        { icon: '📝', bg: 'var(--amber-dim)', text: '<strong>개발 문서 양식 공유</strong> — 이슈 관리 체계 시작' },
+        { icon: '📋', bg: 'var(--violet-dim)', text: '<strong>B라인 펜던트 이벤트 로그 분석</strong> — 에러 레벨 필터링' }
+    ]},
+    { month: '2025.11', events: [
+        { icon: '🖥️', bg: 'var(--green-dim)', text: '<strong>B라인 실물 GUI 첫 배포</strong>' },
+        { icon: '🔧', bg: 'var(--cyan-dim)', text: '<strong>터치 센싱 세분화</strong> — X,Y,Z 포인트 관리' },
+        { icon: '📡', bg: 'var(--violet-dim)', text: '<strong>PLC 알람 .proto 제안</strong> — 관제SW 인터페이스 시작' },
+        { icon: '🚨', bg: 'var(--red-dim)', text: '<strong>실생산 장애 대응</strong> — 명령 데드라인/에러 처리 이슈' },
+    ]},
+    { month: '2025.12', events: [
+        { icon: '🖥️', bg: 'var(--green-dim)', text: '<strong>A/B라인 로컬 GUI 정기 배포 시작</strong>' },
+        { icon: '🤝', bg: 'var(--violet-dim)', text: '<strong>관제SW 인터페이스 협의 확정</strong> — PLCState 메시지 구조' },
+        { icon: '📡', bg: 'var(--cyan-dim)', text: '<strong>통신 주기 최적화 착수</strong> — 와이어샤크 네트워크 분석' },
+        { icon: '📊', bg: 'var(--amber-dim)', text: '<strong>토크 데이터 수집</strong> — B라인 1/2/3호기 CSV' },
+    ]},
+    { month: '2026.01', events: [
+        { icon: '🔥', bg: 'var(--red-dim)', text: '<strong>최다 활동 월 (22건)</strong>' },
+        { icon: '⚙️', bg: 'var(--blue-dim)', text: '<strong>WarmUp .proto 설계 및 구현</strong>' },
+        { icon: '🖥️', bg: 'var(--green-dim)', text: '<strong>수직용접/재시도/터치 플래그 UI 다수 배포</strong>' },
+        { icon: '📖', bg: 'var(--amber-dim)', text: '<strong>용접 데이터 매뉴얼 작성</strong> — 4차 피드백 반영' },
+        { icon: '📋', bg: 'var(--violet-dim)', text: '<strong>펀치리스트 완료율 43%→47%</strong>' },
+    ]},
+    { month: '2026.02', events: [
+        { icon: '🔀', bg: 'var(--cyan-dim)', text: '<strong>캘리브레이션/제어모드 이원화</strong> — 문서화 및 개발' },
+        { icon: '⚙️', bg: 'var(--blue-dim)', text: '<strong>용접 환경 메시지 구현</strong> — 아크/위빙/트래킹' },
+        { icon: '💾', bg: 'var(--green-dim)', text: '<strong>원점 로깅 기능 완료</strong> — sqlite 신규 테이블' },
+        { icon: '🚨', bg: 'var(--red-dim)', text: '<strong>B라인 서버 이슈 리포팅</strong>' },
+    ]},
+    { month: '2026.03', events: [
+        { icon: '📝', bg: 'var(--amber-dim)', text: '<strong>UI 조작 로깅 / 작업자 이력 로그</strong> — 개발 진행 중' },
+        { icon: '💡', bg: 'var(--pink-dim)', text: '<strong>경광등 제어 통합 리팩터링</strong> — 착수' },
+        { icon: '📋', bg: 'var(--violet-dim)', text: '<strong>잔존: 권한 설정, 최종 매뉴얼</strong>' },
+    ]}
+];
+
+const CATEGORIES = [
+    { name: '일일/주간 개발진행 상황 공유', icon: '📬', count: '~25건', color: 'var(--blue)', bg: 'var(--blue-dim)',
+      headers: ['시기','A라인 주요 개발','B라인 주요 개발'],
+      rows: [
+        ['2026.01','재시도/터치센싱 플래그 초기화, 수직용접, 웜업','용접선 유효성 검사, 터치 에러 플래그 초기화'],
+        ['2026.02','캘리브레이션/제어모드 이원화, 용접 활성화 진단','한팔용접(1xx 매크로), 실시간 용접조건'],
+        ['2026.03','UI 조작 로깅, 작업자 이력 로그','UI 조작 로깅, 홀센서 UI, 오프셋 엑셀 관리']
+      ]
+    },
+    { name: 'UI/SW 배포 및 송부', icon: '🖥️', count: '~15건', color: 'var(--green)', bg: 'var(--green-dim)',
+      headers: ['날짜','내용'],
+      rows: [
+        ['2025.11.05','B라인 실물 GUI 송부'],
+        ['2025.12.16','A라인/B라인 로컬 GUI + 진행상황 문서'],
+        ['2025.12.17','A라인 수직용접 UI'],
+        ['2025.12.29','B라인 로컬 GUI'],
+        ['2026.01.20','A라인 웜업, B라인 터치 에러 플래그 초기화, 재시도, 수직용접 UI'],
+        ['2026.01.23','A라인 로컬 UI (노즐티칭, 수직, 리트라이 3종)'],
+        ['2026.02.26','UI 샘플 (상대이동 조깅, 원점 UI, 오프셋 저장 UI)']
+      ]
+    },
+    { name: '기술 이슈 리포팅 및 분석', icon: '🚨', count: '~20건', color: 'var(--red)', bg: 'var(--red-dim)',
+      headers: ['날짜','이슈','핵심 내용'],
+      rows: [
+        ['2025.11.20','실생산 지장 상황','명령 데드라인/에러 처리로 10시까지 생산 불가'],
+        ['2025.11.21','컨트롤러 연결 강제 해제','프로세스 강제 종료 분석, 재연결 로직 검토'],
+        ['2025.12.02~04','와이어샤크 분석','네트워크 패킷 캡처(pcapng)로 통신 문제 추적'],
+        ['2025.12.11~12','B라인 디지털트윈 끊김','내부 예외 미처리로 프로세스 강제 종료'],
+        ['2026.01.09','B라인 3호기 데이터 정리','플랜C → 플랜A 데이터 병합'],
+        ['2026.02.09','매크로 미선택 시 미표시','매크로 뷰/표 분리 컨셉 제안'],
+        ['2026.02.25','B라인 서버 이슈','1호기 발생 이슈 상세 리포트'],
+        ['2026.03.06','경광등 제어','시퀀스 다이어그램으로 루프 덮어쓰기 문제 분석']
+      ]
+    },
+    { name: '문서/매뉴얼 공유', icon: '📖', count: '~12건', color: 'var(--amber)', bg: 'var(--amber-dim)',
+      headers: ['날짜','문서'],
+      rows: [
+        ['2025.12.03','용접 데이터 정리 (전압, 전류, 와이어 피딩)'],
+        ['2026.01.07~08','A/B라인 용접 데이터 제어 매뉴얼 (4차 피드백 반영)'],
+        ['2026.01.07','A라인 와이어커터 티칭, B라인 웜업 매뉴얼'],
+        ['2026.01.15','운영SW 명령 데드라인, 에러 내역 정의 문서'],
+        ['2026.01.20','B라인 용접선 길이/두께 차이 시 용접 불가 반환 문서'],
+        ['2026.02.09','용접선 유효성 검사 개발 구조 문서'],
+        ['2026.02.12','원점 로깅 기능 구성 (sqlite 파일/테이블)'],
+        ['2026.02.13','캘리브레이션 제어모드 이원화 문서']
+      ]
+    },
+    { name: '펀치리스트/이슈 관리', icon: '📋', count: '~8건', color: 'var(--pink)', bg: 'var(--pink-dim)',
+      headers: ['날짜','내용','완료율'],
+      rows: [
+        ['2025.11.18','이슈 리스트 취합 및 일정 산출 요청','-'],
+        ['2025.11.25','운영SW 이슈리스트 공유 (11월 4주차)','-'],
+        ['2025.12.04','담당자별 업무 현황 회신','-'],
+        ['2025.12.09','통합 펀치리스트 전달','-'],
+        ['2026.01.12','GUI 펀치리스트 공유','43%'],
+        ['2026.01.13','GUI 펀치리스트 갱신','47%'],
+        ['2026.01.19','B라인 운영SW 업데이트 내역 (브랜치 관리)','-'],
+        ['2026.01.20','B라인 검증 항목 14건 업데이트','-']
+      ]
+    },
+    { name: '통신/프로토콜 협의 (gRPC)', icon: '📡', count: '~10건', color: 'var(--violet)', bg: 'var(--violet-dim)',
+      headers: ['날짜','내용'],
+      rows: [
+        ['2025.11.14','통합 인터페이스 문서 전달'],
+        ['2025.11.19','PLC 알람 추가에 따른 .proto 추가 제안'],
+        ['2025.11.25','PLC 알람 .proto 갱신 (PLCState 메시지 구조)'],
+        ['2025.12.17','관제SW 협의 - InvalidRequest, PLCState 확정'],
+        ['2026.01.06','로봇 배속/WarmUp .proto 구성'],
+        ['2026.01.22','.proto 활용 여부 및 수정 제안'],
+        ['2026.02.09','메시지 수정 요청 (캘리브레이션, 용접기 필드)'],
+        ['2026.02.13','용접 환경 메시지 처리 (아크/위빙/트래킹)']
+      ]
+    },
+    { name: '설비 기능 개발', icon: '⚙️', count: '~13건', color: 'var(--cyan)', bg: 'var(--cyan-dim)',
+      headers: ['기능','시기','상세'],
+      rows: [
+        ['터치 센싱','2025.11','B라인 터치 센싱 포인트 X,Y,Z 세분화'],
+        ['경광등 제어','2026.03','에러 시 경광등 루프 덮어쓰기 문제, 리팩터링'],
+        ['웜업(WarmUp)','2025.12~2026.01','온습도 기반 설비 웜업, 호기별/전체'],
+        ['수직 용접','2025.12~2026.03','A라인 수직용접 UI, 관제 명령 연결'],
+        ['용접선 유효성 검사','2026.01~02','길이/두께 차이 시 불가 반환'],
+        ['토크 데이터','2025.12~2026.02','1/2/3호기 토크 CSV, Z축 토크 변화'],
+        ['통신 주기 최적화','2025.12~2026.01','데이터 가공 비용 분석, 콜백 한계'],
+        ['원점 로깅','2026.02','호기별 원점 기록, sqlite 신규 테이블'],
+        ['캘리브레이션 이원화','2026.02','소프트 리미트, 원격 제어모드 분리'],
+        ['UI 조작 로깅','2026.03','작업자 사용 이력 로그 기능'],
+        ['PLC 알람','2025.11~2026.02','공압/CO2 압력 알람, 커스텀 팝업']
+      ]
+    }
+];
+
+// ══════════════════════════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════════════════════════
+
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = 'rgba(42,53,80,0.5)';
+Chart.defaults.font.family = "'Pretendard', sans-serif";
+
+// Monthly bar chart
+new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: {
+        labels: MONTHLY_DATA.labels,
+        datasets: [{
+            label: '메일 건수',
+            data: MONTHLY_DATA.counts,
+            backgroundColor: MONTHLY_DATA.counts.map((v,i) => {
+                const max = Math.max(...MONTHLY_DATA.counts);
+                const ratio = v / max;
+                return `rgba(59, 130, 246, ${0.3 + ratio * 0.7})`;
+            }),
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.6,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#1e293b',
+                borderColor: '#3b5bdb',
+                borderWidth: 1,
+                titleFont: { family: "'IBM Plex Mono', monospace", size: 12 },
+                bodyFont: { family: "'Pretendard', sans-serif", size: 13 },
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    label: ctx => `${ctx.parsed.y}건 발송`
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(42,53,80,0.3)' },
+                ticks: { font: { family: "'IBM Plex Mono', monospace", size: 11 } }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { font: { family: "'IBM Plex Mono', monospace", size: 11 } }
+            }
+        }
+    }
+});
+
+// Category doughnut
+new Chart(document.getElementById('categoryChart'), {
+    type: 'doughnut',
+    data: {
+        labels: CATEGORY_DATA.labels,
+        datasets: [{
+            data: CATEGORY_DATA.counts,
+            backgroundColor: CATEGORY_DATA.colors,
+            borderColor: '#1e293b',
+            borderWidth: 3,
+            hoverOffset: 8,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '55%',
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    boxWidth: 12,
+                    padding: 12,
+                    font: { size: 11 },
+                    usePointStyle: true,
+                    pointStyleWidth: 10,
+                }
+            },
+            tooltip: {
+                backgroundColor: '#1e293b',
+                borderColor: '#3b5bdb',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    label: ctx => ` ${ctx.label}: ${ctx.parsed}건 (${Math.round(ctx.parsed/103*100)}%)`
+                }
+            }
+        }
+    }
+});
+
+// ══════════════════════════════════════════════════════════════
+// GANTT
+// ══════════════════════════════════════════════════════════════
+
+function buildGantt() {
+    const container = document.getElementById('ganttContainer');
+    const startDate = new Date('2025-10-01');
+    const endDate = new Date('2026-04-01');
+    const months = [];
+    let d = new Date(startDate);
+    while (d < endDate) {
+        months.push({ year: d.getFullYear(), month: d.getMonth() });
+        d.setMonth(d.getMonth() + 1);
+    }
+
+    const totalDays = (endDate - startDate) / (1000*60*60*24);
+
+    function dayOffset(dateStr) {
+        const dt = new Date(dateStr);
+        return Math.max(0, (dt - startDate) / (1000*60*60*24));
+    }
+
+    function daySpan(s, e) {
+        return Math.max(1, (new Date(e) - new Date(s)) / (1000*60*60*24));
+    }
+
+    const monthNames = ['','','','','','','','','','10월','11월','12월','1월','2월','3월'];
+    const monthLabels = months.map(m => {
+        if (m.year === 2025) return ['','','','','','','','','','10월','11월','12월'][m.month] || '';
+        return ['1월','2월','3월','4월'][m.month] || '';
+    });
+
+    let html = '<table class="gantt-table"><thead><tr><th></th>';
+    monthLabels.forEach(l => { html += `<th>${l}</th>`; });
+    html += '</tr></thead><tbody>';
+
+    GANTT_DATA.forEach(item => {
+        if (item.section) {
+            html += `<tr class="gantt-section-row"><td colspan="${months.length + 1}">${item.section}</td></tr>`;
+            return;
+        }
+
+        html += `<tr class="gantt-row"><td class="gantt-label">${item.label}</td>`;
+
+        const offset = dayOffset(item.start);
+        const span = daySpan(item.start, item.end);
+
+        months.forEach((m, i) => {
+            const mStart = new Date(m.year, m.month, 1);
+            const mEnd = new Date(m.year, m.month + 1, 0);
+            const mDaysTotal = (mEnd - mStart) / (1000*60*60*24) + 1;
+
+            const barStart = new Date(item.start);
+            const barEnd = new Date(item.end);
+
+            if (barEnd < mStart || barStart > mEnd) {
+                html += '<td class="gantt-cell"></td>';
+                return;
+            }
+
+            const clampStart = barStart < mStart ? mStart : barStart;
+            const clampEnd = barEnd > mEnd ? mEnd : barEnd;
+
+            const leftPct = ((clampStart - mStart) / (1000*60*60*24)) / mDaysTotal * 100;
+            const widthPct = ((clampEnd - clampStart) / (1000*60*60*24) + 1) / mDaysTotal * 100;
+
+            html += `<td class="gantt-cell">
+                <div class="gantt-bar ${item.status}" style="margin-left:${leftPct}%;width:${Math.max(widthPct, 4)}%">
+                    <div class="gantt-tooltip">${item.label}<br>${item.start} ~ ${item.end}</div>
+                </div>
+            </td>`;
+        });
+
+        html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    html += `<div class="gantt-legend">
+        <div class="gantt-legend-item"><div class="swatch" style="background:var(--blue)"></div>완료</div>
+        <div class="gantt-legend-item"><div class="swatch" style="background:var(--green)"></div>진행 중</div>
+        <div class="gantt-legend-item"><div class="swatch" style="background:var(--red)"></div>긴급/중요</div>
+    </div>`;
+
+    container.innerHTML = html;
+}
+
+buildGantt();
+
+// ══════════════════════════════════════════════════════════════
+// TIMELINE
+// ══════════════════════════════════════════════════════════════
+
+function buildTimeline() {
+    const container = document.getElementById('timelineContainer');
+    let html = '';
+
+    TIMELINE_DATA.forEach(month => {
+        html += `<div class="tl-month">
+            <div class="tl-month-label">${month.month}</div>
+            <div class="tl-events">`;
+
+        month.events.forEach(ev => {
+            html += `<div class="tl-event">
+                <div class="tl-event-icon" style="background:${ev.bg}">${ev.icon}</div>
+                <div class="tl-event-text">${ev.text}</div>
+            </div>`;
+        });
+
+        html += '</div></div>';
+    });
+
+    container.innerHTML = html;
+}
+
+buildTimeline();
+
+// ══════════════════════════════════════════════════════════════
+// CATEGORY TABLES
+// ══════════════════════════════════════════════════════════════
+
+function buildCategories() {
+    const grid = document.getElementById('categoryGrid');
+    let html = '';
+
+    CATEGORIES.forEach((cat, idx) => {
+        html += `<div class="cat-card" onclick="this.classList.toggle('open')">
+            <div class="cat-header">
+                <div class="cat-header-left">
+                    <div class="cat-badge" style="background:${cat.bg}">${cat.icon}</div>
+                    <span class="cat-name" style="color:${cat.color}">${cat.name}</span>
+                    <span class="cat-count">${cat.count}</span>
+                </div>
+                <span class="cat-chevron">▼</span>
+            </div>
+            <div class="cat-body">
+                <table class="cat-table">
+                    <thead><tr>`;
+
+        cat.headers.forEach(h => { html += `<th>${h}</th>`; });
+        html += '</tr></thead><tbody>';
+
+        cat.rows.forEach(row => {
+            html += '<tr>';
+            row.forEach(cell => { html += `<td>${cell}</td>`; });
+            html += '</tr>';
+        });
+
+        html += '</tbody></table></div></div>';
+    });
+
+    grid.innerHTML = html;
+}
+
+buildCategories();
+</script>
+
+</body>
+</html>
