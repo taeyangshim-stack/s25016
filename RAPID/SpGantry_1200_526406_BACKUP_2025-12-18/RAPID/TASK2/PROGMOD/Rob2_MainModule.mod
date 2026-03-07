@@ -3298,123 +3298,196 @@ ENDPROC
 ! Waits for t1_weld_position_ready, then positions Robot2
 ! v1.9.37: Weld tracking with position logging, edge data from TASK1
 PROC Robot2_EdgeWeldSequence()
-	VAR num wait_count := 0;
-	VAR num max_wait := 200;  ! 20 seconds timeout
-	VAR jointtarget safe_jt;
-	VAR iodev r2_log;
+    ! ========================================
+    ! Robot2 Edge Weld Sequence (v3.0.0)
+    ! Ported from PlanA rWeld012()
+    ! Uses Welds2{} + wobjWeldLine2 + fCalcWeldingpos()
+    ! Simulation mode: MoveL (WELD_ARC_ENABLED=FALSE)
+    ! ========================================
+    VAR num nTempMmps;
+    VAR num nHoldWeldVel;
+    VAR jointtarget jCurrent;
+    VAR iodev weld2_errlog;
+    VAR num nErrorCount;
+    VAR num nMotionErrorCount;
 
-	TPWrite "========================================";
-	TPWrite "[R2_EDGE] v1.9.37 Robot2 Edge Weld Sequence";
-	TPWrite "========================================";
+    TPWrite "[R2_WELD] Robot2_EdgeWeldSequence v4.0 start";
+    nHoldWeldVel:=0.01;
 
-	! Open Robot2 weld trace log
-	Open "HOME:/robot2_weld_trace.txt", r2_log \Write;
-	Write r2_log, "Robot2 Weld Trace Log (v1.9.37) - " + CDate() + " " + CTime();
+    ! Signal TASK1 we are ready (unblocks Step 7 wait in Full Weld Sequence)
+    t2_weld_ready := TRUE;
 
-	! Reset flags
-	t2_weld_ready := FALSE;
+    ! --- Setup weld data (wd1..wd40) ---
+    wd1:=[Welds2{1}.cpm/6,0,[5,0,Welds2{1}.voltage,Welds2{1}.wfs,0,Welds2{1}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd2:=[Welds2{2}.cpm/6,0,[5,0,Welds2{2}.voltage,Welds2{2}.wfs,0,Welds2{2}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd3:=[Welds2{3}.cpm/6,0,[5,0,Welds2{3}.voltage,Welds2{3}.wfs,0,Welds2{3}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd4:=[Welds2{4}.cpm/6,0,[5,0,Welds2{4}.voltage,Welds2{4}.wfs,0,Welds2{4}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd5:=[Welds2{5}.cpm/6,0,[5,0,Welds2{5}.voltage,Welds2{5}.wfs,0,Welds2{5}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd6:=[Welds2{6}.cpm/6,0,[5,0,Welds2{6}.voltage,Welds2{6}.wfs,0,Welds2{6}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd7:=[Welds2{7}.cpm/6,0,[5,0,Welds2{7}.voltage,Welds2{7}.wfs,0,Welds2{7}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd8:=[Welds2{8}.cpm/6,0,[5,0,Welds2{8}.voltage,Welds2{8}.wfs,0,Welds2{8}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd9:=[Welds2{9}.cpm/6,0,[5,0,Welds2{9}.voltage,Welds2{9}.wfs,0,Welds2{9}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd10:=[Welds2{10}.cpm/6,0,[5,0,Welds2{10}.voltage,Welds2{10}.wfs,0,Welds2{10}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd11:=[Welds2{11}.cpm/6,0,[5,0,Welds2{11}.voltage,Welds2{11}.wfs,0,Welds2{11}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd12:=[Welds2{12}.cpm/6,0,[5,0,Welds2{12}.voltage,Welds2{12}.wfs,0,Welds2{12}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd13:=[Welds2{13}.cpm/6,0,[5,0,Welds2{13}.voltage,Welds2{13}.wfs,0,Welds2{13}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd14:=[Welds2{14}.cpm/6,0,[5,0,Welds2{14}.voltage,Welds2{14}.wfs,0,Welds2{14}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd15:=[Welds2{15}.cpm/6,0,[5,0,Welds2{15}.voltage,Welds2{15}.wfs,0,Welds2{15}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd16:=[Welds2{16}.cpm/6,0,[5,0,Welds2{16}.voltage,Welds2{16}.wfs,0,Welds2{16}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd17:=[Welds2{17}.cpm/6,0,[5,0,Welds2{17}.voltage,Welds2{17}.wfs,0,Welds2{17}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd18:=[Welds2{18}.cpm/6,0,[5,0,Welds2{18}.voltage,Welds2{18}.wfs,0,Welds2{18}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd19:=[Welds2{19}.cpm/6,0,[5,0,Welds2{19}.voltage,Welds2{19}.wfs,0,Welds2{19}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd20:=[Welds2{20}.cpm/6,0,[5,0,Welds2{20}.voltage,Welds2{20}.wfs,0,Welds2{20}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd21:=[Welds2{21}.cpm/6,0,[5,0,Welds2{21}.voltage,Welds2{21}.wfs,0,Welds2{21}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd22:=[Welds2{22}.cpm/6,0,[5,0,Welds2{22}.voltage,Welds2{22}.wfs,0,Welds2{22}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd23:=[Welds2{23}.cpm/6,0,[5,0,Welds2{23}.voltage,Welds2{23}.wfs,0,Welds2{23}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd24:=[Welds2{24}.cpm/6,0,[5,0,Welds2{24}.voltage,Welds2{24}.wfs,0,Welds2{24}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd25:=[Welds2{25}.cpm/6,0,[5,0,Welds2{25}.voltage,Welds2{25}.wfs,0,Welds2{25}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd26:=[Welds2{26}.cpm/6,0,[5,0,Welds2{26}.voltage,Welds2{26}.wfs,0,Welds2{26}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd27:=[Welds2{27}.cpm/6,0,[5,0,Welds2{27}.voltage,Welds2{27}.wfs,0,Welds2{27}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd28:=[Welds2{28}.cpm/6,0,[5,0,Welds2{28}.voltage,Welds2{28}.wfs,0,Welds2{28}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd29:=[Welds2{29}.cpm/6,0,[5,0,Welds2{29}.voltage,Welds2{29}.wfs,0,Welds2{29}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd30:=[Welds2{30}.cpm/6,0,[5,0,Welds2{30}.voltage,Welds2{30}.wfs,0,Welds2{30}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd31:=[Welds2{31}.cpm/6,0,[5,0,Welds2{31}.voltage,Welds2{31}.wfs,0,Welds2{31}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd32:=[Welds2{32}.cpm/6,0,[5,0,Welds2{32}.voltage,Welds2{32}.wfs,0,Welds2{32}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd33:=[Welds2{33}.cpm/6,0,[5,0,Welds2{33}.voltage,Welds2{33}.wfs,0,Welds2{33}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd34:=[Welds2{34}.cpm/6,0,[5,0,Welds2{34}.voltage,Welds2{34}.wfs,0,Welds2{34}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd35:=[Welds2{35}.cpm/6,0,[5,0,Welds2{35}.voltage,Welds2{35}.wfs,0,Welds2{35}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd36:=[Welds2{36}.cpm/6,0,[5,0,Welds2{36}.voltage,Welds2{36}.wfs,0,Welds2{36}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd37:=[Welds2{37}.cpm/6,0,[5,0,Welds2{37}.voltage,Welds2{37}.wfs,0,Welds2{37}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd38:=[Welds2{38}.cpm/6,0,[5,0,Welds2{38}.voltage,Welds2{38}.wfs,0,Welds2{38}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd39:=[Welds2{39}.cpm/6,0,[5,0,Welds2{39}.voltage,Welds2{39}.wfs,0,Welds2{39}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    wd40:=[Welds2{nMotionStepCount{2}}.cpm/6,0,[5,0,Welds2{nMotionStepCount{2}}.voltage,Welds2{nMotionStepCount{2}}.wfs,0,Welds2{nMotionStepCount{2}}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
 
-	! Step 1: Wait for TASK1 to position gantry + Robot1
-	TPWrite "[R2_EDGE] Step 1: Waiting for TASK1 gantry positioning...";
-	WHILE NOT t1_weld_position_ready DO
-		WaitTime 0.1;
-		wait_count := wait_count + 1;
-		IF wait_count > max_wait THEN
-			TPWrite "[R2_EDGE] ERROR: Timeout waiting for TASK1";
-			Write r2_log, "ERROR: Timeout waiting for TASK1 (" + NumToStr(wait_count * 0.1, 1) + "s)";
-			Close r2_log;
-			RETURN;
-		ENDIF
-	ENDWHILE
-	TPWrite "[R2_EDGE] TASK1 gantry positioned (" + NumToStr(wait_count * 0.1, 1) + "s)";
-	Write r2_log, "TASK1 ready after " + NumToStr(wait_count * 0.1, 1) + "s";
+    Holdwd1:=[nHoldWeldVel,0,[5,0,Welds2{1}.voltage,Welds2{1}.wfs,0,Welds2{1}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    Holdwd2:=[nHoldWeldVel,0,[5,0,Welds2{2}.voltage,Welds2{2}.wfs,0,Welds2{2}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    Holdwd3:=[nHoldWeldVel,0,[5,0,Welds2{3}.voltage,Welds2{3}.wfs,0,Welds2{3}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    Holdwd4:=[nHoldWeldVel,0,[5,0,Welds2{4}.voltage,Welds2{4}.wfs,0,Welds2{4}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    Holdwd5:=[nHoldWeldVel,0,[5,0,Welds2{5}.voltage,Welds2{5}.wfs,0,Welds2{5}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    Holdwd6:=[nHoldWeldVel,0,[5,0,Welds2{6}.voltage,Welds2{6}.wfs,0,Welds2{6}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    Holdwd7:=[nHoldWeldVel,0,[5,0,Welds2{7}.voltage,Welds2{7}.wfs,0,Welds2{7}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    Holdwd8:=[nHoldWeldVel,0,[5,0,Welds2{8}.voltage,Welds2{8}.wfs,0,Welds2{8}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    Holdwd9:=[nHoldWeldVel,0,[5,0,Welds2{9}.voltage,Welds2{9}.wfs,0,Welds2{9}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
+    Holdwd10:=[nHoldWeldVel,0,[5,0,Welds2{10}.voltage,Welds2{10}.wfs,0,Welds2{10}.Current,0,0,0],[0,0,0,0,0,0,0,0,0]];
 
-	! Step 2: Log weld configuration
-	TPWrite "[R2_EDGE] bRobSwap=" + ValToStr(shared_bRobSwap);
-	Write r2_log, "bRobSwap=" + ValToStr(shared_bRobSwap);
-	Write r2_log, "Robot2 edge Start=["
-		+ NumToStr(shared_posStart_r2.x,1) + ","
-		+ NumToStr(shared_posStart_r2.y,1) + ","
-		+ NumToStr(shared_posStart_r2.z,1) + "]";
-	Write r2_log, "Robot2 edge End=["
-		+ NumToStr(shared_posEnd_r2.x,1) + ","
-		+ NumToStr(shared_posEnd_r2.y,1) + ","
-		+ NumToStr(shared_posEnd_r2.z,1) + "]";
-	Write r2_log, "Weld line length=" + NumToStr(shared_nLengthWeldLine,1) + "mm";
-	TPWrite "[R2_EDGE] Edge: [" + NumToStr(shared_posStart_r2.x,0) + ","
-		+ NumToStr(shared_posStart_r2.y,0) + "] -> ["
-		+ NumToStr(shared_posEnd_r2.x,0) + ","
-		+ NumToStr(shared_posEnd_r2.y,0) + "]";
+    ! --- Setup weave data (weave1..weave40) ---
+    weave1:=[Welds2{1}.WeaveShape,Welds2{1}.WeaveType,Welds2{1}.WeaveLength,Welds2{1}.WeaveWidth,0,Welds2{1}.WeaveDwellLeft,0,Welds2{1}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave2:=[Welds2{2}.WeaveShape,Welds2{2}.WeaveType,Welds2{2}.WeaveLength,Welds2{2}.WeaveWidth,0,Welds2{2}.WeaveDwellLeft,0,Welds2{2}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave3:=[Welds2{3}.WeaveShape,Welds2{3}.WeaveType,Welds2{3}.WeaveLength,Welds2{3}.WeaveWidth,0,Welds2{3}.WeaveDwellLeft,0,Welds2{3}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave4:=[Welds2{4}.WeaveShape,Welds2{4}.WeaveType,Welds2{4}.WeaveLength,Welds2{4}.WeaveWidth,0,Welds2{4}.WeaveDwellLeft,0,Welds2{4}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave5:=[Welds2{5}.WeaveShape,Welds2{5}.WeaveType,Welds2{5}.WeaveLength,Welds2{5}.WeaveWidth,0,Welds2{5}.WeaveDwellLeft,0,Welds2{5}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave6:=[Welds2{6}.WeaveShape,Welds2{6}.WeaveType,Welds2{6}.WeaveLength,Welds2{6}.WeaveWidth,0,Welds2{6}.WeaveDwellLeft,0,Welds2{6}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave7:=[Welds2{7}.WeaveShape,Welds2{7}.WeaveType,Welds2{7}.WeaveLength,Welds2{7}.WeaveWidth,0,Welds2{7}.WeaveDwellLeft,0,Welds2{7}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave8:=[Welds2{8}.WeaveShape,Welds2{8}.WeaveType,Welds2{8}.WeaveLength,Welds2{8}.WeaveWidth,0,Welds2{8}.WeaveDwellLeft,0,Welds2{8}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave9:=[Welds2{9}.WeaveShape,Welds2{9}.WeaveType,Welds2{9}.WeaveLength,Welds2{9}.WeaveWidth,0,Welds2{9}.WeaveDwellLeft,0,Welds2{9}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave10:=[Welds2{10}.WeaveShape,Welds2{10}.WeaveType,Welds2{10}.WeaveLength,Welds2{10}.WeaveWidth,0,Welds2{10}.WeaveDwellLeft,0,Welds2{10}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave11:=[Welds2{11}.WeaveShape,Welds2{11}.WeaveType,Welds2{11}.WeaveLength,Welds2{11}.WeaveWidth,0,Welds2{11}.WeaveDwellLeft,0,Welds2{11}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave12:=[Welds2{12}.WeaveShape,Welds2{12}.WeaveType,Welds2{12}.WeaveLength,Welds2{12}.WeaveWidth,0,Welds2{12}.WeaveDwellLeft,0,Welds2{12}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave13:=[Welds2{13}.WeaveShape,Welds2{13}.WeaveType,Welds2{13}.WeaveLength,Welds2{13}.WeaveWidth,0,Welds2{13}.WeaveDwellLeft,0,Welds2{13}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave14:=[Welds2{14}.WeaveShape,Welds2{14}.WeaveType,Welds2{14}.WeaveLength,Welds2{14}.WeaveWidth,0,Welds2{14}.WeaveDwellLeft,0,Welds2{14}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave15:=[Welds2{15}.WeaveShape,Welds2{15}.WeaveType,Welds2{15}.WeaveLength,Welds2{15}.WeaveWidth,0,Welds2{15}.WeaveDwellLeft,0,Welds2{15}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave16:=[Welds2{16}.WeaveShape,Welds2{16}.WeaveType,Welds2{16}.WeaveLength,Welds2{16}.WeaveWidth,0,Welds2{16}.WeaveDwellLeft,0,Welds2{16}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave17:=[Welds2{17}.WeaveShape,Welds2{17}.WeaveType,Welds2{17}.WeaveLength,Welds2{17}.WeaveWidth,0,Welds2{17}.WeaveDwellLeft,0,Welds2{17}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave18:=[Welds2{18}.WeaveShape,Welds2{18}.WeaveType,Welds2{18}.WeaveLength,Welds2{18}.WeaveWidth,0,Welds2{18}.WeaveDwellLeft,0,Welds2{18}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave19:=[Welds2{19}.WeaveShape,Welds2{19}.WeaveType,Welds2{19}.WeaveLength,Welds2{19}.WeaveWidth,0,Welds2{19}.WeaveDwellLeft,0,Welds2{19}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave20:=[Welds2{20}.WeaveShape,Welds2{20}.WeaveType,Welds2{20}.WeaveLength,Welds2{20}.WeaveWidth,0,Welds2{20}.WeaveDwellLeft,0,Welds2{20}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave21:=[Welds2{21}.WeaveShape,Welds2{21}.WeaveType,Welds2{21}.WeaveLength,Welds2{21}.WeaveWidth,0,Welds2{21}.WeaveDwellLeft,0,Welds2{21}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave22:=[Welds2{22}.WeaveShape,Welds2{22}.WeaveType,Welds2{22}.WeaveLength,Welds2{22}.WeaveWidth,0,Welds2{22}.WeaveDwellLeft,0,Welds2{22}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave23:=[Welds2{23}.WeaveShape,Welds2{23}.WeaveType,Welds2{23}.WeaveLength,Welds2{23}.WeaveWidth,0,Welds2{23}.WeaveDwellLeft,0,Welds2{23}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave24:=[Welds2{24}.WeaveShape,Welds2{24}.WeaveType,Welds2{24}.WeaveLength,Welds2{24}.WeaveWidth,0,Welds2{24}.WeaveDwellLeft,0,Welds2{24}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave25:=[Welds2{25}.WeaveShape,Welds2{25}.WeaveType,Welds2{25}.WeaveLength,Welds2{25}.WeaveWidth,0,Welds2{25}.WeaveDwellLeft,0,Welds2{25}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave26:=[Welds2{26}.WeaveShape,Welds2{26}.WeaveType,Welds2{26}.WeaveLength,Welds2{26}.WeaveWidth,0,Welds2{26}.WeaveDwellLeft,0,Welds2{26}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave27:=[Welds2{27}.WeaveShape,Welds2{27}.WeaveType,Welds2{27}.WeaveLength,Welds2{27}.WeaveWidth,0,Welds2{27}.WeaveDwellLeft,0,Welds2{27}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave28:=[Welds2{28}.WeaveShape,Welds2{28}.WeaveType,Welds2{28}.WeaveLength,Welds2{28}.WeaveWidth,0,Welds2{28}.WeaveDwellLeft,0,Welds2{28}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave29:=[Welds2{29}.WeaveShape,Welds2{29}.WeaveType,Welds2{29}.WeaveLength,Welds2{29}.WeaveWidth,0,Welds2{29}.WeaveDwellLeft,0,Welds2{29}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave30:=[Welds2{30}.WeaveShape,Welds2{30}.WeaveType,Welds2{30}.WeaveLength,Welds2{30}.WeaveWidth,0,Welds2{30}.WeaveDwellLeft,0,Welds2{30}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave31:=[Welds2{31}.WeaveShape,Welds2{31}.WeaveType,Welds2{31}.WeaveLength,Welds2{31}.WeaveWidth,0,Welds2{31}.WeaveDwellLeft,0,Welds2{31}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave32:=[Welds2{32}.WeaveShape,Welds2{32}.WeaveType,Welds2{32}.WeaveLength,Welds2{32}.WeaveWidth,0,Welds2{32}.WeaveDwellLeft,0,Welds2{32}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave33:=[Welds2{33}.WeaveShape,Welds2{33}.WeaveType,Welds2{33}.WeaveLength,Welds2{33}.WeaveWidth,0,Welds2{33}.WeaveDwellLeft,0,Welds2{33}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave34:=[Welds2{34}.WeaveShape,Welds2{34}.WeaveType,Welds2{34}.WeaveLength,Welds2{34}.WeaveWidth,0,Welds2{34}.WeaveDwellLeft,0,Welds2{34}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave35:=[Welds2{35}.WeaveShape,Welds2{35}.WeaveType,Welds2{35}.WeaveLength,Welds2{35}.WeaveWidth,0,Welds2{35}.WeaveDwellLeft,0,Welds2{35}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave36:=[Welds2{36}.WeaveShape,Welds2{36}.WeaveType,Welds2{36}.WeaveLength,Welds2{36}.WeaveWidth,0,Welds2{36}.WeaveDwellLeft,0,Welds2{36}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave37:=[Welds2{37}.WeaveShape,Welds2{37}.WeaveType,Welds2{37}.WeaveLength,Welds2{37}.WeaveWidth,0,Welds2{37}.WeaveDwellLeft,0,Welds2{37}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave38:=[Welds2{38}.WeaveShape,Welds2{38}.WeaveType,Welds2{38}.WeaveLength,Welds2{38}.WeaveWidth,0,Welds2{38}.WeaveDwellLeft,0,Welds2{38}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave39:=[Welds2{39}.WeaveShape,Welds2{39}.WeaveType,Welds2{39}.WeaveLength,Welds2{39}.WeaveWidth,0,Welds2{39}.WeaveDwellLeft,0,Welds2{39}.WeaveDwellRight,0,0,0,0,0,0,0];
+    weave40:=[Welds2{nMotionStepCount{2}}.WeaveShape,Welds2{nMotionStepCount{2}}.WeaveType,Welds2{nMotionStepCount{2}}.WeaveLength,Welds2{nMotionStepCount{2}}.WeaveWidth,0,Welds2{nMotionStepCount{2}}.WeaveDwellLeft,0,Welds2{nMotionStepCount{2}}.WeaveDwellRight,0,0,0,0,0,0,0];
 
-	! Step 3: Position Robot2 (v1.9.28: MoveAbsJ only)
-	! Robot2 has NO config linkage to Gantry.
-	! MoveJ/MoveL with WObj fails at non-HOME positions.
-	! MoveAbsJ bypasses World coord reach check.
-	! Robot2 maintains its relative position from initialization.
-	! NOTE: For full weld tracking (like PlanA), MultiMove or custom IK needed.
-	safe_jt := CJointT();
-	TPWrite "[R2_EDGE] Step 3: Robot2 joints J1=" + NumToStr(safe_jt.robax.rax_1, 1)
-		+ " J2=" + NumToStr(safe_jt.robax.rax_2, 1)
-		+ " J3=" + NumToStr(safe_jt.robax.rax_3, 1);
-	Write r2_log, "Robot2 joints=["
-		+ NumToStr(safe_jt.robax.rax_1,2) + ","
-		+ NumToStr(safe_jt.robax.rax_2,2) + ","
-		+ NumToStr(safe_jt.robax.rax_3,2) + ","
-		+ NumToStr(safe_jt.robax.rax_4,2) + ","
-		+ NumToStr(safe_jt.robax.rax_5,2) + ","
-		+ NumToStr(safe_jt.robax.rax_6,2) + "]";
+    ! --- Compute vWeld speed array ---
+    ! v3.5: Clamp minimum speed to 10mm/s to prevent ERRNO=205 (v_tcp=0 error)
+    FOR i FROM 1 TO nMotionStepCount{2} DO
+        nTempMmps:=Welds2{i}.cpm/6;
+        IF nTempMmps < 0.1 nTempMmps:=10;
+        vWeld{i}:=[nTempMmps,200,200,200];
+    ENDFOR
 
-	IF shared_bRobSwap = TRUE THEN
-		TPWrite "[R2_EDGE] bRobSwap=TRUE: Robot2 at swapped position";
-		Write r2_log, "bRobSwap=TRUE: Robot2 holding swapped position";
-	ELSE
-		TPWrite "[R2_EDGE] bRobSwap=FALSE: Robot2 at normal position";
-		Write r2_log, "bRobSwap=FALSE: Robot2 holding normal position";
-	ENDIF
+    smDefault_2{1}.ign_move_delay:=2;
+    Welds2{40}.position:=Welds2{nMotionStepCount{2}}.position;
 
-	MoveAbsJ safe_jt, v100, fine, tool0;
-	Write r2_log, "MoveAbsJ confirmed at " + CTime();
+    ! v3.5: Debug - log to file (nMotionStepCount, vWeld speeds, positions)
+    jCurrent := CJointT();
+    ! v3.12: Split to avoid ERR_STRTOOLNG (9E9 sentinel values = 10 digits)
+    TPWrite "[R2_WELD] Gantry a="+NumToStr(jCurrent.extax.eax_a,0)+" b="+NumToStr(jCurrent.extax.eax_b,0);
+    TPWrite "[R2_WELD] Gantry c="+NumToStr(jCurrent.extax.eax_c,0)+" d="+NumToStr(jCurrent.extax.eax_d,0);
+    TPWrite "[R2_WELD] nMotionStepCount{2}="+NumToStr(nMotionStepCount{2},0);
+    TPWrite "[R2_WELD] Welds2{1}.pos=["+NumToStr(Welds2{1}.position.trans.x,1)+","+NumToStr(Welds2{1}.position.trans.y,1)+","+NumToStr(Welds2{1}.position.trans.z,1)+"] conf=["+NumToStr(Welds2{1}.position.robconf.cf1,0)+","+NumToStr(Welds2{1}.position.robconf.cf4,0)+"]";
+    TPWrite "[R2_WELD] wobjWeldLine2.uframe=["+NumToStr(wobjWeldLine2.uframe.trans.x,1)+","+NumToStr(wobjWeldLine2.uframe.trans.y,1)+","+NumToStr(wobjWeldLine2.uframe.trans.z,1)+"]";
+    ! v3.6: Write startup info to existing error log (no new file = no ERRNO=205)
+    ! Note: robot2_weld_error.txt already exists from previous runs, \Append is safe
+    Open "HOME:/robot2_weld_error.txt", weld2_errlog \Append;
+    Write weld2_errlog, "=== v3.12 START " + CTime() + " nMotionStepCount=" + NumToStr(nMotionStepCount{2},0) + " nMotionStartStepLast=" + NumToStr(nMotionStartStepLast{2},0) + " ===";
+    Close weld2_errlog;
+    nErrorCount := 0;
+    nMotionErrorCount := 0;
 
-	! Step 4: Signal ready to TASK1
-	t2_weld_ready := TRUE;
-	TPWrite "[R2_EDGE] Robot2 ready, signaling TASK1";
-	Write r2_log, "t2_weld_ready=TRUE";
+    ! v4.0: Correct gantry-traversal architecture
+    ! Phase 1: Robot arm moves 0->50mm  (Welds2{1}->{2}, gantry stopped)
+    ! Phase 2: Robot holds/oscillates   (Welds2{2}<->{3}, gantry traverses 50->950mm)
+    ! Phase 3: Robot arm final          (Welds2{3}, gantry stopped at 950mm)
+    ! Sync: WaitUntil t1_weld_start (begin), WHILE NOT t1_weld_done (hold end)
+    ConfJ\Off;
+    ConfL\Off;
+    WaitRob\ZeroSpeed;
 
-	! Step 5: Monitor weld progress
-	TPWrite "[R2_EDGE] Step 5: Monitoring weld (waiting for t1_weld_start)...";
-	wait_count := 0;
-	WHILE NOT t1_weld_start DO
-		WaitTime 0.1;
-		wait_count := wait_count + 1;
-		IF wait_count > 300 THEN  ! 30s timeout
-			TPWrite "[R2_EDGE] WARNING: t1_weld_start timeout";
-			Write r2_log, "WARNING: t1_weld_start timeout";
-			GOTO wait_done;
-		ENDIF
-	ENDWHILE
-	Write r2_log, "Weld started at " + CTime() + " (after " + NumToStr(wait_count * 0.1, 1) + "s)";
-	TPWrite "[R2_EDGE] Weld started by TASK1";
+    ! Wait for TASK1 TraceWeldLine to start
+    TPWrite "[R2_WELD] Waiting for t1_weld_start...";
+    WaitUntil t1_weld_start = TRUE;
+    TPWrite "[R2_WELD] t1_weld_start received - begin arc";
 
-	! Monitor until weld done
-	TPWrite "[R2_EDGE] Weld in progress... holding position";
-	WHILE NOT t1_weld_done DO
-		WaitTime 0.1;
-	ENDWHILE
-	Write r2_log, "Weld completed at " + CTime();
-	TPWrite "[R2_EDGE] Weld complete";
+    ! ===== Phase 1: Robot arm 0->50mm =====
+    nRunningStep{2} := 1;
+    TPWrite "[R2_WELD] Phase1: MoveJ Welds2{1} (weld start approach)";
+    MoveJ Welds2{1}.position, vTargetSpeed, fine, tWeld2\WObj:=wobjWeldLine2;
 
-wait_done:
-	Write r2_log, "Robot2 Edge Weld Sequence complete at " + CTime();
-	Close r2_log;
+    nRunningStep{2} := 2;
+    TPWrite "[R2_WELD] Phase1: MoveL Welds2{2} (0->50mm robot arc)";
+    MoveL Welds2{2}.position, vWeld{2}, fine, tWeld2\WObj:=wobjWeldLine2;
 
-	TPWrite "========================================";
-	TPWrite "[R2_EDGE] Robot2 Edge Weld Sequence Complete!";
-	TPWrite "========================================";
+    ! ===== Phase 2: Wait for gantry traversal (WaitUntil - no oscillation until Welds2 re-taught) =====
+    nRunningStep{2} := 3;
+    TPWrite "[R2_WELD] Phase2: WaitUntil t1_weld_done (gantry traversing 50->950mm)";
+    WaitUntil t1_weld_done = TRUE;
+    TPWrite "[R2_WELD] Phase2: t1_weld_done received";
+
+    ! ===== Phase 3: Final position =====
+    nRunningStep{2} := 4;
+    TPWrite "[R2_WELD] Phase3: MoveL Welds2{3} (final)";
+    MoveL Welds2{3}.position, vWeld{3}, fine, tWeld2\WObj:=wobjWeldLine2;
+
+    ! Done
+    ConfL\On;
+    ConfJ\On;
+    TPWrite "[R2_WELD] Robot2_EdgeWeldSequence v4.0 done";
 ERROR
-	TPWrite "[R2_EDGE] ERROR: " + NumToStr(ERRNO, 0);
-	Write r2_log, "ERROR: " + NumToStr(ERRNO, 0);
-	Close r2_log;
+    ! 50050: Welds2 position outside reach - skip until re-teaching done
+    IF ERRNO = 50050 THEN
+        TPWrite "[R2_WELD] SKIP50050 step=" + NumToStr(nRunningStep{2},0) + " (re-teaching needed)";
+        TRYNEXT;
+    ENDIF
+    TPWrite "[R2_WELD] ERROR ERRNO=" + NumToStr(ERRNO,0) + " step=" + NumToStr(nRunningStep{2},0);
+    ConfL\On;
+    ConfJ\On;
 ENDPROC
+
 
 ! ========================================
 ! Command Loop (v2.1.0 - PlanA Style)
@@ -3578,5 +3651,25 @@ ERROR
 	Write head_log, "ERROR " + NumToStr(ERRNO, 0);
 	Close head_log;
 ENDPROC
+
+    ! ========================================
+    ! fCalcWeldingpos: Welding position interpolation
+    ! ========================================
+    ! Ported from PlanA T_ROB2_Function.mod
+    ! Computes next interpolated position along weld path (0.5mm step)
+    FUNC robtarget fCalcWeldingpos(robtarget CurrentPos,robtarget Start,robtarget End)
+        VAR robtarget result;
+        VAR robtarget pCalcTemp;
+        VAR num nCalcCount;
+        nCalcCount:=round(VectMagn(End.trans-Start.trans)/0.5);
+        pCalcTemp.trans:=(End.trans-Start.trans)/nCalcCount;
+        tool_rx_end:=[EulerZYX(\z,End.rot),EulerZYX(\y,End.rot),EulerZYX(\x,End.rot)];
+        tool_rx_start:=[EulerZYX(\z,Start.rot),EulerZYX(\y,Start.rot),EulerZYX(\x,Start.rot)];
+        tool_rx_delta:=[(tool_rx_end{1}-tool_rx_start{1})/nCalcCount,(tool_rx_end{2}-tool_rx_start{2})/nCalcCount,(tool_rx_end{3}-tool_rx_start{3})/nCalcCount];
+        result.trans:=CurrentPos.trans+pCalcTemp.trans;
+        result.rot:=(OrientZYX(EulerZYX(\z,CurrentPos.rot)+tool_rx_delta{1},EulerZYX(\y,CurrentPos.rot)+tool_rx_delta{2},EulerZYX(\x,CurrentPos.rot)));
+        result.extax:=[9e9,9e9,9e9,9e9,9e9,9e9];
+        RETURN result;
+    ENDFUNC
 
 ENDMODULE

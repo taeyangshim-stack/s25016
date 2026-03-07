@@ -101,8 +101,11 @@ MODULE Head_Data
 
     PERS wobjdata WobjFloor:=[FALSE,TRUE,"",[[-9500,5300,2100],[0,1,0,0]],[[0,0,0],[1,0,0,0]]];
     PERS wobjdata wobjWeldLine:=[FALSE,TRUE,"",[[-9500,5300,2100],[0,1,0,0]],[[19315.4,2410.84,401.317],[0.711268,0.000233895,0.000236673,-0.702921]]];
-    PERS wobjdata wobjWeldLine1:=[FALSE,TRUE,"",[[488,10,1620],[0,0.707107,-0.707107,0]],[[0,0,0],[1,0,0,0]]];
-    PERS wobjdata wobjWeldLine2:=[FALSE,TRUE,"",[[488,-10,1620],[0,0.707107,0.707107,0]],[[0,0,0],[1,0,0,0]]];
+    ! [PlanB Moving WObj] ELM_X(갠트리 선형축) 연동 좌표계 — 2026-03-05
+    ! 변경 전: ufprog=TRUE(고정), ufmec=""  → 갠트리 이동 시 WObj 미추종
+    ! 변경 후: ufprog=FALSE(이동), ufmec="ELM_X" → 갠트리와 함께 WObj 이동
+    PERS wobjdata wobjWeldLine1:=[FALSE,FALSE,"ELM_X",[[0,0,0],[1,0,0,0]],[[488,10,1620],[0,0.707107,-0.707107,0]]];
+    PERS wobjdata wobjWeldLine2:=[FALSE,FALSE,"ELM_X",[[0,0,0],[1,0,0,0]],[[488,-10,1620],[0,0.707107,0.707107,0]]];
     PERS wobjdata wobjRotCtr1:=[FALSE,TRUE,"",[[488,0,0],[0,0.707107,-0.707107,0]],[[0,0,0],[1,0,0,0]]];
     PERS wobjdata wobjRotCtr2:=[FALSE,TRUE,"",[[0,0,0],[0,0.707107,0.707107,0]],[[0,0,0],[1,0,0,0]]];
 

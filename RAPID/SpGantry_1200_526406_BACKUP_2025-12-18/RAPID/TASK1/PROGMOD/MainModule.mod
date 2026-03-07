@@ -590,6 +590,13 @@ PERS num debug_r2_floor_y_offset := 0;
 		! v1.9.40: Reset shared_test_mode to prevent TASK2 from using stale PERS value
 		shared_test_mode := 0;
 
+		! v3.3: Reset weld sync flags at startup to prevent stale PERS values from previous run
+		! (If previous run was interrupted before step 10 reset, flags may still be TRUE)
+		t1_weld_position_ready := FALSE;
+		t1_weld_start := FALSE;
+		t1_weld_done := FALSE;
+		t2_weld_ready := FALSE;
+
 		! Read TEST_MODE from config.txt
 		test_mode := 0;  ! Default: backward compatible
 		Open "HOME:/config.txt", configfile \Read;
@@ -3638,8 +3645,7 @@ ENDPROC
 ! Reads EDGE_START1/2, EDGE_END1/2 from ConfigModule
 ! Calculates calcPosStart, calcPosEnd as averages
 PROC CalcCenterFromEdges()
-	TPWrite "[EDGE] Calculating center line from edges...";
-
+	! v1.9.58: Reduced to 1 TPWrite to prevent 41617 (was 7 TPWrites)
 	! Calculate center line start (average of edgeStart{1} and edgeStart{2})
 	calcPosStart.x := (EDGE_START1_X + EDGE_START2_X) / 2;
 	calcPosStart.y := (EDGE_START1_Y + EDGE_START2_Y) / 2;
@@ -3650,18 +3656,8 @@ PROC CalcCenterFromEdges()
 	calcPosEnd.y := (EDGE_END1_Y + EDGE_END2_Y) / 2;
 	calcPosEnd.z := (EDGE_END1_Z + EDGE_END2_Z) / 2;
 
-	TPWrite "[EDGE] Edge Start 1: [" + NumToStr(EDGE_START1_X,0) + ","
-	        + NumToStr(EDGE_START1_Y,0) + "," + NumToStr(EDGE_START1_Z,0) + "]";
-	TPWrite "[EDGE] Edge Start 2: [" + NumToStr(EDGE_START2_X,0) + ","
-	        + NumToStr(EDGE_START2_Y,0) + "," + NumToStr(EDGE_START2_Z,0) + "]";
-	TPWrite "[EDGE] Edge End 1: [" + NumToStr(EDGE_END1_X,0) + ","
-	        + NumToStr(EDGE_END1_Y,0) + "," + NumToStr(EDGE_END1_Z,0) + "]";
-	TPWrite "[EDGE] Edge End 2: [" + NumToStr(EDGE_END2_X,0) + ","
-	        + NumToStr(EDGE_END2_Y,0) + "," + NumToStr(EDGE_END2_Z,0) + "]";
-	TPWrite "[EDGE] Center Start: [" + NumToStr(calcPosStart.x,1) + ","
-	        + NumToStr(calcPosStart.y,1) + "," + NumToStr(calcPosStart.z,1) + "]";
-	TPWrite "[EDGE] Center End: [" + NumToStr(calcPosEnd.x,1) + ","
-	        + NumToStr(calcPosEnd.y,1) + "," + NumToStr(calcPosEnd.z,1) + "]";
+	TPWrite "[EDGE] Center=[" + NumToStr(calcPosStart.x,0) + "," + NumToStr(calcPosStart.y,0)
+		+ "] -> [" + NumToStr(calcPosEnd.x,0) + "," + NumToStr(calcPosEnd.y,0) + "]";
 ENDPROC
 
 ! ----------------------------------------
@@ -3670,12 +3666,11 @@ ENDPROC
 ! Ported from PlanA rDefineWobjWeldLine
 ! Calculates R-axis angle and determines bRobSwap
 PROC DefineWeldLine()
+	! v1.9.58: Removed opening TPWrite to prevent 41617 burst
 	VAR num dx;
 	VAR num dy;
 	VAR num dz;
 	VAR pos tempPos;
-
-	TPWrite "[WELD] Defining weld line...";
 
 	! Calculate direction vector
 	dx := calcPosEnd.x - calcPosStart.x;
@@ -3693,10 +3688,7 @@ PROC DefineWeldLine()
 	IF (nAngleRzStore <= -90 OR nAngleRzStore >= 90) THEN
 		bRobSwap := TRUE;
 		shared_bRobSwap := TRUE;
-		TPWrite "[WELD] bRobSwap = TRUE (raw R=" + NumToStr(nAngleRzStore,1) + " deg)";
-
 		! Swap start/end only when strictly outside +/-90deg (PlanC NormalizeAngle strict >)
-		! At exactly +/-90deg: bRobSwap=TRUE for buffer, but no swap needed (within R limit)
 		IF (nAngleRzStore < -90 OR nAngleRzStore > 90) THEN
 			tempPos := calcPosStart;
 			calcPosStart := calcPosEnd;
@@ -3704,23 +3696,22 @@ PROC DefineWeldLine()
 			dx := calcPosEnd.x - calcPosStart.x;
 			dy := calcPosEnd.y - calcPosStart.y;
 			nAngleRzStore := ATan2(dy, dx);
-			TPWrite "[WELD] Swapped start/end -> R=" + NumToStr(nAngleRzStore,1) + " deg";
 		ENDIF
 	ELSE
 		bRobSwap := FALSE;
 		shared_bRobSwap := FALSE;
-		TPWrite "[WELD] bRobSwap = FALSE (R=" + NumToStr(nAngleRzStore,1) + " deg)";
 	ENDIF
 
 	! Calculate robot offset length
 	IF calcLengthWeldLine < 20 THEN
 		calcOffsetLengthBuffer := 10;
 	ELSE
-		calcOffsetLengthBuffer := 10;  ! Default offset for now
+		calcOffsetLengthBuffer := 10;
 	ENDIF
 
-	TPWrite "[WELD] R-axis angle: " + NumToStr(nAngleRzStore, 2) + " deg";
-	TPWrite "[WELD] Weld length: " + NumToStr(calcLengthWeldLine, 1) + " mm";
+	! v1.9.58: Reduced to 1 TPWrite (was 5) to prevent 41617
+	TPWrite "[WELD] R=" + NumToStr(nAngleRzStore,1) + "deg len=" + NumToStr(calcLengthWeldLine,0)
+		+ "mm swap=" + ValToStr(bRobSwap);
 ENDPROC
 
 ! ----------------------------------------
@@ -3884,26 +3875,20 @@ ENDPROC
 !   - X1 (eax_a) and X2 (eax_f) must move together
 !   - Cannot be synced from RAPID - must restart controller
 PROC CheckLinkedMotorSync()
+	! v1.9.58: Reduced TPWrites to 1 line to prevent 41617
 	VAR jointtarget jt;
 	VAR num diff;
 
 	jt := CJointT();
 	diff := Abs(jt.extax.eax_a - jt.extax.eax_f);
 
-	TPWrite "----------------------------------------";
-	TPWrite "[LINKED MOTOR] Status Check";
-	TPWrite "  X1 (Master): " + NumToStr(jt.extax.eax_a,1) + " mm";
-	TPWrite "  X2 (Follower): " + NumToStr(jt.extax.eax_f,1) + " mm";
-	TPWrite "  Difference: " + NumToStr(diff,1) + " mm";
-	TPWrite "  Max Allowed: 2 mm (MOC.cfg LINKED_M_PROCESS)";
-
 	IF diff > 2 THEN
-		TPWrite "[LINKED MOTOR] ERROR: Out of sync!";
-		TPWrite "[LINKED MOTOR] Attempting auto-fix...";
+		TPWrite "[LINKED MOTOR] OUT OF SYNC X1=" + NumToStr(jt.extax.eax_a,1)
+			+ " X2=" + NumToStr(jt.extax.eax_f,1) + " diff=" + NumToStr(diff,1);
 		ForceLinkedMotorSync;
 	ELSE
-		TPWrite "[LINKED MOTOR] OK - In sync";
-		TPWrite "----------------------------------------";
+		TPWrite "[LINKED MOTOR] OK X1=" + NumToStr(jt.extax.eax_a,1)
+			+ " X2=" + NumToStr(jt.extax.eax_f,1) + " diff=" + NumToStr(diff,1);
 	ENDIF
 ENDPROC
 
@@ -4711,6 +4696,9 @@ PROC MoveRobotToWeldPosition()
 	! Define weld target in WobjGantry coordinates
 	weld_target.trans.x := 0;
 	weld_target.trans.y := MODE2_TCP_OFFSET_R1_Y;
+	! v2.5.1 ROOT FIX: Compute weld Z height (was using safe-init Z, robot 100mm too high)
+	! WobjFloor.uframe.trans.z=2100, 180deg-X rot inverts Z: WobjGantry_Z = 2100 - WobjFloor_Z - eax_c
+	weld_target.trans.z := 2100 - calcPosStart.z - cur_jt.extax.eax_c;
 
 	Write rob_log, "Target TCP(WobjGantry): ["
 		+ NumToStr(weld_target.trans.x,1) + ", "
@@ -4815,12 +4803,10 @@ PROC GenerateWeldPath(pos adjStart, pos adjEnd, robtarget refTarget, num nPass)
 		pWeldPosR1{i}.trans.y := adjStart.y + ratio * (adjEnd.y - adjStart.y);
 		pWeldPosR1{i}.trans.z := adjStart.z + ratio * (adjEnd.z - adjStart.z);
 
-		! v1.9.64: Use refTarget orientation (robot's current WobjFloor orient)
-		! Fixed Floor orientations [0.5,0.5,-0.5,0.5] / [0.5,-0.5,-0.5,-0.5]
-		! caused 50050 at non-zero gantry R angles (robot base rotated by R,
-		! fixed Floor orient required impossible joint configs to achieve)
-		! refTarget.rot is already compatible with current R angle
-		! Apply torch angle adjustments (TA/WA) via RelTool on current orient
+		! v2.5.3: Keep refTarget.rot (actual robot orientation from CRobT at weld position).
+		! Design orientation [Cos/Sin(45/2)] was unreachable: tWeld1 bent torch + IK config
+		! yields flange position outside workspace for that rotation. The IK-artifact
+		! orientation is what the robot CAN achieve at this position. Apply TA/WA on top.
 		IF bRobSwap = FALSE THEN
 			pWeldPosR1{i} := RelTool(pWeldPosR1{i}, 0, 0, 0
 				\Rx:=-1*curMacro.TravelAngle
@@ -4928,8 +4914,14 @@ PROC TraceWeldLine()
 	VAR torchmotion curStart;
 	VAR torchmotion curEnd;
 	VAR robtarget pErrPos;
+	VAR jointtarget pre_jt;
+	VAR jointtarget jGantryEnd;
+	VAR jointtarget jCurrent;
+	VAR pos gantry_end_floor;
+	VAR pos gantry_end_physical;
+	VAR speeddata vGantryWeld;
 
-	TPWrite "[TRACE] TraceWeldLine v2.2.0 (PlanC Phase 1)";
+	TPWrite "[TRACE] TraceWeldLine v3.0 (Gantry traversal: robot fixed, gantry moves)";
 
 	! Open own log file
 	Open "HOME:/trace_weld_line.txt", trace_log \Write;
@@ -4946,6 +4938,15 @@ PROC TraceWeldLine()
 		+ NumToStr(current_floor.trans.x,1) + ","
 		+ NumToStr(current_floor.trans.y,1) + ","
 		+ NumToStr(current_floor.trans.z,1) + "]";
+	! DEBUG v2.5.2: Log reference orientation (inherited by all pWeldPosR1 segments)
+	Write trace_log, "Ref rot q1=" + NumToStr(current_floor.rot.q1,5)
+		+ " q2=" + NumToStr(current_floor.rot.q2,5)
+		+ " q3=" + NumToStr(current_floor.rot.q3,5)
+		+ " q4=" + NumToStr(current_floor.rot.q4,5);
+	Write trace_log, "Ref conf cf1=" + NumToStr(current_floor.robconf.cf1,0)
+		+ " cf4=" + NumToStr(current_floor.robconf.cf4,0)
+		+ " cf6=" + NumToStr(current_floor.robconf.cf6,0)
+		+ " cfx=" + NumToStr(current_floor.robconf.cfx,0);
 
 	nSegs := nMotionStepCount{1};
 
@@ -5014,120 +5015,51 @@ PROC TraceWeldLine()
 			+ "V A=" + NumToStr(curStart.Current,0)
 			+ "A WFS=" + NumToStr(curStart.FeedingSpeed,0);
 
-		! --- Generate multi-segment path ---
-		! Fills pWeldPosR1{1..nSegs} and vWeldSpeed{1..nSegs}
-		GenerateWeldPath adjStart, adjEnd, current_floor, pass;
-		Write trace_log, "GenerateWeldPath: " + NumToStr(nSegs,0) + " segments generated";
-		! Log all generated segment positions for verification
-		FOR seg FROM 1 TO nSegs DO
-			Write trace_log, "  Seg " + NumToStr(seg,0)
-				+ " cmd=[" + NumToStr(pWeldPosR1{seg}.trans.x,1)
-				+ "," + NumToStr(pWeldPosR1{seg}.trans.y,1)
-				+ "," + NumToStr(pWeldPosR1{seg}.trans.z,1) + "]"
-				+ " spd=" + NumToStr(vWeldSpeed{seg}.v_tcp,0) + "mm/s";
-		ENDFOR
+		! === v3.0: Calculate gantry END position ===
+		! Robot arm stays fixed at WobjGantry [0,-100,900] after MoveRobotToWeldPosition.
+		! Only gantry eax_a (X linear axis) traverses: weld start -> weld end.
+		! As gantry moves, TCP in WobjFloor automatically traces the weld line.
+		! Same TCP offset formula as MoveGantryToWeldPosition (calcPosStart -> adjEnd):
+		!   offset_floor_x = MODE2_TCP_OFFSET_R1_X
+		!   offset_floor_y = -MODE2_TCP_OFFSET_R1_Y  (negated, then subtracted = +)
+		gantry_end_floor.x := adjEnd.x - MODE2_TCP_OFFSET_R1_X;
+		gantry_end_floor.y := adjEnd.y + MODE2_TCP_OFFSET_R1_Y;
+		gantry_end_floor.z := adjEnd.z + WELD_R1_TCP_Z_OFFSET;
+		gantry_end_physical := FloorToPhysical(gantry_end_floor);
+		Write trace_log, "v3.0 GantryEnd(Physical): eax_a=" + NumToStr(gantry_end_physical.x,1);
 
-		! --- Config check OFF for weld motion (orientation changes cause config boundary) ---
+		! Robot joints + Y/Z/R axes unchanged. Only X traverses.
+		jCurrent := CJointT();
+		jGantryEnd := jCurrent;
+		jGantryEnd.extax.eax_a := gantry_end_physical.x;
+		jGantryEnd.extax.eax_f := gantry_end_physical.x;  ! Linked motor: must = eax_a
+
+		! v_leax = gantry linear axis speed (= weld speed)
+		vGantryWeld.v_tcp  := 500;
+		vGantryWeld.v_ori  := 500;
+		vGantryWeld.v_leax := curStart.WeldingSpeed;
+		vGantryWeld.v_reax := 1000;
+		Write trace_log, "Traverse: eax_a "
+			+ NumToStr(jCurrent.extax.eax_a,1)
+			+ " -> " + NumToStr(jGantryEnd.extax.eax_a,1)
+			+ " speed=" + NumToStr(curStart.WeldingSpeed,0) + "mm/s";
+
+		! --- Config check OFF ---
 		ConfJ \Off;
 		ConfL \Off;
 
-		! --- Approach: 50mm above first segment along tool Z ---
-		approach_pos := RelTool(pWeldPosR1{1}, 0, 0, -50);
-		TPWrite "[TRACE] Approach (-50mm)...";
-		MoveJ approach_pos, v100, fine, tWeld1 \WObj:=WobjFloor;
-		Write trace_log, "Approach (-50mm) OK";
+		! --- v3.0: Gantry traversal (MoveAbsJ) ---
+		TPWrite "[TRACE] v3.0 Gantry traverse pass " + NumToStr(pass,0) + "...";
+		Write trace_log, "MoveAbsJ traversal START";
+		MoveAbsJ jGantryEnd, vGantryWeld, fine, tWeld1;
+		Write trace_log, "MoveAbsJ traversal END";
 
-		! --- Move to first segment position ---
-		TPWrite "[TRACE] MoveL to seg 1...";
-		MoveL pWeldPosR1{1}, v100, fine, tWeld1 \WObj:=WobjFloor;
+		! --- v3.0: Verify final gantry position ---
+		jCurrent := CJointT();
+		Write trace_log, "Final eax_a=" + NumToStr(jCurrent.extax.eax_a,1)
+			+ " target=" + NumToStr(jGantryEnd.extax.eax_a,1);
+		TPWrite "[TRACE] v3.0 pass " + NumToStr(pass,0) + " complete";
 
-		! --- Verify start position ---
-		actual_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
-		err_x := actual_floor.trans.x - pWeldPosR1{1}.trans.x;
-		err_y := actual_floor.trans.y - pWeldPosR1{1}.trans.y;
-		err_z := actual_floor.trans.z - pWeldPosR1{1}.trans.z;
-		err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
-		TPWrite "[TRACE] At seg 1 err=" + NumToStr(err_total,2) + "mm";
-		Write trace_log, "Seg 1 pos=[" + NumToStr(pWeldPosR1{1}.trans.x,1) + ","
-			+ NumToStr(pWeldPosR1{1}.trans.y,1) + ","
-			+ NumToStr(pWeldPosR1{1}.trans.z,1) + "] err=" + NumToStr(err_total,2) + "mm";
-
-		! --- Trace weld line: multi-segment MoveL loop ---
-		IF WELD_ARC_ENABLED = TRUE THEN
-			! v1.9.53: Actual ArcL welding with torchmotion -> ABB param conversion
-			BuildArcParams pass;
-			TPWrite "[TRACE] ARC WELD pass " + NumToStr(pass,0)
-				+ " (" + NumToStr(nSegs,0) + " segs)...";
-			Write trace_log, "ARC mode: V=" + NumToStr(curStart.Voltage,1)
-				+ "V A=" + NumToStr(curStart.Current,0)
-				+ "A WFS=" + NumToStr(curStart.FeedingSpeed,0);
-
-			IF nSegs < 2 THEN
-				! Edge case: single segment - cannot do ArcL sequence, fallback to MoveL
-				TPWrite "[TRACE] WARNING: nSegs=" + NumToStr(nSegs,0) + " < 2, MoveL fallback";
-				Write trace_log, "WARNING: nSegs < 2, ArcL requires min 2 segments, using MoveL";
-				MoveL pWeldPosR1{1}, vWeldSpeed{1}, fine, tWeld1 \WObj:=WobjFloor;
-			ELSE
-				! ArcLStart: first segment (fine zone = precise arc start)
-				ArcLStart pWeldPosR1{1}, vWeldSpeed{1}, seam1, weld1\Weave:=weave1_rob1,
-					fine, tWeld1\WObj:=WobjFloor;
-				Write trace_log, "ArcLStart seg 1 OK";
-
-				! ArcL: intermediate segments (z1 zone = continuous path)
-				FOR seg FROM 2 TO nSegs-1 DO
-					ArcL pWeldPosR1{seg}, vWeldSpeed{seg}, seam1, weld1\Weave:=weave1_rob1,
-						z1, tWeld1\WObj:=WobjFloor;
-					Write trace_log, "ArcL seg " + NumToStr(seg,0) + " OK";
-				ENDFOR
-
-				! ArcLEnd: last segment (fine zone = precise arc end)
-				ArcLEnd pWeldPosR1{nSegs}, vWeldSpeed{nSegs}, seam1, weld1\Weave:=weave1_rob1,
-					fine, tWeld1\WObj:=WobjFloor;
-				Write trace_log, "ArcLEnd seg " + NumToStr(nSegs,0) + " OK";
-			ENDIF
-		ELSE
-			! Simulation: MoveL only (no arc) - with position verification
-			TPWrite "[TRACE] MoveL weld pass " + NumToStr(pass,0) + " (" + NumToStr(nSegs,0) + " segs)...";
-			FOR seg FROM 2 TO nSegs DO
-				MoveL pWeldPosR1{seg}, vWeldSpeed{seg}, fine, tWeld1 \WObj:=WobjFloor;
-				! Verify actual position after each segment (fine zone = stopped)
-				actual_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
-				err_x := actual_floor.trans.x - pWeldPosR1{seg}.trans.x;
-				err_y := actual_floor.trans.y - pWeldPosR1{seg}.trans.y;
-				err_z := actual_floor.trans.z - pWeldPosR1{seg}.trans.z;
-				err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
-				TPWrite "[TRACE] Seg " + NumToStr(seg,0) + "/" + NumToStr(nSegs,0)
-					+ " err=" + NumToStr(err_total,2) + "mm";
-				Write trace_log, "Seg " + NumToStr(seg,0)
-					+ " cmd=[" + NumToStr(pWeldPosR1{seg}.trans.x,1)
-					+ "," + NumToStr(pWeldPosR1{seg}.trans.y,1)
-					+ "," + NumToStr(pWeldPosR1{seg}.trans.z,1) + "]"
-					+ " act=[" + NumToStr(actual_floor.trans.x,1)
-					+ "," + NumToStr(actual_floor.trans.y,1)
-					+ "," + NumToStr(actual_floor.trans.z,1) + "]"
-					+ " err=" + NumToStr(err_total,2) + "mm";
-			ENDFOR
-		ENDIF
-
-		! --- Final segment: MoveL to fine position ---
-		MoveL pWeldPosR1{nSegs}, vWeldSpeed{nSegs}, fine, tWeld1 \WObj:=WobjFloor;
-
-		! --- Verify end position ---
-		actual_floor := CRobT(\Tool:=tWeld1\WObj:=WobjFloor);
-		err_x := actual_floor.trans.x - pWeldPosR1{nSegs}.trans.x;
-		err_y := actual_floor.trans.y - pWeldPosR1{nSegs}.trans.y;
-		err_z := actual_floor.trans.z - pWeldPosR1{nSegs}.trans.z;
-		err_total := Sqrt(err_x*err_x + err_y*err_y + err_z*err_z);
-		TPWrite "[TRACE] At seg " + NumToStr(nSegs,0) + " err=" + NumToStr(err_total,2) + "mm";
-		Write trace_log, "Final seg " + NumToStr(nSegs,0) + " err=" + NumToStr(err_total,2) + "mm"
-			+ " dX=" + NumToStr(err_x,2) + " dY=" + NumToStr(err_y,2)
-			+ " dZ=" + NumToStr(err_z,2);
-
-		! --- Retract: 30mm above last segment along tool Z ---
-		retract_pos := RelTool(pWeldPosR1{nSegs}, 0, 0, -30);
-		TPWrite "[TRACE] Retract (-30mm)...";
-		MoveL retract_pos, v100, fine, tWeld1 \WObj:=WobjFloor;
-		Write trace_log, "Retract (-30mm) OK";
 
 		! --- Inter-pass delay ---
 		IF pass < nWeldPassCount THEN
@@ -5165,10 +5097,12 @@ ERROR
 		+ NumToStr(pErrPos.trans.y,1) + ","
 		+ NumToStr(pErrPos.trans.z,1) + "]";
 
-	! Step 3: Torch retract -10mm along tool Z (PlanA: RelTool 0,0,-10)
-	MoveL RelTool(pErrPos, 0, 0, -10), v100, z0, tWeld1\WObj:=WobjFloor;
-	TPWrite "[TRACE] Torch retract -10mm OK";
-	Write trace_log, "Torch retract -10mm OK";
+	! Step 3: Torch retract -10mm via WobjFloor Z offset (v1.9.59: RelTool caused 50050)
+	! WobjFloor Z decreases = world Z increases = moves UP (away from workpiece)
+	pErrPos.trans.z := pErrPos.trans.z - 10;
+	MoveL pErrPos, v100, z0, tWeld1\WObj:=WobjFloor;
+	TPWrite "[TRACE] Torch retract Z-10mm OK";
+	Write trace_log, "Torch retract Z-10mm OK";
 
 	Write trace_log, "Phase 1 error handling complete at " + CTime();
 	Close trace_log;
@@ -5546,17 +5480,14 @@ PROC TestFullWeldSequence()
 	VAR num max_wait := 300;  ! 30 seconds timeout (Robot2_WeldReady may take time)
 	VAR iodev logfile;
 
-	TPWrite "========================================";
-	TPWrite "[FULL] Full Weld Sequence v1.9.38";
-	TPWrite "========================================";
+	! v1.9.58: Removed banner TPWrites to prevent 41617 burst at startup
+	TPWrite "[FULL] Full Weld Sequence v1.9.58 start";
 
 	! Open log file
 	Open "HOME:/full_weld_sequence.txt", logfile \Write;
-	Write logfile, "Full Weld Sequence Log (v1.9.38) - " + CDate() + " " + CTime();
-	Write logfile, "";
+	Write logfile, "Full Weld Sequence Log (v1.9.58) - " + CDate() + " " + CTime();
 
 	! Step 0: Reset sync flags
-	TPWrite "[FULL] Step 0: Reset sync flags";
 	t1_weld_position_ready := FALSE;
 	t1_weld_start := FALSE;
 	t1_weld_done := FALSE;
@@ -5565,12 +5496,10 @@ PROC TestFullWeldSequence()
 	Write logfile, "Sync flags reset, shared_bRobSwap=" + ValToStr(shared_bRobSwap);
 
 	! Step 1: Check linked motor sync
-	TPWrite "[FULL] Step 1: Check linked motor sync...";
 	CheckLinkedMotorSync;
 	Write logfile, "Step 1: Linked motor sync OK";
 
 	! Step 2-3: Calculate weld position
-	TPWrite "[FULL] Step 2-3: Calculate weld position...";
 	CalcCenterFromEdges;
 	DefineWeldLine;
 	Write logfile, "Step 2-3: Weld Start=[" + NumToStr(calcPosStart.x,1) + "," + NumToStr(calcPosStart.y,1) + "," + NumToStr(calcPosStart.z,1) + "]";
@@ -5587,11 +5516,9 @@ PROC TestFullWeldSequence()
 	Write logfile, "         Robot2 edge: Start=[" + NumToStr(EDGE_START2_X,0) + "," + NumToStr(EDGE_START2_Y,0) + "," + NumToStr(EDGE_START2_Z,0) + "]"
 		+ " End=[" + NumToStr(EDGE_END2_X,0) + "," + NumToStr(EDGE_END2_Y,0) + "," + NumToStr(EDGE_END2_Z,0) + "]";
 
-	TPWrite "[RESULT] Weld Start: [" + NumToStr(calcPosStart.x,1) + "," + NumToStr(calcPosStart.y,1) + "]";
-	TPWrite "[RESULT] R-axis: " + NumToStr(nAngleRzStore,1) + " deg, bRobSwap=" + ValToStr(bRobSwap);
-
+	! v1.9.58: Removed [RESULT] TPWrites (already in logfile) to prevent 41617 burst
 	! Step 4: Move gantry
-	TPWrite "[FULL] Step 4: Move gantry...";
+	TPWrite "[FULL] Step 4+5: Moving gantry+robot...";
 	MoveGantryToWeldPosition;
 	actual_jt := CJointT();
 	Write logfile, "Step 4: Gantry X=" + NumToStr(actual_jt.extax.eax_a,1) + " Y=" + NumToStr(actual_jt.extax.eax_b,1)
