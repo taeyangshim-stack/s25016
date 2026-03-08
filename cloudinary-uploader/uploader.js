@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 require('dotenv').config();
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('cloudinary');
 const fs = require('fs');
 const path = require('path');
 

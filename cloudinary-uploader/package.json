@@ -17,11 +17,11 @@
   "author": "SP 심태양",
   "license": "MIT",
   "dependencies": {
-    "cloudinary": "^1.41.0",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "multer": "^1.4.5-lts.1",
-    "cors": "^2.8.5"
+    "cloudinary": "^2.9.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "multer": "^2.1.1",
+    "cors": "^2.8.6"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

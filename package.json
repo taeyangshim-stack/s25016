@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@notionhq/client": "^2.2.14",
-    "cloudinary": "^1.41.0",
+    "cloudinary": "^2.9.0",
     "formidable": "^3.5.1"
   },
   "engines": {

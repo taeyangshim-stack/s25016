@@ -8,7 +8,7 @@
 require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('cloudinary');
 const cors = require('cors');
 const path = require('path');
 

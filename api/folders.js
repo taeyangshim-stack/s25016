@@ -4,7 +4,7 @@
  * 엔드포인트: /api/folders
  */
 
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('cloudinary');
 
 // Cloudinary 설정
 cloudinary.config({

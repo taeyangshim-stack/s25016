@@ -4,7 +4,7 @@
  * 엔드포인트: /api/upload
  */
 
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('cloudinary');
 const { IncomingForm } = require('formidable');
 
 // Cloudinary 설정
